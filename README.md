@@ -2,8 +2,8 @@
 
 The Merge Go library provides convenient access to the Merge API from Go.
 
-[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://github.com/fern-api/fern)
-[![go shield](https://img.shields.io/badge/go-docs-blue)](https://pkg.go.dev/github.com/merge-api/merge-python-client)
+[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://github.com/merge-api/merge-go-client)
+[![go shield](https://img.shields.io/badge/go-docs-blue)](https://pkg.go.dev/github.com/merge-api/merge-go-client)
 
 ## Requirements
 
@@ -14,7 +14,7 @@ This module requires Go version >= 1.19.
 Run the following command to use the Merge Go library in your Go module:
 
 ```sh
-go get github.com/fern-api/merge-go
+go get github.com/merge-api/merge-go-client
 ```
 
 ## Instantiation
@@ -24,8 +24,8 @@ import (
   "context"
   "fmt"
 
-  merge "github.com/fern-api/merge-go"
-  mergeclient "github.com/fern-api/merge-go/client"
+  merge "github.com/merge-api/merge-go-client"
+  mergeclient "github.com/merge-api/merge-go-client/client"
 )
 
 client := mergeclient.NewClient(
@@ -168,6 +168,7 @@ fmt.Printf("Retrieved candidate with ID %q\n", *candidate.Id)
 import (
   "context"
   "fmt"
+  "time"
 
   merge "github.com/fern-api/merge-go"
   mergeclient "github.com/fern-api/merge-go/client"
