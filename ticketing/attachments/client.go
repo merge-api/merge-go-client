@@ -76,6 +76,9 @@ func (c *client) List(ctx context.Context, request *ticketing.AttachmentsListReq
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}
+	if request.RemoteCreatedAfter != nil {
+		queryParams.Add("remote_created_after", fmt.Sprintf("%v", request.RemoteCreatedAfter.Format(time.RFC3339)))
+	}
 	if request.RemoteId != nil {
 		queryParams.Add("remote_id", fmt.Sprintf("%v", *request.RemoteId))
 	}

@@ -2805,6 +2805,10 @@ func (a *AddressTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type AsyncPassthroughReciept struct {
+	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+}
+
 // # The AvailableActions Object
 // ### Description
 // The `Activity` object is used to see all available model/operation combinations for an integration.
@@ -3139,7 +3143,7 @@ type BalanceSheet struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *BalanceSheetCurrency `json:"currency,omitempty"`
 	// `Company` object for the given `BalanceSheet` object.
-	Company *string `json:"company,omitempty"`
+	Company *BalanceSheetCompany `json:"company,omitempty"`
 	// The balance sheet's date. The balance sheet data will reflect the company's financial position this point in time.
 	Date *time.Time `json:"date,omitempty"`
 	// The balance sheet's net assets.
@@ -3155,6 +3159,64 @@ type BalanceSheet struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// `Company` object for the given `BalanceSheet` object.
+type BalanceSheetCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewBalanceSheetCompanyFromString(value string) *BalanceSheetCompany {
+	return &BalanceSheetCompany{typeName: "string", String: value}
+}
+
+func NewBalanceSheetCompanyFromCompanyInfo(value *CompanyInfo) *BalanceSheetCompany {
+	return &BalanceSheetCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (b *BalanceSheetCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		b.typeName = "companyInfo"
+		b.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BalanceSheetCompany) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return json.Marshal(b.String)
+	case "companyInfo":
+		return json.Marshal(b.CompanyInfo)
+	}
+}
+
+type BalanceSheetCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (b *BalanceSheetCompany) Accept(visitor BalanceSheetCompanyVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return visitor.VisitString(b.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(b.CompanyInfo)
+	}
 }
 
 // The balance sheet's currency.
@@ -3844,7 +3906,7 @@ type CashFlowStatement struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *CashFlowStatementCurrency `json:"currency,omitempty"`
 	// The company the cash flow statement belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *CashFlowStatementCompany `json:"company,omitempty"`
 	// The cash flow statement's start period.
 	StartPeriod *time.Time `json:"start_period,omitempty"`
 	// The cash flow statement's end period.
@@ -3864,6 +3926,64 @@ type CashFlowStatement struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the cash flow statement belongs to.
+type CashFlowStatementCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewCashFlowStatementCompanyFromString(value string) *CashFlowStatementCompany {
+	return &CashFlowStatementCompany{typeName: "string", String: value}
+}
+
+func NewCashFlowStatementCompanyFromCompanyInfo(value *CompanyInfo) *CashFlowStatementCompany {
+	return &CashFlowStatementCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (c *CashFlowStatementCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typeName = "companyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CashFlowStatementCompany) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "companyInfo":
+		return json.Marshal(c.CompanyInfo)
+	}
+}
+
+type CashFlowStatementCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *CashFlowStatementCompany) Accept(visitor CashFlowStatementCompanyVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
 }
 
 // The cash flow statement's currency.
@@ -7591,9 +7711,9 @@ type CreditNote struct {
 	// The credit note's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The amount of value remaining in the credit note that the customer can use.
-	RemainingCredit    *float64              `json:"remaining_credit,omitempty"`
-	LineItems          []*CreditNoteLineItem `json:"line_items,omitempty"`
-	TrackingCategories []*string             `json:"tracking_categories,omitempty"`
+	RemainingCredit    *float64                            `json:"remaining_credit,omitempty"`
+	LineItems          []*CreditNoteLineItem               `json:"line_items,omitempty"`
+	TrackingCategories []*CreditNoteTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The credit note's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -7908,7 +8028,7 @@ type CreditNote struct {
 	// When the third party's credit note was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Array of `Payment` object IDs
-	Payments []*string `json:"payments,omitempty"`
+	Payments []*CreditNotePaymentsItem `json:"payments,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -8283,7 +8403,7 @@ func (c *CreditNoteCurrency) Accept(visitor CreditNoteCurrencyVisitor) error {
 }
 
 type CreditNoteLineItem struct {
-	Item *string `json:"item,omitempty"`
+	Item *CreditNoteLineItemItem `json:"item,omitempty"`
 	// The credit note line item's name.
 	Name *string `json:"name,omitempty"`
 	// The description of the item that is owed.
@@ -8305,11 +8425,183 @@ type CreditNoteLineItem struct {
 	// The credit note line item's account.
 	Account *string `json:"account,omitempty"`
 	// The company the credit note belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *CreditNoteLineItemCompany `json:"company,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// The company the credit note belongs to.
+type CreditNoteLineItemCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewCreditNoteLineItemCompanyFromString(value string) *CreditNoteLineItemCompany {
+	return &CreditNoteLineItemCompany{typeName: "string", String: value}
+}
+
+func NewCreditNoteLineItemCompanyFromCompanyInfo(value *CompanyInfo) *CreditNoteLineItemCompany {
+	return &CreditNoteLineItemCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (c *CreditNoteLineItemCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typeName = "companyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemCompany) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "companyInfo":
+		return json.Marshal(c.CompanyInfo)
+	}
+}
+
+type CreditNoteLineItemCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *CreditNoteLineItemCompany) Accept(visitor CreditNoteLineItemCompanyVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
+}
+
+type CreditNoteLineItemItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewCreditNoteLineItemItemFromString(value string) *CreditNoteLineItemItem {
+	return &CreditNoteLineItemItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteLineItemItemFromItem(value *Item) *CreditNoteLineItemItem {
+	return &CreditNoteLineItemItem{typeName: "item", Item: value}
+}
+
+func (c *CreditNoteLineItemItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		c.typeName = "item"
+		c.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "item":
+		return json.Marshal(c.Item)
+	}
+}
+
+type CreditNoteLineItemItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (c *CreditNoteLineItemItem) Accept(visitor CreditNoteLineItemItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "item":
+		return visitor.VisitItem(c.Item)
+	}
+}
+
+type CreditNotePaymentsItem struct {
+	typeName string
+	String   string
+	Payment  *Payment
+}
+
+func NewCreditNotePaymentsItemFromString(value string) *CreditNotePaymentsItem {
+	return &CreditNotePaymentsItem{typeName: "string", String: value}
+}
+
+func NewCreditNotePaymentsItemFromPayment(value *Payment) *CreditNotePaymentsItem {
+	return &CreditNotePaymentsItem{typeName: "payment", Payment: value}
+}
+
+func (c *CreditNotePaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valuePayment := new(Payment)
+	if err := json.Unmarshal(data, &valuePayment); err == nil {
+		c.typeName = "payment"
+		c.Payment = valuePayment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNotePaymentsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "payment":
+		return json.Marshal(c.Payment)
+	}
+}
+
+type CreditNotePaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPayment(*Payment) error
+}
+
+func (c *CreditNotePaymentsItem) Accept(visitor CreditNotePaymentsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "payment":
+		return visitor.VisitPayment(c.Payment)
+	}
 }
 
 // The credit note's status.
@@ -8419,6 +8711,63 @@ func (c *CreditNoteStatusEnum) UnmarshalJSON(data []byte) error {
 		*c = value
 	}
 	return nil
+}
+
+type CreditNoteTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewCreditNoteTrackingCategoriesItemFromString(value string) *CreditNoteTrackingCategoriesItem {
+	return &CreditNoteTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *CreditNoteTrackingCategoriesItem {
+	return &CreditNoteTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (c *CreditNoteTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		c.typeName = "trackingCategory"
+		c.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "trackingCategory":
+		return json.Marshal(c.TrackingCategory)
+	}
+}
+
+type CreditNoteTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (c *CreditNoteTrackingCategoriesItem) Accept(visitor CreditNoteTrackingCategoriesItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(c.TrackingCategory)
+	}
 }
 
 type CreditNotesListRequestExpand uint
@@ -10901,6 +11250,29 @@ func (c *CurrencyEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// # The DataPassthrough Object
+// ### Description
+// The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
+//
+// ### Usage Example
+// Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
+type DataPassthroughRequest struct {
+	Method MethodEnum `json:"method,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Path string `json:"path"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Data *string `json:"data,omitempty"`
+	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
+	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
+	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
+	Headers       map[string]any     `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
+	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+}
+
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
@@ -11019,9 +11391,9 @@ type Expense struct {
 	// When the expense was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// The expense's payment account.
-	Account *string `json:"account,omitempty"`
+	Account *ExpenseAccount `json:"account,omitempty"`
 	// The expense's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *ExpenseContact `json:"contact,omitempty"`
 	// The expense's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The expense's currency.
@@ -11336,11 +11708,11 @@ type Expense struct {
 	// The expense's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the expense belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *ExpenseCompany `json:"company,omitempty"`
 	// The expense's private note.
-	Memo               *string        `json:"memo,omitempty"`
-	Lines              []*ExpenseLine `json:"lines,omitempty"`
-	TrackingCategories []*string      `json:"tracking_categories,omitempty"`
+	Memo               *string                          `json:"memo,omitempty"`
+	Lines              []*ExpenseLine                   `json:"lines,omitempty"`
+	TrackingCategories []*ExpenseTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
@@ -11350,6 +11722,180 @@ type Expense struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The expense's payment account.
+type ExpenseAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewExpenseAccountFromString(value string) *ExpenseAccount {
+	return &ExpenseAccount{typeName: "string", String: value}
+}
+
+func NewExpenseAccountFromAccount(value *Account) *ExpenseAccount {
+	return &ExpenseAccount{typeName: "account", Account: value}
+}
+
+func (e *ExpenseAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typeName = "account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseAccount) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "account":
+		return json.Marshal(e.Account)
+	}
+}
+
+type ExpenseAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *ExpenseAccount) Accept(visitor ExpenseAccountVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "account":
+		return visitor.VisitAccount(e.Account)
+	}
+}
+
+// The company the expense belongs to.
+type ExpenseCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewExpenseCompanyFromString(value string) *ExpenseCompany {
+	return &ExpenseCompany{typeName: "string", String: value}
+}
+
+func NewExpenseCompanyFromCompanyInfo(value *CompanyInfo) *ExpenseCompany {
+	return &ExpenseCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (e *ExpenseCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		e.typeName = "companyInfo"
+		e.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseCompany) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "companyInfo":
+		return json.Marshal(e.CompanyInfo)
+	}
+}
+
+type ExpenseCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (e *ExpenseCompany) Accept(visitor ExpenseCompanyVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(e.CompanyInfo)
+	}
+}
+
+// The expense's contact.
+type ExpenseContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewExpenseContactFromString(value string) *ExpenseContact {
+	return &ExpenseContact{typeName: "string", String: value}
+}
+
+func NewExpenseContactFromContact(value *Contact) *ExpenseContact {
+	return &ExpenseContact{typeName: "contact", Contact: value}
+}
+
+func (e *ExpenseContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typeName = "contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseContact) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "contact":
+		return json.Marshal(e.Contact)
+	}
+}
+
+type ExpenseContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *ExpenseContact) Accept(visitor ExpenseContactVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "contact":
+		return visitor.VisitContact(e.Contact)
+	}
 }
 
 // The expense's currency.
@@ -11727,23 +12273,197 @@ type ExpenseLine struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The line's item.
-	Item *string `json:"item,omitempty"`
+	Item *ExpenseLineItem `json:"item,omitempty"`
 	// The line's net amount.
-	NetAmount          *float64  `json:"net_amount,omitempty"`
-	TrackingCategory   *string   `json:"tracking_category,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	NetAmount          *float64                             `json:"net_amount,omitempty"`
+	TrackingCategory   *ExpenseLineTrackingCategory         `json:"tracking_category,omitempty"`
+	TrackingCategories []*ExpenseLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
 	// The expense's payment account.
-	Account *string `json:"account,omitempty"`
+	Account *ExpenseLineAccount `json:"account,omitempty"`
 	// The expense's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *ExpenseLineContact `json:"contact,omitempty"`
 	// The description of the item that was purchased by the company.
 	Description *string `json:"description,omitempty"`
 	// The expense line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// The expense's payment account.
+type ExpenseLineAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewExpenseLineAccountFromString(value string) *ExpenseLineAccount {
+	return &ExpenseLineAccount{typeName: "string", String: value}
+}
+
+func NewExpenseLineAccountFromAccount(value *Account) *ExpenseLineAccount {
+	return &ExpenseLineAccount{typeName: "account", Account: value}
+}
+
+func (e *ExpenseLineAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typeName = "account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineAccount) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "account":
+		return json.Marshal(e.Account)
+	}
+}
+
+type ExpenseLineAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *ExpenseLineAccount) Accept(visitor ExpenseLineAccountVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "account":
+		return visitor.VisitAccount(e.Account)
+	}
+}
+
+// The expense's contact.
+type ExpenseLineContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewExpenseLineContactFromString(value string) *ExpenseLineContact {
+	return &ExpenseLineContact{typeName: "string", String: value}
+}
+
+func NewExpenseLineContactFromContact(value *Contact) *ExpenseLineContact {
+	return &ExpenseLineContact{typeName: "contact", Contact: value}
+}
+
+func (e *ExpenseLineContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typeName = "contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineContact) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "contact":
+		return json.Marshal(e.Contact)
+	}
+}
+
+type ExpenseLineContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *ExpenseLineContact) Accept(visitor ExpenseLineContactVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "contact":
+		return visitor.VisitContact(e.Contact)
+	}
+}
+
+// The line's item.
+type ExpenseLineItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewExpenseLineItemFromString(value string) *ExpenseLineItem {
+	return &ExpenseLineItem{typeName: "string", String: value}
+}
+
+func NewExpenseLineItemFromItem(value *Item) *ExpenseLineItem {
+	return &ExpenseLineItem{typeName: "item", Item: value}
+}
+
+func (e *ExpenseLineItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		e.typeName = "item"
+		e.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "item":
+		return json.Marshal(e.Item)
+	}
+}
+
+type ExpenseLineItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (e *ExpenseLineItem) Accept(visitor ExpenseLineItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "item":
+		return visitor.VisitItem(e.Item)
+	}
 }
 
 // # The ExpenseLine Object
@@ -11756,23 +12476,425 @@ type ExpenseLineRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The line's item.
-	Item *string `json:"item,omitempty"`
+	Item *ExpenseLineRequestItem `json:"item,omitempty"`
 	// The line's net amount.
-	NetAmount          *float64  `json:"net_amount,omitempty"`
-	TrackingCategory   *string   `json:"tracking_category,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	NetAmount          *float64                                    `json:"net_amount,omitempty"`
+	TrackingCategory   *ExpenseLineRequestTrackingCategory         `json:"tracking_category,omitempty"`
+	TrackingCategories []*ExpenseLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
 	// The expense's payment account.
-	Account *string `json:"account,omitempty"`
+	Account *ExpenseLineRequestAccount `json:"account,omitempty"`
 	// The expense's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *ExpenseLineRequestContact `json:"contact,omitempty"`
 	// The description of the item that was purchased by the company.
 	Description *string `json:"description,omitempty"`
 	// The expense line item's exchange rate.
 	ExchangeRate        *string        `json:"exchange_rate,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The expense's payment account.
+type ExpenseLineRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewExpenseLineRequestAccountFromString(value string) *ExpenseLineRequestAccount {
+	return &ExpenseLineRequestAccount{typeName: "string", String: value}
+}
+
+func NewExpenseLineRequestAccountFromAccount(value *Account) *ExpenseLineRequestAccount {
+	return &ExpenseLineRequestAccount{typeName: "account", Account: value}
+}
+
+func (e *ExpenseLineRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typeName = "account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineRequestAccount) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "account":
+		return json.Marshal(e.Account)
+	}
+}
+
+type ExpenseLineRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *ExpenseLineRequestAccount) Accept(visitor ExpenseLineRequestAccountVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "account":
+		return visitor.VisitAccount(e.Account)
+	}
+}
+
+// The expense's contact.
+type ExpenseLineRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewExpenseLineRequestContactFromString(value string) *ExpenseLineRequestContact {
+	return &ExpenseLineRequestContact{typeName: "string", String: value}
+}
+
+func NewExpenseLineRequestContactFromContact(value *Contact) *ExpenseLineRequestContact {
+	return &ExpenseLineRequestContact{typeName: "contact", Contact: value}
+}
+
+func (e *ExpenseLineRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typeName = "contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineRequestContact) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "contact":
+		return json.Marshal(e.Contact)
+	}
+}
+
+type ExpenseLineRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *ExpenseLineRequestContact) Accept(visitor ExpenseLineRequestContactVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "contact":
+		return visitor.VisitContact(e.Contact)
+	}
+}
+
+// The line's item.
+type ExpenseLineRequestItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewExpenseLineRequestItemFromString(value string) *ExpenseLineRequestItem {
+	return &ExpenseLineRequestItem{typeName: "string", String: value}
+}
+
+func NewExpenseLineRequestItemFromItem(value *Item) *ExpenseLineRequestItem {
+	return &ExpenseLineRequestItem{typeName: "item", Item: value}
+}
+
+func (e *ExpenseLineRequestItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		e.typeName = "item"
+		e.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineRequestItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "item":
+		return json.Marshal(e.Item)
+	}
+}
+
+type ExpenseLineRequestItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (e *ExpenseLineRequestItem) Accept(visitor ExpenseLineRequestItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "item":
+		return visitor.VisitItem(e.Item)
+	}
+}
+
+type ExpenseLineRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewExpenseLineRequestTrackingCategoriesItemFromString(value string) *ExpenseLineRequestTrackingCategoriesItem {
+	return &ExpenseLineRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewExpenseLineRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *ExpenseLineRequestTrackingCategoriesItem {
+	return &ExpenseLineRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (e *ExpenseLineRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		e.typeName = "trackingCategory"
+		e.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "trackingCategory":
+		return json.Marshal(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (e *ExpenseLineRequestTrackingCategoriesItem) Accept(visitor ExpenseLineRequestTrackingCategoriesItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineRequestTrackingCategory struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewExpenseLineRequestTrackingCategoryFromString(value string) *ExpenseLineRequestTrackingCategory {
+	return &ExpenseLineRequestTrackingCategory{typeName: "string", String: value}
+}
+
+func NewExpenseLineRequestTrackingCategoryFromTrackingCategory(value *TrackingCategory) *ExpenseLineRequestTrackingCategory {
+	return &ExpenseLineRequestTrackingCategory{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (e *ExpenseLineRequestTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		e.typeName = "trackingCategory"
+		e.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineRequestTrackingCategory) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "trackingCategory":
+		return json.Marshal(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineRequestTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (e *ExpenseLineRequestTrackingCategory) Accept(visitor ExpenseLineRequestTrackingCategoryVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewExpenseLineTrackingCategoriesItemFromString(value string) *ExpenseLineTrackingCategoriesItem {
+	return &ExpenseLineTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewExpenseLineTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *ExpenseLineTrackingCategoriesItem {
+	return &ExpenseLineTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (e *ExpenseLineTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		e.typeName = "trackingCategory"
+		e.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "trackingCategory":
+		return json.Marshal(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (e *ExpenseLineTrackingCategoriesItem) Accept(visitor ExpenseLineTrackingCategoriesItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineTrackingCategory struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewExpenseLineTrackingCategoryFromString(value string) *ExpenseLineTrackingCategory {
+	return &ExpenseLineTrackingCategory{typeName: "string", String: value}
+}
+
+func NewExpenseLineTrackingCategoryFromTrackingCategory(value *TrackingCategory) *ExpenseLineTrackingCategory {
+	return &ExpenseLineTrackingCategory{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (e *ExpenseLineTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		e.typeName = "trackingCategory"
+		e.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineTrackingCategory) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "trackingCategory":
+		return json.Marshal(e.TrackingCategory)
+	}
+}
+
+type ExpenseLineTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (e *ExpenseLineTrackingCategory) Accept(visitor ExpenseLineTrackingCategoryVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(e.TrackingCategory)
+	}
 }
 
 // # The Expense Object
@@ -11785,9 +12907,9 @@ type ExpenseRequest struct {
 	// When the transaction occurred.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The expense's payment account.
-	Account *string `json:"account,omitempty"`
+	Account *ExpenseRequestAccount `json:"account,omitempty"`
 	// The expense's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *ExpenseRequestContact `json:"contact,omitempty"`
 	// The expense's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The expense's currency.
@@ -12102,13 +13224,187 @@ type ExpenseRequest struct {
 	// The expense's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the expense belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *ExpenseRequestCompany `json:"company,omitempty"`
 	// The expense's private note.
-	Memo                *string               `json:"memo,omitempty"`
-	Lines               []*ExpenseLineRequest `json:"lines,omitempty"`
-	TrackingCategories  []*string             `json:"tracking_categories,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
+	Memo                *string                                 `json:"memo,omitempty"`
+	Lines               []*ExpenseLineRequest                   `json:"lines,omitempty"`
+	TrackingCategories  []*ExpenseRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	IntegrationParams   map[string]any                          `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                          `json:"linked_account_params,omitempty"`
+}
+
+// The expense's payment account.
+type ExpenseRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewExpenseRequestAccountFromString(value string) *ExpenseRequestAccount {
+	return &ExpenseRequestAccount{typeName: "string", String: value}
+}
+
+func NewExpenseRequestAccountFromAccount(value *Account) *ExpenseRequestAccount {
+	return &ExpenseRequestAccount{typeName: "account", Account: value}
+}
+
+func (e *ExpenseRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typeName = "account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseRequestAccount) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "account":
+		return json.Marshal(e.Account)
+	}
+}
+
+type ExpenseRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *ExpenseRequestAccount) Accept(visitor ExpenseRequestAccountVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "account":
+		return visitor.VisitAccount(e.Account)
+	}
+}
+
+// The company the expense belongs to.
+type ExpenseRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewExpenseRequestCompanyFromString(value string) *ExpenseRequestCompany {
+	return &ExpenseRequestCompany{typeName: "string", String: value}
+}
+
+func NewExpenseRequestCompanyFromCompanyInfo(value *CompanyInfo) *ExpenseRequestCompany {
+	return &ExpenseRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (e *ExpenseRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		e.typeName = "companyInfo"
+		e.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseRequestCompany) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "companyInfo":
+		return json.Marshal(e.CompanyInfo)
+	}
+}
+
+type ExpenseRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (e *ExpenseRequestCompany) Accept(visitor ExpenseRequestCompanyVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(e.CompanyInfo)
+	}
+}
+
+// The expense's contact.
+type ExpenseRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewExpenseRequestContactFromString(value string) *ExpenseRequestContact {
+	return &ExpenseRequestContact{typeName: "string", String: value}
+}
+
+func NewExpenseRequestContactFromContact(value *Contact) *ExpenseRequestContact {
+	return &ExpenseRequestContact{typeName: "contact", Contact: value}
+}
+
+func (e *ExpenseRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typeName = "contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseRequestContact) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "contact":
+		return json.Marshal(e.Contact)
+	}
+}
+
+type ExpenseRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *ExpenseRequestContact) Accept(visitor ExpenseRequestContactVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "contact":
+		return visitor.VisitContact(e.Contact)
+	}
 }
 
 // The expense's currency.
@@ -12476,11 +13772,125 @@ func (e *ExpenseRequestCurrency) Accept(visitor ExpenseRequestCurrencyVisitor) e
 	}
 }
 
+type ExpenseRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewExpenseRequestTrackingCategoriesItemFromString(value string) *ExpenseRequestTrackingCategoriesItem {
+	return &ExpenseRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewExpenseRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *ExpenseRequestTrackingCategoriesItem {
+	return &ExpenseRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (e *ExpenseRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		e.typeName = "trackingCategory"
+		e.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "trackingCategory":
+		return json.Marshal(e.TrackingCategory)
+	}
+}
+
+type ExpenseRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (e *ExpenseRequestTrackingCategoriesItem) Accept(visitor ExpenseRequestTrackingCategoriesItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(e.TrackingCategory)
+	}
+}
+
 type ExpenseResponse struct {
 	Model    *Expense                    `json:"model,omitempty"`
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+type ExpenseTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewExpenseTrackingCategoriesItemFromString(value string) *ExpenseTrackingCategoriesItem {
+	return &ExpenseTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewExpenseTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *ExpenseTrackingCategoriesItem {
+	return &ExpenseTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (e *ExpenseTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		e.typeName = "trackingCategory"
+		e.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "trackingCategory":
+		return json.Marshal(e.TrackingCategory)
+	}
+}
+
+type ExpenseTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (e *ExpenseTrackingCategoriesItem) Accept(visitor ExpenseTrackingCategoriesItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(e.TrackingCategory)
+	}
 }
 
 type ExpensesListRequestExpand uint
@@ -13037,7 +14447,7 @@ type IncomeStatement struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *IncomeStatementCurrency `json:"currency,omitempty"`
 	// The company the income statement belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *IncomeStatementCompany `json:"company,omitempty"`
 	// The income statement's start period.
 	StartPeriod *time.Time `json:"start_period,omitempty"`
 	// The income statement's end period.
@@ -13058,6 +14468,64 @@ type IncomeStatement struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the income statement belongs to.
+type IncomeStatementCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewIncomeStatementCompanyFromString(value string) *IncomeStatementCompany {
+	return &IncomeStatementCompany{typeName: "string", String: value}
+}
+
+func NewIncomeStatementCompanyFromCompanyInfo(value *CompanyInfo) *IncomeStatementCompany {
+	return &IncomeStatementCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (i *IncomeStatementCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		i.typeName = "companyInfo"
+		i.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i IncomeStatementCompany) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "companyInfo":
+		return json.Marshal(i.CompanyInfo)
+	}
+}
+
+type IncomeStatementCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (i *IncomeStatementCompany) Accept(visitor IncomeStatementCompanyVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(i.CompanyInfo)
+	}
 }
 
 // The income statement's currency.
@@ -13439,7 +14907,7 @@ type Invoice struct {
 	// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
 	Type *InvoiceType `json:"type,omitempty"`
 	// The invoice's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *InvoiceContact `json:"contact,omitempty"`
 	// The invoice's number.
 	Number *string `json:"number,omitempty"`
 	// The invoice's issue date.
@@ -13451,7 +14919,7 @@ type Invoice struct {
 	// The invoice's private note.
 	Memo *string `json:"memo,omitempty"`
 	// The company the invoice belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *InvoiceCompany `json:"company,omitempty"`
 	// The invoice's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -13774,18 +15242,134 @@ type Invoice struct {
 	// The invoice's remaining balance.
 	Balance *float64 `json:"balance,omitempty"`
 	// When the third party's invoice entry was updated.
-	RemoteUpdatedAt    *time.Time `json:"remote_updated_at,omitempty"`
-	TrackingCategories []*string  `json:"tracking_categories,omitempty"`
+	RemoteUpdatedAt    *time.Time                       `json:"remote_updated_at,omitempty"`
+	TrackingCategories []*InvoiceTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// Array of `Payment` object IDs.
-	Payments         []*string          `json:"payments,omitempty"`
-	LineItems        []*InvoiceLineItem `json:"line_items,omitempty"`
-	RemoteWasDeleted *bool              `json:"remote_was_deleted,omitempty"`
+	Payments         []*InvoicePaymentsItem `json:"payments,omitempty"`
+	LineItems        []*InvoiceLineItem     `json:"line_items,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the invoice belongs to.
+type InvoiceCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewInvoiceCompanyFromString(value string) *InvoiceCompany {
+	return &InvoiceCompany{typeName: "string", String: value}
+}
+
+func NewInvoiceCompanyFromCompanyInfo(value *CompanyInfo) *InvoiceCompany {
+	return &InvoiceCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (i *InvoiceCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		i.typeName = "companyInfo"
+		i.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceCompany) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "companyInfo":
+		return json.Marshal(i.CompanyInfo)
+	}
+}
+
+type InvoiceCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (i *InvoiceCompany) Accept(visitor InvoiceCompanyVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(i.CompanyInfo)
+	}
+}
+
+// The invoice's contact.
+type InvoiceContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewInvoiceContactFromString(value string) *InvoiceContact {
+	return &InvoiceContact{typeName: "string", String: value}
+}
+
+func NewInvoiceContactFromContact(value *Contact) *InvoiceContact {
+	return &InvoiceContact{typeName: "contact", Contact: value}
+}
+
+func (i *InvoiceContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		i.typeName = "contact"
+		i.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceContact) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "contact":
+		return json.Marshal(i.Contact)
+	}
+}
+
+type InvoiceContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (i *InvoiceContact) Accept(visitor InvoiceContactVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "contact":
+		return visitor.VisitContact(i.Contact)
+	}
 }
 
 // The invoice's currency.
@@ -14480,17 +16064,74 @@ type InvoiceLineItem struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *InvoiceLineItemCurrency `json:"currency,omitempty"`
 	// The line item's exchange rate.
-	ExchangeRate       *string   `json:"exchange_rate,omitempty"`
-	Item               *string   `json:"item,omitempty"`
-	Account            *string   `json:"account,omitempty"`
-	TrackingCategory   *string   `json:"tracking_category,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	ExchangeRate       *string                                  `json:"exchange_rate,omitempty"`
+	Item               *InvoiceLineItemItem                     `json:"item,omitempty"`
+	Account            *InvoiceLineItemAccount                  `json:"account,omitempty"`
+	TrackingCategory   *InvoiceLineItemTrackingCategory         `json:"tracking_category,omitempty"`
+	TrackingCategories []*InvoiceLineItemTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The company the line item belongs to.
 	Company *string `json:"company,omitempty"`
 	Id      *string `json:"id,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
+}
+
+type InvoiceLineItemAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewInvoiceLineItemAccountFromString(value string) *InvoiceLineItemAccount {
+	return &InvoiceLineItemAccount{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemAccountFromAccount(value *Account) *InvoiceLineItemAccount {
+	return &InvoiceLineItemAccount{typeName: "account", Account: value}
+}
+
+func (i *InvoiceLineItemAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		i.typeName = "account"
+		i.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemAccount) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "account":
+		return json.Marshal(i.Account)
+	}
+}
+
+type InvoiceLineItemAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (i *InvoiceLineItemAccount) Accept(visitor InvoiceLineItemAccountVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "account":
+		return visitor.VisitAccount(i.Account)
+	}
 }
 
 // The line item's currency.
@@ -14858,6 +16499,63 @@ func (i *InvoiceLineItemCurrency) Accept(visitor InvoiceLineItemCurrencyVisitor)
 	}
 }
 
+type InvoiceLineItemItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewInvoiceLineItemItemFromString(value string) *InvoiceLineItemItem {
+	return &InvoiceLineItemItem{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemItemFromItem(value *Item) *InvoiceLineItemItem {
+	return &InvoiceLineItemItem{typeName: "item", Item: value}
+}
+
+func (i *InvoiceLineItemItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		i.typeName = "item"
+		i.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "item":
+		return json.Marshal(i.Item)
+	}
+}
+
+type InvoiceLineItemItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (i *InvoiceLineItemItem) Accept(visitor InvoiceLineItemItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "item":
+		return visitor.VisitItem(i.Item)
+	}
+}
+
 // # The InvoiceLineItem Object
 // ### Description
 // The `InvoiceLineItem` object represents an itemized record of goods and/or services sold to a customer.
@@ -15185,15 +16883,72 @@ type InvoiceLineItemRequest struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *InvoiceLineItemRequestCurrency `json:"currency,omitempty"`
 	// The line item's exchange rate.
-	ExchangeRate       *string   `json:"exchange_rate,omitempty"`
-	Item               *string   `json:"item,omitempty"`
-	Account            *string   `json:"account,omitempty"`
-	TrackingCategory   *string   `json:"tracking_category,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	ExchangeRate       *string                                         `json:"exchange_rate,omitempty"`
+	Item               *InvoiceLineItemRequestItem                     `json:"item,omitempty"`
+	Account            *InvoiceLineItemRequestAccount                  `json:"account,omitempty"`
+	TrackingCategory   *InvoiceLineItemRequestTrackingCategory         `json:"tracking_category,omitempty"`
+	TrackingCategories []*InvoiceLineItemRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The company the line item belongs to.
 	Company             *string        `json:"company,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+type InvoiceLineItemRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewInvoiceLineItemRequestAccountFromString(value string) *InvoiceLineItemRequestAccount {
+	return &InvoiceLineItemRequestAccount{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemRequestAccountFromAccount(value *Account) *InvoiceLineItemRequestAccount {
+	return &InvoiceLineItemRequestAccount{typeName: "account", Account: value}
+}
+
+func (i *InvoiceLineItemRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		i.typeName = "account"
+		i.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemRequestAccount) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "account":
+		return json.Marshal(i.Account)
+	}
+}
+
+type InvoiceLineItemRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (i *InvoiceLineItemRequestAccount) Accept(visitor InvoiceLineItemRequestAccountVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "account":
+		return visitor.VisitAccount(i.Account)
+	}
 }
 
 // The line item's currency.
@@ -15561,6 +17316,348 @@ func (i *InvoiceLineItemRequestCurrency) Accept(visitor InvoiceLineItemRequestCu
 	}
 }
 
+type InvoiceLineItemRequestItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewInvoiceLineItemRequestItemFromString(value string) *InvoiceLineItemRequestItem {
+	return &InvoiceLineItemRequestItem{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemRequestItemFromItem(value *Item) *InvoiceLineItemRequestItem {
+	return &InvoiceLineItemRequestItem{typeName: "item", Item: value}
+}
+
+func (i *InvoiceLineItemRequestItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		i.typeName = "item"
+		i.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemRequestItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "item":
+		return json.Marshal(i.Item)
+	}
+}
+
+type InvoiceLineItemRequestItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (i *InvoiceLineItemRequestItem) Accept(visitor InvoiceLineItemRequestItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "item":
+		return visitor.VisitItem(i.Item)
+	}
+}
+
+type InvoiceLineItemRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewInvoiceLineItemRequestTrackingCategoriesItemFromString(value string) *InvoiceLineItemRequestTrackingCategoriesItem {
+	return &InvoiceLineItemRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *InvoiceLineItemRequestTrackingCategoriesItem {
+	return &InvoiceLineItemRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (i *InvoiceLineItemRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		i.typeName = "trackingCategory"
+		i.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "trackingCategory":
+		return json.Marshal(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (i *InvoiceLineItemRequestTrackingCategoriesItem) Accept(visitor InvoiceLineItemRequestTrackingCategoriesItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemRequestTrackingCategory struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewInvoiceLineItemRequestTrackingCategoryFromString(value string) *InvoiceLineItemRequestTrackingCategory {
+	return &InvoiceLineItemRequestTrackingCategory{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemRequestTrackingCategoryFromTrackingCategory(value *TrackingCategory) *InvoiceLineItemRequestTrackingCategory {
+	return &InvoiceLineItemRequestTrackingCategory{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (i *InvoiceLineItemRequestTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		i.typeName = "trackingCategory"
+		i.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemRequestTrackingCategory) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "trackingCategory":
+		return json.Marshal(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemRequestTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (i *InvoiceLineItemRequestTrackingCategory) Accept(visitor InvoiceLineItemRequestTrackingCategoryVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewInvoiceLineItemTrackingCategoriesItemFromString(value string) *InvoiceLineItemTrackingCategoriesItem {
+	return &InvoiceLineItemTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *InvoiceLineItemTrackingCategoriesItem {
+	return &InvoiceLineItemTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (i *InvoiceLineItemTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		i.typeName = "trackingCategory"
+		i.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "trackingCategory":
+		return json.Marshal(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (i *InvoiceLineItemTrackingCategoriesItem) Accept(visitor InvoiceLineItemTrackingCategoriesItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemTrackingCategory struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewInvoiceLineItemTrackingCategoryFromString(value string) *InvoiceLineItemTrackingCategory {
+	return &InvoiceLineItemTrackingCategory{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemTrackingCategoryFromTrackingCategory(value *TrackingCategory) *InvoiceLineItemTrackingCategory {
+	return &InvoiceLineItemTrackingCategory{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (i *InvoiceLineItemTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		i.typeName = "trackingCategory"
+		i.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemTrackingCategory) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "trackingCategory":
+		return json.Marshal(i.TrackingCategory)
+	}
+}
+
+type InvoiceLineItemTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (i *InvoiceLineItemTrackingCategory) Accept(visitor InvoiceLineItemTrackingCategoryVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(i.TrackingCategory)
+	}
+}
+
+type InvoicePaymentsItem struct {
+	typeName string
+	String   string
+	Payment  *Payment
+}
+
+func NewInvoicePaymentsItemFromString(value string) *InvoicePaymentsItem {
+	return &InvoicePaymentsItem{typeName: "string", String: value}
+}
+
+func NewInvoicePaymentsItemFromPayment(value *Payment) *InvoicePaymentsItem {
+	return &InvoicePaymentsItem{typeName: "payment", Payment: value}
+}
+
+func (i *InvoicePaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valuePayment := new(Payment)
+	if err := json.Unmarshal(data, &valuePayment); err == nil {
+		i.typeName = "payment"
+		i.Payment = valuePayment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoicePaymentsItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "payment":
+		return json.Marshal(i.Payment)
+	}
+}
+
+type InvoicePaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPayment(*Payment) error
+}
+
+func (i *InvoicePaymentsItem) Accept(visitor InvoicePaymentsItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "payment":
+		return visitor.VisitPayment(i.Payment)
+	}
+}
+
 // # The Invoice Object
 //
 //	### Description
@@ -15577,7 +17674,7 @@ type InvoiceRequest struct {
 	// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
 	Type *InvoiceRequestType `json:"type,omitempty"`
 	// The invoice's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *InvoiceRequestContact `json:"contact,omitempty"`
 	// The invoice's number.
 	Number *string `json:"number,omitempty"`
 	// The invoice's issue date.
@@ -15589,7 +17686,7 @@ type InvoiceRequest struct {
 	// The invoice's private note.
 	Memo *string `json:"memo,omitempty"`
 	// The company the invoice belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *InvoiceRequestCompany `json:"company,omitempty"`
 	// The invoice's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -15912,10 +18009,127 @@ type InvoiceRequest struct {
 	// The invoice's remaining balance.
 	Balance *float64 `json:"balance,omitempty"`
 	// Array of `Payment` object IDs.
-	Payments            []*string                 `json:"payments,omitempty"`
-	LineItems           []*InvoiceLineItemRequest `json:"line_items,omitempty"`
-	IntegrationParams   map[string]any            `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any            `json:"linked_account_params,omitempty"`
+	Payments            []*InvoiceRequestPaymentsItem           `json:"payments,omitempty"`
+	TrackingCategories  []*InvoiceRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	LineItems           []*InvoiceLineItemRequest               `json:"line_items,omitempty"`
+	IntegrationParams   map[string]any                          `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                          `json:"linked_account_params,omitempty"`
+}
+
+// The company the invoice belongs to.
+type InvoiceRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewInvoiceRequestCompanyFromString(value string) *InvoiceRequestCompany {
+	return &InvoiceRequestCompany{typeName: "string", String: value}
+}
+
+func NewInvoiceRequestCompanyFromCompanyInfo(value *CompanyInfo) *InvoiceRequestCompany {
+	return &InvoiceRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (i *InvoiceRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		i.typeName = "companyInfo"
+		i.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestCompany) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "companyInfo":
+		return json.Marshal(i.CompanyInfo)
+	}
+}
+
+type InvoiceRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (i *InvoiceRequestCompany) Accept(visitor InvoiceRequestCompanyVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(i.CompanyInfo)
+	}
+}
+
+// The invoice's contact.
+type InvoiceRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewInvoiceRequestContactFromString(value string) *InvoiceRequestContact {
+	return &InvoiceRequestContact{typeName: "string", String: value}
+}
+
+func NewInvoiceRequestContactFromContact(value *Contact) *InvoiceRequestContact {
+	return &InvoiceRequestContact{typeName: "contact", Contact: value}
+}
+
+func (i *InvoiceRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		i.typeName = "contact"
+		i.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestContact) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "contact":
+		return json.Marshal(i.Contact)
+	}
+}
+
+type InvoiceRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (i *InvoiceRequestContact) Accept(visitor InvoiceRequestContactVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "contact":
+		return visitor.VisitContact(i.Contact)
+	}
 }
 
 // The invoice's currency.
@@ -16283,6 +18497,120 @@ func (i *InvoiceRequestCurrency) Accept(visitor InvoiceRequestCurrencyVisitor) e
 	}
 }
 
+type InvoiceRequestPaymentsItem struct {
+	typeName string
+	String   string
+	Payment  *Payment
+}
+
+func NewInvoiceRequestPaymentsItemFromString(value string) *InvoiceRequestPaymentsItem {
+	return &InvoiceRequestPaymentsItem{typeName: "string", String: value}
+}
+
+func NewInvoiceRequestPaymentsItemFromPayment(value *Payment) *InvoiceRequestPaymentsItem {
+	return &InvoiceRequestPaymentsItem{typeName: "payment", Payment: value}
+}
+
+func (i *InvoiceRequestPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valuePayment := new(Payment)
+	if err := json.Unmarshal(data, &valuePayment); err == nil {
+		i.typeName = "payment"
+		i.Payment = valuePayment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "payment":
+		return json.Marshal(i.Payment)
+	}
+}
+
+type InvoiceRequestPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPayment(*Payment) error
+}
+
+func (i *InvoiceRequestPaymentsItem) Accept(visitor InvoiceRequestPaymentsItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "payment":
+		return visitor.VisitPayment(i.Payment)
+	}
+}
+
+type InvoiceRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewInvoiceRequestTrackingCategoriesItemFromString(value string) *InvoiceRequestTrackingCategoriesItem {
+	return &InvoiceRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewInvoiceRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *InvoiceRequestTrackingCategoriesItem {
+	return &InvoiceRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (i *InvoiceRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		i.typeName = "trackingCategory"
+		i.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "trackingCategory":
+		return json.Marshal(i.TrackingCategory)
+	}
+}
+
+type InvoiceRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (i *InvoiceRequestTrackingCategoriesItem) Accept(visitor InvoiceRequestTrackingCategoriesItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(i.TrackingCategory)
+	}
+}
+
 // Whether the invoice is an accounts receivable or accounts payable. If `type` is `accounts_payable`, the invoice is a bill. If `type` is `accounts_receivable`, it is an invoice.
 //
 // * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
@@ -16349,6 +18677,63 @@ type InvoiceResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+type InvoiceTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewInvoiceTrackingCategoriesItemFromString(value string) *InvoiceTrackingCategoriesItem {
+	return &InvoiceTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewInvoiceTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *InvoiceTrackingCategoriesItem {
+	return &InvoiceTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (i *InvoiceTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		i.typeName = "trackingCategory"
+		i.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "trackingCategory":
+		return json.Marshal(i.TrackingCategory)
+	}
+}
+
+type InvoiceTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (i *InvoiceTrackingCategoriesItem) Accept(visitor InvoiceTrackingCategoriesItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(i.TrackingCategory)
+	}
 }
 
 // Whether the invoice is an accounts receivable or accounts payable. If `type` is `accounts_payable`, the invoice is a bill. If `type` is `accounts_receivable`, it is an invoice.
@@ -17090,11 +19475,11 @@ type Item struct {
 	// The price at which the item is purchased from a vendor.
 	PurchasePrice *float64 `json:"purchase_price,omitempty"`
 	// References the default account used to record a purchase of the item.
-	PurchaseAccount *string `json:"purchase_account,omitempty"`
+	PurchaseAccount *ItemPurchaseAccount `json:"purchase_account,omitempty"`
 	// References the default account used to record a sale.
-	SalesAccount *string `json:"sales_account,omitempty"`
+	SalesAccount *ItemSalesAccount `json:"sales_account,omitempty"`
 	// The company the item belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *ItemCompany `json:"company,omitempty"`
 	// When the third party's item note was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
@@ -17103,6 +19488,180 @@ type Item struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the item belongs to.
+type ItemCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewItemCompanyFromString(value string) *ItemCompany {
+	return &ItemCompany{typeName: "string", String: value}
+}
+
+func NewItemCompanyFromCompanyInfo(value *CompanyInfo) *ItemCompany {
+	return &ItemCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (i *ItemCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		i.typeName = "companyInfo"
+		i.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i ItemCompany) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "companyInfo":
+		return json.Marshal(i.CompanyInfo)
+	}
+}
+
+type ItemCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (i *ItemCompany) Accept(visitor ItemCompanyVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(i.CompanyInfo)
+	}
+}
+
+// References the default account used to record a purchase of the item.
+type ItemPurchaseAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewItemPurchaseAccountFromString(value string) *ItemPurchaseAccount {
+	return &ItemPurchaseAccount{typeName: "string", String: value}
+}
+
+func NewItemPurchaseAccountFromAccount(value *Account) *ItemPurchaseAccount {
+	return &ItemPurchaseAccount{typeName: "account", Account: value}
+}
+
+func (i *ItemPurchaseAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		i.typeName = "account"
+		i.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i ItemPurchaseAccount) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "account":
+		return json.Marshal(i.Account)
+	}
+}
+
+type ItemPurchaseAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (i *ItemPurchaseAccount) Accept(visitor ItemPurchaseAccountVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "account":
+		return visitor.VisitAccount(i.Account)
+	}
+}
+
+// References the default account used to record a sale.
+type ItemSalesAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewItemSalesAccountFromString(value string) *ItemSalesAccount {
+	return &ItemSalesAccount{typeName: "string", String: value}
+}
+
+func NewItemSalesAccountFromAccount(value *Account) *ItemSalesAccount {
+	return &ItemSalesAccount{typeName: "account", Account: value}
+}
+
+func (i *ItemSalesAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		i.typeName = "account"
+		i.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i ItemSalesAccount) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "account":
+		return json.Marshal(i.Account)
+	}
+}
+
+type ItemSalesAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (i *ItemSalesAccount) Accept(visitor ItemSalesAccountVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "account":
+		return visitor.VisitAccount(i.Account)
+	}
 }
 
 // The item's status.
@@ -17548,7 +20107,7 @@ type JournalEntry struct {
 	// When the third party's journal entry was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Array of `Payment` object IDs.
-	Payments []*string `json:"payments,omitempty"`
+	Payments []*JournalEntryPaymentsItem `json:"payments,omitempty"`
 	// The journal entry's private note.
 	Memo *string `json:"memo,omitempty"`
 	// The journal's currency.
@@ -17863,10 +20422,10 @@ type JournalEntry struct {
 	// The journal entry's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the journal entry belongs to.
-	Company            *string        `json:"company,omitempty"`
-	Lines              []*JournalLine `json:"lines,omitempty"`
-	TrackingCategories []*string      `json:"tracking_categories,omitempty"`
-	RemoteWasDeleted   *bool          `json:"remote_was_deleted,omitempty"`
+	Company            *JournalEntryCompany                  `json:"company,omitempty"`
+	Lines              []*JournalLine                        `json:"lines,omitempty"`
+	TrackingCategories []*JournalEntryTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	RemoteWasDeleted   *bool                                 `json:"remote_was_deleted,omitempty"`
 	// The journal's posting status.
 	//
 	// * `UNPOSTED` - UNPOSTED
@@ -17879,6 +20438,64 @@ type JournalEntry struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the journal entry belongs to.
+type JournalEntryCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewJournalEntryCompanyFromString(value string) *JournalEntryCompany {
+	return &JournalEntryCompany{typeName: "string", String: value}
+}
+
+func NewJournalEntryCompanyFromCompanyInfo(value *CompanyInfo) *JournalEntryCompany {
+	return &JournalEntryCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (j *JournalEntryCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		j.typeName = "companyInfo"
+		j.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryCompany) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "companyInfo":
+		return json.Marshal(j.CompanyInfo)
+	}
+}
+
+type JournalEntryCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (j *JournalEntryCompany) Accept(visitor JournalEntryCompanyVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(j.CompanyInfo)
+	}
 }
 
 // The journal's currency.
@@ -18246,6 +20863,63 @@ func (j *JournalEntryCurrency) Accept(visitor JournalEntryCurrencyVisitor) error
 	}
 }
 
+type JournalEntryPaymentsItem struct {
+	typeName string
+	String   string
+	Payment  *Payment
+}
+
+func NewJournalEntryPaymentsItemFromString(value string) *JournalEntryPaymentsItem {
+	return &JournalEntryPaymentsItem{typeName: "string", String: value}
+}
+
+func NewJournalEntryPaymentsItemFromPayment(value *Payment) *JournalEntryPaymentsItem {
+	return &JournalEntryPaymentsItem{typeName: "payment", Payment: value}
+}
+
+func (j *JournalEntryPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valuePayment := new(Payment)
+	if err := json.Unmarshal(data, &valuePayment); err == nil {
+		j.typeName = "payment"
+		j.Payment = valuePayment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "payment":
+		return json.Marshal(j.Payment)
+	}
+}
+
+type JournalEntryPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPayment(*Payment) error
+}
+
+func (j *JournalEntryPaymentsItem) Accept(visitor JournalEntryPaymentsItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "payment":
+		return visitor.VisitPayment(j.Payment)
+	}
+}
+
 // The journal's posting status.
 //
 // * `UNPOSTED` - UNPOSTED
@@ -18317,7 +20991,7 @@ type JournalEntryRequest struct {
 	// The journal entry's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// Array of `Payment` object IDs.
-	Payments []*string `json:"payments,omitempty"`
+	Payments []*JournalEntryRequestPaymentsItem `json:"payments,omitempty"`
 	// The journal entry's private note.
 	Memo *string `json:"memo,omitempty"`
 	// The journal's currency.
@@ -18632,8 +21306,8 @@ type JournalEntryRequest struct {
 	// The journal entry's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the journal entry belongs to.
-	Company *string               `json:"company,omitempty"`
-	Lines   []*JournalLineRequest `json:"lines,omitempty"`
+	Company *JournalEntryRequestCompany `json:"company,omitempty"`
+	Lines   []*JournalLineRequest       `json:"lines,omitempty"`
 	// The journal's posting status.
 	//
 	// * `UNPOSTED` - UNPOSTED
@@ -18641,6 +21315,64 @@ type JournalEntryRequest struct {
 	PostingStatus       *JournalEntryRequestPostingStatus `json:"posting_status,omitempty"`
 	IntegrationParams   map[string]any                    `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                    `json:"linked_account_params,omitempty"`
+}
+
+// The company the journal entry belongs to.
+type JournalEntryRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewJournalEntryRequestCompanyFromString(value string) *JournalEntryRequestCompany {
+	return &JournalEntryRequestCompany{typeName: "string", String: value}
+}
+
+func NewJournalEntryRequestCompanyFromCompanyInfo(value *CompanyInfo) *JournalEntryRequestCompany {
+	return &JournalEntryRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (j *JournalEntryRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		j.typeName = "companyInfo"
+		j.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryRequestCompany) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "companyInfo":
+		return json.Marshal(j.CompanyInfo)
+	}
+}
+
+type JournalEntryRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (j *JournalEntryRequestCompany) Accept(visitor JournalEntryRequestCompanyVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(j.CompanyInfo)
+	}
 }
 
 // The journal's currency.
@@ -19008,6 +21740,63 @@ func (j *JournalEntryRequestCurrency) Accept(visitor JournalEntryRequestCurrency
 	}
 }
 
+type JournalEntryRequestPaymentsItem struct {
+	typeName string
+	String   string
+	Payment  *Payment
+}
+
+func NewJournalEntryRequestPaymentsItemFromString(value string) *JournalEntryRequestPaymentsItem {
+	return &JournalEntryRequestPaymentsItem{typeName: "string", String: value}
+}
+
+func NewJournalEntryRequestPaymentsItemFromPayment(value *Payment) *JournalEntryRequestPaymentsItem {
+	return &JournalEntryRequestPaymentsItem{typeName: "payment", Payment: value}
+}
+
+func (j *JournalEntryRequestPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valuePayment := new(Payment)
+	if err := json.Unmarshal(data, &valuePayment); err == nil {
+		j.typeName = "payment"
+		j.Payment = valuePayment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryRequestPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "payment":
+		return json.Marshal(j.Payment)
+	}
+}
+
+type JournalEntryRequestPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPayment(*Payment) error
+}
+
+func (j *JournalEntryRequestPaymentsItem) Accept(visitor JournalEntryRequestPaymentsItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "payment":
+		return visitor.VisitPayment(j.Payment)
+	}
+}
+
 // The journal's posting status.
 //
 // * `UNPOSTED` - UNPOSTED
@@ -19076,6 +21865,63 @@ type JournalEntryResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
+type JournalEntryTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewJournalEntryTrackingCategoriesItemFromString(value string) *JournalEntryTrackingCategoriesItem {
+	return &JournalEntryTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewJournalEntryTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *JournalEntryTrackingCategoriesItem {
+	return &JournalEntryTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (j *JournalEntryTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typeName = "trackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "trackingCategory":
+		return json.Marshal(j.TrackingCategory)
+	}
+}
+
+type JournalEntryTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalEntryTrackingCategoriesItem) Accept(visitor JournalEntryTrackingCategoriesItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+}
+
 // # The JournalLine Object
 // ### Description
 // The `JournalLine` object is used to represent a journal entry's line items.
@@ -19084,19 +21930,76 @@ type JournalEntryResponse struct {
 // Fetch from the `GET JournalEntry` endpoint and view the journal entry's line items.
 type JournalLine struct {
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
-	Account  *string `json:"account,omitempty"`
+	RemoteId *string             `json:"remote_id,omitempty"`
+	Account  *JournalLineAccount `json:"account,omitempty"`
 	// The value of the line item including taxes and other fees.
-	NetAmount          *float64  `json:"net_amount,omitempty"`
-	TrackingCategory   *string   `json:"tracking_category,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
-	Contact            *string   `json:"contact,omitempty"`
+	NetAmount          *float64                             `json:"net_amount,omitempty"`
+	TrackingCategory   *JournalLineTrackingCategory         `json:"tracking_category,omitempty"`
+	TrackingCategories []*JournalLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	Contact            *string                              `json:"contact,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+type JournalLineAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewJournalLineAccountFromString(value string) *JournalLineAccount {
+	return &JournalLineAccount{typeName: "string", String: value}
+}
+
+func NewJournalLineAccountFromAccount(value *Account) *JournalLineAccount {
+	return &JournalLineAccount{typeName: "account", Account: value}
+}
+
+func (j *JournalLineAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		j.typeName = "account"
+		j.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineAccount) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "account":
+		return json.Marshal(j.Account)
+	}
+}
+
+type JournalLineAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (j *JournalLineAccount) Accept(visitor JournalLineAccountVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "account":
+		return visitor.VisitAccount(j.Account)
+	}
 }
 
 // # The JournalLine Object
@@ -19107,19 +22010,304 @@ type JournalLine struct {
 // Fetch from the `GET JournalEntry` endpoint and view the journal entry's line items.
 type JournalLineRequest struct {
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
-	Account  *string `json:"account,omitempty"`
+	RemoteId *string                    `json:"remote_id,omitempty"`
+	Account  *JournalLineRequestAccount `json:"account,omitempty"`
 	// The value of the line item including taxes and other fees.
-	NetAmount          *float64  `json:"net_amount,omitempty"`
-	TrackingCategory   *string   `json:"tracking_category,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
-	Contact            *string   `json:"contact,omitempty"`
+	NetAmount          *float64                                    `json:"net_amount,omitempty"`
+	TrackingCategory   *JournalLineRequestTrackingCategory         `json:"tracking_category,omitempty"`
+	TrackingCategories []*JournalLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	Contact            *string                                     `json:"contact,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
 	ExchangeRate        *string        `json:"exchange_rate,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+type JournalLineRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewJournalLineRequestAccountFromString(value string) *JournalLineRequestAccount {
+	return &JournalLineRequestAccount{typeName: "string", String: value}
+}
+
+func NewJournalLineRequestAccountFromAccount(value *Account) *JournalLineRequestAccount {
+	return &JournalLineRequestAccount{typeName: "account", Account: value}
+}
+
+func (j *JournalLineRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		j.typeName = "account"
+		j.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestAccount) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "account":
+		return json.Marshal(j.Account)
+	}
+}
+
+type JournalLineRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (j *JournalLineRequestAccount) Accept(visitor JournalLineRequestAccountVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "account":
+		return visitor.VisitAccount(j.Account)
+	}
+}
+
+type JournalLineRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewJournalLineRequestTrackingCategoriesItemFromString(value string) *JournalLineRequestTrackingCategoriesItem {
+	return &JournalLineRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewJournalLineRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *JournalLineRequestTrackingCategoriesItem {
+	return &JournalLineRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (j *JournalLineRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typeName = "trackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "trackingCategory":
+		return json.Marshal(j.TrackingCategory)
+	}
+}
+
+type JournalLineRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalLineRequestTrackingCategoriesItem) Accept(visitor JournalLineRequestTrackingCategoriesItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+}
+
+type JournalLineRequestTrackingCategory struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewJournalLineRequestTrackingCategoryFromString(value string) *JournalLineRequestTrackingCategory {
+	return &JournalLineRequestTrackingCategory{typeName: "string", String: value}
+}
+
+func NewJournalLineRequestTrackingCategoryFromTrackingCategory(value *TrackingCategory) *JournalLineRequestTrackingCategory {
+	return &JournalLineRequestTrackingCategory{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (j *JournalLineRequestTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typeName = "trackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestTrackingCategory) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "trackingCategory":
+		return json.Marshal(j.TrackingCategory)
+	}
+}
+
+type JournalLineRequestTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalLineRequestTrackingCategory) Accept(visitor JournalLineRequestTrackingCategoryVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+}
+
+type JournalLineTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewJournalLineTrackingCategoriesItemFromString(value string) *JournalLineTrackingCategoriesItem {
+	return &JournalLineTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewJournalLineTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *JournalLineTrackingCategoriesItem {
+	return &JournalLineTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (j *JournalLineTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typeName = "trackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "trackingCategory":
+		return json.Marshal(j.TrackingCategory)
+	}
+}
+
+type JournalLineTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalLineTrackingCategoriesItem) Accept(visitor JournalLineTrackingCategoriesItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+}
+
+type JournalLineTrackingCategory struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewJournalLineTrackingCategoryFromString(value string) *JournalLineTrackingCategory {
+	return &JournalLineTrackingCategory{typeName: "string", String: value}
+}
+
+func NewJournalLineTrackingCategoryFromTrackingCategory(value *TrackingCategory) *JournalLineTrackingCategory {
+	return &JournalLineTrackingCategory{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (j *JournalLineTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typeName = "trackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineTrackingCategory) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "trackingCategory":
+		return json.Marshal(j.TrackingCategory)
+	}
+}
+
+type JournalLineTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalLineTrackingCategory) Accept(visitor JournalLineTrackingCategoryVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
 }
 
 type LinkToken struct {
@@ -19566,9 +22754,9 @@ type Payment struct {
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The supplier, or customer involved in the payment.
-	Contact *string `json:"contact,omitempty"`
+	Contact *PaymentContact `json:"contact,omitempty"`
 	// The supplier’s or customer’s account in which the payment is made.
-	Account *string `json:"account,omitempty"`
+	Account *PaymentAccount `json:"account,omitempty"`
 	// The payment's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -19881,10 +23069,10 @@ type Payment struct {
 	// The payment's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the payment belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *PaymentCompany `json:"company,omitempty"`
 	// The total amount of money being paid to the supplier, or customer, after taxes.
-	TotalAmount        *float64  `json:"total_amount,omitempty"`
-	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	TotalAmount        *float64                         `json:"total_amount,omitempty"`
+	TrackingCategories []*PaymentTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// When the third party's payment entry was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
@@ -19893,6 +23081,180 @@ type Payment struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The supplier’s or customer’s account in which the payment is made.
+type PaymentAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewPaymentAccountFromString(value string) *PaymentAccount {
+	return &PaymentAccount{typeName: "string", String: value}
+}
+
+func NewPaymentAccountFromAccount(value *Account) *PaymentAccount {
+	return &PaymentAccount{typeName: "account", Account: value}
+}
+
+func (p *PaymentAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		p.typeName = "account"
+		p.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentAccount) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "account":
+		return json.Marshal(p.Account)
+	}
+}
+
+type PaymentAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (p *PaymentAccount) Accept(visitor PaymentAccountVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "account":
+		return visitor.VisitAccount(p.Account)
+	}
+}
+
+// The company the payment belongs to.
+type PaymentCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewPaymentCompanyFromString(value string) *PaymentCompany {
+	return &PaymentCompany{typeName: "string", String: value}
+}
+
+func NewPaymentCompanyFromCompanyInfo(value *CompanyInfo) *PaymentCompany {
+	return &PaymentCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (p *PaymentCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		p.typeName = "companyInfo"
+		p.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentCompany) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "companyInfo":
+		return json.Marshal(p.CompanyInfo)
+	}
+}
+
+type PaymentCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (p *PaymentCompany) Accept(visitor PaymentCompanyVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(p.CompanyInfo)
+	}
+}
+
+// The supplier, or customer involved in the payment.
+type PaymentContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewPaymentContactFromString(value string) *PaymentContact {
+	return &PaymentContact{typeName: "string", String: value}
+}
+
+func NewPaymentContactFromContact(value *Contact) *PaymentContact {
+	return &PaymentContact{typeName: "contact", Contact: value}
+}
+
+func (p *PaymentContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		p.typeName = "contact"
+		p.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentContact) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "contact":
+		return json.Marshal(p.Contact)
+	}
+}
+
+type PaymentContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (p *PaymentContact) Accept(visitor PaymentContactVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "contact":
+		return visitor.VisitContact(p.Contact)
+	}
 }
 
 // The payment's currency.
@@ -20270,9 +23632,9 @@ type PaymentRequest struct {
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The supplier, or customer involved in the payment.
-	Contact *string `json:"contact,omitempty"`
+	Contact *PaymentRequestContact `json:"contact,omitempty"`
 	// The supplier’s or customer’s account in which the payment is made.
-	Account *string `json:"account,omitempty"`
+	Account *PaymentRequestAccount `json:"account,omitempty"`
 	// The payment's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -20585,12 +23947,186 @@ type PaymentRequest struct {
 	// The payment's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the payment belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *PaymentRequestCompany `json:"company,omitempty"`
 	// The total amount of money being paid to the supplier, or customer, after taxes.
-	TotalAmount         *float64       `json:"total_amount,omitempty"`
-	TrackingCategories  []*string      `json:"tracking_categories,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	TotalAmount         *float64                                `json:"total_amount,omitempty"`
+	TrackingCategories  []*PaymentRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	IntegrationParams   map[string]any                          `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                          `json:"linked_account_params,omitempty"`
+}
+
+// The supplier’s or customer’s account in which the payment is made.
+type PaymentRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewPaymentRequestAccountFromString(value string) *PaymentRequestAccount {
+	return &PaymentRequestAccount{typeName: "string", String: value}
+}
+
+func NewPaymentRequestAccountFromAccount(value *Account) *PaymentRequestAccount {
+	return &PaymentRequestAccount{typeName: "account", Account: value}
+}
+
+func (p *PaymentRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		p.typeName = "account"
+		p.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentRequestAccount) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "account":
+		return json.Marshal(p.Account)
+	}
+}
+
+type PaymentRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (p *PaymentRequestAccount) Accept(visitor PaymentRequestAccountVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "account":
+		return visitor.VisitAccount(p.Account)
+	}
+}
+
+// The company the payment belongs to.
+type PaymentRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewPaymentRequestCompanyFromString(value string) *PaymentRequestCompany {
+	return &PaymentRequestCompany{typeName: "string", String: value}
+}
+
+func NewPaymentRequestCompanyFromCompanyInfo(value *CompanyInfo) *PaymentRequestCompany {
+	return &PaymentRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (p *PaymentRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		p.typeName = "companyInfo"
+		p.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentRequestCompany) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "companyInfo":
+		return json.Marshal(p.CompanyInfo)
+	}
+}
+
+type PaymentRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (p *PaymentRequestCompany) Accept(visitor PaymentRequestCompanyVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(p.CompanyInfo)
+	}
+}
+
+// The supplier, or customer involved in the payment.
+type PaymentRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewPaymentRequestContactFromString(value string) *PaymentRequestContact {
+	return &PaymentRequestContact{typeName: "string", String: value}
+}
+
+func NewPaymentRequestContactFromContact(value *Contact) *PaymentRequestContact {
+	return &PaymentRequestContact{typeName: "contact", Contact: value}
+}
+
+func (p *PaymentRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		p.typeName = "contact"
+		p.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentRequestContact) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "contact":
+		return json.Marshal(p.Contact)
+	}
+}
+
+type PaymentRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (p *PaymentRequestContact) Accept(visitor PaymentRequestContactVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "contact":
+		return visitor.VisitContact(p.Contact)
+	}
 }
 
 // The payment's currency.
@@ -20958,11 +24494,125 @@ func (p *PaymentRequestCurrency) Accept(visitor PaymentRequestCurrencyVisitor) e
 	}
 }
 
+type PaymentRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewPaymentRequestTrackingCategoriesItemFromString(value string) *PaymentRequestTrackingCategoriesItem {
+	return &PaymentRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewPaymentRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *PaymentRequestTrackingCategoriesItem {
+	return &PaymentRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (p *PaymentRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		p.typeName = "trackingCategory"
+		p.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "trackingCategory":
+		return json.Marshal(p.TrackingCategory)
+	}
+}
+
+type PaymentRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (p *PaymentRequestTrackingCategoriesItem) Accept(visitor PaymentRequestTrackingCategoriesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(p.TrackingCategory)
+	}
+}
+
 type PaymentResponse struct {
 	Model    *Payment                    `json:"model,omitempty"`
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+type PaymentTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewPaymentTrackingCategoriesItemFromString(value string) *PaymentTrackingCategoriesItem {
+	return &PaymentTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewPaymentTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *PaymentTrackingCategoriesItem {
+	return &PaymentTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (p *PaymentTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		p.typeName = "trackingCategory"
+		p.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "trackingCategory":
+		return json.Marshal(p.TrackingCategory)
+	}
+}
+
+type PaymentTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (p *PaymentTrackingCategoriesItem) Accept(visitor PaymentTrackingCategoriesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(p.TrackingCategory)
+	}
 }
 
 type PaymentsListRequestExpand uint
@@ -21257,15 +24907,15 @@ type PurchaseOrder struct {
 	// The purchase order's delivery date.
 	DeliveryDate *time.Time `json:"delivery_date,omitempty"`
 	// The purchase order's delivery address.
-	DeliveryAddress *string `json:"delivery_address,omitempty"`
+	DeliveryAddress *PurchaseOrderDeliveryAddress `json:"delivery_address,omitempty"`
 	// The contact making the purchase order.
 	Customer *string `json:"customer,omitempty"`
 	// The party fulfilling the purchase order.
-	Vendor *string `json:"vendor,omitempty"`
+	Vendor *PurchaseOrderVendor `json:"vendor,omitempty"`
 	// A memo attached to the purchase order.
 	Memo *string `json:"memo,omitempty"`
 	// The company the purchase order belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *PurchaseOrderCompany `json:"company,omitempty"`
 	// The purchase order's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The purchase order's currency.
@@ -21578,9 +25228,9 @@ type PurchaseOrder struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *PurchaseOrderCurrency `json:"currency,omitempty"`
 	// The purchase order's exchange rate.
-	ExchangeRate       *string                  `json:"exchange_rate,omitempty"`
-	LineItems          []*PurchaseOrderLineItem `json:"line_items,omitempty"`
-	TrackingCategories []*string                `json:"tracking_categories,omitempty"`
+	ExchangeRate       *string                                `json:"exchange_rate,omitempty"`
+	LineItems          []*PurchaseOrderLineItem               `json:"line_items,omitempty"`
+	TrackingCategories []*PurchaseOrderTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// When the third party's purchase order note was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's purchase order note was updated.
@@ -21594,6 +25244,64 @@ type PurchaseOrder struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the purchase order belongs to.
+type PurchaseOrderCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewPurchaseOrderCompanyFromString(value string) *PurchaseOrderCompany {
+	return &PurchaseOrderCompany{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderCompanyFromCompanyInfo(value *CompanyInfo) *PurchaseOrderCompany {
+	return &PurchaseOrderCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (p *PurchaseOrderCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		p.typeName = "companyInfo"
+		p.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderCompany) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "companyInfo":
+		return json.Marshal(p.CompanyInfo)
+	}
+}
+
+type PurchaseOrderCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (p *PurchaseOrderCompany) Accept(visitor PurchaseOrderCompanyVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(p.CompanyInfo)
+	}
 }
 
 // The purchase order's currency.
@@ -21961,6 +25669,64 @@ func (p *PurchaseOrderCurrency) Accept(visitor PurchaseOrderCurrencyVisitor) err
 	}
 }
 
+// The purchase order's delivery address.
+type PurchaseOrderDeliveryAddress struct {
+	typeName string
+	String   string
+	Address  *Address
+}
+
+func NewPurchaseOrderDeliveryAddressFromString(value string) *PurchaseOrderDeliveryAddress {
+	return &PurchaseOrderDeliveryAddress{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderDeliveryAddressFromAddress(value *Address) *PurchaseOrderDeliveryAddress {
+	return &PurchaseOrderDeliveryAddress{typeName: "address", Address: value}
+}
+
+func (p *PurchaseOrderDeliveryAddress) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueAddress := new(Address)
+	if err := json.Unmarshal(data, &valueAddress); err == nil {
+		p.typeName = "address"
+		p.Address = valueAddress
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderDeliveryAddress) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "address":
+		return json.Marshal(p.Address)
+	}
+}
+
+type PurchaseOrderDeliveryAddressVisitor interface {
+	VisitString(string) error
+	VisitAddress(*Address) error
+}
+
+func (p *PurchaseOrderDeliveryAddress) Accept(visitor PurchaseOrderDeliveryAddressVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "address":
+		return visitor.VisitAddress(p.Address)
+	}
+}
+
 // # The PurchaseOrderLineItem Object
 // ### Description
 // The `PurchaseOrderLineItem` object is used to represent a purchase order's line item.
@@ -21975,8 +25741,8 @@ type PurchaseOrderLineItem struct {
 	// The line item's unit price.
 	UnitPrice *float64 `json:"unit_price,omitempty"`
 	// The line item's quantity.
-	Quantity *float64 `json:"quantity,omitempty"`
-	Item     *string  `json:"item,omitempty"`
+	Quantity *float64                   `json:"quantity,omitempty"`
+	Item     *PurchaseOrderLineItemItem `json:"item,omitempty"`
 	// The purchase order line item's account.
 	Account *string `json:"account,omitempty"`
 	// The purchase order line item's associated tracking category.
@@ -22669,6 +26435,63 @@ func (p *PurchaseOrderLineItemCurrency) Accept(visitor PurchaseOrderLineItemCurr
 	}
 }
 
+type PurchaseOrderLineItemItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewPurchaseOrderLineItemItemFromString(value string) *PurchaseOrderLineItemItem {
+	return &PurchaseOrderLineItemItem{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderLineItemItemFromItem(value *Item) *PurchaseOrderLineItemItem {
+	return &PurchaseOrderLineItemItem{typeName: "item", Item: value}
+}
+
+func (p *PurchaseOrderLineItemItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		p.typeName = "item"
+		p.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderLineItemItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "item":
+		return json.Marshal(p.Item)
+	}
+}
+
+type PurchaseOrderLineItemItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (p *PurchaseOrderLineItemItem) Accept(visitor PurchaseOrderLineItemItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "item":
+		return visitor.VisitItem(p.Item)
+	}
+}
+
 // # The PurchaseOrderLineItem Object
 // ### Description
 // The `PurchaseOrderLineItem` object is used to represent a purchase order's line item.
@@ -22683,8 +26506,8 @@ type PurchaseOrderLineItemRequest struct {
 	// The line item's unit price.
 	UnitPrice *float64 `json:"unit_price,omitempty"`
 	// The line item's quantity.
-	Quantity *float64 `json:"quantity,omitempty"`
-	Item     *string  `json:"item,omitempty"`
+	Quantity *float64                          `json:"quantity,omitempty"`
+	Item     *PurchaseOrderLineItemRequestItem `json:"item,omitempty"`
 	// The purchase order line item's account.
 	Account *string `json:"account,omitempty"`
 	// The purchase order line item's associated tracking category.
@@ -23377,6 +27200,63 @@ func (p *PurchaseOrderLineItemRequestCurrency) Accept(visitor PurchaseOrderLineI
 	}
 }
 
+type PurchaseOrderLineItemRequestItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewPurchaseOrderLineItemRequestItemFromString(value string) *PurchaseOrderLineItemRequestItem {
+	return &PurchaseOrderLineItemRequestItem{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderLineItemRequestItemFromItem(value *Item) *PurchaseOrderLineItemRequestItem {
+	return &PurchaseOrderLineItemRequestItem{typeName: "item", Item: value}
+}
+
+func (p *PurchaseOrderLineItemRequestItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		p.typeName = "item"
+		p.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderLineItemRequestItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "item":
+		return json.Marshal(p.Item)
+	}
+}
+
+type PurchaseOrderLineItemRequestItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (p *PurchaseOrderLineItemRequestItem) Accept(visitor PurchaseOrderLineItemRequestItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "item":
+		return visitor.VisitItem(p.Item)
+	}
+}
+
 // # The PurchaseOrder Object
 // ### Description
 // The `PurchaseOrder` object is a record of request for a product or service between a buyer and seller.
@@ -23397,15 +27277,15 @@ type PurchaseOrderRequest struct {
 	// The purchase order's delivery date.
 	DeliveryDate *time.Time `json:"delivery_date,omitempty"`
 	// The purchase order's delivery address.
-	DeliveryAddress *string `json:"delivery_address,omitempty"`
+	DeliveryAddress *PurchaseOrderRequestDeliveryAddress `json:"delivery_address,omitempty"`
 	// The contact making the purchase order.
 	Customer *string `json:"customer,omitempty"`
 	// The party fulfilling the purchase order.
-	Vendor *string `json:"vendor,omitempty"`
+	Vendor *PurchaseOrderRequestVendor `json:"vendor,omitempty"`
 	// A memo attached to the purchase order.
 	Memo *string `json:"memo,omitempty"`
 	// The company the purchase order belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *PurchaseOrderRequestCompany `json:"company,omitempty"`
 	// The purchase order's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The purchase order's currency.
@@ -23722,6 +27602,64 @@ type PurchaseOrderRequest struct {
 	LineItems           []*PurchaseOrderLineItemRequest `json:"line_items,omitempty"`
 	IntegrationParams   map[string]any                  `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                  `json:"linked_account_params,omitempty"`
+}
+
+// The company the purchase order belongs to.
+type PurchaseOrderRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewPurchaseOrderRequestCompanyFromString(value string) *PurchaseOrderRequestCompany {
+	return &PurchaseOrderRequestCompany{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderRequestCompanyFromCompanyInfo(value *CompanyInfo) *PurchaseOrderRequestCompany {
+	return &PurchaseOrderRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (p *PurchaseOrderRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		p.typeName = "companyInfo"
+		p.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderRequestCompany) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "companyInfo":
+		return json.Marshal(p.CompanyInfo)
+	}
+}
+
+type PurchaseOrderRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (p *PurchaseOrderRequestCompany) Accept(visitor PurchaseOrderRequestCompanyVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(p.CompanyInfo)
+	}
 }
 
 // The purchase order's currency.
@@ -24089,6 +28027,64 @@ func (p *PurchaseOrderRequestCurrency) Accept(visitor PurchaseOrderRequestCurren
 	}
 }
 
+// The purchase order's delivery address.
+type PurchaseOrderRequestDeliveryAddress struct {
+	typeName string
+	String   string
+	Address  *Address
+}
+
+func NewPurchaseOrderRequestDeliveryAddressFromString(value string) *PurchaseOrderRequestDeliveryAddress {
+	return &PurchaseOrderRequestDeliveryAddress{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderRequestDeliveryAddressFromAddress(value *Address) *PurchaseOrderRequestDeliveryAddress {
+	return &PurchaseOrderRequestDeliveryAddress{typeName: "address", Address: value}
+}
+
+func (p *PurchaseOrderRequestDeliveryAddress) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueAddress := new(Address)
+	if err := json.Unmarshal(data, &valueAddress); err == nil {
+		p.typeName = "address"
+		p.Address = valueAddress
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderRequestDeliveryAddress) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "address":
+		return json.Marshal(p.Address)
+	}
+}
+
+type PurchaseOrderRequestDeliveryAddressVisitor interface {
+	VisitString(string) error
+	VisitAddress(*Address) error
+}
+
+func (p *PurchaseOrderRequestDeliveryAddress) Accept(visitor PurchaseOrderRequestDeliveryAddressVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "address":
+		return visitor.VisitAddress(p.Address)
+	}
+}
+
 // The purchase order's status.
 //
 // * `DRAFT` - DRAFT
@@ -24150,6 +28146,64 @@ func (p *PurchaseOrderRequestStatus) Accept(visitor PurchaseOrderRequestStatusVi
 		return visitor.VisitPurchaseOrderStatusEnum(p.PurchaseOrderStatusEnum)
 	case "string":
 		return visitor.VisitString(p.String)
+	}
+}
+
+// The party fulfilling the purchase order.
+type PurchaseOrderRequestVendor struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewPurchaseOrderRequestVendorFromString(value string) *PurchaseOrderRequestVendor {
+	return &PurchaseOrderRequestVendor{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderRequestVendorFromContact(value *Contact) *PurchaseOrderRequestVendor {
+	return &PurchaseOrderRequestVendor{typeName: "contact", Contact: value}
+}
+
+func (p *PurchaseOrderRequestVendor) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		p.typeName = "contact"
+		p.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderRequestVendor) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "contact":
+		return json.Marshal(p.Contact)
+	}
+}
+
+type PurchaseOrderRequestVendorVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (p *PurchaseOrderRequestVendor) Accept(visitor PurchaseOrderRequestVendorVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "contact":
+		return visitor.VisitContact(p.Contact)
 	}
 }
 
@@ -24283,6 +28337,121 @@ func (p *PurchaseOrderStatusEnum) UnmarshalJSON(data []byte) error {
 		*p = value
 	}
 	return nil
+}
+
+type PurchaseOrderTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewPurchaseOrderTrackingCategoriesItemFromString(value string) *PurchaseOrderTrackingCategoriesItem {
+	return &PurchaseOrderTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *PurchaseOrderTrackingCategoriesItem {
+	return &PurchaseOrderTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (p *PurchaseOrderTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		p.typeName = "trackingCategory"
+		p.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "trackingCategory":
+		return json.Marshal(p.TrackingCategory)
+	}
+}
+
+type PurchaseOrderTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (p *PurchaseOrderTrackingCategoriesItem) Accept(visitor PurchaseOrderTrackingCategoriesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(p.TrackingCategory)
+	}
+}
+
+// The party fulfilling the purchase order.
+type PurchaseOrderVendor struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewPurchaseOrderVendorFromString(value string) *PurchaseOrderVendor {
+	return &PurchaseOrderVendor{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderVendorFromContact(value *Contact) *PurchaseOrderVendor {
+	return &PurchaseOrderVendor{typeName: "contact", Contact: value}
+}
+
+func (p *PurchaseOrderVendor) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		p.typeName = "contact"
+		p.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderVendor) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "contact":
+		return json.Marshal(p.Contact)
+	}
+}
+
+type PurchaseOrderVendorVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (p *PurchaseOrderVendor) Accept(visitor PurchaseOrderVendorVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "contact":
+		return visitor.VisitContact(p.Contact)
+	}
 }
 
 type PurchaseOrdersListRequestExpand uint
@@ -24753,8 +28922,8 @@ type ReportItem struct {
 	// The report item's name.
 	Name *string `json:"name,omitempty"`
 	// The report item's value.
-	Value    *float64       `json:"value,omitempty"`
-	SubItems map[string]any `json:"sub_items,omitempty"`
+	Value    *float64         `json:"value,omitempty"`
+	SubItems []map[string]any `json:"sub_items,omitempty"`
 	// The company the report item belongs to.
 	Company *string `json:"company,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -25026,7 +29195,7 @@ type TaxRate struct {
 	// The tax rate's effective tax rate.
 	EffectiveTaxRate *float64 `json:"effective_tax_rate,omitempty"`
 	// The company the tax rate belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *TaxRateCompany `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
@@ -25036,6 +29205,64 @@ type TaxRate struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the tax rate belongs to.
+type TaxRateCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewTaxRateCompanyFromString(value string) *TaxRateCompany {
+	return &TaxRateCompany{typeName: "string", String: value}
+}
+
+func NewTaxRateCompanyFromCompanyInfo(value *CompanyInfo) *TaxRateCompany {
+	return &TaxRateCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (t *TaxRateCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		t.typeName = "companyInfo"
+		t.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaxRateCompany) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "companyInfo":
+		return json.Marshal(t.CompanyInfo)
+	}
+}
+
+type TaxRateCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (t *TaxRateCompany) Accept(visitor TaxRateCompanyVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(t.CompanyInfo)
+	}
 }
 
 // # The TrackingCategory Object
@@ -25060,7 +29287,7 @@ type TrackingCategory struct {
 	// ID of the parent tracking category.
 	ParentCategory *string `json:"parent_category,omitempty"`
 	// The company the tracking category belongs to.
-	Company *string `json:"company,omitempty"`
+	Company *TrackingCategoryCompany `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
@@ -25130,6 +29357,64 @@ func (t *TrackingCategoryCategoryType) Accept(visitor TrackingCategoryCategoryTy
 		return visitor.VisitCategoryTypeEnum(t.CategoryTypeEnum)
 	case "string":
 		return visitor.VisitString(t.String)
+	}
+}
+
+// The company the tracking category belongs to.
+type TrackingCategoryCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewTrackingCategoryCompanyFromString(value string) *TrackingCategoryCompany {
+	return &TrackingCategoryCompany{typeName: "string", String: value}
+}
+
+func NewTrackingCategoryCompanyFromCompanyInfo(value *CompanyInfo) *TrackingCategoryCompany {
+	return &TrackingCategoryCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (t *TrackingCategoryCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		t.typeName = "companyInfo"
+		t.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TrackingCategoryCompany) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "companyInfo":
+		return json.Marshal(t.CompanyInfo)
+	}
+}
+
+type TrackingCategoryCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (t *TrackingCategoryCompany) Accept(visitor TrackingCategoryCompanyVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(t.CompanyInfo)
 	}
 }
 
@@ -25208,9 +29493,9 @@ type Transaction struct {
 	// The date upon which the transaction occurred.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The transaction's account.
-	Account *string `json:"account,omitempty"`
+	Account *TransactionAccount `json:"account,omitempty"`
 	// The contact to whom the transaction relates to.
-	Contact *string `json:"contact,omitempty"`
+	Contact *TransactionContact `json:"contact,omitempty"`
 	// The total amount being paid after taxes.
 	TotalAmount *string `json:"total_amount,omitempty"`
 	// The transaction's currency.
@@ -25525,9 +29810,9 @@ type Transaction struct {
 	// The transaction's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the transaction belongs to.
-	Company            *string                `json:"company,omitempty"`
-	TrackingCategories []*string              `json:"tracking_categories,omitempty"`
-	LineItems          []*TransactionLineItem `json:"line_items,omitempty"`
+	Company            *string                              `json:"company,omitempty"`
+	TrackingCategories []*TransactionTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	LineItems          []*TransactionLineItem               `json:"line_items,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
@@ -25537,6 +29822,122 @@ type Transaction struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The transaction's account.
+type TransactionAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewTransactionAccountFromString(value string) *TransactionAccount {
+	return &TransactionAccount{typeName: "string", String: value}
+}
+
+func NewTransactionAccountFromAccount(value *Account) *TransactionAccount {
+	return &TransactionAccount{typeName: "account", Account: value}
+}
+
+func (t *TransactionAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		t.typeName = "account"
+		t.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TransactionAccount) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "account":
+		return json.Marshal(t.Account)
+	}
+}
+
+type TransactionAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (t *TransactionAccount) Accept(visitor TransactionAccountVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "account":
+		return visitor.VisitAccount(t.Account)
+	}
+}
+
+// The contact to whom the transaction relates to.
+type TransactionContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewTransactionContactFromString(value string) *TransactionContact {
+	return &TransactionContact{typeName: "string", String: value}
+}
+
+func NewTransactionContactFromContact(value *Contact) *TransactionContact {
+	return &TransactionContact{typeName: "contact", Contact: value}
+}
+
+func (t *TransactionContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		t.typeName = "contact"
+		t.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TransactionContact) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "contact":
+		return json.Marshal(t.Contact)
+	}
+}
+
+type TransactionContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (t *TransactionContact) Accept(visitor TransactionContactVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "contact":
+		return visitor.VisitContact(t.Contact)
+	}
 }
 
 // The transaction's currency.
@@ -25918,8 +30319,8 @@ type TransactionLineItem struct {
 	// The line item's unit price.
 	UnitPrice *string `json:"unit_price,omitempty"`
 	// The line item's quantity.
-	Quantity *string `json:"quantity,omitempty"`
-	Item     *string `json:"item,omitempty"`
+	Quantity *string                  `json:"quantity,omitempty"`
+	Item     *TransactionLineItemItem `json:"item,omitempty"`
 	// The line item's account.
 	Account *string `json:"account,omitempty"`
 	// The line's associated tracking category.
@@ -26612,6 +31013,120 @@ func (t *TransactionLineItemCurrency) Accept(visitor TransactionLineItemCurrency
 	}
 }
 
+type TransactionLineItemItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewTransactionLineItemItemFromString(value string) *TransactionLineItemItem {
+	return &TransactionLineItemItem{typeName: "string", String: value}
+}
+
+func NewTransactionLineItemItemFromItem(value *Item) *TransactionLineItemItem {
+	return &TransactionLineItemItem{typeName: "item", Item: value}
+}
+
+func (t *TransactionLineItemItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		t.typeName = "item"
+		t.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TransactionLineItemItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "item":
+		return json.Marshal(t.Item)
+	}
+}
+
+type TransactionLineItemItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (t *TransactionLineItemItem) Accept(visitor TransactionLineItemItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "item":
+		return visitor.VisitItem(t.Item)
+	}
+}
+
+type TransactionTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewTransactionTrackingCategoriesItemFromString(value string) *TransactionTrackingCategoriesItem {
+	return &TransactionTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewTransactionTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *TransactionTrackingCategoriesItem {
+	return &TransactionTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (t *TransactionTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		t.typeName = "trackingCategory"
+		t.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TransactionTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "trackingCategory":
+		return json.Marshal(t.TrackingCategory)
+	}
+}
+
+type TransactionTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (t *TransactionTrackingCategoriesItem) Accept(visitor TransactionTrackingCategoriesItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(t.TrackingCategory)
+	}
+}
+
 type TransactionsListRequestExpand uint
 
 const (
@@ -26863,7 +31378,7 @@ type VendorCredit struct {
 	// The vendor credit's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The vendor that owes the gift or refund.
-	Vendor *string `json:"vendor,omitempty"`
+	Vendor *VendorCreditVendor `json:"vendor,omitempty"`
 	// The vendor credit's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The vendor credit's currency.
@@ -27178,15 +31693,73 @@ type VendorCredit struct {
 	// The vendor credit's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the vendor credit belongs to.
-	Company            *string             `json:"company,omitempty"`
-	Lines              []*VendorCreditLine `json:"lines,omitempty"`
-	TrackingCategories []*string           `json:"tracking_categories,omitempty"`
+	Company            *VendorCreditCompany                  `json:"company,omitempty"`
+	Lines              []*VendorCreditLine                   `json:"lines,omitempty"`
+	TrackingCategories []*VendorCreditTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The company the vendor credit belongs to.
+type VendorCreditCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewVendorCreditCompanyFromString(value string) *VendorCreditCompany {
+	return &VendorCreditCompany{typeName: "string", String: value}
+}
+
+func NewVendorCreditCompanyFromCompanyInfo(value *CompanyInfo) *VendorCreditCompany {
+	return &VendorCreditCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (v *VendorCreditCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		v.typeName = "companyInfo"
+		v.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditCompany) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "companyInfo":
+		return json.Marshal(v.CompanyInfo)
+	}
+}
+
+type VendorCreditCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (v *VendorCreditCompany) Accept(visitor VendorCreditCompanyVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(v.CompanyInfo)
+	}
 }
 
 // The vendor credit's currency.
@@ -27572,13 +32145,186 @@ type VendorCreditLine struct {
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The line's account.
-	Account *string `json:"account,omitempty"`
+	Account *VendorCreditLineAccount `json:"account,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
 	// The vendor credit line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// The line's account.
+type VendorCreditLineAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewVendorCreditLineAccountFromString(value string) *VendorCreditLineAccount {
+	return &VendorCreditLineAccount{typeName: "string", String: value}
+}
+
+func NewVendorCreditLineAccountFromAccount(value *Account) *VendorCreditLineAccount {
+	return &VendorCreditLineAccount{typeName: "account", Account: value}
+}
+
+func (v *VendorCreditLineAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		v.typeName = "account"
+		v.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditLineAccount) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "account":
+		return json.Marshal(v.Account)
+	}
+}
+
+type VendorCreditLineAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (v *VendorCreditLineAccount) Accept(visitor VendorCreditLineAccountVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "account":
+		return visitor.VisitAccount(v.Account)
+	}
+}
+
+type VendorCreditTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewVendorCreditTrackingCategoriesItemFromString(value string) *VendorCreditTrackingCategoriesItem {
+	return &VendorCreditTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewVendorCreditTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *VendorCreditTrackingCategoriesItem {
+	return &VendorCreditTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (v *VendorCreditTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		v.typeName = "trackingCategory"
+		v.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "trackingCategory":
+		return json.Marshal(v.TrackingCategory)
+	}
+}
+
+type VendorCreditTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (v *VendorCreditTrackingCategoriesItem) Accept(visitor VendorCreditTrackingCategoriesItemVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(v.TrackingCategory)
+	}
+}
+
+// The vendor that owes the gift or refund.
+type VendorCreditVendor struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewVendorCreditVendorFromString(value string) *VendorCreditVendor {
+	return &VendorCreditVendor{typeName: "string", String: value}
+}
+
+func NewVendorCreditVendorFromContact(value *Contact) *VendorCreditVendor {
+	return &VendorCreditVendor{typeName: "contact", Contact: value}
+}
+
+func (v *VendorCreditVendor) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		v.typeName = "contact"
+		v.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditVendor) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "contact":
+		return json.Marshal(v.Contact)
+	}
+}
+
+type VendorCreditVendorVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (v *VendorCreditVendor) Accept(visitor VendorCreditVendorVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "contact":
+		return visitor.VisitContact(v.Contact)
+	}
 }
 
 type VendorCreditsListRequestExpand uint

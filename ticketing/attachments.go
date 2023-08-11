@@ -33,6 +33,8 @@ type AttachmentsListRequest struct {
 	ModifiedBefore *time.Time `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
+	// If provided, will only return attachments created in the third party platform after this datetime.
+	RemoteCreatedAfter *time.Time `json:"-"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-"`
 	// If provided, will only return comments for this ticket.

@@ -9,7 +9,7 @@ import (
 )
 
 type Client interface {
-	Create(ctx context.Context) error
+	Delete(ctx context.Context) error
 }
 
 func NewClient(opts ...core.ClientOption) Client {
@@ -31,7 +31,7 @@ type client struct {
 }
 
 // Delete a linked account.
-func (c *client) Create(ctx context.Context) error {
+func (c *client) Delete(ctx context.Context) error {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL

@@ -7,6 +7,7 @@ import (
 	accounttoken "github.com/merge-api/merge-go-client/ats/accounttoken"
 	activities "github.com/merge-api/merge-go-client/ats/activities"
 	applications "github.com/merge-api/merge-go-client/ats/applications"
+	asyncpassthrough "github.com/merge-api/merge-go-client/ats/asyncpassthrough"
 	attachments "github.com/merge-api/merge-go-client/ats/attachments"
 	availableactions "github.com/merge-api/merge-go-client/ats/availableactions"
 	candidates "github.com/merge-api/merge-go-client/ats/candidates"
@@ -41,6 +42,7 @@ type Client interface {
 	AccountToken() accounttoken.Client
 	Activities() activities.Client
 	Applications() applications.Client
+	AsyncPassthrough() asyncpassthrough.Client
 	Attachments() attachments.Client
 	AvailableActions() availableactions.Client
 	Candidates() candidates.Client
@@ -81,6 +83,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountTokenClient:       accounttoken.NewClient(opts...),
 		activitiesClient:         activities.NewClient(opts...),
 		applicationsClient:       applications.NewClient(opts...),
+		asyncPassthroughClient:   asyncpassthrough.NewClient(opts...),
 		attachmentsClient:        attachments.NewClient(opts...),
 		availableActionsClient:   availableactions.NewClient(opts...),
 		candidatesClient:         candidates.NewClient(opts...),
@@ -117,6 +120,7 @@ type client struct {
 	accountTokenClient       accounttoken.Client
 	activitiesClient         activities.Client
 	applicationsClient       applications.Client
+	asyncPassthroughClient   asyncpassthrough.Client
 	attachmentsClient        attachments.Client
 	availableActionsClient   availableactions.Client
 	candidatesClient         candidates.Client
@@ -158,6 +162,10 @@ func (c *client) Activities() activities.Client {
 
 func (c *client) Applications() applications.Client {
 	return c.applicationsClient
+}
+
+func (c *client) AsyncPassthrough() asyncpassthrough.Client {
+	return c.asyncPassthroughClient
 }
 
 func (c *client) Attachments() attachments.Client {
