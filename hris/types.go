@@ -164,6 +164,10 @@ func (a *AccountTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type AsyncPassthroughReciept struct {
+	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+}
+
 // # The AvailableActions Object
 // ### Description
 // The `Activity` object is used to see all available model/operation combinations for an integration.
@@ -187,7 +191,7 @@ type BankInfo struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The employee with this bank account.
-	Employee *string `json:"employee,omitempty"`
+	Employee *BankInfoEmployee `json:"employee,omitempty"`
 	// The account number.
 	AccountNumber *string `json:"account_number,omitempty"`
 	// The routing number.
@@ -267,6 +271,64 @@ func (b *BankInfoAccountType) Accept(visitor BankInfoAccountTypeVisitor) error {
 		return visitor.VisitAccountTypeEnum(b.AccountTypeEnum)
 	case "string":
 		return visitor.VisitString(b.String)
+	}
+}
+
+// The employee with this bank account.
+type BankInfoEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewBankInfoEmployeeFromString(value string) *BankInfoEmployee {
+	return &BankInfoEmployee{typeName: "string", String: value}
+}
+
+func NewBankInfoEmployeeFromEmployee(value *Employee) *BankInfoEmployee {
+	return &BankInfoEmployee{typeName: "employee", Employee: value}
+}
+
+func (b *BankInfoEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		b.typeName = "employee"
+		b.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankInfoEmployee) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return json.Marshal(b.String)
+	case "employee":
+		return json.Marshal(b.Employee)
+	}
+}
+
+type BankInfoEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (b *BankInfoEmployee) Accept(visitor BankInfoEmployeeVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return visitor.VisitString(b.String)
+	case "employee":
+		return visitor.VisitEmployee(b.Employee)
 	}
 }
 
@@ -357,7 +419,7 @@ type Benefit struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The employee on the plan.
-	Employee *string `json:"employee,omitempty"`
+	Employee *BenefitEmployee `json:"employee,omitempty"`
 	// The name of the benefit provider.
 	ProviderName *string `json:"provider_name,omitempty"`
 	// The type of benefit plan
@@ -372,10 +434,131 @@ type Benefit struct {
 	EndDate *time.Time `json:"end_date,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// The employer benefit plan the employee is enrolled in.
+	EmployerBenefit *string `json:"employer_benefit,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The employee on the plan.
+type BenefitEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewBenefitEmployeeFromString(value string) *BenefitEmployee {
+	return &BenefitEmployee{typeName: "string", String: value}
+}
+
+func NewBenefitEmployeeFromEmployee(value *Employee) *BenefitEmployee {
+	return &BenefitEmployee{typeName: "employee", Employee: value}
+}
+
+func (b *BenefitEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		b.typeName = "employee"
+		b.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BenefitEmployee) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return json.Marshal(b.String)
+	case "employee":
+		return json.Marshal(b.Employee)
+	}
+}
+
+type BenefitEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (b *BenefitEmployee) Accept(visitor BenefitEmployeeVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return visitor.VisitString(b.String)
+	case "employee":
+		return visitor.VisitEmployee(b.Employee)
+	}
+}
+
+// * `MEDICAL` - MEDICAL
+// * `HEALTH_SAVINGS` - HEALTH_SAVINGS
+// * `INSURANCE` - INSURANCE
+// * `RETIREMENT` - RETIREMENT
+// * `OTHER` - OTHER
+type BenefitPlanTypeEnum uint
+
+const (
+	BenefitPlanTypeEnumMedical BenefitPlanTypeEnum = iota + 1
+	BenefitPlanTypeEnumHealthSavings
+	BenefitPlanTypeEnumInsurance
+	BenefitPlanTypeEnumRetirement
+	BenefitPlanTypeEnumOther
+)
+
+func (b BenefitPlanTypeEnum) String() string {
+	switch b {
+	default:
+		return strconv.Itoa(int(b))
+	case BenefitPlanTypeEnumMedical:
+		return "MEDICAL"
+	case BenefitPlanTypeEnumHealthSavings:
+		return "HEALTH_SAVINGS"
+	case BenefitPlanTypeEnumInsurance:
+		return "INSURANCE"
+	case BenefitPlanTypeEnumRetirement:
+		return "RETIREMENT"
+	case BenefitPlanTypeEnumOther:
+		return "OTHER"
+	}
+}
+
+func (b BenefitPlanTypeEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", b.String())), nil
+}
+
+func (b *BenefitPlanTypeEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "MEDICAL":
+		value := BenefitPlanTypeEnumMedical
+		*b = value
+	case "HEALTH_SAVINGS":
+		value := BenefitPlanTypeEnumHealthSavings
+		*b = value
+	case "INSURANCE":
+		value := BenefitPlanTypeEnumInsurance
+		*b = value
+	case "RETIREMENT":
+		value := BenefitPlanTypeEnumRetirement
+		*b = value
+	case "OTHER":
+		value := BenefitPlanTypeEnumOther
+		*b = value
+	}
+	return nil
 }
 
 // * `hris` - hris
@@ -2494,6 +2677,29 @@ func (c *CountryEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// # The DataPassthrough Object
+// ### Description
+// The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
+//
+// ### Usage Example
+// Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
+type DataPassthroughRequest struct {
+	Method MethodEnum `json:"method,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Path string `json:"path"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Data *string `json:"data,omitempty"`
+	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
+	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
+	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
+	Headers       map[string]any     `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
+	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+}
+
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
@@ -2529,6 +2735,182 @@ type Deduction struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// # The Dependent Object
+// ### Description
+// The `Dependent` object is used to represent a dependent (e.g. child, spouse, domestic partner, etc) of an `Employee`
+//
+// ### Usage Example
+// Fetch from the `LIST Dependents` endpoint and filter by `ID` to show all dependents.
+type Dependent struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The dependents's first name.
+	FirstName *string `json:"first_name,omitempty"`
+	// The dependents's middle name.
+	MiddleName *string `json:"middle_name,omitempty"`
+	// The dependents's last name.
+	LastName *string `json:"last_name,omitempty"`
+	// The dependent's relationship to the employee.
+	//
+	// * `CHILD` - CHILD
+	// * `SPOUSE` - SPOUSE
+	// * `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
+	Relationship *DependentRelationship `json:"relationship,omitempty"`
+	// The employee this person is a dependent of.
+	Employee *string `json:"employee,omitempty"`
+	// The dependent's date of birth.
+	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
+	// The dependent's gender.
+	//
+	// * `MALE` - MALE
+	// * `FEMALE` - FEMALE
+	// * `NON-BINARY` - NON-BINARY
+	// * `OTHER` - OTHER
+	// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+	Gender *DependentGender `json:"gender,omitempty"`
+	// The dependent's phone number.
+	PhoneNumber *string `json:"phone_number,omitempty"`
+	// The dependents's home address.
+	HomeLocation *string `json:"home_location,omitempty"`
+	// Whether or not the dependent is a student
+	IsStudent *bool `json:"is_student,omitempty"`
+	// The dependents's social security number.
+	Ssn *string `json:"ssn,omitempty"`
+	// Indicates whether or not this object has been deleted by third party webhooks.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
+	FieldMappings map[string]any `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The dependent's gender.
+//
+// * `MALE` - MALE
+// * `FEMALE` - FEMALE
+// * `NON-BINARY` - NON-BINARY
+// * `OTHER` - OTHER
+// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+type DependentGender struct {
+	typeName   string
+	GenderEnum GenderEnum
+	String     string
+}
+
+func NewDependentGenderFromGenderEnum(value GenderEnum) *DependentGender {
+	return &DependentGender{typeName: "genderEnum", GenderEnum: value}
+}
+
+func NewDependentGenderFromString(value string) *DependentGender {
+	return &DependentGender{typeName: "string", String: value}
+}
+
+func (d *DependentGender) UnmarshalJSON(data []byte) error {
+	var valueGenderEnum GenderEnum
+	if err := json.Unmarshal(data, &valueGenderEnum); err == nil {
+		d.typeName = "genderEnum"
+		d.GenderEnum = valueGenderEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		d.typeName = "string"
+		d.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, d)
+}
+
+func (d DependentGender) MarshalJSON() ([]byte, error) {
+	switch d.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", d.typeName, d)
+	case "genderEnum":
+		return json.Marshal(d.GenderEnum)
+	case "string":
+		return json.Marshal(d.String)
+	}
+}
+
+type DependentGenderVisitor interface {
+	VisitGenderEnum(GenderEnum) error
+	VisitString(string) error
+}
+
+func (d *DependentGender) Accept(visitor DependentGenderVisitor) error {
+	switch d.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", d.typeName, d)
+	case "genderEnum":
+		return visitor.VisitGenderEnum(d.GenderEnum)
+	case "string":
+		return visitor.VisitString(d.String)
+	}
+}
+
+// The dependent's relationship to the employee.
+//
+// * `CHILD` - CHILD
+// * `SPOUSE` - SPOUSE
+// * `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
+type DependentRelationship struct {
+	typeName         string
+	RelationshipEnum RelationshipEnum
+	String           string
+}
+
+func NewDependentRelationshipFromRelationshipEnum(value RelationshipEnum) *DependentRelationship {
+	return &DependentRelationship{typeName: "relationshipEnum", RelationshipEnum: value}
+}
+
+func NewDependentRelationshipFromString(value string) *DependentRelationship {
+	return &DependentRelationship{typeName: "string", String: value}
+}
+
+func (d *DependentRelationship) UnmarshalJSON(data []byte) error {
+	var valueRelationshipEnum RelationshipEnum
+	if err := json.Unmarshal(data, &valueRelationshipEnum); err == nil {
+		d.typeName = "relationshipEnum"
+		d.RelationshipEnum = valueRelationshipEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		d.typeName = "string"
+		d.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, d)
+}
+
+func (d DependentRelationship) MarshalJSON() ([]byte, error) {
+	switch d.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", d.typeName, d)
+	case "relationshipEnum":
+		return json.Marshal(d.RelationshipEnum)
+	case "string":
+		return json.Marshal(d.String)
+	}
+}
+
+type DependentRelationshipVisitor interface {
+	VisitRelationshipEnum(RelationshipEnum) error
+	VisitString(string) error
+}
+
+func (d *DependentRelationship) Accept(visitor DependentRelationshipVisitor) error {
+	switch d.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", d.typeName, d)
+	case "relationshipEnum":
+		return visitor.VisitRelationshipEnum(d.RelationshipEnum)
+	case "string":
+		return visitor.VisitString(d.String)
+	}
 }
 
 // # The Earning Object
@@ -2689,7 +3071,7 @@ type Employee struct {
 	// The employee's number that appears in the third-party integration's UI.
 	EmployeeNumber *string `json:"employee_number,omitempty"`
 	// The ID of the employee's company.
-	Company *string `json:"company,omitempty"`
+	Company *EmployeeCompany `json:"company,omitempty"`
 	// The employee's first name.
 	FirstName *string `json:"first_name,omitempty"`
 	// The employee's last name.
@@ -2697,8 +3079,8 @@ type Employee struct {
 	// The employee's full name, to use for display purposes. If a preferred first name is available, the full name will include the preferred first name.
 	DisplayFullName *string `json:"display_full_name,omitempty"`
 	// The employee's username that appears in the remote UI.
-	Username *string   `json:"username,omitempty"`
-	Groups   []*string `json:"groups,omitempty"`
+	Username *string               `json:"username,omitempty"`
+	Groups   []*EmployeeGroupsItem `json:"groups,omitempty"`
 	// The employee's work email.
 	WorkEmail *string `json:"work_email,omitempty"`
 	// The employee's personal email.
@@ -2706,17 +3088,17 @@ type Employee struct {
 	// The employee's mobile phone number.
 	MobilePhoneNumber *string `json:"mobile_phone_number,omitempty"`
 	// Array of `Employment` IDs for this Employee.
-	Employments []*string `json:"employments,omitempty"`
+	Employments []*EmployeeEmploymentsItem `json:"employments,omitempty"`
 	// The employee's home address.
-	HomeLocation *string `json:"home_location,omitempty"`
+	HomeLocation *EmployeeHomeLocation `json:"home_location,omitempty"`
 	// The employee's work address.
-	WorkLocation *string `json:"work_location,omitempty"`
+	WorkLocation *EmployeeWorkLocation `json:"work_location,omitempty"`
 	// The employee ID of the employee's manager.
-	Manager *string `json:"manager,omitempty"`
+	Manager *EmployeeManager `json:"manager,omitempty"`
 	// The employee's team.
-	Team *string `json:"team,omitempty"`
+	Team *EmployeeTeam `json:"team,omitempty"`
 	// The employee's pay group
-	PayGroup *string `json:"pay_group,omitempty"`
+	PayGroup *EmployeePayGroup `json:"pay_group,omitempty"`
 	// The employee's social security number.
 	Ssn *string `json:"ssn,omitempty"`
 	// The employee's gender.
@@ -2771,6 +3153,64 @@ type Employee struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The ID of the employee's company.
+type EmployeeCompany struct {
+	typeName string
+	String   string
+	Company  *Company
+}
+
+func NewEmployeeCompanyFromString(value string) *EmployeeCompany {
+	return &EmployeeCompany{typeName: "string", String: value}
+}
+
+func NewEmployeeCompanyFromCompany(value *Company) *EmployeeCompany {
+	return &EmployeeCompany{typeName: "company", Company: value}
+}
+
+func (e *EmployeeCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueCompany := new(Company)
+	if err := json.Unmarshal(data, &valueCompany); err == nil {
+		e.typeName = "company"
+		e.Company = valueCompany
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeCompany) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "company":
+		return json.Marshal(e.Company)
+	}
+}
+
+type EmployeeCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompany(*Company) error
+}
+
+func (e *EmployeeCompany) Accept(visitor EmployeeCompanyVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "company":
+		return visitor.VisitCompany(e.Company)
+	}
 }
 
 // The employment status of the employee.
@@ -2832,6 +3272,63 @@ func (e *EmployeeEmploymentStatus) Accept(visitor EmployeeEmploymentStatusVisito
 		return visitor.VisitEmploymentStatusEnum(e.EmploymentStatusEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+type EmployeeEmploymentsItem struct {
+	typeName   string
+	String     string
+	Employment *Employment
+}
+
+func NewEmployeeEmploymentsItemFromString(value string) *EmployeeEmploymentsItem {
+	return &EmployeeEmploymentsItem{typeName: "string", String: value}
+}
+
+func NewEmployeeEmploymentsItemFromEmployment(value *Employment) *EmployeeEmploymentsItem {
+	return &EmployeeEmploymentsItem{typeName: "employment", Employment: value}
+}
+
+func (e *EmployeeEmploymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployment := new(Employment)
+	if err := json.Unmarshal(data, &valueEmployment); err == nil {
+		e.typeName = "employment"
+		e.Employment = valueEmployment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeEmploymentsItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employment":
+		return json.Marshal(e.Employment)
+	}
+}
+
+type EmployeeEmploymentsItemVisitor interface {
+	VisitString(string) error
+	VisitEmployment(*Employment) error
+}
+
+func (e *EmployeeEmploymentsItem) Accept(visitor EmployeeEmploymentsItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employment":
+		return visitor.VisitEmployment(e.Employment)
 	}
 }
 
@@ -2966,6 +3463,179 @@ func (e *EmployeeGender) Accept(visitor EmployeeGenderVisitor) error {
 	}
 }
 
+type EmployeeGroupsItem struct {
+	typeName string
+	String   string
+	Group    *Group
+}
+
+func NewEmployeeGroupsItemFromString(value string) *EmployeeGroupsItem {
+	return &EmployeeGroupsItem{typeName: "string", String: value}
+}
+
+func NewEmployeeGroupsItemFromGroup(value *Group) *EmployeeGroupsItem {
+	return &EmployeeGroupsItem{typeName: "group", Group: value}
+}
+
+func (e *EmployeeGroupsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueGroup := new(Group)
+	if err := json.Unmarshal(data, &valueGroup); err == nil {
+		e.typeName = "group"
+		e.Group = valueGroup
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeGroupsItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "group":
+		return json.Marshal(e.Group)
+	}
+}
+
+type EmployeeGroupsItemVisitor interface {
+	VisitString(string) error
+	VisitGroup(*Group) error
+}
+
+func (e *EmployeeGroupsItem) Accept(visitor EmployeeGroupsItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "group":
+		return visitor.VisitGroup(e.Group)
+	}
+}
+
+// The employee's home address.
+type EmployeeHomeLocation struct {
+	typeName string
+	String   string
+	Location *Location
+}
+
+func NewEmployeeHomeLocationFromString(value string) *EmployeeHomeLocation {
+	return &EmployeeHomeLocation{typeName: "string", String: value}
+}
+
+func NewEmployeeHomeLocationFromLocation(value *Location) *EmployeeHomeLocation {
+	return &EmployeeHomeLocation{typeName: "location", Location: value}
+}
+
+func (e *EmployeeHomeLocation) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueLocation := new(Location)
+	if err := json.Unmarshal(data, &valueLocation); err == nil {
+		e.typeName = "location"
+		e.Location = valueLocation
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeHomeLocation) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "location":
+		return json.Marshal(e.Location)
+	}
+}
+
+type EmployeeHomeLocationVisitor interface {
+	VisitString(string) error
+	VisitLocation(*Location) error
+}
+
+func (e *EmployeeHomeLocation) Accept(visitor EmployeeHomeLocationVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "location":
+		return visitor.VisitLocation(e.Location)
+	}
+}
+
+// The employee ID of the employee's manager.
+type EmployeeManager struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewEmployeeManagerFromString(value string) *EmployeeManager {
+	return &EmployeeManager{typeName: "string", String: value}
+}
+
+func NewEmployeeManagerFromEmployee(value *Employee) *EmployeeManager {
+	return &EmployeeManager{typeName: "employee", Employee: value}
+}
+
+func (e *EmployeeManager) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeManager) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type EmployeeManagerVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *EmployeeManager) Accept(visitor EmployeeManagerVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
+	}
+}
+
 // The employee's filing status as related to marital status.
 //
 // * `SINGLE` - SINGLE
@@ -3030,6 +3700,64 @@ func (e *EmployeeMaritalStatus) Accept(visitor EmployeeMaritalStatusVisitor) err
 	}
 }
 
+// The employee's pay group
+type EmployeePayGroup struct {
+	typeName string
+	String   string
+	PayGroup *PayGroup
+}
+
+func NewEmployeePayGroupFromString(value string) *EmployeePayGroup {
+	return &EmployeePayGroup{typeName: "string", String: value}
+}
+
+func NewEmployeePayGroupFromPayGroup(value *PayGroup) *EmployeePayGroup {
+	return &EmployeePayGroup{typeName: "payGroup", PayGroup: value}
+}
+
+func (e *EmployeePayGroup) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valuePayGroup := new(PayGroup)
+	if err := json.Unmarshal(data, &valuePayGroup); err == nil {
+		e.typeName = "payGroup"
+		e.PayGroup = valuePayGroup
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeePayGroup) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "payGroup":
+		return json.Marshal(e.PayGroup)
+	}
+}
+
+type EmployeePayGroupVisitor interface {
+	VisitString(string) error
+	VisitPayGroup(*PayGroup) error
+}
+
+func (e *EmployeePayGroup) Accept(visitor EmployeePayGroupVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "payGroup":
+		return visitor.VisitPayGroup(e.PayGroup)
+	}
+}
+
 // # The EmployeePayrollRun Object
 // ### Description
 // The `EmployeePayrollRun` object is used to represent an employee's pay statement for a specific payroll run.
@@ -3041,9 +3769,9 @@ type EmployeePayrollRun struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The employee whose payroll is being run.
-	Employee *string `json:"employee,omitempty"`
+	Employee *EmployeePayrollRunEmployee `json:"employee,omitempty"`
 	// The payroll being run.
-	PayrollRun *string `json:"payroll_run,omitempty"`
+	PayrollRun *EmployeePayrollRunPayrollRun `json:"payroll_run,omitempty"`
 	// The total earnings throughout a given period for an employee before any deductions are made.
 	GrossPay *float64 `json:"gross_pay,omitempty"`
 	// The take-home pay throughout a given period for an employee after deductions are made.
@@ -3063,6 +3791,122 @@ type EmployeePayrollRun struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The employee whose payroll is being run.
+type EmployeePayrollRunEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewEmployeePayrollRunEmployeeFromString(value string) *EmployeePayrollRunEmployee {
+	return &EmployeePayrollRunEmployee{typeName: "string", String: value}
+}
+
+func NewEmployeePayrollRunEmployeeFromEmployee(value *Employee) *EmployeePayrollRunEmployee {
+	return &EmployeePayrollRunEmployee{typeName: "employee", Employee: value}
+}
+
+func (e *EmployeePayrollRunEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeePayrollRunEmployee) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type EmployeePayrollRunEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *EmployeePayrollRunEmployee) Accept(visitor EmployeePayrollRunEmployeeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
+	}
+}
+
+// The payroll being run.
+type EmployeePayrollRunPayrollRun struct {
+	typeName   string
+	String     string
+	PayrollRun *PayrollRun
+}
+
+func NewEmployeePayrollRunPayrollRunFromString(value string) *EmployeePayrollRunPayrollRun {
+	return &EmployeePayrollRunPayrollRun{typeName: "string", String: value}
+}
+
+func NewEmployeePayrollRunPayrollRunFromPayrollRun(value *PayrollRun) *EmployeePayrollRunPayrollRun {
+	return &EmployeePayrollRunPayrollRun{typeName: "payrollRun", PayrollRun: value}
+}
+
+func (e *EmployeePayrollRunPayrollRun) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valuePayrollRun := new(PayrollRun)
+	if err := json.Unmarshal(data, &valuePayrollRun); err == nil {
+		e.typeName = "payrollRun"
+		e.PayrollRun = valuePayrollRun
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeePayrollRunPayrollRun) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "payrollRun":
+		return json.Marshal(e.PayrollRun)
+	}
+}
+
+type EmployeePayrollRunPayrollRunVisitor interface {
+	VisitString(string) error
+	VisitPayrollRun(*PayrollRun) error
+}
+
+func (e *EmployeePayrollRunPayrollRun) Accept(visitor EmployeePayrollRunPayrollRunVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "payrollRun":
+		return visitor.VisitPayrollRun(e.PayrollRun)
+	}
 }
 
 type EmployeePayrollRunsListRequestExpand uint
@@ -3163,7 +4007,7 @@ type EmployeeRequest struct {
 	// The employee's number that appears in the third-party integration's UI.
 	EmployeeNumber *string `json:"employee_number,omitempty"`
 	// The ID of the employee's company.
-	Company *string `json:"company,omitempty"`
+	Company *EmployeeRequestCompany `json:"company,omitempty"`
 	// The employee's first name.
 	FirstName *string `json:"first_name,omitempty"`
 	// The employee's last name.
@@ -3171,8 +4015,8 @@ type EmployeeRequest struct {
 	// The employee's full name, to use for display purposes. If a preferred first name is available, the full name will include the preferred first name.
 	DisplayFullName *string `json:"display_full_name,omitempty"`
 	// The employee's username that appears in the remote UI.
-	Username *string   `json:"username,omitempty"`
-	Groups   []*string `json:"groups,omitempty"`
+	Username *string                      `json:"username,omitempty"`
+	Groups   []*EmployeeRequestGroupsItem `json:"groups,omitempty"`
 	// The employee's work email.
 	WorkEmail *string `json:"work_email,omitempty"`
 	// The employee's personal email.
@@ -3180,17 +4024,17 @@ type EmployeeRequest struct {
 	// The employee's mobile phone number.
 	MobilePhoneNumber *string `json:"mobile_phone_number,omitempty"`
 	// Array of `Employment` IDs for this Employee.
-	Employments []*string `json:"employments,omitempty"`
+	Employments []*EmployeeRequestEmploymentsItem `json:"employments,omitempty"`
 	// The employee's home address.
-	HomeLocation *string `json:"home_location,omitempty"`
+	HomeLocation *EmployeeRequestHomeLocation `json:"home_location,omitempty"`
 	// The employee's work address.
-	WorkLocation *string `json:"work_location,omitempty"`
+	WorkLocation *EmployeeRequestWorkLocation `json:"work_location,omitempty"`
 	// The employee ID of the employee's manager.
-	Manager *string `json:"manager,omitempty"`
+	Manager *EmployeeRequestManager `json:"manager,omitempty"`
 	// The employee's team.
-	Team *string `json:"team,omitempty"`
+	Team *EmployeeRequestTeam `json:"team,omitempty"`
 	// The employee's pay group
-	PayGroup *string `json:"pay_group,omitempty"`
+	PayGroup *EmployeeRequestPayGroup `json:"pay_group,omitempty"`
 	// The employee's social security number.
 	Ssn *string `json:"ssn,omitempty"`
 	// The employee's gender.
@@ -3238,6 +4082,64 @@ type EmployeeRequest struct {
 	Avatar              *string        `json:"avatar,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The ID of the employee's company.
+type EmployeeRequestCompany struct {
+	typeName string
+	String   string
+	Company  *Company
+}
+
+func NewEmployeeRequestCompanyFromString(value string) *EmployeeRequestCompany {
+	return &EmployeeRequestCompany{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestCompanyFromCompany(value *Company) *EmployeeRequestCompany {
+	return &EmployeeRequestCompany{typeName: "company", Company: value}
+}
+
+func (e *EmployeeRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueCompany := new(Company)
+	if err := json.Unmarshal(data, &valueCompany); err == nil {
+		e.typeName = "company"
+		e.Company = valueCompany
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestCompany) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "company":
+		return json.Marshal(e.Company)
+	}
+}
+
+type EmployeeRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompany(*Company) error
+}
+
+func (e *EmployeeRequestCompany) Accept(visitor EmployeeRequestCompanyVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "company":
+		return visitor.VisitCompany(e.Company)
+	}
 }
 
 // The employment status of the employee.
@@ -3299,6 +4201,63 @@ func (e *EmployeeRequestEmploymentStatus) Accept(visitor EmployeeRequestEmployme
 		return visitor.VisitEmploymentStatusEnum(e.EmploymentStatusEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+type EmployeeRequestEmploymentsItem struct {
+	typeName   string
+	String     string
+	Employment *Employment
+}
+
+func NewEmployeeRequestEmploymentsItemFromString(value string) *EmployeeRequestEmploymentsItem {
+	return &EmployeeRequestEmploymentsItem{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestEmploymentsItemFromEmployment(value *Employment) *EmployeeRequestEmploymentsItem {
+	return &EmployeeRequestEmploymentsItem{typeName: "employment", Employment: value}
+}
+
+func (e *EmployeeRequestEmploymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployment := new(Employment)
+	if err := json.Unmarshal(data, &valueEmployment); err == nil {
+		e.typeName = "employment"
+		e.Employment = valueEmployment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestEmploymentsItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employment":
+		return json.Marshal(e.Employment)
+	}
+}
+
+type EmployeeRequestEmploymentsItemVisitor interface {
+	VisitString(string) error
+	VisitEmployment(*Employment) error
+}
+
+func (e *EmployeeRequestEmploymentsItem) Accept(visitor EmployeeRequestEmploymentsItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employment":
+		return visitor.VisitEmployment(e.Employment)
 	}
 }
 
@@ -3433,6 +4392,179 @@ func (e *EmployeeRequestGender) Accept(visitor EmployeeRequestGenderVisitor) err
 	}
 }
 
+type EmployeeRequestGroupsItem struct {
+	typeName string
+	String   string
+	Group    *Group
+}
+
+func NewEmployeeRequestGroupsItemFromString(value string) *EmployeeRequestGroupsItem {
+	return &EmployeeRequestGroupsItem{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestGroupsItemFromGroup(value *Group) *EmployeeRequestGroupsItem {
+	return &EmployeeRequestGroupsItem{typeName: "group", Group: value}
+}
+
+func (e *EmployeeRequestGroupsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueGroup := new(Group)
+	if err := json.Unmarshal(data, &valueGroup); err == nil {
+		e.typeName = "group"
+		e.Group = valueGroup
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestGroupsItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "group":
+		return json.Marshal(e.Group)
+	}
+}
+
+type EmployeeRequestGroupsItemVisitor interface {
+	VisitString(string) error
+	VisitGroup(*Group) error
+}
+
+func (e *EmployeeRequestGroupsItem) Accept(visitor EmployeeRequestGroupsItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "group":
+		return visitor.VisitGroup(e.Group)
+	}
+}
+
+// The employee's home address.
+type EmployeeRequestHomeLocation struct {
+	typeName string
+	String   string
+	Location *Location
+}
+
+func NewEmployeeRequestHomeLocationFromString(value string) *EmployeeRequestHomeLocation {
+	return &EmployeeRequestHomeLocation{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestHomeLocationFromLocation(value *Location) *EmployeeRequestHomeLocation {
+	return &EmployeeRequestHomeLocation{typeName: "location", Location: value}
+}
+
+func (e *EmployeeRequestHomeLocation) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueLocation := new(Location)
+	if err := json.Unmarshal(data, &valueLocation); err == nil {
+		e.typeName = "location"
+		e.Location = valueLocation
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestHomeLocation) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "location":
+		return json.Marshal(e.Location)
+	}
+}
+
+type EmployeeRequestHomeLocationVisitor interface {
+	VisitString(string) error
+	VisitLocation(*Location) error
+}
+
+func (e *EmployeeRequestHomeLocation) Accept(visitor EmployeeRequestHomeLocationVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "location":
+		return visitor.VisitLocation(e.Location)
+	}
+}
+
+// The employee ID of the employee's manager.
+type EmployeeRequestManager struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewEmployeeRequestManagerFromString(value string) *EmployeeRequestManager {
+	return &EmployeeRequestManager{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestManagerFromEmployee(value *Employee) *EmployeeRequestManager {
+	return &EmployeeRequestManager{typeName: "employee", Employee: value}
+}
+
+func (e *EmployeeRequestManager) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestManager) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type EmployeeRequestManagerVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *EmployeeRequestManager) Accept(visitor EmployeeRequestManagerVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
+	}
+}
+
 // The employee's filing status as related to marital status.
 //
 // * `SINGLE` - SINGLE
@@ -3497,11 +4629,301 @@ func (e *EmployeeRequestMaritalStatus) Accept(visitor EmployeeRequestMaritalStat
 	}
 }
 
+// The employee's pay group
+type EmployeeRequestPayGroup struct {
+	typeName string
+	String   string
+	PayGroup *PayGroup
+}
+
+func NewEmployeeRequestPayGroupFromString(value string) *EmployeeRequestPayGroup {
+	return &EmployeeRequestPayGroup{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestPayGroupFromPayGroup(value *PayGroup) *EmployeeRequestPayGroup {
+	return &EmployeeRequestPayGroup{typeName: "payGroup", PayGroup: value}
+}
+
+func (e *EmployeeRequestPayGroup) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valuePayGroup := new(PayGroup)
+	if err := json.Unmarshal(data, &valuePayGroup); err == nil {
+		e.typeName = "payGroup"
+		e.PayGroup = valuePayGroup
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestPayGroup) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "payGroup":
+		return json.Marshal(e.PayGroup)
+	}
+}
+
+type EmployeeRequestPayGroupVisitor interface {
+	VisitString(string) error
+	VisitPayGroup(*PayGroup) error
+}
+
+func (e *EmployeeRequestPayGroup) Accept(visitor EmployeeRequestPayGroupVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "payGroup":
+		return visitor.VisitPayGroup(e.PayGroup)
+	}
+}
+
+// The employee's team.
+type EmployeeRequestTeam struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewEmployeeRequestTeamFromString(value string) *EmployeeRequestTeam {
+	return &EmployeeRequestTeam{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestTeamFromTeam(value *Team) *EmployeeRequestTeam {
+	return &EmployeeRequestTeam{typeName: "team", Team: value}
+}
+
+func (e *EmployeeRequestTeam) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		e.typeName = "team"
+		e.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestTeam) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "team":
+		return json.Marshal(e.Team)
+	}
+}
+
+type EmployeeRequestTeamVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (e *EmployeeRequestTeam) Accept(visitor EmployeeRequestTeamVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "team":
+		return visitor.VisitTeam(e.Team)
+	}
+}
+
+// The employee's work address.
+type EmployeeRequestWorkLocation struct {
+	typeName string
+	String   string
+	Location *Location
+}
+
+func NewEmployeeRequestWorkLocationFromString(value string) *EmployeeRequestWorkLocation {
+	return &EmployeeRequestWorkLocation{typeName: "string", String: value}
+}
+
+func NewEmployeeRequestWorkLocationFromLocation(value *Location) *EmployeeRequestWorkLocation {
+	return &EmployeeRequestWorkLocation{typeName: "location", Location: value}
+}
+
+func (e *EmployeeRequestWorkLocation) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueLocation := new(Location)
+	if err := json.Unmarshal(data, &valueLocation); err == nil {
+		e.typeName = "location"
+		e.Location = valueLocation
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeRequestWorkLocation) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "location":
+		return json.Marshal(e.Location)
+	}
+}
+
+type EmployeeRequestWorkLocationVisitor interface {
+	VisitString(string) error
+	VisitLocation(*Location) error
+}
+
+func (e *EmployeeRequestWorkLocation) Accept(visitor EmployeeRequestWorkLocationVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "location":
+		return visitor.VisitLocation(e.Location)
+	}
+}
+
 type EmployeeResponse struct {
 	Model    *Employee                   `json:"model,omitempty"`
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+// The employee's team.
+type EmployeeTeam struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewEmployeeTeamFromString(value string) *EmployeeTeam {
+	return &EmployeeTeam{typeName: "string", String: value}
+}
+
+func NewEmployeeTeamFromTeam(value *Team) *EmployeeTeam {
+	return &EmployeeTeam{typeName: "team", Team: value}
+}
+
+func (e *EmployeeTeam) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		e.typeName = "team"
+		e.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeTeam) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "team":
+		return json.Marshal(e.Team)
+	}
+}
+
+type EmployeeTeamVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (e *EmployeeTeam) Accept(visitor EmployeeTeamVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "team":
+		return visitor.VisitTeam(e.Team)
+	}
+}
+
+// The employee's work address.
+type EmployeeWorkLocation struct {
+	typeName string
+	String   string
+	Location *Location
+}
+
+func NewEmployeeWorkLocationFromString(value string) *EmployeeWorkLocation {
+	return &EmployeeWorkLocation{typeName: "string", String: value}
+}
+
+func NewEmployeeWorkLocationFromLocation(value *Location) *EmployeeWorkLocation {
+	return &EmployeeWorkLocation{typeName: "location", Location: value}
+}
+
+func (e *EmployeeWorkLocation) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueLocation := new(Location)
+	if err := json.Unmarshal(data, &valueLocation); err == nil {
+		e.typeName = "location"
+		e.Location = valueLocation
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeWorkLocation) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "location":
+		return json.Marshal(e.Location)
+	}
+}
+
+type EmployeeWorkLocationVisitor interface {
+	VisitString(string) error
+	VisitLocation(*Location) error
+}
+
+func (e *EmployeeWorkLocation) Accept(visitor EmployeeWorkLocationVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "location":
+		return visitor.VisitLocation(e.Location)
+	}
 }
 
 type EmployeesListRequestEmploymentStatus uint
@@ -7124,6 +8546,102 @@ func (e *EmployeesRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) err
 	return nil
 }
 
+// # The EmployerBenefit Object
+// ### Description
+// The `Employer Benefit` object is used to represent a benefit plan offered by a company.
+//
+// ### Usage Example
+// Fetch from the `LIST EmployerBenefits` endpoint and filter by `ID` to show all EmployerBenefits.
+type EmployerBenefit struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The type of benefit plan.
+	//
+	// * `MEDICAL` - MEDICAL
+	// * `HEALTH_SAVINGS` - HEALTH_SAVINGS
+	// * `INSURANCE` - INSURANCE
+	// * `RETIREMENT` - RETIREMENT
+	// * `OTHER` - OTHER
+	BenefitPlanType *EmployerBenefitBenefitPlanType `json:"benefit_plan_type,omitempty"`
+	// The employer benefit's name - typically the carrier or network name.
+	Name *string `json:"name,omitempty"`
+	// The employer benefit's description.
+	Description *string `json:"description,omitempty"`
+	// The employer benefit's deduction code.
+	DeductionCode *string `json:"deduction_code,omitempty"`
+	// Indicates whether or not this object has been deleted by third party webhooks.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
+	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+}
+
+// The type of benefit plan.
+//
+// * `MEDICAL` - MEDICAL
+// * `HEALTH_SAVINGS` - HEALTH_SAVINGS
+// * `INSURANCE` - INSURANCE
+// * `RETIREMENT` - RETIREMENT
+// * `OTHER` - OTHER
+type EmployerBenefitBenefitPlanType struct {
+	typeName            string
+	BenefitPlanTypeEnum BenefitPlanTypeEnum
+	String              string
+}
+
+func NewEmployerBenefitBenefitPlanTypeFromBenefitPlanTypeEnum(value BenefitPlanTypeEnum) *EmployerBenefitBenefitPlanType {
+	return &EmployerBenefitBenefitPlanType{typeName: "benefitPlanTypeEnum", BenefitPlanTypeEnum: value}
+}
+
+func NewEmployerBenefitBenefitPlanTypeFromString(value string) *EmployerBenefitBenefitPlanType {
+	return &EmployerBenefitBenefitPlanType{typeName: "string", String: value}
+}
+
+func (e *EmployerBenefitBenefitPlanType) UnmarshalJSON(data []byte) error {
+	var valueBenefitPlanTypeEnum BenefitPlanTypeEnum
+	if err := json.Unmarshal(data, &valueBenefitPlanTypeEnum); err == nil {
+		e.typeName = "benefitPlanTypeEnum"
+		e.BenefitPlanTypeEnum = valueBenefitPlanTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployerBenefitBenefitPlanType) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "benefitPlanTypeEnum":
+		return json.Marshal(e.BenefitPlanTypeEnum)
+	case "string":
+		return json.Marshal(e.String)
+	}
+}
+
+type EmployerBenefitBenefitPlanTypeVisitor interface {
+	VisitBenefitPlanTypeEnum(BenefitPlanTypeEnum) error
+	VisitString(string) error
+}
+
+func (e *EmployerBenefitBenefitPlanType) Accept(visitor EmployerBenefitBenefitPlanTypeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "benefitPlanTypeEnum":
+		return visitor.VisitBenefitPlanTypeEnum(e.BenefitPlanTypeEnum)
+	case "string":
+		return visitor.VisitString(e.String)
+	}
+}
+
 // # The Employment Object
 // ### Description
 // The `Employment` object is used to represent a job position at a company.
@@ -7137,7 +8655,7 @@ type Employment struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The employee holding this position.
-	Employee *string `json:"employee,omitempty"`
+	Employee *EmploymentEmployee `json:"employee,omitempty"`
 	// The position's title.
 	JobTitle *string `json:"job_title,omitempty"`
 	// The position's pay rate in dollars.
@@ -7476,7 +8994,7 @@ type Employment struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	PayCurrency *EmploymentPayCurrency `json:"pay_currency,omitempty"`
 	// The employment's pay group
-	PayGroup *string `json:"pay_group,omitempty"`
+	PayGroup *EmploymentPayGroup `json:"pay_group,omitempty"`
 	// The position's FLSA status.
 	//
 	// * `EXEMPT` - EXEMPT
@@ -7500,6 +9018,64 @@ type Employment struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The employee holding this position.
+type EmploymentEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewEmploymentEmployeeFromString(value string) *EmploymentEmployee {
+	return &EmploymentEmployee{typeName: "string", String: value}
+}
+
+func NewEmploymentEmployeeFromEmployee(value *Employee) *EmploymentEmployee {
+	return &EmploymentEmployee{typeName: "employee", Employee: value}
+}
+
+func (e *EmploymentEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmploymentEmployee) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type EmploymentEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *EmploymentEmployee) Accept(visitor EmploymentEmployeeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
+	}
 }
 
 // The position's type of employment.
@@ -8059,6 +9635,64 @@ func (e *EmploymentPayFrequency) Accept(visitor EmploymentPayFrequencyVisitor) e
 		return visitor.VisitPayFrequencyEnum(e.PayFrequencyEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+// The employment's pay group
+type EmploymentPayGroup struct {
+	typeName string
+	String   string
+	PayGroup *PayGroup
+}
+
+func NewEmploymentPayGroupFromString(value string) *EmploymentPayGroup {
+	return &EmploymentPayGroup{typeName: "string", String: value}
+}
+
+func NewEmploymentPayGroupFromPayGroup(value *PayGroup) *EmploymentPayGroup {
+	return &EmploymentPayGroup{typeName: "payGroup", PayGroup: value}
+}
+
+func (e *EmploymentPayGroup) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valuePayGroup := new(PayGroup)
+	if err := json.Unmarshal(data, &valuePayGroup); err == nil {
+		e.typeName = "payGroup"
+		e.PayGroup = valuePayGroup
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmploymentPayGroup) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "payGroup":
+		return json.Marshal(e.PayGroup)
+	}
+}
+
+type EmploymentPayGroupVisitor interface {
+	VisitString(string) error
+	VisitPayGroup(*PayGroup) error
+}
+
+func (e *EmploymentPayGroup) Accept(visitor EmploymentPayGroupVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "payGroup":
+		return visitor.VisitPayGroup(e.PayGroup)
 	}
 }
 
@@ -10573,6 +12207,12 @@ type PaginatedConditionSchemaList struct {
 	Results  []*ConditionSchema `json:"results,omitempty"`
 }
 
+type PaginatedDependentList struct {
+	Next     *string      `json:"next,omitempty"`
+	Previous *string      `json:"previous,omitempty"`
+	Results  []*Dependent `json:"results,omitempty"`
+}
+
 type PaginatedEmployeeList struct {
 	Next     *string     `json:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty"`
@@ -10583,6 +12223,12 @@ type PaginatedEmployeePayrollRunList struct {
 	Next     *string               `json:"next,omitempty"`
 	Previous *string               `json:"previous,omitempty"`
 	Results  []*EmployeePayrollRun `json:"results,omitempty"`
+}
+
+type PaginatedEmployerBenefitList struct {
+	Next     *string            `json:"next,omitempty"`
+	Previous *string            `json:"previous,omitempty"`
+	Results  []*EmployerBenefit `json:"results,omitempty"`
 }
 
 type PaginatedEmploymentList struct {
@@ -13526,6 +15172,53 @@ func (r *ReasonEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// * `CHILD` - CHILD
+// * `SPOUSE` - SPOUSE
+// * `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
+type RelationshipEnum uint
+
+const (
+	RelationshipEnumChild RelationshipEnum = iota + 1
+	RelationshipEnumSpouse
+	RelationshipEnumDomesticPartner
+)
+
+func (r RelationshipEnum) String() string {
+	switch r {
+	default:
+		return strconv.Itoa(int(r))
+	case RelationshipEnumChild:
+		return "CHILD"
+	case RelationshipEnumSpouse:
+		return "SPOUSE"
+	case RelationshipEnumDomesticPartner:
+		return "DOMESTIC_PARTNER"
+	}
+}
+
+func (r RelationshipEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", r.String())), nil
+}
+
+func (r *RelationshipEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "CHILD":
+		value := RelationshipEnumChild
+		*r = value
+	case "SPOUSE":
+		value := RelationshipEnumSpouse
+		*r = value
+	case "DOMESTIC_PARTNER":
+		value := RelationshipEnumDomesticPartner
+		*r = value
+	}
+	return nil
+}
+
 type RemoteData struct {
 	Path string         `json:"path"`
 	Data map[string]any `json:"data,omitempty"`
@@ -14054,13 +15747,71 @@ type Team struct {
 	// The team's name.
 	Name *string `json:"name,omitempty"`
 	// The team's parent team.
-	ParentTeam *string `json:"parent_team,omitempty"`
+	ParentTeam *TeamParentTeam `json:"parent_team,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The team's parent team.
+type TeamParentTeam struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewTeamParentTeamFromString(value string) *TeamParentTeam {
+	return &TeamParentTeam{typeName: "string", String: value}
+}
+
+func NewTeamParentTeamFromTeam(value *Team) *TeamParentTeam {
+	return &TeamParentTeam{typeName: "team", Team: value}
+}
+
+func (t *TeamParentTeam) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		t.typeName = "team"
+		t.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TeamParentTeam) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "team":
+		return json.Marshal(t.Team)
+	}
+}
+
+type TeamParentTeamVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (t *TeamParentTeam) Accept(visitor TeamParentTeamVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "team":
+		return visitor.VisitTeam(t.Team)
+	}
 }
 
 // # The TimeOff Object
@@ -14074,9 +15825,9 @@ type TimeOff struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The employee requesting time off.
-	Employee *string `json:"employee,omitempty"`
+	Employee *TimeOffEmployee `json:"employee,omitempty"`
 	// The Merge ID of the employee with the ability to approve the time off request.
-	Approver *string `json:"approver,omitempty"`
+	Approver *TimeOffApprover `json:"approver,omitempty"`
 	// The status of this time off request.
 	//
 	// * `REQUESTED` - REQUESTED
@@ -14114,6 +15865,64 @@ type TimeOff struct {
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 }
 
+// The Merge ID of the employee with the ability to approve the time off request.
+type TimeOffApprover struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewTimeOffApproverFromString(value string) *TimeOffApprover {
+	return &TimeOffApprover{typeName: "string", String: value}
+}
+
+func NewTimeOffApproverFromEmployee(value *Employee) *TimeOffApprover {
+	return &TimeOffApprover{typeName: "employee", Employee: value}
+}
+
+func (t *TimeOffApprover) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		t.typeName = "employee"
+		t.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TimeOffApprover) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "employee":
+		return json.Marshal(t.Employee)
+	}
+}
+
+type TimeOffApproverVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (t *TimeOffApprover) Accept(visitor TimeOffApproverVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "employee":
+		return visitor.VisitEmployee(t.Employee)
+	}
+}
+
 // # The TimeOffBalance Object
 // ### Description
 // The `TimeOffBalance` object is used to represent current balances for an employee's Time Off plan.
@@ -14125,7 +15934,7 @@ type TimeOffBalance struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The employee the balance belongs to.
-	Employee *string `json:"employee,omitempty"`
+	Employee *TimeOffBalanceEmployee `json:"employee,omitempty"`
 	// The current remaining PTO balance, always measured in terms of hours.
 	Balance *float64 `json:"balance,omitempty"`
 	// The amount of PTO used in terms of hours.
@@ -14145,6 +15954,64 @@ type TimeOffBalance struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The employee the balance belongs to.
+type TimeOffBalanceEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewTimeOffBalanceEmployeeFromString(value string) *TimeOffBalanceEmployee {
+	return &TimeOffBalanceEmployee{typeName: "string", String: value}
+}
+
+func NewTimeOffBalanceEmployeeFromEmployee(value *Employee) *TimeOffBalanceEmployee {
+	return &TimeOffBalanceEmployee{typeName: "employee", Employee: value}
+}
+
+func (t *TimeOffBalanceEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		t.typeName = "employee"
+		t.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TimeOffBalanceEmployee) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "employee":
+		return json.Marshal(t.Employee)
+	}
+}
+
+type TimeOffBalanceEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (t *TimeOffBalanceEmployee) Accept(visitor TimeOffBalanceEmployeeVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "employee":
+		return visitor.VisitEmployee(t.Employee)
+	}
 }
 
 // The policy type of this time off balance.
@@ -14272,6 +16139,64 @@ func (t *TimeOffBalancesListRequestPolicyType) UnmarshalJSON(data []byte) error 
 		*t = value
 	}
 	return nil
+}
+
+// The employee requesting time off.
+type TimeOffEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewTimeOffEmployeeFromString(value string) *TimeOffEmployee {
+	return &TimeOffEmployee{typeName: "string", String: value}
+}
+
+func NewTimeOffEmployeeFromEmployee(value *Employee) *TimeOffEmployee {
+	return &TimeOffEmployee{typeName: "employee", Employee: value}
+}
+
+func (t *TimeOffEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		t.typeName = "employee"
+		t.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TimeOffEmployee) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "employee":
+		return json.Marshal(t.Employee)
+	}
+}
+
+type TimeOffEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (t *TimeOffEmployee) Accept(visitor TimeOffEmployeeVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "employee":
+		return visitor.VisitEmployee(t.Employee)
+	}
 }
 
 type TimeOffListRequestExpand uint
@@ -14580,9 +16505,9 @@ func (t *TimeOffListRequestStatus) UnmarshalJSON(data []byte) error {
 // Fetch from the `LIST TimeOffs` endpoint and filter by `ID` to show all time off requests.
 type TimeOffRequest struct {
 	// The employee requesting time off.
-	Employee *string `json:"employee,omitempty"`
+	Employee *TimeOffRequestEmployee `json:"employee,omitempty"`
 	// The Merge ID of the employee with the ability to approve the time off request.
-	Approver *string `json:"approver,omitempty"`
+	Approver *TimeOffRequestApprover `json:"approver,omitempty"`
 	// The status of this time off request.
 	//
 	// * `REQUESTED` - REQUESTED
@@ -14615,6 +16540,122 @@ type TimeOffRequest struct {
 	EndTime             *time.Time     `json:"end_time,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The Merge ID of the employee with the ability to approve the time off request.
+type TimeOffRequestApprover struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewTimeOffRequestApproverFromString(value string) *TimeOffRequestApprover {
+	return &TimeOffRequestApprover{typeName: "string", String: value}
+}
+
+func NewTimeOffRequestApproverFromEmployee(value *Employee) *TimeOffRequestApprover {
+	return &TimeOffRequestApprover{typeName: "employee", Employee: value}
+}
+
+func (t *TimeOffRequestApprover) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		t.typeName = "employee"
+		t.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TimeOffRequestApprover) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "employee":
+		return json.Marshal(t.Employee)
+	}
+}
+
+type TimeOffRequestApproverVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (t *TimeOffRequestApprover) Accept(visitor TimeOffRequestApproverVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "employee":
+		return visitor.VisitEmployee(t.Employee)
+	}
+}
+
+// The employee requesting time off.
+type TimeOffRequestEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewTimeOffRequestEmployeeFromString(value string) *TimeOffRequestEmployee {
+	return &TimeOffRequestEmployee{typeName: "string", String: value}
+}
+
+func NewTimeOffRequestEmployeeFromEmployee(value *Employee) *TimeOffRequestEmployee {
+	return &TimeOffRequestEmployee{typeName: "employee", Employee: value}
+}
+
+func (t *TimeOffRequestEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		t.typeName = "employee"
+		t.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TimeOffRequestEmployee) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "employee":
+		return json.Marshal(t.Employee)
+	}
+}
+
+type TimeOffRequestEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (t *TimeOffRequestEmployee) Accept(visitor TimeOffRequestEmployeeVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "employee":
+		return visitor.VisitEmployee(t.Employee)
+	}
 }
 
 // The type of time off request.

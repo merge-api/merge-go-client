@@ -6,6 +6,7 @@ import (
 	core "github.com/merge-api/merge-go-client/core"
 	accountdetails "github.com/merge-api/merge-go-client/filestorage/accountdetails"
 	accounttoken "github.com/merge-api/merge-go-client/filestorage/accounttoken"
+	asyncpassthrough "github.com/merge-api/merge-go-client/filestorage/asyncpassthrough"
 	availableactions "github.com/merge-api/merge-go-client/filestorage/availableactions"
 	deleteaccount "github.com/merge-api/merge-go-client/filestorage/deleteaccount"
 	drives "github.com/merge-api/merge-go-client/filestorage/drives"
@@ -29,6 +30,7 @@ import (
 type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
+	AsyncPassthrough() asyncpassthrough.Client
 	AvailableActions() availableactions.Client
 	DeleteAccount() deleteaccount.Client
 	Drives() drives.Client
@@ -59,6 +61,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		header:                 options.ToHeader(),
 		accountDetailsClient:   accountdetails.NewClient(opts...),
 		accountTokenClient:     accounttoken.NewClient(opts...),
+		asyncPassthroughClient: asyncpassthrough.NewClient(opts...),
 		availableActionsClient: availableactions.NewClient(opts...),
 		deleteAccountClient:    deleteaccount.NewClient(opts...),
 		drivesClient:           drives.NewClient(opts...),
@@ -85,6 +88,7 @@ type client struct {
 	header                 http.Header
 	accountDetailsClient   accountdetails.Client
 	accountTokenClient     accounttoken.Client
+	asyncPassthroughClient asyncpassthrough.Client
 	availableActionsClient availableactions.Client
 	deleteAccountClient    deleteaccount.Client
 	drivesClient           drives.Client
@@ -110,6 +114,10 @@ func (c *client) AccountDetails() accountdetails.Client {
 
 func (c *client) AccountToken() accounttoken.Client {
 	return c.accountTokenClient
+}
+
+func (c *client) AsyncPassthrough() asyncpassthrough.Client {
+	return c.asyncPassthroughClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {

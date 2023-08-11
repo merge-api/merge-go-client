@@ -371,7 +371,7 @@ type Activity struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The user that performed the action.
-	User *string `json:"user,omitempty"`
+	User *ActivityUser `json:"user,omitempty"`
 	// When the third party's activity was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// The activity's type.
@@ -469,7 +469,7 @@ func (a *ActivityActivityType) Accept(visitor ActivityActivityTypeVisitor) error
 // Fetch from the `LIST Activities` endpoint and filter by `ID` to show all activities.
 type ActivityRequest struct {
 	// The user that performed the action.
-	User *string `json:"user,omitempty"`
+	User *ActivityRequestUser `json:"user,omitempty"`
 	// The activity's type.
 	//
 	// * `NOTE` - NOTE
@@ -551,6 +551,64 @@ func (a *ActivityRequestActivityType) Accept(visitor ActivityRequestActivityType
 		return visitor.VisitActivityTypeEnum(a.ActivityTypeEnum)
 	case "string":
 		return visitor.VisitString(a.String)
+	}
+}
+
+// The user that performed the action.
+type ActivityRequestUser struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewActivityRequestUserFromString(value string) *ActivityRequestUser {
+	return &ActivityRequestUser{typeName: "string", String: value}
+}
+
+func NewActivityRequestUserFromRemoteUser(value *RemoteUser) *ActivityRequestUser {
+	return &ActivityRequestUser{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (a *ActivityRequestUser) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		a.typeName = "remoteUser"
+		a.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ActivityRequestUser) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "remoteUser":
+		return json.Marshal(a.RemoteUser)
+	}
+}
+
+type ActivityRequestUserVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (a *ActivityRequestUser) Accept(visitor ActivityRequestUserVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(a.RemoteUser)
 	}
 }
 
@@ -670,6 +728,64 @@ func (a *ActivityTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// The user that performed the action.
+type ActivityUser struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewActivityUserFromString(value string) *ActivityUser {
+	return &ActivityUser{typeName: "string", String: value}
+}
+
+func NewActivityUserFromRemoteUser(value *RemoteUser) *ActivityUser {
+	return &ActivityUser{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (a *ActivityUser) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		a.typeName = "remoteUser"
+		a.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ActivityUser) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "remoteUser":
+		return json.Marshal(a.RemoteUser)
+	}
+}
+
+type ActivityUserVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (a *ActivityUser) Accept(visitor ActivityUserVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(a.RemoteUser)
+	}
+}
+
 // The activity's visibility.
 //
 // * `ADMIN_ONLY` - ADMIN_ONLY
@@ -743,9 +859,9 @@ type Application struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The candidate applying.
-	Candidate *string `json:"candidate,omitempty"`
+	Candidate *ApplicationCandidate `json:"candidate,omitempty"`
 	// The job being applied for.
-	Job *string `json:"job,omitempty"`
+	Job *ApplicationJob `json:"job,omitempty"`
 	// When the application was submitted.
 	AppliedAt *time.Time `json:"applied_at,omitempty"`
 	// When the application was rejected.
@@ -753,16 +869,306 @@ type Application struct {
 	// The application's source.
 	Source *string `json:"source,omitempty"`
 	// The user credited for this application.
-	CreditedTo *string `json:"credited_to,omitempty"`
+	CreditedTo *ApplicationCreditedTo `json:"credited_to,omitempty"`
 	// The application's current stage.
-	CurrentStage *string `json:"current_stage,omitempty"`
+	CurrentStage *ApplicationCurrentStage `json:"current_stage,omitempty"`
 	// The application's reason for rejection.
-	RejectReason     *string `json:"reject_reason,omitempty"`
-	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
+	RejectReason     *ApplicationRejectReason `json:"reject_reason,omitempty"`
+	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The candidate applying.
+type ApplicationCandidate struct {
+	typeName  string
+	String    string
+	Candidate *Candidate
+}
+
+func NewApplicationCandidateFromString(value string) *ApplicationCandidate {
+	return &ApplicationCandidate{typeName: "string", String: value}
+}
+
+func NewApplicationCandidateFromCandidate(value *Candidate) *ApplicationCandidate {
+	return &ApplicationCandidate{typeName: "candidate", Candidate: value}
+}
+
+func (a *ApplicationCandidate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueCandidate := new(Candidate)
+	if err := json.Unmarshal(data, &valueCandidate); err == nil {
+		a.typeName = "candidate"
+		a.Candidate = valueCandidate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationCandidate) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "candidate":
+		return json.Marshal(a.Candidate)
+	}
+}
+
+type ApplicationCandidateVisitor interface {
+	VisitString(string) error
+	VisitCandidate(*Candidate) error
+}
+
+func (a *ApplicationCandidate) Accept(visitor ApplicationCandidateVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "candidate":
+		return visitor.VisitCandidate(a.Candidate)
+	}
+}
+
+// The user credited for this application.
+type ApplicationCreditedTo struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewApplicationCreditedToFromString(value string) *ApplicationCreditedTo {
+	return &ApplicationCreditedTo{typeName: "string", String: value}
+}
+
+func NewApplicationCreditedToFromRemoteUser(value *RemoteUser) *ApplicationCreditedTo {
+	return &ApplicationCreditedTo{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (a *ApplicationCreditedTo) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		a.typeName = "remoteUser"
+		a.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationCreditedTo) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "remoteUser":
+		return json.Marshal(a.RemoteUser)
+	}
+}
+
+type ApplicationCreditedToVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (a *ApplicationCreditedTo) Accept(visitor ApplicationCreditedToVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(a.RemoteUser)
+	}
+}
+
+// The application's current stage.
+type ApplicationCurrentStage struct {
+	typeName          string
+	String            string
+	JobInterviewStage *JobInterviewStage
+}
+
+func NewApplicationCurrentStageFromString(value string) *ApplicationCurrentStage {
+	return &ApplicationCurrentStage{typeName: "string", String: value}
+}
+
+func NewApplicationCurrentStageFromJobInterviewStage(value *JobInterviewStage) *ApplicationCurrentStage {
+	return &ApplicationCurrentStage{typeName: "jobInterviewStage", JobInterviewStage: value}
+}
+
+func (a *ApplicationCurrentStage) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueJobInterviewStage := new(JobInterviewStage)
+	if err := json.Unmarshal(data, &valueJobInterviewStage); err == nil {
+		a.typeName = "jobInterviewStage"
+		a.JobInterviewStage = valueJobInterviewStage
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationCurrentStage) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "jobInterviewStage":
+		return json.Marshal(a.JobInterviewStage)
+	}
+}
+
+type ApplicationCurrentStageVisitor interface {
+	VisitString(string) error
+	VisitJobInterviewStage(*JobInterviewStage) error
+}
+
+func (a *ApplicationCurrentStage) Accept(visitor ApplicationCurrentStageVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "jobInterviewStage":
+		return visitor.VisitJobInterviewStage(a.JobInterviewStage)
+	}
+}
+
+// The job being applied for.
+type ApplicationJob struct {
+	typeName string
+	String   string
+	Job      *Job
+}
+
+func NewApplicationJobFromString(value string) *ApplicationJob {
+	return &ApplicationJob{typeName: "string", String: value}
+}
+
+func NewApplicationJobFromJob(value *Job) *ApplicationJob {
+	return &ApplicationJob{typeName: "job", Job: value}
+}
+
+func (a *ApplicationJob) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueJob := new(Job)
+	if err := json.Unmarshal(data, &valueJob); err == nil {
+		a.typeName = "job"
+		a.Job = valueJob
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationJob) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "job":
+		return json.Marshal(a.Job)
+	}
+}
+
+type ApplicationJobVisitor interface {
+	VisitString(string) error
+	VisitJob(*Job) error
+}
+
+func (a *ApplicationJob) Accept(visitor ApplicationJobVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "job":
+		return visitor.VisitJob(a.Job)
+	}
+}
+
+// The application's reason for rejection.
+type ApplicationRejectReason struct {
+	typeName     string
+	String       string
+	RejectReason *RejectReason
+}
+
+func NewApplicationRejectReasonFromString(value string) *ApplicationRejectReason {
+	return &ApplicationRejectReason{typeName: "string", String: value}
+}
+
+func NewApplicationRejectReasonFromRejectReason(value *RejectReason) *ApplicationRejectReason {
+	return &ApplicationRejectReason{typeName: "rejectReason", RejectReason: value}
+}
+
+func (a *ApplicationRejectReason) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueRejectReason := new(RejectReason)
+	if err := json.Unmarshal(data, &valueRejectReason); err == nil {
+		a.typeName = "rejectReason"
+		a.RejectReason = valueRejectReason
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRejectReason) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "rejectReason":
+		return json.Marshal(a.RejectReason)
+	}
+}
+
+type ApplicationRejectReasonVisitor interface {
+	VisitString(string) error
+	VisitRejectReason(*RejectReason) error
+}
+
+func (a *ApplicationRejectReason) Accept(visitor ApplicationRejectReasonVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "rejectReason":
+		return visitor.VisitRejectReason(a.RejectReason)
+	}
 }
 
 // # The Application Object
@@ -773,9 +1179,9 @@ type Application struct {
 // Fetch from the `LIST Applications` endpoint and filter by `ID` to show all applications.
 type ApplicationRequest struct {
 	// The candidate applying.
-	Candidate *string `json:"candidate,omitempty"`
+	Candidate *ApplicationRequestCandidate `json:"candidate,omitempty"`
 	// The job being applied for.
-	Job *string `json:"job,omitempty"`
+	Job *ApplicationRequestJob `json:"job,omitempty"`
 	// When the application was submitted.
 	AppliedAt *time.Time `json:"applied_at,omitempty"`
 	// When the application was rejected.
@@ -783,15 +1189,305 @@ type ApplicationRequest struct {
 	// The application's source.
 	Source *string `json:"source,omitempty"`
 	// The user credited for this application.
-	CreditedTo *string `json:"credited_to,omitempty"`
+	CreditedTo *ApplicationRequestCreditedTo `json:"credited_to,omitempty"`
 	// The application's current stage.
-	CurrentStage *string `json:"current_stage,omitempty"`
+	CurrentStage *ApplicationRequestCurrentStage `json:"current_stage,omitempty"`
 	// The application's reason for rejection.
-	RejectReason *string `json:"reject_reason,omitempty"`
+	RejectReason *ApplicationRequestRejectReason `json:"reject_reason,omitempty"`
 	// <span style="white-space: nowrap">`non-empty`</span>
 	RemoteTemplateId    *string        `json:"remote_template_id,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The candidate applying.
+type ApplicationRequestCandidate struct {
+	typeName  string
+	String    string
+	Candidate *Candidate
+}
+
+func NewApplicationRequestCandidateFromString(value string) *ApplicationRequestCandidate {
+	return &ApplicationRequestCandidate{typeName: "string", String: value}
+}
+
+func NewApplicationRequestCandidateFromCandidate(value *Candidate) *ApplicationRequestCandidate {
+	return &ApplicationRequestCandidate{typeName: "candidate", Candidate: value}
+}
+
+func (a *ApplicationRequestCandidate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueCandidate := new(Candidate)
+	if err := json.Unmarshal(data, &valueCandidate); err == nil {
+		a.typeName = "candidate"
+		a.Candidate = valueCandidate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestCandidate) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "candidate":
+		return json.Marshal(a.Candidate)
+	}
+}
+
+type ApplicationRequestCandidateVisitor interface {
+	VisitString(string) error
+	VisitCandidate(*Candidate) error
+}
+
+func (a *ApplicationRequestCandidate) Accept(visitor ApplicationRequestCandidateVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "candidate":
+		return visitor.VisitCandidate(a.Candidate)
+	}
+}
+
+// The user credited for this application.
+type ApplicationRequestCreditedTo struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewApplicationRequestCreditedToFromString(value string) *ApplicationRequestCreditedTo {
+	return &ApplicationRequestCreditedTo{typeName: "string", String: value}
+}
+
+func NewApplicationRequestCreditedToFromRemoteUser(value *RemoteUser) *ApplicationRequestCreditedTo {
+	return &ApplicationRequestCreditedTo{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (a *ApplicationRequestCreditedTo) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		a.typeName = "remoteUser"
+		a.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestCreditedTo) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "remoteUser":
+		return json.Marshal(a.RemoteUser)
+	}
+}
+
+type ApplicationRequestCreditedToVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (a *ApplicationRequestCreditedTo) Accept(visitor ApplicationRequestCreditedToVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(a.RemoteUser)
+	}
+}
+
+// The application's current stage.
+type ApplicationRequestCurrentStage struct {
+	typeName          string
+	String            string
+	JobInterviewStage *JobInterviewStage
+}
+
+func NewApplicationRequestCurrentStageFromString(value string) *ApplicationRequestCurrentStage {
+	return &ApplicationRequestCurrentStage{typeName: "string", String: value}
+}
+
+func NewApplicationRequestCurrentStageFromJobInterviewStage(value *JobInterviewStage) *ApplicationRequestCurrentStage {
+	return &ApplicationRequestCurrentStage{typeName: "jobInterviewStage", JobInterviewStage: value}
+}
+
+func (a *ApplicationRequestCurrentStage) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueJobInterviewStage := new(JobInterviewStage)
+	if err := json.Unmarshal(data, &valueJobInterviewStage); err == nil {
+		a.typeName = "jobInterviewStage"
+		a.JobInterviewStage = valueJobInterviewStage
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestCurrentStage) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "jobInterviewStage":
+		return json.Marshal(a.JobInterviewStage)
+	}
+}
+
+type ApplicationRequestCurrentStageVisitor interface {
+	VisitString(string) error
+	VisitJobInterviewStage(*JobInterviewStage) error
+}
+
+func (a *ApplicationRequestCurrentStage) Accept(visitor ApplicationRequestCurrentStageVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "jobInterviewStage":
+		return visitor.VisitJobInterviewStage(a.JobInterviewStage)
+	}
+}
+
+// The job being applied for.
+type ApplicationRequestJob struct {
+	typeName string
+	String   string
+	Job      *Job
+}
+
+func NewApplicationRequestJobFromString(value string) *ApplicationRequestJob {
+	return &ApplicationRequestJob{typeName: "string", String: value}
+}
+
+func NewApplicationRequestJobFromJob(value *Job) *ApplicationRequestJob {
+	return &ApplicationRequestJob{typeName: "job", Job: value}
+}
+
+func (a *ApplicationRequestJob) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueJob := new(Job)
+	if err := json.Unmarshal(data, &valueJob); err == nil {
+		a.typeName = "job"
+		a.Job = valueJob
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestJob) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "job":
+		return json.Marshal(a.Job)
+	}
+}
+
+type ApplicationRequestJobVisitor interface {
+	VisitString(string) error
+	VisitJob(*Job) error
+}
+
+func (a *ApplicationRequestJob) Accept(visitor ApplicationRequestJobVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "job":
+		return visitor.VisitJob(a.Job)
+	}
+}
+
+// The application's reason for rejection.
+type ApplicationRequestRejectReason struct {
+	typeName     string
+	String       string
+	RejectReason *RejectReason
+}
+
+func NewApplicationRequestRejectReasonFromString(value string) *ApplicationRequestRejectReason {
+	return &ApplicationRequestRejectReason{typeName: "string", String: value}
+}
+
+func NewApplicationRequestRejectReasonFromRejectReason(value *RejectReason) *ApplicationRequestRejectReason {
+	return &ApplicationRequestRejectReason{typeName: "rejectReason", RejectReason: value}
+}
+
+func (a *ApplicationRequestRejectReason) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueRejectReason := new(RejectReason)
+	if err := json.Unmarshal(data, &valueRejectReason); err == nil {
+		a.typeName = "rejectReason"
+		a.RejectReason = valueRejectReason
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestRejectReason) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "rejectReason":
+		return json.Marshal(a.RejectReason)
+	}
+}
+
+type ApplicationRequestRejectReasonVisitor interface {
+	VisitString(string) error
+	VisitRejectReason(*RejectReason) error
+}
+
+func (a *ApplicationRequestRejectReason) Accept(visitor ApplicationRequestRejectReasonVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "rejectReason":
+		return visitor.VisitRejectReason(a.RejectReason)
+	}
 }
 
 type ApplicationResponse struct {
@@ -1225,6 +1921,10 @@ func (a *ApplicationsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type AsyncPassthroughReciept struct {
+	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+}
+
 // # The Attachment Object
 // ### Description
 // The `Attachment` object is used to represent a file attached to a candidate.
@@ -1509,14 +2209,128 @@ type Candidate struct {
 	// Array of `Tag` names as strings.
 	Tags []*string `json:"tags,omitempty"`
 	// Array of `Application` object IDs.
-	Applications []*string `json:"applications,omitempty"`
+	Applications []*CandidateApplicationsItem `json:"applications,omitempty"`
 	// Array of `Attachment` object IDs.
-	Attachments      []*string `json:"attachments,omitempty"`
-	RemoteWasDeleted *bool     `json:"remote_was_deleted,omitempty"`
+	Attachments      []*CandidateAttachmentsItem `json:"attachments,omitempty"`
+	RemoteWasDeleted *bool                       `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+type CandidateApplicationsItem struct {
+	typeName    string
+	String      string
+	Application *Application
+}
+
+func NewCandidateApplicationsItemFromString(value string) *CandidateApplicationsItem {
+	return &CandidateApplicationsItem{typeName: "string", String: value}
+}
+
+func NewCandidateApplicationsItemFromApplication(value *Application) *CandidateApplicationsItem {
+	return &CandidateApplicationsItem{typeName: "application", Application: value}
+}
+
+func (c *CandidateApplicationsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueApplication := new(Application)
+	if err := json.Unmarshal(data, &valueApplication); err == nil {
+		c.typeName = "application"
+		c.Application = valueApplication
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CandidateApplicationsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "application":
+		return json.Marshal(c.Application)
+	}
+}
+
+type CandidateApplicationsItemVisitor interface {
+	VisitString(string) error
+	VisitApplication(*Application) error
+}
+
+func (c *CandidateApplicationsItem) Accept(visitor CandidateApplicationsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "application":
+		return visitor.VisitApplication(c.Application)
+	}
+}
+
+type CandidateAttachmentsItem struct {
+	typeName   string
+	String     string
+	Attachment *Attachment
+}
+
+func NewCandidateAttachmentsItemFromString(value string) *CandidateAttachmentsItem {
+	return &CandidateAttachmentsItem{typeName: "string", String: value}
+}
+
+func NewCandidateAttachmentsItemFromAttachment(value *Attachment) *CandidateAttachmentsItem {
+	return &CandidateAttachmentsItem{typeName: "attachment", Attachment: value}
+}
+
+func (c *CandidateAttachmentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueAttachment := new(Attachment)
+	if err := json.Unmarshal(data, &valueAttachment); err == nil {
+		c.typeName = "attachment"
+		c.Attachment = valueAttachment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CandidateAttachmentsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "attachment":
+		return json.Marshal(c.Attachment)
+	}
+}
+
+type CandidateAttachmentsItemVisitor interface {
+	VisitString(string) error
+	VisitAttachment(*Attachment) error
+}
+
+func (c *CandidateAttachmentsItem) Accept(visitor CandidateAttachmentsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "attachment":
+		return visitor.VisitAttachment(c.Attachment)
+	}
 }
 
 // # The Candidate Object
@@ -1547,13 +2361,127 @@ type CandidateRequest struct {
 	// Array of `Tag` names as strings.
 	Tags []*string `json:"tags,omitempty"`
 	// Array of `Application` object IDs.
-	Applications []*string `json:"applications,omitempty"`
+	Applications []*CandidateRequestApplicationsItem `json:"applications,omitempty"`
 	// Array of `Attachment` object IDs.
-	Attachments []*string `json:"attachments,omitempty"`
+	Attachments []*CandidateRequestAttachmentsItem `json:"attachments,omitempty"`
 	// <span style="white-space: nowrap">`non-empty`</span>
 	RemoteTemplateId    *string        `json:"remote_template_id,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+type CandidateRequestApplicationsItem struct {
+	typeName    string
+	String      string
+	Application *Application
+}
+
+func NewCandidateRequestApplicationsItemFromString(value string) *CandidateRequestApplicationsItem {
+	return &CandidateRequestApplicationsItem{typeName: "string", String: value}
+}
+
+func NewCandidateRequestApplicationsItemFromApplication(value *Application) *CandidateRequestApplicationsItem {
+	return &CandidateRequestApplicationsItem{typeName: "application", Application: value}
+}
+
+func (c *CandidateRequestApplicationsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueApplication := new(Application)
+	if err := json.Unmarshal(data, &valueApplication); err == nil {
+		c.typeName = "application"
+		c.Application = valueApplication
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CandidateRequestApplicationsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "application":
+		return json.Marshal(c.Application)
+	}
+}
+
+type CandidateRequestApplicationsItemVisitor interface {
+	VisitString(string) error
+	VisitApplication(*Application) error
+}
+
+func (c *CandidateRequestApplicationsItem) Accept(visitor CandidateRequestApplicationsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "application":
+		return visitor.VisitApplication(c.Application)
+	}
+}
+
+type CandidateRequestAttachmentsItem struct {
+	typeName   string
+	String     string
+	Attachment *Attachment
+}
+
+func NewCandidateRequestAttachmentsItemFromString(value string) *CandidateRequestAttachmentsItem {
+	return &CandidateRequestAttachmentsItem{typeName: "string", String: value}
+}
+
+func NewCandidateRequestAttachmentsItemFromAttachment(value *Attachment) *CandidateRequestAttachmentsItem {
+	return &CandidateRequestAttachmentsItem{typeName: "attachment", Attachment: value}
+}
+
+func (c *CandidateRequestAttachmentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueAttachment := new(Attachment)
+	if err := json.Unmarshal(data, &valueAttachment); err == nil {
+		c.typeName = "attachment"
+		c.Attachment = valueAttachment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CandidateRequestAttachmentsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "attachment":
+		return json.Marshal(c.Attachment)
+	}
+}
+
+type CandidateRequestAttachmentsItemVisitor interface {
+	VisitString(string) error
+	VisitAttachment(*Attachment) error
+}
+
+func (c *CandidateRequestAttachmentsItem) Accept(visitor CandidateRequestAttachmentsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "attachment":
+		return visitor.VisitAttachment(c.Attachment)
+	}
 }
 
 type CandidateResponse struct {
@@ -1974,6 +2902,29 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// # The DataPassthrough Object
+// ### Description
+// The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
+//
+// ### Usage Example
+// Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
+type DataPassthroughRequest struct {
+	Method MethodEnum `json:"method,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Path string `json:"path"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Data *string `json:"data,omitempty"`
+	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
+	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
+	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
+	Headers       map[string]any     `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
+	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+}
+
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
@@ -2062,7 +3013,7 @@ type Eeoc struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The candidate being represented.
-	Candidate *string `json:"candidate,omitempty"`
+	Candidate *EeocCandidate `json:"candidate,omitempty"`
 	// When the information was submitted.
 	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 	// The candidate's race.
@@ -2102,6 +3053,64 @@ type Eeoc struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The candidate being represented.
+type EeocCandidate struct {
+	typeName  string
+	String    string
+	Candidate *Candidate
+}
+
+func NewEeocCandidateFromString(value string) *EeocCandidate {
+	return &EeocCandidate{typeName: "string", String: value}
+}
+
+func NewEeocCandidateFromCandidate(value *Candidate) *EeocCandidate {
+	return &EeocCandidate{typeName: "candidate", Candidate: value}
+}
+
+func (e *EeocCandidate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueCandidate := new(Candidate)
+	if err := json.Unmarshal(data, &valueCandidate); err == nil {
+		e.typeName = "candidate"
+		e.Candidate = valueCandidate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EeocCandidate) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "candidate":
+		return json.Marshal(e.Candidate)
+	}
+}
+
+type EeocCandidateVisitor interface {
+	VisitString(string) error
+	VisitCandidate(*Candidate) error
+}
+
+func (e *EeocCandidate) Accept(visitor EeocCandidateVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "candidate":
+		return visitor.VisitCandidate(e.Candidate)
+	}
 }
 
 // The candidate's disability status.
@@ -3602,19 +4611,133 @@ type Job struct {
 	// Whether the job is confidential.
 	Confidential *bool `json:"confidential,omitempty"`
 	// IDs of `Department` objects for this `Job`.
-	Departments []*string `json:"departments,omitempty"`
+	Departments []*JobDepartmentsItem `json:"departments,omitempty"`
 	// IDs of `Office` objects for this `Job`.
-	Offices []*string `json:"offices,omitempty"`
+	Offices []*JobOfficesItem `json:"offices,omitempty"`
 	// IDs of `RemoteUser` objects that serve as hiring managers for this `Job`.
-	HiringManagers []*string `json:"hiring_managers,omitempty"`
+	HiringManagers []*JobHiringManagersItem `json:"hiring_managers,omitempty"`
 	// IDs of `RemoteUser` objects that serve as recruiters for this `Job`.
-	Recruiters []*string `json:"recruiters,omitempty"`
+	Recruiters []*JobRecruitersItem `json:"recruiters,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+type JobDepartmentsItem struct {
+	typeName   string
+	String     string
+	Department *Department
+}
+
+func NewJobDepartmentsItemFromString(value string) *JobDepartmentsItem {
+	return &JobDepartmentsItem{typeName: "string", String: value}
+}
+
+func NewJobDepartmentsItemFromDepartment(value *Department) *JobDepartmentsItem {
+	return &JobDepartmentsItem{typeName: "department", Department: value}
+}
+
+func (j *JobDepartmentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueDepartment := new(Department)
+	if err := json.Unmarshal(data, &valueDepartment); err == nil {
+		j.typeName = "department"
+		j.Department = valueDepartment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobDepartmentsItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "department":
+		return json.Marshal(j.Department)
+	}
+}
+
+type JobDepartmentsItemVisitor interface {
+	VisitString(string) error
+	VisitDepartment(*Department) error
+}
+
+func (j *JobDepartmentsItem) Accept(visitor JobDepartmentsItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "department":
+		return visitor.VisitDepartment(j.Department)
+	}
+}
+
+type JobHiringManagersItem struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewJobHiringManagersItemFromString(value string) *JobHiringManagersItem {
+	return &JobHiringManagersItem{typeName: "string", String: value}
+}
+
+func NewJobHiringManagersItemFromRemoteUser(value *RemoteUser) *JobHiringManagersItem {
+	return &JobHiringManagersItem{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (j *JobHiringManagersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		j.typeName = "remoteUser"
+		j.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobHiringManagersItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "remoteUser":
+		return json.Marshal(j.RemoteUser)
+	}
+}
+
+type JobHiringManagersItemVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (j *JobHiringManagersItem) Accept(visitor JobHiringManagersItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(j.RemoteUser)
+	}
 }
 
 // # The JobInterviewStage Object
@@ -3629,7 +4752,7 @@ type JobInterviewStage struct {
 	// Standard stage names are offered by ATS systems but can be modified by users.
 	Name *string `json:"name,omitempty"`
 	// This field is populated only if the stage is specific to a particular job. If the stage is generic, this field will not be populated.
-	Job *string `json:"job,omitempty"`
+	Job *JobInterviewStageJob `json:"job,omitempty"`
 	// The stage’s order, with the lowest values ordered first. If the third-party does not return details on the order of stages, this field will not be populated.
 	StageOrder *int `json:"stage_order,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
@@ -3638,6 +4761,178 @@ type JobInterviewStage struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// This field is populated only if the stage is specific to a particular job. If the stage is generic, this field will not be populated.
+type JobInterviewStageJob struct {
+	typeName string
+	String   string
+	Job      *Job
+}
+
+func NewJobInterviewStageJobFromString(value string) *JobInterviewStageJob {
+	return &JobInterviewStageJob{typeName: "string", String: value}
+}
+
+func NewJobInterviewStageJobFromJob(value *Job) *JobInterviewStageJob {
+	return &JobInterviewStageJob{typeName: "job", Job: value}
+}
+
+func (j *JobInterviewStageJob) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueJob := new(Job)
+	if err := json.Unmarshal(data, &valueJob); err == nil {
+		j.typeName = "job"
+		j.Job = valueJob
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobInterviewStageJob) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "job":
+		return json.Marshal(j.Job)
+	}
+}
+
+type JobInterviewStageJobVisitor interface {
+	VisitString(string) error
+	VisitJob(*Job) error
+}
+
+func (j *JobInterviewStageJob) Accept(visitor JobInterviewStageJobVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "job":
+		return visitor.VisitJob(j.Job)
+	}
+}
+
+type JobOfficesItem struct {
+	typeName string
+	String   string
+	Office   *Office
+}
+
+func NewJobOfficesItemFromString(value string) *JobOfficesItem {
+	return &JobOfficesItem{typeName: "string", String: value}
+}
+
+func NewJobOfficesItemFromOffice(value *Office) *JobOfficesItem {
+	return &JobOfficesItem{typeName: "office", Office: value}
+}
+
+func (j *JobOfficesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueOffice := new(Office)
+	if err := json.Unmarshal(data, &valueOffice); err == nil {
+		j.typeName = "office"
+		j.Office = valueOffice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobOfficesItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "office":
+		return json.Marshal(j.Office)
+	}
+}
+
+type JobOfficesItemVisitor interface {
+	VisitString(string) error
+	VisitOffice(*Office) error
+}
+
+func (j *JobOfficesItem) Accept(visitor JobOfficesItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "office":
+		return visitor.VisitOffice(j.Office)
+	}
+}
+
+type JobRecruitersItem struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewJobRecruitersItemFromString(value string) *JobRecruitersItem {
+	return &JobRecruitersItem{typeName: "string", String: value}
+}
+
+func NewJobRecruitersItemFromRemoteUser(value *RemoteUser) *JobRecruitersItem {
+	return &JobRecruitersItem{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (j *JobRecruitersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		j.typeName = "remoteUser"
+		j.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobRecruitersItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "remoteUser":
+		return json.Marshal(j.RemoteUser)
+	}
+}
+
+type JobRecruitersItemVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (j *JobRecruitersItem) Accept(visitor JobRecruitersItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(j.RemoteUser)
+	}
 }
 
 // The job's status.
@@ -4355,9 +5650,9 @@ type Offer struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The application who is receiving the offer.
-	Application *string `json:"application,omitempty"`
+	Application *OfferApplication `json:"application,omitempty"`
 	// The user who created the offer.
-	Creator *string `json:"creator,omitempty"`
+	Creator *OfferCreator `json:"creator,omitempty"`
 	// When the third party's offer was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the offer was closed.
@@ -4384,6 +5679,122 @@ type Offer struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The application who is receiving the offer.
+type OfferApplication struct {
+	typeName    string
+	String      string
+	Application *Application
+}
+
+func NewOfferApplicationFromString(value string) *OfferApplication {
+	return &OfferApplication{typeName: "string", String: value}
+}
+
+func NewOfferApplicationFromApplication(value *Application) *OfferApplication {
+	return &OfferApplication{typeName: "application", Application: value}
+}
+
+func (o *OfferApplication) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueApplication := new(Application)
+	if err := json.Unmarshal(data, &valueApplication); err == nil {
+		o.typeName = "application"
+		o.Application = valueApplication
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OfferApplication) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "application":
+		return json.Marshal(o.Application)
+	}
+}
+
+type OfferApplicationVisitor interface {
+	VisitString(string) error
+	VisitApplication(*Application) error
+}
+
+func (o *OfferApplication) Accept(visitor OfferApplicationVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "application":
+		return visitor.VisitApplication(o.Application)
+	}
+}
+
+// The user who created the offer.
+type OfferCreator struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewOfferCreatorFromString(value string) *OfferCreator {
+	return &OfferCreator{typeName: "string", String: value}
+}
+
+func NewOfferCreatorFromRemoteUser(value *RemoteUser) *OfferCreator {
+	return &OfferCreator{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (o *OfferCreator) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		o.typeName = "remoteUser"
+		o.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OfferCreator) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "remoteUser":
+		return json.Marshal(o.RemoteUser)
+	}
+}
+
+type OfferCreatorVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (o *OfferCreator) Accept(visitor OfferCreatorVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(o.RemoteUser)
+	}
 }
 
 // The offer's status.
@@ -5533,13 +6944,13 @@ type ScheduledInterview struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The application being interviewed.
-	Application *string `json:"application,omitempty"`
+	Application *ScheduledInterviewApplication `json:"application,omitempty"`
 	// The stage of the interview.
-	JobInterviewStage *string `json:"job_interview_stage,omitempty"`
+	JobInterviewStage *ScheduledInterviewJobInterviewStage `json:"job_interview_stage,omitempty"`
 	// The user organizing the interview.
-	Organizer *string `json:"organizer,omitempty"`
+	Organizer *ScheduledInterviewOrganizer `json:"organizer,omitempty"`
 	// Array of `RemoteUser` IDs.
-	Interviewers []*string `json:"interviewers,omitempty"`
+	Interviewers []*ScheduledInterviewInterviewersItem `json:"interviewers,omitempty"`
 	// The interview's location.
 	Location *string `json:"location,omitempty"`
 	// When the interview was started.
@@ -5564,6 +6975,237 @@ type ScheduledInterview struct {
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 }
 
+// The application being interviewed.
+type ScheduledInterviewApplication struct {
+	typeName    string
+	String      string
+	Application *Application
+}
+
+func NewScheduledInterviewApplicationFromString(value string) *ScheduledInterviewApplication {
+	return &ScheduledInterviewApplication{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewApplicationFromApplication(value *Application) *ScheduledInterviewApplication {
+	return &ScheduledInterviewApplication{typeName: "application", Application: value}
+}
+
+func (s *ScheduledInterviewApplication) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueApplication := new(Application)
+	if err := json.Unmarshal(data, &valueApplication); err == nil {
+		s.typeName = "application"
+		s.Application = valueApplication
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewApplication) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "application":
+		return json.Marshal(s.Application)
+	}
+}
+
+type ScheduledInterviewApplicationVisitor interface {
+	VisitString(string) error
+	VisitApplication(*Application) error
+}
+
+func (s *ScheduledInterviewApplication) Accept(visitor ScheduledInterviewApplicationVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "application":
+		return visitor.VisitApplication(s.Application)
+	}
+}
+
+type ScheduledInterviewInterviewersItem struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewScheduledInterviewInterviewersItemFromString(value string) *ScheduledInterviewInterviewersItem {
+	return &ScheduledInterviewInterviewersItem{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewInterviewersItemFromRemoteUser(value *RemoteUser) *ScheduledInterviewInterviewersItem {
+	return &ScheduledInterviewInterviewersItem{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (s *ScheduledInterviewInterviewersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		s.typeName = "remoteUser"
+		s.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewInterviewersItem) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "remoteUser":
+		return json.Marshal(s.RemoteUser)
+	}
+}
+
+type ScheduledInterviewInterviewersItemVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (s *ScheduledInterviewInterviewersItem) Accept(visitor ScheduledInterviewInterviewersItemVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(s.RemoteUser)
+	}
+}
+
+// The stage of the interview.
+type ScheduledInterviewJobInterviewStage struct {
+	typeName          string
+	String            string
+	JobInterviewStage *JobInterviewStage
+}
+
+func NewScheduledInterviewJobInterviewStageFromString(value string) *ScheduledInterviewJobInterviewStage {
+	return &ScheduledInterviewJobInterviewStage{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewJobInterviewStageFromJobInterviewStage(value *JobInterviewStage) *ScheduledInterviewJobInterviewStage {
+	return &ScheduledInterviewJobInterviewStage{typeName: "jobInterviewStage", JobInterviewStage: value}
+}
+
+func (s *ScheduledInterviewJobInterviewStage) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueJobInterviewStage := new(JobInterviewStage)
+	if err := json.Unmarshal(data, &valueJobInterviewStage); err == nil {
+		s.typeName = "jobInterviewStage"
+		s.JobInterviewStage = valueJobInterviewStage
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewJobInterviewStage) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "jobInterviewStage":
+		return json.Marshal(s.JobInterviewStage)
+	}
+}
+
+type ScheduledInterviewJobInterviewStageVisitor interface {
+	VisitString(string) error
+	VisitJobInterviewStage(*JobInterviewStage) error
+}
+
+func (s *ScheduledInterviewJobInterviewStage) Accept(visitor ScheduledInterviewJobInterviewStageVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "jobInterviewStage":
+		return visitor.VisitJobInterviewStage(s.JobInterviewStage)
+	}
+}
+
+// The user organizing the interview.
+type ScheduledInterviewOrganizer struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewScheduledInterviewOrganizerFromString(value string) *ScheduledInterviewOrganizer {
+	return &ScheduledInterviewOrganizer{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewOrganizerFromRemoteUser(value *RemoteUser) *ScheduledInterviewOrganizer {
+	return &ScheduledInterviewOrganizer{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (s *ScheduledInterviewOrganizer) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		s.typeName = "remoteUser"
+		s.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewOrganizer) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "remoteUser":
+		return json.Marshal(s.RemoteUser)
+	}
+}
+
+type ScheduledInterviewOrganizerVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (s *ScheduledInterviewOrganizer) Accept(visitor ScheduledInterviewOrganizerVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(s.RemoteUser)
+	}
+}
+
 // # The ScheduledInterview Object
 // ### Description
 // The `ScheduledInterview` object is used to represent a scheduled interview for a given candidate’s application to a job. An `Application` can have multiple `ScheduledInterview`s depending on the particular hiring process.
@@ -5571,13 +7213,13 @@ type ScheduledInterview struct {
 // Fetch from the `LIST ScheduledInterviews` endpoint and filter by `interviewers` to show all office locations.
 type ScheduledInterviewRequest struct {
 	// The application being interviewed.
-	Application *string `json:"application,omitempty"`
+	Application *ScheduledInterviewRequestApplication `json:"application,omitempty"`
 	// The stage of the interview.
-	JobInterviewStage *string `json:"job_interview_stage,omitempty"`
+	JobInterviewStage *ScheduledInterviewRequestJobInterviewStage `json:"job_interview_stage,omitempty"`
 	// The user organizing the interview.
-	Organizer *string `json:"organizer,omitempty"`
+	Organizer *ScheduledInterviewRequestOrganizer `json:"organizer,omitempty"`
 	// Array of `RemoteUser` IDs.
-	Interviewers []*string `json:"interviewers,omitempty"`
+	Interviewers []*ScheduledInterviewRequestInterviewersItem `json:"interviewers,omitempty"`
 	// The interview's location.
 	Location *string `json:"location,omitempty"`
 	// When the interview was started.
@@ -5592,6 +7234,237 @@ type ScheduledInterviewRequest struct {
 	Status              *ScheduledInterviewRequestStatus `json:"status,omitempty"`
 	IntegrationParams   map[string]any                   `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                   `json:"linked_account_params,omitempty"`
+}
+
+// The application being interviewed.
+type ScheduledInterviewRequestApplication struct {
+	typeName    string
+	String      string
+	Application *Application
+}
+
+func NewScheduledInterviewRequestApplicationFromString(value string) *ScheduledInterviewRequestApplication {
+	return &ScheduledInterviewRequestApplication{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewRequestApplicationFromApplication(value *Application) *ScheduledInterviewRequestApplication {
+	return &ScheduledInterviewRequestApplication{typeName: "application", Application: value}
+}
+
+func (s *ScheduledInterviewRequestApplication) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueApplication := new(Application)
+	if err := json.Unmarshal(data, &valueApplication); err == nil {
+		s.typeName = "application"
+		s.Application = valueApplication
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewRequestApplication) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "application":
+		return json.Marshal(s.Application)
+	}
+}
+
+type ScheduledInterviewRequestApplicationVisitor interface {
+	VisitString(string) error
+	VisitApplication(*Application) error
+}
+
+func (s *ScheduledInterviewRequestApplication) Accept(visitor ScheduledInterviewRequestApplicationVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "application":
+		return visitor.VisitApplication(s.Application)
+	}
+}
+
+type ScheduledInterviewRequestInterviewersItem struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewScheduledInterviewRequestInterviewersItemFromString(value string) *ScheduledInterviewRequestInterviewersItem {
+	return &ScheduledInterviewRequestInterviewersItem{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewRequestInterviewersItemFromRemoteUser(value *RemoteUser) *ScheduledInterviewRequestInterviewersItem {
+	return &ScheduledInterviewRequestInterviewersItem{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (s *ScheduledInterviewRequestInterviewersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		s.typeName = "remoteUser"
+		s.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewRequestInterviewersItem) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "remoteUser":
+		return json.Marshal(s.RemoteUser)
+	}
+}
+
+type ScheduledInterviewRequestInterviewersItemVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (s *ScheduledInterviewRequestInterviewersItem) Accept(visitor ScheduledInterviewRequestInterviewersItemVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(s.RemoteUser)
+	}
+}
+
+// The stage of the interview.
+type ScheduledInterviewRequestJobInterviewStage struct {
+	typeName          string
+	String            string
+	JobInterviewStage *JobInterviewStage
+}
+
+func NewScheduledInterviewRequestJobInterviewStageFromString(value string) *ScheduledInterviewRequestJobInterviewStage {
+	return &ScheduledInterviewRequestJobInterviewStage{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewRequestJobInterviewStageFromJobInterviewStage(value *JobInterviewStage) *ScheduledInterviewRequestJobInterviewStage {
+	return &ScheduledInterviewRequestJobInterviewStage{typeName: "jobInterviewStage", JobInterviewStage: value}
+}
+
+func (s *ScheduledInterviewRequestJobInterviewStage) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueJobInterviewStage := new(JobInterviewStage)
+	if err := json.Unmarshal(data, &valueJobInterviewStage); err == nil {
+		s.typeName = "jobInterviewStage"
+		s.JobInterviewStage = valueJobInterviewStage
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewRequestJobInterviewStage) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "jobInterviewStage":
+		return json.Marshal(s.JobInterviewStage)
+	}
+}
+
+type ScheduledInterviewRequestJobInterviewStageVisitor interface {
+	VisitString(string) error
+	VisitJobInterviewStage(*JobInterviewStage) error
+}
+
+func (s *ScheduledInterviewRequestJobInterviewStage) Accept(visitor ScheduledInterviewRequestJobInterviewStageVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "jobInterviewStage":
+		return visitor.VisitJobInterviewStage(s.JobInterviewStage)
+	}
+}
+
+// The user organizing the interview.
+type ScheduledInterviewRequestOrganizer struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewScheduledInterviewRequestOrganizerFromString(value string) *ScheduledInterviewRequestOrganizer {
+	return &ScheduledInterviewRequestOrganizer{typeName: "string", String: value}
+}
+
+func NewScheduledInterviewRequestOrganizerFromRemoteUser(value *RemoteUser) *ScheduledInterviewRequestOrganizer {
+	return &ScheduledInterviewRequestOrganizer{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (s *ScheduledInterviewRequestOrganizer) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		s.typeName = "remoteUser"
+		s.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScheduledInterviewRequestOrganizer) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "remoteUser":
+		return json.Marshal(s.RemoteUser)
+	}
+}
+
+type ScheduledInterviewRequestOrganizerVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (s *ScheduledInterviewRequestOrganizer) Accept(visitor ScheduledInterviewRequestOrganizerVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(s.RemoteUser)
+	}
 }
 
 // The interview's status.
@@ -5782,11 +7655,11 @@ type Scorecard struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The application being scored.
-	Application *string `json:"application,omitempty"`
+	Application *ScorecardApplication `json:"application,omitempty"`
 	// The interview being scored.
-	Interview *string `json:"interview,omitempty"`
+	Interview *ScorecardInterview `json:"interview,omitempty"`
 	// The interviewer doing the scoring.
-	Interviewer *string `json:"interviewer,omitempty"`
+	Interviewer *ScorecardInterviewer `json:"interviewer,omitempty"`
 	// When the third party's scorecard was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the scorecard was submitted.
@@ -5805,6 +7678,180 @@ type Scorecard struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The application being scored.
+type ScorecardApplication struct {
+	typeName    string
+	String      string
+	Application *Application
+}
+
+func NewScorecardApplicationFromString(value string) *ScorecardApplication {
+	return &ScorecardApplication{typeName: "string", String: value}
+}
+
+func NewScorecardApplicationFromApplication(value *Application) *ScorecardApplication {
+	return &ScorecardApplication{typeName: "application", Application: value}
+}
+
+func (s *ScorecardApplication) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueApplication := new(Application)
+	if err := json.Unmarshal(data, &valueApplication); err == nil {
+		s.typeName = "application"
+		s.Application = valueApplication
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScorecardApplication) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "application":
+		return json.Marshal(s.Application)
+	}
+}
+
+type ScorecardApplicationVisitor interface {
+	VisitString(string) error
+	VisitApplication(*Application) error
+}
+
+func (s *ScorecardApplication) Accept(visitor ScorecardApplicationVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "application":
+		return visitor.VisitApplication(s.Application)
+	}
+}
+
+// The interview being scored.
+type ScorecardInterview struct {
+	typeName           string
+	String             string
+	ScheduledInterview *ScheduledInterview
+}
+
+func NewScorecardInterviewFromString(value string) *ScorecardInterview {
+	return &ScorecardInterview{typeName: "string", String: value}
+}
+
+func NewScorecardInterviewFromScheduledInterview(value *ScheduledInterview) *ScorecardInterview {
+	return &ScorecardInterview{typeName: "scheduledInterview", ScheduledInterview: value}
+}
+
+func (s *ScorecardInterview) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueScheduledInterview := new(ScheduledInterview)
+	if err := json.Unmarshal(data, &valueScheduledInterview); err == nil {
+		s.typeName = "scheduledInterview"
+		s.ScheduledInterview = valueScheduledInterview
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScorecardInterview) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "scheduledInterview":
+		return json.Marshal(s.ScheduledInterview)
+	}
+}
+
+type ScorecardInterviewVisitor interface {
+	VisitString(string) error
+	VisitScheduledInterview(*ScheduledInterview) error
+}
+
+func (s *ScorecardInterview) Accept(visitor ScorecardInterviewVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "scheduledInterview":
+		return visitor.VisitScheduledInterview(s.ScheduledInterview)
+	}
+}
+
+// The interviewer doing the scoring.
+type ScorecardInterviewer struct {
+	typeName   string
+	String     string
+	RemoteUser *RemoteUser
+}
+
+func NewScorecardInterviewerFromString(value string) *ScorecardInterviewer {
+	return &ScorecardInterviewer{typeName: "string", String: value}
+}
+
+func NewScorecardInterviewerFromRemoteUser(value *RemoteUser) *ScorecardInterviewer {
+	return &ScorecardInterviewer{typeName: "remoteUser", RemoteUser: value}
+}
+
+func (s *ScorecardInterviewer) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueRemoteUser := new(RemoteUser)
+	if err := json.Unmarshal(data, &valueRemoteUser); err == nil {
+		s.typeName = "remoteUser"
+		s.RemoteUser = valueRemoteUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScorecardInterviewer) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "remoteUser":
+		return json.Marshal(s.RemoteUser)
+	}
+}
+
+type ScorecardInterviewerVisitor interface {
+	VisitString(string) error
+	VisitRemoteUser(*RemoteUser) error
+}
+
+func (s *ScorecardInterviewer) Accept(visitor ScorecardInterviewerVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "remoteUser":
+		return visitor.VisitRemoteUser(s.RemoteUser)
+	}
 }
 
 // The inteviewer's recommendation.

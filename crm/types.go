@@ -16,7 +16,7 @@ import (
 // TODO
 type Account struct {
 	// The account's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *AccountOwner `json:"owner,omitempty"`
 	// The account's name.
 	Name *string `json:"name,omitempty"`
 	// The account's description.
@@ -156,6 +156,64 @@ type AccountIntegration struct {
 	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
 }
 
+// The account's owner.
+type AccountOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewAccountOwnerFromString(value string) *AccountOwner {
+	return &AccountOwner{typeName: "string", String: value}
+}
+
+func NewAccountOwnerFromUser(value *User) *AccountOwner {
+	return &AccountOwner{typeName: "user", User: value}
+}
+
+func (a *AccountOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		a.typeName = "user"
+		a.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountOwner) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "user":
+		return json.Marshal(a.User)
+	}
+}
+
+type AccountOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (a *AccountOwner) Accept(visitor AccountOwnerVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "user":
+		return visitor.VisitUser(a.User)
+	}
+}
+
 // # The Account Object
 // ### Description
 // The `Account` object is used to represent a company in a CRM system.
@@ -163,7 +221,7 @@ type AccountIntegration struct {
 // TODO
 type AccountRequest struct {
 	// The account's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *AccountRequestOwner `json:"owner,omitempty"`
 	// The account's name.
 	Name *string `json:"name,omitempty"`
 	// The account's description.
@@ -179,6 +237,64 @@ type AccountRequest struct {
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+}
+
+// The account's owner.
+type AccountRequestOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewAccountRequestOwnerFromString(value string) *AccountRequestOwner {
+	return &AccountRequestOwner{typeName: "string", String: value}
+}
+
+func NewAccountRequestOwnerFromUser(value *User) *AccountRequestOwner {
+	return &AccountRequestOwner{typeName: "user", User: value}
+}
+
+func (a *AccountRequestOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		a.typeName = "user"
+		a.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountRequestOwner) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "user":
+		return json.Marshal(a.User)
+	}
+}
+
+type AccountRequestOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (a *AccountRequestOwner) Accept(visitor AccountRequestOwnerVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "user":
+		return visitor.VisitUser(a.User)
+	}
 }
 
 type AccountToken struct {
@@ -1571,11 +1687,68 @@ func (a *AddressTypeEnum) UnmarshalJSON(data []byte) error {
 // ### Usage Example
 // TODO
 type Association struct {
-	SourceObject    map[string]any `json:"source_object,omitempty"`
-	TargetObject    map[string]any `json:"target_object,omitempty"`
-	AssociationType *string        `json:"association_type,omitempty"`
+	SourceObject    map[string]any              `json:"source_object,omitempty"`
+	TargetObject    map[string]any              `json:"target_object,omitempty"`
+	AssociationType *AssociationAssociationType `json:"association_type,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+type AssociationAssociationType struct {
+	typeName        string
+	String          string
+	AssociationType *AssociationType
+}
+
+func NewAssociationAssociationTypeFromString(value string) *AssociationAssociationType {
+	return &AssociationAssociationType{typeName: "string", String: value}
+}
+
+func NewAssociationAssociationTypeFromAssociationType(value *AssociationType) *AssociationAssociationType {
+	return &AssociationAssociationType{typeName: "associationType", AssociationType: value}
+}
+
+func (a *AssociationAssociationType) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueAssociationType := new(AssociationType)
+	if err := json.Unmarshal(data, &valueAssociationType); err == nil {
+		a.typeName = "associationType"
+		a.AssociationType = valueAssociationType
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AssociationAssociationType) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "associationType":
+		return json.Marshal(a.AssociationType)
+	}
+}
+
+type AssociationAssociationTypeVisitor interface {
+	VisitString(string) error
+	VisitAssociationType(*AssociationType) error
+}
+
+func (a *AssociationAssociationType) Accept(visitor AssociationAssociationTypeVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "associationType":
+		return visitor.VisitAssociationType(a.AssociationType)
+	}
 }
 
 type AssociationSubType struct {
@@ -1670,6 +1843,10 @@ type AssociationTypeRequestRequest struct {
 	DisplayName *string          `json:"display_name,omitempty"`
 	Cardinality *CardinalityEnum `json:"cardinality,omitempty"`
 	IsRequired  *bool            `json:"is_required,omitempty"`
+}
+
+type AsyncPassthroughReciept struct {
+	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
 }
 
 // # The AvailableActions Object
@@ -2072,7 +2249,7 @@ type Contact struct {
 	// The contact's last name.
 	LastName *string `json:"last_name,omitempty"`
 	// The contact's account.
-	Account        *string         `json:"account,omitempty"`
+	Account        *ContactAccount `json:"account,omitempty"`
 	Addresses      []*Address      `json:"addresses,omitempty"`
 	EmailAddresses []*EmailAddress `json:"email_addresses,omitempty"`
 	PhoneNumbers   []*PhoneNumber  `json:"phone_numbers,omitempty"`
@@ -2091,6 +2268,64 @@ type Contact struct {
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
 }
 
+// The contact's account.
+type ContactAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewContactAccountFromString(value string) *ContactAccount {
+	return &ContactAccount{typeName: "string", String: value}
+}
+
+func NewContactAccountFromAccount(value *Account) *ContactAccount {
+	return &ContactAccount{typeName: "account", Account: value}
+}
+
+func (c *ContactAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		c.typeName = "account"
+		c.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactAccount) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "account":
+		return json.Marshal(c.Account)
+	}
+}
+
+type ContactAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (c *ContactAccount) Accept(visitor ContactAccountVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "account":
+		return visitor.VisitAccount(c.Account)
+	}
+}
+
 // # The Contact Object
 // ### Description
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
@@ -2102,7 +2337,7 @@ type ContactRequest struct {
 	// The contact's last name.
 	LastName *string `json:"last_name,omitempty"`
 	// The contact's account.
-	Account        *string                `json:"account,omitempty"`
+	Account        *ContactRequestAccount `json:"account,omitempty"`
 	Addresses      []*AddressRequest      `json:"addresses,omitempty"`
 	EmailAddresses []*EmailAddressRequest `json:"email_addresses,omitempty"`
 	PhoneNumbers   []*PhoneNumberRequest  `json:"phone_numbers,omitempty"`
@@ -2111,6 +2346,64 @@ type ContactRequest struct {
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+}
+
+// The contact's account.
+type ContactRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewContactRequestAccountFromString(value string) *ContactRequestAccount {
+	return &ContactRequestAccount{typeName: "string", String: value}
+}
+
+func NewContactRequestAccountFromAccount(value *Account) *ContactRequestAccount {
+	return &ContactRequestAccount{typeName: "account", Account: value}
+}
+
+func (c *ContactRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		c.typeName = "account"
+		c.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactRequestAccount) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "account":
+		return json.Marshal(c.Account)
+	}
+}
+
+type ContactRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (c *ContactRequestAccount) Accept(visitor ContactRequestAccountVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "account":
+		return visitor.VisitAccount(c.Account)
+	}
 }
 
 // * `AF` - Afghanistan
@@ -3947,6 +4240,29 @@ type CustomObjectRequest struct {
 	Fields map[string]any `json:"fields,omitempty"`
 }
 
+// # The DataPassthrough Object
+// ### Description
+// The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
+//
+// ### Usage Example
+// Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
+type DataPassthroughRequest struct {
+	Method MethodEnum `json:"method,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Path string `json:"path"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Data *string `json:"data,omitempty"`
+	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
+	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
+	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
+	Headers       map[string]any     `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
+	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+}
+
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
@@ -4121,7 +4437,7 @@ func (e *EncodingEnum) UnmarshalJSON(data []byte) error {
 // TODO
 type Engagement struct {
 	// The engagement's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *EngagementOwner `json:"owner,omitempty"`
 	// The engagement's content.
 	Content *string `json:"content,omitempty"`
 	// The engagement's subject.
@@ -4132,14 +4448,14 @@ type Engagement struct {
 	// * `OUTBOUND` - OUTBOUND
 	Direction *EngagementDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
-	EngagementType *string `json:"engagement_type,omitempty"`
+	EngagementType *EngagementEngagementType `json:"engagement_type,omitempty"`
 	// The time at which the engagement started.
 	StartTime *time.Time `json:"start_time,omitempty"`
 	// The time at which the engagement ended.
 	EndTime *time.Time `json:"end_time,omitempty"`
 	// The account of the engagement.
-	Account  *string   `json:"account,omitempty"`
-	Contacts []*string `json:"contacts,omitempty"`
+	Account  *EngagementAccount        `json:"account,omitempty"`
+	Contacts []*EngagementContactsItem `json:"contacts,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
@@ -4150,6 +4466,121 @@ type Engagement struct {
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+}
+
+// The account of the engagement.
+type EngagementAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewEngagementAccountFromString(value string) *EngagementAccount {
+	return &EngagementAccount{typeName: "string", String: value}
+}
+
+func NewEngagementAccountFromAccount(value *Account) *EngagementAccount {
+	return &EngagementAccount{typeName: "account", Account: value}
+}
+
+func (e *EngagementAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typeName = "account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementAccount) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "account":
+		return json.Marshal(e.Account)
+	}
+}
+
+type EngagementAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *EngagementAccount) Accept(visitor EngagementAccountVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "account":
+		return visitor.VisitAccount(e.Account)
+	}
+}
+
+type EngagementContactsItem struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewEngagementContactsItemFromString(value string) *EngagementContactsItem {
+	return &EngagementContactsItem{typeName: "string", String: value}
+}
+
+func NewEngagementContactsItemFromContact(value *Contact) *EngagementContactsItem {
+	return &EngagementContactsItem{typeName: "contact", Contact: value}
+}
+
+func (e *EngagementContactsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typeName = "contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementContactsItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "contact":
+		return json.Marshal(e.Contact)
+	}
+}
+
+type EngagementContactsItemVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *EngagementContactsItem) Accept(visitor EngagementContactsItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "contact":
+		return visitor.VisitContact(e.Contact)
+	}
 }
 
 // The engagement's direction.
@@ -4213,6 +4644,122 @@ func (e *EngagementDirection) Accept(visitor EngagementDirectionVisitor) error {
 	}
 }
 
+// The engagement type of the engagement.
+type EngagementEngagementType struct {
+	typeName       string
+	String         string
+	EngagementType *EngagementType
+}
+
+func NewEngagementEngagementTypeFromString(value string) *EngagementEngagementType {
+	return &EngagementEngagementType{typeName: "string", String: value}
+}
+
+func NewEngagementEngagementTypeFromEngagementType(value *EngagementType) *EngagementEngagementType {
+	return &EngagementEngagementType{typeName: "engagementType", EngagementType: value}
+}
+
+func (e *EngagementEngagementType) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEngagementType := new(EngagementType)
+	if err := json.Unmarshal(data, &valueEngagementType); err == nil {
+		e.typeName = "engagementType"
+		e.EngagementType = valueEngagementType
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementEngagementType) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "engagementType":
+		return json.Marshal(e.EngagementType)
+	}
+}
+
+type EngagementEngagementTypeVisitor interface {
+	VisitString(string) error
+	VisitEngagementType(*EngagementType) error
+}
+
+func (e *EngagementEngagementType) Accept(visitor EngagementEngagementTypeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "engagementType":
+		return visitor.VisitEngagementType(e.EngagementType)
+	}
+}
+
+// The engagement's owner.
+type EngagementOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewEngagementOwnerFromString(value string) *EngagementOwner {
+	return &EngagementOwner{typeName: "string", String: value}
+}
+
+func NewEngagementOwnerFromUser(value *User) *EngagementOwner {
+	return &EngagementOwner{typeName: "user", User: value}
+}
+
+func (e *EngagementOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		e.typeName = "user"
+		e.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementOwner) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "user":
+		return json.Marshal(e.User)
+	}
+}
+
+type EngagementOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (e *EngagementOwner) Accept(visitor EngagementOwnerVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "user":
+		return visitor.VisitUser(e.User)
+	}
+}
+
 // # The Engagement Object
 // ### Description
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
@@ -4220,7 +4767,7 @@ func (e *EngagementDirection) Accept(visitor EngagementDirectionVisitor) error {
 // TODO
 type EngagementRequest struct {
 	// The engagement's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *EngagementRequestOwner `json:"owner,omitempty"`
 	// The engagement's content.
 	Content *string `json:"content,omitempty"`
 	// The engagement's subject.
@@ -4231,17 +4778,132 @@ type EngagementRequest struct {
 	// * `OUTBOUND` - OUTBOUND
 	Direction *EngagementRequestDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
-	EngagementType *string `json:"engagement_type,omitempty"`
+	EngagementType *EngagementRequestEngagementType `json:"engagement_type,omitempty"`
 	// The time at which the engagement started.
 	StartTime *time.Time `json:"start_time,omitempty"`
 	// The time at which the engagement ended.
 	EndTime *time.Time `json:"end_time,omitempty"`
 	// The account of the engagement.
-	Account             *string               `json:"account,omitempty"`
-	Contacts            []*string             `json:"contacts,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	Account             *EngagementRequestAccount        `json:"account,omitempty"`
+	Contacts            []*EngagementRequestContactsItem `json:"contacts,omitempty"`
+	IntegrationParams   map[string]any                   `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                   `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest            `json:"remote_fields,omitempty"`
+}
+
+// The account of the engagement.
+type EngagementRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewEngagementRequestAccountFromString(value string) *EngagementRequestAccount {
+	return &EngagementRequestAccount{typeName: "string", String: value}
+}
+
+func NewEngagementRequestAccountFromAccount(value *Account) *EngagementRequestAccount {
+	return &EngagementRequestAccount{typeName: "account", Account: value}
+}
+
+func (e *EngagementRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typeName = "account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementRequestAccount) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "account":
+		return json.Marshal(e.Account)
+	}
+}
+
+type EngagementRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *EngagementRequestAccount) Accept(visitor EngagementRequestAccountVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "account":
+		return visitor.VisitAccount(e.Account)
+	}
+}
+
+type EngagementRequestContactsItem struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewEngagementRequestContactsItemFromString(value string) *EngagementRequestContactsItem {
+	return &EngagementRequestContactsItem{typeName: "string", String: value}
+}
+
+func NewEngagementRequestContactsItemFromContact(value *Contact) *EngagementRequestContactsItem {
+	return &EngagementRequestContactsItem{typeName: "contact", Contact: value}
+}
+
+func (e *EngagementRequestContactsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typeName = "contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementRequestContactsItem) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "contact":
+		return json.Marshal(e.Contact)
+	}
+}
+
+type EngagementRequestContactsItemVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *EngagementRequestContactsItem) Accept(visitor EngagementRequestContactsItemVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "contact":
+		return visitor.VisitContact(e.Contact)
+	}
 }
 
 // The engagement's direction.
@@ -4302,6 +4964,122 @@ func (e *EngagementRequestDirection) Accept(visitor EngagementRequestDirectionVi
 		return visitor.VisitDirectionEnum(e.DirectionEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+// The engagement type of the engagement.
+type EngagementRequestEngagementType struct {
+	typeName       string
+	String         string
+	EngagementType *EngagementType
+}
+
+func NewEngagementRequestEngagementTypeFromString(value string) *EngagementRequestEngagementType {
+	return &EngagementRequestEngagementType{typeName: "string", String: value}
+}
+
+func NewEngagementRequestEngagementTypeFromEngagementType(value *EngagementType) *EngagementRequestEngagementType {
+	return &EngagementRequestEngagementType{typeName: "engagementType", EngagementType: value}
+}
+
+func (e *EngagementRequestEngagementType) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEngagementType := new(EngagementType)
+	if err := json.Unmarshal(data, &valueEngagementType); err == nil {
+		e.typeName = "engagementType"
+		e.EngagementType = valueEngagementType
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementRequestEngagementType) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "engagementType":
+		return json.Marshal(e.EngagementType)
+	}
+}
+
+type EngagementRequestEngagementTypeVisitor interface {
+	VisitString(string) error
+	VisitEngagementType(*EngagementType) error
+}
+
+func (e *EngagementRequestEngagementType) Accept(visitor EngagementRequestEngagementTypeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "engagementType":
+		return visitor.VisitEngagementType(e.EngagementType)
+	}
+}
+
+// The engagement's owner.
+type EngagementRequestOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewEngagementRequestOwnerFromString(value string) *EngagementRequestOwner {
+	return &EngagementRequestOwner{typeName: "string", String: value}
+}
+
+func NewEngagementRequestOwnerFromUser(value *User) *EngagementRequestOwner {
+	return &EngagementRequestOwner{typeName: "user", User: value}
+}
+
+func (e *EngagementRequestOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		e.typeName = "user"
+		e.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EngagementRequestOwner) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "user":
+		return json.Marshal(e.User)
+	}
+}
+
+type EngagementRequestOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (e *EngagementRequestOwner) Accept(visitor EngagementRequestOwnerVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "user":
+		return visitor.VisitUser(e.User)
 	}
 }
 
@@ -5080,7 +5858,7 @@ func (i *ItemTypeEnum) UnmarshalJSON(data []byte) error {
 // TODO
 type Lead struct {
 	// The lead's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *LeadOwner `json:"owner,omitempty"`
 	// The lead's source.
 	LeadSource *string `json:"lead_source,omitempty"`
 	// The lead's title.
@@ -5101,11 +5879,11 @@ type Lead struct {
 	// When the lead was converted.
 	ConvertedDate *time.Time `json:"converted_date,omitempty"`
 	// The contact of the converted lead.
-	ConvertedContact *string `json:"converted_contact,omitempty"`
+	ConvertedContact *LeadConvertedContact `json:"converted_contact,omitempty"`
 	// The account of the converted lead.
-	ConvertedAccount *string `json:"converted_account,omitempty"`
-	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
-	Id               *string `json:"id,omitempty"`
+	ConvertedAccount *LeadConvertedAccount `json:"converted_account,omitempty"`
+	RemoteWasDeleted *bool                 `json:"remote_was_deleted,omitempty"`
+	Id               *string               `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -5115,6 +5893,180 @@ type Lead struct {
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
 }
 
+// The account of the converted lead.
+type LeadConvertedAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewLeadConvertedAccountFromString(value string) *LeadConvertedAccount {
+	return &LeadConvertedAccount{typeName: "string", String: value}
+}
+
+func NewLeadConvertedAccountFromAccount(value *Account) *LeadConvertedAccount {
+	return &LeadConvertedAccount{typeName: "account", Account: value}
+}
+
+func (l *LeadConvertedAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typeName = "string"
+		l.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		l.typeName = "account"
+		l.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadConvertedAccount) MarshalJSON() ([]byte, error) {
+	switch l.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return json.Marshal(l.String)
+	case "account":
+		return json.Marshal(l.Account)
+	}
+}
+
+type LeadConvertedAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (l *LeadConvertedAccount) Accept(visitor LeadConvertedAccountVisitor) error {
+	switch l.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return visitor.VisitString(l.String)
+	case "account":
+		return visitor.VisitAccount(l.Account)
+	}
+}
+
+// The contact of the converted lead.
+type LeadConvertedContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewLeadConvertedContactFromString(value string) *LeadConvertedContact {
+	return &LeadConvertedContact{typeName: "string", String: value}
+}
+
+func NewLeadConvertedContactFromContact(value *Contact) *LeadConvertedContact {
+	return &LeadConvertedContact{typeName: "contact", Contact: value}
+}
+
+func (l *LeadConvertedContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typeName = "string"
+		l.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		l.typeName = "contact"
+		l.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadConvertedContact) MarshalJSON() ([]byte, error) {
+	switch l.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return json.Marshal(l.String)
+	case "contact":
+		return json.Marshal(l.Contact)
+	}
+}
+
+type LeadConvertedContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (l *LeadConvertedContact) Accept(visitor LeadConvertedContactVisitor) error {
+	switch l.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return visitor.VisitString(l.String)
+	case "contact":
+		return visitor.VisitContact(l.Contact)
+	}
+}
+
+// The lead's owner.
+type LeadOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewLeadOwnerFromString(value string) *LeadOwner {
+	return &LeadOwner{typeName: "string", String: value}
+}
+
+func NewLeadOwnerFromUser(value *User) *LeadOwner {
+	return &LeadOwner{typeName: "user", User: value}
+}
+
+func (l *LeadOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typeName = "string"
+		l.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		l.typeName = "user"
+		l.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadOwner) MarshalJSON() ([]byte, error) {
+	switch l.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return json.Marshal(l.String)
+	case "user":
+		return json.Marshal(l.User)
+	}
+}
+
+type LeadOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (l *LeadOwner) Accept(visitor LeadOwnerVisitor) error {
+	switch l.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return visitor.VisitString(l.String)
+	case "user":
+		return visitor.VisitUser(l.User)
+	}
+}
+
 // # The Lead Object
 // ### Description
 // The `Lead` object is used to represent an individual who is a potential customer.
@@ -5122,7 +6074,7 @@ type Lead struct {
 // TODO
 type LeadRequest struct {
 	// The lead's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *LeadRequestOwner `json:"owner,omitempty"`
 	// The lead's source.
 	LeadSource *string `json:"lead_source,omitempty"`
 	// The lead's title.
@@ -5139,12 +6091,186 @@ type LeadRequest struct {
 	// When the lead was converted.
 	ConvertedDate *time.Time `json:"converted_date,omitempty"`
 	// The contact of the converted lead.
-	ConvertedContact *string `json:"converted_contact,omitempty"`
+	ConvertedContact *LeadRequestConvertedContact `json:"converted_contact,omitempty"`
 	// The account of the converted lead.
-	ConvertedAccount    *string               `json:"converted_account,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	ConvertedAccount    *LeadRequestConvertedAccount `json:"converted_account,omitempty"`
+	IntegrationParams   map[string]any               `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any               `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest        `json:"remote_fields,omitempty"`
+}
+
+// The account of the converted lead.
+type LeadRequestConvertedAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewLeadRequestConvertedAccountFromString(value string) *LeadRequestConvertedAccount {
+	return &LeadRequestConvertedAccount{typeName: "string", String: value}
+}
+
+func NewLeadRequestConvertedAccountFromAccount(value *Account) *LeadRequestConvertedAccount {
+	return &LeadRequestConvertedAccount{typeName: "account", Account: value}
+}
+
+func (l *LeadRequestConvertedAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typeName = "string"
+		l.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		l.typeName = "account"
+		l.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadRequestConvertedAccount) MarshalJSON() ([]byte, error) {
+	switch l.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return json.Marshal(l.String)
+	case "account":
+		return json.Marshal(l.Account)
+	}
+}
+
+type LeadRequestConvertedAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (l *LeadRequestConvertedAccount) Accept(visitor LeadRequestConvertedAccountVisitor) error {
+	switch l.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return visitor.VisitString(l.String)
+	case "account":
+		return visitor.VisitAccount(l.Account)
+	}
+}
+
+// The contact of the converted lead.
+type LeadRequestConvertedContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewLeadRequestConvertedContactFromString(value string) *LeadRequestConvertedContact {
+	return &LeadRequestConvertedContact{typeName: "string", String: value}
+}
+
+func NewLeadRequestConvertedContactFromContact(value *Contact) *LeadRequestConvertedContact {
+	return &LeadRequestConvertedContact{typeName: "contact", Contact: value}
+}
+
+func (l *LeadRequestConvertedContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typeName = "string"
+		l.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		l.typeName = "contact"
+		l.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadRequestConvertedContact) MarshalJSON() ([]byte, error) {
+	switch l.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return json.Marshal(l.String)
+	case "contact":
+		return json.Marshal(l.Contact)
+	}
+}
+
+type LeadRequestConvertedContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (l *LeadRequestConvertedContact) Accept(visitor LeadRequestConvertedContactVisitor) error {
+	switch l.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return visitor.VisitString(l.String)
+	case "contact":
+		return visitor.VisitContact(l.Contact)
+	}
+}
+
+// The lead's owner.
+type LeadRequestOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewLeadRequestOwnerFromString(value string) *LeadRequestOwner {
+	return &LeadRequestOwner{typeName: "string", String: value}
+}
+
+func NewLeadRequestOwnerFromUser(value *User) *LeadRequestOwner {
+	return &LeadRequestOwner{typeName: "user", User: value}
+}
+
+func (l *LeadRequestOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typeName = "string"
+		l.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		l.typeName = "user"
+		l.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadRequestOwner) MarshalJSON() ([]byte, error) {
+	switch l.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return json.Marshal(l.String)
+	case "user":
+		return json.Marshal(l.User)
+	}
+}
+
+type LeadRequestOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (l *LeadRequestOwner) Accept(visitor LeadRequestOwnerVisitor) error {
+	switch l.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", l.typeName, l)
+	case "string":
+		return visitor.VisitString(l.String)
+	case "user":
+		return visitor.VisitUser(l.User)
+	}
 }
 
 type LeadResponse struct {
@@ -5589,15 +6715,15 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 // TODO
 type Note struct {
 	// The note's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *NoteOwner `json:"owner,omitempty"`
 	// The note's content.
 	Content *string `json:"content,omitempty"`
 	// The note's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *NoteContact `json:"contact,omitempty"`
 	// The note's account.
-	Account *string `json:"account,omitempty"`
+	Account *NoteAccount `json:"account,omitempty"`
 	// The note's opportunity.
-	Opportunity *string `json:"opportunity,omitempty"`
+	Opportunity *NoteOpportunity `json:"opportunity,omitempty"`
 	// When the third party's lead was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// When the third party's lead was created.
@@ -5613,6 +6739,238 @@ type Note struct {
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
 }
 
+// The note's account.
+type NoteAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewNoteAccountFromString(value string) *NoteAccount {
+	return &NoteAccount{typeName: "string", String: value}
+}
+
+func NewNoteAccountFromAccount(value *Account) *NoteAccount {
+	return &NoteAccount{typeName: "account", Account: value}
+}
+
+func (n *NoteAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		n.typeName = "account"
+		n.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteAccount) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "account":
+		return json.Marshal(n.Account)
+	}
+}
+
+type NoteAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (n *NoteAccount) Accept(visitor NoteAccountVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "account":
+		return visitor.VisitAccount(n.Account)
+	}
+}
+
+// The note's contact.
+type NoteContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewNoteContactFromString(value string) *NoteContact {
+	return &NoteContact{typeName: "string", String: value}
+}
+
+func NewNoteContactFromContact(value *Contact) *NoteContact {
+	return &NoteContact{typeName: "contact", Contact: value}
+}
+
+func (n *NoteContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		n.typeName = "contact"
+		n.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteContact) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "contact":
+		return json.Marshal(n.Contact)
+	}
+}
+
+type NoteContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (n *NoteContact) Accept(visitor NoteContactVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "contact":
+		return visitor.VisitContact(n.Contact)
+	}
+}
+
+// The note's opportunity.
+type NoteOpportunity struct {
+	typeName    string
+	String      string
+	Opportunity *Opportunity
+}
+
+func NewNoteOpportunityFromString(value string) *NoteOpportunity {
+	return &NoteOpportunity{typeName: "string", String: value}
+}
+
+func NewNoteOpportunityFromOpportunity(value *Opportunity) *NoteOpportunity {
+	return &NoteOpportunity{typeName: "opportunity", Opportunity: value}
+}
+
+func (n *NoteOpportunity) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueOpportunity := new(Opportunity)
+	if err := json.Unmarshal(data, &valueOpportunity); err == nil {
+		n.typeName = "opportunity"
+		n.Opportunity = valueOpportunity
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteOpportunity) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "opportunity":
+		return json.Marshal(n.Opportunity)
+	}
+}
+
+type NoteOpportunityVisitor interface {
+	VisitString(string) error
+	VisitOpportunity(*Opportunity) error
+}
+
+func (n *NoteOpportunity) Accept(visitor NoteOpportunityVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "opportunity":
+		return visitor.VisitOpportunity(n.Opportunity)
+	}
+}
+
+// The note's owner.
+type NoteOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewNoteOwnerFromString(value string) *NoteOwner {
+	return &NoteOwner{typeName: "string", String: value}
+}
+
+func NewNoteOwnerFromUser(value *User) *NoteOwner {
+	return &NoteOwner{typeName: "user", User: value}
+}
+
+func (n *NoteOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		n.typeName = "user"
+		n.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteOwner) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "user":
+		return json.Marshal(n.User)
+	}
+}
+
+type NoteOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (n *NoteOwner) Accept(visitor NoteOwnerVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "user":
+		return visitor.VisitUser(n.User)
+	}
+}
+
 // # The Note Object
 // ### Description
 // The `Note` object is used to represent a note on another object.
@@ -5620,18 +6978,250 @@ type Note struct {
 // TODO
 type NoteRequest struct {
 	// The note's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *NoteRequestOwner `json:"owner,omitempty"`
 	// The note's content.
 	Content *string `json:"content,omitempty"`
 	// The note's contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *NoteRequestContact `json:"contact,omitempty"`
 	// The note's account.
-	Account *string `json:"account,omitempty"`
+	Account *NoteRequestAccount `json:"account,omitempty"`
 	// The note's opportunity.
-	Opportunity         *string               `json:"opportunity,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	Opportunity         *NoteRequestOpportunity `json:"opportunity,omitempty"`
+	IntegrationParams   map[string]any          `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any          `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest   `json:"remote_fields,omitempty"`
+}
+
+// The note's account.
+type NoteRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewNoteRequestAccountFromString(value string) *NoteRequestAccount {
+	return &NoteRequestAccount{typeName: "string", String: value}
+}
+
+func NewNoteRequestAccountFromAccount(value *Account) *NoteRequestAccount {
+	return &NoteRequestAccount{typeName: "account", Account: value}
+}
+
+func (n *NoteRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		n.typeName = "account"
+		n.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteRequestAccount) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "account":
+		return json.Marshal(n.Account)
+	}
+}
+
+type NoteRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (n *NoteRequestAccount) Accept(visitor NoteRequestAccountVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "account":
+		return visitor.VisitAccount(n.Account)
+	}
+}
+
+// The note's contact.
+type NoteRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewNoteRequestContactFromString(value string) *NoteRequestContact {
+	return &NoteRequestContact{typeName: "string", String: value}
+}
+
+func NewNoteRequestContactFromContact(value *Contact) *NoteRequestContact {
+	return &NoteRequestContact{typeName: "contact", Contact: value}
+}
+
+func (n *NoteRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		n.typeName = "contact"
+		n.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteRequestContact) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "contact":
+		return json.Marshal(n.Contact)
+	}
+}
+
+type NoteRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (n *NoteRequestContact) Accept(visitor NoteRequestContactVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "contact":
+		return visitor.VisitContact(n.Contact)
+	}
+}
+
+// The note's opportunity.
+type NoteRequestOpportunity struct {
+	typeName    string
+	String      string
+	Opportunity *Opportunity
+}
+
+func NewNoteRequestOpportunityFromString(value string) *NoteRequestOpportunity {
+	return &NoteRequestOpportunity{typeName: "string", String: value}
+}
+
+func NewNoteRequestOpportunityFromOpportunity(value *Opportunity) *NoteRequestOpportunity {
+	return &NoteRequestOpportunity{typeName: "opportunity", Opportunity: value}
+}
+
+func (n *NoteRequestOpportunity) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueOpportunity := new(Opportunity)
+	if err := json.Unmarshal(data, &valueOpportunity); err == nil {
+		n.typeName = "opportunity"
+		n.Opportunity = valueOpportunity
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteRequestOpportunity) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "opportunity":
+		return json.Marshal(n.Opportunity)
+	}
+}
+
+type NoteRequestOpportunityVisitor interface {
+	VisitString(string) error
+	VisitOpportunity(*Opportunity) error
+}
+
+func (n *NoteRequestOpportunity) Accept(visitor NoteRequestOpportunityVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "opportunity":
+		return visitor.VisitOpportunity(n.Opportunity)
+	}
+}
+
+// The note's owner.
+type NoteRequestOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewNoteRequestOwnerFromString(value string) *NoteRequestOwner {
+	return &NoteRequestOwner{typeName: "string", String: value}
+}
+
+func NewNoteRequestOwnerFromUser(value *User) *NoteRequestOwner {
+	return &NoteRequestOwner{typeName: "user", User: value}
+}
+
+func (n *NoteRequestOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		n.typeName = "string"
+		n.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		n.typeName = "user"
+		n.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, n)
+}
+
+func (n NoteRequestOwner) MarshalJSON() ([]byte, error) {
+	switch n.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return json.Marshal(n.String)
+	case "user":
+		return json.Marshal(n.User)
+	}
+}
+
+type NoteRequestOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (n *NoteRequestOwner) Accept(visitor NoteRequestOwnerVisitor) error {
+	switch n.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", n.typeName, n)
+	case "string":
+		return visitor.VisitString(n.String)
+	case "user":
+		return visitor.VisitUser(n.User)
+	}
 }
 
 type NoteResponse struct {
@@ -6079,11 +7669,11 @@ type Opportunity struct {
 	// The opportunity's amount.
 	Amount *int `json:"amount,omitempty"`
 	// The opportunity's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *OpportunityOwner `json:"owner,omitempty"`
 	// The account of the opportunity.
-	Account *string `json:"account,omitempty"`
+	Account *OpportunityAccount `json:"account,omitempty"`
 	// The stage of the opportunity.
-	Stage *string `json:"stage,omitempty"`
+	Stage *OpportunityStage `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
 	// * `OPEN` - OPEN
@@ -6107,6 +7697,122 @@ type Opportunity struct {
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
 }
 
+// The account of the opportunity.
+type OpportunityAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewOpportunityAccountFromString(value string) *OpportunityAccount {
+	return &OpportunityAccount{typeName: "string", String: value}
+}
+
+func NewOpportunityAccountFromAccount(value *Account) *OpportunityAccount {
+	return &OpportunityAccount{typeName: "account", Account: value}
+}
+
+func (o *OpportunityAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		o.typeName = "account"
+		o.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OpportunityAccount) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "account":
+		return json.Marshal(o.Account)
+	}
+}
+
+type OpportunityAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (o *OpportunityAccount) Accept(visitor OpportunityAccountVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "account":
+		return visitor.VisitAccount(o.Account)
+	}
+}
+
+// The opportunity's owner.
+type OpportunityOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewOpportunityOwnerFromString(value string) *OpportunityOwner {
+	return &OpportunityOwner{typeName: "string", String: value}
+}
+
+func NewOpportunityOwnerFromUser(value *User) *OpportunityOwner {
+	return &OpportunityOwner{typeName: "user", User: value}
+}
+
+func (o *OpportunityOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		o.typeName = "user"
+		o.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OpportunityOwner) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "user":
+		return json.Marshal(o.User)
+	}
+}
+
+type OpportunityOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (o *OpportunityOwner) Accept(visitor OpportunityOwnerVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "user":
+		return visitor.VisitUser(o.User)
+	}
+}
+
 // # The Opportunity Object
 // ### Description
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
@@ -6120,11 +7826,11 @@ type OpportunityRequest struct {
 	// The opportunity's amount.
 	Amount *int `json:"amount,omitempty"`
 	// The opportunity's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *OpportunityRequestOwner `json:"owner,omitempty"`
 	// The account of the opportunity.
-	Account *string `json:"account,omitempty"`
+	Account *OpportunityRequestAccount `json:"account,omitempty"`
 	// The stage of the opportunity.
-	Stage *string `json:"stage,omitempty"`
+	Stage *OpportunityRequestStage `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
 	// * `OPEN` - OPEN
@@ -6138,6 +7844,180 @@ type OpportunityRequest struct {
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+}
+
+// The account of the opportunity.
+type OpportunityRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewOpportunityRequestAccountFromString(value string) *OpportunityRequestAccount {
+	return &OpportunityRequestAccount{typeName: "string", String: value}
+}
+
+func NewOpportunityRequestAccountFromAccount(value *Account) *OpportunityRequestAccount {
+	return &OpportunityRequestAccount{typeName: "account", Account: value}
+}
+
+func (o *OpportunityRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		o.typeName = "account"
+		o.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OpportunityRequestAccount) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "account":
+		return json.Marshal(o.Account)
+	}
+}
+
+type OpportunityRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (o *OpportunityRequestAccount) Accept(visitor OpportunityRequestAccountVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "account":
+		return visitor.VisitAccount(o.Account)
+	}
+}
+
+// The opportunity's owner.
+type OpportunityRequestOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewOpportunityRequestOwnerFromString(value string) *OpportunityRequestOwner {
+	return &OpportunityRequestOwner{typeName: "string", String: value}
+}
+
+func NewOpportunityRequestOwnerFromUser(value *User) *OpportunityRequestOwner {
+	return &OpportunityRequestOwner{typeName: "user", User: value}
+}
+
+func (o *OpportunityRequestOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		o.typeName = "user"
+		o.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OpportunityRequestOwner) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "user":
+		return json.Marshal(o.User)
+	}
+}
+
+type OpportunityRequestOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (o *OpportunityRequestOwner) Accept(visitor OpportunityRequestOwnerVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "user":
+		return visitor.VisitUser(o.User)
+	}
+}
+
+// The stage of the opportunity.
+type OpportunityRequestStage struct {
+	typeName string
+	String   string
+	Stage    *Stage
+}
+
+func NewOpportunityRequestStageFromString(value string) *OpportunityRequestStage {
+	return &OpportunityRequestStage{typeName: "string", String: value}
+}
+
+func NewOpportunityRequestStageFromStage(value *Stage) *OpportunityRequestStage {
+	return &OpportunityRequestStage{typeName: "stage", Stage: value}
+}
+
+func (o *OpportunityRequestStage) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueStage := new(Stage)
+	if err := json.Unmarshal(data, &valueStage); err == nil {
+		o.typeName = "stage"
+		o.Stage = valueStage
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OpportunityRequestStage) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "stage":
+		return json.Marshal(o.Stage)
+	}
+}
+
+type OpportunityRequestStageVisitor interface {
+	VisitString(string) error
+	VisitStage(*Stage) error
+}
+
+func (o *OpportunityRequestStage) Accept(visitor OpportunityRequestStageVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "stage":
+		return visitor.VisitStage(o.Stage)
+	}
 }
 
 // The opportunity's status.
@@ -6207,6 +8087,64 @@ type OpportunityResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+// The stage of the opportunity.
+type OpportunityStage struct {
+	typeName string
+	String   string
+	Stage    *Stage
+}
+
+func NewOpportunityStageFromString(value string) *OpportunityStage {
+	return &OpportunityStage{typeName: "string", String: value}
+}
+
+func NewOpportunityStageFromStage(value *Stage) *OpportunityStage {
+	return &OpportunityStage{typeName: "stage", Stage: value}
+}
+
+func (o *OpportunityStage) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		o.typeName = "string"
+		o.String = valueString
+		return nil
+	}
+	valueStage := new(Stage)
+	if err := json.Unmarshal(data, &valueStage); err == nil {
+		o.typeName = "stage"
+		o.Stage = valueStage
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, o)
+}
+
+func (o OpportunityStage) MarshalJSON() ([]byte, error) {
+	switch o.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return json.Marshal(o.String)
+	case "stage":
+		return json.Marshal(o.Stage)
+	}
+}
+
+type OpportunityStageVisitor interface {
+	VisitString(string) error
+	VisitStage(*Stage) error
+}
+
+func (o *OpportunityStage) Accept(visitor OpportunityStageVisitor) error {
+	switch o.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", o.typeName, o)
+	case "string":
+		return visitor.VisitString(o.String)
+	case "stage":
+		return visitor.VisitStage(o.Stage)
+	}
 }
 
 // The opportunity's status.
@@ -7036,8 +8974,65 @@ type RemoteFieldClassForCustomObjectClassItemSchema struct {
 }
 
 type RemoteFieldRequest struct {
-	RemoteFieldClass string         `json:"remote_field_class"`
-	Value            map[string]any `json:"value,omitempty"`
+	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
+	Value            map[string]any                      `json:"value,omitempty"`
+}
+
+type RemoteFieldRequestRemoteFieldClass struct {
+	typeName         string
+	String           string
+	RemoteFieldClass *RemoteFieldClass
+}
+
+func NewRemoteFieldRequestRemoteFieldClassFromString(value string) *RemoteFieldRequestRemoteFieldClass {
+	return &RemoteFieldRequestRemoteFieldClass{typeName: "string", String: value}
+}
+
+func NewRemoteFieldRequestRemoteFieldClassFromRemoteFieldClass(value *RemoteFieldClass) *RemoteFieldRequestRemoteFieldClass {
+	return &RemoteFieldRequestRemoteFieldClass{typeName: "remoteFieldClass", RemoteFieldClass: value}
+}
+
+func (r *RemoteFieldRequestRemoteFieldClass) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	valueRemoteFieldClass := new(RemoteFieldClass)
+	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
+		r.typeName = "remoteFieldClass"
+		r.RemoteFieldClass = valueRemoteFieldClass
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldRequestRemoteFieldClass) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "remoteFieldClass":
+		return json.Marshal(r.RemoteFieldClass)
+	}
+}
+
+type RemoteFieldRequestRemoteFieldClassVisitor interface {
+	VisitString(string) error
+	VisitRemoteFieldClass(*RemoteFieldClass) error
+}
+
+func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRemoteFieldClassVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "remoteFieldClass":
+		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
+	}
 }
 
 // # The RemoteKey Object
@@ -7309,11 +9304,11 @@ type Task struct {
 	// The task's content.
 	Content *string `json:"content,omitempty"`
 	// The task's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *TaskOwner `json:"owner,omitempty"`
 	// The task's account.
-	Account *string `json:"account,omitempty"`
+	Account *TaskAccount `json:"account,omitempty"`
 	// The task's opportunity.
-	Opportunity *string `json:"opportunity,omitempty"`
+	Opportunity *TaskOpportunity `json:"opportunity,omitempty"`
 	// When the task is completed.
 	CompletedDate *time.Time `json:"completed_date,omitempty"`
 	// When the task is due.
@@ -7335,6 +9330,180 @@ type Task struct {
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
 }
 
+// The task's account.
+type TaskAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewTaskAccountFromString(value string) *TaskAccount {
+	return &TaskAccount{typeName: "string", String: value}
+}
+
+func NewTaskAccountFromAccount(value *Account) *TaskAccount {
+	return &TaskAccount{typeName: "account", Account: value}
+}
+
+func (t *TaskAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		t.typeName = "account"
+		t.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskAccount) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "account":
+		return json.Marshal(t.Account)
+	}
+}
+
+type TaskAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (t *TaskAccount) Accept(visitor TaskAccountVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "account":
+		return visitor.VisitAccount(t.Account)
+	}
+}
+
+// The task's opportunity.
+type TaskOpportunity struct {
+	typeName    string
+	String      string
+	Opportunity *Opportunity
+}
+
+func NewTaskOpportunityFromString(value string) *TaskOpportunity {
+	return &TaskOpportunity{typeName: "string", String: value}
+}
+
+func NewTaskOpportunityFromOpportunity(value *Opportunity) *TaskOpportunity {
+	return &TaskOpportunity{typeName: "opportunity", Opportunity: value}
+}
+
+func (t *TaskOpportunity) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueOpportunity := new(Opportunity)
+	if err := json.Unmarshal(data, &valueOpportunity); err == nil {
+		t.typeName = "opportunity"
+		t.Opportunity = valueOpportunity
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskOpportunity) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "opportunity":
+		return json.Marshal(t.Opportunity)
+	}
+}
+
+type TaskOpportunityVisitor interface {
+	VisitString(string) error
+	VisitOpportunity(*Opportunity) error
+}
+
+func (t *TaskOpportunity) Accept(visitor TaskOpportunityVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "opportunity":
+		return visitor.VisitOpportunity(t.Opportunity)
+	}
+}
+
+// The task's owner.
+type TaskOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewTaskOwnerFromString(value string) *TaskOwner {
+	return &TaskOwner{typeName: "string", String: value}
+}
+
+func NewTaskOwnerFromUser(value *User) *TaskOwner {
+	return &TaskOwner{typeName: "user", User: value}
+}
+
+func (t *TaskOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		t.typeName = "user"
+		t.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskOwner) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "user":
+		return json.Marshal(t.User)
+	}
+}
+
+type TaskOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (t *TaskOwner) Accept(visitor TaskOwnerVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "user":
+		return visitor.VisitUser(t.User)
+	}
+}
+
 // # The Task Object
 // ### Description
 // The `Task` object is used to represent a task, such as a to-do item.
@@ -7346,11 +9515,11 @@ type TaskRequest struct {
 	// The task's content.
 	Content *string `json:"content,omitempty"`
 	// The task's owner.
-	Owner *string `json:"owner,omitempty"`
+	Owner *TaskRequestOwner `json:"owner,omitempty"`
 	// The task's account.
-	Account *string `json:"account,omitempty"`
+	Account *TaskRequestAccount `json:"account,omitempty"`
 	// The task's opportunity.
-	Opportunity *string `json:"opportunity,omitempty"`
+	Opportunity *TaskRequestOpportunity `json:"opportunity,omitempty"`
 	// When the task is completed.
 	CompletedDate *time.Time `json:"completed_date,omitempty"`
 	// When the task is due.
@@ -7363,6 +9532,180 @@ type TaskRequest struct {
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+}
+
+// The task's account.
+type TaskRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewTaskRequestAccountFromString(value string) *TaskRequestAccount {
+	return &TaskRequestAccount{typeName: "string", String: value}
+}
+
+func NewTaskRequestAccountFromAccount(value *Account) *TaskRequestAccount {
+	return &TaskRequestAccount{typeName: "account", Account: value}
+}
+
+func (t *TaskRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		t.typeName = "account"
+		t.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskRequestAccount) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "account":
+		return json.Marshal(t.Account)
+	}
+}
+
+type TaskRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (t *TaskRequestAccount) Accept(visitor TaskRequestAccountVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "account":
+		return visitor.VisitAccount(t.Account)
+	}
+}
+
+// The task's opportunity.
+type TaskRequestOpportunity struct {
+	typeName    string
+	String      string
+	Opportunity *Opportunity
+}
+
+func NewTaskRequestOpportunityFromString(value string) *TaskRequestOpportunity {
+	return &TaskRequestOpportunity{typeName: "string", String: value}
+}
+
+func NewTaskRequestOpportunityFromOpportunity(value *Opportunity) *TaskRequestOpportunity {
+	return &TaskRequestOpportunity{typeName: "opportunity", Opportunity: value}
+}
+
+func (t *TaskRequestOpportunity) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueOpportunity := new(Opportunity)
+	if err := json.Unmarshal(data, &valueOpportunity); err == nil {
+		t.typeName = "opportunity"
+		t.Opportunity = valueOpportunity
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskRequestOpportunity) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "opportunity":
+		return json.Marshal(t.Opportunity)
+	}
+}
+
+type TaskRequestOpportunityVisitor interface {
+	VisitString(string) error
+	VisitOpportunity(*Opportunity) error
+}
+
+func (t *TaskRequestOpportunity) Accept(visitor TaskRequestOpportunityVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "opportunity":
+		return visitor.VisitOpportunity(t.Opportunity)
+	}
+}
+
+// The task's owner.
+type TaskRequestOwner struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewTaskRequestOwnerFromString(value string) *TaskRequestOwner {
+	return &TaskRequestOwner{typeName: "string", String: value}
+}
+
+func NewTaskRequestOwnerFromUser(value *User) *TaskRequestOwner {
+	return &TaskRequestOwner{typeName: "user", User: value}
+}
+
+func (t *TaskRequestOwner) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		t.typeName = "user"
+		t.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskRequestOwner) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "user":
+		return json.Marshal(t.User)
+	}
+}
+
+type TaskRequestOwnerVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (t *TaskRequestOwner) Accept(visitor TaskRequestOwnerVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "user":
+		return visitor.VisitUser(t.User)
+	}
 }
 
 // The task's status.

@@ -195,6 +195,10 @@ type AccountToken struct {
 	Integration  *AccountIntegration `json:"integration,omitempty"`
 }
 
+type AsyncPassthroughReciept struct {
+	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+}
+
 // # The Attachment Object
 // ### Description
 // The `Attachment` object is used to represent an attachment for a ticket.
@@ -208,7 +212,7 @@ type Attachment struct {
 	// The attachment's name. It is required to include the file extension in the attachment's name.
 	FileName *string `json:"file_name,omitempty"`
 	// The ticket associated with the attachment.
-	Ticket *string `json:"ticket,omitempty"`
+	Ticket *AttachmentTicket `json:"ticket,omitempty"`
 	// The attachment's url. It is required to include the file extension in the file's URL.
 	FileUrl *string `json:"file_url,omitempty"`
 	// The attachment's file format.
@@ -234,7 +238,7 @@ type AttachmentRequest struct {
 	// The attachment's name. It is required to include the file extension in the attachment's name.
 	FileName *string `json:"file_name,omitempty"`
 	// The ticket associated with the attachment.
-	Ticket *string `json:"ticket,omitempty"`
+	Ticket *AttachmentRequestTicket `json:"ticket,omitempty"`
 	// The attachment's url. It is required to include the file extension in the file's URL.
 	FileUrl *string `json:"file_url,omitempty"`
 	// The attachment's file format.
@@ -243,6 +247,122 @@ type AttachmentRequest struct {
 	UploadedBy          *string        `json:"uploaded_by,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The ticket associated with the attachment.
+type AttachmentRequestTicket struct {
+	typeName string
+	String   string
+	Ticket   *Ticket
+}
+
+func NewAttachmentRequestTicketFromString(value string) *AttachmentRequestTicket {
+	return &AttachmentRequestTicket{typeName: "string", String: value}
+}
+
+func NewAttachmentRequestTicketFromTicket(value *Ticket) *AttachmentRequestTicket {
+	return &AttachmentRequestTicket{typeName: "ticket", Ticket: value}
+}
+
+func (a *AttachmentRequestTicket) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueTicket := new(Ticket)
+	if err := json.Unmarshal(data, &valueTicket); err == nil {
+		a.typeName = "ticket"
+		a.Ticket = valueTicket
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AttachmentRequestTicket) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "ticket":
+		return json.Marshal(a.Ticket)
+	}
+}
+
+type AttachmentRequestTicketVisitor interface {
+	VisitString(string) error
+	VisitTicket(*Ticket) error
+}
+
+func (a *AttachmentRequestTicket) Accept(visitor AttachmentRequestTicketVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "ticket":
+		return visitor.VisitTicket(a.Ticket)
+	}
+}
+
+// The ticket associated with the attachment.
+type AttachmentTicket struct {
+	typeName string
+	String   string
+	Ticket   *Ticket
+}
+
+func NewAttachmentTicketFromString(value string) *AttachmentTicket {
+	return &AttachmentTicket{typeName: "string", String: value}
+}
+
+func NewAttachmentTicketFromTicket(value *Ticket) *AttachmentTicket {
+	return &AttachmentTicket{typeName: "ticket", Ticket: value}
+}
+
+func (a *AttachmentTicket) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueTicket := new(Ticket)
+	if err := json.Unmarshal(data, &valueTicket); err == nil {
+		a.typeName = "ticket"
+		a.Ticket = valueTicket
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AttachmentTicket) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "ticket":
+		return json.Marshal(a.Ticket)
+	}
+}
+
+type AttachmentTicketVisitor interface {
+	VisitString(string) error
+	VisitTicket(*Ticket) error
+}
+
+func (a *AttachmentTicket) Accept(visitor AttachmentTicketVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "ticket":
+		return visitor.VisitTicket(a.Ticket)
+	}
 }
 
 // # The AvailableActions Object
@@ -428,7 +548,7 @@ type Collection struct {
 	// * `PROJECT` - PROJECT
 	CollectionType *CollectionCollectionType `json:"collection_type,omitempty"`
 	// The parent collection for this collection.
-	ParentCollection *string `json:"parent_collection,omitempty"`
+	ParentCollection *CollectionParentCollection `json:"parent_collection,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The level of access a User has to the Collection and its sub-objects.
@@ -566,6 +686,64 @@ func (c *CollectionCollectionType) Accept(visitor CollectionCollectionTypeVisito
 	}
 }
 
+// The parent collection for this collection.
+type CollectionParentCollection struct {
+	typeName   string
+	String     string
+	Collection *Collection
+}
+
+func NewCollectionParentCollectionFromString(value string) *CollectionParentCollection {
+	return &CollectionParentCollection{typeName: "string", String: value}
+}
+
+func NewCollectionParentCollectionFromCollection(value *Collection) *CollectionParentCollection {
+	return &CollectionParentCollection{typeName: "collection", Collection: value}
+}
+
+func (c *CollectionParentCollection) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCollection := new(Collection)
+	if err := json.Unmarshal(data, &valueCollection); err == nil {
+		c.typeName = "collection"
+		c.Collection = valueCollection
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CollectionParentCollection) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "collection":
+		return json.Marshal(c.Collection)
+	}
+}
+
+type CollectionParentCollectionVisitor interface {
+	VisitString(string) error
+	VisitCollection(*Collection) error
+}
+
+func (c *CollectionParentCollection) Accept(visitor CollectionParentCollectionVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "collection":
+		return visitor.VisitCollection(c.Collection)
+	}
+}
+
 // * `LIST` - LIST
 // * `PROJECT` - PROJECT
 type CollectionTypeEnum uint
@@ -699,15 +877,15 @@ type Comment struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The author of the Comment, if the author is a User.
-	User *string `json:"user,omitempty"`
+	User *CommentUser `json:"user,omitempty"`
 	// The author of the Comment, if the author is a Contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *CommentContact `json:"contact,omitempty"`
 	// The comment's text body.
 	Body *string `json:"body,omitempty"`
 	// The comment's text body formatted as html.
 	HtmlBody *string `json:"html_body,omitempty"`
 	// The ticket associated with the comment.
-	Ticket *string `json:"ticket,omitempty"`
+	Ticket *CommentTicket `json:"ticket,omitempty"`
 	// Whether or not the comment is internal.
 	IsPrivate *bool `json:"is_private,omitempty"`
 	// When the third party's comment was created.
@@ -719,6 +897,64 @@ type Comment struct {
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 }
 
+// The author of the Comment, if the author is a Contact.
+type CommentContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewCommentContactFromString(value string) *CommentContact {
+	return &CommentContact{typeName: "string", String: value}
+}
+
+func NewCommentContactFromContact(value *Contact) *CommentContact {
+	return &CommentContact{typeName: "contact", Contact: value}
+}
+
+func (c *CommentContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		c.typeName = "contact"
+		c.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CommentContact) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "contact":
+		return json.Marshal(c.Contact)
+	}
+}
+
+type CommentContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (c *CommentContact) Accept(visitor CommentContactVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "contact":
+		return visitor.VisitContact(c.Contact)
+	}
+}
+
 // # The Comment Object
 // ### Description
 // The `Comment` object is used to represent a comment on a ticket.
@@ -727,19 +963,193 @@ type Comment struct {
 // TODO
 type CommentRequest struct {
 	// The author of the Comment, if the author is a User.
-	User *string `json:"user,omitempty"`
+	User *CommentRequestUser `json:"user,omitempty"`
 	// The author of the Comment, if the author is a Contact.
-	Contact *string `json:"contact,omitempty"`
+	Contact *CommentRequestContact `json:"contact,omitempty"`
 	// The comment's text body.
 	Body *string `json:"body,omitempty"`
 	// The comment's text body formatted as html.
 	HtmlBody *string `json:"html_body,omitempty"`
 	// The ticket associated with the comment.
-	Ticket *string `json:"ticket,omitempty"`
+	Ticket *CommentRequestTicket `json:"ticket,omitempty"`
 	// Whether or not the comment is internal.
 	IsPrivate           *bool          `json:"is_private,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The author of the Comment, if the author is a Contact.
+type CommentRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewCommentRequestContactFromString(value string) *CommentRequestContact {
+	return &CommentRequestContact{typeName: "string", String: value}
+}
+
+func NewCommentRequestContactFromContact(value *Contact) *CommentRequestContact {
+	return &CommentRequestContact{typeName: "contact", Contact: value}
+}
+
+func (c *CommentRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		c.typeName = "contact"
+		c.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CommentRequestContact) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "contact":
+		return json.Marshal(c.Contact)
+	}
+}
+
+type CommentRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (c *CommentRequestContact) Accept(visitor CommentRequestContactVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "contact":
+		return visitor.VisitContact(c.Contact)
+	}
+}
+
+// The ticket associated with the comment.
+type CommentRequestTicket struct {
+	typeName string
+	String   string
+	Ticket   *Ticket
+}
+
+func NewCommentRequestTicketFromString(value string) *CommentRequestTicket {
+	return &CommentRequestTicket{typeName: "string", String: value}
+}
+
+func NewCommentRequestTicketFromTicket(value *Ticket) *CommentRequestTicket {
+	return &CommentRequestTicket{typeName: "ticket", Ticket: value}
+}
+
+func (c *CommentRequestTicket) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueTicket := new(Ticket)
+	if err := json.Unmarshal(data, &valueTicket); err == nil {
+		c.typeName = "ticket"
+		c.Ticket = valueTicket
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CommentRequestTicket) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "ticket":
+		return json.Marshal(c.Ticket)
+	}
+}
+
+type CommentRequestTicketVisitor interface {
+	VisitString(string) error
+	VisitTicket(*Ticket) error
+}
+
+func (c *CommentRequestTicket) Accept(visitor CommentRequestTicketVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "ticket":
+		return visitor.VisitTicket(c.Ticket)
+	}
+}
+
+// The author of the Comment, if the author is a User.
+type CommentRequestUser struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewCommentRequestUserFromString(value string) *CommentRequestUser {
+	return &CommentRequestUser{typeName: "string", String: value}
+}
+
+func NewCommentRequestUserFromUser(value *User) *CommentRequestUser {
+	return &CommentRequestUser{typeName: "user", User: value}
+}
+
+func (c *CommentRequestUser) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		c.typeName = "user"
+		c.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CommentRequestUser) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "user":
+		return json.Marshal(c.User)
+	}
+}
+
+type CommentRequestUserVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (c *CommentRequestUser) Accept(visitor CommentRequestUserVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "user":
+		return visitor.VisitUser(c.User)
+	}
 }
 
 type CommentResponse struct {
@@ -747,6 +1157,122 @@ type CommentResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+// The ticket associated with the comment.
+type CommentTicket struct {
+	typeName string
+	String   string
+	Ticket   *Ticket
+}
+
+func NewCommentTicketFromString(value string) *CommentTicket {
+	return &CommentTicket{typeName: "string", String: value}
+}
+
+func NewCommentTicketFromTicket(value *Ticket) *CommentTicket {
+	return &CommentTicket{typeName: "ticket", Ticket: value}
+}
+
+func (c *CommentTicket) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueTicket := new(Ticket)
+	if err := json.Unmarshal(data, &valueTicket); err == nil {
+		c.typeName = "ticket"
+		c.Ticket = valueTicket
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CommentTicket) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "ticket":
+		return json.Marshal(c.Ticket)
+	}
+}
+
+type CommentTicketVisitor interface {
+	VisitString(string) error
+	VisitTicket(*Ticket) error
+}
+
+func (c *CommentTicket) Accept(visitor CommentTicketVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "ticket":
+		return visitor.VisitTicket(c.Ticket)
+	}
+}
+
+// The author of the Comment, if the author is a User.
+type CommentUser struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewCommentUserFromString(value string) *CommentUser {
+	return &CommentUser{typeName: "string", String: value}
+}
+
+func NewCommentUserFromUser(value *User) *CommentUser {
+	return &CommentUser{typeName: "user", User: value}
+}
+
+func (c *CommentUser) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		c.typeName = "user"
+		c.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CommentUser) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "user":
+		return json.Marshal(c.User)
+	}
+}
+
+type CommentUserVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (c *CommentUser) Accept(visitor CommentUserVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "user":
+		return visitor.VisitUser(c.User)
+	}
 }
 
 type CommentsListRequestExpand uint
@@ -1077,13 +1603,94 @@ type Contact struct {
 	// The contact's details.
 	Details *string `json:"details,omitempty"`
 	// The contact's account.
-	Account *string `json:"account,omitempty"`
+	Account *ContactAccount `json:"account,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// The contact's account.
+type ContactAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewContactAccountFromString(value string) *ContactAccount {
+	return &ContactAccount{typeName: "string", String: value}
+}
+
+func NewContactAccountFromAccount(value *Account) *ContactAccount {
+	return &ContactAccount{typeName: "account", Account: value}
+}
+
+func (c *ContactAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		c.typeName = "account"
+		c.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactAccount) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "account":
+		return json.Marshal(c.Account)
+	}
+}
+
+type ContactAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (c *ContactAccount) Accept(visitor ContactAccountVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "account":
+		return visitor.VisitAccount(c.Account)
+	}
+}
+
+// # The DataPassthrough Object
+// ### Description
+// The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
+//
+// ### Usage Example
+// Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
+type DataPassthroughRequest struct {
+	Method MethodEnum `json:"method,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Path string `json:"path"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Data *string `json:"data,omitempty"`
+	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
+	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
+	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
+	Headers       map[string]any     `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
+	NormalizeResponse *bool `json:"normalize_response,omitempty"`
 }
 
 type DebugModeLog struct {
@@ -2332,8 +2939,65 @@ type RemoteFieldClass struct {
 }
 
 type RemoteFieldRequest struct {
-	RemoteFieldClass string         `json:"remote_field_class"`
-	Value            map[string]any `json:"value,omitempty"`
+	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
+	Value            map[string]any                      `json:"value,omitempty"`
+}
+
+type RemoteFieldRequestRemoteFieldClass struct {
+	typeName         string
+	String           string
+	RemoteFieldClass *RemoteFieldClass
+}
+
+func NewRemoteFieldRequestRemoteFieldClassFromString(value string) *RemoteFieldRequestRemoteFieldClass {
+	return &RemoteFieldRequestRemoteFieldClass{typeName: "string", String: value}
+}
+
+func NewRemoteFieldRequestRemoteFieldClassFromRemoteFieldClass(value *RemoteFieldClass) *RemoteFieldRequestRemoteFieldClass {
+	return &RemoteFieldRequestRemoteFieldClass{typeName: "remoteFieldClass", RemoteFieldClass: value}
+}
+
+func (r *RemoteFieldRequestRemoteFieldClass) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	valueRemoteFieldClass := new(RemoteFieldClass)
+	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
+		r.typeName = "remoteFieldClass"
+		r.RemoteFieldClass = valueRemoteFieldClass
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldRequestRemoteFieldClass) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "remoteFieldClass":
+		return json.Marshal(r.RemoteFieldClass)
+	}
+}
+
+type RemoteFieldRequestRemoteFieldClassVisitor interface {
+	VisitString(string) error
+	VisitRemoteFieldClass(*RemoteFieldClass) error
+}
+
+func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRemoteFieldClassVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "remoteFieldClass":
+		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
+	}
 }
 
 // # The RemoteKey Object
@@ -2626,10 +3290,10 @@ type Ticket struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The ticket's name.
-	Name      *string   `json:"name,omitempty"`
-	Assignees []*string `json:"assignees,omitempty"`
+	Name      *string                `json:"name,omitempty"`
+	Assignees []*TicketAssigneesItem `json:"assignees,omitempty"`
 	// The user who created this ticket.
-	Creator *string `json:"creator,omitempty"`
+	Creator *TicketCreator `json:"creator,omitempty"`
 	// The ticket's due date.
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
@@ -2640,18 +3304,18 @@ type Ticket struct {
 	// * `ON_HOLD` - ON_HOLD
 	Status *TicketStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
-	Description *string   `json:"description,omitempty"`
-	Collections []*string `json:"collections,omitempty"`
+	Description *string                  `json:"description,omitempty"`
+	Collections []*TicketCollectionsItem `json:"collections,omitempty"`
 	// The ticket's type.
 	TicketType *string `json:"ticket_type,omitempty"`
 	// The account associated with the ticket.
-	Account *string `json:"account,omitempty"`
+	Account *TicketAccount `json:"account,omitempty"`
 	// The contact associated with the ticket.
-	Contact *string `json:"contact,omitempty"`
+	Contact *TicketContact `json:"contact,omitempty"`
 	// The ticket's parent ticket.
-	ParentTicket *string   `json:"parent_ticket,omitempty"`
-	Attachments  []*string `json:"attachments,omitempty"`
-	Tags         []*string `json:"tags,omitempty"`
+	ParentTicket *TicketParentTicket      `json:"parent_ticket,omitempty"`
+	Attachments  []*TicketAttachmentsItem `json:"attachments,omitempty"`
+	Tags         []*string                `json:"tags,omitempty"`
 	// When the third party's ticket was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's ticket was updated.
@@ -2673,6 +3337,409 @@ type Ticket struct {
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+}
+
+// The account associated with the ticket.
+type TicketAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewTicketAccountFromString(value string) *TicketAccount {
+	return &TicketAccount{typeName: "string", String: value}
+}
+
+func NewTicketAccountFromAccount(value *Account) *TicketAccount {
+	return &TicketAccount{typeName: "account", Account: value}
+}
+
+func (t *TicketAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		t.typeName = "account"
+		t.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketAccount) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "account":
+		return json.Marshal(t.Account)
+	}
+}
+
+type TicketAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (t *TicketAccount) Accept(visitor TicketAccountVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "account":
+		return visitor.VisitAccount(t.Account)
+	}
+}
+
+type TicketAssigneesItem struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewTicketAssigneesItemFromString(value string) *TicketAssigneesItem {
+	return &TicketAssigneesItem{typeName: "string", String: value}
+}
+
+func NewTicketAssigneesItemFromUser(value *User) *TicketAssigneesItem {
+	return &TicketAssigneesItem{typeName: "user", User: value}
+}
+
+func (t *TicketAssigneesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		t.typeName = "user"
+		t.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketAssigneesItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "user":
+		return json.Marshal(t.User)
+	}
+}
+
+type TicketAssigneesItemVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (t *TicketAssigneesItem) Accept(visitor TicketAssigneesItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "user":
+		return visitor.VisitUser(t.User)
+	}
+}
+
+type TicketAttachmentsItem struct {
+	typeName   string
+	String     string
+	Attachment *Attachment
+}
+
+func NewTicketAttachmentsItemFromString(value string) *TicketAttachmentsItem {
+	return &TicketAttachmentsItem{typeName: "string", String: value}
+}
+
+func NewTicketAttachmentsItemFromAttachment(value *Attachment) *TicketAttachmentsItem {
+	return &TicketAttachmentsItem{typeName: "attachment", Attachment: value}
+}
+
+func (t *TicketAttachmentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAttachment := new(Attachment)
+	if err := json.Unmarshal(data, &valueAttachment); err == nil {
+		t.typeName = "attachment"
+		t.Attachment = valueAttachment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketAttachmentsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "attachment":
+		return json.Marshal(t.Attachment)
+	}
+}
+
+type TicketAttachmentsItemVisitor interface {
+	VisitString(string) error
+	VisitAttachment(*Attachment) error
+}
+
+func (t *TicketAttachmentsItem) Accept(visitor TicketAttachmentsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "attachment":
+		return visitor.VisitAttachment(t.Attachment)
+	}
+}
+
+type TicketCollectionsItem struct {
+	typeName   string
+	String     string
+	Collection *Collection
+}
+
+func NewTicketCollectionsItemFromString(value string) *TicketCollectionsItem {
+	return &TicketCollectionsItem{typeName: "string", String: value}
+}
+
+func NewTicketCollectionsItemFromCollection(value *Collection) *TicketCollectionsItem {
+	return &TicketCollectionsItem{typeName: "collection", Collection: value}
+}
+
+func (t *TicketCollectionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueCollection := new(Collection)
+	if err := json.Unmarshal(data, &valueCollection); err == nil {
+		t.typeName = "collection"
+		t.Collection = valueCollection
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketCollectionsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "collection":
+		return json.Marshal(t.Collection)
+	}
+}
+
+type TicketCollectionsItemVisitor interface {
+	VisitString(string) error
+	VisitCollection(*Collection) error
+}
+
+func (t *TicketCollectionsItem) Accept(visitor TicketCollectionsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "collection":
+		return visitor.VisitCollection(t.Collection)
+	}
+}
+
+// The contact associated with the ticket.
+type TicketContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewTicketContactFromString(value string) *TicketContact {
+	return &TicketContact{typeName: "string", String: value}
+}
+
+func NewTicketContactFromContact(value *Contact) *TicketContact {
+	return &TicketContact{typeName: "contact", Contact: value}
+}
+
+func (t *TicketContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		t.typeName = "contact"
+		t.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketContact) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "contact":
+		return json.Marshal(t.Contact)
+	}
+}
+
+type TicketContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (t *TicketContact) Accept(visitor TicketContactVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "contact":
+		return visitor.VisitContact(t.Contact)
+	}
+}
+
+// The user who created this ticket.
+type TicketCreator struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewTicketCreatorFromString(value string) *TicketCreator {
+	return &TicketCreator{typeName: "string", String: value}
+}
+
+func NewTicketCreatorFromUser(value *User) *TicketCreator {
+	return &TicketCreator{typeName: "user", User: value}
+}
+
+func (t *TicketCreator) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		t.typeName = "user"
+		t.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketCreator) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "user":
+		return json.Marshal(t.User)
+	}
+}
+
+type TicketCreatorVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (t *TicketCreator) Accept(visitor TicketCreatorVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "user":
+		return visitor.VisitUser(t.User)
+	}
+}
+
+// The ticket's parent ticket.
+type TicketParentTicket struct {
+	typeName string
+	String   string
+	Ticket   *Ticket
+}
+
+func NewTicketParentTicketFromString(value string) *TicketParentTicket {
+	return &TicketParentTicket{typeName: "string", String: value}
+}
+
+func NewTicketParentTicketFromTicket(value *Ticket) *TicketParentTicket {
+	return &TicketParentTicket{typeName: "ticket", Ticket: value}
+}
+
+func (t *TicketParentTicket) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTicket := new(Ticket)
+	if err := json.Unmarshal(data, &valueTicket); err == nil {
+		t.typeName = "ticket"
+		t.Ticket = valueTicket
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketParentTicket) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "ticket":
+		return json.Marshal(t.Ticket)
+	}
+}
+
+type TicketParentTicketVisitor interface {
+	VisitString(string) error
+	VisitTicket(*Ticket) error
+}
+
+func (t *TicketParentTicket) Accept(visitor TicketParentTicketVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "ticket":
+		return visitor.VisitTicket(t.Ticket)
+	}
 }
 
 // The priority or urgency of the Ticket.
@@ -2746,10 +3813,10 @@ func (t *TicketPriority) Accept(visitor TicketPriorityVisitor) error {
 // TODO
 type TicketRequest struct {
 	// The ticket's name.
-	Name      *string   `json:"name,omitempty"`
-	Assignees []*string `json:"assignees,omitempty"`
+	Name      *string                       `json:"name,omitempty"`
+	Assignees []*TicketRequestAssigneesItem `json:"assignees,omitempty"`
 	// The user who created this ticket.
-	Creator *string `json:"creator,omitempty"`
+	Creator *TicketRequestCreator `json:"creator,omitempty"`
 	// The ticket's due date.
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
@@ -2760,18 +3827,18 @@ type TicketRequest struct {
 	// * `ON_HOLD` - ON_HOLD
 	Status *TicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
-	Description *string   `json:"description,omitempty"`
-	Collections []*string `json:"collections,omitempty"`
+	Description *string                         `json:"description,omitempty"`
+	Collections []*TicketRequestCollectionsItem `json:"collections,omitempty"`
 	// The ticket's type.
 	TicketType *string `json:"ticket_type,omitempty"`
 	// The account associated with the ticket.
-	Account *string `json:"account,omitempty"`
+	Account *TicketRequestAccount `json:"account,omitempty"`
 	// The contact associated with the ticket.
-	Contact *string `json:"contact,omitempty"`
+	Contact *TicketRequestContact `json:"contact,omitempty"`
 	// The ticket's parent ticket.
-	ParentTicket *string   `json:"parent_ticket,omitempty"`
-	Attachments  []*string `json:"attachments,omitempty"`
-	Tags         []*string `json:"tags,omitempty"`
+	ParentTicket *TicketRequestParentTicket      `json:"parent_ticket,omitempty"`
+	Attachments  []*TicketRequestAttachmentsItem `json:"attachments,omitempty"`
+	Tags         []*string                       `json:"tags,omitempty"`
 	// When the ticket was completed.
 	CompletedAt *time.Time `json:"completed_at,omitempty"`
 	// The 3rd party url of the Ticket.
@@ -2786,6 +3853,409 @@ type TicketRequest struct {
 	IntegrationParams   map[string]any         `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any         `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+}
+
+// The account associated with the ticket.
+type TicketRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewTicketRequestAccountFromString(value string) *TicketRequestAccount {
+	return &TicketRequestAccount{typeName: "string", String: value}
+}
+
+func NewTicketRequestAccountFromAccount(value *Account) *TicketRequestAccount {
+	return &TicketRequestAccount{typeName: "account", Account: value}
+}
+
+func (t *TicketRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		t.typeName = "account"
+		t.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestAccount) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "account":
+		return json.Marshal(t.Account)
+	}
+}
+
+type TicketRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (t *TicketRequestAccount) Accept(visitor TicketRequestAccountVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "account":
+		return visitor.VisitAccount(t.Account)
+	}
+}
+
+type TicketRequestAssigneesItem struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewTicketRequestAssigneesItemFromString(value string) *TicketRequestAssigneesItem {
+	return &TicketRequestAssigneesItem{typeName: "string", String: value}
+}
+
+func NewTicketRequestAssigneesItemFromUser(value *User) *TicketRequestAssigneesItem {
+	return &TicketRequestAssigneesItem{typeName: "user", User: value}
+}
+
+func (t *TicketRequestAssigneesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		t.typeName = "user"
+		t.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestAssigneesItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "user":
+		return json.Marshal(t.User)
+	}
+}
+
+type TicketRequestAssigneesItemVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (t *TicketRequestAssigneesItem) Accept(visitor TicketRequestAssigneesItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "user":
+		return visitor.VisitUser(t.User)
+	}
+}
+
+type TicketRequestAttachmentsItem struct {
+	typeName   string
+	String     string
+	Attachment *Attachment
+}
+
+func NewTicketRequestAttachmentsItemFromString(value string) *TicketRequestAttachmentsItem {
+	return &TicketRequestAttachmentsItem{typeName: "string", String: value}
+}
+
+func NewTicketRequestAttachmentsItemFromAttachment(value *Attachment) *TicketRequestAttachmentsItem {
+	return &TicketRequestAttachmentsItem{typeName: "attachment", Attachment: value}
+}
+
+func (t *TicketRequestAttachmentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueAttachment := new(Attachment)
+	if err := json.Unmarshal(data, &valueAttachment); err == nil {
+		t.typeName = "attachment"
+		t.Attachment = valueAttachment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestAttachmentsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "attachment":
+		return json.Marshal(t.Attachment)
+	}
+}
+
+type TicketRequestAttachmentsItemVisitor interface {
+	VisitString(string) error
+	VisitAttachment(*Attachment) error
+}
+
+func (t *TicketRequestAttachmentsItem) Accept(visitor TicketRequestAttachmentsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "attachment":
+		return visitor.VisitAttachment(t.Attachment)
+	}
+}
+
+type TicketRequestCollectionsItem struct {
+	typeName   string
+	String     string
+	Collection *Collection
+}
+
+func NewTicketRequestCollectionsItemFromString(value string) *TicketRequestCollectionsItem {
+	return &TicketRequestCollectionsItem{typeName: "string", String: value}
+}
+
+func NewTicketRequestCollectionsItemFromCollection(value *Collection) *TicketRequestCollectionsItem {
+	return &TicketRequestCollectionsItem{typeName: "collection", Collection: value}
+}
+
+func (t *TicketRequestCollectionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueCollection := new(Collection)
+	if err := json.Unmarshal(data, &valueCollection); err == nil {
+		t.typeName = "collection"
+		t.Collection = valueCollection
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestCollectionsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "collection":
+		return json.Marshal(t.Collection)
+	}
+}
+
+type TicketRequestCollectionsItemVisitor interface {
+	VisitString(string) error
+	VisitCollection(*Collection) error
+}
+
+func (t *TicketRequestCollectionsItem) Accept(visitor TicketRequestCollectionsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "collection":
+		return visitor.VisitCollection(t.Collection)
+	}
+}
+
+// The contact associated with the ticket.
+type TicketRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewTicketRequestContactFromString(value string) *TicketRequestContact {
+	return &TicketRequestContact{typeName: "string", String: value}
+}
+
+func NewTicketRequestContactFromContact(value *Contact) *TicketRequestContact {
+	return &TicketRequestContact{typeName: "contact", Contact: value}
+}
+
+func (t *TicketRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		t.typeName = "contact"
+		t.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestContact) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "contact":
+		return json.Marshal(t.Contact)
+	}
+}
+
+type TicketRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (t *TicketRequestContact) Accept(visitor TicketRequestContactVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "contact":
+		return visitor.VisitContact(t.Contact)
+	}
+}
+
+// The user who created this ticket.
+type TicketRequestCreator struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewTicketRequestCreatorFromString(value string) *TicketRequestCreator {
+	return &TicketRequestCreator{typeName: "string", String: value}
+}
+
+func NewTicketRequestCreatorFromUser(value *User) *TicketRequestCreator {
+	return &TicketRequestCreator{typeName: "user", User: value}
+}
+
+func (t *TicketRequestCreator) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		t.typeName = "user"
+		t.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestCreator) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "user":
+		return json.Marshal(t.User)
+	}
+}
+
+type TicketRequestCreatorVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (t *TicketRequestCreator) Accept(visitor TicketRequestCreatorVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "user":
+		return visitor.VisitUser(t.User)
+	}
+}
+
+// The ticket's parent ticket.
+type TicketRequestParentTicket struct {
+	typeName string
+	String   string
+	Ticket   *Ticket
+}
+
+func NewTicketRequestParentTicketFromString(value string) *TicketRequestParentTicket {
+	return &TicketRequestParentTicket{typeName: "string", String: value}
+}
+
+func NewTicketRequestParentTicketFromTicket(value *Ticket) *TicketRequestParentTicket {
+	return &TicketRequestParentTicket{typeName: "ticket", Ticket: value}
+}
+
+func (t *TicketRequestParentTicket) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTicket := new(Ticket)
+	if err := json.Unmarshal(data, &valueTicket); err == nil {
+		t.typeName = "ticket"
+		t.Ticket = valueTicket
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestParentTicket) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "ticket":
+		return json.Marshal(t.Ticket)
+	}
+}
+
+type TicketRequestParentTicketVisitor interface {
+	VisitString(string) error
+	VisitTicket(*Ticket) error
+}
+
+func (t *TicketRequestParentTicket) Accept(visitor TicketRequestParentTicketVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "ticket":
+		return visitor.VisitTicket(t.Ticket)
+	}
 }
 
 // The priority or urgency of the Ticket.
@@ -5052,8 +6522,8 @@ type User struct {
 	// The user's email address.
 	EmailAddress *string `json:"email_address,omitempty"`
 	// Whether or not the user is active.
-	IsActive *bool     `json:"is_active,omitempty"`
-	Teams    []*string `json:"teams,omitempty"`
+	IsActive *bool            `json:"is_active,omitempty"`
+	Teams    []*UserTeamsItem `json:"teams,omitempty"`
 	// The user's avatar picture.
 	Avatar *string `json:"avatar,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
@@ -5062,6 +6532,63 @@ type User struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+type UserTeamsItem struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewUserTeamsItemFromString(value string) *UserTeamsItem {
+	return &UserTeamsItem{typeName: "string", String: value}
+}
+
+func NewUserTeamsItemFromTeam(value *Team) *UserTeamsItem {
+	return &UserTeamsItem{typeName: "team", Team: value}
+}
+
+func (u *UserTeamsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		u.typeName = "string"
+		u.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		u.typeName = "team"
+		u.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, u)
+}
+
+func (u UserTeamsItem) MarshalJSON() ([]byte, error) {
+	switch u.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", u.typeName, u)
+	case "string":
+		return json.Marshal(u.String)
+	case "team":
+		return json.Marshal(u.Team)
+	}
+}
+
+type UserTeamsItemVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (u *UserTeamsItem) Accept(visitor UserTeamsItemVisitor) error {
+	switch u.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", u.typeName, u)
+	case "string":
+		return visitor.VisitString(u.String)
+	case "team":
+		return visitor.VisitTeam(u.Team)
+	}
 }
 
 type UsersListRequestExpand uint

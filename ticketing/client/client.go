@@ -7,6 +7,7 @@ import (
 	accountdetails "github.com/merge-api/merge-go-client/ticketing/accountdetails"
 	accounts "github.com/merge-api/merge-go-client/ticketing/accounts"
 	accounttoken "github.com/merge-api/merge-go-client/ticketing/accounttoken"
+	asyncpassthrough "github.com/merge-api/merge-go-client/ticketing/asyncpassthrough"
 	attachments "github.com/merge-api/merge-go-client/ticketing/attachments"
 	availableactions "github.com/merge-api/merge-go-client/ticketing/availableactions"
 	collections "github.com/merge-api/merge-go-client/ticketing/collections"
@@ -35,6 +36,7 @@ type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
 	Accounts() accounts.Client
+	AsyncPassthrough() asyncpassthrough.Client
 	Attachments() attachments.Client
 	AvailableActions() availableactions.Client
 	Collections() collections.Client
@@ -70,6 +72,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountDetailsClient:   accountdetails.NewClient(opts...),
 		accountTokenClient:     accounttoken.NewClient(opts...),
 		accountsClient:         accounts.NewClient(opts...),
+		asyncPassthroughClient: asyncpassthrough.NewClient(opts...),
 		attachmentsClient:      attachments.NewClient(opts...),
 		availableActionsClient: availableactions.NewClient(opts...),
 		collectionsClient:      collections.NewClient(opts...),
@@ -101,6 +104,7 @@ type client struct {
 	accountDetailsClient   accountdetails.Client
 	accountTokenClient     accounttoken.Client
 	accountsClient         accounts.Client
+	asyncPassthroughClient asyncpassthrough.Client
 	attachmentsClient      attachments.Client
 	availableActionsClient availableactions.Client
 	collectionsClient      collections.Client
@@ -134,6 +138,10 @@ func (c *client) AccountToken() accounttoken.Client {
 
 func (c *client) Accounts() accounts.Client {
 	return c.accountsClient
+}
+
+func (c *client) AsyncPassthrough() asyncpassthrough.Client {
+	return c.asyncPassthroughClient
 }
 
 func (c *client) Attachments() attachments.Client {

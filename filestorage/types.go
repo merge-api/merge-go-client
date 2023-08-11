@@ -124,6 +124,10 @@ type AccountToken struct {
 	Integration  *AccountIntegration `json:"integration,omitempty"`
 }
 
+type AsyncPassthroughReciept struct {
+	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+}
+
 // # The AvailableActions Object
 // ### Description
 // The `Activity` object is used to see all available model/operation combinations for an integration.
@@ -457,6 +461,29 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 		*c = value
 	}
 	return nil
+}
+
+// # The DataPassthrough Object
+// ### Description
+// The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
+//
+// ### Usage Example
+// Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
+type DataPassthroughRequest struct {
+	Method MethodEnum `json:"method,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Path string `json:"path"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// <span style="white-space: nowrap">`non-empty`</span>
+	Data *string `json:"data,omitempty"`
+	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
+	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
+	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
+	Headers       map[string]any     `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
+	NormalizeResponse *bool `json:"normalize_response,omitempty"`
 }
 
 type DebugModeLog struct {

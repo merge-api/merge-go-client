@@ -7,6 +7,7 @@ import (
 	accounts "github.com/merge-api/merge-go-client/accounting/accounts"
 	accounttoken "github.com/merge-api/merge-go-client/accounting/accounttoken"
 	addresses "github.com/merge-api/merge-go-client/accounting/addresses"
+	asyncpassthrough "github.com/merge-api/merge-go-client/accounting/asyncpassthrough"
 	attachments "github.com/merge-api/merge-go-client/accounting/attachments"
 	availableactions "github.com/merge-api/merge-go-client/accounting/availableactions"
 	balancesheets "github.com/merge-api/merge-go-client/accounting/balancesheets"
@@ -46,6 +47,7 @@ type Client interface {
 	AccountToken() accounttoken.Client
 	Accounts() accounts.Client
 	Addresses() addresses.Client
+	AsyncPassthrough() asyncpassthrough.Client
 	Attachments() attachments.Client
 	AvailableActions() availableactions.Client
 	BalanceSheets() balancesheets.Client
@@ -91,6 +93,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountTokenClient:       accounttoken.NewClient(opts...),
 		accountsClient:           accounts.NewClient(opts...),
 		addressesClient:          addresses.NewClient(opts...),
+		asyncPassthroughClient:   asyncpassthrough.NewClient(opts...),
 		attachmentsClient:        attachments.NewClient(opts...),
 		availableActionsClient:   availableactions.NewClient(opts...),
 		balanceSheetsClient:      balancesheets.NewClient(opts...),
@@ -132,6 +135,7 @@ type client struct {
 	accountTokenClient       accounttoken.Client
 	accountsClient           accounts.Client
 	addressesClient          addresses.Client
+	asyncPassthroughClient   asyncpassthrough.Client
 	attachmentsClient        attachments.Client
 	availableActionsClient   availableactions.Client
 	balanceSheetsClient      balancesheets.Client
@@ -178,6 +182,10 @@ func (c *client) Accounts() accounts.Client {
 
 func (c *client) Addresses() addresses.Client {
 	return c.addressesClient
+}
+
+func (c *client) AsyncPassthrough() asyncpassthrough.Client {
+	return c.asyncPassthroughClient
 }
 
 func (c *client) Attachments() attachments.Client {

@@ -9,6 +9,7 @@ import (
 	accounttoken "github.com/merge-api/merge-go-client/crm/accounttoken"
 	associations "github.com/merge-api/merge-go-client/crm/associations"
 	associationtypes "github.com/merge-api/merge-go-client/crm/associationtypes"
+	asyncpassthrough "github.com/merge-api/merge-go-client/crm/asyncpassthrough"
 	availableactions "github.com/merge-api/merge-go-client/crm/availableactions"
 	contacts "github.com/merge-api/merge-go-client/crm/contacts"
 	customobjectclasses "github.com/merge-api/merge-go-client/crm/customobjectclasses"
@@ -39,6 +40,7 @@ type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
 	Accounts() accounts.Client
+	AsyncPassthrough() asyncpassthrough.Client
 	AvailableActions() availableactions.Client
 	Contacts() contacts.Client
 	CustomObjectClasses() customobjectclasses.Client
@@ -78,6 +80,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountDetailsClient:      accountdetails.NewClient(opts...),
 		accountTokenClient:        accounttoken.NewClient(opts...),
 		accountsClient:            accounts.NewClient(opts...),
+		asyncPassthroughClient:    asyncpassthrough.NewClient(opts...),
 		availableActionsClient:    availableactions.NewClient(opts...),
 		contactsClient:            contacts.NewClient(opts...),
 		customObjectClassesClient: customobjectclasses.NewClient(opts...),
@@ -113,6 +116,7 @@ type client struct {
 	accountDetailsClient      accountdetails.Client
 	accountTokenClient        accounttoken.Client
 	accountsClient            accounts.Client
+	asyncPassthroughClient    asyncpassthrough.Client
 	availableActionsClient    availableactions.Client
 	contactsClient            contacts.Client
 	customObjectClassesClient customobjectclasses.Client
@@ -150,6 +154,10 @@ func (c *client) AccountToken() accounttoken.Client {
 
 func (c *client) Accounts() accounts.Client {
 	return c.accountsClient
+}
+
+func (c *client) AsyncPassthrough() asyncpassthrough.Client {
+	return c.asyncPassthroughClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {

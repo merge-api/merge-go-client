@@ -6,13 +6,16 @@ import (
 	core "github.com/merge-api/merge-go-client/core"
 	accountdetails "github.com/merge-api/merge-go-client/hris/accountdetails"
 	accounttoken "github.com/merge-api/merge-go-client/hris/accounttoken"
+	asyncpassthrough "github.com/merge-api/merge-go-client/hris/asyncpassthrough"
 	availableactions "github.com/merge-api/merge-go-client/hris/availableactions"
 	bankinfo "github.com/merge-api/merge-go-client/hris/bankinfo"
 	benefits "github.com/merge-api/merge-go-client/hris/benefits"
 	companies "github.com/merge-api/merge-go-client/hris/companies"
 	deleteaccount "github.com/merge-api/merge-go-client/hris/deleteaccount"
+	dependents "github.com/merge-api/merge-go-client/hris/dependents"
 	employeepayrollruns "github.com/merge-api/merge-go-client/hris/employeepayrollruns"
 	employees "github.com/merge-api/merge-go-client/hris/employees"
+	employerbenefits "github.com/merge-api/merge-go-client/hris/employerbenefits"
 	employments "github.com/merge-api/merge-go-client/hris/employments"
 	forceresync "github.com/merge-api/merge-go-client/hris/forceresync"
 	generatekey "github.com/merge-api/merge-go-client/hris/generatekey"
@@ -37,13 +40,16 @@ import (
 type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
+	AsyncPassthrough() asyncpassthrough.Client
 	AvailableActions() availableactions.Client
 	BankInfo() bankinfo.Client
 	Benefits() benefits.Client
 	Companies() companies.Client
 	DeleteAccount() deleteaccount.Client
+	Dependents() dependents.Client
 	EmployeePayrollRuns() employeepayrollruns.Client
 	Employees() employees.Client
+	EmployerBenefits() employerbenefits.Client
 	Employments() employments.Client
 	GenerateKey() generatekey.Client
 	Groups() groups.Client
@@ -75,13 +81,16 @@ func NewClient(opts ...core.ClientOption) Client {
 		header:                    options.ToHeader(),
 		accountDetailsClient:      accountdetails.NewClient(opts...),
 		accountTokenClient:        accounttoken.NewClient(opts...),
+		asyncPassthroughClient:    asyncpassthrough.NewClient(opts...),
 		availableActionsClient:    availableactions.NewClient(opts...),
 		bankInfoClient:            bankinfo.NewClient(opts...),
 		benefitsClient:            benefits.NewClient(opts...),
 		companiesClient:           companies.NewClient(opts...),
 		deleteAccountClient:       deleteaccount.NewClient(opts...),
+		dependentsClient:          dependents.NewClient(opts...),
 		employeePayrollRunsClient: employeepayrollruns.NewClient(opts...),
 		employeesClient:           employees.NewClient(opts...),
+		employerBenefitsClient:    employerbenefits.NewClient(opts...),
 		employmentsClient:         employments.NewClient(opts...),
 		generateKeyClient:         generatekey.NewClient(opts...),
 		groupsClient:              groups.NewClient(opts...),
@@ -109,13 +118,16 @@ type client struct {
 	header                    http.Header
 	accountDetailsClient      accountdetails.Client
 	accountTokenClient        accounttoken.Client
+	asyncPassthroughClient    asyncpassthrough.Client
 	availableActionsClient    availableactions.Client
 	bankInfoClient            bankinfo.Client
 	benefitsClient            benefits.Client
 	companiesClient           companies.Client
 	deleteAccountClient       deleteaccount.Client
+	dependentsClient          dependents.Client
 	employeePayrollRunsClient employeepayrollruns.Client
 	employeesClient           employees.Client
+	employerBenefitsClient    employerbenefits.Client
 	employmentsClient         employments.Client
 	generateKeyClient         generatekey.Client
 	groupsClient              groups.Client
@@ -144,6 +156,10 @@ func (c *client) AccountToken() accounttoken.Client {
 	return c.accountTokenClient
 }
 
+func (c *client) AsyncPassthrough() asyncpassthrough.Client {
+	return c.asyncPassthroughClient
+}
+
 func (c *client) AvailableActions() availableactions.Client {
 	return c.availableActionsClient
 }
@@ -164,12 +180,20 @@ func (c *client) DeleteAccount() deleteaccount.Client {
 	return c.deleteAccountClient
 }
 
+func (c *client) Dependents() dependents.Client {
+	return c.dependentsClient
+}
+
 func (c *client) EmployeePayrollRuns() employeepayrollruns.Client {
 	return c.employeePayrollRunsClient
 }
 
 func (c *client) Employees() employees.Client {
 	return c.employeesClient
+}
+
+func (c *client) EmployerBenefits() employerbenefits.Client {
+	return c.employerBenefitsClient
 }
 
 func (c *client) Employments() employments.Client {
