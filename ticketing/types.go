@@ -2926,16 +2926,135 @@ type RemoteField struct {
 }
 
 type RemoteFieldClass struct {
-	Id            *string          `json:"id,omitempty"`
-	DisplayName   *string          `json:"display_name,omitempty"`
-	RemoteKeyName *string          `json:"remote_key_name,omitempty"`
-	Description   *string          `json:"description,omitempty"`
-	IsCustom      *bool            `json:"is_custom,omitempty"`
-	IsRequired    *bool            `json:"is_required,omitempty"`
-	FieldType     *FieldTypeEnum   `json:"field_type,omitempty"`
-	FieldFormat   *FieldFormatEnum `json:"field_format,omitempty"`
-	FieldChoices  []string         `json:"field_choices,omitempty"`
-	ItemSchema    *ItemSchema      `json:"item_schema,omitempty"`
+	Id            *string                             `json:"id,omitempty"`
+	DisplayName   *string                             `json:"display_name,omitempty"`
+	RemoteKeyName *string                             `json:"remote_key_name,omitempty"`
+	Description   *string                             `json:"description,omitempty"`
+	IsCustom      *bool                               `json:"is_custom,omitempty"`
+	IsRequired    *bool                               `json:"is_required,omitempty"`
+	FieldType     *RemoteFieldClassFieldType          `json:"field_type,omitempty"`
+	FieldFormat   *RemoteFieldClassFieldFormat        `json:"field_format,omitempty"`
+	FieldChoices  []*RemoteFieldClassFieldChoicesItem `json:"field_choices,omitempty"`
+	ItemSchema    *ItemSchema                         `json:"item_schema,omitempty"`
+}
+
+type RemoteFieldClassFieldChoicesItem struct {
+	Value       *any    `json:"value,omitempty"`
+	DisplayName *string `json:"display_name,omitempty"`
+}
+
+type RemoteFieldClassFieldFormat struct {
+	typeName        string
+	String          string
+	FieldFormatEnum FieldFormatEnum
+}
+
+func NewRemoteFieldClassFieldFormatFromString(value string) *RemoteFieldClassFieldFormat {
+	return &RemoteFieldClassFieldFormat{typeName: "string", String: value}
+}
+
+func NewRemoteFieldClassFieldFormatFromFieldFormatEnum(value FieldFormatEnum) *RemoteFieldClassFieldFormat {
+	return &RemoteFieldClassFieldFormat{typeName: "fieldFormatEnum", FieldFormatEnum: value}
+}
+
+func (r *RemoteFieldClassFieldFormat) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	var valueFieldFormatEnum FieldFormatEnum
+	if err := json.Unmarshal(data, &valueFieldFormatEnum); err == nil {
+		r.typeName = "fieldFormatEnum"
+		r.FieldFormatEnum = valueFieldFormatEnum
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldClassFieldFormat) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "fieldFormatEnum":
+		return json.Marshal(r.FieldFormatEnum)
+	}
+}
+
+type RemoteFieldClassFieldFormatVisitor interface {
+	VisitString(string) error
+	VisitFieldFormatEnum(FieldFormatEnum) error
+}
+
+func (r *RemoteFieldClassFieldFormat) Accept(visitor RemoteFieldClassFieldFormatVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "fieldFormatEnum":
+		return visitor.VisitFieldFormatEnum(r.FieldFormatEnum)
+	}
+}
+
+type RemoteFieldClassFieldType struct {
+	typeName      string
+	String        string
+	FieldTypeEnum FieldTypeEnum
+}
+
+func NewRemoteFieldClassFieldTypeFromString(value string) *RemoteFieldClassFieldType {
+	return &RemoteFieldClassFieldType{typeName: "string", String: value}
+}
+
+func NewRemoteFieldClassFieldTypeFromFieldTypeEnum(value FieldTypeEnum) *RemoteFieldClassFieldType {
+	return &RemoteFieldClassFieldType{typeName: "fieldTypeEnum", FieldTypeEnum: value}
+}
+
+func (r *RemoteFieldClassFieldType) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	var valueFieldTypeEnum FieldTypeEnum
+	if err := json.Unmarshal(data, &valueFieldTypeEnum); err == nil {
+		r.typeName = "fieldTypeEnum"
+		r.FieldTypeEnum = valueFieldTypeEnum
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldClassFieldType) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "fieldTypeEnum":
+		return json.Marshal(r.FieldTypeEnum)
+	}
+}
+
+type RemoteFieldClassFieldTypeVisitor interface {
+	VisitString(string) error
+	VisitFieldTypeEnum(FieldTypeEnum) error
+}
+
+func (r *RemoteFieldClassFieldType) Accept(visitor RemoteFieldClassFieldTypeVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "fieldTypeEnum":
+		return visitor.VisitFieldTypeEnum(r.FieldTypeEnum)
+	}
 }
 
 type RemoteFieldRequest struct {

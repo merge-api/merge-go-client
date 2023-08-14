@@ -17,8 +17,8 @@ type Client interface {
 	Ats() atsclient.Client
 	Crm() crmclient.Client
 	Filestorage() filestorageclient.Client
-	Ticketing() ticketingclient.Client
 	Hris() hrisclient.Client
+	Ticketing() ticketingclient.Client
 	Accounting() accountingclient.Client
 }
 
@@ -34,8 +34,8 @@ func NewClient(opts ...core.ClientOption) Client {
 		atsClient:         atsclient.NewClient(opts...),
 		crmClient:         crmclient.NewClient(opts...),
 		filestorageClient: filestorageclient.NewClient(opts...),
-		ticketingClient:   ticketingclient.NewClient(opts...),
 		hrisClient:        hrisclient.NewClient(opts...),
+		ticketingClient:   ticketingclient.NewClient(opts...),
 		accountingClient:  accountingclient.NewClient(opts...),
 	}
 }
@@ -47,8 +47,8 @@ type client struct {
 	atsClient         atsclient.Client
 	crmClient         crmclient.Client
 	filestorageClient filestorageclient.Client
-	ticketingClient   ticketingclient.Client
 	hrisClient        hrisclient.Client
+	ticketingClient   ticketingclient.Client
 	accountingClient  accountingclient.Client
 }
 
@@ -64,12 +64,12 @@ func (c *client) Filestorage() filestorageclient.Client {
 	return c.filestorageClient
 }
 
-func (c *client) Ticketing() ticketingclient.Client {
-	return c.ticketingClient
-}
-
 func (c *client) Hris() hrisclient.Client {
 	return c.hrisClient
+}
+
+func (c *client) Ticketing() ticketingclient.Client {
+	return c.ticketingClient
 }
 
 func (c *client) Accounting() accountingclient.Client {
