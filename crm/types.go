@@ -8823,8 +8823,8 @@ type RemoteData struct {
 }
 
 type RemoteField struct {
-	RemoteFieldClass *RemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            map[string]any    `json:"value,omitempty"`
+	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
+	Value            *any                         `json:"value,omitempty"`
 }
 
 type RemoteFieldClass struct {
@@ -9095,6 +9095,63 @@ type RemoteFieldClassForCustomObjectClassItemSchema struct {
 	ItemType    *string   `json:"item_type,omitempty"`
 	ItemFormat  *string   `json:"item_format,omitempty"`
 	ItemChoices []*string `json:"item_choices,omitempty"`
+}
+
+type RemoteFieldRemoteFieldClass struct {
+	typeName         string
+	String           string
+	RemoteFieldClass *RemoteFieldClass
+}
+
+func NewRemoteFieldRemoteFieldClassFromString(value string) *RemoteFieldRemoteFieldClass {
+	return &RemoteFieldRemoteFieldClass{typeName: "string", String: value}
+}
+
+func NewRemoteFieldRemoteFieldClassFromRemoteFieldClass(value *RemoteFieldClass) *RemoteFieldRemoteFieldClass {
+	return &RemoteFieldRemoteFieldClass{typeName: "remoteFieldClass", RemoteFieldClass: value}
+}
+
+func (r *RemoteFieldRemoteFieldClass) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	valueRemoteFieldClass := new(RemoteFieldClass)
+	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
+		r.typeName = "remoteFieldClass"
+		r.RemoteFieldClass = valueRemoteFieldClass
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldRemoteFieldClass) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "remoteFieldClass":
+		return json.Marshal(r.RemoteFieldClass)
+	}
+}
+
+type RemoteFieldRemoteFieldClassVisitor interface {
+	VisitString(string) error
+	VisitRemoteFieldClass(*RemoteFieldClass) error
+}
+
+func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClassVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "remoteFieldClass":
+		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
+	}
 }
 
 type RemoteFieldRequest struct {
