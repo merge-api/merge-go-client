@@ -33,7 +33,7 @@ type client struct {
 	header     http.Header
 }
 
-// Get syncing status. Possible values: `DISABLED`, `DONE`, `FAILED`, `PARTIALLY_SYNCED`, `PAUSED`, `SYNCING`
+// Get syncing status. Possible values: `DISABLED`, `DONE`, `FAILED`, `PARTIALLY_SYNCED`, `PAUSED`, `SYNCING`. Learn more about sync status in our [Help Center](https://help.merge.dev/en/articles/8184193-merge-sync-statuses).
 func (c *client) List(ctx context.Context, request *ats.SyncStatusListRequest) (*ats.PaginatedSyncStatusList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {

@@ -18,7 +18,7 @@ type UsersListRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
 	// If provided, will only return the user object for requestor.
-	IsMe *bool `json:"-"`
+	IsMe *string `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.

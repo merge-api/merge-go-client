@@ -231,7 +231,9 @@ type AccountRequest struct {
 	// The account's website.
 	Website *string `json:"website,omitempty"`
 	// The account's number of employees.
-	NumberOfEmployees *int `json:"number_of_employees,omitempty"`
+	NumberOfEmployees *int           `json:"number_of_employees,omitempty"`
+	Addresses         []*Address     `json:"addresses,omitempty"`
+	PhoneNumbers      []*PhoneNumber `json:"phone_numbers,omitempty"`
 	// The last date (either most recent or furthest in the future) of when an activity occurs in an account.
 	LastActivityAt      *time.Time            `json:"last_activity_at,omitempty"`
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`

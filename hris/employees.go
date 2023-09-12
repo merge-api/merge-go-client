@@ -37,18 +37,24 @@ type EmployeesListRequest struct {
 	// * `PENDING` - PENDING
 	// * `INACTIVE` - INACTIVE
 	EmploymentStatus *EmployeesListRequestEmploymentStatus `json:"-"`
+	// If provided, will only return employees that have an employment of the specified employment_type.
+	EmploymentType *string `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *EmployeesListRequestExpand `json:"-"`
 	// If provided, will only return employees with this first name.
 	FirstName *string `json:"-"`
 	// If provided, will only return employees matching the group ids; multiple groups can be separated by commas.
 	Groups *string `json:"-"`
+	// If provided, will only return employees for this home location.
+	HomeLocationId *string `json:"-"`
 	// Whether to include data that was marked as deleted by third party webhooks.
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include sensitive fields (such as social security numbers) in the response.
 	IncludeSensitiveFields *bool `json:"-"`
+	// If provided, will only return employees that have an employment of the specified job_title.
+	JobTitle *string `json:"-"`
 	// If provided, will only return employees with this last name.
 	LastName *string `json:"-"`
 	// If provided, will only return employees for this manager.

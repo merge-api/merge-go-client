@@ -29,6 +29,10 @@ type ContactsListRequest struct {
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// If provided, will only return Contacts that are denoted as customers.
+	IsCustomer *string `json:"-"`
+	// If provided, will only return Contacts that are denoted as suppliers.
+	IsSupplier *string `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.

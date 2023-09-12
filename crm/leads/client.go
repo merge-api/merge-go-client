@@ -62,6 +62,9 @@ func (c *client) List(ctx context.Context, request *crm.LeadsListRequest) (*crm.
 	if request.Cursor != nil {
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
+	if request.EmailAddresses != nil {
+		queryParams.Add("email_addresses", fmt.Sprintf("%v", *request.EmailAddresses))
+	}
 	if request.Expand != nil {
 		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
 	}
@@ -85,6 +88,9 @@ func (c *client) List(ctx context.Context, request *crm.LeadsListRequest) (*crm.
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
+	}
+	if request.PhoneNumbers != nil {
+		queryParams.Add("phone_numbers", fmt.Sprintf("%v", *request.PhoneNumbers))
 	}
 	if request.RemoteId != nil {
 		queryParams.Add("remote_id", fmt.Sprintf("%v", *request.RemoteId))

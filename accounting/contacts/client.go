@@ -67,6 +67,12 @@ func (c *client) List(ctx context.Context, request *accounting.ContactsListReque
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IsCustomer != nil {
+		queryParams.Add("is_customer", fmt.Sprintf("%v", *request.IsCustomer))
+	}
+	if request.IsSupplier != nil {
+		queryParams.Add("is_supplier", fmt.Sprintf("%v", *request.IsSupplier))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}

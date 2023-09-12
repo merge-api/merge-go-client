@@ -65,6 +65,9 @@ func (c *client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 	if request.EmploymentStatus != nil {
 		queryParams.Add("employment_status", fmt.Sprintf("%v", *request.EmploymentStatus))
 	}
+	if request.EmploymentType != nil {
+		queryParams.Add("employment_type", fmt.Sprintf("%v", *request.EmploymentType))
+	}
 	if request.Expand != nil {
 		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
 	}
@@ -74,6 +77,9 @@ func (c *client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 	if request.Groups != nil {
 		queryParams.Add("groups", fmt.Sprintf("%v", *request.Groups))
 	}
+	if request.HomeLocationId != nil {
+		queryParams.Add("home_location_id", fmt.Sprintf("%v", *request.HomeLocationId))
+	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
 	}
@@ -82,6 +88,9 @@ func (c *client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 	}
 	if request.IncludeSensitiveFields != nil {
 		queryParams.Add("include_sensitive_fields", fmt.Sprintf("%v", *request.IncludeSensitiveFields))
+	}
+	if request.JobTitle != nil {
+		queryParams.Add("job_title", fmt.Sprintf("%v", *request.JobTitle))
 	}
 	if request.LastName != nil {
 		queryParams.Add("last_name", fmt.Sprintf("%v", *request.LastName))
