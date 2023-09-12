@@ -25,6 +25,8 @@ type LeadsListRequest struct {
 	CreatedBefore *time.Time `json:"-"`
 	// The pagination cursor value.
 	Cursor *string `json:"-"`
+	// If provided, will only return contacts matching the email addresses; multiple email_addresses can be separated by commas.
+	EmailAddresses *string `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *LeadsListRequestExpand `json:"-"`
 	// Whether to include data that was marked as deleted by third party webhooks.
@@ -41,6 +43,8 @@ type LeadsListRequest struct {
 	OwnerId *string `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
+	// If provided, will only return contacts matching the phone numbers; multiple phone numbers can be separated by commas.
+	PhoneNumbers *string `json:"-"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-"`
 }

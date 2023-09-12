@@ -3076,6 +3076,8 @@ type Employee struct {
 	FirstName *string `json:"first_name,omitempty"`
 	// The employee's last name.
 	LastName *string `json:"last_name,omitempty"`
+	// The employee's preferred first name.
+	PreferredName *string `json:"preferred_name,omitempty"`
 	// The employee's full name, to use for display purposes. If a preferred first name is available, the full name will include the preferred first name.
 	DisplayFullName *string `json:"display_full_name,omitempty"`
 	// The employee's username that appears in the remote UI.
@@ -4012,6 +4014,8 @@ type EmployeeRequest struct {
 	FirstName *string `json:"first_name,omitempty"`
 	// The employee's last name.
 	LastName *string `json:"last_name,omitempty"`
+	// The employee's preferred first name.
+	PreferredName *string `json:"preferred_name,omitempty"`
 	// The employee's full name, to use for display purposes. If a preferred first name is available, the full name will include the preferred first name.
 	DisplayFullName *string `json:"display_full_name,omitempty"`
 	// The employee's username that appears in the remote UI.

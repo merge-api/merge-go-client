@@ -639,7 +639,7 @@ type File struct {
 	// The folder that the file belongs to.
 	Folder *string `json:"folder,omitempty"`
 	// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /files`.
-	Permissions []string `json:"permissions,omitempty"`
+	Permissions *FilePermissions `json:"permissions,omitempty"`
 	// The drive that the file belongs to.
 	Drive *string `json:"drive,omitempty"`
 	// When the third party's file was created.
@@ -652,6 +652,137 @@ type File struct {
 	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
 	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
 	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+}
+
+// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /files`.
+type FilePermissions struct {
+	typeName                string
+	String                  string
+	Unknown                 any
+	FilePermissionsItemList []*FilePermissionsItem
+}
+
+func NewFilePermissionsFromString(value string) *FilePermissions {
+	return &FilePermissions{typeName: "string", String: value}
+}
+
+func NewFilePermissionsFromUnknown(value any) *FilePermissions {
+	return &FilePermissions{typeName: "unknown", Unknown: value}
+}
+
+func NewFilePermissionsFromFilePermissionsItemList(value []*FilePermissionsItem) *FilePermissions {
+	return &FilePermissions{typeName: "filePermissionsItemList", FilePermissionsItemList: value}
+}
+
+func (f *FilePermissions) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	var valueUnknown any
+	if err := json.Unmarshal(data, &valueUnknown); err == nil {
+		f.typeName = "unknown"
+		f.Unknown = valueUnknown
+		return nil
+	}
+	var valueFilePermissionsItemList []*FilePermissionsItem
+	if err := json.Unmarshal(data, &valueFilePermissionsItemList); err == nil {
+		f.typeName = "filePermissionsItemList"
+		f.FilePermissionsItemList = valueFilePermissionsItemList
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FilePermissions) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "unknown":
+		return json.Marshal(f.Unknown)
+	case "filePermissionsItemList":
+		return json.Marshal(f.FilePermissionsItemList)
+	}
+}
+
+type FilePermissionsVisitor interface {
+	VisitString(string) error
+	VisitUnknown(any) error
+	VisitFilePermissionsItemList([]*FilePermissionsItem) error
+}
+
+func (f *FilePermissions) Accept(visitor FilePermissionsVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "unknown":
+		return visitor.VisitUnknown(f.Unknown)
+	case "filePermissionsItemList":
+		return visitor.VisitFilePermissionsItemList(f.FilePermissionsItemList)
+	}
+}
+
+type FilePermissionsItem struct {
+	typeName          string
+	String            string
+	PermissionRequest *PermissionRequest
+}
+
+func NewFilePermissionsItemFromString(value string) *FilePermissionsItem {
+	return &FilePermissionsItem{typeName: "string", String: value}
+}
+
+func NewFilePermissionsItemFromPermissionRequest(value *PermissionRequest) *FilePermissionsItem {
+	return &FilePermissionsItem{typeName: "permissionRequest", PermissionRequest: value}
+}
+
+func (f *FilePermissionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	valuePermissionRequest := new(PermissionRequest)
+	if err := json.Unmarshal(data, &valuePermissionRequest); err == nil {
+		f.typeName = "permissionRequest"
+		f.PermissionRequest = valuePermissionRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FilePermissionsItem) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "permissionRequest":
+		return json.Marshal(f.PermissionRequest)
+	}
+}
+
+type FilePermissionsItemVisitor interface {
+	VisitString(string) error
+	VisitPermissionRequest(*PermissionRequest) error
+}
+
+func (f *FilePermissionsItem) Accept(visitor FilePermissionsItemVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "permissionRequest":
+		return visitor.VisitPermissionRequest(f.PermissionRequest)
+	}
 }
 
 // # The File Object
@@ -675,11 +806,142 @@ type FileRequest struct {
 	// The folder that the file belongs to.
 	Folder *string `json:"folder,omitempty"`
 	// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /files`.
-	Permissions []string `json:"permissions,omitempty"`
+	Permissions *FileRequestPermissions `json:"permissions,omitempty"`
 	// The drive that the file belongs to.
 	Drive               *string        `json:"drive,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /files`.
+type FileRequestPermissions struct {
+	typeName                       string
+	String                         string
+	Unknown                        any
+	FileRequestPermissionsItemList []*FileRequestPermissionsItem
+}
+
+func NewFileRequestPermissionsFromString(value string) *FileRequestPermissions {
+	return &FileRequestPermissions{typeName: "string", String: value}
+}
+
+func NewFileRequestPermissionsFromUnknown(value any) *FileRequestPermissions {
+	return &FileRequestPermissions{typeName: "unknown", Unknown: value}
+}
+
+func NewFileRequestPermissionsFromFileRequestPermissionsItemList(value []*FileRequestPermissionsItem) *FileRequestPermissions {
+	return &FileRequestPermissions{typeName: "fileRequestPermissionsItemList", FileRequestPermissionsItemList: value}
+}
+
+func (f *FileRequestPermissions) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	var valueUnknown any
+	if err := json.Unmarshal(data, &valueUnknown); err == nil {
+		f.typeName = "unknown"
+		f.Unknown = valueUnknown
+		return nil
+	}
+	var valueFileRequestPermissionsItemList []*FileRequestPermissionsItem
+	if err := json.Unmarshal(data, &valueFileRequestPermissionsItemList); err == nil {
+		f.typeName = "fileRequestPermissionsItemList"
+		f.FileRequestPermissionsItemList = valueFileRequestPermissionsItemList
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FileRequestPermissions) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "unknown":
+		return json.Marshal(f.Unknown)
+	case "fileRequestPermissionsItemList":
+		return json.Marshal(f.FileRequestPermissionsItemList)
+	}
+}
+
+type FileRequestPermissionsVisitor interface {
+	VisitString(string) error
+	VisitUnknown(any) error
+	VisitFileRequestPermissionsItemList([]*FileRequestPermissionsItem) error
+}
+
+func (f *FileRequestPermissions) Accept(visitor FileRequestPermissionsVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "unknown":
+		return visitor.VisitUnknown(f.Unknown)
+	case "fileRequestPermissionsItemList":
+		return visitor.VisitFileRequestPermissionsItemList(f.FileRequestPermissionsItemList)
+	}
+}
+
+type FileRequestPermissionsItem struct {
+	typeName          string
+	String            string
+	PermissionRequest *PermissionRequest
+}
+
+func NewFileRequestPermissionsItemFromString(value string) *FileRequestPermissionsItem {
+	return &FileRequestPermissionsItem{typeName: "string", String: value}
+}
+
+func NewFileRequestPermissionsItemFromPermissionRequest(value *PermissionRequest) *FileRequestPermissionsItem {
+	return &FileRequestPermissionsItem{typeName: "permissionRequest", PermissionRequest: value}
+}
+
+func (f *FileRequestPermissionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	valuePermissionRequest := new(PermissionRequest)
+	if err := json.Unmarshal(data, &valuePermissionRequest); err == nil {
+		f.typeName = "permissionRequest"
+		f.PermissionRequest = valuePermissionRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FileRequestPermissionsItem) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "permissionRequest":
+		return json.Marshal(f.PermissionRequest)
+	}
+}
+
+type FileRequestPermissionsItemVisitor interface {
+	VisitString(string) error
+	VisitPermissionRequest(*PermissionRequest) error
+}
+
+func (f *FileRequestPermissionsItem) Accept(visitor FileRequestPermissionsItemVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "permissionRequest":
+		return visitor.VisitPermissionRequest(f.PermissionRequest)
+	}
 }
 
 type FileStorageFileResponse struct {
@@ -854,7 +1116,7 @@ type Folder struct {
 	// The drive that the folder belongs to.
 	Drive *string `json:"drive,omitempty"`
 	// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /folders`.
-	Permissions []string `json:"permissions,omitempty"`
+	Permissions *FolderPermissions `json:"permissions,omitempty"`
 	// When the third party's folder was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's folder was updated.
@@ -865,6 +1127,137 @@ type Folder struct {
 	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
 	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
 	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+}
+
+// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /folders`.
+type FolderPermissions struct {
+	typeName                  string
+	String                    string
+	Unknown                   any
+	FolderPermissionsItemList []*FolderPermissionsItem
+}
+
+func NewFolderPermissionsFromString(value string) *FolderPermissions {
+	return &FolderPermissions{typeName: "string", String: value}
+}
+
+func NewFolderPermissionsFromUnknown(value any) *FolderPermissions {
+	return &FolderPermissions{typeName: "unknown", Unknown: value}
+}
+
+func NewFolderPermissionsFromFolderPermissionsItemList(value []*FolderPermissionsItem) *FolderPermissions {
+	return &FolderPermissions{typeName: "folderPermissionsItemList", FolderPermissionsItemList: value}
+}
+
+func (f *FolderPermissions) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	var valueUnknown any
+	if err := json.Unmarshal(data, &valueUnknown); err == nil {
+		f.typeName = "unknown"
+		f.Unknown = valueUnknown
+		return nil
+	}
+	var valueFolderPermissionsItemList []*FolderPermissionsItem
+	if err := json.Unmarshal(data, &valueFolderPermissionsItemList); err == nil {
+		f.typeName = "folderPermissionsItemList"
+		f.FolderPermissionsItemList = valueFolderPermissionsItemList
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FolderPermissions) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "unknown":
+		return json.Marshal(f.Unknown)
+	case "folderPermissionsItemList":
+		return json.Marshal(f.FolderPermissionsItemList)
+	}
+}
+
+type FolderPermissionsVisitor interface {
+	VisitString(string) error
+	VisitUnknown(any) error
+	VisitFolderPermissionsItemList([]*FolderPermissionsItem) error
+}
+
+func (f *FolderPermissions) Accept(visitor FolderPermissionsVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "unknown":
+		return visitor.VisitUnknown(f.Unknown)
+	case "folderPermissionsItemList":
+		return visitor.VisitFolderPermissionsItemList(f.FolderPermissionsItemList)
+	}
+}
+
+type FolderPermissionsItem struct {
+	typeName          string
+	String            string
+	PermissionRequest *PermissionRequest
+}
+
+func NewFolderPermissionsItemFromString(value string) *FolderPermissionsItem {
+	return &FolderPermissionsItem{typeName: "string", String: value}
+}
+
+func NewFolderPermissionsItemFromPermissionRequest(value *PermissionRequest) *FolderPermissionsItem {
+	return &FolderPermissionsItem{typeName: "permissionRequest", PermissionRequest: value}
+}
+
+func (f *FolderPermissionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	valuePermissionRequest := new(PermissionRequest)
+	if err := json.Unmarshal(data, &valuePermissionRequest); err == nil {
+		f.typeName = "permissionRequest"
+		f.PermissionRequest = valuePermissionRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FolderPermissionsItem) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "permissionRequest":
+		return json.Marshal(f.PermissionRequest)
+	}
+}
+
+type FolderPermissionsItemVisitor interface {
+	VisitString(string) error
+	VisitPermissionRequest(*PermissionRequest) error
+}
+
+func (f *FolderPermissionsItem) Accept(visitor FolderPermissionsItemVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "permissionRequest":
+		return visitor.VisitPermissionRequest(f.PermissionRequest)
+	}
 }
 
 // # The Folder Object
@@ -886,9 +1279,140 @@ type FolderRequest struct {
 	// The drive that the folder belongs to.
 	Drive *string `json:"drive,omitempty"`
 	// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /folders`.
-	Permissions         []string       `json:"permissions,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	Permissions         *FolderRequestPermissions `json:"permissions,omitempty"`
+	IntegrationParams   map[string]any            `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any            `json:"linked_account_params,omitempty"`
+}
+
+// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /folders`.
+type FolderRequestPermissions struct {
+	typeName                         string
+	String                           string
+	Unknown                          any
+	FolderRequestPermissionsItemList []*FolderRequestPermissionsItem
+}
+
+func NewFolderRequestPermissionsFromString(value string) *FolderRequestPermissions {
+	return &FolderRequestPermissions{typeName: "string", String: value}
+}
+
+func NewFolderRequestPermissionsFromUnknown(value any) *FolderRequestPermissions {
+	return &FolderRequestPermissions{typeName: "unknown", Unknown: value}
+}
+
+func NewFolderRequestPermissionsFromFolderRequestPermissionsItemList(value []*FolderRequestPermissionsItem) *FolderRequestPermissions {
+	return &FolderRequestPermissions{typeName: "folderRequestPermissionsItemList", FolderRequestPermissionsItemList: value}
+}
+
+func (f *FolderRequestPermissions) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	var valueUnknown any
+	if err := json.Unmarshal(data, &valueUnknown); err == nil {
+		f.typeName = "unknown"
+		f.Unknown = valueUnknown
+		return nil
+	}
+	var valueFolderRequestPermissionsItemList []*FolderRequestPermissionsItem
+	if err := json.Unmarshal(data, &valueFolderRequestPermissionsItemList); err == nil {
+		f.typeName = "folderRequestPermissionsItemList"
+		f.FolderRequestPermissionsItemList = valueFolderRequestPermissionsItemList
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FolderRequestPermissions) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "unknown":
+		return json.Marshal(f.Unknown)
+	case "folderRequestPermissionsItemList":
+		return json.Marshal(f.FolderRequestPermissionsItemList)
+	}
+}
+
+type FolderRequestPermissionsVisitor interface {
+	VisitString(string) error
+	VisitUnknown(any) error
+	VisitFolderRequestPermissionsItemList([]*FolderRequestPermissionsItem) error
+}
+
+func (f *FolderRequestPermissions) Accept(visitor FolderRequestPermissionsVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "unknown":
+		return visitor.VisitUnknown(f.Unknown)
+	case "folderRequestPermissionsItemList":
+		return visitor.VisitFolderRequestPermissionsItemList(f.FolderRequestPermissionsItemList)
+	}
+}
+
+type FolderRequestPermissionsItem struct {
+	typeName          string
+	String            string
+	PermissionRequest *PermissionRequest
+}
+
+func NewFolderRequestPermissionsItemFromString(value string) *FolderRequestPermissionsItem {
+	return &FolderRequestPermissionsItem{typeName: "string", String: value}
+}
+
+func NewFolderRequestPermissionsItemFromPermissionRequest(value *PermissionRequest) *FolderRequestPermissionsItem {
+	return &FolderRequestPermissionsItem{typeName: "permissionRequest", PermissionRequest: value}
+}
+
+func (f *FolderRequestPermissionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		f.typeName = "string"
+		f.String = valueString
+		return nil
+	}
+	valuePermissionRequest := new(PermissionRequest)
+	if err := json.Unmarshal(data, &valuePermissionRequest); err == nil {
+		f.typeName = "permissionRequest"
+		f.PermissionRequest = valuePermissionRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, f)
+}
+
+func (f FolderRequestPermissionsItem) MarshalJSON() ([]byte, error) {
+	switch f.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return json.Marshal(f.String)
+	case "permissionRequest":
+		return json.Marshal(f.PermissionRequest)
+	}
+}
+
+type FolderRequestPermissionsItemVisitor interface {
+	VisitString(string) error
+	VisitPermissionRequest(*PermissionRequest) error
+}
+
+func (f *FolderRequestPermissionsItem) Accept(visitor FolderRequestPermissionsItemVisitor) error {
+	switch f.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", f.typeName, f)
+	case "string":
+		return visitor.VisitString(f.String)
+	case "permissionRequest":
+		return visitor.VisitPermissionRequest(f.PermissionRequest)
+	}
 }
 
 type FoldersListRequestExpand uint
@@ -1555,6 +2079,59 @@ type PaginatedUserList struct {
 	Results  []*User `json:"results,omitempty"`
 }
 
+// # The Permission Object
+// ### Description
+// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default.
+//
+// ### Usage Example
+// Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
+type Permission struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The user that is granted this permission.
+	User *string `json:"user,omitempty"`
+	// The group that is granted this permission.
+	Group *string `json:"group,omitempty"`
+	// Denotes what type of people have access to the file.
+	//
+	// * `USER` - USER
+	// * `GROUP` - GROUP
+	// * `COMPANY` - COMPANY
+	// * `ANYONE` - ANYONE
+	Type *TypeEnum `json:"type,omitempty"`
+	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
+	Roles []*RolesEnum `json:"roles,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// # The Permission Object
+// ### Description
+// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default.
+//
+// ### Usage Example
+// Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
+type PermissionRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The user that is granted this permission.
+	User *string `json:"user,omitempty"`
+	// The group that is granted this permission.
+	Group *string `json:"group,omitempty"`
+	// Denotes what type of people have access to the file.
+	//
+	// * `USER` - USER
+	// * `GROUP` - GROUP
+	// * `COMPANY` - COMPANY
+	// * `ANYONE` - ANYONE
+	Type *TypeEnum `json:"type,omitempty"`
+	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
+	Roles               []*RolesEnum   `json:"roles,omitempty"`
+	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
 // # The RemoteKey Object
 // ### Description
 // The `RemoteKey` object is used to represent a request for a new remote key.
@@ -1664,6 +2241,53 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 		*r = value
 	case "BASE64_GZIP":
 		value := ResponseTypeEnumBase64Gzip
+		*r = value
+	}
+	return nil
+}
+
+// * `READ` - READ
+// * `WRITE` - WRITE
+// * `OWNER` - OWNER
+type RolesEnum uint
+
+const (
+	RolesEnumRead RolesEnum = iota + 1
+	RolesEnumWrite
+	RolesEnumOwner
+)
+
+func (r RolesEnum) String() string {
+	switch r {
+	default:
+		return strconv.Itoa(int(r))
+	case RolesEnumRead:
+		return "READ"
+	case RolesEnumWrite:
+		return "WRITE"
+	case RolesEnumOwner:
+		return "OWNER"
+	}
+}
+
+func (r RolesEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", r.String())), nil
+}
+
+func (r *RolesEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "READ":
+		value := RolesEnumRead
+		*r = value
+	case "WRITE":
+		value := RolesEnumWrite
+		*r = value
+	case "OWNER":
+		value := RolesEnumOwner
 		*r = value
 	}
 	return nil
@@ -1789,6 +2413,60 @@ func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
 	case "PARTIALLY_SYNCED":
 		value := SyncStatusStatusEnumPartiallySynced
 		*s = value
+	}
+	return nil
+}
+
+// * `USER` - USER
+// * `GROUP` - GROUP
+// * `COMPANY` - COMPANY
+// * `ANYONE` - ANYONE
+type TypeEnum uint
+
+const (
+	TypeEnumUser TypeEnum = iota + 1
+	TypeEnumGroup
+	TypeEnumCompany
+	TypeEnumAnyone
+)
+
+func (t TypeEnum) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TypeEnumUser:
+		return "USER"
+	case TypeEnumGroup:
+		return "GROUP"
+	case TypeEnumCompany:
+		return "COMPANY"
+	case TypeEnumAnyone:
+		return "ANYONE"
+	}
+}
+
+func (t TypeEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TypeEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "USER":
+		value := TypeEnumUser
+		*t = value
+	case "GROUP":
+		value := TypeEnumGroup
+		*t = value
+	case "COMPANY":
+		value := TypeEnumCompany
+		*t = value
+	case "ANYONE":
+		value := TypeEnumAnyone
+		*t = value
 	}
 	return nil
 }

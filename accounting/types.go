@@ -7684,8 +7684,7 @@ func (c *CountryEnum) UnmarshalJSON(data []byte) error {
 
 // # The CreditNote Object
 // ### Description
-// The `CreditNote` object are an accounts payable transaction used when to represent a gift or refund to a customer. A credit note will contain information on the amount of credit owed, the customer, and the account.
-//
+// The `CreditNote` object is an accounts payable transaction used when to represent a gift or refund to a customer. A credit note will contain information on the amount of credit owed, the customer, and the account.
 // ### Usage Example
 // Fetch from the `LIST CreditNotes` endpoint and view a company's credit notes.
 type CreditNote struct {
@@ -8030,11 +8029,85 @@ type CreditNote struct {
 	// Array of `Payment` object IDs
 	Payments []*CreditNotePaymentsItem `json:"payments,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	AppliedToLines   []*CreditNoteApplyLine `json:"applied_to_lines,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// # The CreditNoteApplyLine Object
+// ### Description
+// The `CreditNoteApplyLine` is attached to the CreditNote model.
+//
+// ### Usage Example
+// Fetch from the `GET CreditNote` endpoint and view the invoice's applied to lines.
+type CreditNoteApplyLine struct {
+	Invoice *CreditNoteApplyLineInvoice `json:"invoice,omitempty"`
+	// Date that the credit note is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the Credit Note applied to the invoice.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+type CreditNoteApplyLineInvoice struct {
+	typeName string
+	String   string
+	Invoice  *Invoice
+}
+
+func NewCreditNoteApplyLineInvoiceFromString(value string) *CreditNoteApplyLineInvoice {
+	return &CreditNoteApplyLineInvoice{typeName: "string", String: value}
+}
+
+func NewCreditNoteApplyLineInvoiceFromInvoice(value *Invoice) *CreditNoteApplyLineInvoice {
+	return &CreditNoteApplyLineInvoice{typeName: "invoice", Invoice: value}
+}
+
+func (c *CreditNoteApplyLineInvoice) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueInvoice := new(Invoice)
+	if err := json.Unmarshal(data, &valueInvoice); err == nil {
+		c.typeName = "invoice"
+		c.Invoice = valueInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteApplyLineInvoice) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "invoice":
+		return json.Marshal(c.Invoice)
+	}
+}
+
+type CreditNoteApplyLineInvoiceVisitor interface {
+	VisitString(string) error
+	VisitInvoice(*Invoice) error
+}
+
+func (c *CreditNoteApplyLineInvoice) Accept(visitor CreditNoteApplyLineInvoiceVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "invoice":
+		return visitor.VisitInvoice(c.Invoice)
+	}
 }
 
 // The credit note's currency.
@@ -8773,33 +8846,57 @@ func (c *CreditNoteTrackingCategoriesItem) Accept(visitor CreditNoteTrackingCate
 type CreditNotesListRequestExpand uint
 
 const (
-	CreditNotesListRequestExpandLineItems CreditNotesListRequestExpand = iota + 1
+	CreditNotesListRequestExpandAppliedToLines CreditNotesListRequestExpand = iota + 1
+	CreditNotesListRequestExpandLineItems
+	CreditNotesListRequestExpandLineItemsAppliedToLines
 	CreditNotesListRequestExpandLineItemsTrackingCategories
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesAppliedToLines
 	CreditNotesListRequestExpandPayments
+	CreditNotesListRequestExpandPaymentsAppliedToLines
 	CreditNotesListRequestExpandPaymentsLineItems
+	CreditNotesListRequestExpandPaymentsLineItemsAppliedToLines
 	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategories
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesAppliedToLines
 	CreditNotesListRequestExpandPaymentsTrackingCategories
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesAppliedToLines
 	CreditNotesListRequestExpandTrackingCategories
+	CreditNotesListRequestExpandTrackingCategoriesAppliedToLines
 )
 
 func (c CreditNotesListRequestExpand) String() string {
 	switch c {
 	default:
 		return strconv.Itoa(int(c))
+	case CreditNotesListRequestExpandAppliedToLines:
+		return "applied_to_lines"
 	case CreditNotesListRequestExpandLineItems:
 		return "line_items"
+	case CreditNotesListRequestExpandLineItemsAppliedToLines:
+		return "line_items,applied_to_lines"
 	case CreditNotesListRequestExpandLineItemsTrackingCategories:
 		return "line_items,tracking_categories"
+	case CreditNotesListRequestExpandLineItemsTrackingCategoriesAppliedToLines:
+		return "line_items,tracking_categories,applied_to_lines"
 	case CreditNotesListRequestExpandPayments:
 		return "payments"
+	case CreditNotesListRequestExpandPaymentsAppliedToLines:
+		return "payments,applied_to_lines"
 	case CreditNotesListRequestExpandPaymentsLineItems:
 		return "payments,line_items"
+	case CreditNotesListRequestExpandPaymentsLineItemsAppliedToLines:
+		return "payments,line_items,applied_to_lines"
 	case CreditNotesListRequestExpandPaymentsLineItemsTrackingCategories:
 		return "payments,line_items,tracking_categories"
+	case CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesAppliedToLines:
+		return "payments,line_items,tracking_categories,applied_to_lines"
 	case CreditNotesListRequestExpandPaymentsTrackingCategories:
 		return "payments,tracking_categories"
+	case CreditNotesListRequestExpandPaymentsTrackingCategoriesAppliedToLines:
+		return "payments,tracking_categories,applied_to_lines"
 	case CreditNotesListRequestExpandTrackingCategories:
 		return "tracking_categories"
+	case CreditNotesListRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
 	}
 }
 
@@ -8813,26 +8910,50 @@ func (c *CreditNotesListRequestExpand) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch raw {
+	case "applied_to_lines":
+		value := CreditNotesListRequestExpandAppliedToLines
+		*c = value
 	case "line_items":
 		value := CreditNotesListRequestExpandLineItems
+		*c = value
+	case "line_items,applied_to_lines":
+		value := CreditNotesListRequestExpandLineItemsAppliedToLines
 		*c = value
 	case "line_items,tracking_categories":
 		value := CreditNotesListRequestExpandLineItemsTrackingCategories
 		*c = value
+	case "line_items,tracking_categories,applied_to_lines":
+		value := CreditNotesListRequestExpandLineItemsTrackingCategoriesAppliedToLines
+		*c = value
 	case "payments":
 		value := CreditNotesListRequestExpandPayments
+		*c = value
+	case "payments,applied_to_lines":
+		value := CreditNotesListRequestExpandPaymentsAppliedToLines
 		*c = value
 	case "payments,line_items":
 		value := CreditNotesListRequestExpandPaymentsLineItems
 		*c = value
+	case "payments,line_items,applied_to_lines":
+		value := CreditNotesListRequestExpandPaymentsLineItemsAppliedToLines
+		*c = value
 	case "payments,line_items,tracking_categories":
 		value := CreditNotesListRequestExpandPaymentsLineItemsTrackingCategories
+		*c = value
+	case "payments,line_items,tracking_categories,applied_to_lines":
+		value := CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesAppliedToLines
 		*c = value
 	case "payments,tracking_categories":
 		value := CreditNotesListRequestExpandPaymentsTrackingCategories
 		*c = value
+	case "payments,tracking_categories,applied_to_lines":
+		value := CreditNotesListRequestExpandPaymentsTrackingCategoriesAppliedToLines
+		*c = value
 	case "tracking_categories":
 		value := CreditNotesListRequestExpandTrackingCategories
+		*c = value
+	case "tracking_categories,applied_to_lines":
+		value := CreditNotesListRequestExpandTrackingCategoriesAppliedToLines
 		*c = value
 	}
 	return nil
@@ -8929,33 +9050,57 @@ func (c *CreditNotesListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error
 type CreditNotesRetrieveRequestExpand uint
 
 const (
-	CreditNotesRetrieveRequestExpandLineItems CreditNotesRetrieveRequestExpand = iota + 1
+	CreditNotesRetrieveRequestExpandAppliedToLines CreditNotesRetrieveRequestExpand = iota + 1
+	CreditNotesRetrieveRequestExpandLineItems
+	CreditNotesRetrieveRequestExpandLineItemsAppliedToLines
 	CreditNotesRetrieveRequestExpandLineItemsTrackingCategories
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesAppliedToLines
 	CreditNotesRetrieveRequestExpandPayments
+	CreditNotesRetrieveRequestExpandPaymentsAppliedToLines
 	CreditNotesRetrieveRequestExpandPaymentsLineItems
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsAppliedToLines
 	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategories
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAppliedToLines
 	CreditNotesRetrieveRequestExpandPaymentsTrackingCategories
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesAppliedToLines
 	CreditNotesRetrieveRequestExpandTrackingCategories
+	CreditNotesRetrieveRequestExpandTrackingCategoriesAppliedToLines
 )
 
 func (c CreditNotesRetrieveRequestExpand) String() string {
 	switch c {
 	default:
 		return strconv.Itoa(int(c))
+	case CreditNotesRetrieveRequestExpandAppliedToLines:
+		return "applied_to_lines"
 	case CreditNotesRetrieveRequestExpandLineItems:
 		return "line_items"
+	case CreditNotesRetrieveRequestExpandLineItemsAppliedToLines:
+		return "line_items,applied_to_lines"
 	case CreditNotesRetrieveRequestExpandLineItemsTrackingCategories:
 		return "line_items,tracking_categories"
+	case CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesAppliedToLines:
+		return "line_items,tracking_categories,applied_to_lines"
 	case CreditNotesRetrieveRequestExpandPayments:
 		return "payments"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedToLines:
+		return "payments,applied_to_lines"
 	case CreditNotesRetrieveRequestExpandPaymentsLineItems:
 		return "payments,line_items"
+	case CreditNotesRetrieveRequestExpandPaymentsLineItemsAppliedToLines:
+		return "payments,line_items,applied_to_lines"
 	case CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategories:
 		return "payments,line_items,tracking_categories"
+	case CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAppliedToLines:
+		return "payments,line_items,tracking_categories,applied_to_lines"
 	case CreditNotesRetrieveRequestExpandPaymentsTrackingCategories:
 		return "payments,tracking_categories"
+	case CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesAppliedToLines:
+		return "payments,tracking_categories,applied_to_lines"
 	case CreditNotesRetrieveRequestExpandTrackingCategories:
 		return "tracking_categories"
+	case CreditNotesRetrieveRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
 	}
 }
 
@@ -8969,26 +9114,50 @@ func (c *CreditNotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch raw {
+	case "applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandAppliedToLines
+		*c = value
 	case "line_items":
 		value := CreditNotesRetrieveRequestExpandLineItems
+		*c = value
+	case "line_items,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandLineItemsAppliedToLines
 		*c = value
 	case "line_items,tracking_categories":
 		value := CreditNotesRetrieveRequestExpandLineItemsTrackingCategories
 		*c = value
+	case "line_items,tracking_categories,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesAppliedToLines
+		*c = value
 	case "payments":
 		value := CreditNotesRetrieveRequestExpandPayments
+		*c = value
+	case "payments,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedToLines
 		*c = value
 	case "payments,line_items":
 		value := CreditNotesRetrieveRequestExpandPaymentsLineItems
 		*c = value
+	case "payments,line_items,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandPaymentsLineItemsAppliedToLines
+		*c = value
 	case "payments,line_items,tracking_categories":
 		value := CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategories
+		*c = value
+	case "payments,line_items,tracking_categories,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAppliedToLines
 		*c = value
 	case "payments,tracking_categories":
 		value := CreditNotesRetrieveRequestExpandPaymentsTrackingCategories
 		*c = value
+	case "payments,tracking_categories,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesAppliedToLines
+		*c = value
 	case "tracking_categories":
 		value := CreditNotesRetrieveRequestExpandTrackingCategories
+		*c = value
+	case "tracking_categories,applied_to_lines":
+		value := CreditNotesRetrieveRequestExpandTrackingCategoriesAppliedToLines
 		*c = value
 	}
 	return nil
@@ -11396,6 +11565,10 @@ type Expense struct {
 	Contact *ExpenseContact `json:"contact,omitempty"`
 	// The expense's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
+	// The expense's total amount before tax.
+	SubTotal *float64 `json:"sub_total,omitempty"`
+	// The expense's total tax amount.
+	TotalTaxAmount *float64 `json:"total_tax_amount,omitempty"`
 	// The expense's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -12280,6 +12453,315 @@ type ExpenseLine struct {
 	TrackingCategories []*ExpenseLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
+	// The expense line item's currency.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *ExpenseLineCurrency `json:"currency,omitempty"`
 	// The expense's payment account.
 	Account *ExpenseLineAccount `json:"account,omitempty"`
 	// The expense's contact.
@@ -12408,6 +12890,371 @@ func (e *ExpenseLineContact) Accept(visitor ExpenseLineContactVisitor) error {
 	}
 }
 
+// The expense line item's currency.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type ExpenseLineCurrency struct {
+	typeName     string
+	CurrencyEnum CurrencyEnum
+	String       string
+}
+
+func NewExpenseLineCurrencyFromCurrencyEnum(value CurrencyEnum) *ExpenseLineCurrency {
+	return &ExpenseLineCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+}
+
+func NewExpenseLineCurrencyFromString(value string) *ExpenseLineCurrency {
+	return &ExpenseLineCurrency{typeName: "string", String: value}
+}
+
+func (e *ExpenseLineCurrency) UnmarshalJSON(data []byte) error {
+	var valueCurrencyEnum CurrencyEnum
+	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
+		e.typeName = "currencyEnum"
+		e.CurrencyEnum = valueCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineCurrency) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "currencyEnum":
+		return json.Marshal(e.CurrencyEnum)
+	case "string":
+		return json.Marshal(e.String)
+	}
+}
+
+type ExpenseLineCurrencyVisitor interface {
+	VisitCurrencyEnum(CurrencyEnum) error
+	VisitString(string) error
+}
+
+func (e *ExpenseLineCurrency) Accept(visitor ExpenseLineCurrencyVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "currencyEnum":
+		return visitor.VisitCurrencyEnum(e.CurrencyEnum)
+	case "string":
+		return visitor.VisitString(e.String)
+	}
+}
+
 // The line's item.
 type ExpenseLineItem struct {
 	typeName string
@@ -12483,6 +13330,315 @@ type ExpenseLineRequest struct {
 	TrackingCategories []*ExpenseLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
+	// The expense line item's currency.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *CurrencyEnum `json:"currency,omitempty"`
 	// The expense's payment account.
 	Account *ExpenseLineRequestAccount `json:"account,omitempty"`
 	// The expense's contact.
@@ -12912,6 +14068,10 @@ type ExpenseRequest struct {
 	Contact *ExpenseRequestContact `json:"contact,omitempty"`
 	// The expense's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
+	// The expense's total amount before tax.
+	SubTotal *float64 `json:"sub_total,omitempty"`
+	// The expense's total tax amount.
+	TotalTaxAmount *float64 `json:"total_tax_amount,omitempty"`
 	// The expense's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -15235,6 +16395,15 @@ type Invoice struct {
 	TotalDiscount *float64 `json:"total_discount,omitempty"`
 	// The total amount being paid before taxes.
 	SubTotal *float64 `json:"sub_total,omitempty"`
+	// The status of the invoice.
+	//
+	// * `PAID` - PAID
+	// * `DRAFT` - DRAFT
+	// * `SUBMITTED` - SUBMITTED
+	// * `PARTIALLY_PAID` - PARTIALLY_PAID
+	// * `OPEN` - OPEN
+	// * `VOID` - VOID
+	Status *InvoiceStatusEnum `json:"status,omitempty"`
 	// The total amount being paid in taxes.
 	TotalTaxAmount *float64 `json:"total_tax_amount,omitempty"`
 	// The invoice's total amount.
@@ -17685,6 +18854,15 @@ type InvoiceRequest struct {
 	PaidOnDate *time.Time `json:"paid_on_date,omitempty"`
 	// The invoice's private note.
 	Memo *string `json:"memo,omitempty"`
+	// The status of the invoice.
+	//
+	// * `PAID` - PAID
+	// * `DRAFT` - DRAFT
+	// * `SUBMITTED` - SUBMITTED
+	// * `PARTIALLY_PAID` - PARTIALLY_PAID
+	// * `OPEN` - OPEN
+	// * `VOID` - VOID
+	Status *InvoiceRequestStatus `json:"status,omitempty"`
 	// The company the invoice belongs to.
 	Company *InvoiceRequestCompany `json:"company,omitempty"`
 	// The invoice's currency.
@@ -18554,6 +19732,71 @@ func (i *InvoiceRequestPaymentsItem) Accept(visitor InvoiceRequestPaymentsItemVi
 	}
 }
 
+// The status of the invoice.
+//
+// * `PAID` - PAID
+// * `DRAFT` - DRAFT
+// * `SUBMITTED` - SUBMITTED
+// * `PARTIALLY_PAID` - PARTIALLY_PAID
+// * `OPEN` - OPEN
+// * `VOID` - VOID
+type InvoiceRequestStatus struct {
+	typeName          string
+	InvoiceStatusEnum InvoiceStatusEnum
+	String            string
+}
+
+func NewInvoiceRequestStatusFromInvoiceStatusEnum(value InvoiceStatusEnum) *InvoiceRequestStatus {
+	return &InvoiceRequestStatus{typeName: "invoiceStatusEnum", InvoiceStatusEnum: value}
+}
+
+func NewInvoiceRequestStatusFromString(value string) *InvoiceRequestStatus {
+	return &InvoiceRequestStatus{typeName: "string", String: value}
+}
+
+func (i *InvoiceRequestStatus) UnmarshalJSON(data []byte) error {
+	var valueInvoiceStatusEnum InvoiceStatusEnum
+	if err := json.Unmarshal(data, &valueInvoiceStatusEnum); err == nil {
+		i.typeName = "invoiceStatusEnum"
+		i.InvoiceStatusEnum = valueInvoiceStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestStatus) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "invoiceStatusEnum":
+		return json.Marshal(i.InvoiceStatusEnum)
+	case "string":
+		return json.Marshal(i.String)
+	}
+}
+
+type InvoiceRequestStatusVisitor interface {
+	VisitInvoiceStatusEnum(InvoiceStatusEnum) error
+	VisitString(string) error
+}
+
+func (i *InvoiceRequestStatus) Accept(visitor InvoiceRequestStatusVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "invoiceStatusEnum":
+		return visitor.VisitInvoiceStatusEnum(i.InvoiceStatusEnum)
+	case "string":
+		return visitor.VisitString(i.String)
+	}
+}
+
 type InvoiceRequestTrackingCategoriesItem struct {
 	typeName         string
 	String           string
@@ -18677,6 +19920,74 @@ type InvoiceResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+}
+
+// * `PAID` - PAID
+// * `DRAFT` - DRAFT
+// * `SUBMITTED` - SUBMITTED
+// * `PARTIALLY_PAID` - PARTIALLY_PAID
+// * `OPEN` - OPEN
+// * `VOID` - VOID
+type InvoiceStatusEnum uint
+
+const (
+	InvoiceStatusEnumPaid InvoiceStatusEnum = iota + 1
+	InvoiceStatusEnumDraft
+	InvoiceStatusEnumSubmitted
+	InvoiceStatusEnumPartiallyPaid
+	InvoiceStatusEnumOpen
+	InvoiceStatusEnumVoid
+)
+
+func (i InvoiceStatusEnum) String() string {
+	switch i {
+	default:
+		return strconv.Itoa(int(i))
+	case InvoiceStatusEnumPaid:
+		return "PAID"
+	case InvoiceStatusEnumDraft:
+		return "DRAFT"
+	case InvoiceStatusEnumSubmitted:
+		return "SUBMITTED"
+	case InvoiceStatusEnumPartiallyPaid:
+		return "PARTIALLY_PAID"
+	case InvoiceStatusEnumOpen:
+		return "OPEN"
+	case InvoiceStatusEnumVoid:
+		return "VOID"
+	}
+}
+
+func (i InvoiceStatusEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", i.String())), nil
+}
+
+func (i *InvoiceStatusEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "PAID":
+		value := InvoiceStatusEnumPaid
+		*i = value
+	case "DRAFT":
+		value := InvoiceStatusEnumDraft
+		*i = value
+	case "SUBMITTED":
+		value := InvoiceStatusEnumSubmitted
+		*i = value
+	case "PARTIALLY_PAID":
+		value := InvoiceStatusEnumPartiallyPaid
+		*i = value
+	case "OPEN":
+		value := InvoiceStatusEnumOpen
+		*i = value
+	case "VOID":
+		value := InvoiceStatusEnumVoid
+		*i = value
+	}
+	return nil
 }
 
 type InvoiceTrackingCategoriesItem struct {
@@ -20422,8 +21733,10 @@ type JournalEntry struct {
 	// The journal entry's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the journal entry belongs to.
-	Company            *JournalEntryCompany                  `json:"company,omitempty"`
-	Lines              []*JournalLine                        `json:"lines,omitempty"`
+	Company *JournalEntryCompany `json:"company,omitempty"`
+	Lines   []*JournalLine       `json:"lines,omitempty"`
+	// Reference number for identifying journal entries.
+	JournalNumber      *string                               `json:"journal_number,omitempty"`
 	TrackingCategories []*JournalEntryTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	RemoteWasDeleted   *bool                                 `json:"remote_was_deleted,omitempty"`
 	// The journal's posting status.
@@ -21306,8 +22619,11 @@ type JournalEntryRequest struct {
 	// The journal entry's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the journal entry belongs to.
-	Company *JournalEntryRequestCompany `json:"company,omitempty"`
-	Lines   []*JournalLineRequest       `json:"lines,omitempty"`
+	Company            *JournalEntryRequestCompany                  `json:"company,omitempty"`
+	TrackingCategories []*JournalEntryRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	Lines              []*JournalLineRequest                        `json:"lines,omitempty"`
+	// Reference number for identifying journal entries.
+	JournalNumber *string `json:"journal_number,omitempty"`
 	// The journal's posting status.
 	//
 	// * `UNPOSTED` - UNPOSTED
@@ -21858,6 +23174,63 @@ func (j *JournalEntryRequestPostingStatus) Accept(visitor JournalEntryRequestPos
 	}
 }
 
+type JournalEntryRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewJournalEntryRequestTrackingCategoriesItemFromString(value string) *JournalEntryRequestTrackingCategoriesItem {
+	return &JournalEntryRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewJournalEntryRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *JournalEntryRequestTrackingCategoriesItem {
+	return &JournalEntryRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (j *JournalEntryRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typeName = "trackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "trackingCategory":
+		return json.Marshal(j.TrackingCategory)
+	}
+}
+
+type JournalEntryRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalEntryRequestTrackingCategoriesItem) Accept(visitor JournalEntryRequestTrackingCategoriesItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+}
+
 type JournalEntryResponse struct {
 	Model    *JournalEntry               `json:"model,omitempty"`
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
@@ -21936,7 +23309,316 @@ type JournalLine struct {
 	NetAmount          *float64                             `json:"net_amount,omitempty"`
 	TrackingCategory   *JournalLineTrackingCategory         `json:"tracking_category,omitempty"`
 	TrackingCategories []*JournalLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	Contact            *string                              `json:"contact,omitempty"`
+	// The journal line item's currency.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *JournalLineCurrency `json:"currency,omitempty"`
+	Contact  *string              `json:"contact,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
@@ -22002,6 +23684,371 @@ func (j *JournalLineAccount) Accept(visitor JournalLineAccountVisitor) error {
 	}
 }
 
+// The journal line item's currency.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type JournalLineCurrency struct {
+	typeName     string
+	CurrencyEnum CurrencyEnum
+	String       string
+}
+
+func NewJournalLineCurrencyFromCurrencyEnum(value CurrencyEnum) *JournalLineCurrency {
+	return &JournalLineCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+}
+
+func NewJournalLineCurrencyFromString(value string) *JournalLineCurrency {
+	return &JournalLineCurrency{typeName: "string", String: value}
+}
+
+func (j *JournalLineCurrency) UnmarshalJSON(data []byte) error {
+	var valueCurrencyEnum CurrencyEnum
+	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
+		j.typeName = "currencyEnum"
+		j.CurrencyEnum = valueCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineCurrency) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "currencyEnum":
+		return json.Marshal(j.CurrencyEnum)
+	case "string":
+		return json.Marshal(j.String)
+	}
+}
+
+type JournalLineCurrencyVisitor interface {
+	VisitCurrencyEnum(CurrencyEnum) error
+	VisitString(string) error
+}
+
+func (j *JournalLineCurrency) Accept(visitor JournalLineCurrencyVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "currencyEnum":
+		return visitor.VisitCurrencyEnum(j.CurrencyEnum)
+	case "string":
+		return visitor.VisitString(j.String)
+	}
+}
+
 // # The JournalLine Object
 // ### Description
 // The `JournalLine` object is used to represent a journal entry's line items.
@@ -22016,7 +24063,316 @@ type JournalLineRequest struct {
 	NetAmount          *float64                                    `json:"net_amount,omitempty"`
 	TrackingCategory   *JournalLineRequestTrackingCategory         `json:"tracking_category,omitempty"`
 	TrackingCategories []*JournalLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	Contact            *string                                     `json:"contact,omitempty"`
+	// The journal line item's currency.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *JournalLineRequestCurrency `json:"currency,omitempty"`
+	Contact  *string                     `json:"contact,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
@@ -22079,6 +24435,371 @@ func (j *JournalLineRequestAccount) Accept(visitor JournalLineRequestAccountVisi
 		return visitor.VisitString(j.String)
 	case "account":
 		return visitor.VisitAccount(j.Account)
+	}
+}
+
+// The journal line item's currency.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type JournalLineRequestCurrency struct {
+	typeName     string
+	CurrencyEnum CurrencyEnum
+	String       string
+}
+
+func NewJournalLineRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *JournalLineRequestCurrency {
+	return &JournalLineRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+}
+
+func NewJournalLineRequestCurrencyFromString(value string) *JournalLineRequestCurrency {
+	return &JournalLineRequestCurrency{typeName: "string", String: value}
+}
+
+func (j *JournalLineRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueCurrencyEnum CurrencyEnum
+	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
+		j.typeName = "currencyEnum"
+		j.CurrencyEnum = valueCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestCurrency) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "currencyEnum":
+		return json.Marshal(j.CurrencyEnum)
+	case "string":
+		return json.Marshal(j.String)
+	}
+}
+
+type JournalLineRequestCurrencyVisitor interface {
+	VisitCurrencyEnum(CurrencyEnum) error
+	VisitString(string) error
+}
+
+func (j *JournalLineRequestCurrency) Accept(visitor JournalLineRequestCurrencyVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "currencyEnum":
+		return visitor.VisitCurrencyEnum(j.CurrencyEnum)
+	case "string":
+		return visitor.VisitString(j.String)
 	}
 }
 
@@ -23076,7 +25797,8 @@ type Payment struct {
 	// When the third party's payment entry was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	RemoteWasDeleted *bool              `json:"remote_was_deleted,omitempty"`
+	AppliedToLines   []*PaymentLineItem `json:"applied_to_lines,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -23622,6 +26344,161 @@ func (p *PaymentCurrency) Accept(visitor PaymentCurrencyVisitor) error {
 	}
 }
 
+// # The PaymentLineItem Object
+// ### Description
+// The `PaymentLineItem` object is an applied-to-line on a `Payment` that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+//
+// ### Usage Example
+// `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+type PaymentLineItem struct {
+	// The amount of the PaymentLineItem.
+	AppliedAmount     *string                           `json:"applied_amount,omitempty"`
+	RelatedObjectType *PaymentLineItemRelatedObjectType `json:"related_object_type,omitempty"`
+	// UUID of the related_object_type associated to this PaymentLineItem.
+	RelatedObjectId *string `json:"related_object_id,omitempty"`
+	// Applied date of the PaymentLineItem
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	Id       *string `json:"id,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+type PaymentLineItemRelatedObjectType struct {
+	typeName              string
+	RelatedObjectTypeEnum RelatedObjectTypeEnum
+	String                string
+}
+
+func NewPaymentLineItemRelatedObjectTypeFromRelatedObjectTypeEnum(value RelatedObjectTypeEnum) *PaymentLineItemRelatedObjectType {
+	return &PaymentLineItemRelatedObjectType{typeName: "relatedObjectTypeEnum", RelatedObjectTypeEnum: value}
+}
+
+func NewPaymentLineItemRelatedObjectTypeFromString(value string) *PaymentLineItemRelatedObjectType {
+	return &PaymentLineItemRelatedObjectType{typeName: "string", String: value}
+}
+
+func (p *PaymentLineItemRelatedObjectType) UnmarshalJSON(data []byte) error {
+	var valueRelatedObjectTypeEnum RelatedObjectTypeEnum
+	if err := json.Unmarshal(data, &valueRelatedObjectTypeEnum); err == nil {
+		p.typeName = "relatedObjectTypeEnum"
+		p.RelatedObjectTypeEnum = valueRelatedObjectTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentLineItemRelatedObjectType) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "relatedObjectTypeEnum":
+		return json.Marshal(p.RelatedObjectTypeEnum)
+	case "string":
+		return json.Marshal(p.String)
+	}
+}
+
+type PaymentLineItemRelatedObjectTypeVisitor interface {
+	VisitRelatedObjectTypeEnum(RelatedObjectTypeEnum) error
+	VisitString(string) error
+}
+
+func (p *PaymentLineItemRelatedObjectType) Accept(visitor PaymentLineItemRelatedObjectTypeVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "relatedObjectTypeEnum":
+		return visitor.VisitRelatedObjectTypeEnum(p.RelatedObjectTypeEnum)
+	case "string":
+		return visitor.VisitString(p.String)
+	}
+}
+
+// # The PaymentLineItem Object
+// ### Description
+// The `PaymentLineItem` object is an applied-to-line on a `Payment` that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+//
+// ### Usage Example
+// `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+type PaymentLineItemRequest struct {
+	// The amount of the PaymentLineItem.
+	AppliedAmount     *string                                  `json:"applied_amount,omitempty"`
+	RelatedObjectType *PaymentLineItemRequestRelatedObjectType `json:"related_object_type,omitempty"`
+	// UUID of the related_object_type associated to this PaymentLineItem.
+	RelatedObjectId *string `json:"related_object_id,omitempty"`
+	// Applied date of the PaymentLineItem
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId            *string        `json:"remote_id,omitempty"`
+	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
+type PaymentLineItemRequestRelatedObjectType struct {
+	typeName              string
+	RelatedObjectTypeEnum RelatedObjectTypeEnum
+	String                string
+}
+
+func NewPaymentLineItemRequestRelatedObjectTypeFromRelatedObjectTypeEnum(value RelatedObjectTypeEnum) *PaymentLineItemRequestRelatedObjectType {
+	return &PaymentLineItemRequestRelatedObjectType{typeName: "relatedObjectTypeEnum", RelatedObjectTypeEnum: value}
+}
+
+func NewPaymentLineItemRequestRelatedObjectTypeFromString(value string) *PaymentLineItemRequestRelatedObjectType {
+	return &PaymentLineItemRequestRelatedObjectType{typeName: "string", String: value}
+}
+
+func (p *PaymentLineItemRequestRelatedObjectType) UnmarshalJSON(data []byte) error {
+	var valueRelatedObjectTypeEnum RelatedObjectTypeEnum
+	if err := json.Unmarshal(data, &valueRelatedObjectTypeEnum); err == nil {
+		p.typeName = "relatedObjectTypeEnum"
+		p.RelatedObjectTypeEnum = valueRelatedObjectTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentLineItemRequestRelatedObjectType) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "relatedObjectTypeEnum":
+		return json.Marshal(p.RelatedObjectTypeEnum)
+	case "string":
+		return json.Marshal(p.String)
+	}
+}
+
+type PaymentLineItemRequestRelatedObjectTypeVisitor interface {
+	VisitRelatedObjectTypeEnum(RelatedObjectTypeEnum) error
+	VisitString(string) error
+}
+
+func (p *PaymentLineItemRequestRelatedObjectType) Accept(visitor PaymentLineItemRequestRelatedObjectTypeVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "relatedObjectTypeEnum":
+		return visitor.VisitRelatedObjectTypeEnum(p.RelatedObjectTypeEnum)
+	case "string":
+		return visitor.VisitString(p.String)
+	}
+}
+
 // # The Payment Object
 // ### Description
 // The `Payment` object represents general payments made towards a specific transaction.
@@ -23951,6 +26828,7 @@ type PaymentRequest struct {
 	// The total amount of money being paid to the supplier, or customer, after taxes.
 	TotalAmount         *float64                                `json:"total_amount,omitempty"`
 	TrackingCategories  []*PaymentRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	AppliedToLines      []*PaymentLineItemRequest               `json:"applied_to_lines,omitempty"`
 	IntegrationParams   map[string]any                          `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                          `json:"linked_account_params,omitempty"`
 }
@@ -24620,6 +27498,14 @@ type PaymentsListRequestExpand uint
 const (
 	PaymentsListRequestExpandAccount PaymentsListRequestExpand = iota + 1
 	PaymentsListRequestExpandAccountCompany
+	PaymentsListRequestExpandAppliedToLines
+	PaymentsListRequestExpandAppliedToLinesAccount
+	PaymentsListRequestExpandAppliedToLinesAccountCompany
+	PaymentsListRequestExpandAppliedToLinesCompany
+	PaymentsListRequestExpandAppliedToLinesContact
+	PaymentsListRequestExpandAppliedToLinesContactAccount
+	PaymentsListRequestExpandAppliedToLinesContactAccountCompany
+	PaymentsListRequestExpandAppliedToLinesContactCompany
 	PaymentsListRequestExpandCompany
 	PaymentsListRequestExpandContact
 	PaymentsListRequestExpandContactAccount
@@ -24628,6 +27514,14 @@ const (
 	PaymentsListRequestExpandTrackingCategories
 	PaymentsListRequestExpandTrackingCategoriesAccount
 	PaymentsListRequestExpandTrackingCategoriesAccountCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLines
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany
 	PaymentsListRequestExpandTrackingCategoriesCompany
 	PaymentsListRequestExpandTrackingCategoriesContact
 	PaymentsListRequestExpandTrackingCategoriesContactAccount
@@ -24643,6 +27537,22 @@ func (p PaymentsListRequestExpand) String() string {
 		return "account"
 	case PaymentsListRequestExpandAccountCompany:
 		return "account,company"
+	case PaymentsListRequestExpandAppliedToLines:
+		return "applied_to_lines"
+	case PaymentsListRequestExpandAppliedToLinesAccount:
+		return "applied_to_lines,account"
+	case PaymentsListRequestExpandAppliedToLinesAccountCompany:
+		return "applied_to_lines,account,company"
+	case PaymentsListRequestExpandAppliedToLinesCompany:
+		return "applied_to_lines,company"
+	case PaymentsListRequestExpandAppliedToLinesContact:
+		return "applied_to_lines,contact"
+	case PaymentsListRequestExpandAppliedToLinesContactAccount:
+		return "applied_to_lines,contact,account"
+	case PaymentsListRequestExpandAppliedToLinesContactAccountCompany:
+		return "applied_to_lines,contact,account,company"
+	case PaymentsListRequestExpandAppliedToLinesContactCompany:
+		return "applied_to_lines,contact,company"
 	case PaymentsListRequestExpandCompany:
 		return "company"
 	case PaymentsListRequestExpandContact:
@@ -24659,6 +27569,22 @@ func (p PaymentsListRequestExpand) String() string {
 		return "tracking_categories,account"
 	case PaymentsListRequestExpandTrackingCategoriesAccountCompany:
 		return "tracking_categories,account,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount:
+		return "tracking_categories,applied_to_lines,account"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany:
+		return "tracking_categories,applied_to_lines,account,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany:
+		return "tracking_categories,applied_to_lines,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact:
+		return "tracking_categories,applied_to_lines,contact"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount:
+		return "tracking_categories,applied_to_lines,contact,account"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany:
+		return "tracking_categories,applied_to_lines,contact,account,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany:
+		return "tracking_categories,applied_to_lines,contact,company"
 	case PaymentsListRequestExpandTrackingCategoriesCompany:
 		return "tracking_categories,company"
 	case PaymentsListRequestExpandTrackingCategoriesContact:
@@ -24688,6 +27614,30 @@ func (p *PaymentsListRequestExpand) UnmarshalJSON(data []byte) error {
 	case "account,company":
 		value := PaymentsListRequestExpandAccountCompany
 		*p = value
+	case "applied_to_lines":
+		value := PaymentsListRequestExpandAppliedToLines
+		*p = value
+	case "applied_to_lines,account":
+		value := PaymentsListRequestExpandAppliedToLinesAccount
+		*p = value
+	case "applied_to_lines,account,company":
+		value := PaymentsListRequestExpandAppliedToLinesAccountCompany
+		*p = value
+	case "applied_to_lines,company":
+		value := PaymentsListRequestExpandAppliedToLinesCompany
+		*p = value
+	case "applied_to_lines,contact":
+		value := PaymentsListRequestExpandAppliedToLinesContact
+		*p = value
+	case "applied_to_lines,contact,account":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccount
+		*p = value
+	case "applied_to_lines,contact,account,company":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccountCompany
+		*p = value
+	case "applied_to_lines,contact,company":
+		value := PaymentsListRequestExpandAppliedToLinesContactCompany
+		*p = value
 	case "company":
 		value := PaymentsListRequestExpandCompany
 		*p = value
@@ -24711,6 +27661,30 @@ func (p *PaymentsListRequestExpand) UnmarshalJSON(data []byte) error {
 		*p = value
 	case "tracking_categories,account,company":
 		value := PaymentsListRequestExpandTrackingCategoriesAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLines
+		*p = value
+	case "tracking_categories,applied_to_lines,account":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,account,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany
 		*p = value
 	case "tracking_categories,company":
 		value := PaymentsListRequestExpandTrackingCategoriesCompany
@@ -24736,6 +27710,14 @@ type PaymentsRetrieveRequestExpand uint
 const (
 	PaymentsRetrieveRequestExpandAccount PaymentsRetrieveRequestExpand = iota + 1
 	PaymentsRetrieveRequestExpandAccountCompany
+	PaymentsRetrieveRequestExpandAppliedToLines
+	PaymentsRetrieveRequestExpandAppliedToLinesAccount
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesContact
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccount
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesContactCompany
 	PaymentsRetrieveRequestExpandCompany
 	PaymentsRetrieveRequestExpandContact
 	PaymentsRetrieveRequestExpandContactAccount
@@ -24744,6 +27726,14 @@ const (
 	PaymentsRetrieveRequestExpandTrackingCategories
 	PaymentsRetrieveRequestExpandTrackingCategoriesAccount
 	PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany
 	PaymentsRetrieveRequestExpandTrackingCategoriesCompany
 	PaymentsRetrieveRequestExpandTrackingCategoriesContact
 	PaymentsRetrieveRequestExpandTrackingCategoriesContactAccount
@@ -24759,6 +27749,22 @@ func (p PaymentsRetrieveRequestExpand) String() string {
 		return "account"
 	case PaymentsRetrieveRequestExpandAccountCompany:
 		return "account,company"
+	case PaymentsRetrieveRequestExpandAppliedToLines:
+		return "applied_to_lines"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccount:
+		return "applied_to_lines,account"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany:
+		return "applied_to_lines,account,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesCompany:
+		return "applied_to_lines,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContact:
+		return "applied_to_lines,contact"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccount:
+		return "applied_to_lines,contact,account"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany:
+		return "applied_to_lines,contact,account,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactCompany:
+		return "applied_to_lines,contact,company"
 	case PaymentsRetrieveRequestExpandCompany:
 		return "company"
 	case PaymentsRetrieveRequestExpandContact:
@@ -24775,6 +27781,22 @@ func (p PaymentsRetrieveRequestExpand) String() string {
 		return "tracking_categories,account"
 	case PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompany:
 		return "tracking_categories,account,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount:
+		return "tracking_categories,applied_to_lines,account"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany:
+		return "tracking_categories,applied_to_lines,account,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany:
+		return "tracking_categories,applied_to_lines,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact:
+		return "tracking_categories,applied_to_lines,contact"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount:
+		return "tracking_categories,applied_to_lines,contact,account"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany:
+		return "tracking_categories,applied_to_lines,contact,account,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany:
+		return "tracking_categories,applied_to_lines,contact,company"
 	case PaymentsRetrieveRequestExpandTrackingCategoriesCompany:
 		return "tracking_categories,company"
 	case PaymentsRetrieveRequestExpandTrackingCategoriesContact:
@@ -24804,6 +27826,30 @@ func (p *PaymentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "account,company":
 		value := PaymentsRetrieveRequestExpandAccountCompany
 		*p = value
+	case "applied_to_lines":
+		value := PaymentsRetrieveRequestExpandAppliedToLines
+		*p = value
+	case "applied_to_lines,account":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccount
+		*p = value
+	case "applied_to_lines,account,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany
+		*p = value
+	case "applied_to_lines,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesCompany
+		*p = value
+	case "applied_to_lines,contact":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContact
+		*p = value
+	case "applied_to_lines,contact,account":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccount
+		*p = value
+	case "applied_to_lines,contact,account,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany
+		*p = value
+	case "applied_to_lines,contact,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactCompany
+		*p = value
 	case "company":
 		value := PaymentsRetrieveRequestExpandCompany
 		*p = value
@@ -24827,6 +27873,30 @@ func (p *PaymentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*p = value
 	case "tracking_categories,account,company":
 		value := PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines
+		*p = value
+	case "tracking_categories,applied_to_lines,account":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,account,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany
 		*p = value
 	case "tracking_categories,company":
 		value := PaymentsRetrieveRequestExpandTrackingCategoriesCompany
@@ -24904,6 +27974,8 @@ type PurchaseOrder struct {
 	Status *PurchaseOrderStatus `json:"status,omitempty"`
 	// The purchase order's issue date.
 	IssueDate *time.Time `json:"issue_date,omitempty"`
+	// The human-readable number of the purchase order.
+	PurchaseOrderNumber *string `json:"purchase_order_number,omitempty"`
 	// The purchase order's delivery date.
 	DeliveryDate *time.Time `json:"delivery_date,omitempty"`
 	// The purchase order's delivery address.
@@ -27598,10 +30670,11 @@ type PurchaseOrderRequest struct {
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *PurchaseOrderRequestCurrency `json:"currency,omitempty"`
 	// The purchase order's exchange rate.
-	ExchangeRate        *string                         `json:"exchange_rate,omitempty"`
-	LineItems           []*PurchaseOrderLineItemRequest `json:"line_items,omitempty"`
-	IntegrationParams   map[string]any                  `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any                  `json:"linked_account_params,omitempty"`
+	ExchangeRate        *string                                       `json:"exchange_rate,omitempty"`
+	TrackingCategories  []*PurchaseOrderRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	LineItems           []*PurchaseOrderLineItemRequest               `json:"line_items,omitempty"`
+	IntegrationParams   map[string]any                                `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                                `json:"linked_account_params,omitempty"`
 }
 
 // The company the purchase order belongs to.
@@ -28146,6 +31219,63 @@ func (p *PurchaseOrderRequestStatus) Accept(visitor PurchaseOrderRequestStatusVi
 		return visitor.VisitPurchaseOrderStatusEnum(p.PurchaseOrderStatusEnum)
 	case "string":
 		return visitor.VisitString(p.String)
+	}
+}
+
+type PurchaseOrderRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewPurchaseOrderRequestTrackingCategoriesItemFromString(value string) *PurchaseOrderRequestTrackingCategoriesItem {
+	return &PurchaseOrderRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewPurchaseOrderRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *PurchaseOrderRequestTrackingCategoriesItem {
+	return &PurchaseOrderRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (p *PurchaseOrderRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		p.typeName = "trackingCategory"
+		p.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "trackingCategory":
+		return json.Marshal(p.TrackingCategory)
+	}
+}
+
+type PurchaseOrderRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (p *PurchaseOrderRequestTrackingCategoriesItem) Accept(visitor PurchaseOrderRequestTrackingCategoriesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(p.TrackingCategory)
 	}
 }
 
@@ -28874,6 +32004,60 @@ func (p *PurchaseOrdersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "vendor,company":
 		value := PurchaseOrdersRetrieveRequestExpandVendorCompany
 		*p = value
+	}
+	return nil
+}
+
+// * `INVOICE` - INVOICE
+// * `CREDIT_NOTE` - CREDIT_NOTE
+// * `JOURNAL_ENTRY` - JOURNAL_ENTRY
+// * `NONE` - NONE
+type RelatedObjectTypeEnum uint
+
+const (
+	RelatedObjectTypeEnumInvoice RelatedObjectTypeEnum = iota + 1
+	RelatedObjectTypeEnumCreditNote
+	RelatedObjectTypeEnumJournalEntry
+	RelatedObjectTypeEnumNone
+)
+
+func (r RelatedObjectTypeEnum) String() string {
+	switch r {
+	default:
+		return strconv.Itoa(int(r))
+	case RelatedObjectTypeEnumInvoice:
+		return "INVOICE"
+	case RelatedObjectTypeEnumCreditNote:
+		return "CREDIT_NOTE"
+	case RelatedObjectTypeEnumJournalEntry:
+		return "JOURNAL_ENTRY"
+	case RelatedObjectTypeEnumNone:
+		return "NONE"
+	}
+}
+
+func (r RelatedObjectTypeEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", r.String())), nil
+}
+
+func (r *RelatedObjectTypeEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "INVOICE":
+		value := RelatedObjectTypeEnumInvoice
+		*r = value
+	case "CREDIT_NOTE":
+		value := RelatedObjectTypeEnumCreditNote
+		*r = value
+	case "JOURNAL_ENTRY":
+		value := RelatedObjectTypeEnumJournalEntry
+		*r = value
+	case "NONE":
+		value := RelatedObjectTypeEnumNone
+		*r = value
 	}
 	return nil
 }
@@ -31697,11 +34881,85 @@ type VendorCredit struct {
 	Lines              []*VendorCreditLine                   `json:"lines,omitempty"`
 	TrackingCategories []*VendorCreditTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
+	AppliedToLines   []*VendorCreditApplyLine `json:"applied_to_lines,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+// # The VendorCreditApplyLine Object
+// ### Description
+// The `VendorCreditApplyLine` object is used to represent a applied vendor credit.
+//
+// ### Usage Example
+// Fetch from the `GET VendorCredit` endpoint and view the vendor credit's applied to lines.
+type VendorCreditApplyLine struct {
+	Invoice *VendorCreditApplyLineInvoice `json:"invoice,omitempty"`
+	// Date that the vendor credit is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the VendorCredit applied to the invoice.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+type VendorCreditApplyLineInvoice struct {
+	typeName string
+	String   string
+	Invoice  *Invoice
+}
+
+func NewVendorCreditApplyLineInvoiceFromString(value string) *VendorCreditApplyLineInvoice {
+	return &VendorCreditApplyLineInvoice{typeName: "string", String: value}
+}
+
+func NewVendorCreditApplyLineInvoiceFromInvoice(value *Invoice) *VendorCreditApplyLineInvoice {
+	return &VendorCreditApplyLineInvoice{typeName: "invoice", Invoice: value}
+}
+
+func (v *VendorCreditApplyLineInvoice) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueInvoice := new(Invoice)
+	if err := json.Unmarshal(data, &valueInvoice); err == nil {
+		v.typeName = "invoice"
+		v.Invoice = valueInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditApplyLineInvoice) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "invoice":
+		return json.Marshal(v.Invoice)
+	}
+}
+
+type VendorCreditApplyLineInvoiceVisitor interface {
+	VisitString(string) error
+	VisitInvoice(*Invoice) error
+}
+
+func (v *VendorCreditApplyLineInvoice) Accept(visitor VendorCreditApplyLineInvoiceVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "invoice":
+		return visitor.VisitInvoice(v.Invoice)
+	}
 }
 
 // The company the vendor credit belongs to.
@@ -32330,16 +35588,32 @@ func (v *VendorCreditVendor) Accept(visitor VendorCreditVendorVisitor) error {
 type VendorCreditsListRequestExpand uint
 
 const (
-	VendorCreditsListRequestExpandCompany VendorCreditsListRequestExpand = iota + 1
+	VendorCreditsListRequestExpandAppliedToLines VendorCreditsListRequestExpand = iota + 1
+	VendorCreditsListRequestExpandAppliedToLinesCompany
+	VendorCreditsListRequestExpandAppliedToLinesVendor
+	VendorCreditsListRequestExpandAppliedToLinesVendorCompany
+	VendorCreditsListRequestExpandCompany
 	VendorCreditsListRequestExpandLines
+	VendorCreditsListRequestExpandLinesAppliedToLines
+	VendorCreditsListRequestExpandLinesAppliedToLinesCompany
+	VendorCreditsListRequestExpandLinesAppliedToLinesVendor
+	VendorCreditsListRequestExpandLinesAppliedToLinesVendorCompany
 	VendorCreditsListRequestExpandLinesCompany
 	VendorCreditsListRequestExpandLinesTrackingCategories
+	VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLines
+	VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesCompany
+	VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesVendor
+	VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesVendorCompany
 	VendorCreditsListRequestExpandLinesTrackingCategoriesCompany
 	VendorCreditsListRequestExpandLinesTrackingCategoriesVendor
 	VendorCreditsListRequestExpandLinesTrackingCategoriesVendorCompany
 	VendorCreditsListRequestExpandLinesVendor
 	VendorCreditsListRequestExpandLinesVendorCompany
 	VendorCreditsListRequestExpandTrackingCategories
+	VendorCreditsListRequestExpandTrackingCategoriesAppliedToLines
+	VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesCompany
+	VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesVendor
+	VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesVendorCompany
 	VendorCreditsListRequestExpandTrackingCategoriesCompany
 	VendorCreditsListRequestExpandTrackingCategoriesVendor
 	VendorCreditsListRequestExpandTrackingCategoriesVendorCompany
@@ -32351,14 +35625,38 @@ func (v VendorCreditsListRequestExpand) String() string {
 	switch v {
 	default:
 		return strconv.Itoa(int(v))
+	case VendorCreditsListRequestExpandAppliedToLines:
+		return "applied_to_lines"
+	case VendorCreditsListRequestExpandAppliedToLinesCompany:
+		return "applied_to_lines,company"
+	case VendorCreditsListRequestExpandAppliedToLinesVendor:
+		return "applied_to_lines,vendor"
+	case VendorCreditsListRequestExpandAppliedToLinesVendorCompany:
+		return "applied_to_lines,vendor,company"
 	case VendorCreditsListRequestExpandCompany:
 		return "company"
 	case VendorCreditsListRequestExpandLines:
 		return "lines"
+	case VendorCreditsListRequestExpandLinesAppliedToLines:
+		return "lines,applied_to_lines"
+	case VendorCreditsListRequestExpandLinesAppliedToLinesCompany:
+		return "lines,applied_to_lines,company"
+	case VendorCreditsListRequestExpandLinesAppliedToLinesVendor:
+		return "lines,applied_to_lines,vendor"
+	case VendorCreditsListRequestExpandLinesAppliedToLinesVendorCompany:
+		return "lines,applied_to_lines,vendor,company"
 	case VendorCreditsListRequestExpandLinesCompany:
 		return "lines,company"
 	case VendorCreditsListRequestExpandLinesTrackingCategories:
 		return "lines,tracking_categories"
+	case VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLines:
+		return "lines,tracking_categories,applied_to_lines"
+	case VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesCompany:
+		return "lines,tracking_categories,applied_to_lines,company"
+	case VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesVendor:
+		return "lines,tracking_categories,applied_to_lines,vendor"
+	case VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesVendorCompany:
+		return "lines,tracking_categories,applied_to_lines,vendor,company"
 	case VendorCreditsListRequestExpandLinesTrackingCategoriesCompany:
 		return "lines,tracking_categories,company"
 	case VendorCreditsListRequestExpandLinesTrackingCategoriesVendor:
@@ -32371,6 +35669,14 @@ func (v VendorCreditsListRequestExpand) String() string {
 		return "lines,vendor,company"
 	case VendorCreditsListRequestExpandTrackingCategories:
 		return "tracking_categories"
+	case VendorCreditsListRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
+	case VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesCompany:
+		return "tracking_categories,applied_to_lines,company"
+	case VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesVendor:
+		return "tracking_categories,applied_to_lines,vendor"
+	case VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesVendorCompany:
+		return "tracking_categories,applied_to_lines,vendor,company"
 	case VendorCreditsListRequestExpandTrackingCategoriesCompany:
 		return "tracking_categories,company"
 	case VendorCreditsListRequestExpandTrackingCategoriesVendor:
@@ -32394,17 +35700,53 @@ func (v *VendorCreditsListRequestExpand) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch raw {
+	case "applied_to_lines":
+		value := VendorCreditsListRequestExpandAppliedToLines
+		*v = value
+	case "applied_to_lines,company":
+		value := VendorCreditsListRequestExpandAppliedToLinesCompany
+		*v = value
+	case "applied_to_lines,vendor":
+		value := VendorCreditsListRequestExpandAppliedToLinesVendor
+		*v = value
+	case "applied_to_lines,vendor,company":
+		value := VendorCreditsListRequestExpandAppliedToLinesVendorCompany
+		*v = value
 	case "company":
 		value := VendorCreditsListRequestExpandCompany
 		*v = value
 	case "lines":
 		value := VendorCreditsListRequestExpandLines
 		*v = value
+	case "lines,applied_to_lines":
+		value := VendorCreditsListRequestExpandLinesAppliedToLines
+		*v = value
+	case "lines,applied_to_lines,company":
+		value := VendorCreditsListRequestExpandLinesAppliedToLinesCompany
+		*v = value
+	case "lines,applied_to_lines,vendor":
+		value := VendorCreditsListRequestExpandLinesAppliedToLinesVendor
+		*v = value
+	case "lines,applied_to_lines,vendor,company":
+		value := VendorCreditsListRequestExpandLinesAppliedToLinesVendorCompany
+		*v = value
 	case "lines,company":
 		value := VendorCreditsListRequestExpandLinesCompany
 		*v = value
 	case "lines,tracking_categories":
 		value := VendorCreditsListRequestExpandLinesTrackingCategories
+		*v = value
+	case "lines,tracking_categories,applied_to_lines":
+		value := VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLines
+		*v = value
+	case "lines,tracking_categories,applied_to_lines,company":
+		value := VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesCompany
+		*v = value
+	case "lines,tracking_categories,applied_to_lines,vendor":
+		value := VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesVendor
+		*v = value
+	case "lines,tracking_categories,applied_to_lines,vendor,company":
+		value := VendorCreditsListRequestExpandLinesTrackingCategoriesAppliedToLinesVendorCompany
 		*v = value
 	case "lines,tracking_categories,company":
 		value := VendorCreditsListRequestExpandLinesTrackingCategoriesCompany
@@ -32423,6 +35765,18 @@ func (v *VendorCreditsListRequestExpand) UnmarshalJSON(data []byte) error {
 		*v = value
 	case "tracking_categories":
 		value := VendorCreditsListRequestExpandTrackingCategories
+		*v = value
+	case "tracking_categories,applied_to_lines":
+		value := VendorCreditsListRequestExpandTrackingCategoriesAppliedToLines
+		*v = value
+	case "tracking_categories,applied_to_lines,company":
+		value := VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesCompany
+		*v = value
+	case "tracking_categories,applied_to_lines,vendor":
+		value := VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesVendor
+		*v = value
+	case "tracking_categories,applied_to_lines,vendor,company":
+		value := VendorCreditsListRequestExpandTrackingCategoriesAppliedToLinesVendorCompany
 		*v = value
 	case "tracking_categories,company":
 		value := VendorCreditsListRequestExpandTrackingCategoriesCompany
@@ -32446,16 +35800,32 @@ func (v *VendorCreditsListRequestExpand) UnmarshalJSON(data []byte) error {
 type VendorCreditsRetrieveRequestExpand uint
 
 const (
-	VendorCreditsRetrieveRequestExpandCompany VendorCreditsRetrieveRequestExpand = iota + 1
+	VendorCreditsRetrieveRequestExpandAppliedToLines VendorCreditsRetrieveRequestExpand = iota + 1
+	VendorCreditsRetrieveRequestExpandAppliedToLinesCompany
+	VendorCreditsRetrieveRequestExpandAppliedToLinesVendor
+	VendorCreditsRetrieveRequestExpandAppliedToLinesVendorCompany
+	VendorCreditsRetrieveRequestExpandCompany
 	VendorCreditsRetrieveRequestExpandLines
+	VendorCreditsRetrieveRequestExpandLinesAppliedToLines
+	VendorCreditsRetrieveRequestExpandLinesAppliedToLinesCompany
+	VendorCreditsRetrieveRequestExpandLinesAppliedToLinesVendor
+	VendorCreditsRetrieveRequestExpandLinesAppliedToLinesVendorCompany
 	VendorCreditsRetrieveRequestExpandLinesCompany
 	VendorCreditsRetrieveRequestExpandLinesTrackingCategories
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLines
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesCompany
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesVendor
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesVendorCompany
 	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompany
 	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendor
 	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorCompany
 	VendorCreditsRetrieveRequestExpandLinesVendor
 	VendorCreditsRetrieveRequestExpandLinesVendorCompany
 	VendorCreditsRetrieveRequestExpandTrackingCategories
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLines
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesVendor
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesVendorCompany
 	VendorCreditsRetrieveRequestExpandTrackingCategoriesCompany
 	VendorCreditsRetrieveRequestExpandTrackingCategoriesVendor
 	VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorCompany
@@ -32467,14 +35837,38 @@ func (v VendorCreditsRetrieveRequestExpand) String() string {
 	switch v {
 	default:
 		return strconv.Itoa(int(v))
+	case VendorCreditsRetrieveRequestExpandAppliedToLines:
+		return "applied_to_lines"
+	case VendorCreditsRetrieveRequestExpandAppliedToLinesCompany:
+		return "applied_to_lines,company"
+	case VendorCreditsRetrieveRequestExpandAppliedToLinesVendor:
+		return "applied_to_lines,vendor"
+	case VendorCreditsRetrieveRequestExpandAppliedToLinesVendorCompany:
+		return "applied_to_lines,vendor,company"
 	case VendorCreditsRetrieveRequestExpandCompany:
 		return "company"
 	case VendorCreditsRetrieveRequestExpandLines:
 		return "lines"
+	case VendorCreditsRetrieveRequestExpandLinesAppliedToLines:
+		return "lines,applied_to_lines"
+	case VendorCreditsRetrieveRequestExpandLinesAppliedToLinesCompany:
+		return "lines,applied_to_lines,company"
+	case VendorCreditsRetrieveRequestExpandLinesAppliedToLinesVendor:
+		return "lines,applied_to_lines,vendor"
+	case VendorCreditsRetrieveRequestExpandLinesAppliedToLinesVendorCompany:
+		return "lines,applied_to_lines,vendor,company"
 	case VendorCreditsRetrieveRequestExpandLinesCompany:
 		return "lines,company"
 	case VendorCreditsRetrieveRequestExpandLinesTrackingCategories:
 		return "lines,tracking_categories"
+	case VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLines:
+		return "lines,tracking_categories,applied_to_lines"
+	case VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesCompany:
+		return "lines,tracking_categories,applied_to_lines,company"
+	case VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesVendor:
+		return "lines,tracking_categories,applied_to_lines,vendor"
+	case VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesVendorCompany:
+		return "lines,tracking_categories,applied_to_lines,vendor,company"
 	case VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompany:
 		return "lines,tracking_categories,company"
 	case VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendor:
@@ -32487,6 +35881,14 @@ func (v VendorCreditsRetrieveRequestExpand) String() string {
 		return "lines,vendor,company"
 	case VendorCreditsRetrieveRequestExpandTrackingCategories:
 		return "tracking_categories"
+	case VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
+	case VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany:
+		return "tracking_categories,applied_to_lines,company"
+	case VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesVendor:
+		return "tracking_categories,applied_to_lines,vendor"
+	case VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesVendorCompany:
+		return "tracking_categories,applied_to_lines,vendor,company"
 	case VendorCreditsRetrieveRequestExpandTrackingCategoriesCompany:
 		return "tracking_categories,company"
 	case VendorCreditsRetrieveRequestExpandTrackingCategoriesVendor:
@@ -32510,17 +35912,53 @@ func (v *VendorCreditsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch raw {
+	case "applied_to_lines":
+		value := VendorCreditsRetrieveRequestExpandAppliedToLines
+		*v = value
+	case "applied_to_lines,company":
+		value := VendorCreditsRetrieveRequestExpandAppliedToLinesCompany
+		*v = value
+	case "applied_to_lines,vendor":
+		value := VendorCreditsRetrieveRequestExpandAppliedToLinesVendor
+		*v = value
+	case "applied_to_lines,vendor,company":
+		value := VendorCreditsRetrieveRequestExpandAppliedToLinesVendorCompany
+		*v = value
 	case "company":
 		value := VendorCreditsRetrieveRequestExpandCompany
 		*v = value
 	case "lines":
 		value := VendorCreditsRetrieveRequestExpandLines
 		*v = value
+	case "lines,applied_to_lines":
+		value := VendorCreditsRetrieveRequestExpandLinesAppliedToLines
+		*v = value
+	case "lines,applied_to_lines,company":
+		value := VendorCreditsRetrieveRequestExpandLinesAppliedToLinesCompany
+		*v = value
+	case "lines,applied_to_lines,vendor":
+		value := VendorCreditsRetrieveRequestExpandLinesAppliedToLinesVendor
+		*v = value
+	case "lines,applied_to_lines,vendor,company":
+		value := VendorCreditsRetrieveRequestExpandLinesAppliedToLinesVendorCompany
+		*v = value
 	case "lines,company":
 		value := VendorCreditsRetrieveRequestExpandLinesCompany
 		*v = value
 	case "lines,tracking_categories":
 		value := VendorCreditsRetrieveRequestExpandLinesTrackingCategories
+		*v = value
+	case "lines,tracking_categories,applied_to_lines":
+		value := VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLines
+		*v = value
+	case "lines,tracking_categories,applied_to_lines,company":
+		value := VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesCompany
+		*v = value
+	case "lines,tracking_categories,applied_to_lines,vendor":
+		value := VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesVendor
+		*v = value
+	case "lines,tracking_categories,applied_to_lines,vendor,company":
+		value := VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAppliedToLinesVendorCompany
 		*v = value
 	case "lines,tracking_categories,company":
 		value := VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompany
@@ -32539,6 +35977,18 @@ func (v *VendorCreditsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*v = value
 	case "tracking_categories":
 		value := VendorCreditsRetrieveRequestExpandTrackingCategories
+		*v = value
+	case "tracking_categories,applied_to_lines":
+		value := VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLines
+		*v = value
+	case "tracking_categories,applied_to_lines,company":
+		value := VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany
+		*v = value
+	case "tracking_categories,applied_to_lines,vendor":
+		value := VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesVendor
+		*v = value
+	case "tracking_categories,applied_to_lines,vendor,company":
+		value := VendorCreditsRetrieveRequestExpandTrackingCategoriesAppliedToLinesVendorCompany
 		*v = value
 	case "tracking_categories,company":
 		value := VendorCreditsRetrieveRequestExpandTrackingCategoriesCompany
