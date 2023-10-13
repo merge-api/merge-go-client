@@ -238,7 +238,7 @@ like the following:
 ctx, cancel := context.WithTimeout(context.TODO(), time.Second)
 defer cancel()
 employeeList, err := client.Hris().Employees().List(
-  context.TODO(),
+  ctx,
   &hris.EmployeesListRequest{
     CreatedBefore: merge.Time(time.Now()),
   },
