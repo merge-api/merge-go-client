@@ -15,7 +15,6 @@ import (
 type Client interface {
 	List(ctx context.Context, request *crm.CustomObjectClassesListRequest) (*crm.PaginatedCustomObjectClassList, error)
 	Retrieve(ctx context.Context, id string, request *crm.CustomObjectClassesRetrieveRequest) (*crm.CustomObjectClass, error)
-	GeneratorUpdate(ctx context.Context, generatorId string, request *crm.CustomObjectClassesGeneratorUpdateRequest) (*crm.CustomObjectClass, error)
 }
 
 func NewClient(opts ...core.ClientOption) Client {
@@ -121,42 +120,6 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.CustomObj
 		c.httpClient,
 		endpointURL,
 		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
-	); err != nil {
-		return response, err
-	}
-	return response, nil
-}
-
-// Updates a `CustomObjectClass` object with the given `id`.
-func (c *client) GeneratorUpdate(ctx context.Context, generatorId string, request *crm.CustomObjectClassesGeneratorUpdateRequest) (*crm.CustomObjectClass, error) {
-	baseURL := "https://api.merge.dev"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/generator/%v", generatorId)
-
-	queryParams := make(url.Values)
-	if request.IsDebugMode != nil {
-		queryParams.Add("is_debug_mode", fmt.Sprintf("%v", *request.IsDebugMode))
-	}
-	if request.RunAsync != nil {
-		queryParams.Add("run_async", fmt.Sprintf("%v", *request.RunAsync))
-	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-
-	var response *crm.CustomObjectClass
-	if err := core.DoRequest(
-		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPut,
 		request,
 		&response,
 		false,

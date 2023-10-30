@@ -13,8 +13,7 @@ type UpdateApplicationStageRequest struct {
 	RunAsync *bool `json:"-"`
 	// The interview stage to move the application to.
 	JobInterviewStage *string `json:"job_interview_stage,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	RemoteUserId *string `json:"remote_user_id,omitempty"`
+	RemoteUserId      *string `json:"remote_user_id,omitempty"`
 }
 
 type ApplicationEndpointRequest struct {

@@ -59,6 +59,9 @@ func (c *client) List(ctx context.Context, request *hris.LocationsListRequest) (
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.LocationType != nil {
+		queryParams.Add("location_type", fmt.Sprintf("%v", *request.LocationType))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}

@@ -16,7 +16,6 @@ type Client interface {
 	CustomObjectClassesCustomObjectsList(ctx context.Context, customObjectClassId string, request *crm.CustomObjectClassesCustomObjectsListRequest) (*crm.PaginatedCustomObjectList, error)
 	CustomObjectClassesCustomObjectsCreate(ctx context.Context, customObjectClassId string, request *crm.CrmCustomObjectEndpointRequest) (*crm.CrmCustomObjectResponse, error)
 	CustomObjectClassesCustomObjectsRetrieve(ctx context.Context, customObjectClassId string, id string, request *crm.CustomObjectClassesCustomObjectsRetrieveRequest) (*crm.CustomObject, error)
-	CustomObjectClassesCustomObjectsPartialUpdate(ctx context.Context, customObjectClassId string, id string, request *crm.PatchedCrmCustomObjectEndpointRequest) (*crm.CrmCustomObjectResponse, error)
 	CustomObjectClassesCustomObjectsMetaPatchRetrieve(ctx context.Context, customObjectClassId string, id string) (*crm.MetaResponse, error)
 	CustomObjectClassesCustomObjectsMetaPostRetrieve(ctx context.Context, customObjectClassId string) (*crm.MetaResponse, error)
 }
@@ -160,42 +159,6 @@ func (c *client) CustomObjectClassesCustomObjectsRetrieve(ctx context.Context, c
 		c.httpClient,
 		endpointURL,
 		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
-	); err != nil {
-		return response, err
-	}
-	return response, nil
-}
-
-// Updates a `CustomObject` object with the given `id`.
-func (c *client) CustomObjectClassesCustomObjectsPartialUpdate(ctx context.Context, customObjectClassId string, id string, request *crm.PatchedCrmCustomObjectEndpointRequest) (*crm.CrmCustomObjectResponse, error) {
-	baseURL := "https://api.merge.dev"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v", customObjectClassId, id)
-
-	queryParams := make(url.Values)
-	if request.IsDebugMode != nil {
-		queryParams.Add("is_debug_mode", fmt.Sprintf("%v", *request.IsDebugMode))
-	}
-	if request.RunAsync != nil {
-		queryParams.Add("run_async", fmt.Sprintf("%v", *request.RunAsync))
-	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-
-	var response *crm.CrmCustomObjectResponse
-	if err := core.DoRequest(
-		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPatch,
 		request,
 		&response,
 		false,

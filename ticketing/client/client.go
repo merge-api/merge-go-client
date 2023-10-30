@@ -9,6 +9,7 @@ import (
 	accounttoken "github.com/merge-api/merge-go-client/ticketing/accounttoken"
 	asyncpassthrough "github.com/merge-api/merge-go-client/ticketing/asyncpassthrough"
 	attachments "github.com/merge-api/merge-go-client/ticketing/attachments"
+	audittrail "github.com/merge-api/merge-go-client/ticketing/audittrail"
 	availableactions "github.com/merge-api/merge-go-client/ticketing/availableactions"
 	collections "github.com/merge-api/merge-go-client/ticketing/collections"
 	comments "github.com/merge-api/merge-go-client/ticketing/comments"
@@ -38,6 +39,7 @@ type Client interface {
 	Accounts() accounts.Client
 	AsyncPassthrough() asyncpassthrough.Client
 	Attachments() attachments.Client
+	AuditTrail() audittrail.Client
 	AvailableActions() availableactions.Client
 	Collections() collections.Client
 	Comments() comments.Client
@@ -74,6 +76,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountsClient:         accounts.NewClient(opts...),
 		asyncPassthroughClient: asyncpassthrough.NewClient(opts...),
 		attachmentsClient:      attachments.NewClient(opts...),
+		auditTrailClient:       audittrail.NewClient(opts...),
 		availableActionsClient: availableactions.NewClient(opts...),
 		collectionsClient:      collections.NewClient(opts...),
 		commentsClient:         comments.NewClient(opts...),
@@ -106,6 +109,7 @@ type client struct {
 	accountsClient         accounts.Client
 	asyncPassthroughClient asyncpassthrough.Client
 	attachmentsClient      attachments.Client
+	auditTrailClient       audittrail.Client
 	availableActionsClient availableactions.Client
 	collectionsClient      collections.Client
 	commentsClient         comments.Client
@@ -146,6 +150,10 @@ func (c *client) AsyncPassthrough() asyncpassthrough.Client {
 
 func (c *client) Attachments() attachments.Client {
 	return c.attachmentsClient
+}
+
+func (c *client) AuditTrail() audittrail.Client {
+	return c.auditTrailClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {

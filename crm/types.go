@@ -38,7 +38,8 @@ type Account struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	Id               *string    `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -147,13 +148,15 @@ type AccountIntegration struct {
 	Image *string `json:"image,omitempty"`
 	// Company logo in square shape. <b>Upload an image with a white background.</b>
 	SquareImage *string `json:"square_image,omitempty"`
-	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b> <span style="white-space: nowrap">`<= 18 characters`</span>
+	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
 	Slug  *string `json:"slug,omitempty"`
 	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
 	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
 	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
+	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
+	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
 }
 
 // The account's owner.
@@ -231,9 +234,7 @@ type AccountRequest struct {
 	// The account's website.
 	Website *string `json:"website,omitempty"`
 	// The account's number of employees.
-	NumberOfEmployees *int           `json:"number_of_employees,omitempty"`
-	Addresses         []*Address     `json:"addresses,omitempty"`
-	PhoneNumbers      []*PhoneNumber `json:"phone_numbers,omitempty"`
+	NumberOfEmployees *int `json:"number_of_employees,omitempty"`
 	// The last date (either most recent or furthest in the future) of when an activity occurs in an account.
 	LastActivityAt      *time.Time            `json:"last_activity_at,omitempty"`
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
@@ -624,6 +625,7 @@ type Address struct {
 	// * `BILLING` - BILLING
 	// * `SHIPPING` - SHIPPING
 	AddressType *AddressAddressType `json:"address_type,omitempty"`
+	CreatedAt   *time.Time          `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -1692,6 +1694,7 @@ type Association struct {
 	SourceObject    map[string]any              `json:"source_object,omitempty"`
 	TargetObject    map[string]any              `json:"target_object,omitempty"`
 	AssociationType *AssociationAssociationType `json:"association_type,omitempty"`
+	CreatedAt       *time.Time                  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -1754,8 +1757,9 @@ func (a *AssociationAssociationType) Accept(visitor AssociationAssociationTypeVi
 }
 
 type AssociationSubType struct {
-	Id         *string `json:"id,omitempty"`
-	OriginType *string `json:"origin_type,omitempty"`
+	Id         *string    `json:"id,omitempty"`
+	OriginType *string    `json:"origin_type,omitempty"`
+	CreatedAt  *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -1774,7 +1778,8 @@ type AssociationType struct {
 	IsRequired          *bool                       `json:"is_required,omitempty"`
 	Id                  *string                     `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -1839,16 +1844,209 @@ func (a *AssociationTypeCardinality) Accept(visitor AssociationTypeCardinalityVi
 type AssociationTypeRequestRequest struct {
 	SourceObjectClass   *ObjectClassDescriptionRequest   `json:"source_object_class,omitempty"`
 	TargetObjectClasses []*ObjectClassDescriptionRequest `json:"target_object_classes,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	RemoteKeyName string `json:"remote_key_name"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	DisplayName *string          `json:"display_name,omitempty"`
-	Cardinality *CardinalityEnum `json:"cardinality,omitempty"`
-	IsRequired  *bool            `json:"is_required,omitempty"`
+	RemoteKeyName       string                           `json:"remote_key_name"`
+	DisplayName         *string                          `json:"display_name,omitempty"`
+	Cardinality         *CardinalityEnum                 `json:"cardinality,omitempty"`
+	IsRequired          *bool                            `json:"is_required,omitempty"`
 }
 
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+}
+
+type AuditLogEvent struct {
+	Id *string `json:"id,omitempty"`
+	// The User's full name at the time of this Event occurring.
+	UserName *string `json:"user_name,omitempty"`
+	// The User's email at the time of this Event occurring.
+	UserEmail *string `json:"user_email,omitempty"`
+	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
+	//
+	// * `ADMIN` - ADMIN
+	// * `DEVELOPER` - DEVELOPER
+	// * `MEMBER` - MEMBER
+	// * `API` - API
+	// * `SYSTEM` - SYSTEM
+	// * `MERGE_TEAM` - MERGE_TEAM
+	Role      *AuditLogEventRole `json:"role,omitempty"`
+	IpAddress string             `json:"ip_address"`
+	// Designates the type of event that occurred.
+	//
+	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// * `INVITED_USER` - INVITED_USER
+	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// * `CREATED_DESTINATION` - CREATED_DESTINATION
+	// * `DELETED_DESTINATION` - DELETED_DESTINATION
+	// * `CHANGED_SCOPES` - CHANGED_SCOPES
+	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// * `RESET_PASSWORD` - RESET_PASSWORD
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
+	EventDescription string                  `json:"event_description"`
+	CreatedAt        *time.Time              `json:"created_at,omitempty"`
+}
+
+// Designates the type of event that occurred.
+//
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+type AuditLogEventEventType struct {
+	typeName      string
+	EventTypeEnum EventTypeEnum
+	String        string
+}
+
+func NewAuditLogEventEventTypeFromEventTypeEnum(value EventTypeEnum) *AuditLogEventEventType {
+	return &AuditLogEventEventType{typeName: "eventTypeEnum", EventTypeEnum: value}
+}
+
+func NewAuditLogEventEventTypeFromString(value string) *AuditLogEventEventType {
+	return &AuditLogEventEventType{typeName: "string", String: value}
+}
+
+func (a *AuditLogEventEventType) UnmarshalJSON(data []byte) error {
+	var valueEventTypeEnum EventTypeEnum
+	if err := json.Unmarshal(data, &valueEventTypeEnum); err == nil {
+		a.typeName = "eventTypeEnum"
+		a.EventTypeEnum = valueEventTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AuditLogEventEventType) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "eventTypeEnum":
+		return json.Marshal(a.EventTypeEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AuditLogEventEventTypeVisitor interface {
+	VisitEventTypeEnum(EventTypeEnum) error
+	VisitString(string) error
+}
+
+func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "eventTypeEnum":
+		return visitor.VisitEventTypeEnum(a.EventTypeEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
+}
+
+// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
+//
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
+type AuditLogEventRole struct {
+	typeName string
+	RoleEnum RoleEnum
+	String   string
+}
+
+func NewAuditLogEventRoleFromRoleEnum(value RoleEnum) *AuditLogEventRole {
+	return &AuditLogEventRole{typeName: "roleEnum", RoleEnum: value}
+}
+
+func NewAuditLogEventRoleFromString(value string) *AuditLogEventRole {
+	return &AuditLogEventRole{typeName: "string", String: value}
+}
+
+func (a *AuditLogEventRole) UnmarshalJSON(data []byte) error {
+	var valueRoleEnum RoleEnum
+	if err := json.Unmarshal(data, &valueRoleEnum); err == nil {
+		a.typeName = "roleEnum"
+		a.RoleEnum = valueRoleEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AuditLogEventRole) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "roleEnum":
+		return json.Marshal(a.RoleEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AuditLogEventRoleVisitor interface {
+	VisitRoleEnum(RoleEnum) error
+	VisitString(string) error
+}
+
+func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "roleEnum":
+		return visitor.VisitRoleEnum(a.RoleEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
 }
 
 // # The AvailableActions Object
@@ -2068,7 +2266,6 @@ func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
 }
 
 type CommonModelScopesBodyRequest struct {
-	// <span style="white-space: nowrap">`non-empty`</span>
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
 	DisabledFields []string             `json:"disabled_fields,omitempty"`
@@ -2262,7 +2459,8 @@ type Contact struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	Id               *string    `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -4214,8 +4412,9 @@ type CustomObject struct {
 	ObjectClass *string        `json:"object_class,omitempty"`
 	Fields      map[string]any `json:"fields,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
-	Id       *string `json:"id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	Id        *string    `json:"id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt   *time.Time     `json:"modified_at,omitempty"`
 	RemoteFields []*RemoteField `json:"remote_fields,omitempty"`
@@ -4235,6 +4434,7 @@ type CustomObjectClass struct {
 	Id               *string                                 `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId   *string    `json:"remote_id,omitempty"`
+	CreatedAt  *time.Time `json:"created_at,omitempty"`
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
 
@@ -4249,13 +4449,10 @@ type CustomObjectRequest struct {
 // ### Usage Example
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
-	Method MethodEnum `json:"method,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	Path string `json:"path"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	BaseUrlOverride *string `json:"base_url_override,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	Data *string `json:"data,omitempty"`
+	Method          MethodEnum `json:"method,omitempty"`
+	Path            string     `json:"path"`
+	BaseUrlOverride *string    `json:"base_url_override,omitempty"`
+	Data            *string    `json:"data,omitempty"`
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
@@ -4326,7 +4523,8 @@ type EmailAddress struct {
 	// The email address.
 	EmailAddress *string `json:"email_address,omitempty"`
 	// The email address's type.
-	EmailAddressType *string `json:"email_address_type,omitempty"`
+	EmailAddressType *string    `json:"email_address_type,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -4458,11 +4656,12 @@ type Engagement struct {
 	// The account of the engagement.
 	Account  *EngagementAccount        `json:"account,omitempty"`
 	Contacts []*EngagementContactsItem `json:"contacts,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -5108,7 +5307,8 @@ type EngagementType struct {
 	Name *string `json:"name,omitempty"`
 	Id   *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt   *time.Time     `json:"modified_at,omitempty"`
 	RemoteFields []*RemoteField `json:"remote_fields,omitempty"`
@@ -5415,6 +5615,200 @@ type ErrorValidationProblem struct {
 	ProblemType string                   `json:"problem_type"`
 }
 
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+type EventTypeEnum uint
+
+const (
+	EventTypeEnumCreatedRemoteProductionApiKey EventTypeEnum = iota + 1
+	EventTypeEnumDeletedRemoteProductionApiKey
+	EventTypeEnumCreatedTestApiKey
+	EventTypeEnumDeletedTestApiKey
+	EventTypeEnumRegeneratedProductionApiKey
+	EventTypeEnumInvitedUser
+	EventTypeEnumTwoFactorAuthEnabled
+	EventTypeEnumTwoFactorAuthDisabled
+	EventTypeEnumDeletedLinkedAccount
+	EventTypeEnumCreatedDestination
+	EventTypeEnumDeletedDestination
+	EventTypeEnumChangedScopes
+	EventTypeEnumChangedPersonalInformation
+	EventTypeEnumChangedOrganizationSettings
+	EventTypeEnumEnabledIntegration
+	EventTypeEnumDisabledIntegration
+	EventTypeEnumEnabledCategory
+	EventTypeEnumDisabledCategory
+	EventTypeEnumChangedPassword
+	EventTypeEnumResetPassword
+	EventTypeEnumEnabledRedactUnmappedDataForOrganization
+	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
+	EventTypeEnumDisabledRedactUnmappedDataForOrganization
+	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
+)
+
+func (e EventTypeEnum) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EventTypeEnumCreatedRemoteProductionApiKey:
+		return "CREATED_REMOTE_PRODUCTION_API_KEY"
+	case EventTypeEnumDeletedRemoteProductionApiKey:
+		return "DELETED_REMOTE_PRODUCTION_API_KEY"
+	case EventTypeEnumCreatedTestApiKey:
+		return "CREATED_TEST_API_KEY"
+	case EventTypeEnumDeletedTestApiKey:
+		return "DELETED_TEST_API_KEY"
+	case EventTypeEnumRegeneratedProductionApiKey:
+		return "REGENERATED_PRODUCTION_API_KEY"
+	case EventTypeEnumInvitedUser:
+		return "INVITED_USER"
+	case EventTypeEnumTwoFactorAuthEnabled:
+		return "TWO_FACTOR_AUTH_ENABLED"
+	case EventTypeEnumTwoFactorAuthDisabled:
+		return "TWO_FACTOR_AUTH_DISABLED"
+	case EventTypeEnumDeletedLinkedAccount:
+		return "DELETED_LINKED_ACCOUNT"
+	case EventTypeEnumCreatedDestination:
+		return "CREATED_DESTINATION"
+	case EventTypeEnumDeletedDestination:
+		return "DELETED_DESTINATION"
+	case EventTypeEnumChangedScopes:
+		return "CHANGED_SCOPES"
+	case EventTypeEnumChangedPersonalInformation:
+		return "CHANGED_PERSONAL_INFORMATION"
+	case EventTypeEnumChangedOrganizationSettings:
+		return "CHANGED_ORGANIZATION_SETTINGS"
+	case EventTypeEnumEnabledIntegration:
+		return "ENABLED_INTEGRATION"
+	case EventTypeEnumDisabledIntegration:
+		return "DISABLED_INTEGRATION"
+	case EventTypeEnumEnabledCategory:
+		return "ENABLED_CATEGORY"
+	case EventTypeEnumDisabledCategory:
+		return "DISABLED_CATEGORY"
+	case EventTypeEnumChangedPassword:
+		return "CHANGED_PASSWORD"
+	case EventTypeEnumResetPassword:
+		return "RESET_PASSWORD"
+	case EventTypeEnumEnabledRedactUnmappedDataForOrganization:
+		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	case EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount:
+		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	case EventTypeEnumDisabledRedactUnmappedDataForOrganization:
+		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
+		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	}
+}
+
+func (e EventTypeEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "CREATED_REMOTE_PRODUCTION_API_KEY":
+		value := EventTypeEnumCreatedRemoteProductionApiKey
+		*e = value
+	case "DELETED_REMOTE_PRODUCTION_API_KEY":
+		value := EventTypeEnumDeletedRemoteProductionApiKey
+		*e = value
+	case "CREATED_TEST_API_KEY":
+		value := EventTypeEnumCreatedTestApiKey
+		*e = value
+	case "DELETED_TEST_API_KEY":
+		value := EventTypeEnumDeletedTestApiKey
+		*e = value
+	case "REGENERATED_PRODUCTION_API_KEY":
+		value := EventTypeEnumRegeneratedProductionApiKey
+		*e = value
+	case "INVITED_USER":
+		value := EventTypeEnumInvitedUser
+		*e = value
+	case "TWO_FACTOR_AUTH_ENABLED":
+		value := EventTypeEnumTwoFactorAuthEnabled
+		*e = value
+	case "TWO_FACTOR_AUTH_DISABLED":
+		value := EventTypeEnumTwoFactorAuthDisabled
+		*e = value
+	case "DELETED_LINKED_ACCOUNT":
+		value := EventTypeEnumDeletedLinkedAccount
+		*e = value
+	case "CREATED_DESTINATION":
+		value := EventTypeEnumCreatedDestination
+		*e = value
+	case "DELETED_DESTINATION":
+		value := EventTypeEnumDeletedDestination
+		*e = value
+	case "CHANGED_SCOPES":
+		value := EventTypeEnumChangedScopes
+		*e = value
+	case "CHANGED_PERSONAL_INFORMATION":
+		value := EventTypeEnumChangedPersonalInformation
+		*e = value
+	case "CHANGED_ORGANIZATION_SETTINGS":
+		value := EventTypeEnumChangedOrganizationSettings
+		*e = value
+	case "ENABLED_INTEGRATION":
+		value := EventTypeEnumEnabledIntegration
+		*e = value
+	case "DISABLED_INTEGRATION":
+		value := EventTypeEnumDisabledIntegration
+		*e = value
+	case "ENABLED_CATEGORY":
+		value := EventTypeEnumEnabledCategory
+		*e = value
+	case "DISABLED_CATEGORY":
+		value := EventTypeEnumDisabledCategory
+		*e = value
+	case "CHANGED_PASSWORD":
+		value := EventTypeEnumChangedPassword
+		*e = value
+	case "RESET_PASSWORD":
+		value := EventTypeEnumResetPassword
+		*e = value
+	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
+		value := EventTypeEnumEnabledRedactUnmappedDataForOrganization
+		*e = value
+	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
+		value := EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
+		*e = value
+	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
+		value := EventTypeEnumDisabledRedactUnmappedDataForOrganization
+		*e = value
+	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
+		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
+		*e = value
+	}
+	return nil
+}
+
 // * `string` - string
 // * `number` - number
 // * `date` - date
@@ -5552,9 +5946,8 @@ func (f *FieldTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 type IgnoreCommonModelRequest struct {
-	Reason ReasonEnum `json:"reason,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span> <span style="white-space: nowrap">`<= 256 characters`</span>
-	Message *string `json:"message,omitempty"`
+	Reason  ReasonEnum `json:"reason,omitempty"`
+	Message *string    `json:"message,omitempty"`
 }
 
 type Issue struct {
@@ -5887,7 +6280,8 @@ type Lead struct {
 	RemoteWasDeleted *bool                 `json:"remote_was_deleted,omitempty"`
 	Id               *string               `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -6441,7 +6835,7 @@ type LinkedAccountCondition struct {
 type LinkedAccountConditionRequest struct {
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
-	// The operator for a specific condition. <span style="white-space: nowrap">`non-empty`</span>
+	// The operator for a specific condition.
 	Operator string `json:"operator"`
 	Value    any    `json:"value,omitempty"`
 }
@@ -6632,9 +7026,9 @@ type ModelOperation struct {
 // ### Usage Example
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
-	// The name of the form field <span style="white-space: nowrap">`non-empty`</span>
+	// The name of the form field
 	Name string `json:"name"`
-	// The data for the form field. <span style="white-space: nowrap">`non-empty`</span>
+	// The data for the form field.
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
@@ -6733,7 +7127,8 @@ type Note struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	Id               *string    `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -7466,7 +7861,6 @@ func (n *NotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 }
 
 type ObjectClassDescriptionRequest struct {
-	// <span style="white-space: nowrap">`non-empty`</span>
 	Id         string         `json:"id"`
 	OriginType OriginTypeEnum `json:"origin_type,omitempty"`
 }
@@ -7691,7 +8085,8 @@ type Opportunity struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	Id               *string    `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -8329,6 +8724,12 @@ type PaginatedAssociationTypeList struct {
 	Results  []*AssociationType `json:"results,omitempty"`
 }
 
+type PaginatedAuditLogEventList struct {
+	Next     *string          `json:"next,omitempty"`
+	Previous *string          `json:"previous,omitempty"`
+	Results  []*AuditLogEvent `json:"results,omitempty"`
+}
+
 type PaginatedConditionSchemaList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
@@ -8753,7 +9154,8 @@ type PhoneNumber struct {
 	// The phone number.
 	PhoneNumber *string `json:"phone_number,omitempty"`
 	// The phone number's type.
-	PhoneNumberType *string `json:"phone_number_type,omitempty"`
+	PhoneNumberType *string    `json:"phone_number_type,omitempty"`
+	CreatedAt       *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -8970,6 +9372,7 @@ type RemoteFieldClassForCustomObjectClass struct {
 	FieldFormat   *RemoteFieldClassForCustomObjectClassFieldFormat        `json:"field_format,omitempty"`
 	FieldChoices  []*RemoteFieldClassForCustomObjectClassFieldChoicesItem `json:"field_choices,omitempty"`
 	ItemSchema    *RemoteFieldClassForCustomObjectClassItemSchema         `json:"item_schema,omitempty"`
+	CreatedAt     *time.Time                                              `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -9158,7 +9561,7 @@ func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClass
 
 type RemoteFieldRequest struct {
 	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            map[string]any                      `json:"value,omitempty"`
+	Value            *string                             `json:"value,omitempty"`
 }
 
 type RemoteFieldRequestRemoteFieldClass struct {
@@ -9332,6 +9735,74 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
+type RoleEnum uint
+
+const (
+	RoleEnumAdmin RoleEnum = iota + 1
+	RoleEnumDeveloper
+	RoleEnumMember
+	RoleEnumApi
+	RoleEnumSystem
+	RoleEnumMergeTeam
+)
+
+func (r RoleEnum) String() string {
+	switch r {
+	default:
+		return strconv.Itoa(int(r))
+	case RoleEnumAdmin:
+		return "ADMIN"
+	case RoleEnumDeveloper:
+		return "DEVELOPER"
+	case RoleEnumMember:
+		return "MEMBER"
+	case RoleEnumApi:
+		return "API"
+	case RoleEnumSystem:
+		return "SYSTEM"
+	case RoleEnumMergeTeam:
+		return "MERGE_TEAM"
+	}
+}
+
+func (r RoleEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", r.String())), nil
+}
+
+func (r *RoleEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ADMIN":
+		value := RoleEnumAdmin
+		*r = value
+	case "DEVELOPER":
+		value := RoleEnumDeveloper
+		*r = value
+	case "MEMBER":
+		value := RoleEnumMember
+		*r = value
+	case "API":
+		value := RoleEnumApi
+		*r = value
+	case "SYSTEM":
+		value := RoleEnumSystem
+		*r = value
+	case "MERGE_TEAM":
+		value := RoleEnumMergeTeam
+		*r = value
+	}
+	return nil
+}
+
 // * `IN_NEXT_SYNC` - IN_NEXT_SYNC
 // * `IN_LAST_SYNC` - IN_LAST_SYNC
 type SelectiveSyncConfigurationsUsageEnum uint
@@ -9380,11 +9851,12 @@ func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error 
 type Stage struct {
 	// The stage's name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -9501,11 +9973,12 @@ type Task struct {
 	// * `OPEN` - OPEN
 	// * `CLOSED` - CLOSED
 	Status *TaskStatus `json:"status,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -10208,11 +10681,12 @@ type User struct {
 	Email *string `json:"email,omitempty"`
 	// Whether or not the user is active.
 	IsActive *bool `json:"is_active,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
 	Id               *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`

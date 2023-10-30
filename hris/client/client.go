@@ -7,6 +7,7 @@ import (
 	accountdetails "github.com/merge-api/merge-go-client/hris/accountdetails"
 	accounttoken "github.com/merge-api/merge-go-client/hris/accounttoken"
 	asyncpassthrough "github.com/merge-api/merge-go-client/hris/asyncpassthrough"
+	audittrail "github.com/merge-api/merge-go-client/hris/audittrail"
 	availableactions "github.com/merge-api/merge-go-client/hris/availableactions"
 	bankinfo "github.com/merge-api/merge-go-client/hris/bankinfo"
 	benefits "github.com/merge-api/merge-go-client/hris/benefits"
@@ -33,6 +34,7 @@ import (
 	teams "github.com/merge-api/merge-go-client/hris/teams"
 	timeoff "github.com/merge-api/merge-go-client/hris/timeoff"
 	timeoffbalances "github.com/merge-api/merge-go-client/hris/timeoffbalances"
+	timesheetentries "github.com/merge-api/merge-go-client/hris/timesheetentries"
 	webhookreceivers "github.com/merge-api/merge-go-client/hris/webhookreceivers"
 	http "net/http"
 )
@@ -41,6 +43,7 @@ type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
 	AsyncPassthrough() asyncpassthrough.Client
+	AuditTrail() audittrail.Client
 	AvailableActions() availableactions.Client
 	BankInfo() bankinfo.Client
 	Benefits() benefits.Client
@@ -67,6 +70,7 @@ type Client interface {
 	Teams() teams.Client
 	TimeOff() timeoff.Client
 	TimeOffBalances() timeoffbalances.Client
+	TimesheetEntries() timesheetentries.Client
 	WebhookReceivers() webhookreceivers.Client
 }
 
@@ -82,6 +86,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountDetailsClient:      accountdetails.NewClient(opts...),
 		accountTokenClient:        accounttoken.NewClient(opts...),
 		asyncPassthroughClient:    asyncpassthrough.NewClient(opts...),
+		auditTrailClient:          audittrail.NewClient(opts...),
 		availableActionsClient:    availableactions.NewClient(opts...),
 		bankInfoClient:            bankinfo.NewClient(opts...),
 		benefitsClient:            benefits.NewClient(opts...),
@@ -108,6 +113,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		teamsClient:               teams.NewClient(opts...),
 		timeOffClient:             timeoff.NewClient(opts...),
 		timeOffBalancesClient:     timeoffbalances.NewClient(opts...),
+		timesheetEntriesClient:    timesheetentries.NewClient(opts...),
 		webhookReceiversClient:    webhookreceivers.NewClient(opts...),
 	}
 }
@@ -119,6 +125,7 @@ type client struct {
 	accountDetailsClient      accountdetails.Client
 	accountTokenClient        accounttoken.Client
 	asyncPassthroughClient    asyncpassthrough.Client
+	auditTrailClient          audittrail.Client
 	availableActionsClient    availableactions.Client
 	bankInfoClient            bankinfo.Client
 	benefitsClient            benefits.Client
@@ -145,6 +152,7 @@ type client struct {
 	teamsClient               teams.Client
 	timeOffClient             timeoff.Client
 	timeOffBalancesClient     timeoffbalances.Client
+	timesheetEntriesClient    timesheetentries.Client
 	webhookReceiversClient    webhookreceivers.Client
 }
 
@@ -158,6 +166,10 @@ func (c *client) AccountToken() accounttoken.Client {
 
 func (c *client) AsyncPassthrough() asyncpassthrough.Client {
 	return c.asyncPassthroughClient
+}
+
+func (c *client) AuditTrail() audittrail.Client {
+	return c.auditTrailClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {
@@ -262,6 +274,10 @@ func (c *client) TimeOff() timeoff.Client {
 
 func (c *client) TimeOffBalances() timeoffbalances.Client {
 	return c.timeOffBalancesClient
+}
+
+func (c *client) TimesheetEntries() timesheetentries.Client {
+	return c.timesheetEntriesClient
 }
 
 func (c *client) WebhookReceivers() webhookreceivers.Client {

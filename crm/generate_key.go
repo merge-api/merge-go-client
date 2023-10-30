@@ -3,6 +3,5 @@
 package crm
 
 type GenerateRemoteKeyRequest struct {
-	// <span style="white-space: nowrap">`non-empty`</span>
 	Name string `json:"name"`
 }

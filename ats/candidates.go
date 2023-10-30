@@ -16,9 +16,8 @@ type CandidateEndpointRequest struct {
 }
 
 type IgnoreCommonModelRequest struct {
-	Reason ReasonEnum `json:"reason,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span> <span style="white-space: nowrap">`<= 256 characters`</span>
-	Message *string `json:"message,omitempty"`
+	Reason  ReasonEnum `json:"reason,omitempty"`
+	Message *string    `json:"message,omitempty"`
 }
 
 type CandidatesListRequest struct {

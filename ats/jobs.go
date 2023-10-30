@@ -55,3 +55,16 @@ type JobsRetrieveRequest struct {
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
 }
+
+type JobsScreeningQuestionsListRequest struct {
+	// The pagination cursor value.
+	Cursor *string `json:"-"`
+	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+	Expand *JobsScreeningQuestionsListRequestExpand `json:"-"`
+	// Whether to include data that was marked as deleted by third party webhooks.
+	IncludeDeletedData *bool `json:"-"`
+	// Whether to include the original data Merge fetched from the third-party to produce these models.
+	IncludeRemoteData *bool `json:"-"`
+	// Number of results to return per page.
+	PageSize *int `json:"-"`
+}

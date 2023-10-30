@@ -3,15 +3,15 @@
 package accounting
 
 type EndUserDetailsRequest struct {
-	// Your end user's email address. This is purely for identification purposes - setting this value will not cause any emails to be sent. <span style="white-space: nowrap">`non-empty`</span> <span style="white-space: nowrap">`<= 100 characters`</span>
+	// Your end user's email address. This is purely for identification purposes - setting this value will not cause any emails to be sent.
 	EndUserEmailAddress string `json:"end_user_email_address"`
-	// Your end user's organization. <span style="white-space: nowrap">`non-empty`</span> <span style="white-space: nowrap">`<= 100 characters`</span>
+	// Your end user's organization.
 	EndUserOrganizationName string `json:"end_user_organization_name"`
-	// This unique identifier typically represents the ID for your end user in your product's database. This value must be distinct from other Linked Accounts' unique identifiers. <span style="white-space: nowrap">`non-empty`</span> <span style="white-space: nowrap">`<= 100 characters`</span>
+	// This unique identifier typically represents the ID for your end user in your product's database. This value must be distinct from other Linked Accounts' unique identifiers.
 	EndUserOriginId string `json:"end_user_origin_id"`
 	// The integration categories to show in Merge Link.
 	Categories []CategoriesEnum `json:"categories,omitempty"`
-	// The slug of a specific pre-selected integration for this linking flow token. For examples of slugs, see https://www.merge.dev/docs/basics/integration-metadata/.
+	// The slug of a specific pre-selected integration for this linking flow token. For examples of slugs, see https://docs.merge.dev/guides/merge-link/single-integration/.
 	Integration *string `json:"integration,omitempty"`
 	// An integer number of minutes between [30, 720 or 10080 if for a Magic Link URL] for how long this token is valid. Defaults to 30.
 	LinkExpiryMins *int `json:"link_expiry_mins,omitempty"`

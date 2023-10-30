@@ -15,6 +15,7 @@ import (
 type Client interface {
 	List(ctx context.Context, request *ats.JobsListRequest) (*ats.PaginatedJobList, error)
 	Retrieve(ctx context.Context, id string, request *ats.JobsRetrieveRequest) (*ats.Job, error)
+	ScreeningQuestionsList(ctx context.Context, jobId string, request *ats.JobsScreeningQuestionsListRequest) (*ats.PaginatedScreeningQuestionList, error)
 }
 
 func NewClient(opts ...core.ClientOption) Client {
@@ -136,6 +137,51 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.JobsRetri
 	}
 
 	var response *ats.Job
+	if err := core.DoRequest(
+		ctx,
+		c.httpClient,
+		endpointURL,
+		http.MethodGet,
+		request,
+		&response,
+		false,
+		c.header,
+		nil,
+	); err != nil {
+		return response, err
+	}
+	return response, nil
+}
+
+// Returns a list of `ScreeningQuestion` objects.
+func (c *client) ScreeningQuestionsList(ctx context.Context, jobId string, request *ats.JobsScreeningQuestionsListRequest) (*ats.PaginatedScreeningQuestionList, error) {
+	baseURL := "https://api.merge.dev"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/jobs/%v/screening-questions", jobId)
+
+	queryParams := make(url.Values)
+	if request.Cursor != nil {
+		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
+	}
+	if request.Expand != nil {
+		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+	}
+	if request.IncludeDeletedData != nil {
+		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
+	}
+	if request.IncludeRemoteData != nil {
+		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.PageSize != nil {
+		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *ats.PaginatedScreeningQuestionList
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,
