@@ -9,6 +9,7 @@ import (
 	applications "github.com/merge-api/merge-go-client/ats/applications"
 	asyncpassthrough "github.com/merge-api/merge-go-client/ats/asyncpassthrough"
 	attachments "github.com/merge-api/merge-go-client/ats/attachments"
+	audittrail "github.com/merge-api/merge-go-client/ats/audittrail"
 	availableactions "github.com/merge-api/merge-go-client/ats/availableactions"
 	candidates "github.com/merge-api/merge-go-client/ats/candidates"
 	deleteaccount "github.com/merge-api/merge-go-client/ats/deleteaccount"
@@ -44,6 +45,7 @@ type Client interface {
 	Applications() applications.Client
 	AsyncPassthrough() asyncpassthrough.Client
 	Attachments() attachments.Client
+	AuditTrail() audittrail.Client
 	AvailableActions() availableactions.Client
 	Candidates() candidates.Client
 	DeleteAccount() deleteaccount.Client
@@ -85,6 +87,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		applicationsClient:       applications.NewClient(opts...),
 		asyncPassthroughClient:   asyncpassthrough.NewClient(opts...),
 		attachmentsClient:        attachments.NewClient(opts...),
+		auditTrailClient:         audittrail.NewClient(opts...),
 		availableActionsClient:   availableactions.NewClient(opts...),
 		candidatesClient:         candidates.NewClient(opts...),
 		deleteAccountClient:      deleteaccount.NewClient(opts...),
@@ -122,6 +125,7 @@ type client struct {
 	applicationsClient       applications.Client
 	asyncPassthroughClient   asyncpassthrough.Client
 	attachmentsClient        attachments.Client
+	auditTrailClient         audittrail.Client
 	availableActionsClient   availableactions.Client
 	candidatesClient         candidates.Client
 	deleteAccountClient      deleteaccount.Client
@@ -170,6 +174,10 @@ func (c *client) AsyncPassthrough() asyncpassthrough.Client {
 
 func (c *client) Attachments() attachments.Client {
 	return c.attachmentsClient
+}
+
+func (c *client) AuditTrail() audittrail.Client {
+	return c.auditTrailClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {

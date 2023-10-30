@@ -30,6 +30,8 @@ type InterviewsListRequest struct {
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// If provided, wll only return interviews organized for this job.
+	JobId *string `json:"-"`
 	// If provided, will only return interviews at this stage.
 	JobInterviewStageId *string `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.

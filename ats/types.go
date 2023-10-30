@@ -171,13 +171,15 @@ type AccountIntegration struct {
 	Image *string `json:"image,omitempty"`
 	// Company logo in square shape. <b>Upload an image with a white background.</b>
 	SquareImage *string `json:"square_image,omitempty"`
-	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b> <span style="white-space: nowrap">`<= 18 characters`</span>
+	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
 	Slug  *string `json:"slug,omitempty"`
 	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
 	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
 	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
+	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
+	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
 }
 
 type AccountToken struct {
@@ -392,8 +394,9 @@ type Activity struct {
 	Visibility *ActivityVisibility `json:"visibility,omitempty"`
 	// The activity’s candidate.
 	Candidate *string `json:"candidate,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -875,6 +878,7 @@ type Application struct {
 	// The application's reason for rejection.
 	RejectReason     *ApplicationRejectReason `json:"reject_reason,omitempty"`
 	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time               `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -1193,11 +1197,10 @@ type ApplicationRequest struct {
 	// The application's current stage.
 	CurrentStage *ApplicationRequestCurrentStage `json:"current_stage,omitempty"`
 	// The application's reason for rejection.
-	RejectReason *ApplicationRequestRejectReason `json:"reject_reason,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	RemoteTemplateId    *string        `json:"remote_template_id,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	RejectReason        *ApplicationRequestRejectReason `json:"reject_reason,omitempty"`
+	RemoteTemplateId    *string                         `json:"remote_template_id,omitempty"`
+	IntegrationParams   map[string]any                  `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                  `json:"linked_account_params,omitempty"`
 }
 
 // The candidate applying.
@@ -1947,6 +1950,7 @@ type Attachment struct {
 	// * `OTHER` - OTHER
 	AttachmentType   *AttachmentAttachmentType `json:"attachment_type,omitempty"`
 	RemoteWasDeleted *bool                     `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time                `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -2162,6 +2166,201 @@ func (a *AttachmentTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type AuditLogEvent struct {
+	Id *string `json:"id,omitempty"`
+	// The User's full name at the time of this Event occurring.
+	UserName *string `json:"user_name,omitempty"`
+	// The User's email at the time of this Event occurring.
+	UserEmail *string `json:"user_email,omitempty"`
+	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
+	//
+	// * `ADMIN` - ADMIN
+	// * `DEVELOPER` - DEVELOPER
+	// * `MEMBER` - MEMBER
+	// * `API` - API
+	// * `SYSTEM` - SYSTEM
+	// * `MERGE_TEAM` - MERGE_TEAM
+	Role      *AuditLogEventRole `json:"role,omitempty"`
+	IpAddress string             `json:"ip_address"`
+	// Designates the type of event that occurred.
+	//
+	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// * `INVITED_USER` - INVITED_USER
+	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// * `CREATED_DESTINATION` - CREATED_DESTINATION
+	// * `DELETED_DESTINATION` - DELETED_DESTINATION
+	// * `CHANGED_SCOPES` - CHANGED_SCOPES
+	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// * `RESET_PASSWORD` - RESET_PASSWORD
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
+	EventDescription string                  `json:"event_description"`
+	CreatedAt        *time.Time              `json:"created_at,omitempty"`
+}
+
+// Designates the type of event that occurred.
+//
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+type AuditLogEventEventType struct {
+	typeName      string
+	EventTypeEnum EventTypeEnum
+	String        string
+}
+
+func NewAuditLogEventEventTypeFromEventTypeEnum(value EventTypeEnum) *AuditLogEventEventType {
+	return &AuditLogEventEventType{typeName: "eventTypeEnum", EventTypeEnum: value}
+}
+
+func NewAuditLogEventEventTypeFromString(value string) *AuditLogEventEventType {
+	return &AuditLogEventEventType{typeName: "string", String: value}
+}
+
+func (a *AuditLogEventEventType) UnmarshalJSON(data []byte) error {
+	var valueEventTypeEnum EventTypeEnum
+	if err := json.Unmarshal(data, &valueEventTypeEnum); err == nil {
+		a.typeName = "eventTypeEnum"
+		a.EventTypeEnum = valueEventTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AuditLogEventEventType) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "eventTypeEnum":
+		return json.Marshal(a.EventTypeEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AuditLogEventEventTypeVisitor interface {
+	VisitEventTypeEnum(EventTypeEnum) error
+	VisitString(string) error
+}
+
+func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "eventTypeEnum":
+		return visitor.VisitEventTypeEnum(a.EventTypeEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
+}
+
+// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
+//
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
+type AuditLogEventRole struct {
+	typeName string
+	RoleEnum RoleEnum
+	String   string
+}
+
+func NewAuditLogEventRoleFromRoleEnum(value RoleEnum) *AuditLogEventRole {
+	return &AuditLogEventRole{typeName: "roleEnum", RoleEnum: value}
+}
+
+func NewAuditLogEventRoleFromString(value string) *AuditLogEventRole {
+	return &AuditLogEventRole{typeName: "string", String: value}
+}
+
+func (a *AuditLogEventRole) UnmarshalJSON(data []byte) error {
+	var valueRoleEnum RoleEnum
+	if err := json.Unmarshal(data, &valueRoleEnum); err == nil {
+		a.typeName = "roleEnum"
+		a.RoleEnum = valueRoleEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AuditLogEventRole) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "roleEnum":
+		return json.Marshal(a.RoleEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AuditLogEventRoleVisitor interface {
+	VisitRoleEnum(RoleEnum) error
+	VisitString(string) error
+}
+
+func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "roleEnum":
+		return visitor.VisitRoleEnum(a.RoleEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
+}
+
 // # The AvailableActions Object
 // ### Description
 // The `Activity` object is used to see all available model/operation combinations for an integration.
@@ -2213,6 +2412,7 @@ type Candidate struct {
 	// Array of `Attachment` object IDs.
 	Attachments      []*CandidateAttachmentsItem `json:"attachments,omitempty"`
 	RemoteWasDeleted *bool                       `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time                  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -2363,11 +2563,10 @@ type CandidateRequest struct {
 	// Array of `Application` object IDs.
 	Applications []*CandidateRequestApplicationsItem `json:"applications,omitempty"`
 	// Array of `Attachment` object IDs.
-	Attachments []*CandidateRequestAttachmentsItem `json:"attachments,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	RemoteTemplateId    *string        `json:"remote_template_id,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	Attachments         []*CandidateRequestAttachmentsItem `json:"attachments,omitempty"`
+	RemoteTemplateId    *string                            `json:"remote_template_id,omitempty"`
+	IntegrationParams   map[string]any                     `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                     `json:"linked_account_params,omitempty"`
 }
 
 type CandidateRequestApplicationsItem struct {
@@ -2730,7 +2929,6 @@ func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
 }
 
 type CommonModelScopesBodyRequest struct {
-	// <span style="white-space: nowrap">`non-empty`</span>
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
 	DisabledFields []string             `json:"disabled_fields,omitempty"`
@@ -2909,13 +3107,10 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 // ### Usage Example
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
-	Method MethodEnum `json:"method,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	Path string `json:"path"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	BaseUrlOverride *string `json:"base_url_override,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
-	Data *string `json:"data,omitempty"`
+	Method          MethodEnum `json:"method,omitempty"`
+	Path            string     `json:"path"`
+	BaseUrlOverride *string    `json:"base_url_override,omitempty"`
+	Data            *string    `json:"data,omitempty"`
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
@@ -2948,8 +3143,9 @@ type Department struct {
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The department's name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -3047,8 +3243,9 @@ type Eeoc struct {
 	// * `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
 	// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 	DisabilityStatus *EeocDisabilityStatus `json:"disability_status,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -3846,6 +4043,7 @@ type EmailAddress struct {
 	// * `WORK` - WORK
 	// * `OTHER` - OTHER
 	EmailAddressType *EmailAddressEmailAddressType `json:"email_address_type,omitempty"`
+	CreatedAt        *time.Time                    `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -4131,6 +4329,200 @@ type ErrorValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+}
+
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+type EventTypeEnum uint
+
+const (
+	EventTypeEnumCreatedRemoteProductionApiKey EventTypeEnum = iota + 1
+	EventTypeEnumDeletedRemoteProductionApiKey
+	EventTypeEnumCreatedTestApiKey
+	EventTypeEnumDeletedTestApiKey
+	EventTypeEnumRegeneratedProductionApiKey
+	EventTypeEnumInvitedUser
+	EventTypeEnumTwoFactorAuthEnabled
+	EventTypeEnumTwoFactorAuthDisabled
+	EventTypeEnumDeletedLinkedAccount
+	EventTypeEnumCreatedDestination
+	EventTypeEnumDeletedDestination
+	EventTypeEnumChangedScopes
+	EventTypeEnumChangedPersonalInformation
+	EventTypeEnumChangedOrganizationSettings
+	EventTypeEnumEnabledIntegration
+	EventTypeEnumDisabledIntegration
+	EventTypeEnumEnabledCategory
+	EventTypeEnumDisabledCategory
+	EventTypeEnumChangedPassword
+	EventTypeEnumResetPassword
+	EventTypeEnumEnabledRedactUnmappedDataForOrganization
+	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
+	EventTypeEnumDisabledRedactUnmappedDataForOrganization
+	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
+)
+
+func (e EventTypeEnum) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EventTypeEnumCreatedRemoteProductionApiKey:
+		return "CREATED_REMOTE_PRODUCTION_API_KEY"
+	case EventTypeEnumDeletedRemoteProductionApiKey:
+		return "DELETED_REMOTE_PRODUCTION_API_KEY"
+	case EventTypeEnumCreatedTestApiKey:
+		return "CREATED_TEST_API_KEY"
+	case EventTypeEnumDeletedTestApiKey:
+		return "DELETED_TEST_API_KEY"
+	case EventTypeEnumRegeneratedProductionApiKey:
+		return "REGENERATED_PRODUCTION_API_KEY"
+	case EventTypeEnumInvitedUser:
+		return "INVITED_USER"
+	case EventTypeEnumTwoFactorAuthEnabled:
+		return "TWO_FACTOR_AUTH_ENABLED"
+	case EventTypeEnumTwoFactorAuthDisabled:
+		return "TWO_FACTOR_AUTH_DISABLED"
+	case EventTypeEnumDeletedLinkedAccount:
+		return "DELETED_LINKED_ACCOUNT"
+	case EventTypeEnumCreatedDestination:
+		return "CREATED_DESTINATION"
+	case EventTypeEnumDeletedDestination:
+		return "DELETED_DESTINATION"
+	case EventTypeEnumChangedScopes:
+		return "CHANGED_SCOPES"
+	case EventTypeEnumChangedPersonalInformation:
+		return "CHANGED_PERSONAL_INFORMATION"
+	case EventTypeEnumChangedOrganizationSettings:
+		return "CHANGED_ORGANIZATION_SETTINGS"
+	case EventTypeEnumEnabledIntegration:
+		return "ENABLED_INTEGRATION"
+	case EventTypeEnumDisabledIntegration:
+		return "DISABLED_INTEGRATION"
+	case EventTypeEnumEnabledCategory:
+		return "ENABLED_CATEGORY"
+	case EventTypeEnumDisabledCategory:
+		return "DISABLED_CATEGORY"
+	case EventTypeEnumChangedPassword:
+		return "CHANGED_PASSWORD"
+	case EventTypeEnumResetPassword:
+		return "RESET_PASSWORD"
+	case EventTypeEnumEnabledRedactUnmappedDataForOrganization:
+		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	case EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount:
+		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	case EventTypeEnumDisabledRedactUnmappedDataForOrganization:
+		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
+		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	}
+}
+
+func (e EventTypeEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "CREATED_REMOTE_PRODUCTION_API_KEY":
+		value := EventTypeEnumCreatedRemoteProductionApiKey
+		*e = value
+	case "DELETED_REMOTE_PRODUCTION_API_KEY":
+		value := EventTypeEnumDeletedRemoteProductionApiKey
+		*e = value
+	case "CREATED_TEST_API_KEY":
+		value := EventTypeEnumCreatedTestApiKey
+		*e = value
+	case "DELETED_TEST_API_KEY":
+		value := EventTypeEnumDeletedTestApiKey
+		*e = value
+	case "REGENERATED_PRODUCTION_API_KEY":
+		value := EventTypeEnumRegeneratedProductionApiKey
+		*e = value
+	case "INVITED_USER":
+		value := EventTypeEnumInvitedUser
+		*e = value
+	case "TWO_FACTOR_AUTH_ENABLED":
+		value := EventTypeEnumTwoFactorAuthEnabled
+		*e = value
+	case "TWO_FACTOR_AUTH_DISABLED":
+		value := EventTypeEnumTwoFactorAuthDisabled
+		*e = value
+	case "DELETED_LINKED_ACCOUNT":
+		value := EventTypeEnumDeletedLinkedAccount
+		*e = value
+	case "CREATED_DESTINATION":
+		value := EventTypeEnumCreatedDestination
+		*e = value
+	case "DELETED_DESTINATION":
+		value := EventTypeEnumDeletedDestination
+		*e = value
+	case "CHANGED_SCOPES":
+		value := EventTypeEnumChangedScopes
+		*e = value
+	case "CHANGED_PERSONAL_INFORMATION":
+		value := EventTypeEnumChangedPersonalInformation
+		*e = value
+	case "CHANGED_ORGANIZATION_SETTINGS":
+		value := EventTypeEnumChangedOrganizationSettings
+		*e = value
+	case "ENABLED_INTEGRATION":
+		value := EventTypeEnumEnabledIntegration
+		*e = value
+	case "DISABLED_INTEGRATION":
+		value := EventTypeEnumDisabledIntegration
+		*e = value
+	case "ENABLED_CATEGORY":
+		value := EventTypeEnumEnabledCategory
+		*e = value
+	case "DISABLED_CATEGORY":
+		value := EventTypeEnumDisabledCategory
+		*e = value
+	case "CHANGED_PASSWORD":
+		value := EventTypeEnumChangedPassword
+		*e = value
+	case "RESET_PASSWORD":
+		value := EventTypeEnumResetPassword
+		*e = value
+	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
+		value := EventTypeEnumEnabledRedactUnmappedDataForOrganization
+		*e = value
+	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
+		value := EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
+		*e = value
+	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
+		value := EventTypeEnumDisabledRedactUnmappedDataForOrganization
+		*e = value
+	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
+		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
+		*e = value
+	}
+	return nil
 }
 
 // * `MALE` - MALE
@@ -4618,8 +5010,9 @@ type Job struct {
 	HiringManagers []*JobHiringManagersItem `json:"hiring_managers,omitempty"`
 	// IDs of `RemoteUser` objects that serve as recruiters for this `Job`.
 	Recruiters []*JobRecruitersItem `json:"recruiters,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -4755,8 +5148,9 @@ type JobInterviewStage struct {
 	Job *JobInterviewStageJob `json:"job,omitempty"`
 	// The stage’s order, with the lowest values ordered first. If the third-party does not return details on the order of stages, this field will not be populated.
 	StageOrder *int `json:"stage_order,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -5348,6 +5742,50 @@ func (j *JobsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type JobsScreeningQuestionsListRequestExpand uint
+
+const (
+	JobsScreeningQuestionsListRequestExpandJob JobsScreeningQuestionsListRequestExpand = iota + 1
+	JobsScreeningQuestionsListRequestExpandOptions
+	JobsScreeningQuestionsListRequestExpandOptionsJob
+)
+
+func (j JobsScreeningQuestionsListRequestExpand) String() string {
+	switch j {
+	default:
+		return strconv.Itoa(int(j))
+	case JobsScreeningQuestionsListRequestExpandJob:
+		return "job"
+	case JobsScreeningQuestionsListRequestExpandOptions:
+		return "options"
+	case JobsScreeningQuestionsListRequestExpandOptionsJob:
+		return "options,job"
+	}
+}
+
+func (j JobsScreeningQuestionsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", j.String())), nil
+}
+
+func (j *JobsScreeningQuestionsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "job":
+		value := JobsScreeningQuestionsListRequestExpandJob
+		*j = value
+	case "options":
+		value := JobsScreeningQuestionsListRequestExpandOptions
+		*j = value
+	case "options,job":
+		value := JobsScreeningQuestionsListRequestExpandOptionsJob
+		*j = value
+	}
+	return nil
+}
+
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
@@ -5371,7 +5809,7 @@ type LinkedAccountCondition struct {
 type LinkedAccountConditionRequest struct {
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
-	// The operator for a specific condition. <span style="white-space: nowrap">`non-empty`</span>
+	// The operator for a specific condition.
 	Operator string `json:"operator"`
 	Value    any    `json:"value,omitempty"`
 }
@@ -5562,9 +6000,9 @@ type ModelOperation struct {
 // ### Usage Example
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
-	// The name of the form field <span style="white-space: nowrap">`non-empty`</span>
+	// The name of the form field
 	Name string `json:"name"`
-	// The data for the form field. <span style="white-space: nowrap">`non-empty`</span>
+	// The data for the form field.
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
@@ -5673,8 +6111,9 @@ type Offer struct {
 	// * `SIGNED` - SIGNED
 	// * `DEPRECATED` - DEPRECATED
 	Status *OfferStatus `json:"status,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -6055,8 +6494,9 @@ type Office struct {
 	Name *string `json:"name,omitempty"`
 	// The office's location.
 	Location *string `json:"location,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -6155,6 +6595,12 @@ type PaginatedAttachmentList struct {
 	Results  []*Attachment `json:"results,omitempty"`
 }
 
+type PaginatedAuditLogEventList struct {
+	Next     *string          `json:"next,omitempty"`
+	Previous *string          `json:"previous,omitempty"`
+	Results  []*AuditLogEvent `json:"results,omitempty"`
+}
+
 type PaginatedCandidateList struct {
 	Next     *string      `json:"next,omitempty"`
 	Previous *string      `json:"previous,omitempty"`
@@ -6233,6 +6679,12 @@ type PaginatedScorecardList struct {
 	Results  []*Scorecard `json:"results,omitempty"`
 }
 
+type PaginatedScreeningQuestionList struct {
+	Next     *string              `json:"next,omitempty"`
+	Previous *string              `json:"previous,omitempty"`
+	Results  []*ScreeningQuestion `json:"results,omitempty"`
+}
+
 type PaginatedSyncStatusList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
@@ -6275,8 +6727,7 @@ type PatchedCandidateRequest struct {
 	// Array of `Application` object IDs.
 	Applications []*string `json:"applications,omitempty"`
 	// Array of `Attachment` object IDs.
-	Attachments []*string `json:"attachments,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span>
+	Attachments         []*string      `json:"attachments,omitempty"`
 	RemoteTemplateId    *string        `json:"remote_template_id,omitempty"`
 	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
@@ -6298,6 +6749,7 @@ type PhoneNumber struct {
 	// * `SKYPE` - SKYPE
 	// * `OTHER` - OTHER
 	PhoneNumberType *PhoneNumberPhoneNumberType `json:"phone_number_type,omitempty"`
+	CreatedAt       *time.Time                  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -6651,8 +7103,9 @@ type RejectReason struct {
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The rejection reason’s name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -6775,8 +7228,9 @@ type RemoteUser struct {
 	// * `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
 	// * `INTERVIEWER` - INTERVIEWER
 	AccessRole *RemoteUserAccessRole `json:"access_role,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -6934,6 +7388,74 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
+type RoleEnum uint
+
+const (
+	RoleEnumAdmin RoleEnum = iota + 1
+	RoleEnumDeveloper
+	RoleEnumMember
+	RoleEnumApi
+	RoleEnumSystem
+	RoleEnumMergeTeam
+)
+
+func (r RoleEnum) String() string {
+	switch r {
+	default:
+		return strconv.Itoa(int(r))
+	case RoleEnumAdmin:
+		return "ADMIN"
+	case RoleEnumDeveloper:
+		return "DEVELOPER"
+	case RoleEnumMember:
+		return "MEMBER"
+	case RoleEnumApi:
+		return "API"
+	case RoleEnumSystem:
+		return "SYSTEM"
+	case RoleEnumMergeTeam:
+		return "MERGE_TEAM"
+	}
+}
+
+func (r RoleEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", r.String())), nil
+}
+
+func (r *RoleEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ADMIN":
+		value := RoleEnumAdmin
+		*r = value
+	case "DEVELOPER":
+		value := RoleEnumDeveloper
+		*r = value
+	case "MEMBER":
+		value := RoleEnumMember
+		*r = value
+	case "API":
+		value := RoleEnumApi
+		*r = value
+	case "SYSTEM":
+		value := RoleEnumSystem
+		*r = value
+	case "MERGE_TEAM":
+		value := RoleEnumMergeTeam
+		*r = value
+	}
+	return nil
+}
+
 // # The ScheduledInterview Object
 // ### Description
 // The `ScheduledInterview` object is used to represent a scheduled interview for a given candidate’s application to a job. An `Application` can have multiple `ScheduledInterview`s depending on the particular hiring process.
@@ -6967,8 +7489,9 @@ type ScheduledInterview struct {
 	// * `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
 	// * `COMPLETE` - COMPLETE
 	Status *ScheduledInterviewStatus `json:"status,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -7672,8 +8195,9 @@ type Scorecard struct {
 	// * `STRONG_YES` - STRONG_YES
 	// * `NO_DECISION` - NO_DECISION
 	OverallRecommendation *ScorecardOverallRecommendation `json:"overall_recommendation,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -8054,6 +8578,183 @@ func (s *ScorecardsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// # The ScreeningQuestion Object
+// ### Description
+// The `ScreeningQuestion` object is used to represent questions asked to screen candidates for a job.
+//
+// ### Usage Example
+// TODO
+type ScreeningQuestion struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The job associated with the screening question.
+	Job *ScreeningQuestionJob `json:"job,omitempty"`
+	// The description of the screening question
+	Description *string `json:"description,omitempty"`
+	// The title of the screening question
+	Title *string `json:"title,omitempty"`
+	// The data type for the screening question.
+	//
+	// * `DATE` - DATE
+	// * `FILE` - FILE
+	// * `SINGLE_SELECT` - SINGLE_SELECT
+	// * `MULTI_SELECT` - MULTI_SELECT
+	// * `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+	// * `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+	// * `NUMERIC` - NUMERIC
+	// * `BOOLEAN` - BOOLEAN
+	Type *ScreeningQuestionType `json:"type,omitempty"`
+	// Whether or not the screening question is required.
+	Required  *bool      `json:"required,omitempty"`
+	Options   []any      `json:"options,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// The job associated with the screening question.
+type ScreeningQuestionJob struct {
+	typeName string
+	String   string
+	Job      *Job
+}
+
+func NewScreeningQuestionJobFromString(value string) *ScreeningQuestionJob {
+	return &ScreeningQuestionJob{typeName: "string", String: value}
+}
+
+func NewScreeningQuestionJobFromJob(value *Job) *ScreeningQuestionJob {
+	return &ScreeningQuestionJob{typeName: "job", Job: value}
+}
+
+func (s *ScreeningQuestionJob) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueJob := new(Job)
+	if err := json.Unmarshal(data, &valueJob); err == nil {
+		s.typeName = "job"
+		s.Job = valueJob
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScreeningQuestionJob) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "job":
+		return json.Marshal(s.Job)
+	}
+}
+
+type ScreeningQuestionJobVisitor interface {
+	VisitString(string) error
+	VisitJob(*Job) error
+}
+
+func (s *ScreeningQuestionJob) Accept(visitor ScreeningQuestionJobVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "job":
+		return visitor.VisitJob(s.Job)
+	}
+}
+
+// # The ScreeningQuestionOption Object
+// ### Description
+// The `ScreeningQuestionOption` object is used to represent options for a `ScreeningQuestion` object
+//
+// ### Usage Example
+// TODO
+type ScreeningQuestionOption struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// Available response options
+	Label     *string    `json:"label,omitempty"`
+	Id        *string    `json:"id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// The data type for the screening question.
+//
+// * `DATE` - DATE
+// * `FILE` - FILE
+// * `SINGLE_SELECT` - SINGLE_SELECT
+// * `MULTI_SELECT` - MULTI_SELECT
+// * `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+// * `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+// * `NUMERIC` - NUMERIC
+// * `BOOLEAN` - BOOLEAN
+type ScreeningQuestionType struct {
+	typeName string
+	TypeEnum TypeEnum
+	String   string
+}
+
+func NewScreeningQuestionTypeFromTypeEnum(value TypeEnum) *ScreeningQuestionType {
+	return &ScreeningQuestionType{typeName: "typeEnum", TypeEnum: value}
+}
+
+func NewScreeningQuestionTypeFromString(value string) *ScreeningQuestionType {
+	return &ScreeningQuestionType{typeName: "string", String: value}
+}
+
+func (s *ScreeningQuestionType) UnmarshalJSON(data []byte) error {
+	var valueTypeEnum TypeEnum
+	if err := json.Unmarshal(data, &valueTypeEnum); err == nil {
+		s.typeName = "typeEnum"
+		s.TypeEnum = valueTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScreeningQuestionType) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "typeEnum":
+		return json.Marshal(s.TypeEnum)
+	case "string":
+		return json.Marshal(s.String)
+	}
+}
+
+type ScreeningQuestionTypeVisitor interface {
+	VisitTypeEnum(TypeEnum) error
+	VisitString(string) error
+}
+
+func (s *ScreeningQuestionType) Accept(visitor ScreeningQuestionTypeVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "typeEnum":
+		return visitor.VisitTypeEnum(s.TypeEnum)
+	case "string":
+		return visitor.VisitString(s.String)
+	}
+}
+
 // * `IN_NEXT_SYNC` - IN_NEXT_SYNC
 // * `IN_LAST_SYNC` - IN_LAST_SYNC
 type SelectiveSyncConfigurationsUsageEnum uint
@@ -8188,12 +8889,95 @@ type Tag struct {
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The tag's name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted by third party webhooks.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
 	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
 	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+}
+
+// * `DATE` - DATE
+// * `FILE` - FILE
+// * `SINGLE_SELECT` - SINGLE_SELECT
+// * `MULTI_SELECT` - MULTI_SELECT
+// * `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+// * `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+// * `NUMERIC` - NUMERIC
+// * `BOOLEAN` - BOOLEAN
+type TypeEnum uint
+
+const (
+	TypeEnumDate TypeEnum = iota + 1
+	TypeEnumFile
+	TypeEnumSingleSelect
+	TypeEnumMultiSelect
+	TypeEnumSingleLineText
+	TypeEnumMultiLineText
+	TypeEnumNumeric
+	TypeEnumBoolean
+)
+
+func (t TypeEnum) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TypeEnumDate:
+		return "DATE"
+	case TypeEnumFile:
+		return "FILE"
+	case TypeEnumSingleSelect:
+		return "SINGLE_SELECT"
+	case TypeEnumMultiSelect:
+		return "MULTI_SELECT"
+	case TypeEnumSingleLineText:
+		return "SINGLE_LINE_TEXT"
+	case TypeEnumMultiLineText:
+		return "MULTI_LINE_TEXT"
+	case TypeEnumNumeric:
+		return "NUMERIC"
+	case TypeEnumBoolean:
+		return "BOOLEAN"
+	}
+}
+
+func (t TypeEnum) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TypeEnum) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "DATE":
+		value := TypeEnumDate
+		*t = value
+	case "FILE":
+		value := TypeEnumFile
+		*t = value
+	case "SINGLE_SELECT":
+		value := TypeEnumSingleSelect
+		*t = value
+	case "MULTI_SELECT":
+		value := TypeEnumMultiSelect
+		*t = value
+	case "SINGLE_LINE_TEXT":
+		value := TypeEnumSingleLineText
+		*t = value
+	case "MULTI_LINE_TEXT":
+		value := TypeEnumMultiLineText
+		*t = value
+	case "NUMERIC":
+		value := TypeEnumNumeric
+		*t = value
+	case "BOOLEAN":
+		value := TypeEnumBoolean
+		*t = value
+	}
+	return nil
 }
 
 // # The Url Object
@@ -8213,7 +8997,8 @@ type Url struct {
 	// * `SOCIAL_MEDIA` - SOCIAL_MEDIA
 	// * `OTHER` - OTHER
 	// * `JOB_POSTING` - JOB_POSTING
-	UrlType *UrlUrlType `json:"url_type,omitempty"`
+	UrlType   *UrlUrlType `json:"url_type,omitempty"`
+	CreatedAt *time.Time  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }

@@ -15,9 +15,8 @@ type EmployeeEndpointRequest struct {
 }
 
 type IgnoreCommonModelRequest struct {
-	Reason *IgnoreCommonModelRequestReason `json:"reason,omitempty"`
-	// <span style="white-space: nowrap">`non-empty`</span> <span style="white-space: nowrap">`<= 256 characters`</span>
-	Message *string `json:"message,omitempty"`
+	Reason  *IgnoreCommonModelRequestReason `json:"reason,omitempty"`
+	Message *string                         `json:"message,omitempty"`
 }
 
 type EmployeesListRequest struct {

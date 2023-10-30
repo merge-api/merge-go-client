@@ -7,6 +7,7 @@ import (
 	accountdetails "github.com/merge-api/merge-go-client/filestorage/accountdetails"
 	accounttoken "github.com/merge-api/merge-go-client/filestorage/accounttoken"
 	asyncpassthrough "github.com/merge-api/merge-go-client/filestorage/asyncpassthrough"
+	audittrail "github.com/merge-api/merge-go-client/filestorage/audittrail"
 	availableactions "github.com/merge-api/merge-go-client/filestorage/availableactions"
 	deleteaccount "github.com/merge-api/merge-go-client/filestorage/deleteaccount"
 	drives "github.com/merge-api/merge-go-client/filestorage/drives"
@@ -31,6 +32,7 @@ type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
 	AsyncPassthrough() asyncpassthrough.Client
+	AuditTrail() audittrail.Client
 	AvailableActions() availableactions.Client
 	DeleteAccount() deleteaccount.Client
 	Drives() drives.Client
@@ -62,6 +64,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		accountDetailsClient:   accountdetails.NewClient(opts...),
 		accountTokenClient:     accounttoken.NewClient(opts...),
 		asyncPassthroughClient: asyncpassthrough.NewClient(opts...),
+		auditTrailClient:       audittrail.NewClient(opts...),
 		availableActionsClient: availableactions.NewClient(opts...),
 		deleteAccountClient:    deleteaccount.NewClient(opts...),
 		drivesClient:           drives.NewClient(opts...),
@@ -89,6 +92,7 @@ type client struct {
 	accountDetailsClient   accountdetails.Client
 	accountTokenClient     accounttoken.Client
 	asyncPassthroughClient asyncpassthrough.Client
+	auditTrailClient       audittrail.Client
 	availableActionsClient availableactions.Client
 	deleteAccountClient    deleteaccount.Client
 	drivesClient           drives.Client
@@ -118,6 +122,10 @@ func (c *client) AccountToken() accounttoken.Client {
 
 func (c *client) AsyncPassthrough() asyncpassthrough.Client {
 	return c.asyncPassthroughClient
+}
+
+func (c *client) AuditTrail() audittrail.Client {
+	return c.auditTrailClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {

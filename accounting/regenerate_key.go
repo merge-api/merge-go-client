@@ -3,6 +3,5 @@
 package accounting
 
 type RemoteKeyForRegenerationRequest struct {
-	// <span style="white-space: nowrap">`non-empty`</span>
 	Name string `json:"name"`
 }

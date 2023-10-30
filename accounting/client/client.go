@@ -4,11 +4,13 @@ package client
 
 import (
 	accountdetails "github.com/merge-api/merge-go-client/accounting/accountdetails"
+	accountingperiods "github.com/merge-api/merge-go-client/accounting/accountingperiods"
 	accounts "github.com/merge-api/merge-go-client/accounting/accounts"
 	accounttoken "github.com/merge-api/merge-go-client/accounting/accounttoken"
 	addresses "github.com/merge-api/merge-go-client/accounting/addresses"
 	asyncpassthrough "github.com/merge-api/merge-go-client/accounting/asyncpassthrough"
 	attachments "github.com/merge-api/merge-go-client/accounting/attachments"
+	audittrail "github.com/merge-api/merge-go-client/accounting/audittrail"
 	availableactions "github.com/merge-api/merge-go-client/accounting/availableactions"
 	balancesheets "github.com/merge-api/merge-go-client/accounting/balancesheets"
 	cashflowstatements "github.com/merge-api/merge-go-client/accounting/cashflowstatements"
@@ -45,10 +47,12 @@ import (
 type Client interface {
 	AccountDetails() accountdetails.Client
 	AccountToken() accounttoken.Client
+	AccountingPeriods() accountingperiods.Client
 	Accounts() accounts.Client
 	Addresses() addresses.Client
 	AsyncPassthrough() asyncpassthrough.Client
 	Attachments() attachments.Client
+	AuditTrail() audittrail.Client
 	AvailableActions() availableactions.Client
 	BalanceSheets() balancesheets.Client
 	CashFlowStatements() cashflowstatements.Client
@@ -91,10 +95,12 @@ func NewClient(opts ...core.ClientOption) Client {
 		header:                   options.ToHeader(),
 		accountDetailsClient:     accountdetails.NewClient(opts...),
 		accountTokenClient:       accounttoken.NewClient(opts...),
+		accountingPeriodsClient:  accountingperiods.NewClient(opts...),
 		accountsClient:           accounts.NewClient(opts...),
 		addressesClient:          addresses.NewClient(opts...),
 		asyncPassthroughClient:   asyncpassthrough.NewClient(opts...),
 		attachmentsClient:        attachments.NewClient(opts...),
+		auditTrailClient:         audittrail.NewClient(opts...),
 		availableActionsClient:   availableactions.NewClient(opts...),
 		balanceSheetsClient:      balancesheets.NewClient(opts...),
 		cashFlowStatementsClient: cashflowstatements.NewClient(opts...),
@@ -133,10 +139,12 @@ type client struct {
 	header                   http.Header
 	accountDetailsClient     accountdetails.Client
 	accountTokenClient       accounttoken.Client
+	accountingPeriodsClient  accountingperiods.Client
 	accountsClient           accounts.Client
 	addressesClient          addresses.Client
 	asyncPassthroughClient   asyncpassthrough.Client
 	attachmentsClient        attachments.Client
+	auditTrailClient         audittrail.Client
 	availableActionsClient   availableactions.Client
 	balanceSheetsClient      balancesheets.Client
 	cashFlowStatementsClient cashflowstatements.Client
@@ -176,6 +184,10 @@ func (c *client) AccountToken() accounttoken.Client {
 	return c.accountTokenClient
 }
 
+func (c *client) AccountingPeriods() accountingperiods.Client {
+	return c.accountingPeriodsClient
+}
+
 func (c *client) Accounts() accounts.Client {
 	return c.accountsClient
 }
@@ -190,6 +202,10 @@ func (c *client) AsyncPassthrough() asyncpassthrough.Client {
 
 func (c *client) Attachments() attachments.Client {
 	return c.attachmentsClient
+}
+
+func (c *client) AuditTrail() audittrail.Client {
+	return c.auditTrailClient
 }
 
 func (c *client) AvailableActions() availableactions.Client {
