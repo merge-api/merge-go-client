@@ -9129,6 +9129,8 @@ type CreditNote struct {
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Array of `Payment` object IDs
 	Payments []*CreditNotePaymentsItem `json:"payments,omitempty"`
+	// Array of `PaymentLineItems` object IDs.
+	AppliedPayments []*CreditNoteAppliedPaymentsItem `json:"applied_payments,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the CreditNote was generated in.
@@ -9195,6 +9197,63 @@ func (c *CreditNoteAccountingPeriod) Accept(visitor CreditNoteAccountingPeriodVi
 		return visitor.VisitString(c.String)
 	case "accountingPeriod":
 		return visitor.VisitAccountingPeriod(c.AccountingPeriod)
+	}
+}
+
+type CreditNoteAppliedPaymentsItem struct {
+	typeName        string
+	String          string
+	PaymentLineItem *PaymentLineItem
+}
+
+func NewCreditNoteAppliedPaymentsItemFromString(value string) *CreditNoteAppliedPaymentsItem {
+	return &CreditNoteAppliedPaymentsItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteAppliedPaymentsItemFromPaymentLineItem(value *PaymentLineItem) *CreditNoteAppliedPaymentsItem {
+	return &CreditNoteAppliedPaymentsItem{typeName: "paymentLineItem", PaymentLineItem: value}
+}
+
+func (c *CreditNoteAppliedPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		c.typeName = "paymentLineItem"
+		c.PaymentLineItem = valuePaymentLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteAppliedPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "paymentLineItem":
+		return json.Marshal(c.PaymentLineItem)
+	}
+}
+
+type CreditNoteAppliedPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItem(*PaymentLineItem) error
+}
+
+func (c *CreditNoteAppliedPaymentsItem) Accept(visitor CreditNoteAppliedPaymentsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "paymentLineItem":
+		return visitor.VisitPaymentLineItem(c.PaymentLineItem)
 	}
 }
 
@@ -9704,8 +9763,10 @@ type CreditNoteLineItem struct {
 	// The company the credit note belongs to.
 	Company *CreditNoteLineItemCompany `json:"company,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
@@ -10052,6 +10113,38 @@ type CreditNotesListRequestExpand uint
 
 const (
 	CreditNotesListRequestExpandAccountingPeriod CreditNotesListRequestExpand = iota + 1
+	CreditNotesListRequestExpandAppliedPayments
+	CreditNotesListRequestExpandAppliedPaymentsAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsCompany
+	CreditNotesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsContact
+	CreditNotesListRequestExpandAppliedPaymentsContactAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsContactCompany
+	CreditNotesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItems
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsCompany
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContact
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompany
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategories
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategories
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContact
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
 	CreditNotesListRequestExpandCompany
 	CreditNotesListRequestExpandCompanyAccountingPeriod
 	CreditNotesListRequestExpandContact
@@ -10076,6 +10169,38 @@ const (
 	CreditNotesListRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod
 	CreditNotesListRequestExpandPayments
 	CreditNotesListRequestExpandPaymentsAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPayments
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContact
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItems
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContact
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
 	CreditNotesListRequestExpandPaymentsCompany
 	CreditNotesListRequestExpandPaymentsCompanyAccountingPeriod
 	CreditNotesListRequestExpandPaymentsContact
@@ -10122,6 +10247,70 @@ func (c CreditNotesListRequestExpand) String() string {
 		return strconv.Itoa(int(c))
 	case CreditNotesListRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case CreditNotesListRequestExpandAppliedPayments:
+		return "applied_payments"
+	case CreditNotesListRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case CreditNotesListRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsContact:
+		return "applied_payments,contact"
+	case CreditNotesListRequestExpandAppliedPaymentsContactAccountingPeriod:
+		return "applied_payments,contact,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsContactCompany:
+		return "applied_payments,contact,company"
+	case CreditNotesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod:
+		return "applied_payments,contact,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItems:
+		return "applied_payments,line_items"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod:
+		return "applied_payments,line_items,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsCompany:
+		return "applied_payments,line_items,company"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "applied_payments,line_items,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsContact:
+		return "applied_payments,line_items,contact"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "applied_payments,line_items,contact,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompany:
+		return "applied_payments,line_items,contact,company"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,contact,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategories:
+		return "applied_payments,line_items,tracking_categories"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "applied_payments,line_items,tracking_categories,company"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "applied_payments,line_items,tracking_categories,contact"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "applied_payments,line_items,tracking_categories,contact,company"
+	case CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContact:
+		return "applied_payments,tracking_categories,contact"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,accounting_period"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany:
+		return "applied_payments,tracking_categories,contact,company"
+	case CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,company,accounting_period"
 	case CreditNotesListRequestExpandCompany:
 		return "company"
 	case CreditNotesListRequestExpandCompanyAccountingPeriod:
@@ -10170,6 +10359,70 @@ func (c CreditNotesListRequestExpand) String() string {
 		return "payments"
 	case CreditNotesListRequestExpandPaymentsAccountingPeriod:
 		return "payments,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsContact:
+		return "payments,applied_payments,contact"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod:
+		return "payments,applied_payments,contact,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompany:
+		return "payments,applied_payments,contact,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,contact,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItems:
+		return "payments,applied_payments,line_items"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod:
+		return "payments,applied_payments,line_items,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany:
+		return "payments,applied_payments,line_items,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContact:
+		return "payments,applied_payments,line_items,contact"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany:
+		return "payments,applied_payments,line_items,contact,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories:
+		return "payments,applied_payments,line_items,tracking_categories"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "payments,applied_payments,line_items,tracking_categories,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "payments,applied_payments,line_items,tracking_categories,contact"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact:
+		return "payments,applied_payments,tracking_categories,contact"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,accounting_period"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,tracking_categories,contact,company"
+	case CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,company,accounting_period"
 	case CreditNotesListRequestExpandPaymentsCompany:
 		return "payments,company"
 	case CreditNotesListRequestExpandPaymentsCompanyAccountingPeriod:
@@ -10262,6 +10515,102 @@ func (c *CreditNotesListRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := CreditNotesListRequestExpandAccountingPeriod
 		*c = value
+	case "applied_payments":
+		value := CreditNotesListRequestExpandAppliedPayments
+		*c = value
+	case "applied_payments,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsAccountingPeriod
+		*c = value
+	case "applied_payments,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsCompany
+		*c = value
+	case "applied_payments,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,contact":
+		value := CreditNotesListRequestExpandAppliedPaymentsContact
+		*c = value
+	case "applied_payments,contact,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsContactAccountingPeriod
+		*c = value
+	case "applied_payments,contact,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsContactCompany
+		*c = value
+	case "applied_payments,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItems
+		*c = value
+	case "applied_payments,line_items,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsCompany
+		*c = value
+	case "applied_payments,line_items,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,contact":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsContact
+		*c = value
+	case "applied_payments,line_items,contact,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,contact,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompany
+		*c = value
+	case "applied_payments,line_items,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategories
+		*c = value
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*c = value
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategories
+		*c = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*c = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories,contact":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContact
+		*c = value
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories,contact,company":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+		*c = value
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+		*c = value
 	case "company":
 		value := CreditNotesListRequestExpandCompany
 		*c = value
@@ -10333,6 +10682,102 @@ func (c *CreditNotesListRequestExpand) UnmarshalJSON(data []byte) error {
 		*c = value
 	case "payments,accounting_period":
 		value := CreditNotesListRequestExpandPaymentsAccountingPeriod
+		*c = value
+	case "payments,applied_payments":
+		value := CreditNotesListRequestExpandPaymentsAppliedPayments
+		*c = value
+	case "payments,applied_payments,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*c = value
+	case "payments,applied_payments,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsCompany
+		*c = value
+	case "payments,applied_payments,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,contact":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsContact
+		*c = value
+	case "payments,applied_payments,contact,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,contact,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompany
+		*c = value
+	case "payments,applied_payments,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItems
+		*c = value
+	case "payments,applied_payments,line_items,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+		*c = value
+	case "payments,applied_payments,line_items,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,contact":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContact
+		*c = value
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,contact,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+		*c = value
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*c = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*c = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact,company":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
 		*c = value
 	case "payments,company":
 		value := CreditNotesListRequestExpandPaymentsCompany
@@ -10544,6 +10989,38 @@ type CreditNotesRetrieveRequestExpand uint
 
 const (
 	CreditNotesRetrieveRequestExpandAccountingPeriod CreditNotesRetrieveRequestExpand = iota + 1
+	CreditNotesRetrieveRequestExpandAppliedPayments
+	CreditNotesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContact
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItems
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContact
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
 	CreditNotesRetrieveRequestExpandCompany
 	CreditNotesRetrieveRequestExpandCompanyAccountingPeriod
 	CreditNotesRetrieveRequestExpandContact
@@ -10568,6 +11045,38 @@ const (
 	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod
 	CreditNotesRetrieveRequestExpandPayments
 	CreditNotesRetrieveRequestExpandPaymentsAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPayments
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContact
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
 	CreditNotesRetrieveRequestExpandPaymentsCompany
 	CreditNotesRetrieveRequestExpandPaymentsCompanyAccountingPeriod
 	CreditNotesRetrieveRequestExpandPaymentsContact
@@ -10614,6 +11123,70 @@ func (c CreditNotesRetrieveRequestExpand) String() string {
 		return strconv.Itoa(int(c))
 	case CreditNotesRetrieveRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPayments:
+		return "applied_payments"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsContact:
+		return "applied_payments,contact"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod:
+		return "applied_payments,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompany:
+		return "applied_payments,contact,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod:
+		return "applied_payments,contact,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItems:
+		return "applied_payments,line_items"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod:
+		return "applied_payments,line_items,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompany:
+		return "applied_payments,line_items,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "applied_payments,line_items,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContact:
+		return "applied_payments,line_items,contact"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "applied_payments,line_items,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany:
+		return "applied_payments,line_items,contact,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,contact,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories:
+		return "applied_payments,line_items,tracking_categories"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "applied_payments,line_items,tracking_categories,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "applied_payments,line_items,tracking_categories,contact"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "applied_payments,line_items,tracking_categories,contact,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact:
+		return "applied_payments,tracking_categories,contact"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany:
+		return "applied_payments,tracking_categories,contact,company"
+	case CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,company,accounting_period"
 	case CreditNotesRetrieveRequestExpandCompany:
 		return "company"
 	case CreditNotesRetrieveRequestExpandCompanyAccountingPeriod:
@@ -10662,6 +11235,70 @@ func (c CreditNotesRetrieveRequestExpand) String() string {
 		return "payments"
 	case CreditNotesRetrieveRequestExpandPaymentsAccountingPeriod:
 		return "payments,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContact:
+		return "payments,applied_payments,contact"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod:
+		return "payments,applied_payments,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany:
+		return "payments,applied_payments,contact,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,contact,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems:
+		return "payments,applied_payments,line_items"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod:
+		return "payments,applied_payments,line_items,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany:
+		return "payments,applied_payments,line_items,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact:
+		return "payments,applied_payments,line_items,contact"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany:
+		return "payments,applied_payments,line_items,contact,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories:
+		return "payments,applied_payments,line_items,tracking_categories"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "payments,applied_payments,line_items,tracking_categories,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "payments,applied_payments,line_items,tracking_categories,contact"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact:
+		return "payments,applied_payments,tracking_categories,contact"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,accounting_period"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,tracking_categories,contact,company"
+	case CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,company,accounting_period"
 	case CreditNotesRetrieveRequestExpandPaymentsCompany:
 		return "payments,company"
 	case CreditNotesRetrieveRequestExpandPaymentsCompanyAccountingPeriod:
@@ -10754,6 +11391,102 @@ func (c *CreditNotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := CreditNotesRetrieveRequestExpandAccountingPeriod
 		*c = value
+	case "applied_payments":
+		value := CreditNotesRetrieveRequestExpandAppliedPayments
+		*c = value
+	case "applied_payments,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+		*c = value
+	case "applied_payments,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsCompany
+		*c = value
+	case "applied_payments,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,contact":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsContact
+		*c = value
+	case "applied_payments,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod
+		*c = value
+	case "applied_payments,contact,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompany
+		*c = value
+	case "applied_payments,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItems
+		*c = value
+	case "applied_payments,line_items,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompany
+		*c = value
+	case "applied_payments,line_items,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,contact":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContact
+		*c = value
+	case "applied_payments,line_items,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,contact,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany
+		*c = value
+	case "applied_payments,line_items,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories
+		*c = value
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*c = value
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*c = value
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+		*c = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*c = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories,contact":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact
+		*c = value
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "applied_payments,tracking_categories,contact,company":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+		*c = value
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+		*c = value
 	case "company":
 		value := CreditNotesRetrieveRequestExpandCompany
 		*c = value
@@ -10825,6 +11558,102 @@ func (c *CreditNotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*c = value
 	case "payments,accounting_period":
 		value := CreditNotesRetrieveRequestExpandPaymentsAccountingPeriod
+		*c = value
+	case "payments,applied_payments":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPayments
+		*c = value
+	case "payments,applied_payments,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*c = value
+	case "payments,applied_payments,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+		*c = value
+	case "payments,applied_payments,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,contact":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContact
+		*c = value
+	case "payments,applied_payments,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,contact,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany
+		*c = value
+	case "payments,applied_payments,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems
+		*c = value
+	case "payments,applied_payments,line_items,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+		*c = value
+	case "payments,applied_payments,line_items,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,contact":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact
+		*c = value
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,contact,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+		*c = value
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*c = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*c = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*c = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact,company":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+		*c = value
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		value := CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
 		*c = value
 	case "payments,company":
 		value := CreditNotesRetrieveRequestExpandPaymentsCompany
@@ -18707,9 +19536,11 @@ type Invoice struct {
 	RemoteUpdatedAt    *time.Time                       `json:"remote_updated_at,omitempty"`
 	TrackingCategories []*InvoiceTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// Array of `Payment` object IDs.
-	Payments         []*InvoicePaymentsItem `json:"payments,omitempty"`
-	LineItems        []*InvoiceLineItem     `json:"line_items,omitempty"`
-	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	Payments []*InvoicePaymentsItem `json:"payments,omitempty"`
+	// Array of `PaymentLineItems` object IDs.
+	AppliedPayments  []*InvoiceAppliedPaymentsItem `json:"applied_payments,omitempty"`
+	LineItems        []*InvoiceLineItem            `json:"line_items,omitempty"`
+	RemoteWasDeleted *bool                         `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Invoice was generated in.
 	AccountingPeriod *InvoiceAccountingPeriod     `json:"accounting_period,omitempty"`
 	PurchaseOrders   []*InvoicePurchaseOrdersItem `json:"purchase_orders,omitempty"`
@@ -18777,6 +19608,63 @@ func (i *InvoiceAccountingPeriod) Accept(visitor InvoiceAccountingPeriodVisitor)
 		return visitor.VisitString(i.String)
 	case "accountingPeriod":
 		return visitor.VisitAccountingPeriod(i.AccountingPeriod)
+	}
+}
+
+type InvoiceAppliedPaymentsItem struct {
+	typeName        string
+	String          string
+	PaymentLineItem *PaymentLineItem
+}
+
+func NewInvoiceAppliedPaymentsItemFromString(value string) *InvoiceAppliedPaymentsItem {
+	return &InvoiceAppliedPaymentsItem{typeName: "string", String: value}
+}
+
+func NewInvoiceAppliedPaymentsItemFromPaymentLineItem(value *PaymentLineItem) *InvoiceAppliedPaymentsItem {
+	return &InvoiceAppliedPaymentsItem{typeName: "paymentLineItem", PaymentLineItem: value}
+}
+
+func (i *InvoiceAppliedPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		i.typeName = "paymentLineItem"
+		i.PaymentLineItem = valuePaymentLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceAppliedPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "paymentLineItem":
+		return json.Marshal(i.PaymentLineItem)
+	}
+}
+
+type InvoiceAppliedPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItem(*PaymentLineItem) error
+}
+
+func (i *InvoiceAppliedPaymentsItem) Accept(visitor InvoiceAppliedPaymentsItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "paymentLineItem":
+		return visitor.VisitPaymentLineItem(i.PaymentLineItem)
 	}
 }
 
@@ -22567,6 +23455,70 @@ type InvoicesListRequestExpand uint
 
 const (
 	InvoicesListRequestExpandAccountingPeriod InvoicesListRequestExpand = iota + 1
+	InvoicesListRequestExpandAppliedPayments
+	InvoicesListRequestExpandAppliedPaymentsAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsCompany
+	InvoicesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsContact
+	InvoicesListRequestExpandAppliedPaymentsContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsContactCompany
+	InvoicesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItems
+	InvoicesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContact
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrders
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategories
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrders
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompany
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContact
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompany
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategories
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContact
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 	InvoicesListRequestExpandCompany
 	InvoicesListRequestExpandCompanyAccountingPeriod
 	InvoicesListRequestExpandContact
@@ -22607,6 +23559,70 @@ const (
 	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 	InvoicesListRequestExpandPayments
 	InvoicesListRequestExpandPaymentsAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPayments
+	InvoicesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItems
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrders
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 	InvoicesListRequestExpandPaymentsCompany
 	InvoicesListRequestExpandPaymentsCompanyAccountingPeriod
 	InvoicesListRequestExpandPaymentsContact
@@ -22701,6 +23717,134 @@ func (i InvoicesListRequestExpand) String() string {
 		return strconv.Itoa(int(i))
 	case InvoicesListRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case InvoicesListRequestExpandAppliedPayments:
+		return "applied_payments"
+	case InvoicesListRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case InvoicesListRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsContact:
+		return "applied_payments,contact"
+	case InvoicesListRequestExpandAppliedPaymentsContactAccountingPeriod:
+		return "applied_payments,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsContactCompany:
+		return "applied_payments,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod:
+		return "applied_payments,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItems:
+		return "applied_payments,line_items"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod:
+		return "applied_payments,line_items,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsCompany:
+		return "applied_payments,line_items,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "applied_payments,line_items,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsContact:
+		return "applied_payments,line_items,contact"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "applied_payments,line_items,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompany:
+		return "applied_payments,line_items,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrders:
+		return "applied_payments,line_items,purchase_orders"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany:
+		return "applied_payments,line_items,purchase_orders,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact:
+		return "applied_payments,line_items,purchase_orders,contact"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany:
+		return "applied_payments,line_items,purchase_orders,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategories:
+		return "applied_payments,line_items,tracking_categories"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "applied_payments,line_items,tracking_categories,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "applied_payments,line_items,tracking_categories,contact"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "applied_payments,line_items,tracking_categories,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders:
+		return "applied_payments,line_items,tracking_categories,purchase_orders"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrders:
+		return "applied_payments,purchase_orders"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod:
+		return "applied_payments,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompany:
+		return "applied_payments,purchase_orders,company"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContact:
+		return "applied_payments,purchase_orders,contact"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompany:
+		return "applied_payments,purchase_orders,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,purchase_orders,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContact:
+		return "applied_payments,tracking_categories,contact"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany:
+		return "applied_payments,tracking_categories,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders:
+		return "applied_payments,tracking_categories,purchase_orders"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany:
+		return "applied_payments,tracking_categories,purchase_orders,company"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact:
+		return "applied_payments,tracking_categories,purchase_orders,contact"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "applied_payments,tracking_categories,purchase_orders,contact,company"
+	case InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
 	case InvoicesListRequestExpandCompany:
 		return "company"
 	case InvoicesListRequestExpandCompanyAccountingPeriod:
@@ -22781,6 +23925,134 @@ func (i InvoicesListRequestExpand) String() string {
 		return "payments"
 	case InvoicesListRequestExpandPaymentsAccountingPeriod:
 		return "payments,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsContact:
+		return "payments,applied_payments,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod:
+		return "payments,applied_payments,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompany:
+		return "payments,applied_payments,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItems:
+		return "payments,applied_payments,line_items"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod:
+		return "payments,applied_payments,line_items,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany:
+		return "payments,applied_payments,line_items,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContact:
+		return "payments,applied_payments,line_items,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany:
+		return "payments,applied_payments,line_items,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders:
+		return "payments,applied_payments,line_items,purchase_orders"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany:
+		return "payments,applied_payments,line_items,purchase_orders,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact:
+		return "payments,applied_payments,line_items,purchase_orders,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany:
+		return "payments,applied_payments,line_items,purchase_orders,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories:
+		return "payments,applied_payments,line_items,tracking_categories"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "payments,applied_payments,line_items,tracking_categories,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "payments,applied_payments,line_items,tracking_categories,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrders:
+		return "payments,applied_payments,purchase_orders"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany:
+		return "payments,applied_payments,purchase_orders,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact:
+		return "payments,applied_payments,purchase_orders,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany:
+		return "payments,applied_payments,purchase_orders,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact:
+		return "payments,applied_payments,tracking_categories,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,tracking_categories,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders:
+		return "payments,applied_payments,tracking_categories,purchase_orders"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany:
+		return "payments,applied_payments,tracking_categories,purchase_orders,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact,company"
+	case InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
 	case InvoicesListRequestExpandPaymentsCompany:
 		return "payments,company"
 	case InvoicesListRequestExpandPaymentsCompanyAccountingPeriod:
@@ -22969,6 +24241,198 @@ func (i *InvoicesListRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := InvoicesListRequestExpandAccountingPeriod
 		*i = value
+	case "applied_payments":
+		value := InvoicesListRequestExpandAppliedPayments
+		*i = value
+	case "applied_payments,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsAccountingPeriod
+		*i = value
+	case "applied_payments,company":
+		value := InvoicesListRequestExpandAppliedPaymentsCompany
+		*i = value
+	case "applied_payments,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsContact
+		*i = value
+	case "applied_payments,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsContactAccountingPeriod
+		*i = value
+	case "applied_payments,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsContactCompany
+		*i = value
+	case "applied_payments,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItems
+		*i = value
+	case "applied_payments,line_items,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsCompany
+		*i = value
+	case "applied_payments,line_items,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsContact
+		*i = value
+	case "applied_payments,line_items,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompany
+		*i = value
+	case "applied_payments,line_items,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrders
+		*i = value
+	case "applied_payments,line_items,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,line_items,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategories
+		*i = value
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrders
+		*i = value
+	case "applied_payments,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders,company":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContact
+		*i = value
+	case "applied_payments,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategories
+		*i = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,company":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*i = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContact
+		*i = value
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+		*i = value
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,company":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
 	case "company":
 		value := InvoicesListRequestExpandCompany
 		*i = value
@@ -23088,6 +24552,198 @@ func (i *InvoicesListRequestExpand) UnmarshalJSON(data []byte) error {
 		*i = value
 	case "payments,accounting_period":
 		value := InvoicesListRequestExpandPaymentsAccountingPeriod
+		*i = value
+	case "payments,applied_payments":
+		value := InvoicesListRequestExpandPaymentsAppliedPayments
+		*i = value
+	case "payments,applied_payments,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*i = value
+	case "payments,applied_payments,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsCompany
+		*i = value
+	case "payments,applied_payments,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsContact
+		*i = value
+	case "payments,applied_payments,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompany
+		*i = value
+	case "payments,applied_payments,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItems
+		*i = value
+	case "payments,applied_payments,line_items,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+		*i = value
+	case "payments,applied_payments,line_items,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContact
+		*i = value
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrders
+		*i = value
+	case "payments,applied_payments,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*i = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 		*i = value
 	case "payments,company":
 		value := InvoicesListRequestExpandPaymentsCompany
@@ -23393,6 +25049,70 @@ type InvoicesRetrieveRequestExpand uint
 
 const (
 	InvoicesRetrieveRequestExpandAccountingPeriod InvoicesRetrieveRequestExpand = iota + 1
+	InvoicesRetrieveRequestExpandAppliedPayments
+	InvoicesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItems
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrders
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrders
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 	InvoicesRetrieveRequestExpandCompany
 	InvoicesRetrieveRequestExpandCompanyAccountingPeriod
 	InvoicesRetrieveRequestExpandContact
@@ -23433,6 +25153,70 @@ const (
 	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 	InvoicesRetrieveRequestExpandPayments
 	InvoicesRetrieveRequestExpandPaymentsAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPayments
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrders
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 	InvoicesRetrieveRequestExpandPaymentsCompany
 	InvoicesRetrieveRequestExpandPaymentsCompanyAccountingPeriod
 	InvoicesRetrieveRequestExpandPaymentsContact
@@ -23527,6 +25311,134 @@ func (i InvoicesRetrieveRequestExpand) String() string {
 		return strconv.Itoa(int(i))
 	case InvoicesRetrieveRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPayments:
+		return "applied_payments"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsContact:
+		return "applied_payments,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod:
+		return "applied_payments,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsContactCompany:
+		return "applied_payments,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod:
+		return "applied_payments,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItems:
+		return "applied_payments,line_items"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod:
+		return "applied_payments,line_items,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompany:
+		return "applied_payments,line_items,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "applied_payments,line_items,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContact:
+		return "applied_payments,line_items,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "applied_payments,line_items,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany:
+		return "applied_payments,line_items,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrders:
+		return "applied_payments,line_items,purchase_orders"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany:
+		return "applied_payments,line_items,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact:
+		return "applied_payments,line_items,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany:
+		return "applied_payments,line_items,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories:
+		return "applied_payments,line_items,tracking_categories"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "applied_payments,line_items,tracking_categories,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "applied_payments,line_items,tracking_categories,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "applied_payments,line_items,tracking_categories,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders:
+		return "applied_payments,line_items,tracking_categories,purchase_orders"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrders:
+		return "applied_payments,purchase_orders"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod:
+		return "applied_payments,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompany:
+		return "applied_payments,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContact:
+		return "applied_payments,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompany:
+		return "applied_payments,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,purchase_orders,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact:
+		return "applied_payments,tracking_categories,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany:
+		return "applied_payments,tracking_categories,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders:
+		return "applied_payments,tracking_categories,purchase_orders"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany:
+		return "applied_payments,tracking_categories,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact:
+		return "applied_payments,tracking_categories,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "applied_payments,tracking_categories,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
 	case InvoicesRetrieveRequestExpandCompany:
 		return "company"
 	case InvoicesRetrieveRequestExpandCompanyAccountingPeriod:
@@ -23607,6 +25519,134 @@ func (i InvoicesRetrieveRequestExpand) String() string {
 		return "payments"
 	case InvoicesRetrieveRequestExpandPaymentsAccountingPeriod:
 		return "payments,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContact:
+		return "payments,applied_payments,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod:
+		return "payments,applied_payments,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany:
+		return "payments,applied_payments,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems:
+		return "payments,applied_payments,line_items"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod:
+		return "payments,applied_payments,line_items,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany:
+		return "payments,applied_payments,line_items,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact:
+		return "payments,applied_payments,line_items,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany:
+		return "payments,applied_payments,line_items,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders:
+		return "payments,applied_payments,line_items,purchase_orders"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany:
+		return "payments,applied_payments,line_items,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact:
+		return "payments,applied_payments,line_items,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany:
+		return "payments,applied_payments,line_items,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories:
+		return "payments,applied_payments,line_items,tracking_categories"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany:
+		return "payments,applied_payments,line_items,tracking_categories,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact:
+		return "payments,applied_payments,line_items,tracking_categories,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrders:
+		return "payments,applied_payments,purchase_orders"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany:
+		return "payments,applied_payments,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact:
+		return "payments,applied_payments,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany:
+		return "payments,applied_payments,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,purchase_orders,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact:
+		return "payments,applied_payments,tracking_categories,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany:
+		return "payments,applied_payments,tracking_categories,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,contact,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders:
+		return "payments,applied_payments,tracking_categories,purchase_orders"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany:
+		return "payments,applied_payments,tracking_categories,purchase_orders,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact,company"
+	case InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
 	case InvoicesRetrieveRequestExpandPaymentsCompany:
 		return "payments,company"
 	case InvoicesRetrieveRequestExpandPaymentsCompanyAccountingPeriod:
@@ -23795,6 +25835,198 @@ func (i *InvoicesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := InvoicesRetrieveRequestExpandAccountingPeriod
 		*i = value
+	case "applied_payments":
+		value := InvoicesRetrieveRequestExpandAppliedPayments
+		*i = value
+	case "applied_payments,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+		*i = value
+	case "applied_payments,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsCompany
+		*i = value
+	case "applied_payments,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsContact
+		*i = value
+	case "applied_payments,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod
+		*i = value
+	case "applied_payments,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsContactCompany
+		*i = value
+	case "applied_payments,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItems
+		*i = value
+	case "applied_payments,line_items,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompany
+		*i = value
+	case "applied_payments,line_items,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContact
+		*i = value
+	case "applied_payments,line_items,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany
+		*i = value
+	case "applied_payments,line_items,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrders
+		*i = value
+	case "applied_payments,line_items,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,line_items,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories
+		*i = value
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrders
+		*i = value
+	case "applied_payments,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContact
+		*i = value
+	case "applied_payments,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+		*i = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*i = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact
+		*i = value
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany
+		*i = value
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
 	case "company":
 		value := InvoicesRetrieveRequestExpandCompany
 		*i = value
@@ -23914,6 +26146,198 @@ func (i *InvoicesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*i = value
 	case "payments,accounting_period":
 		value := InvoicesRetrieveRequestExpandPaymentsAccountingPeriod
+		*i = value
+	case "payments,applied_payments":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPayments
+		*i = value
+	case "payments,applied_payments,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*i = value
+	case "payments,applied_payments,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+		*i = value
+	case "payments,applied_payments,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContact
+		*i = value
+	case "payments,applied_payments,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany
+		*i = value
+	case "payments,applied_payments,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems
+		*i = value
+	case "payments,applied_payments,line_items,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany
+		*i = value
+	case "payments,applied_payments,line_items,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact
+		*i = value
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrders
+		*i = value
+	case "payments,applied_payments,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*i = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany
+		*i = value
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		value := InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod
 		*i = value
 	case "payments,company":
 		value := InvoicesRetrieveRequestExpandPaymentsCompany
@@ -24744,14 +27168,38 @@ type JournalEntriesListRequestExpand uint
 
 const (
 	JournalEntriesListRequestExpandAccountingPeriod JournalEntriesListRequestExpand = iota + 1
+	JournalEntriesListRequestExpandAppliedPayments
+	JournalEntriesListRequestExpandAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandAppliedPaymentsCompany
+	JournalEntriesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesListRequestExpandCompany
 	JournalEntriesListRequestExpandCompanyAccountingPeriod
 	JournalEntriesListRequestExpandLines
 	JournalEntriesListRequestExpandLinesAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPayments
+	JournalEntriesListRequestExpandLinesAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPaymentsCompany
+	JournalEntriesListRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesListRequestExpandLinesCompany
 	JournalEntriesListRequestExpandLinesCompanyAccountingPeriod
 	JournalEntriesListRequestExpandLinesPayments
 	JournalEntriesListRequestExpandLinesPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPayments
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompany
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesListRequestExpandLinesPaymentsCompany
 	JournalEntriesListRequestExpandLinesPaymentsCompanyAccountingPeriod
 	JournalEntriesListRequestExpandLinesPaymentsTrackingCategories
@@ -24764,6 +27212,14 @@ const (
 	JournalEntriesListRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesListRequestExpandPayments
 	JournalEntriesListRequestExpandPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPayments
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompany
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesListRequestExpandPaymentsCompany
 	JournalEntriesListRequestExpandPaymentsCompanyAccountingPeriod
 	JournalEntriesListRequestExpandPaymentsTrackingCategories
@@ -24782,6 +27238,22 @@ func (j JournalEntriesListRequestExpand) String() string {
 		return strconv.Itoa(int(j))
 	case JournalEntriesListRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case JournalEntriesListRequestExpandAppliedPayments:
+		return "applied_payments"
+	case JournalEntriesListRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case JournalEntriesListRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesListRequestExpandCompany:
 		return "company"
 	case JournalEntriesListRequestExpandCompanyAccountingPeriod:
@@ -24790,6 +27262,22 @@ func (j JournalEntriesListRequestExpand) String() string {
 		return "lines"
 	case JournalEntriesListRequestExpandLinesAccountingPeriod:
 		return "lines,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPayments:
+		return "lines,applied_payments"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsAccountingPeriod:
+		return "lines,applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsCompany:
+		return "lines,applied_payments,company"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategories:
+		return "lines,applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesListRequestExpandLinesCompany:
 		return "lines,company"
 	case JournalEntriesListRequestExpandLinesCompanyAccountingPeriod:
@@ -24798,6 +27286,22 @@ func (j JournalEntriesListRequestExpand) String() string {
 		return "lines,payments"
 	case JournalEntriesListRequestExpandLinesPaymentsAccountingPeriod:
 		return "lines,payments,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPayments:
+		return "lines,payments,applied_payments"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod:
+		return "lines,payments,applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompany:
+		return "lines,payments,applied_payments,company"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories:
+		return "lines,payments,applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,payments,applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesListRequestExpandLinesPaymentsCompany:
 		return "lines,payments,company"
 	case JournalEntriesListRequestExpandLinesPaymentsCompanyAccountingPeriod:
@@ -24822,6 +27326,22 @@ func (j JournalEntriesListRequestExpand) String() string {
 		return "payments"
 	case JournalEntriesListRequestExpandPaymentsAccountingPeriod:
 		return "payments,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesListRequestExpandPaymentsCompany:
 		return "payments,company"
 	case JournalEntriesListRequestExpandPaymentsCompanyAccountingPeriod:
@@ -24858,6 +27378,30 @@ func (j *JournalEntriesListRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := JournalEntriesListRequestExpandAccountingPeriod
 		*j = value
+	case "applied_payments":
+		value := JournalEntriesListRequestExpandAppliedPayments
+		*j = value
+	case "applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsAccountingPeriod
+		*j = value
+	case "applied_payments,company":
+		value := JournalEntriesListRequestExpandAppliedPaymentsCompany
+		*j = value
+	case "applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategories
+		*j = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
 	case "company":
 		value := JournalEntriesListRequestExpandCompany
 		*j = value
@@ -24870,6 +27414,30 @@ func (j *JournalEntriesListRequestExpand) UnmarshalJSON(data []byte) error {
 	case "lines,accounting_period":
 		value := JournalEntriesListRequestExpandLinesAccountingPeriod
 		*j = value
+	case "lines,applied_payments":
+		value := JournalEntriesListRequestExpandLinesAppliedPayments
+		*j = value
+	case "lines,applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,applied_payments,company":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsCompany
+		*j = value
+	case "lines,applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
 	case "lines,company":
 		value := JournalEntriesListRequestExpandLinesCompany
 		*j = value
@@ -24881,6 +27449,30 @@ func (j *JournalEntriesListRequestExpand) UnmarshalJSON(data []byte) error {
 		*j = value
 	case "lines,payments,accounting_period":
 		value := JournalEntriesListRequestExpandLinesPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPayments
+		*j = value
+	case "lines,payments,applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,company":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompany
+		*j = value
+	case "lines,payments,applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 		*j = value
 	case "lines,payments,company":
 		value := JournalEntriesListRequestExpandLinesPaymentsCompany
@@ -24917,6 +27509,30 @@ func (j *JournalEntriesListRequestExpand) UnmarshalJSON(data []byte) error {
 		*j = value
 	case "payments,accounting_period":
 		value := JournalEntriesListRequestExpandPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPayments
+		*j = value
+	case "payments,applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments,company":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompany
+		*j = value
+	case "payments,applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 		*j = value
 	case "payments,company":
 		value := JournalEntriesListRequestExpandPaymentsCompany
@@ -24956,14 +27572,38 @@ type JournalEntriesRetrieveRequestExpand uint
 
 const (
 	JournalEntriesRetrieveRequestExpandAccountingPeriod JournalEntriesRetrieveRequestExpand = iota + 1
+	JournalEntriesRetrieveRequestExpandAppliedPayments
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandCompany
 	JournalEntriesRetrieveRequestExpandCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandLines
 	JournalEntriesRetrieveRequestExpandLinesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPayments
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandLinesCompany
 	JournalEntriesRetrieveRequestExpandLinesCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandLinesPayments
 	JournalEntriesRetrieveRequestExpandLinesPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPayments
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandLinesPaymentsCompany
 	JournalEntriesRetrieveRequestExpandLinesPaymentsCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategories
@@ -24976,6 +27616,14 @@ const (
 	JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandPayments
 	JournalEntriesRetrieveRequestExpandPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPayments
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandPaymentsCompany
 	JournalEntriesRetrieveRequestExpandPaymentsCompanyAccountingPeriod
 	JournalEntriesRetrieveRequestExpandPaymentsTrackingCategories
@@ -24994,6 +27642,22 @@ func (j JournalEntriesRetrieveRequestExpand) String() string {
 		return strconv.Itoa(int(j))
 	case JournalEntriesRetrieveRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPayments:
+		return "applied_payments"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesRetrieveRequestExpandCompany:
 		return "company"
 	case JournalEntriesRetrieveRequestExpandCompanyAccountingPeriod:
@@ -25002,6 +27666,22 @@ func (j JournalEntriesRetrieveRequestExpand) String() string {
 		return "lines"
 	case JournalEntriesRetrieveRequestExpandLinesAccountingPeriod:
 		return "lines,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPayments:
+		return "lines,applied_payments"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsAccountingPeriod:
+		return "lines,applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompany:
+		return "lines,applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategories:
+		return "lines,applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesRetrieveRequestExpandLinesCompany:
 		return "lines,company"
 	case JournalEntriesRetrieveRequestExpandLinesCompanyAccountingPeriod:
@@ -25010,6 +27690,22 @@ func (j JournalEntriesRetrieveRequestExpand) String() string {
 		return "lines,payments"
 	case JournalEntriesRetrieveRequestExpandLinesPaymentsAccountingPeriod:
 		return "lines,payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPayments:
+		return "lines,payments,applied_payments"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod:
+		return "lines,payments,applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompany:
+		return "lines,payments,applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories:
+		return "lines,payments,applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,payments,applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesRetrieveRequestExpandLinesPaymentsCompany:
 		return "lines,payments,company"
 	case JournalEntriesRetrieveRequestExpandLinesPaymentsCompanyAccountingPeriod:
@@ -25034,6 +27730,22 @@ func (j JournalEntriesRetrieveRequestExpand) String() string {
 		return "payments"
 	case JournalEntriesRetrieveRequestExpandPaymentsAccountingPeriod:
 		return "payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
 	case JournalEntriesRetrieveRequestExpandPaymentsCompany:
 		return "payments,company"
 	case JournalEntriesRetrieveRequestExpandPaymentsCompanyAccountingPeriod:
@@ -25070,6 +27782,30 @@ func (j *JournalEntriesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := JournalEntriesRetrieveRequestExpandAccountingPeriod
 		*j = value
+	case "applied_payments":
+		value := JournalEntriesRetrieveRequestExpandAppliedPayments
+		*j = value
+	case "applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+		*j = value
+	case "applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsCompany
+		*j = value
+	case "applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+		*j = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
 	case "company":
 		value := JournalEntriesRetrieveRequestExpandCompany
 		*j = value
@@ -25082,6 +27818,30 @@ func (j *JournalEntriesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "lines,accounting_period":
 		value := JournalEntriesRetrieveRequestExpandLinesAccountingPeriod
 		*j = value
+	case "lines,applied_payments":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPayments
+		*j = value
+	case "lines,applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompany
+		*j = value
+	case "lines,applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
 	case "lines,company":
 		value := JournalEntriesRetrieveRequestExpandLinesCompany
 		*j = value
@@ -25093,6 +27853,30 @@ func (j *JournalEntriesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*j = value
 	case "lines,payments,accounting_period":
 		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPayments
+		*j = value
+	case "lines,payments,applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompany
+		*j = value
+	case "lines,payments,applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 		*j = value
 	case "lines,payments,company":
 		value := JournalEntriesRetrieveRequestExpandLinesPaymentsCompany
@@ -25129,6 +27913,30 @@ func (j *JournalEntriesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*j = value
 	case "payments,accounting_period":
 		value := JournalEntriesRetrieveRequestExpandPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPayments
+		*j = value
+	case "payments,applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+		*j = value
+	case "payments,applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
 		*j = value
 	case "payments,company":
 		value := JournalEntriesRetrieveRequestExpandPaymentsCompany
@@ -25183,6 +27991,8 @@ type JournalEntry struct {
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Array of `Payment` object IDs.
 	Payments []*JournalEntryPaymentsItem `json:"payments,omitempty"`
+	// Array of `PaymentLineItems` object IDs.
+	AppliedPayments []*JournalEntryAppliedPaymentsItem `json:"applied_payments,omitempty"`
 	// The journal entry's private note.
 	Memo *string `json:"memo,omitempty"`
 	// The journal's currency.
@@ -25575,6 +28385,63 @@ func (j *JournalEntryAccountingPeriod) Accept(visitor JournalEntryAccountingPeri
 		return visitor.VisitString(j.String)
 	case "accountingPeriod":
 		return visitor.VisitAccountingPeriod(j.AccountingPeriod)
+	}
+}
+
+type JournalEntryAppliedPaymentsItem struct {
+	typeName        string
+	String          string
+	PaymentLineItem *PaymentLineItem
+}
+
+func NewJournalEntryAppliedPaymentsItemFromString(value string) *JournalEntryAppliedPaymentsItem {
+	return &JournalEntryAppliedPaymentsItem{typeName: "string", String: value}
+}
+
+func NewJournalEntryAppliedPaymentsItemFromPaymentLineItem(value *PaymentLineItem) *JournalEntryAppliedPaymentsItem {
+	return &JournalEntryAppliedPaymentsItem{typeName: "paymentLineItem", PaymentLineItem: value}
+}
+
+func (j *JournalEntryAppliedPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		j.typeName = "paymentLineItem"
+		j.PaymentLineItem = valuePaymentLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalEntryAppliedPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "paymentLineItem":
+		return json.Marshal(j.PaymentLineItem)
+	}
+}
+
+type JournalEntryAppliedPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItem(*PaymentLineItem) error
+}
+
+func (j *JournalEntryAppliedPaymentsItem) Accept(visitor JournalEntryAppliedPaymentsItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "paymentLineItem":
+		return visitor.VisitPaymentLineItem(j.PaymentLineItem)
 	}
 }
 
@@ -27443,7 +30310,9 @@ type JournalLine struct {
 	// * `ZWR` - Zimbabwean Dollar (2008)
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *JournalLineCurrency `json:"currency,omitempty"`
-	Contact  *string              `json:"contact,omitempty"`
+	// The company the journal entry belongs to.
+	Company *string `json:"company,omitempty"`
+	Contact *string `json:"contact,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
@@ -28200,7 +31069,9 @@ type JournalLineRequest struct {
 	// * `ZWR` - Zimbabwean Dollar (2008)
 	// * `ZWL` - Zimbabwean Dollar (2009)
 	Currency *JournalLineRequestCurrency `json:"currency,omitempty"`
-	Contact  *string                     `json:"contact,omitempty"`
+	// The company the journal entry belongs to.
+	Company *string `json:"company,omitempty"`
+	Contact *string `json:"contact,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
@@ -29639,8 +32510,9 @@ type Payment struct {
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Payment was generated in.
-	AccountingPeriod *PaymentAccountingPeriod `json:"accounting_period,omitempty"`
-	CreatedAt        *time.Time               `json:"created_at,omitempty"`
+	AccountingPeriod *PaymentAccountingPeriod     `json:"accounting_period,omitempty"`
+	AppliedToLines   []*PaymentAppliedToLinesItem `json:"applied_to_lines,omitempty"`
+	CreatedAt        *time.Time                   `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
@@ -29760,6 +32632,63 @@ func (p *PaymentAccountingPeriod) Accept(visitor PaymentAccountingPeriodVisitor)
 		return visitor.VisitString(p.String)
 	case "accountingPeriod":
 		return visitor.VisitAccountingPeriod(p.AccountingPeriod)
+	}
+}
+
+type PaymentAppliedToLinesItem struct {
+	typeName        string
+	String          string
+	PaymentLineItem *PaymentLineItem
+}
+
+func NewPaymentAppliedToLinesItemFromString(value string) *PaymentAppliedToLinesItem {
+	return &PaymentAppliedToLinesItem{typeName: "string", String: value}
+}
+
+func NewPaymentAppliedToLinesItemFromPaymentLineItem(value *PaymentLineItem) *PaymentAppliedToLinesItem {
+	return &PaymentAppliedToLinesItem{typeName: "paymentLineItem", PaymentLineItem: value}
+}
+
+func (p *PaymentAppliedToLinesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		p.typeName = "paymentLineItem"
+		p.PaymentLineItem = valuePaymentLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentAppliedToLinesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "paymentLineItem":
+		return json.Marshal(p.PaymentLineItem)
+	}
+}
+
+type PaymentAppliedToLinesItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItem(*PaymentLineItem) error
+}
+
+func (p *PaymentAppliedToLinesItem) Accept(visitor PaymentAppliedToLinesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "paymentLineItem":
+		return visitor.VisitPaymentLineItem(p.PaymentLineItem)
 	}
 }
 
@@ -30244,6 +33173,52 @@ func (p *PaymentCurrency) Accept(visitor PaymentCurrencyVisitor) error {
 	}
 }
 
+// # The PaymentLineItem Object
+// ### Description
+// The `PaymentLineItem` object is an applied-to-line on a `Payment` that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+//
+// ### Usage Example
+// `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemInternalMappingSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+//
+// # EXTERNAL SERIALIZER: This is used as the serializer that will be used for actual payloads to and from the
+// # customer
+type PaymentLineItem struct {
+	// The amount of the PaymentLineItem.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// Applied date of the PaymentLineItem
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId          *string    `json:"remote_id,omitempty"`
+	RelatedObjectId   *string    `json:"related_object_id,omitempty"`
+	RelatedObjectType *string    `json:"related_object_type,omitempty"`
+	Id                *string    `json:"id,omitempty"`
+	CreatedAt         *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+}
+
+// # The PaymentLineItem Object
+// ### Description
+// The `PaymentLineItem` object is an applied-to-line on a `Payment` that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+//
+// ### Usage Example
+// `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemInternalMappingSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+//
+// # EXTERNAL SERIALIZER: This is used as the serializer that will be used for actual payloads to and from the
+// # customer
+type PaymentLineItemRequest struct {
+	// The amount of the PaymentLineItem.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// Applied date of the PaymentLineItem
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId            *string        `json:"remote_id,omitempty"`
+	RelatedObjectId     *string        `json:"related_object_id,omitempty"`
+	RelatedObjectType   *string        `json:"related_object_type,omitempty"`
+	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+}
+
 // # The Payment Object
 // ### Description
 // The `Payment` object represents general payments made towards a specific transaction.
@@ -30574,9 +33549,10 @@ type PaymentRequest struct {
 	TotalAmount        *float64                                `json:"total_amount,omitempty"`
 	TrackingCategories []*PaymentRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The accounting period that the Payment was generated in.
-	AccountingPeriod    *PaymentRequestAccountingPeriod `json:"accounting_period,omitempty"`
-	IntegrationParams   map[string]any                  `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any                  `json:"linked_account_params,omitempty"`
+	AccountingPeriod    *PaymentRequestAccountingPeriod     `json:"accounting_period,omitempty"`
+	AppliedToLines      []*PaymentRequestAppliedToLinesItem `json:"applied_to_lines,omitempty"`
+	IntegrationParams   map[string]any                      `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]any                      `json:"linked_account_params,omitempty"`
 }
 
 // The supplier’s or customer’s account in which the payment is made.
@@ -30692,6 +33668,63 @@ func (p *PaymentRequestAccountingPeriod) Accept(visitor PaymentRequestAccounting
 		return visitor.VisitString(p.String)
 	case "accountingPeriod":
 		return visitor.VisitAccountingPeriod(p.AccountingPeriod)
+	}
+}
+
+type PaymentRequestAppliedToLinesItem struct {
+	typeName               string
+	String                 string
+	PaymentLineItemRequest *PaymentLineItemRequest
+}
+
+func NewPaymentRequestAppliedToLinesItemFromString(value string) *PaymentRequestAppliedToLinesItem {
+	return &PaymentRequestAppliedToLinesItem{typeName: "string", String: value}
+}
+
+func NewPaymentRequestAppliedToLinesItemFromPaymentLineItemRequest(value *PaymentLineItemRequest) *PaymentRequestAppliedToLinesItem {
+	return &PaymentRequestAppliedToLinesItem{typeName: "paymentLineItemRequest", PaymentLineItemRequest: value}
+}
+
+func (p *PaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valuePaymentLineItemRequest := new(PaymentLineItemRequest)
+	if err := json.Unmarshal(data, &valuePaymentLineItemRequest); err == nil {
+		p.typeName = "paymentLineItemRequest"
+		p.PaymentLineItemRequest = valuePaymentLineItemRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PaymentRequestAppliedToLinesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "paymentLineItemRequest":
+		return json.Marshal(p.PaymentLineItemRequest)
+	}
+}
+
+type PaymentRequestAppliedToLinesItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItemRequest(*PaymentLineItemRequest) error
+}
+
+func (p *PaymentRequestAppliedToLinesItem) Accept(visitor PaymentRequestAppliedToLinesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "paymentLineItemRequest":
+		return visitor.VisitPaymentLineItemRequest(p.PaymentLineItemRequest)
 	}
 }
 
@@ -31305,6 +34338,22 @@ const (
 	PaymentsListRequestExpandAccountCompany
 	PaymentsListRequestExpandAccountCompanyAccountingPeriod
 	PaymentsListRequestExpandAccountingPeriod
+	PaymentsListRequestExpandAppliedToLines
+	PaymentsListRequestExpandAppliedToLinesAccount
+	PaymentsListRequestExpandAppliedToLinesAccountAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesAccountCompany
+	PaymentsListRequestExpandAppliedToLinesAccountCompanyAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesCompany
+	PaymentsListRequestExpandAppliedToLinesCompanyAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesContact
+	PaymentsListRequestExpandAppliedToLinesContactAccount
+	PaymentsListRequestExpandAppliedToLinesContactAccountAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesContactAccountCompany
+	PaymentsListRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesContactAccountingPeriod
+	PaymentsListRequestExpandAppliedToLinesContactCompany
+	PaymentsListRequestExpandAppliedToLinesContactCompanyAccountingPeriod
 	PaymentsListRequestExpandCompany
 	PaymentsListRequestExpandCompanyAccountingPeriod
 	PaymentsListRequestExpandContact
@@ -31321,6 +34370,22 @@ const (
 	PaymentsListRequestExpandTrackingCategoriesAccountCompany
 	PaymentsListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod
 	PaymentsListRequestExpandTrackingCategoriesAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLines
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod
 	PaymentsListRequestExpandTrackingCategoriesCompany
 	PaymentsListRequestExpandTrackingCategoriesCompanyAccountingPeriod
 	PaymentsListRequestExpandTrackingCategoriesContact
@@ -31347,6 +34412,38 @@ func (p PaymentsListRequestExpand) String() string {
 		return "account,company,accounting_period"
 	case PaymentsListRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case PaymentsListRequestExpandAppliedToLines:
+		return "applied_to_lines"
+	case PaymentsListRequestExpandAppliedToLinesAccount:
+		return "applied_to_lines,account"
+	case PaymentsListRequestExpandAppliedToLinesAccountAccountingPeriod:
+		return "applied_to_lines,account,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesAccountCompany:
+		return "applied_to_lines,account,company"
+	case PaymentsListRequestExpandAppliedToLinesAccountCompanyAccountingPeriod:
+		return "applied_to_lines,account,company,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesAccountingPeriod:
+		return "applied_to_lines,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesCompany:
+		return "applied_to_lines,company"
+	case PaymentsListRequestExpandAppliedToLinesCompanyAccountingPeriod:
+		return "applied_to_lines,company,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesContact:
+		return "applied_to_lines,contact"
+	case PaymentsListRequestExpandAppliedToLinesContactAccount:
+		return "applied_to_lines,contact,account"
+	case PaymentsListRequestExpandAppliedToLinesContactAccountAccountingPeriod:
+		return "applied_to_lines,contact,account,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesContactAccountCompany:
+		return "applied_to_lines,contact,account,company"
+	case PaymentsListRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod:
+		return "applied_to_lines,contact,account,company,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesContactAccountingPeriod:
+		return "applied_to_lines,contact,accounting_period"
+	case PaymentsListRequestExpandAppliedToLinesContactCompany:
+		return "applied_to_lines,contact,company"
+	case PaymentsListRequestExpandAppliedToLinesContactCompanyAccountingPeriod:
+		return "applied_to_lines,contact,company,accounting_period"
 	case PaymentsListRequestExpandCompany:
 		return "company"
 	case PaymentsListRequestExpandCompanyAccountingPeriod:
@@ -31379,6 +34476,38 @@ func (p PaymentsListRequestExpand) String() string {
 		return "tracking_categories,account,company,accounting_period"
 	case PaymentsListRequestExpandTrackingCategoriesAccountingPeriod:
 		return "tracking_categories,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount:
+		return "tracking_categories,applied_to_lines,account"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod:
+		return "tracking_categories,applied_to_lines,account,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany:
+		return "tracking_categories,applied_to_lines,account,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,account,company,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod:
+		return "tracking_categories,applied_to_lines,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany:
+		return "tracking_categories,applied_to_lines,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,company,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact:
+		return "tracking_categories,applied_to_lines,contact"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount:
+		return "tracking_categories,applied_to_lines,contact,account"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,account,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany:
+		return "tracking_categories,applied_to_lines,contact,account,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,account,company,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,accounting_period"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany:
+		return "tracking_categories,applied_to_lines,contact,company"
+	case PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,company,accounting_period"
 	case PaymentsListRequestExpandTrackingCategoriesCompany:
 		return "tracking_categories,company"
 	case PaymentsListRequestExpandTrackingCategoriesCompanyAccountingPeriod:
@@ -31426,6 +34555,54 @@ func (p *PaymentsListRequestExpand) UnmarshalJSON(data []byte) error {
 		*p = value
 	case "accounting_period":
 		value := PaymentsListRequestExpandAccountingPeriod
+		*p = value
+	case "applied_to_lines":
+		value := PaymentsListRequestExpandAppliedToLines
+		*p = value
+	case "applied_to_lines,account":
+		value := PaymentsListRequestExpandAppliedToLinesAccount
+		*p = value
+	case "applied_to_lines,account,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesAccountAccountingPeriod
+		*p = value
+	case "applied_to_lines,account,company":
+		value := PaymentsListRequestExpandAppliedToLinesAccountCompany
+		*p = value
+	case "applied_to_lines,account,company,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesAccountCompanyAccountingPeriod
+		*p = value
+	case "applied_to_lines,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesAccountingPeriod
+		*p = value
+	case "applied_to_lines,company":
+		value := PaymentsListRequestExpandAppliedToLinesCompany
+		*p = value
+	case "applied_to_lines,company,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesCompanyAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact":
+		value := PaymentsListRequestExpandAppliedToLinesContact
+		*p = value
+	case "applied_to_lines,contact,account":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccount
+		*p = value
+	case "applied_to_lines,contact,account,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccountAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact,account,company":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccountCompany
+		*p = value
+	case "applied_to_lines,contact,account,company,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesContactAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact,company":
+		value := PaymentsListRequestExpandAppliedToLinesContactCompany
+		*p = value
+	case "applied_to_lines,contact,company,accounting_period":
+		value := PaymentsListRequestExpandAppliedToLinesContactCompanyAccountingPeriod
 		*p = value
 	case "company":
 		value := PaymentsListRequestExpandCompany
@@ -31475,6 +34652,54 @@ func (p *PaymentsListRequestExpand) UnmarshalJSON(data []byte) error {
 	case "tracking_categories,accounting_period":
 		value := PaymentsListRequestExpandTrackingCategoriesAccountingPeriod
 		*p = value
+	case "tracking_categories,applied_to_lines":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLines
+		*p = value
+	case "tracking_categories,applied_to_lines,account":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,account,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,account,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,account,company,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,company,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,company,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,company":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,company,accounting_period":
+		value := PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod
+		*p = value
 	case "tracking_categories,company":
 		value := PaymentsListRequestExpandTrackingCategoriesCompany
 		*p = value
@@ -31517,6 +34742,22 @@ const (
 	PaymentsRetrieveRequestExpandAccountCompany
 	PaymentsRetrieveRequestExpandAccountCompanyAccountingPeriod
 	PaymentsRetrieveRequestExpandAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLines
+	PaymentsRetrieveRequestExpandAppliedToLinesAccount
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountCompanyAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesCompanyAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesContact
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccount
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountingPeriod
+	PaymentsRetrieveRequestExpandAppliedToLinesContactCompany
+	PaymentsRetrieveRequestExpandAppliedToLinesContactCompanyAccountingPeriod
 	PaymentsRetrieveRequestExpandCompany
 	PaymentsRetrieveRequestExpandCompanyAccountingPeriod
 	PaymentsRetrieveRequestExpandContact
@@ -31533,6 +34774,22 @@ const (
 	PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompany
 	PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod
 	PaymentsRetrieveRequestExpandTrackingCategoriesAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod
 	PaymentsRetrieveRequestExpandTrackingCategoriesCompany
 	PaymentsRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod
 	PaymentsRetrieveRequestExpandTrackingCategoriesContact
@@ -31559,6 +34816,38 @@ func (p PaymentsRetrieveRequestExpand) String() string {
 		return "account,company,accounting_period"
 	case PaymentsRetrieveRequestExpandAccountingPeriod:
 		return "accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLines:
+		return "applied_to_lines"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccount:
+		return "applied_to_lines,account"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccountAccountingPeriod:
+		return "applied_to_lines,account,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany:
+		return "applied_to_lines,account,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccountCompanyAccountingPeriod:
+		return "applied_to_lines,account,company,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesAccountingPeriod:
+		return "applied_to_lines,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesCompany:
+		return "applied_to_lines,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesCompanyAccountingPeriod:
+		return "applied_to_lines,company,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContact:
+		return "applied_to_lines,contact"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccount:
+		return "applied_to_lines,contact,account"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccountAccountingPeriod:
+		return "applied_to_lines,contact,account,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany:
+		return "applied_to_lines,contact,account,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod:
+		return "applied_to_lines,contact,account,company,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactAccountingPeriod:
+		return "applied_to_lines,contact,accounting_period"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactCompany:
+		return "applied_to_lines,contact,company"
+	case PaymentsRetrieveRequestExpandAppliedToLinesContactCompanyAccountingPeriod:
+		return "applied_to_lines,contact,company,accounting_period"
 	case PaymentsRetrieveRequestExpandCompany:
 		return "company"
 	case PaymentsRetrieveRequestExpandCompanyAccountingPeriod:
@@ -31591,6 +34880,38 @@ func (p PaymentsRetrieveRequestExpand) String() string {
 		return "tracking_categories,account,company,accounting_period"
 	case PaymentsRetrieveRequestExpandTrackingCategoriesAccountingPeriod:
 		return "tracking_categories,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines:
+		return "tracking_categories,applied_to_lines"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount:
+		return "tracking_categories,applied_to_lines,account"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod:
+		return "tracking_categories,applied_to_lines,account,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany:
+		return "tracking_categories,applied_to_lines,account,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,account,company,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod:
+		return "tracking_categories,applied_to_lines,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany:
+		return "tracking_categories,applied_to_lines,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,company,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact:
+		return "tracking_categories,applied_to_lines,contact"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount:
+		return "tracking_categories,applied_to_lines,contact,account"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,account,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany:
+		return "tracking_categories,applied_to_lines,contact,account,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,account,company,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,accounting_period"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany:
+		return "tracking_categories,applied_to_lines,contact,company"
+	case PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod:
+		return "tracking_categories,applied_to_lines,contact,company,accounting_period"
 	case PaymentsRetrieveRequestExpandTrackingCategoriesCompany:
 		return "tracking_categories,company"
 	case PaymentsRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod:
@@ -31639,6 +34960,54 @@ func (p *PaymentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 	case "accounting_period":
 		value := PaymentsRetrieveRequestExpandAccountingPeriod
 		*p = value
+	case "applied_to_lines":
+		value := PaymentsRetrieveRequestExpandAppliedToLines
+		*p = value
+	case "applied_to_lines,account":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccount
+		*p = value
+	case "applied_to_lines,account,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccountAccountingPeriod
+		*p = value
+	case "applied_to_lines,account,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany
+		*p = value
+	case "applied_to_lines,account,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccountCompanyAccountingPeriod
+		*p = value
+	case "applied_to_lines,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesAccountingPeriod
+		*p = value
+	case "applied_to_lines,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesCompany
+		*p = value
+	case "applied_to_lines,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesCompanyAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContact
+		*p = value
+	case "applied_to_lines,contact,account":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccount
+		*p = value
+	case "applied_to_lines,contact,account,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccountAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact,account,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany
+		*p = value
+	case "applied_to_lines,contact,account,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactAccountingPeriod
+		*p = value
+	case "applied_to_lines,contact,company":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactCompany
+		*p = value
+	case "applied_to_lines,contact,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandAppliedToLinesContactCompanyAccountingPeriod
+		*p = value
 	case "company":
 		value := PaymentsRetrieveRequestExpandCompany
 		*p = value
@@ -31686,6 +35055,54 @@ func (p *PaymentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
 		*p = value
 	case "tracking_categories,accounting_period":
 		value := PaymentsRetrieveRequestExpandTrackingCategoriesAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines
+		*p = value
+	case "tracking_categories,applied_to_lines,account":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,account,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,account,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,account,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,account,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,company":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany
+		*p = value
+	case "tracking_categories,applied_to_lines,contact,company,accounting_period":
+		value := PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod
 		*p = value
 	case "tracking_categories,company":
 		value := PaymentsRetrieveRequestExpandTrackingCategoriesCompany
@@ -39928,8 +43345,10 @@ type VendorCreditLine struct {
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
 	// The vendor credit line item's exchange rate.
-	ExchangeRate *string    `json:"exchange_rate,omitempty"`
-	CreatedAt    *time.Time `json:"created_at,omitempty"`
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 }
