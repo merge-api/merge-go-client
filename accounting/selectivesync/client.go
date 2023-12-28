@@ -41,7 +41,7 @@ func (c *client) ConfigurationsList(ctx context.Context) ([]*accounting.LinkedAc
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "selective-sync/configurations"
 
 	var response []*accounting.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -66,7 +66,7 @@ func (c *client) ConfigurationsUpdate(ctx context.Context, request *accounting.L
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "selective-sync/configurations"
 
 	var response []*accounting.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -91,7 +91,7 @@ func (c *client) MetaList(ctx context.Context, request *accounting.SelectiveSync
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

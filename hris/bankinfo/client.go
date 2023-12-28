@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.BankInfoListRequest) (*
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/bank-info"
+	endpointURL := baseURL + "/" + "bank-info"
 
 	queryParams := make(url.Values)
 	if request.AccountType != nil {
@@ -119,7 +119,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.BankInfo
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/bank-info/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"bank-info/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

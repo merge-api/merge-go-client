@@ -3,6 +3,9 @@
 package filestorage
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -14,6 +17,11 @@ type FileStorageFileEndpointRequest struct {
 	Model    *FileRequest `json:"model,omitempty"`
 }
 
+type FilesDownloadRetrieveRequest struct {
+	// If provided, specifies the export format of the file to be downloaded. For information on supported export formats, please refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
+	MimeType *string `json:"-"`
+}
+
 type FilesListRequest struct {
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-"`
@@ -21,11 +29,11 @@ type FilesListRequest struct {
 	CreatedBefore *time.Time `json:"-"`
 	// The pagination cursor value.
 	Cursor *string `json:"-"`
-	// If provided, will only return files in this drive. If null, will return files in the top level drive.
+	// Specifying a drive id returns only the files in that drive. Specifying null returns only the files outside the top-level drive.
 	DriveId *string `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *FilesListRequestExpand `json:"-"`
-	// If provided, will only return files in this folder. If null, will return files in root directory.
+	// Specifying a folder id returns only the files in that folder. Specifying null returns only the files in root directory.
 	FolderId *string `json:"-"`
 	// Whether to include data that was marked as deleted by third party webhooks.
 	IncludeDeletedData *bool `json:"-"`
@@ -48,4 +56,140 @@ type FilesRetrieveRequest struct {
 	Expand *FilesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type FilesListRequestExpand uint
+
+const (
+	FilesListRequestExpandDrive FilesListRequestExpand = iota + 1
+	FilesListRequestExpandFolder
+	FilesListRequestExpandFolderDrive
+	FilesListRequestExpandPermissions
+	FilesListRequestExpandPermissionsDrive
+	FilesListRequestExpandPermissionsFolder
+	FilesListRequestExpandPermissionsFolderDrive
+)
+
+func (f FilesListRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FilesListRequestExpandDrive:
+		return "drive"
+	case FilesListRequestExpandFolder:
+		return "folder"
+	case FilesListRequestExpandFolderDrive:
+		return "folder,drive"
+	case FilesListRequestExpandPermissions:
+		return "permissions"
+	case FilesListRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FilesListRequestExpandPermissionsFolder:
+		return "permissions,folder"
+	case FilesListRequestExpandPermissionsFolderDrive:
+		return "permissions,folder,drive"
+	}
+}
+
+func (f FilesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FilesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FilesListRequestExpandDrive
+		*f = value
+	case "folder":
+		value := FilesListRequestExpandFolder
+		*f = value
+	case "folder,drive":
+		value := FilesListRequestExpandFolderDrive
+		*f = value
+	case "permissions":
+		value := FilesListRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FilesListRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,folder":
+		value := FilesListRequestExpandPermissionsFolder
+		*f = value
+	case "permissions,folder,drive":
+		value := FilesListRequestExpandPermissionsFolderDrive
+		*f = value
+	}
+	return nil
+}
+
+type FilesRetrieveRequestExpand uint
+
+const (
+	FilesRetrieveRequestExpandDrive FilesRetrieveRequestExpand = iota + 1
+	FilesRetrieveRequestExpandFolder
+	FilesRetrieveRequestExpandFolderDrive
+	FilesRetrieveRequestExpandPermissions
+	FilesRetrieveRequestExpandPermissionsDrive
+	FilesRetrieveRequestExpandPermissionsFolder
+	FilesRetrieveRequestExpandPermissionsFolderDrive
+)
+
+func (f FilesRetrieveRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FilesRetrieveRequestExpandDrive:
+		return "drive"
+	case FilesRetrieveRequestExpandFolder:
+		return "folder"
+	case FilesRetrieveRequestExpandFolderDrive:
+		return "folder,drive"
+	case FilesRetrieveRequestExpandPermissions:
+		return "permissions"
+	case FilesRetrieveRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FilesRetrieveRequestExpandPermissionsFolder:
+		return "permissions,folder"
+	case FilesRetrieveRequestExpandPermissionsFolderDrive:
+		return "permissions,folder,drive"
+	}
+}
+
+func (f FilesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FilesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FilesRetrieveRequestExpandDrive
+		*f = value
+	case "folder":
+		value := FilesRetrieveRequestExpandFolder
+		*f = value
+	case "folder,drive":
+		value := FilesRetrieveRequestExpandFolderDrive
+		*f = value
+	case "permissions":
+		value := FilesRetrieveRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FilesRetrieveRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,folder":
+		value := FilesRetrieveRequestExpandPermissionsFolder
+		*f = value
+	case "permissions,folder,drive":
+		value := FilesRetrieveRequestExpandPermissionsFolderDrive
+		*f = value
+	}
+	return nil
 }

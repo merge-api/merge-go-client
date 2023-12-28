@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *hris.SyncStatusListRequest) 
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/sync-status"
+	endpointURL := baseURL + "/" + "sync-status"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

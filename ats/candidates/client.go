@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *ats.CandidatesListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/candidates"
+	endpointURL := baseURL + "/" + "candidates"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -118,7 +118,7 @@ func (c *client) Create(ctx context.Context, request *ats.CandidateEndpointReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/candidates"
+	endpointURL := baseURL + "/" + "candidates"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -154,7 +154,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Candidate
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"candidates/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -190,7 +190,7 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *ats.Patc
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"candidates/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -226,7 +226,7 @@ func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *ats.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"candidates/ignore/%v", modelId)
 
 	if err := core.DoRequest(
 		ctx,
@@ -250,7 +250,7 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaRes
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"candidates/meta/patch/%v", id)
 
 	var response *ats.MetaResponse
 	if err := core.DoRequest(
@@ -275,7 +275,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/candidates/meta/post"
+	endpointURL := baseURL + "/" + "candidates/meta/post"
 
 	var response *ats.MetaResponse
 	if err := core.DoRequest(

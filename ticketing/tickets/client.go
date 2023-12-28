@@ -47,7 +47,7 @@ func (c *client) List(ctx context.Context, request *ticketing.TicketsListRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets"
+	endpointURL := baseURL + "/" + "tickets"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -170,7 +170,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.TicketEndpointRe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets"
+	endpointURL := baseURL + "/" + "tickets"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -206,7 +206,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Tic
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tickets/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -251,7 +251,7 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *ticketin
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tickets/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -287,7 +287,7 @@ func (c *client) CollaboratorsList(ctx context.Context, parentId string, request
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/%v/collaborators", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tickets/%v/collaborators", parentId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {
@@ -332,7 +332,7 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.M
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tickets/meta/patch/%v", id)
 
 	var response *ticketing.MetaResponse
 	if err := core.DoRequest(
@@ -357,7 +357,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse,
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets/meta/post"
+	endpointURL := baseURL + "/" + "tickets/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := core.DoRequest(
@@ -382,7 +382,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *ticketing.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets/remote-field-classes"
+	endpointURL := baseURL + "/" + "tickets/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

@@ -3,6 +3,9 @@
 package crm
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -67,4 +70,236 @@ type NotesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type NotesListRequestExpand uint
+
+const (
+	NotesListRequestExpandAccount NotesListRequestExpand = iota + 1
+	NotesListRequestExpandAccountOpportunity
+	NotesListRequestExpandContact
+	NotesListRequestExpandContactAccount
+	NotesListRequestExpandContactAccountOpportunity
+	NotesListRequestExpandContactOpportunity
+	NotesListRequestExpandOpportunity
+	NotesListRequestExpandOwner
+	NotesListRequestExpandOwnerAccount
+	NotesListRequestExpandOwnerAccountOpportunity
+	NotesListRequestExpandOwnerContact
+	NotesListRequestExpandOwnerContactAccount
+	NotesListRequestExpandOwnerContactAccountOpportunity
+	NotesListRequestExpandOwnerContactOpportunity
+	NotesListRequestExpandOwnerOpportunity
+)
+
+func (n NotesListRequestExpand) String() string {
+	switch n {
+	default:
+		return strconv.Itoa(int(n))
+	case NotesListRequestExpandAccount:
+		return "account"
+	case NotesListRequestExpandAccountOpportunity:
+		return "account,opportunity"
+	case NotesListRequestExpandContact:
+		return "contact"
+	case NotesListRequestExpandContactAccount:
+		return "contact,account"
+	case NotesListRequestExpandContactAccountOpportunity:
+		return "contact,account,opportunity"
+	case NotesListRequestExpandContactOpportunity:
+		return "contact,opportunity"
+	case NotesListRequestExpandOpportunity:
+		return "opportunity"
+	case NotesListRequestExpandOwner:
+		return "owner"
+	case NotesListRequestExpandOwnerAccount:
+		return "owner,account"
+	case NotesListRequestExpandOwnerAccountOpportunity:
+		return "owner,account,opportunity"
+	case NotesListRequestExpandOwnerContact:
+		return "owner,contact"
+	case NotesListRequestExpandOwnerContactAccount:
+		return "owner,contact,account"
+	case NotesListRequestExpandOwnerContactAccountOpportunity:
+		return "owner,contact,account,opportunity"
+	case NotesListRequestExpandOwnerContactOpportunity:
+		return "owner,contact,opportunity"
+	case NotesListRequestExpandOwnerOpportunity:
+		return "owner,opportunity"
+	}
+}
+
+func (n NotesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", n.String())), nil
+}
+
+func (n *NotesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := NotesListRequestExpandAccount
+		*n = value
+	case "account,opportunity":
+		value := NotesListRequestExpandAccountOpportunity
+		*n = value
+	case "contact":
+		value := NotesListRequestExpandContact
+		*n = value
+	case "contact,account":
+		value := NotesListRequestExpandContactAccount
+		*n = value
+	case "contact,account,opportunity":
+		value := NotesListRequestExpandContactAccountOpportunity
+		*n = value
+	case "contact,opportunity":
+		value := NotesListRequestExpandContactOpportunity
+		*n = value
+	case "opportunity":
+		value := NotesListRequestExpandOpportunity
+		*n = value
+	case "owner":
+		value := NotesListRequestExpandOwner
+		*n = value
+	case "owner,account":
+		value := NotesListRequestExpandOwnerAccount
+		*n = value
+	case "owner,account,opportunity":
+		value := NotesListRequestExpandOwnerAccountOpportunity
+		*n = value
+	case "owner,contact":
+		value := NotesListRequestExpandOwnerContact
+		*n = value
+	case "owner,contact,account":
+		value := NotesListRequestExpandOwnerContactAccount
+		*n = value
+	case "owner,contact,account,opportunity":
+		value := NotesListRequestExpandOwnerContactAccountOpportunity
+		*n = value
+	case "owner,contact,opportunity":
+		value := NotesListRequestExpandOwnerContactOpportunity
+		*n = value
+	case "owner,opportunity":
+		value := NotesListRequestExpandOwnerOpportunity
+		*n = value
+	}
+	return nil
+}
+
+type NotesRetrieveRequestExpand uint
+
+const (
+	NotesRetrieveRequestExpandAccount NotesRetrieveRequestExpand = iota + 1
+	NotesRetrieveRequestExpandAccountOpportunity
+	NotesRetrieveRequestExpandContact
+	NotesRetrieveRequestExpandContactAccount
+	NotesRetrieveRequestExpandContactAccountOpportunity
+	NotesRetrieveRequestExpandContactOpportunity
+	NotesRetrieveRequestExpandOpportunity
+	NotesRetrieveRequestExpandOwner
+	NotesRetrieveRequestExpandOwnerAccount
+	NotesRetrieveRequestExpandOwnerAccountOpportunity
+	NotesRetrieveRequestExpandOwnerContact
+	NotesRetrieveRequestExpandOwnerContactAccount
+	NotesRetrieveRequestExpandOwnerContactAccountOpportunity
+	NotesRetrieveRequestExpandOwnerContactOpportunity
+	NotesRetrieveRequestExpandOwnerOpportunity
+)
+
+func (n NotesRetrieveRequestExpand) String() string {
+	switch n {
+	default:
+		return strconv.Itoa(int(n))
+	case NotesRetrieveRequestExpandAccount:
+		return "account"
+	case NotesRetrieveRequestExpandAccountOpportunity:
+		return "account,opportunity"
+	case NotesRetrieveRequestExpandContact:
+		return "contact"
+	case NotesRetrieveRequestExpandContactAccount:
+		return "contact,account"
+	case NotesRetrieveRequestExpandContactAccountOpportunity:
+		return "contact,account,opportunity"
+	case NotesRetrieveRequestExpandContactOpportunity:
+		return "contact,opportunity"
+	case NotesRetrieveRequestExpandOpportunity:
+		return "opportunity"
+	case NotesRetrieveRequestExpandOwner:
+		return "owner"
+	case NotesRetrieveRequestExpandOwnerAccount:
+		return "owner,account"
+	case NotesRetrieveRequestExpandOwnerAccountOpportunity:
+		return "owner,account,opportunity"
+	case NotesRetrieveRequestExpandOwnerContact:
+		return "owner,contact"
+	case NotesRetrieveRequestExpandOwnerContactAccount:
+		return "owner,contact,account"
+	case NotesRetrieveRequestExpandOwnerContactAccountOpportunity:
+		return "owner,contact,account,opportunity"
+	case NotesRetrieveRequestExpandOwnerContactOpportunity:
+		return "owner,contact,opportunity"
+	case NotesRetrieveRequestExpandOwnerOpportunity:
+		return "owner,opportunity"
+	}
+}
+
+func (n NotesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", n.String())), nil
+}
+
+func (n *NotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := NotesRetrieveRequestExpandAccount
+		*n = value
+	case "account,opportunity":
+		value := NotesRetrieveRequestExpandAccountOpportunity
+		*n = value
+	case "contact":
+		value := NotesRetrieveRequestExpandContact
+		*n = value
+	case "contact,account":
+		value := NotesRetrieveRequestExpandContactAccount
+		*n = value
+	case "contact,account,opportunity":
+		value := NotesRetrieveRequestExpandContactAccountOpportunity
+		*n = value
+	case "contact,opportunity":
+		value := NotesRetrieveRequestExpandContactOpportunity
+		*n = value
+	case "opportunity":
+		value := NotesRetrieveRequestExpandOpportunity
+		*n = value
+	case "owner":
+		value := NotesRetrieveRequestExpandOwner
+		*n = value
+	case "owner,account":
+		value := NotesRetrieveRequestExpandOwnerAccount
+		*n = value
+	case "owner,account,opportunity":
+		value := NotesRetrieveRequestExpandOwnerAccountOpportunity
+		*n = value
+	case "owner,contact":
+		value := NotesRetrieveRequestExpandOwnerContact
+		*n = value
+	case "owner,contact,account":
+		value := NotesRetrieveRequestExpandOwnerContactAccount
+		*n = value
+	case "owner,contact,account,opportunity":
+		value := NotesRetrieveRequestExpandOwnerContactAccountOpportunity
+		*n = value
+	case "owner,contact,opportunity":
+		value := NotesRetrieveRequestExpandOwnerContactOpportunity
+		*n = value
+	case "owner,opportunity":
+		value := NotesRetrieveRequestExpandOwnerOpportunity
+		*n = value
+	}
+	return nil
 }

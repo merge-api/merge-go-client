@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.DataPassthroug
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/passthrough"
+	endpointURL := baseURL + "/" + "passthrough"
 
 	var response *filestorage.RemoteResponse
 	if err := core.DoRequest(

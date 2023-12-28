@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*crm.AvailableActions, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/available-actions"
+	endpointURL := baseURL + "/" + "available-actions"
 
 	var response *crm.AvailableActions
 	if err := core.DoRequest(

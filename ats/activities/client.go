@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *ats.ActivitiesListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/activities"
+	endpointURL := baseURL + "/" + "activities"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *ats.ActivityEndpointReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/activities"
+	endpointURL := baseURL + "/" + "activities"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Activitie
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/activities/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"activities/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -190,7 +190,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/activities/meta/post"
+	endpointURL := baseURL + "/" + "activities/meta/post"
 
 	var response *ats.MetaResponse
 	if err := core.DoRequest(

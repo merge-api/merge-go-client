@@ -3,6 +3,9 @@
 package crm
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -69,4 +72,140 @@ type LeadsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type LeadsListRequestExpand uint
+
+const (
+	LeadsListRequestExpandConvertedAccount LeadsListRequestExpand = iota + 1
+	LeadsListRequestExpandConvertedContact
+	LeadsListRequestExpandConvertedContactConvertedAccount
+	LeadsListRequestExpandOwner
+	LeadsListRequestExpandOwnerConvertedAccount
+	LeadsListRequestExpandOwnerConvertedContact
+	LeadsListRequestExpandOwnerConvertedContactConvertedAccount
+)
+
+func (l LeadsListRequestExpand) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LeadsListRequestExpandConvertedAccount:
+		return "converted_account"
+	case LeadsListRequestExpandConvertedContact:
+		return "converted_contact"
+	case LeadsListRequestExpandConvertedContactConvertedAccount:
+		return "converted_contact,converted_account"
+	case LeadsListRequestExpandOwner:
+		return "owner"
+	case LeadsListRequestExpandOwnerConvertedAccount:
+		return "owner,converted_account"
+	case LeadsListRequestExpandOwnerConvertedContact:
+		return "owner,converted_contact"
+	case LeadsListRequestExpandOwnerConvertedContactConvertedAccount:
+		return "owner,converted_contact,converted_account"
+	}
+}
+
+func (l LeadsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LeadsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "converted_account":
+		value := LeadsListRequestExpandConvertedAccount
+		*l = value
+	case "converted_contact":
+		value := LeadsListRequestExpandConvertedContact
+		*l = value
+	case "converted_contact,converted_account":
+		value := LeadsListRequestExpandConvertedContactConvertedAccount
+		*l = value
+	case "owner":
+		value := LeadsListRequestExpandOwner
+		*l = value
+	case "owner,converted_account":
+		value := LeadsListRequestExpandOwnerConvertedAccount
+		*l = value
+	case "owner,converted_contact":
+		value := LeadsListRequestExpandOwnerConvertedContact
+		*l = value
+	case "owner,converted_contact,converted_account":
+		value := LeadsListRequestExpandOwnerConvertedContactConvertedAccount
+		*l = value
+	}
+	return nil
+}
+
+type LeadsRetrieveRequestExpand uint
+
+const (
+	LeadsRetrieveRequestExpandConvertedAccount LeadsRetrieveRequestExpand = iota + 1
+	LeadsRetrieveRequestExpandConvertedContact
+	LeadsRetrieveRequestExpandConvertedContactConvertedAccount
+	LeadsRetrieveRequestExpandOwner
+	LeadsRetrieveRequestExpandOwnerConvertedAccount
+	LeadsRetrieveRequestExpandOwnerConvertedContact
+	LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount
+)
+
+func (l LeadsRetrieveRequestExpand) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LeadsRetrieveRequestExpandConvertedAccount:
+		return "converted_account"
+	case LeadsRetrieveRequestExpandConvertedContact:
+		return "converted_contact"
+	case LeadsRetrieveRequestExpandConvertedContactConvertedAccount:
+		return "converted_contact,converted_account"
+	case LeadsRetrieveRequestExpandOwner:
+		return "owner"
+	case LeadsRetrieveRequestExpandOwnerConvertedAccount:
+		return "owner,converted_account"
+	case LeadsRetrieveRequestExpandOwnerConvertedContact:
+		return "owner,converted_contact"
+	case LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount:
+		return "owner,converted_contact,converted_account"
+	}
+}
+
+func (l LeadsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LeadsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "converted_account":
+		value := LeadsRetrieveRequestExpandConvertedAccount
+		*l = value
+	case "converted_contact":
+		value := LeadsRetrieveRequestExpandConvertedContact
+		*l = value
+	case "converted_contact,converted_account":
+		value := LeadsRetrieveRequestExpandConvertedContactConvertedAccount
+		*l = value
+	case "owner":
+		value := LeadsRetrieveRequestExpandOwner
+		*l = value
+	case "owner,converted_account":
+		value := LeadsRetrieveRequestExpandOwnerConvertedAccount
+		*l = value
+	case "owner,converted_contact":
+		value := LeadsRetrieveRequestExpandOwnerConvertedContact
+		*l = value
+	case "owner,converted_contact,converted_account":
+		value := LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount
+		*l = value
+	}
+	return nil
 }

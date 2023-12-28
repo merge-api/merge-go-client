@@ -18,7 +18,7 @@ type Client interface {
 	List(ctx context.Context, request *filestorage.FilesListRequest) (*filestorage.PaginatedFileList, error)
 	Create(ctx context.Context, request *filestorage.FileStorageFileEndpointRequest) (*filestorage.FileStorageFileResponse, error)
 	Retrieve(ctx context.Context, id string, request *filestorage.FilesRetrieveRequest) (*filestorage.File, error)
-	DownloadRetrieve(ctx context.Context, id string) (io.Reader, error)
+	DownloadRetrieve(ctx context.Context, id string, request *filestorage.FilesDownloadRetrieveRequest) (io.Reader, error)
 	MetaPostRetrieve(ctx context.Context) (*filestorage.MetaResponse, error)
 }
 
@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *filestorage.FilesListRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/files"
+	endpointURL := baseURL + "/" + "files"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -115,7 +115,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.FileStorageFil
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/files"
+	endpointURL := baseURL + "/" + "files"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -151,7 +151,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.F
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/files/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"files/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -182,12 +182,20 @@ func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.F
 }
 
 // Returns a `File` object with the given `id`.
-func (c *client) DownloadRetrieve(ctx context.Context, id string) (io.Reader, error) {
+func (c *client) DownloadRetrieve(ctx context.Context, id string, request *filestorage.FilesDownloadRetrieveRequest) (io.Reader, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/files/%v/download", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"files/%v/download", id)
+
+	queryParams := make(url.Values)
+	if request.MimeType != nil {
+		queryParams.Add("mime_type", fmt.Sprintf("%v", *request.MimeType))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
 
 	response := bytes.NewBuffer(nil)
 	if err := core.DoRequest(
@@ -195,7 +203,7 @@ func (c *client) DownloadRetrieve(ctx context.Context, id string) (io.Reader, er
 		c.httpClient,
 		endpointURL,
 		http.MethodGet,
-		nil,
+		request,
 		response,
 		false,
 		c.header,
@@ -212,7 +220,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaRespons
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/files/meta/post"
+	endpointURL := baseURL + "/" + "files/meta/post"
 
 	var response *filestorage.MetaResponse
 	if err := core.DoRequest(

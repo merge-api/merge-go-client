@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *accounting.PaymentsListReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/payments"
+	endpointURL := baseURL + "/" + "payments"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -118,7 +118,7 @@ func (c *client) Create(ctx context.Context, request *accounting.PaymentEndpoint
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/payments"
+	endpointURL := baseURL + "/" + "payments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -154,7 +154,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Pa
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/payments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"payments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -190,7 +190,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/payments/meta/post"
+	endpointURL := baseURL + "/" + "payments/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := core.DoRequest(

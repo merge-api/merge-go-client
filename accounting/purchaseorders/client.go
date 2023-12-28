@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *accounting.PurchaseOrdersLis
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/purchase-orders"
+	endpointURL := baseURL + "/" + "purchase-orders"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -118,7 +118,7 @@ func (c *client) Create(ctx context.Context, request *accounting.PurchaseOrderEn
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/purchase-orders"
+	endpointURL := baseURL + "/" + "purchase-orders"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -154,7 +154,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Pu
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/purchase-orders/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"purchase-orders/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -196,7 +196,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/purchase-orders/meta/post"
+	endpointURL := baseURL + "/" + "purchase-orders/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := core.DoRequest(

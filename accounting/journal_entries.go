@@ -3,6 +3,9 @@
 package accounting
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -48,4 +51,812 @@ type JournalEntriesRetrieveRequest struct {
 	Expand *JournalEntriesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type JournalEntriesListRequestExpand uint
+
+const (
+	JournalEntriesListRequestExpandAccountingPeriod JournalEntriesListRequestExpand = iota + 1
+	JournalEntriesListRequestExpandAppliedPayments
+	JournalEntriesListRequestExpandAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandAppliedPaymentsCompany
+	JournalEntriesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandCompany
+	JournalEntriesListRequestExpandCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLines
+	JournalEntriesListRequestExpandLinesAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPayments
+	JournalEntriesListRequestExpandLinesAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPaymentsCompany
+	JournalEntriesListRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesCompany
+	JournalEntriesListRequestExpandLinesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesPayments
+	JournalEntriesListRequestExpandLinesPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPayments
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompany
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsCompany
+	JournalEntriesListRequestExpandLinesPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsTrackingCategories
+	JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandLinesTrackingCategories
+	JournalEntriesListRequestExpandLinesTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandLinesTrackingCategoriesCompany
+	JournalEntriesListRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandPayments
+	JournalEntriesListRequestExpandPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPayments
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompany
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsCompany
+	JournalEntriesListRequestExpandPaymentsCompanyAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsTrackingCategories
+	JournalEntriesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandPaymentsTrackingCategoriesCompany
+	JournalEntriesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesListRequestExpandTrackingCategories
+	JournalEntriesListRequestExpandTrackingCategoriesAccountingPeriod
+	JournalEntriesListRequestExpandTrackingCategoriesCompany
+	JournalEntriesListRequestExpandTrackingCategoriesCompanyAccountingPeriod
+)
+
+func (j JournalEntriesListRequestExpand) String() string {
+	switch j {
+	default:
+		return strconv.Itoa(int(j))
+	case JournalEntriesListRequestExpandAccountingPeriod:
+		return "accounting_period"
+	case JournalEntriesListRequestExpandAppliedPayments:
+		return "applied_payments"
+	case JournalEntriesListRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case JournalEntriesListRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandCompany:
+		return "company"
+	case JournalEntriesListRequestExpandCompanyAccountingPeriod:
+		return "company,accounting_period"
+	case JournalEntriesListRequestExpandLines:
+		return "lines"
+	case JournalEntriesListRequestExpandLinesAccountingPeriod:
+		return "lines,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPayments:
+		return "lines,applied_payments"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsAccountingPeriod:
+		return "lines,applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsCompany:
+		return "lines,applied_payments,company"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategories:
+		return "lines,applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesCompany:
+		return "lines,company"
+	case JournalEntriesListRequestExpandLinesCompanyAccountingPeriod:
+		return "lines,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesPayments:
+		return "lines,payments"
+	case JournalEntriesListRequestExpandLinesPaymentsAccountingPeriod:
+		return "lines,payments,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPayments:
+		return "lines,payments,applied_payments"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod:
+		return "lines,payments,applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompany:
+		return "lines,payments,applied_payments,company"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories:
+		return "lines,payments,applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,payments,applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsCompany:
+		return "lines,payments,company"
+	case JournalEntriesListRequestExpandLinesPaymentsCompanyAccountingPeriod:
+		return "lines,payments,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsTrackingCategories:
+		return "lines,payments,tracking_categories"
+	case JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesCompany:
+		return "lines,payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,payments,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandLinesTrackingCategories:
+		return "lines,tracking_categories"
+	case JournalEntriesListRequestExpandLinesTrackingCategoriesAccountingPeriod:
+		return "lines,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandLinesTrackingCategoriesCompany:
+		return "lines,tracking_categories,company"
+	case JournalEntriesListRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandPayments:
+		return "payments"
+	case JournalEntriesListRequestExpandPaymentsAccountingPeriod:
+		return "payments,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsCompany:
+		return "payments,company"
+	case JournalEntriesListRequestExpandPaymentsCompanyAccountingPeriod:
+		return "payments,company,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsTrackingCategories:
+		return "payments,tracking_categories"
+	case JournalEntriesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandPaymentsTrackingCategoriesCompany:
+		return "payments,tracking_categories,company"
+	case JournalEntriesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,tracking_categories,company,accounting_period"
+	case JournalEntriesListRequestExpandTrackingCategories:
+		return "tracking_categories"
+	case JournalEntriesListRequestExpandTrackingCategoriesAccountingPeriod:
+		return "tracking_categories,accounting_period"
+	case JournalEntriesListRequestExpandTrackingCategoriesCompany:
+		return "tracking_categories,company"
+	case JournalEntriesListRequestExpandTrackingCategoriesCompanyAccountingPeriod:
+		return "tracking_categories,company,accounting_period"
+	}
+}
+
+func (j JournalEntriesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", j.String())), nil
+}
+
+func (j *JournalEntriesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "accounting_period":
+		value := JournalEntriesListRequestExpandAccountingPeriod
+		*j = value
+	case "applied_payments":
+		value := JournalEntriesListRequestExpandAppliedPayments
+		*j = value
+	case "applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsAccountingPeriod
+		*j = value
+	case "applied_payments,company":
+		value := JournalEntriesListRequestExpandAppliedPaymentsCompany
+		*j = value
+	case "applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategories
+		*j = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "company":
+		value := JournalEntriesListRequestExpandCompany
+		*j = value
+	case "company,accounting_period":
+		value := JournalEntriesListRequestExpandCompanyAccountingPeriod
+		*j = value
+	case "lines":
+		value := JournalEntriesListRequestExpandLines
+		*j = value
+	case "lines,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAccountingPeriod
+		*j = value
+	case "lines,applied_payments":
+		value := JournalEntriesListRequestExpandLinesAppliedPayments
+		*j = value
+	case "lines,applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,applied_payments,company":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsCompany
+		*j = value
+	case "lines,applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "lines,company":
+		value := JournalEntriesListRequestExpandLinesCompany
+		*j = value
+	case "lines,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesCompanyAccountingPeriod
+		*j = value
+	case "lines,payments":
+		value := JournalEntriesListRequestExpandLinesPayments
+		*j = value
+	case "lines,payments,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPayments
+		*j = value
+	case "lines,payments,applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,company":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompany
+		*j = value
+	case "lines,payments,applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,company":
+		value := JournalEntriesListRequestExpandLinesPaymentsCompany
+		*j = value
+	case "lines,payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,tracking_categories":
+		value := JournalEntriesListRequestExpandLinesPaymentsTrackingCategories
+		*j = value
+	case "lines,payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "lines,tracking_categories":
+		value := JournalEntriesListRequestExpandLinesTrackingCategories
+		*j = value
+	case "lines,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandLinesTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,tracking_categories,company":
+		value := JournalEntriesListRequestExpandLinesTrackingCategoriesCompany
+		*j = value
+	case "lines,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "payments":
+		value := JournalEntriesListRequestExpandPayments
+		*j = value
+	case "payments,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPayments
+		*j = value
+	case "payments,applied_payments,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments,company":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompany
+		*j = value
+	case "payments,applied_payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "payments,company":
+		value := JournalEntriesListRequestExpandPaymentsCompany
+		*j = value
+	case "payments,company,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsCompanyAccountingPeriod
+		*j = value
+	case "payments,tracking_categories":
+		value := JournalEntriesListRequestExpandPaymentsTrackingCategories
+		*j = value
+	case "payments,tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "payments,tracking_categories,company":
+		value := JournalEntriesListRequestExpandPaymentsTrackingCategoriesCompany
+		*j = value
+	case "payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "tracking_categories":
+		value := JournalEntriesListRequestExpandTrackingCategories
+		*j = value
+	case "tracking_categories,accounting_period":
+		value := JournalEntriesListRequestExpandTrackingCategoriesAccountingPeriod
+		*j = value
+	case "tracking_categories,company":
+		value := JournalEntriesListRequestExpandTrackingCategoriesCompany
+		*j = value
+	case "tracking_categories,company,accounting_period":
+		value := JournalEntriesListRequestExpandTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	}
+	return nil
+}
+
+type JournalEntriesRetrieveRequestExpand uint
+
+const (
+	JournalEntriesRetrieveRequestExpandAccountingPeriod JournalEntriesRetrieveRequestExpand = iota + 1
+	JournalEntriesRetrieveRequestExpandAppliedPayments
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandCompany
+	JournalEntriesRetrieveRequestExpandCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLines
+	JournalEntriesRetrieveRequestExpandLinesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPayments
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesCompany
+	JournalEntriesRetrieveRequestExpandLinesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPayments
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPayments
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsCompany
+	JournalEntriesRetrieveRequestExpandLinesPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesTrackingCategories
+	JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPayments
+	JournalEntriesRetrieveRequestExpandPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPayments
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsCompany
+	JournalEntriesRetrieveRequestExpandPaymentsCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsTrackingCategories
+	JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod
+	JournalEntriesRetrieveRequestExpandTrackingCategories
+	JournalEntriesRetrieveRequestExpandTrackingCategoriesAccountingPeriod
+	JournalEntriesRetrieveRequestExpandTrackingCategoriesCompany
+	JournalEntriesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod
+)
+
+func (j JournalEntriesRetrieveRequestExpand) String() string {
+	switch j {
+	default:
+		return strconv.Itoa(int(j))
+	case JournalEntriesRetrieveRequestExpandAccountingPeriod:
+		return "accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPayments:
+		return "applied_payments"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsAccountingPeriod:
+		return "applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsCompany:
+		return "applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod:
+		return "applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategories:
+		return "applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany:
+		return "applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandCompany:
+		return "company"
+	case JournalEntriesRetrieveRequestExpandCompanyAccountingPeriod:
+		return "company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLines:
+		return "lines"
+	case JournalEntriesRetrieveRequestExpandLinesAccountingPeriod:
+		return "lines,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPayments:
+		return "lines,applied_payments"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsAccountingPeriod:
+		return "lines,applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompany:
+		return "lines,applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategories:
+		return "lines,applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesCompany:
+		return "lines,company"
+	case JournalEntriesRetrieveRequestExpandLinesCompanyAccountingPeriod:
+		return "lines,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPayments:
+		return "lines,payments"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAccountingPeriod:
+		return "lines,payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPayments:
+		return "lines,payments,applied_payments"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod:
+		return "lines,payments,applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompany:
+		return "lines,payments,applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories:
+		return "lines,payments,applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "lines,payments,applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,payments,applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsCompany:
+		return "lines,payments,company"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsCompanyAccountingPeriod:
+		return "lines,payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategories:
+		return "lines,payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesAccountingPeriod:
+		return "lines,payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesCompany:
+		return "lines,payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,payments,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesTrackingCategories:
+		return "lines,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesAccountingPeriod:
+		return "lines,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompany:
+		return "lines,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod:
+		return "lines,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPayments:
+		return "payments"
+	case JournalEntriesRetrieveRequestExpandPaymentsAccountingPeriod:
+		return "payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPayments:
+		return "payments,applied_payments"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod:
+		return "payments,applied_payments,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompany:
+		return "payments,applied_payments,company"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod:
+		return "payments,applied_payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories:
+		return "payments,applied_payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany:
+		return "payments,applied_payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,applied_payments,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsCompany:
+		return "payments,company"
+	case JournalEntriesRetrieveRequestExpandPaymentsCompanyAccountingPeriod:
+		return "payments,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsTrackingCategories:
+		return "payments,tracking_categories"
+	case JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod:
+		return "payments,tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesCompany:
+		return "payments,tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod:
+		return "payments,tracking_categories,company,accounting_period"
+	case JournalEntriesRetrieveRequestExpandTrackingCategories:
+		return "tracking_categories"
+	case JournalEntriesRetrieveRequestExpandTrackingCategoriesAccountingPeriod:
+		return "tracking_categories,accounting_period"
+	case JournalEntriesRetrieveRequestExpandTrackingCategoriesCompany:
+		return "tracking_categories,company"
+	case JournalEntriesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod:
+		return "tracking_categories,company,accounting_period"
+	}
+}
+
+func (j JournalEntriesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", j.String())), nil
+}
+
+func (j *JournalEntriesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAccountingPeriod
+		*j = value
+	case "applied_payments":
+		value := JournalEntriesRetrieveRequestExpandAppliedPayments
+		*j = value
+	case "applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsAccountingPeriod
+		*j = value
+	case "applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsCompany
+		*j = value
+	case "applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategories
+		*j = value
+	case "applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "company":
+		value := JournalEntriesRetrieveRequestExpandCompany
+		*j = value
+	case "company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandCompanyAccountingPeriod
+		*j = value
+	case "lines":
+		value := JournalEntriesRetrieveRequestExpandLines
+		*j = value
+	case "lines,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAccountingPeriod
+		*j = value
+	case "lines,applied_payments":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPayments
+		*j = value
+	case "lines,applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompany
+		*j = value
+	case "lines,applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "lines,company":
+		value := JournalEntriesRetrieveRequestExpandLinesCompany
+		*j = value
+	case "lines,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesCompanyAccountingPeriod
+		*j = value
+	case "lines,payments":
+		value := JournalEntriesRetrieveRequestExpandLinesPayments
+		*j = value
+	case "lines,payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPayments
+		*j = value
+	case "lines,payments,applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompany
+		*j = value
+	case "lines,payments,applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,company":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsCompany
+		*j = value
+	case "lines,payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsCompanyAccountingPeriod
+		*j = value
+	case "lines,payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategories
+		*j = value
+	case "lines,payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesCompany
+		*j = value
+	case "lines,payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "lines,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandLinesTrackingCategories
+		*j = value
+	case "lines,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesAccountingPeriod
+		*j = value
+	case "lines,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompany
+		*j = value
+	case "lines,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "payments":
+		value := JournalEntriesRetrieveRequestExpandPayments
+		*j = value
+	case "payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPayments
+		*j = value
+	case "payments,applied_payments,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod
+		*j = value
+	case "payments,applied_payments,company":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompany
+		*j = value
+	case "payments,applied_payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories
+		*j = value
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "payments,applied_payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany
+		*j = value
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "payments,company":
+		value := JournalEntriesRetrieveRequestExpandPaymentsCompany
+		*j = value
+	case "payments,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsCompanyAccountingPeriod
+		*j = value
+	case "payments,tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandPaymentsTrackingCategories
+		*j = value
+	case "payments,tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod
+		*j = value
+	case "payments,tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesCompany
+		*j = value
+	case "payments,tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	case "tracking_categories":
+		value := JournalEntriesRetrieveRequestExpandTrackingCategories
+		*j = value
+	case "tracking_categories,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandTrackingCategoriesAccountingPeriod
+		*j = value
+	case "tracking_categories,company":
+		value := JournalEntriesRetrieveRequestExpandTrackingCategoriesCompany
+		*j = value
+	case "tracking_categories,company,accounting_period":
+		value := JournalEntriesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod
+		*j = value
+	}
+	return nil
 }

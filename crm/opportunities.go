@@ -3,6 +3,9 @@
 package crm
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -49,9 +52,9 @@ type OpportunitiesListRequest struct {
 	StageId *string `json:"-"`
 	// If provided, will only return opportunities with this status. Options: ('OPEN', 'WON', 'LOST')
 	//
-	// * `OPEN` - OPEN
-	// * `WON` - WON
-	// * `LOST` - LOST
+	// - `OPEN` - OPEN
+	// - `WON` - WON
+	// - `LOST` - LOST
 	Status *OpportunitiesListRequestStatus `json:"-"`
 }
 
@@ -87,4 +90,184 @@ type OpportunitiesRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type OpportunitiesListRequestExpand uint
+
+const (
+	OpportunitiesListRequestExpandAccount OpportunitiesListRequestExpand = iota + 1
+	OpportunitiesListRequestExpandOwner
+	OpportunitiesListRequestExpandOwnerAccount
+	OpportunitiesListRequestExpandOwnerStage
+	OpportunitiesListRequestExpandOwnerStageAccount
+	OpportunitiesListRequestExpandStage
+	OpportunitiesListRequestExpandStageAccount
+)
+
+func (o OpportunitiesListRequestExpand) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OpportunitiesListRequestExpandAccount:
+		return "account"
+	case OpportunitiesListRequestExpandOwner:
+		return "owner"
+	case OpportunitiesListRequestExpandOwnerAccount:
+		return "owner,account"
+	case OpportunitiesListRequestExpandOwnerStage:
+		return "owner,stage"
+	case OpportunitiesListRequestExpandOwnerStageAccount:
+		return "owner,stage,account"
+	case OpportunitiesListRequestExpandStage:
+		return "stage"
+	case OpportunitiesListRequestExpandStageAccount:
+		return "stage,account"
+	}
+}
+
+func (o OpportunitiesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OpportunitiesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := OpportunitiesListRequestExpandAccount
+		*o = value
+	case "owner":
+		value := OpportunitiesListRequestExpandOwner
+		*o = value
+	case "owner,account":
+		value := OpportunitiesListRequestExpandOwnerAccount
+		*o = value
+	case "owner,stage":
+		value := OpportunitiesListRequestExpandOwnerStage
+		*o = value
+	case "owner,stage,account":
+		value := OpportunitiesListRequestExpandOwnerStageAccount
+		*o = value
+	case "stage":
+		value := OpportunitiesListRequestExpandStage
+		*o = value
+	case "stage,account":
+		value := OpportunitiesListRequestExpandStageAccount
+		*o = value
+	}
+	return nil
+}
+
+type OpportunitiesListRequestStatus uint
+
+const (
+	OpportunitiesListRequestStatusLost OpportunitiesListRequestStatus = iota + 1
+	OpportunitiesListRequestStatusOpen
+	OpportunitiesListRequestStatusWon
+)
+
+func (o OpportunitiesListRequestStatus) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OpportunitiesListRequestStatusLost:
+		return "LOST"
+	case OpportunitiesListRequestStatusOpen:
+		return "OPEN"
+	case OpportunitiesListRequestStatusWon:
+		return "WON"
+	}
+}
+
+func (o OpportunitiesListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OpportunitiesListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "LOST":
+		value := OpportunitiesListRequestStatusLost
+		*o = value
+	case "OPEN":
+		value := OpportunitiesListRequestStatusOpen
+		*o = value
+	case "WON":
+		value := OpportunitiesListRequestStatusWon
+		*o = value
+	}
+	return nil
+}
+
+type OpportunitiesRetrieveRequestExpand uint
+
+const (
+	OpportunitiesRetrieveRequestExpandAccount OpportunitiesRetrieveRequestExpand = iota + 1
+	OpportunitiesRetrieveRequestExpandOwner
+	OpportunitiesRetrieveRequestExpandOwnerAccount
+	OpportunitiesRetrieveRequestExpandOwnerStage
+	OpportunitiesRetrieveRequestExpandOwnerStageAccount
+	OpportunitiesRetrieveRequestExpandStage
+	OpportunitiesRetrieveRequestExpandStageAccount
+)
+
+func (o OpportunitiesRetrieveRequestExpand) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OpportunitiesRetrieveRequestExpandAccount:
+		return "account"
+	case OpportunitiesRetrieveRequestExpandOwner:
+		return "owner"
+	case OpportunitiesRetrieveRequestExpandOwnerAccount:
+		return "owner,account"
+	case OpportunitiesRetrieveRequestExpandOwnerStage:
+		return "owner,stage"
+	case OpportunitiesRetrieveRequestExpandOwnerStageAccount:
+		return "owner,stage,account"
+	case OpportunitiesRetrieveRequestExpandStage:
+		return "stage"
+	case OpportunitiesRetrieveRequestExpandStageAccount:
+		return "stage,account"
+	}
+}
+
+func (o OpportunitiesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OpportunitiesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := OpportunitiesRetrieveRequestExpandAccount
+		*o = value
+	case "owner":
+		value := OpportunitiesRetrieveRequestExpandOwner
+		*o = value
+	case "owner,account":
+		value := OpportunitiesRetrieveRequestExpandOwnerAccount
+		*o = value
+	case "owner,stage":
+		value := OpportunitiesRetrieveRequestExpandOwnerStage
+		*o = value
+	case "owner,stage,account":
+		value := OpportunitiesRetrieveRequestExpandOwnerStageAccount
+		*o = value
+	case "stage":
+		value := OpportunitiesRetrieveRequestExpandStage
+		*o = value
+	case "stage,account":
+		value := OpportunitiesRetrieveRequestExpandStageAccount
+		*o = value
+	}
+	return nil
 }

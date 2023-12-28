@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *hris.LinkedAccountsListReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/linked-accounts"
+	endpointURL := baseURL + "/" + "linked-accounts"
 
 	queryParams := make(url.Values)
 	if request.Category != nil {

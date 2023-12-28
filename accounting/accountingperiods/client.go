@@ -40,7 +40,7 @@ func (c *client) List(ctx context.Context, request *accounting.AccountingPeriods
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/accounting-periods"
+	endpointURL := baseURL + "/" + "accounting-periods"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {
@@ -82,7 +82,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ac
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/accounting-periods/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting-periods/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *accounting.VendorCreditsList
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/vendor-credits"
+	endpointURL := baseURL + "/" + "vendor-credits"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -110,7 +110,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ve
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/vendor-credits/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"vendor-credits/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

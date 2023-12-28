@@ -3,6 +3,9 @@
 package ats
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -65,4 +68,92 @@ type CandidatesRetrieveRequest struct {
 	Expand *CandidatesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type CandidatesListRequestExpand uint
+
+const (
+	CandidatesListRequestExpandApplications CandidatesListRequestExpand = iota + 1
+	CandidatesListRequestExpandApplicationsAttachments
+	CandidatesListRequestExpandAttachments
+)
+
+func (c CandidatesListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CandidatesListRequestExpandApplications:
+		return "applications"
+	case CandidatesListRequestExpandApplicationsAttachments:
+		return "applications,attachments"
+	case CandidatesListRequestExpandAttachments:
+		return "attachments"
+	}
+}
+
+func (c CandidatesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CandidatesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "applications":
+		value := CandidatesListRequestExpandApplications
+		*c = value
+	case "applications,attachments":
+		value := CandidatesListRequestExpandApplicationsAttachments
+		*c = value
+	case "attachments":
+		value := CandidatesListRequestExpandAttachments
+		*c = value
+	}
+	return nil
+}
+
+type CandidatesRetrieveRequestExpand uint
+
+const (
+	CandidatesRetrieveRequestExpandApplications CandidatesRetrieveRequestExpand = iota + 1
+	CandidatesRetrieveRequestExpandApplicationsAttachments
+	CandidatesRetrieveRequestExpandAttachments
+)
+
+func (c CandidatesRetrieveRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CandidatesRetrieveRequestExpandApplications:
+		return "applications"
+	case CandidatesRetrieveRequestExpandApplicationsAttachments:
+		return "applications,attachments"
+	case CandidatesRetrieveRequestExpandAttachments:
+		return "attachments"
+	}
+}
+
+func (c CandidatesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CandidatesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "applications":
+		value := CandidatesRetrieveRequestExpandApplications
+		*c = value
+	case "applications,attachments":
+		value := CandidatesRetrieveRequestExpandApplicationsAttachments
+		*c = value
+	case "attachments":
+		value := CandidatesRetrieveRequestExpandAttachments
+		*c = value
+	}
+	return nil
 }

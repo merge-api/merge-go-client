@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *accounting.EndUserDetailsR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/link-token"
+	endpointURL := baseURL + "/" + "link-token"
 
 	var response *accounting.LinkToken
 	if err := core.DoRequest(

@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *crm.AccountsListRequest) (*c
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/accounts"
+	endpointURL := baseURL + "/" + "accounts"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -75,6 +75,9 @@ func (c *client) List(ctx context.Context, request *crm.AccountsListRequest) (*c
 	}
 	if request.ModifiedBefore != nil {
 		queryParams.Add("modified_before", fmt.Sprintf("%v", request.ModifiedBefore.Format(time.RFC3339)))
+	}
+	if request.Name != nil {
+		queryParams.Add("name", fmt.Sprintf("%v", *request.Name))
 	}
 	if request.OwnerId != nil {
 		queryParams.Add("owner_id", fmt.Sprintf("%v", *request.OwnerId))
@@ -112,7 +115,7 @@ func (c *client) Create(ctx context.Context, request *crm.CrmAccountEndpointRequ
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/accounts"
+	endpointURL := baseURL + "/" + "accounts"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +151,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.AccountsR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/accounts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -187,7 +190,7 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/accounts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -223,7 +226,7 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/accounts/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounts/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -248,7 +251,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/accounts/meta/post"
+	endpointURL := baseURL + "/" + "accounts/meta/post"
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -273,7 +276,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.Accoun
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/accounts/remote-field-classes"
+	endpointURL := baseURL + "/" + "accounts/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

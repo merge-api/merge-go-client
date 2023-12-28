@@ -3,14 +3,17 @@
 package hris
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
 type BankInfoListRequest struct {
 	// If provided, will only return BankInfo's with this account type. Options: ('SAVINGS', 'CHECKING')
 	//
-	// * `SAVINGS` - SAVINGS
-	// * `CHECKING` - CHECKING
+	// - `SAVINGS` - SAVINGS
+	// - `CHECKING` - CHECKING
 	AccountType *BankInfoListRequestAccountType `json:"-"`
 	// If provided, will only return BankInfo's with this bank name.
 	BankName *string `json:"-"`
@@ -53,4 +56,80 @@ type BankInfoRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type BankInfoListRequestAccountType uint
+
+const (
+	BankInfoListRequestAccountTypeChecking BankInfoListRequestAccountType = iota + 1
+	BankInfoListRequestAccountTypeSavings
+)
+
+func (b BankInfoListRequestAccountType) String() string {
+	switch b {
+	default:
+		return strconv.Itoa(int(b))
+	case BankInfoListRequestAccountTypeChecking:
+		return "CHECKING"
+	case BankInfoListRequestAccountTypeSavings:
+		return "SAVINGS"
+	}
+}
+
+func (b BankInfoListRequestAccountType) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", b.String())), nil
+}
+
+func (b *BankInfoListRequestAccountType) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "CHECKING":
+		value := BankInfoListRequestAccountTypeChecking
+		*b = value
+	case "SAVINGS":
+		value := BankInfoListRequestAccountTypeSavings
+		*b = value
+	}
+	return nil
+}
+
+type BankInfoListRequestOrderBy uint
+
+const (
+	BankInfoListRequestOrderByRemoteCreatedAtDescending BankInfoListRequestOrderBy = iota + 1
+	BankInfoListRequestOrderByRemoteCreatedAtAscending
+)
+
+func (b BankInfoListRequestOrderBy) String() string {
+	switch b {
+	default:
+		return strconv.Itoa(int(b))
+	case BankInfoListRequestOrderByRemoteCreatedAtDescending:
+		return "-remote_created_at"
+	case BankInfoListRequestOrderByRemoteCreatedAtAscending:
+		return "remote_created_at"
+	}
+}
+
+func (b BankInfoListRequestOrderBy) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", b.String())), nil
+}
+
+func (b *BankInfoListRequestOrderBy) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "-remote_created_at":
+		value := BankInfoListRequestOrderByRemoteCreatedAtDescending
+		*b = value
+	case "remote_created_at":
+		value := BankInfoListRequestOrderByRemoteCreatedAtAscending
+		*b = value
+	}
+	return nil
 }

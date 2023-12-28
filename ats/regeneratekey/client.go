@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *ats.RemoteKeyForRegenerati
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/regenerate-key"
+	endpointURL := baseURL + "/" + "regenerate-key"
 
 	var response *ats.RemoteKey
 	if err := core.DoRequest(

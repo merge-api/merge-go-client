@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *accounting.DataPassthrough
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/passthrough"
+	endpointURL := baseURL + "/" + "passthrough"
 
 	var response *accounting.RemoteResponse
 	if err := core.DoRequest(

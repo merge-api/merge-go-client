@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *crm.TasksListRequest) (*crm.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/tasks"
+	endpointURL := baseURL + "/" + "tasks"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -109,7 +109,7 @@ func (c *client) Create(ctx context.Context, request *crm.TaskEndpointRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/tasks"
+	endpointURL := baseURL + "/" + "tasks"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -145,7 +145,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.TasksRetr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/tasks/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tasks/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -184,7 +184,7 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/tasks/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tasks/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -220,7 +220,7 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/tasks/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tasks/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -245,7 +245,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/tasks/meta/post"
+	endpointURL := baseURL + "/" + "tasks/meta/post"
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -270,7 +270,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.TasksR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/tasks/remote-field-classes"
+	endpointURL := baseURL + "/" + "tasks/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

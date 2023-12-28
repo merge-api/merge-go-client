@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *accounting.LinkedAccountsLis
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/linked-accounts"
+	endpointURL := baseURL + "/" + "linked-accounts"
 
 	queryParams := make(url.Values)
 	if request.Category != nil {

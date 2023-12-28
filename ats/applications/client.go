@@ -44,7 +44,7 @@ func (c *client) List(ctx context.Context, request *ats.ApplicationsListRequest)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/applications"
+	endpointURL := baseURL + "/" + "applications"
 
 	queryParams := make(url.Values)
 	if request.CandidateId != nil {
@@ -122,7 +122,7 @@ func (c *client) Create(ctx context.Context, request *ats.ApplicationEndpointReq
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/applications"
+	endpointURL := baseURL + "/" + "applications"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -158,7 +158,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Applicati
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/applications/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"applications/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -194,7 +194,7 @@ func (c *client) ChangeStageCreate(ctx context.Context, id string, request *ats.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/applications/%v/change-stage", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"applications/%v/change-stage", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -230,7 +230,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context, request *ats.Applications
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/applications/meta/post"
+	endpointURL := baseURL + "/" + "applications/meta/post"
 
 	queryParams := make(url.Values)
 	if request.ApplicationRemoteTemplateId != nil {

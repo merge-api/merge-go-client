@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ticketing.TagsListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tags"
+	endpointURL := baseURL + "/" + "tags"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -98,7 +98,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Tag
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tags/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"tags/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

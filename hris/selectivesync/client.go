@@ -41,7 +41,7 @@ func (c *client) ConfigurationsList(ctx context.Context) ([]*hris.LinkedAccountS
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "selective-sync/configurations"
 
 	var response []*hris.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -66,7 +66,7 @@ func (c *client) ConfigurationsUpdate(ctx context.Context, request *hris.LinkedA
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "selective-sync/configurations"
 
 	var response []*hris.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -91,7 +91,7 @@ func (c *client) MetaList(ctx context.Context, request *hris.SelectiveSyncMetaLi
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

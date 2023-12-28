@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*filestorage.AccountDetails, err
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/account-details"
+	endpointURL := baseURL + "/" + "account-details"
 
 	var response *filestorage.AccountDetails
 	if err := core.DoRequest(

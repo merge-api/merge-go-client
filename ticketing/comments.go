@@ -3,6 +3,9 @@
 package ticketing
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -46,4 +49,140 @@ type CommentsRetrieveRequest struct {
 	Expand *CommentsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type CommentsListRequestExpand uint
+
+const (
+	CommentsListRequestExpandContact CommentsListRequestExpand = iota + 1
+	CommentsListRequestExpandContactTicket
+	CommentsListRequestExpandTicket
+	CommentsListRequestExpandUser
+	CommentsListRequestExpandUserContact
+	CommentsListRequestExpandUserContactTicket
+	CommentsListRequestExpandUserTicket
+)
+
+func (c CommentsListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CommentsListRequestExpandContact:
+		return "contact"
+	case CommentsListRequestExpandContactTicket:
+		return "contact,ticket"
+	case CommentsListRequestExpandTicket:
+		return "ticket"
+	case CommentsListRequestExpandUser:
+		return "user"
+	case CommentsListRequestExpandUserContact:
+		return "user,contact"
+	case CommentsListRequestExpandUserContactTicket:
+		return "user,contact,ticket"
+	case CommentsListRequestExpandUserTicket:
+		return "user,ticket"
+	}
+}
+
+func (c CommentsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CommentsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "contact":
+		value := CommentsListRequestExpandContact
+		*c = value
+	case "contact,ticket":
+		value := CommentsListRequestExpandContactTicket
+		*c = value
+	case "ticket":
+		value := CommentsListRequestExpandTicket
+		*c = value
+	case "user":
+		value := CommentsListRequestExpandUser
+		*c = value
+	case "user,contact":
+		value := CommentsListRequestExpandUserContact
+		*c = value
+	case "user,contact,ticket":
+		value := CommentsListRequestExpandUserContactTicket
+		*c = value
+	case "user,ticket":
+		value := CommentsListRequestExpandUserTicket
+		*c = value
+	}
+	return nil
+}
+
+type CommentsRetrieveRequestExpand uint
+
+const (
+	CommentsRetrieveRequestExpandContact CommentsRetrieveRequestExpand = iota + 1
+	CommentsRetrieveRequestExpandContactTicket
+	CommentsRetrieveRequestExpandTicket
+	CommentsRetrieveRequestExpandUser
+	CommentsRetrieveRequestExpandUserContact
+	CommentsRetrieveRequestExpandUserContactTicket
+	CommentsRetrieveRequestExpandUserTicket
+)
+
+func (c CommentsRetrieveRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CommentsRetrieveRequestExpandContact:
+		return "contact"
+	case CommentsRetrieveRequestExpandContactTicket:
+		return "contact,ticket"
+	case CommentsRetrieveRequestExpandTicket:
+		return "ticket"
+	case CommentsRetrieveRequestExpandUser:
+		return "user"
+	case CommentsRetrieveRequestExpandUserContact:
+		return "user,contact"
+	case CommentsRetrieveRequestExpandUserContactTicket:
+		return "user,contact,ticket"
+	case CommentsRetrieveRequestExpandUserTicket:
+		return "user,ticket"
+	}
+}
+
+func (c CommentsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CommentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "contact":
+		value := CommentsRetrieveRequestExpandContact
+		*c = value
+	case "contact,ticket":
+		value := CommentsRetrieveRequestExpandContactTicket
+		*c = value
+	case "ticket":
+		value := CommentsRetrieveRequestExpandTicket
+		*c = value
+	case "user":
+		value := CommentsRetrieveRequestExpandUser
+		*c = value
+	case "user,contact":
+		value := CommentsRetrieveRequestExpandUserContact
+		*c = value
+	case "user,contact,ticket":
+		value := CommentsRetrieveRequestExpandUserContactTicket
+		*c = value
+	case "user,ticket":
+		value := CommentsRetrieveRequestExpandUserTicket
+		*c = value
+	}
+	return nil
 }

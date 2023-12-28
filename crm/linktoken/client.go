@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *crm.EndUserDetailsRequest)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/link-token"
+	endpointURL := baseURL + "/" + "link-token"
 
 	var response *crm.LinkToken
 	if err := core.DoRequest(

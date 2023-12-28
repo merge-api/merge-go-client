@@ -39,7 +39,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ph
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/phone-numbers/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"phone-numbers/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

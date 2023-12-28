@@ -41,7 +41,7 @@ func (c *client) ConfigurationsList(ctx context.Context) ([]*ticketing.LinkedAcc
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "selective-sync/configurations"
 
 	var response []*ticketing.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -66,7 +66,7 @@ func (c *client) ConfigurationsUpdate(ctx context.Context, request *ticketing.Li
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "selective-sync/configurations"
 
 	var response []*ticketing.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -91,7 +91,7 @@ func (c *client) MetaList(ctx context.Context, request *ticketing.SelectiveSyncM
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

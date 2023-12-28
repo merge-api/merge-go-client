@@ -3,6 +3,9 @@
 package accounting
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -56,4 +59,140 @@ type ContactsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type ContactsListRequestExpand uint
+
+const (
+	ContactsListRequestExpandAddresses ContactsListRequestExpand = iota + 1
+	ContactsListRequestExpandAddressesCompany
+	ContactsListRequestExpandAddressesPhoneNumbers
+	ContactsListRequestExpandAddressesPhoneNumbersCompany
+	ContactsListRequestExpandCompany
+	ContactsListRequestExpandPhoneNumbers
+	ContactsListRequestExpandPhoneNumbersCompany
+)
+
+func (c ContactsListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case ContactsListRequestExpandAddresses:
+		return "addresses"
+	case ContactsListRequestExpandAddressesCompany:
+		return "addresses,company"
+	case ContactsListRequestExpandAddressesPhoneNumbers:
+		return "addresses,phone_numbers"
+	case ContactsListRequestExpandAddressesPhoneNumbersCompany:
+		return "addresses,phone_numbers,company"
+	case ContactsListRequestExpandCompany:
+		return "company"
+	case ContactsListRequestExpandPhoneNumbers:
+		return "phone_numbers"
+	case ContactsListRequestExpandPhoneNumbersCompany:
+		return "phone_numbers,company"
+	}
+}
+
+func (c ContactsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *ContactsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "addresses":
+		value := ContactsListRequestExpandAddresses
+		*c = value
+	case "addresses,company":
+		value := ContactsListRequestExpandAddressesCompany
+		*c = value
+	case "addresses,phone_numbers":
+		value := ContactsListRequestExpandAddressesPhoneNumbers
+		*c = value
+	case "addresses,phone_numbers,company":
+		value := ContactsListRequestExpandAddressesPhoneNumbersCompany
+		*c = value
+	case "company":
+		value := ContactsListRequestExpandCompany
+		*c = value
+	case "phone_numbers":
+		value := ContactsListRequestExpandPhoneNumbers
+		*c = value
+	case "phone_numbers,company":
+		value := ContactsListRequestExpandPhoneNumbersCompany
+		*c = value
+	}
+	return nil
+}
+
+type ContactsRetrieveRequestExpand uint
+
+const (
+	ContactsRetrieveRequestExpandAddresses ContactsRetrieveRequestExpand = iota + 1
+	ContactsRetrieveRequestExpandAddressesCompany
+	ContactsRetrieveRequestExpandAddressesPhoneNumbers
+	ContactsRetrieveRequestExpandAddressesPhoneNumbersCompany
+	ContactsRetrieveRequestExpandCompany
+	ContactsRetrieveRequestExpandPhoneNumbers
+	ContactsRetrieveRequestExpandPhoneNumbersCompany
+)
+
+func (c ContactsRetrieveRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case ContactsRetrieveRequestExpandAddresses:
+		return "addresses"
+	case ContactsRetrieveRequestExpandAddressesCompany:
+		return "addresses,company"
+	case ContactsRetrieveRequestExpandAddressesPhoneNumbers:
+		return "addresses,phone_numbers"
+	case ContactsRetrieveRequestExpandAddressesPhoneNumbersCompany:
+		return "addresses,phone_numbers,company"
+	case ContactsRetrieveRequestExpandCompany:
+		return "company"
+	case ContactsRetrieveRequestExpandPhoneNumbers:
+		return "phone_numbers"
+	case ContactsRetrieveRequestExpandPhoneNumbersCompany:
+		return "phone_numbers,company"
+	}
+}
+
+func (c ContactsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *ContactsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "addresses":
+		value := ContactsRetrieveRequestExpandAddresses
+		*c = value
+	case "addresses,company":
+		value := ContactsRetrieveRequestExpandAddressesCompany
+		*c = value
+	case "addresses,phone_numbers":
+		value := ContactsRetrieveRequestExpandAddressesPhoneNumbers
+		*c = value
+	case "addresses,phone_numbers,company":
+		value := ContactsRetrieveRequestExpandAddressesPhoneNumbersCompany
+		*c = value
+	case "company":
+		value := ContactsRetrieveRequestExpandCompany
+		*c = value
+	case "phone_numbers":
+		value := ContactsRetrieveRequestExpandPhoneNumbers
+		*c = value
+	case "phone_numbers,company":
+		value := ContactsRetrieveRequestExpandPhoneNumbersCompany
+		*c = value
+	}
+	return nil
 }

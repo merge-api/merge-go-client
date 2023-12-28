@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*ats.AvailableActions, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/available-actions"
+	endpointURL := baseURL + "/" + "available-actions"
 
 	var response *ats.AvailableActions
 	if err := core.DoRequest(

@@ -44,7 +44,7 @@ func (c *client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employees"
+	endpointURL := baseURL + "/" + "employees"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -170,7 +170,7 @@ func (c *client) Create(ctx context.Context, request *hris.EmployeeEndpointReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employees"
+	endpointURL := baseURL + "/" + "employees"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -206,7 +206,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.Employee
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/employees/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"employees/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -251,7 +251,7 @@ func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *hris
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/employees/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"employees/ignore/%v", modelId)
 
 	if err := core.DoRequest(
 		ctx,
@@ -275,7 +275,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, erro
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employees/meta/post"
+	endpointURL := baseURL + "/" + "employees/meta/post"
 
 	var response *hris.MetaResponse
 	if err := core.DoRequest(

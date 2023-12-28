@@ -37,7 +37,7 @@ func (c *client) SyncStatusResyncCreate(ctx context.Context) ([]*crm.SyncStatus,
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/sync-status/resync"
+	endpointURL := baseURL + "/" + "sync-status/resync"
 
 	var response []*crm.SyncStatus
 	if err := core.DoRequest(

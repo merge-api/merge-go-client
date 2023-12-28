@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *hris.TimesheetEntriesListReq
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries"
+	endpointURL := baseURL + "/" + "timesheet-entries"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -118,7 +118,7 @@ func (c *client) Create(ctx context.Context, request *hris.TimesheetEntryEndpoin
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries"
+	endpointURL := baseURL + "/" + "timesheet-entries"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -154,7 +154,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.Timeshee
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/timesheet-entries/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"timesheet-entries/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -187,7 +187,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, erro
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries/meta/post"
+	endpointURL := baseURL + "/" + "timesheet-entries/meta/post"
 
 	var response *hris.MetaResponse
 	if err := core.DoRequest(

@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.TimeOffBalancesListRequ
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/time-off-balances"
+	endpointURL := baseURL + "/" + "time-off-balances"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -113,7 +113,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.TimeOffB
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/time-off-balances/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"time-off-balances/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
