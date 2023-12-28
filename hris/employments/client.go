@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.EmploymentsListRequest)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employments"
+	endpointURL := baseURL + "/" + "employments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -113,7 +113,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.Employme
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/employments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"employments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

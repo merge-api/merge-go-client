@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *accounting.RemoteKeyForReg
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/regenerate-key"
+	endpointURL := baseURL + "/" + "regenerate-key"
 
 	var response *accounting.RemoteKey
 	if err := core.DoRequest(

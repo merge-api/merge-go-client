@@ -3,6 +3,9 @@
 package hris
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -43,22 +46,22 @@ type TimeOffListRequest struct {
 	RemoteId *string `json:"-"`
 	// If provided, will only return TimeOff with this request type. Options: ('VACATION', 'SICK', 'PERSONAL', 'JURY_DUTY', 'VOLUNTEER', 'BEREAVEMENT')
 	//
-	// * `VACATION` - VACATION
-	// * `SICK` - SICK
-	// * `PERSONAL` - PERSONAL
-	// * `JURY_DUTY` - JURY_DUTY
-	// * `VOLUNTEER` - VOLUNTEER
-	// * `BEREAVEMENT` - BEREAVEMENT
+	// - `VACATION` - VACATION
+	// - `SICK` - SICK
+	// - `PERSONAL` - PERSONAL
+	// - `JURY_DUTY` - JURY_DUTY
+	// - `VOLUNTEER` - VOLUNTEER
+	// - `BEREAVEMENT` - BEREAVEMENT
 	RequestType *TimeOffListRequestRequestType `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *TimeOffListRequestShowEnumOrigins `json:"-"`
 	// If provided, will only return TimeOff with this status. Options: ('REQUESTED', 'APPROVED', 'DECLINED', 'CANCELLED', 'DELETED')
 	//
-	// * `REQUESTED` - REQUESTED
-	// * `APPROVED` - APPROVED
-	// * `DECLINED` - DECLINED
-	// * `CANCELLED` - CANCELLED
-	// * `DELETED` - DELETED
+	// - `REQUESTED` - REQUESTED
+	// - `APPROVED` - APPROVED
+	// - `DECLINED` - DECLINED
+	// - `CANCELLED` - CANCELLED
+	// - `DELETED` - DELETED
 	Status *TimeOffListRequestStatus `json:"-"`
 }
 
@@ -71,4 +74,482 @@ type TimeOffRetrieveRequest struct {
 	RemoteFields *TimeOffRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *TimeOffRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type TimeOffListRequestExpand uint
+
+const (
+	TimeOffListRequestExpandApprover TimeOffListRequestExpand = iota + 1
+	TimeOffListRequestExpandEmployee
+	TimeOffListRequestExpandEmployeeApprover
+)
+
+func (t TimeOffListRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffListRequestExpandApprover:
+		return "approver"
+	case TimeOffListRequestExpandEmployee:
+		return "employee"
+	case TimeOffListRequestExpandEmployeeApprover:
+		return "employee,approver"
+	}
+}
+
+func (t TimeOffListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "approver":
+		value := TimeOffListRequestExpandApprover
+		*t = value
+	case "employee":
+		value := TimeOffListRequestExpandEmployee
+		*t = value
+	case "employee,approver":
+		value := TimeOffListRequestExpandEmployeeApprover
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffListRequestRemoteFields uint
+
+const (
+	TimeOffListRequestRemoteFieldsRequestType TimeOffListRequestRemoteFields = iota + 1
+	TimeOffListRequestRemoteFieldsRequestTypeStatus
+	TimeOffListRequestRemoteFieldsRequestTypeStatusUnits
+	TimeOffListRequestRemoteFieldsRequestTypeUnits
+	TimeOffListRequestRemoteFieldsStatus
+	TimeOffListRequestRemoteFieldsStatusUnits
+	TimeOffListRequestRemoteFieldsUnits
+)
+
+func (t TimeOffListRequestRemoteFields) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffListRequestRemoteFieldsRequestType:
+		return "request_type"
+	case TimeOffListRequestRemoteFieldsRequestTypeStatus:
+		return "request_type,status"
+	case TimeOffListRequestRemoteFieldsRequestTypeStatusUnits:
+		return "request_type,status,units"
+	case TimeOffListRequestRemoteFieldsRequestTypeUnits:
+		return "request_type,units"
+	case TimeOffListRequestRemoteFieldsStatus:
+		return "status"
+	case TimeOffListRequestRemoteFieldsStatusUnits:
+		return "status,units"
+	case TimeOffListRequestRemoteFieldsUnits:
+		return "units"
+	}
+}
+
+func (t TimeOffListRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffListRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "request_type":
+		value := TimeOffListRequestRemoteFieldsRequestType
+		*t = value
+	case "request_type,status":
+		value := TimeOffListRequestRemoteFieldsRequestTypeStatus
+		*t = value
+	case "request_type,status,units":
+		value := TimeOffListRequestRemoteFieldsRequestTypeStatusUnits
+		*t = value
+	case "request_type,units":
+		value := TimeOffListRequestRemoteFieldsRequestTypeUnits
+		*t = value
+	case "status":
+		value := TimeOffListRequestRemoteFieldsStatus
+		*t = value
+	case "status,units":
+		value := TimeOffListRequestRemoteFieldsStatusUnits
+		*t = value
+	case "units":
+		value := TimeOffListRequestRemoteFieldsUnits
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffListRequestRequestType uint
+
+const (
+	TimeOffListRequestRequestTypeBereavement TimeOffListRequestRequestType = iota + 1
+	TimeOffListRequestRequestTypeJuryDuty
+	TimeOffListRequestRequestTypePersonal
+	TimeOffListRequestRequestTypeSick
+	TimeOffListRequestRequestTypeVacation
+	TimeOffListRequestRequestTypeVolunteer
+)
+
+func (t TimeOffListRequestRequestType) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffListRequestRequestTypeBereavement:
+		return "BEREAVEMENT"
+	case TimeOffListRequestRequestTypeJuryDuty:
+		return "JURY_DUTY"
+	case TimeOffListRequestRequestTypePersonal:
+		return "PERSONAL"
+	case TimeOffListRequestRequestTypeSick:
+		return "SICK"
+	case TimeOffListRequestRequestTypeVacation:
+		return "VACATION"
+	case TimeOffListRequestRequestTypeVolunteer:
+		return "VOLUNTEER"
+	}
+}
+
+func (t TimeOffListRequestRequestType) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffListRequestRequestType) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "BEREAVEMENT":
+		value := TimeOffListRequestRequestTypeBereavement
+		*t = value
+	case "JURY_DUTY":
+		value := TimeOffListRequestRequestTypeJuryDuty
+		*t = value
+	case "PERSONAL":
+		value := TimeOffListRequestRequestTypePersonal
+		*t = value
+	case "SICK":
+		value := TimeOffListRequestRequestTypeSick
+		*t = value
+	case "VACATION":
+		value := TimeOffListRequestRequestTypeVacation
+		*t = value
+	case "VOLUNTEER":
+		value := TimeOffListRequestRequestTypeVolunteer
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffListRequestShowEnumOrigins uint
+
+const (
+	TimeOffListRequestShowEnumOriginsRequestType TimeOffListRequestShowEnumOrigins = iota + 1
+	TimeOffListRequestShowEnumOriginsRequestTypeStatus
+	TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits
+	TimeOffListRequestShowEnumOriginsRequestTypeUnits
+	TimeOffListRequestShowEnumOriginsStatus
+	TimeOffListRequestShowEnumOriginsStatusUnits
+	TimeOffListRequestShowEnumOriginsUnits
+)
+
+func (t TimeOffListRequestShowEnumOrigins) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffListRequestShowEnumOriginsRequestType:
+		return "request_type"
+	case TimeOffListRequestShowEnumOriginsRequestTypeStatus:
+		return "request_type,status"
+	case TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits:
+		return "request_type,status,units"
+	case TimeOffListRequestShowEnumOriginsRequestTypeUnits:
+		return "request_type,units"
+	case TimeOffListRequestShowEnumOriginsStatus:
+		return "status"
+	case TimeOffListRequestShowEnumOriginsStatusUnits:
+		return "status,units"
+	case TimeOffListRequestShowEnumOriginsUnits:
+		return "units"
+	}
+}
+
+func (t TimeOffListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "request_type":
+		value := TimeOffListRequestShowEnumOriginsRequestType
+		*t = value
+	case "request_type,status":
+		value := TimeOffListRequestShowEnumOriginsRequestTypeStatus
+		*t = value
+	case "request_type,status,units":
+		value := TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits
+		*t = value
+	case "request_type,units":
+		value := TimeOffListRequestShowEnumOriginsRequestTypeUnits
+		*t = value
+	case "status":
+		value := TimeOffListRequestShowEnumOriginsStatus
+		*t = value
+	case "status,units":
+		value := TimeOffListRequestShowEnumOriginsStatusUnits
+		*t = value
+	case "units":
+		value := TimeOffListRequestShowEnumOriginsUnits
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffListRequestStatus uint
+
+const (
+	TimeOffListRequestStatusApproved TimeOffListRequestStatus = iota + 1
+	TimeOffListRequestStatusCancelled
+	TimeOffListRequestStatusDeclined
+	TimeOffListRequestStatusDeleted
+	TimeOffListRequestStatusRequested
+)
+
+func (t TimeOffListRequestStatus) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffListRequestStatusApproved:
+		return "APPROVED"
+	case TimeOffListRequestStatusCancelled:
+		return "CANCELLED"
+	case TimeOffListRequestStatusDeclined:
+		return "DECLINED"
+	case TimeOffListRequestStatusDeleted:
+		return "DELETED"
+	case TimeOffListRequestStatusRequested:
+		return "REQUESTED"
+	}
+}
+
+func (t TimeOffListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "APPROVED":
+		value := TimeOffListRequestStatusApproved
+		*t = value
+	case "CANCELLED":
+		value := TimeOffListRequestStatusCancelled
+		*t = value
+	case "DECLINED":
+		value := TimeOffListRequestStatusDeclined
+		*t = value
+	case "DELETED":
+		value := TimeOffListRequestStatusDeleted
+		*t = value
+	case "REQUESTED":
+		value := TimeOffListRequestStatusRequested
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffRetrieveRequestExpand uint
+
+const (
+	TimeOffRetrieveRequestExpandApprover TimeOffRetrieveRequestExpand = iota + 1
+	TimeOffRetrieveRequestExpandEmployee
+	TimeOffRetrieveRequestExpandEmployeeApprover
+)
+
+func (t TimeOffRetrieveRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffRetrieveRequestExpandApprover:
+		return "approver"
+	case TimeOffRetrieveRequestExpandEmployee:
+		return "employee"
+	case TimeOffRetrieveRequestExpandEmployeeApprover:
+		return "employee,approver"
+	}
+}
+
+func (t TimeOffRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "approver":
+		value := TimeOffRetrieveRequestExpandApprover
+		*t = value
+	case "employee":
+		value := TimeOffRetrieveRequestExpandEmployee
+		*t = value
+	case "employee,approver":
+		value := TimeOffRetrieveRequestExpandEmployeeApprover
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffRetrieveRequestRemoteFields uint
+
+const (
+	TimeOffRetrieveRequestRemoteFieldsRequestType TimeOffRetrieveRequestRemoteFields = iota + 1
+	TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus
+	TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits
+	TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits
+	TimeOffRetrieveRequestRemoteFieldsStatus
+	TimeOffRetrieveRequestRemoteFieldsStatusUnits
+	TimeOffRetrieveRequestRemoteFieldsUnits
+)
+
+func (t TimeOffRetrieveRequestRemoteFields) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffRetrieveRequestRemoteFieldsRequestType:
+		return "request_type"
+	case TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus:
+		return "request_type,status"
+	case TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits:
+		return "request_type,status,units"
+	case TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits:
+		return "request_type,units"
+	case TimeOffRetrieveRequestRemoteFieldsStatus:
+		return "status"
+	case TimeOffRetrieveRequestRemoteFieldsStatusUnits:
+		return "status,units"
+	case TimeOffRetrieveRequestRemoteFieldsUnits:
+		return "units"
+	}
+}
+
+func (t TimeOffRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "request_type":
+		value := TimeOffRetrieveRequestRemoteFieldsRequestType
+		*t = value
+	case "request_type,status":
+		value := TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus
+		*t = value
+	case "request_type,status,units":
+		value := TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits
+		*t = value
+	case "request_type,units":
+		value := TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits
+		*t = value
+	case "status":
+		value := TimeOffRetrieveRequestRemoteFieldsStatus
+		*t = value
+	case "status,units":
+		value := TimeOffRetrieveRequestRemoteFieldsStatusUnits
+		*t = value
+	case "units":
+		value := TimeOffRetrieveRequestRemoteFieldsUnits
+		*t = value
+	}
+	return nil
+}
+
+type TimeOffRetrieveRequestShowEnumOrigins uint
+
+const (
+	TimeOffRetrieveRequestShowEnumOriginsRequestType TimeOffRetrieveRequestShowEnumOrigins = iota + 1
+	TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus
+	TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits
+	TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits
+	TimeOffRetrieveRequestShowEnumOriginsStatus
+	TimeOffRetrieveRequestShowEnumOriginsStatusUnits
+	TimeOffRetrieveRequestShowEnumOriginsUnits
+)
+
+func (t TimeOffRetrieveRequestShowEnumOrigins) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimeOffRetrieveRequestShowEnumOriginsRequestType:
+		return "request_type"
+	case TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus:
+		return "request_type,status"
+	case TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits:
+		return "request_type,status,units"
+	case TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits:
+		return "request_type,units"
+	case TimeOffRetrieveRequestShowEnumOriginsStatus:
+		return "status"
+	case TimeOffRetrieveRequestShowEnumOriginsStatusUnits:
+		return "status,units"
+	case TimeOffRetrieveRequestShowEnumOriginsUnits:
+		return "units"
+	}
+}
+
+func (t TimeOffRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimeOffRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "request_type":
+		value := TimeOffRetrieveRequestShowEnumOriginsRequestType
+		*t = value
+	case "request_type,status":
+		value := TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus
+		*t = value
+	case "request_type,status,units":
+		value := TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits
+		*t = value
+	case "request_type,units":
+		value := TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits
+		*t = value
+	case "status":
+		value := TimeOffRetrieveRequestShowEnumOriginsStatus
+		*t = value
+	case "status,units":
+		value := TimeOffRetrieveRequestShowEnumOriginsStatusUnits
+		*t = value
+	case "units":
+		value := TimeOffRetrieveRequestShowEnumOriginsUnits
+		*t = value
+	}
+	return nil
 }

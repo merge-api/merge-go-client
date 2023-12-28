@@ -42,7 +42,7 @@ func (c *client) List(ctx context.Context, request *crm.EngagementTypesListReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagement-types"
+	endpointURL := baseURL + "/" + "engagement-types"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -102,7 +102,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.Engagemen
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/engagement-types/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"engagement-types/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -138,7 +138,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.Engage
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagement-types/remote-field-classes"
+	endpointURL := baseURL + "/" + "engagement-types/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

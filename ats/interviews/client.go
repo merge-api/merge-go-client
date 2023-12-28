@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *ats.InterviewsListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/interviews"
+	endpointURL := baseURL + "/" + "interviews"
 
 	queryParams := make(url.Values)
 	if request.ApplicationId != nil {
@@ -121,7 +121,7 @@ func (c *client) Create(ctx context.Context, request *ats.ScheduledInterviewEndp
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/interviews"
+	endpointURL := baseURL + "/" + "interviews"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -157,7 +157,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Interview
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/interviews/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"interviews/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -199,7 +199,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/interviews/meta/post"
+	endpointURL := baseURL + "/" + "interviews/meta/post"
 
 	var response *ats.MetaResponse
 	if err := core.DoRequest(

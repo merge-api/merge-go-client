@@ -3,6 +3,9 @@
 package accounting
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -48,4 +51,428 @@ type ExpensesRetrieveRequest struct {
 	Expand *ExpensesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type ExpensesListRequestExpand uint
+
+const (
+	ExpensesListRequestExpandAccount ExpensesListRequestExpand = iota + 1
+	ExpensesListRequestExpandAccountAccountingPeriod
+	ExpensesListRequestExpandAccountCompany
+	ExpensesListRequestExpandAccountCompanyAccountingPeriod
+	ExpensesListRequestExpandAccountContact
+	ExpensesListRequestExpandAccountContactAccountingPeriod
+	ExpensesListRequestExpandAccountContactCompany
+	ExpensesListRequestExpandAccountContactCompanyAccountingPeriod
+	ExpensesListRequestExpandAccountingPeriod
+	ExpensesListRequestExpandCompany
+	ExpensesListRequestExpandCompanyAccountingPeriod
+	ExpensesListRequestExpandContact
+	ExpensesListRequestExpandContactAccountingPeriod
+	ExpensesListRequestExpandContactCompany
+	ExpensesListRequestExpandContactCompanyAccountingPeriod
+	ExpensesListRequestExpandTrackingCategories
+	ExpensesListRequestExpandTrackingCategoriesAccount
+	ExpensesListRequestExpandTrackingCategoriesAccountAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesAccountCompany
+	ExpensesListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesAccountContact
+	ExpensesListRequestExpandTrackingCategoriesAccountContactAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesAccountContactCompany
+	ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesCompany
+	ExpensesListRequestExpandTrackingCategoriesCompanyAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesContact
+	ExpensesListRequestExpandTrackingCategoriesContactAccountingPeriod
+	ExpensesListRequestExpandTrackingCategoriesContactCompany
+	ExpensesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod
+)
+
+func (e ExpensesListRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case ExpensesListRequestExpandAccount:
+		return "account"
+	case ExpensesListRequestExpandAccountAccountingPeriod:
+		return "account,accounting_period"
+	case ExpensesListRequestExpandAccountCompany:
+		return "account,company"
+	case ExpensesListRequestExpandAccountCompanyAccountingPeriod:
+		return "account,company,accounting_period"
+	case ExpensesListRequestExpandAccountContact:
+		return "account,contact"
+	case ExpensesListRequestExpandAccountContactAccountingPeriod:
+		return "account,contact,accounting_period"
+	case ExpensesListRequestExpandAccountContactCompany:
+		return "account,contact,company"
+	case ExpensesListRequestExpandAccountContactCompanyAccountingPeriod:
+		return "account,contact,company,accounting_period"
+	case ExpensesListRequestExpandAccountingPeriod:
+		return "accounting_period"
+	case ExpensesListRequestExpandCompany:
+		return "company"
+	case ExpensesListRequestExpandCompanyAccountingPeriod:
+		return "company,accounting_period"
+	case ExpensesListRequestExpandContact:
+		return "contact"
+	case ExpensesListRequestExpandContactAccountingPeriod:
+		return "contact,accounting_period"
+	case ExpensesListRequestExpandContactCompany:
+		return "contact,company"
+	case ExpensesListRequestExpandContactCompanyAccountingPeriod:
+		return "contact,company,accounting_period"
+	case ExpensesListRequestExpandTrackingCategories:
+		return "tracking_categories"
+	case ExpensesListRequestExpandTrackingCategoriesAccount:
+		return "tracking_categories,account"
+	case ExpensesListRequestExpandTrackingCategoriesAccountAccountingPeriod:
+		return "tracking_categories,account,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesAccountCompany:
+		return "tracking_categories,account,company"
+	case ExpensesListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod:
+		return "tracking_categories,account,company,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesAccountContact:
+		return "tracking_categories,account,contact"
+	case ExpensesListRequestExpandTrackingCategoriesAccountContactAccountingPeriod:
+		return "tracking_categories,account,contact,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesAccountContactCompany:
+		return "tracking_categories,account,contact,company"
+	case ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod:
+		return "tracking_categories,account,contact,company,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesAccountingPeriod:
+		return "tracking_categories,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesCompany:
+		return "tracking_categories,company"
+	case ExpensesListRequestExpandTrackingCategoriesCompanyAccountingPeriod:
+		return "tracking_categories,company,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesContact:
+		return "tracking_categories,contact"
+	case ExpensesListRequestExpandTrackingCategoriesContactAccountingPeriod:
+		return "tracking_categories,contact,accounting_period"
+	case ExpensesListRequestExpandTrackingCategoriesContactCompany:
+		return "tracking_categories,contact,company"
+	case ExpensesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod:
+		return "tracking_categories,contact,company,accounting_period"
+	}
+}
+
+func (e ExpensesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *ExpensesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := ExpensesListRequestExpandAccount
+		*e = value
+	case "account,accounting_period":
+		value := ExpensesListRequestExpandAccountAccountingPeriod
+		*e = value
+	case "account,company":
+		value := ExpensesListRequestExpandAccountCompany
+		*e = value
+	case "account,company,accounting_period":
+		value := ExpensesListRequestExpandAccountCompanyAccountingPeriod
+		*e = value
+	case "account,contact":
+		value := ExpensesListRequestExpandAccountContact
+		*e = value
+	case "account,contact,accounting_period":
+		value := ExpensesListRequestExpandAccountContactAccountingPeriod
+		*e = value
+	case "account,contact,company":
+		value := ExpensesListRequestExpandAccountContactCompany
+		*e = value
+	case "account,contact,company,accounting_period":
+		value := ExpensesListRequestExpandAccountContactCompanyAccountingPeriod
+		*e = value
+	case "accounting_period":
+		value := ExpensesListRequestExpandAccountingPeriod
+		*e = value
+	case "company":
+		value := ExpensesListRequestExpandCompany
+		*e = value
+	case "company,accounting_period":
+		value := ExpensesListRequestExpandCompanyAccountingPeriod
+		*e = value
+	case "contact":
+		value := ExpensesListRequestExpandContact
+		*e = value
+	case "contact,accounting_period":
+		value := ExpensesListRequestExpandContactAccountingPeriod
+		*e = value
+	case "contact,company":
+		value := ExpensesListRequestExpandContactCompany
+		*e = value
+	case "contact,company,accounting_period":
+		value := ExpensesListRequestExpandContactCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories":
+		value := ExpensesListRequestExpandTrackingCategories
+		*e = value
+	case "tracking_categories,account":
+		value := ExpensesListRequestExpandTrackingCategoriesAccount
+		*e = value
+	case "tracking_categories,account,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountAccountingPeriod
+		*e = value
+	case "tracking_categories,account,company":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountCompany
+		*e = value
+	case "tracking_categories,account,company,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories,account,contact":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountContact
+		*e = value
+	case "tracking_categories,account,contact,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountContactAccountingPeriod
+		*e = value
+	case "tracking_categories,account,contact,company":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountContactCompany
+		*e = value
+	case "tracking_categories,account,contact,company,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesAccountingPeriod
+		*e = value
+	case "tracking_categories,company":
+		value := ExpensesListRequestExpandTrackingCategoriesCompany
+		*e = value
+	case "tracking_categories,company,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories,contact":
+		value := ExpensesListRequestExpandTrackingCategoriesContact
+		*e = value
+	case "tracking_categories,contact,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesContactAccountingPeriod
+		*e = value
+	case "tracking_categories,contact,company":
+		value := ExpensesListRequestExpandTrackingCategoriesContactCompany
+		*e = value
+	case "tracking_categories,contact,company,accounting_period":
+		value := ExpensesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod
+		*e = value
+	}
+	return nil
+}
+
+type ExpensesRetrieveRequestExpand uint
+
+const (
+	ExpensesRetrieveRequestExpandAccount ExpensesRetrieveRequestExpand = iota + 1
+	ExpensesRetrieveRequestExpandAccountAccountingPeriod
+	ExpensesRetrieveRequestExpandAccountCompany
+	ExpensesRetrieveRequestExpandAccountCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandAccountContact
+	ExpensesRetrieveRequestExpandAccountContactAccountingPeriod
+	ExpensesRetrieveRequestExpandAccountContactCompany
+	ExpensesRetrieveRequestExpandAccountContactCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandAccountingPeriod
+	ExpensesRetrieveRequestExpandCompany
+	ExpensesRetrieveRequestExpandCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandContact
+	ExpensesRetrieveRequestExpandContactAccountingPeriod
+	ExpensesRetrieveRequestExpandContactCompany
+	ExpensesRetrieveRequestExpandContactCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategories
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccount
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompany
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContact
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompany
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesCompany
+	ExpensesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesContact
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompany
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod
+)
+
+func (e ExpensesRetrieveRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case ExpensesRetrieveRequestExpandAccount:
+		return "account"
+	case ExpensesRetrieveRequestExpandAccountAccountingPeriod:
+		return "account,accounting_period"
+	case ExpensesRetrieveRequestExpandAccountCompany:
+		return "account,company"
+	case ExpensesRetrieveRequestExpandAccountCompanyAccountingPeriod:
+		return "account,company,accounting_period"
+	case ExpensesRetrieveRequestExpandAccountContact:
+		return "account,contact"
+	case ExpensesRetrieveRequestExpandAccountContactAccountingPeriod:
+		return "account,contact,accounting_period"
+	case ExpensesRetrieveRequestExpandAccountContactCompany:
+		return "account,contact,company"
+	case ExpensesRetrieveRequestExpandAccountContactCompanyAccountingPeriod:
+		return "account,contact,company,accounting_period"
+	case ExpensesRetrieveRequestExpandAccountingPeriod:
+		return "accounting_period"
+	case ExpensesRetrieveRequestExpandCompany:
+		return "company"
+	case ExpensesRetrieveRequestExpandCompanyAccountingPeriod:
+		return "company,accounting_period"
+	case ExpensesRetrieveRequestExpandContact:
+		return "contact"
+	case ExpensesRetrieveRequestExpandContactAccountingPeriod:
+		return "contact,accounting_period"
+	case ExpensesRetrieveRequestExpandContactCompany:
+		return "contact,company"
+	case ExpensesRetrieveRequestExpandContactCompanyAccountingPeriod:
+		return "contact,company,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategories:
+		return "tracking_categories"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccount:
+		return "tracking_categories,account"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod:
+		return "tracking_categories,account,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompany:
+		return "tracking_categories,account,company"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod:
+		return "tracking_categories,account,company,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountContact:
+		return "tracking_categories,account,contact"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactAccountingPeriod:
+		return "tracking_categories,account,contact,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompany:
+		return "tracking_categories,account,contact,company"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod:
+		return "tracking_categories,account,contact,company,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesAccountingPeriod:
+		return "tracking_categories,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesCompany:
+		return "tracking_categories,company"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod:
+		return "tracking_categories,company,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesContact:
+		return "tracking_categories,contact"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod:
+		return "tracking_categories,contact,accounting_period"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesContactCompany:
+		return "tracking_categories,contact,company"
+	case ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod:
+		return "tracking_categories,contact,company,accounting_period"
+	}
+}
+
+func (e ExpensesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *ExpensesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := ExpensesRetrieveRequestExpandAccount
+		*e = value
+	case "account,accounting_period":
+		value := ExpensesRetrieveRequestExpandAccountAccountingPeriod
+		*e = value
+	case "account,company":
+		value := ExpensesRetrieveRequestExpandAccountCompany
+		*e = value
+	case "account,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandAccountCompanyAccountingPeriod
+		*e = value
+	case "account,contact":
+		value := ExpensesRetrieveRequestExpandAccountContact
+		*e = value
+	case "account,contact,accounting_period":
+		value := ExpensesRetrieveRequestExpandAccountContactAccountingPeriod
+		*e = value
+	case "account,contact,company":
+		value := ExpensesRetrieveRequestExpandAccountContactCompany
+		*e = value
+	case "account,contact,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandAccountContactCompanyAccountingPeriod
+		*e = value
+	case "accounting_period":
+		value := ExpensesRetrieveRequestExpandAccountingPeriod
+		*e = value
+	case "company":
+		value := ExpensesRetrieveRequestExpandCompany
+		*e = value
+	case "company,accounting_period":
+		value := ExpensesRetrieveRequestExpandCompanyAccountingPeriod
+		*e = value
+	case "contact":
+		value := ExpensesRetrieveRequestExpandContact
+		*e = value
+	case "contact,accounting_period":
+		value := ExpensesRetrieveRequestExpandContactAccountingPeriod
+		*e = value
+	case "contact,company":
+		value := ExpensesRetrieveRequestExpandContactCompany
+		*e = value
+	case "contact,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandContactCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories":
+		value := ExpensesRetrieveRequestExpandTrackingCategories
+		*e = value
+	case "tracking_categories,account":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccount
+		*e = value
+	case "tracking_categories,account,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod
+		*e = value
+	case "tracking_categories,account,company":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompany
+		*e = value
+	case "tracking_categories,account,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories,account,contact":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountContact
+		*e = value
+	case "tracking_categories,account,contact,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactAccountingPeriod
+		*e = value
+	case "tracking_categories,account,contact,company":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompany
+		*e = value
+	case "tracking_categories,account,contact,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesAccountingPeriod
+		*e = value
+	case "tracking_categories,company":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesCompany
+		*e = value
+	case "tracking_categories,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod
+		*e = value
+	case "tracking_categories,contact":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesContact
+		*e = value
+	case "tracking_categories,contact,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod
+		*e = value
+	case "tracking_categories,contact,company":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesContactCompany
+		*e = value
+	case "tracking_categories,contact,company,accounting_period":
+		value := ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod
+		*e = value
+	}
+	return nil
 }

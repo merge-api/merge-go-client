@@ -3,6 +3,9 @@
 package ticketing
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -30,6 +33,50 @@ type ProjectsListRequest struct {
 type ProjectsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type ProjectsUsersListRequestExpand uint
+
+const (
+	ProjectsUsersListRequestExpandRoles ProjectsUsersListRequestExpand = iota + 1
+	ProjectsUsersListRequestExpandTeams
+	ProjectsUsersListRequestExpandTeamsRoles
+)
+
+func (p ProjectsUsersListRequestExpand) String() string {
+	switch p {
+	default:
+		return strconv.Itoa(int(p))
+	case ProjectsUsersListRequestExpandRoles:
+		return "roles"
+	case ProjectsUsersListRequestExpandTeams:
+		return "teams"
+	case ProjectsUsersListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (p ProjectsUsersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", p.String())), nil
+}
+
+func (p *ProjectsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := ProjectsUsersListRequestExpandRoles
+		*p = value
+	case "teams":
+		value := ProjectsUsersListRequestExpandTeams
+		*p = value
+	case "teams,roles":
+		value := ProjectsUsersListRequestExpandTeamsRoles
+		*p = value
+	}
+	return nil
 }
 
 type ProjectsUsersListRequest struct {

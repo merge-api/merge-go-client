@@ -18,7 +18,7 @@ type Client interface {
 	List(ctx context.Context, request *ticketing.AttachmentsListRequest) (*ticketing.PaginatedAttachmentList, error)
 	Create(ctx context.Context, request *ticketing.TicketingAttachmentEndpointRequest) (*ticketing.TicketingAttachmentResponse, error)
 	Retrieve(ctx context.Context, id string, request *ticketing.AttachmentsRetrieveRequest) (*ticketing.Attachment, error)
-	DownloadRetrieve(ctx context.Context, id string) (io.Reader, error)
+	DownloadRetrieve(ctx context.Context, id string, request *ticketing.AttachmentsDownloadRetrieveRequest) (io.Reader, error)
 	MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error)
 }
 
@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *ticketing.AttachmentsListReq
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments"
+	endpointURL := baseURL + "/" + "attachments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.TicketingAttachm
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments"
+	endpointURL := baseURL + "/" + "attachments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Att
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/attachments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"attachments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -179,12 +179,20 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Att
 }
 
 // Returns an `Attachment` object with the given `id`.
-func (c *client) DownloadRetrieve(ctx context.Context, id string) (io.Reader, error) {
+func (c *client) DownloadRetrieve(ctx context.Context, id string, request *ticketing.AttachmentsDownloadRetrieveRequest) (io.Reader, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/attachments/%v/download", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"attachments/%v/download", id)
+
+	queryParams := make(url.Values)
+	if request.MimeType != nil {
+		queryParams.Add("mime_type", fmt.Sprintf("%v", *request.MimeType))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
 
 	response := bytes.NewBuffer(nil)
 	if err := core.DoRequest(
@@ -192,7 +200,7 @@ func (c *client) DownloadRetrieve(ctx context.Context, id string) (io.Reader, er
 		c.httpClient,
 		endpointURL,
 		http.MethodGet,
-		nil,
+		request,
 		response,
 		false,
 		c.header,
@@ -209,7 +217,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse,
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments/meta/post"
+	endpointURL := baseURL + "/" + "attachments/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := core.DoRequest(

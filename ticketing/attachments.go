@@ -14,6 +14,11 @@ type TicketingAttachmentEndpointRequest struct {
 	Model    *AttachmentRequest `json:"model,omitempty"`
 }
 
+type AttachmentsDownloadRetrieveRequest struct {
+	// If provided, specifies the export format of the file to be downloaded. For information on supported export formats, please refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
+	MimeType *string `json:"-"`
+}
+
 type AttachmentsListRequest struct {
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-"`

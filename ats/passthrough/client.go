@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *ats.DataPassthroughRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/passthrough"
+	endpointURL := baseURL + "/" + "passthrough"
 
 	var response *ats.RemoteResponse
 	if err := core.DoRequest(

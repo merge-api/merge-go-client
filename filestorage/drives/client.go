@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *filestorage.DrivesListReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/drives"
+	endpointURL := baseURL + "/" + "drives"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -101,7 +101,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.D
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/drives/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"drives/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

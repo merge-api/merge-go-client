@@ -3,6 +3,9 @@
 package accounting
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -34,4 +37,92 @@ type CompanyInfoRetrieveRequest struct {
 	Expand *CompanyInfoRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type CompanyInfoListRequestExpand uint
+
+const (
+	CompanyInfoListRequestExpandAddresses CompanyInfoListRequestExpand = iota + 1
+	CompanyInfoListRequestExpandAddressesPhoneNumbers
+	CompanyInfoListRequestExpandPhoneNumbers
+)
+
+func (c CompanyInfoListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CompanyInfoListRequestExpandAddresses:
+		return "addresses"
+	case CompanyInfoListRequestExpandAddressesPhoneNumbers:
+		return "addresses,phone_numbers"
+	case CompanyInfoListRequestExpandPhoneNumbers:
+		return "phone_numbers"
+	}
+}
+
+func (c CompanyInfoListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CompanyInfoListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "addresses":
+		value := CompanyInfoListRequestExpandAddresses
+		*c = value
+	case "addresses,phone_numbers":
+		value := CompanyInfoListRequestExpandAddressesPhoneNumbers
+		*c = value
+	case "phone_numbers":
+		value := CompanyInfoListRequestExpandPhoneNumbers
+		*c = value
+	}
+	return nil
+}
+
+type CompanyInfoRetrieveRequestExpand uint
+
+const (
+	CompanyInfoRetrieveRequestExpandAddresses CompanyInfoRetrieveRequestExpand = iota + 1
+	CompanyInfoRetrieveRequestExpandAddressesPhoneNumbers
+	CompanyInfoRetrieveRequestExpandPhoneNumbers
+)
+
+func (c CompanyInfoRetrieveRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CompanyInfoRetrieveRequestExpandAddresses:
+		return "addresses"
+	case CompanyInfoRetrieveRequestExpandAddressesPhoneNumbers:
+		return "addresses,phone_numbers"
+	case CompanyInfoRetrieveRequestExpandPhoneNumbers:
+		return "phone_numbers"
+	}
+}
+
+func (c CompanyInfoRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CompanyInfoRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "addresses":
+		value := CompanyInfoRetrieveRequestExpandAddresses
+		*c = value
+	case "addresses,phone_numbers":
+		value := CompanyInfoRetrieveRequestExpandAddressesPhoneNumbers
+		*c = value
+	case "phone_numbers":
+		value := CompanyInfoRetrieveRequestExpandPhoneNumbers
+		*c = value
+	}
+	return nil
 }

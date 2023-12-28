@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *filestorage.FoldersListReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/folders"
+	endpointURL := baseURL + "/" + "folders"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.FileStorageFol
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/folders"
+	endpointURL := baseURL + "/" + "folders"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.F
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/folders/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"folders/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -184,7 +184,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaRespons
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/folders/meta/post"
+	endpointURL := baseURL + "/" + "folders/meta/post"
 
 	var response *filestorage.MetaResponse
 	if err := core.DoRequest(

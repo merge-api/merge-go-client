@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *ticketing.CommentsListReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/comments"
+	endpointURL := baseURL + "/" + "comments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -109,7 +109,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.CommentEndpointR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/comments"
+	endpointURL := baseURL + "/" + "comments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -145,7 +145,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Com
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/comments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"comments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -181,7 +181,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse,
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/comments/meta/post"
+	endpointURL := baseURL + "/" + "comments/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := core.DoRequest(

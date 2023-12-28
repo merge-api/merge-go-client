@@ -3,6 +3,9 @@
 package hris
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -46,4 +49,594 @@ type EmploymentsRetrieveRequest struct {
 	RemoteFields *EmploymentsRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *EmploymentsRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type EmploymentsListRequestExpand uint
+
+const (
+	EmploymentsListRequestExpandEmployee EmploymentsListRequestExpand = iota + 1
+	EmploymentsListRequestExpandEmployeePayGroup
+	EmploymentsListRequestExpandPayGroup
+)
+
+func (e EmploymentsListRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsListRequestExpandEmployee:
+		return "employee"
+	case EmploymentsListRequestExpandEmployeePayGroup:
+		return "employee,pay_group"
+	case EmploymentsListRequestExpandPayGroup:
+		return "pay_group"
+	}
+}
+
+func (e EmploymentsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employee":
+		value := EmploymentsListRequestExpandEmployee
+		*e = value
+	case "employee,pay_group":
+		value := EmploymentsListRequestExpandEmployeePayGroup
+		*e = value
+	case "pay_group":
+		value := EmploymentsListRequestExpandPayGroup
+		*e = value
+	}
+	return nil
+}
+
+type EmploymentsListRequestOrderBy uint
+
+const (
+	EmploymentsListRequestOrderByEffectiveDateDescending EmploymentsListRequestOrderBy = iota + 1
+	EmploymentsListRequestOrderByEffectiveDateAscending
+)
+
+func (e EmploymentsListRequestOrderBy) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsListRequestOrderByEffectiveDateDescending:
+		return "-effective_date"
+	case EmploymentsListRequestOrderByEffectiveDateAscending:
+		return "effective_date"
+	}
+}
+
+func (e EmploymentsListRequestOrderBy) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsListRequestOrderBy) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "-effective_date":
+		value := EmploymentsListRequestOrderByEffectiveDateDescending
+		*e = value
+	case "effective_date":
+		value := EmploymentsListRequestOrderByEffectiveDateAscending
+		*e = value
+	}
+	return nil
+}
+
+type EmploymentsListRequestRemoteFields uint
+
+const (
+	EmploymentsListRequestRemoteFieldsEmploymentType EmploymentsListRequestRemoteFields = iota + 1
+	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatus
+	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
+	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
+	EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequency
+	EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
+	EmploymentsListRequestRemoteFieldsEmploymentTypePayPeriod
+	EmploymentsListRequestRemoteFieldsFlsaStatus
+	EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequency
+	EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
+	EmploymentsListRequestRemoteFieldsFlsaStatusPayPeriod
+	EmploymentsListRequestRemoteFieldsPayFrequency
+	EmploymentsListRequestRemoteFieldsPayFrequencyPayPeriod
+	EmploymentsListRequestRemoteFieldsPayPeriod
+)
+
+func (e EmploymentsListRequestRemoteFields) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsListRequestRemoteFieldsEmploymentType:
+		return "employment_type"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatus:
+		return "employment_type,flsa_status"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency:
+		return "employment_type,flsa_status,pay_frequency"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
+		return "employment_type,flsa_status,pay_frequency,pay_period"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod:
+		return "employment_type,flsa_status,pay_period"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequency:
+		return "employment_type,pay_frequency"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod:
+		return "employment_type,pay_frequency,pay_period"
+	case EmploymentsListRequestRemoteFieldsEmploymentTypePayPeriod:
+		return "employment_type,pay_period"
+	case EmploymentsListRequestRemoteFieldsFlsaStatus:
+		return "flsa_status"
+	case EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequency:
+		return "flsa_status,pay_frequency"
+	case EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod:
+		return "flsa_status,pay_frequency,pay_period"
+	case EmploymentsListRequestRemoteFieldsFlsaStatusPayPeriod:
+		return "flsa_status,pay_period"
+	case EmploymentsListRequestRemoteFieldsPayFrequency:
+		return "pay_frequency"
+	case EmploymentsListRequestRemoteFieldsPayFrequencyPayPeriod:
+		return "pay_frequency,pay_period"
+	case EmploymentsListRequestRemoteFieldsPayPeriod:
+		return "pay_period"
+	}
+}
+
+func (e EmploymentsListRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsListRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_type":
+		value := EmploymentsListRequestRemoteFieldsEmploymentType
+		*e = value
+	case "employment_type,flsa_status":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatus
+		*e = value
+	case "employment_type,flsa_status,pay_frequency":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
+		*e = value
+	case "employment_type,flsa_status,pay_frequency,pay_period":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "employment_type,flsa_status,pay_period":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
+		*e = value
+	case "employment_type,pay_frequency":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequency
+		*e = value
+	case "employment_type,pay_frequency,pay_period":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
+		*e = value
+	case "employment_type,pay_period":
+		value := EmploymentsListRequestRemoteFieldsEmploymentTypePayPeriod
+		*e = value
+	case "flsa_status":
+		value := EmploymentsListRequestRemoteFieldsFlsaStatus
+		*e = value
+	case "flsa_status,pay_frequency":
+		value := EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequency
+		*e = value
+	case "flsa_status,pay_frequency,pay_period":
+		value := EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "flsa_status,pay_period":
+		value := EmploymentsListRequestRemoteFieldsFlsaStatusPayPeriod
+		*e = value
+	case "pay_frequency":
+		value := EmploymentsListRequestRemoteFieldsPayFrequency
+		*e = value
+	case "pay_frequency,pay_period":
+		value := EmploymentsListRequestRemoteFieldsPayFrequencyPayPeriod
+		*e = value
+	case "pay_period":
+		value := EmploymentsListRequestRemoteFieldsPayPeriod
+		*e = value
+	}
+	return nil
+}
+
+type EmploymentsListRequestShowEnumOrigins uint
+
+const (
+	EmploymentsListRequestShowEnumOriginsEmploymentType EmploymentsListRequestShowEnumOrigins = iota + 1
+	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatus
+	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
+	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
+	EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequency
+	EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
+	EmploymentsListRequestShowEnumOriginsEmploymentTypePayPeriod
+	EmploymentsListRequestShowEnumOriginsFlsaStatus
+	EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequency
+	EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
+	EmploymentsListRequestShowEnumOriginsFlsaStatusPayPeriod
+	EmploymentsListRequestShowEnumOriginsPayFrequency
+	EmploymentsListRequestShowEnumOriginsPayFrequencyPayPeriod
+	EmploymentsListRequestShowEnumOriginsPayPeriod
+)
+
+func (e EmploymentsListRequestShowEnumOrigins) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsListRequestShowEnumOriginsEmploymentType:
+		return "employment_type"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatus:
+		return "employment_type,flsa_status"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency:
+		return "employment_type,flsa_status,pay_frequency"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
+		return "employment_type,flsa_status,pay_frequency,pay_period"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod:
+		return "employment_type,flsa_status,pay_period"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequency:
+		return "employment_type,pay_frequency"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod:
+		return "employment_type,pay_frequency,pay_period"
+	case EmploymentsListRequestShowEnumOriginsEmploymentTypePayPeriod:
+		return "employment_type,pay_period"
+	case EmploymentsListRequestShowEnumOriginsFlsaStatus:
+		return "flsa_status"
+	case EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequency:
+		return "flsa_status,pay_frequency"
+	case EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod:
+		return "flsa_status,pay_frequency,pay_period"
+	case EmploymentsListRequestShowEnumOriginsFlsaStatusPayPeriod:
+		return "flsa_status,pay_period"
+	case EmploymentsListRequestShowEnumOriginsPayFrequency:
+		return "pay_frequency"
+	case EmploymentsListRequestShowEnumOriginsPayFrequencyPayPeriod:
+		return "pay_frequency,pay_period"
+	case EmploymentsListRequestShowEnumOriginsPayPeriod:
+		return "pay_period"
+	}
+}
+
+func (e EmploymentsListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_type":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentType
+		*e = value
+	case "employment_type,flsa_status":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatus
+		*e = value
+	case "employment_type,flsa_status,pay_frequency":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
+		*e = value
+	case "employment_type,flsa_status,pay_frequency,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "employment_type,flsa_status,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
+		*e = value
+	case "employment_type,pay_frequency":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequency
+		*e = value
+	case "employment_type,pay_frequency,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
+		*e = value
+	case "employment_type,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsEmploymentTypePayPeriod
+		*e = value
+	case "flsa_status":
+		value := EmploymentsListRequestShowEnumOriginsFlsaStatus
+		*e = value
+	case "flsa_status,pay_frequency":
+		value := EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequency
+		*e = value
+	case "flsa_status,pay_frequency,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "flsa_status,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsFlsaStatusPayPeriod
+		*e = value
+	case "pay_frequency":
+		value := EmploymentsListRequestShowEnumOriginsPayFrequency
+		*e = value
+	case "pay_frequency,pay_period":
+		value := EmploymentsListRequestShowEnumOriginsPayFrequencyPayPeriod
+		*e = value
+	case "pay_period":
+		value := EmploymentsListRequestShowEnumOriginsPayPeriod
+		*e = value
+	}
+	return nil
+}
+
+type EmploymentsRetrieveRequestExpand uint
+
+const (
+	EmploymentsRetrieveRequestExpandEmployee EmploymentsRetrieveRequestExpand = iota + 1
+	EmploymentsRetrieveRequestExpandEmployeePayGroup
+	EmploymentsRetrieveRequestExpandPayGroup
+)
+
+func (e EmploymentsRetrieveRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsRetrieveRequestExpandEmployee:
+		return "employee"
+	case EmploymentsRetrieveRequestExpandEmployeePayGroup:
+		return "employee,pay_group"
+	case EmploymentsRetrieveRequestExpandPayGroup:
+		return "pay_group"
+	}
+}
+
+func (e EmploymentsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employee":
+		value := EmploymentsRetrieveRequestExpandEmployee
+		*e = value
+	case "employee,pay_group":
+		value := EmploymentsRetrieveRequestExpandEmployeePayGroup
+		*e = value
+	case "pay_group":
+		value := EmploymentsRetrieveRequestExpandPayGroup
+		*e = value
+	}
+	return nil
+}
+
+type EmploymentsRetrieveRequestRemoteFields uint
+
+const (
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentType EmploymentsRetrieveRequestRemoteFields = iota + 1
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatus
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequency
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsFlsaStatus
+	EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequency
+	EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsPayFrequency
+	EmploymentsRetrieveRequestRemoteFieldsPayFrequencyPayPeriod
+	EmploymentsRetrieveRequestRemoteFieldsPayPeriod
+)
+
+func (e EmploymentsRetrieveRequestRemoteFields) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentType:
+		return "employment_type"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatus:
+		return "employment_type,flsa_status"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency:
+		return "employment_type,flsa_status,pay_frequency"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
+		return "employment_type,flsa_status,pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod:
+		return "employment_type,flsa_status,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequency:
+		return "employment_type,pay_frequency"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod:
+		return "employment_type,pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayPeriod:
+		return "employment_type,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatus:
+		return "flsa_status"
+	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequency:
+		return "flsa_status,pay_frequency"
+	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod:
+		return "flsa_status,pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayPeriod:
+		return "flsa_status,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsPayFrequency:
+		return "pay_frequency"
+	case EmploymentsRetrieveRequestRemoteFieldsPayFrequencyPayPeriod:
+		return "pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestRemoteFieldsPayPeriod:
+		return "pay_period"
+	}
+}
+
+func (e EmploymentsRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_type":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentType
+		*e = value
+	case "employment_type,flsa_status":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatus
+		*e = value
+	case "employment_type,flsa_status,pay_frequency":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
+		*e = value
+	case "employment_type,flsa_status,pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "employment_type,flsa_status,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
+		*e = value
+	case "employment_type,pay_frequency":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequency
+		*e = value
+	case "employment_type,pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
+		*e = value
+	case "employment_type,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayPeriod
+		*e = value
+	case "flsa_status":
+		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatus
+		*e = value
+	case "flsa_status,pay_frequency":
+		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequency
+		*e = value
+	case "flsa_status,pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "flsa_status,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayPeriod
+		*e = value
+	case "pay_frequency":
+		value := EmploymentsRetrieveRequestRemoteFieldsPayFrequency
+		*e = value
+	case "pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsPayFrequencyPayPeriod
+		*e = value
+	case "pay_period":
+		value := EmploymentsRetrieveRequestRemoteFieldsPayPeriod
+		*e = value
+	}
+	return nil
+}
+
+type EmploymentsRetrieveRequestShowEnumOrigins uint
+
+const (
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentType EmploymentsRetrieveRequestShowEnumOrigins = iota + 1
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatus
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequency
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatus
+	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequency
+	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsPayFrequency
+	EmploymentsRetrieveRequestShowEnumOriginsPayFrequencyPayPeriod
+	EmploymentsRetrieveRequestShowEnumOriginsPayPeriod
+)
+
+func (e EmploymentsRetrieveRequestShowEnumOrigins) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentType:
+		return "employment_type"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatus:
+		return "employment_type,flsa_status"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency:
+		return "employment_type,flsa_status,pay_frequency"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
+		return "employment_type,flsa_status,pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod:
+		return "employment_type,flsa_status,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequency:
+		return "employment_type,pay_frequency"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod:
+		return "employment_type,pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayPeriod:
+		return "employment_type,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatus:
+		return "flsa_status"
+	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequency:
+		return "flsa_status,pay_frequency"
+	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod:
+		return "flsa_status,pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayPeriod:
+		return "flsa_status,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsPayFrequency:
+		return "pay_frequency"
+	case EmploymentsRetrieveRequestShowEnumOriginsPayFrequencyPayPeriod:
+		return "pay_frequency,pay_period"
+	case EmploymentsRetrieveRequestShowEnumOriginsPayPeriod:
+		return "pay_period"
+	}
+}
+
+func (e EmploymentsRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmploymentsRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_type":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentType
+		*e = value
+	case "employment_type,flsa_status":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatus
+		*e = value
+	case "employment_type,flsa_status,pay_frequency":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
+		*e = value
+	case "employment_type,flsa_status,pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "employment_type,flsa_status,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
+		*e = value
+	case "employment_type,pay_frequency":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequency
+		*e = value
+	case "employment_type,pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
+		*e = value
+	case "employment_type,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayPeriod
+		*e = value
+	case "flsa_status":
+		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatus
+		*e = value
+	case "flsa_status,pay_frequency":
+		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequency
+		*e = value
+	case "flsa_status,pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
+		*e = value
+	case "flsa_status,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayPeriod
+		*e = value
+	case "pay_frequency":
+		value := EmploymentsRetrieveRequestShowEnumOriginsPayFrequency
+		*e = value
+	case "pay_frequency,pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsPayFrequencyPayPeriod
+		*e = value
+	case "pay_period":
+		value := EmploymentsRetrieveRequestShowEnumOriginsPayPeriod
+		*e = value
+	}
+	return nil
 }

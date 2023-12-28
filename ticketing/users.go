@@ -3,6 +3,9 @@
 package ticketing
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -36,4 +39,92 @@ type UsersRetrieveRequest struct {
 	Expand *UsersRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type UsersListRequestExpand uint
+
+const (
+	UsersListRequestExpandRoles UsersListRequestExpand = iota + 1
+	UsersListRequestExpandTeams
+	UsersListRequestExpandTeamsRoles
+)
+
+func (u UsersListRequestExpand) String() string {
+	switch u {
+	default:
+		return strconv.Itoa(int(u))
+	case UsersListRequestExpandRoles:
+		return "roles"
+	case UsersListRequestExpandTeams:
+		return "teams"
+	case UsersListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (u UsersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", u.String())), nil
+}
+
+func (u *UsersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := UsersListRequestExpandRoles
+		*u = value
+	case "teams":
+		value := UsersListRequestExpandTeams
+		*u = value
+	case "teams,roles":
+		value := UsersListRequestExpandTeamsRoles
+		*u = value
+	}
+	return nil
+}
+
+type UsersRetrieveRequestExpand uint
+
+const (
+	UsersRetrieveRequestExpandRoles UsersRetrieveRequestExpand = iota + 1
+	UsersRetrieveRequestExpandTeams
+	UsersRetrieveRequestExpandTeamsRoles
+)
+
+func (u UsersRetrieveRequestExpand) String() string {
+	switch u {
+	default:
+		return strconv.Itoa(int(u))
+	case UsersRetrieveRequestExpandRoles:
+		return "roles"
+	case UsersRetrieveRequestExpandTeams:
+		return "teams"
+	case UsersRetrieveRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (u UsersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", u.String())), nil
+}
+
+func (u *UsersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := UsersRetrieveRequestExpandRoles
+		*u = value
+	case "teams":
+		value := UsersRetrieveRequestExpandTeams
+		*u = value
+	case "teams,roles":
+		value := UsersRetrieveRequestExpandTeamsRoles
+		*u = value
+	}
+	return nil
 }

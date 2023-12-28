@@ -39,7 +39,7 @@ func (c *client) Create(ctx context.Context, request *hris.DataPassthroughReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/async-passthrough"
+	endpointURL := baseURL + "/" + "async-passthrough"
 
 	var response *hris.AsyncPassthroughReciept
 	if err := core.DoRequest(
@@ -64,7 +64,7 @@ func (c *client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/async-passthrough/%v", asyncPassthroughReceiptId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"async-passthrough/%v", asyncPassthroughReceiptId)
 
 	var response *hris.RemoteResponse
 	if err := core.DoRequest(

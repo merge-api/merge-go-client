@@ -39,7 +39,7 @@ func (c *client) Create(ctx context.Context, request *accounting.DataPassthrough
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/async-passthrough"
+	endpointURL := baseURL + "/" + "async-passthrough"
 
 	var response *accounting.AsyncPassthroughReciept
 	if err := core.DoRequest(
@@ -64,7 +64,7 @@ func (c *client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/async-passthrough/%v", asyncPassthroughReceiptId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"async-passthrough/%v", asyncPassthroughReceiptId)
 
 	var response *accounting.RemoteResponse
 	if err := core.DoRequest(

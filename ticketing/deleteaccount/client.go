@@ -36,7 +36,7 @@ func (c *client) Delete(ctx context.Context) error {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/delete-account"
+	endpointURL := baseURL + "/" + "delete-account"
 
 	if err := core.DoRequest(
 		ctx,

@@ -42,7 +42,7 @@ func (c *client) List(ctx context.Context, request *ticketing.CollectionsListReq
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/collections"
+	endpointURL := baseURL + "/" + "collections"
 
 	queryParams := make(url.Values)
 	if request.CollectionType != nil {
@@ -114,7 +114,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Col
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/collections/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"collections/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -156,7 +156,7 @@ func (c *client) UsersList(ctx context.Context, parentId string, request *ticket
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/collections/%v/users", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"collections/%v/users", parentId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

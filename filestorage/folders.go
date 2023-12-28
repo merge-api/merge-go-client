@@ -3,6 +3,9 @@
 package filestorage
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -48,4 +51,140 @@ type FoldersRetrieveRequest struct {
 	Expand *FoldersRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type FoldersListRequestExpand uint
+
+const (
+	FoldersListRequestExpandDrive FoldersListRequestExpand = iota + 1
+	FoldersListRequestExpandParentFolder
+	FoldersListRequestExpandParentFolderDrive
+	FoldersListRequestExpandPermissions
+	FoldersListRequestExpandPermissionsDrive
+	FoldersListRequestExpandPermissionsParentFolder
+	FoldersListRequestExpandPermissionsParentFolderDrive
+)
+
+func (f FoldersListRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FoldersListRequestExpandDrive:
+		return "drive"
+	case FoldersListRequestExpandParentFolder:
+		return "parent_folder"
+	case FoldersListRequestExpandParentFolderDrive:
+		return "parent_folder,drive"
+	case FoldersListRequestExpandPermissions:
+		return "permissions"
+	case FoldersListRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FoldersListRequestExpandPermissionsParentFolder:
+		return "permissions,parent_folder"
+	case FoldersListRequestExpandPermissionsParentFolderDrive:
+		return "permissions,parent_folder,drive"
+	}
+}
+
+func (f FoldersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FoldersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FoldersListRequestExpandDrive
+		*f = value
+	case "parent_folder":
+		value := FoldersListRequestExpandParentFolder
+		*f = value
+	case "parent_folder,drive":
+		value := FoldersListRequestExpandParentFolderDrive
+		*f = value
+	case "permissions":
+		value := FoldersListRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FoldersListRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,parent_folder":
+		value := FoldersListRequestExpandPermissionsParentFolder
+		*f = value
+	case "permissions,parent_folder,drive":
+		value := FoldersListRequestExpandPermissionsParentFolderDrive
+		*f = value
+	}
+	return nil
+}
+
+type FoldersRetrieveRequestExpand uint
+
+const (
+	FoldersRetrieveRequestExpandDrive FoldersRetrieveRequestExpand = iota + 1
+	FoldersRetrieveRequestExpandParentFolder
+	FoldersRetrieveRequestExpandParentFolderDrive
+	FoldersRetrieveRequestExpandPermissions
+	FoldersRetrieveRequestExpandPermissionsDrive
+	FoldersRetrieveRequestExpandPermissionsParentFolder
+	FoldersRetrieveRequestExpandPermissionsParentFolderDrive
+)
+
+func (f FoldersRetrieveRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FoldersRetrieveRequestExpandDrive:
+		return "drive"
+	case FoldersRetrieveRequestExpandParentFolder:
+		return "parent_folder"
+	case FoldersRetrieveRequestExpandParentFolderDrive:
+		return "parent_folder,drive"
+	case FoldersRetrieveRequestExpandPermissions:
+		return "permissions"
+	case FoldersRetrieveRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FoldersRetrieveRequestExpandPermissionsParentFolder:
+		return "permissions,parent_folder"
+	case FoldersRetrieveRequestExpandPermissionsParentFolderDrive:
+		return "permissions,parent_folder,drive"
+	}
+}
+
+func (f FoldersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FoldersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FoldersRetrieveRequestExpandDrive
+		*f = value
+	case "parent_folder":
+		value := FoldersRetrieveRequestExpandParentFolder
+		*f = value
+	case "parent_folder,drive":
+		value := FoldersRetrieveRequestExpandParentFolderDrive
+		*f = value
+	case "permissions":
+		value := FoldersRetrieveRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FoldersRetrieveRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,parent_folder":
+		value := FoldersRetrieveRequestExpandPermissionsParentFolder
+		*f = value
+	case "permissions,parent_folder,drive":
+		value := FoldersRetrieveRequestExpandPermissionsParentFolderDrive
+		*f = value
+	}
+	return nil
 }

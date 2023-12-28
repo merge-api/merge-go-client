@@ -42,7 +42,7 @@ func (c *client) List(ctx context.Context, request *ats.JobsListRequest) (*ats.P
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/jobs"
+	endpointURL := baseURL + "/" + "jobs"
 
 	queryParams := make(url.Values)
 	if request.Code != nil {
@@ -117,7 +117,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.JobsRetri
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/jobs/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"jobs/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -159,7 +159,7 @@ func (c *client) ScreeningQuestionsList(ctx context.Context, jobId string, reque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/jobs/%v/screening-questions", jobId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"jobs/%v/screening-questions", jobId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

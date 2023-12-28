@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.RemoteKeyForRe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/regenerate-key"
+	endpointURL := baseURL + "/" + "regenerate-key"
 
 	var response *filestorage.RemoteKey
 	if err := core.DoRequest(

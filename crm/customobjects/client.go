@@ -44,7 +44,7 @@ func (c *client) CustomObjectClassesCustomObjectsList(ctx context.Context, custo
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -104,7 +104,7 @@ func (c *client) CustomObjectClassesCustomObjectsCreate(ctx context.Context, cus
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -140,7 +140,7 @@ func (c *client) CustomObjectClassesCustomObjectsRetrieve(ctx context.Context, c
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v", customObjectClassId, id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects/%v", customObjectClassId, id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -176,7 +176,7 @@ func (c *client) CustomObjectClassesCustomObjectsMetaPatchRetrieve(ctx context.C
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/meta/patch/%v", customObjectClassId, id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects/meta/patch/%v", customObjectClassId, id)
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -201,7 +201,7 @@ func (c *client) CustomObjectClassesCustomObjectsMetaPostRetrieve(ctx context.Co
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/meta/post", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects/meta/post", customObjectClassId)
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(

@@ -9,11 +9,11 @@ import (
 	time "time"
 )
 
-// * `SUPER_ADMIN` - SUPER_ADMIN
-// * `ADMIN` - ADMIN
-// * `TEAM_MEMBER` - TEAM_MEMBER
-// * `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
-// * `INTERVIEWER` - INTERVIEWER
+// - `SUPER_ADMIN` - SUPER_ADMIN
+// - `ADMIN` - ADMIN
+// - `TEAM_MEMBER` - TEAM_MEMBER
+// - `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
+// - `INTERVIEWER` - INTERVIEWER
 type AccessRoleEnum uint
 
 const (
@@ -81,14 +81,18 @@ type AccountDetails struct {
 	Status                  *string       `json:"status,omitempty"`
 	WebhookListenerUrl      *string       `json:"webhook_listener_url,omitempty"`
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
-	IsDuplicate *bool `json:"is_duplicate,omitempty"`
+	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
+	AccountType *string `json:"account_type,omitempty"`
 }
 
 // # The LinkedAccount Object
+//
 // ### Description
+//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
+//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -102,6 +106,7 @@ type AccountDetailsAndActions struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
+	AccountType string                               `json:"account_type"`
 }
 
 type AccountDetailsAndActionsIntegration struct {
@@ -115,9 +120,9 @@ type AccountDetailsAndActionsIntegration struct {
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
 }
 
-// * `COMPLETE` - COMPLETE
-// * `INCOMPLETE` - INCOMPLETE
-// * `RELINK_NEEDED` - RELINK_NEEDED
+// - `COMPLETE` - COMPLETE
+// - `INCOMPLETE` - INCOMPLETE
+// - `RELINK_NEEDED` - RELINK_NEEDED
 type AccountDetailsAndActionsStatusEnum uint
 
 const (
@@ -187,186 +192,14 @@ type AccountToken struct {
 	Integration  *AccountIntegration `json:"integration,omitempty"`
 }
 
-type ActivitiesListRequestRemoteFields uint
-
-const (
-	ActivitiesListRequestRemoteFieldsActivityType ActivitiesListRequestRemoteFields = iota + 1
-	ActivitiesListRequestRemoteFieldsActivityTypeVisibility
-	ActivitiesListRequestRemoteFieldsVisibility
-)
-
-func (a ActivitiesListRequestRemoteFields) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ActivitiesListRequestRemoteFieldsActivityType:
-		return "activity_type"
-	case ActivitiesListRequestRemoteFieldsActivityTypeVisibility:
-		return "activity_type,visibility"
-	case ActivitiesListRequestRemoteFieldsVisibility:
-		return "visibility"
-	}
-}
-
-func (a ActivitiesListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ActivitiesListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "activity_type":
-		value := ActivitiesListRequestRemoteFieldsActivityType
-		*a = value
-	case "activity_type,visibility":
-		value := ActivitiesListRequestRemoteFieldsActivityTypeVisibility
-		*a = value
-	case "visibility":
-		value := ActivitiesListRequestRemoteFieldsVisibility
-		*a = value
-	}
-	return nil
-}
-
-type ActivitiesListRequestShowEnumOrigins uint
-
-const (
-	ActivitiesListRequestShowEnumOriginsActivityType ActivitiesListRequestShowEnumOrigins = iota + 1
-	ActivitiesListRequestShowEnumOriginsActivityTypeVisibility
-	ActivitiesListRequestShowEnumOriginsVisibility
-)
-
-func (a ActivitiesListRequestShowEnumOrigins) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ActivitiesListRequestShowEnumOriginsActivityType:
-		return "activity_type"
-	case ActivitiesListRequestShowEnumOriginsActivityTypeVisibility:
-		return "activity_type,visibility"
-	case ActivitiesListRequestShowEnumOriginsVisibility:
-		return "visibility"
-	}
-}
-
-func (a ActivitiesListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ActivitiesListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "activity_type":
-		value := ActivitiesListRequestShowEnumOriginsActivityType
-		*a = value
-	case "activity_type,visibility":
-		value := ActivitiesListRequestShowEnumOriginsActivityTypeVisibility
-		*a = value
-	case "visibility":
-		value := ActivitiesListRequestShowEnumOriginsVisibility
-		*a = value
-	}
-	return nil
-}
-
-type ActivitiesRetrieveRequestRemoteFields uint
-
-const (
-	ActivitiesRetrieveRequestRemoteFieldsActivityType ActivitiesRetrieveRequestRemoteFields = iota + 1
-	ActivitiesRetrieveRequestRemoteFieldsActivityTypeVisibility
-	ActivitiesRetrieveRequestRemoteFieldsVisibility
-)
-
-func (a ActivitiesRetrieveRequestRemoteFields) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ActivitiesRetrieveRequestRemoteFieldsActivityType:
-		return "activity_type"
-	case ActivitiesRetrieveRequestRemoteFieldsActivityTypeVisibility:
-		return "activity_type,visibility"
-	case ActivitiesRetrieveRequestRemoteFieldsVisibility:
-		return "visibility"
-	}
-}
-
-func (a ActivitiesRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ActivitiesRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "activity_type":
-		value := ActivitiesRetrieveRequestRemoteFieldsActivityType
-		*a = value
-	case "activity_type,visibility":
-		value := ActivitiesRetrieveRequestRemoteFieldsActivityTypeVisibility
-		*a = value
-	case "visibility":
-		value := ActivitiesRetrieveRequestRemoteFieldsVisibility
-		*a = value
-	}
-	return nil
-}
-
-type ActivitiesRetrieveRequestShowEnumOrigins uint
-
-const (
-	ActivitiesRetrieveRequestShowEnumOriginsActivityType ActivitiesRetrieveRequestShowEnumOrigins = iota + 1
-	ActivitiesRetrieveRequestShowEnumOriginsActivityTypeVisibility
-	ActivitiesRetrieveRequestShowEnumOriginsVisibility
-)
-
-func (a ActivitiesRetrieveRequestShowEnumOrigins) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ActivitiesRetrieveRequestShowEnumOriginsActivityType:
-		return "activity_type"
-	case ActivitiesRetrieveRequestShowEnumOriginsActivityTypeVisibility:
-		return "activity_type,visibility"
-	case ActivitiesRetrieveRequestShowEnumOriginsVisibility:
-		return "visibility"
-	}
-}
-
-func (a ActivitiesRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ActivitiesRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "activity_type":
-		value := ActivitiesRetrieveRequestShowEnumOriginsActivityType
-		*a = value
-	case "activity_type,visibility":
-		value := ActivitiesRetrieveRequestShowEnumOriginsActivityTypeVisibility
-		*a = value
-	case "visibility":
-		value := ActivitiesRetrieveRequestShowEnumOriginsVisibility
-		*a = value
-	}
-	return nil
-}
-
 // # The Activity Object
+//
 // ### Description
+//
 // The `Activity` object is used to represent an activity for a candidate performed by a user.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Activities` endpoint and filter by `ID` to show all activities.
 type Activity struct {
 	Id *string `json:"id,omitempty"`
@@ -378,9 +211,9 @@ type Activity struct {
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// The activity's type.
 	//
-	// * `NOTE` - NOTE
-	// * `EMAIL` - EMAIL
-	// * `OTHER` - OTHER
+	// - `NOTE` - NOTE
+	// - `EMAIL` - EMAIL
+	// - `OTHER` - OTHER
 	ActivityType *ActivityActivityType `json:"activity_type,omitempty"`
 	// The activity's subject.
 	Subject *string `json:"subject,omitempty"`
@@ -388,9 +221,9 @@ type Activity struct {
 	Body *string `json:"body,omitempty"`
 	// The activity's visibility.
 	//
-	// * `ADMIN_ONLY` - ADMIN_ONLY
-	// * `PUBLIC` - PUBLIC
-	// * `PRIVATE` - PRIVATE
+	// - `ADMIN_ONLY` - ADMIN_ONLY
+	// - `PUBLIC` - PUBLIC
+	// - `PRIVATE` - PRIVATE
 	Visibility *ActivityVisibility `json:"visibility,omitempty"`
 	// The activity’s candidate.
 	Candidate *string `json:"candidate,omitempty"`
@@ -405,9 +238,9 @@ type Activity struct {
 
 // The activity's type.
 //
-// * `NOTE` - NOTE
-// * `EMAIL` - EMAIL
-// * `OTHER` - OTHER
+// - `NOTE` - NOTE
+// - `EMAIL` - EMAIL
+// - `OTHER` - OTHER
 type ActivityActivityType struct {
 	typeName         string
 	ActivityTypeEnum ActivityTypeEnum
@@ -466,18 +299,22 @@ func (a *ActivityActivityType) Accept(visitor ActivityActivityTypeVisitor) error
 }
 
 // # The Activity Object
+//
 // ### Description
+//
 // The `Activity` object is used to represent an activity for a candidate performed by a user.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Activities` endpoint and filter by `ID` to show all activities.
 type ActivityRequest struct {
 	// The user that performed the action.
 	User *ActivityRequestUser `json:"user,omitempty"`
 	// The activity's type.
 	//
-	// * `NOTE` - NOTE
-	// * `EMAIL` - EMAIL
-	// * `OTHER` - OTHER
+	// - `NOTE` - NOTE
+	// - `EMAIL` - EMAIL
+	// - `OTHER` - OTHER
 	ActivityType *ActivityRequestActivityType `json:"activity_type,omitempty"`
 	// The activity's subject.
 	Subject *string `json:"subject,omitempty"`
@@ -485,9 +322,9 @@ type ActivityRequest struct {
 	Body *string `json:"body,omitempty"`
 	// The activity's visibility.
 	//
-	// * `ADMIN_ONLY` - ADMIN_ONLY
-	// * `PUBLIC` - PUBLIC
-	// * `PRIVATE` - PRIVATE
+	// - `ADMIN_ONLY` - ADMIN_ONLY
+	// - `PUBLIC` - PUBLIC
+	// - `PRIVATE` - PRIVATE
 	Visibility *ActivityRequestVisibility `json:"visibility,omitempty"`
 	// The activity’s candidate.
 	Candidate           *string        `json:"candidate,omitempty"`
@@ -497,9 +334,9 @@ type ActivityRequest struct {
 
 // The activity's type.
 //
-// * `NOTE` - NOTE
-// * `EMAIL` - EMAIL
-// * `OTHER` - OTHER
+// - `NOTE` - NOTE
+// - `EMAIL` - EMAIL
+// - `OTHER` - OTHER
 type ActivityRequestActivityType struct {
 	typeName         string
 	ActivityTypeEnum ActivityTypeEnum
@@ -617,9 +454,9 @@ func (a *ActivityRequestUser) Accept(visitor ActivityRequestUserVisitor) error {
 
 // The activity's visibility.
 //
-// * `ADMIN_ONLY` - ADMIN_ONLY
-// * `PUBLIC` - PUBLIC
-// * `PRIVATE` - PRIVATE
+// - `ADMIN_ONLY` - ADMIN_ONLY
+// - `PUBLIC` - PUBLIC
+// - `PRIVATE` - PRIVATE
 type ActivityRequestVisibility struct {
 	typeName       string
 	VisibilityEnum VisibilityEnum
@@ -684,9 +521,9 @@ type ActivityResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
-// * `NOTE` - NOTE
-// * `EMAIL` - EMAIL
-// * `OTHER` - OTHER
+// - `NOTE` - NOTE
+// - `EMAIL` - EMAIL
+// - `OTHER` - OTHER
 type ActivityTypeEnum uint
 
 const (
@@ -791,9 +628,9 @@ func (a *ActivityUser) Accept(visitor ActivityUserVisitor) error {
 
 // The activity's visibility.
 //
-// * `ADMIN_ONLY` - ADMIN_ONLY
-// * `PUBLIC` - PUBLIC
-// * `PRIVATE` - PRIVATE
+// - `ADMIN_ONLY` - ADMIN_ONLY
+// - `PUBLIC` - PUBLIC
+// - `PRIVATE` - PRIVATE
 type ActivityVisibility struct {
 	typeName       string
 	VisibilityEnum VisibilityEnum
@@ -852,10 +689,13 @@ func (a *ActivityVisibility) Accept(visitor ActivityVisibilityVisitor) error {
 }
 
 // # The Application Object
+//
 // ### Description
+//
 // The Application Object is used to represent a candidate's journey through a particular Job's recruiting process. If a Candidate applies for multiple Jobs, there will be a separate Application for each Job if the third-party integration allows it.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Applications` endpoint and filter by `ID` to show all applications.
 type Application struct {
 	Id *string `json:"id,omitempty"`
@@ -1176,10 +1016,13 @@ func (a *ApplicationRejectReason) Accept(visitor ApplicationRejectReasonVisitor)
 }
 
 // # The Application Object
+//
 // ### Description
+//
 // The Application Object is used to represent a candidate's journey through a particular Job's recruiting process. If a Candidate applies for multiple Jobs, there will be a separate Application for each Job if the third-party integration allows it.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Applications` endpoint and filter by `ID` to show all applications.
 type ApplicationRequest struct {
 	// The candidate applying.
@@ -1500,438 +1343,18 @@ type ApplicationResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
-type ApplicationsListRequestExpand uint
-
-const (
-	ApplicationsListRequestExpandCandidate ApplicationsListRequestExpand = iota + 1
-	ApplicationsListRequestExpandCandidateCreditedTo
-	ApplicationsListRequestExpandCandidateCreditedToCurrentStage
-	ApplicationsListRequestExpandCandidateCreditedToCurrentStageRejectReason
-	ApplicationsListRequestExpandCandidateCreditedToRejectReason
-	ApplicationsListRequestExpandCandidateCurrentStage
-	ApplicationsListRequestExpandCandidateCurrentStageRejectReason
-	ApplicationsListRequestExpandCandidateJob
-	ApplicationsListRequestExpandCandidateJobCreditedTo
-	ApplicationsListRequestExpandCandidateJobCreditedToCurrentStage
-	ApplicationsListRequestExpandCandidateJobCreditedToCurrentStageRejectReason
-	ApplicationsListRequestExpandCandidateJobCreditedToRejectReason
-	ApplicationsListRequestExpandCandidateJobCurrentStage
-	ApplicationsListRequestExpandCandidateJobCurrentStageRejectReason
-	ApplicationsListRequestExpandCandidateJobRejectReason
-	ApplicationsListRequestExpandCandidateRejectReason
-	ApplicationsListRequestExpandCreditedTo
-	ApplicationsListRequestExpandCreditedToCurrentStage
-	ApplicationsListRequestExpandCreditedToCurrentStageRejectReason
-	ApplicationsListRequestExpandCreditedToRejectReason
-	ApplicationsListRequestExpandCurrentStage
-	ApplicationsListRequestExpandCurrentStageRejectReason
-	ApplicationsListRequestExpandJob
-	ApplicationsListRequestExpandJobCreditedTo
-	ApplicationsListRequestExpandJobCreditedToCurrentStage
-	ApplicationsListRequestExpandJobCreditedToCurrentStageRejectReason
-	ApplicationsListRequestExpandJobCreditedToRejectReason
-	ApplicationsListRequestExpandJobCurrentStage
-	ApplicationsListRequestExpandJobCurrentStageRejectReason
-	ApplicationsListRequestExpandJobRejectReason
-	ApplicationsListRequestExpandRejectReason
-)
-
-func (a ApplicationsListRequestExpand) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ApplicationsListRequestExpandCandidate:
-		return "candidate"
-	case ApplicationsListRequestExpandCandidateCreditedTo:
-		return "candidate,credited_to"
-	case ApplicationsListRequestExpandCandidateCreditedToCurrentStage:
-		return "candidate,credited_to,current_stage"
-	case ApplicationsListRequestExpandCandidateCreditedToCurrentStageRejectReason:
-		return "candidate,credited_to,current_stage,reject_reason"
-	case ApplicationsListRequestExpandCandidateCreditedToRejectReason:
-		return "candidate,credited_to,reject_reason"
-	case ApplicationsListRequestExpandCandidateCurrentStage:
-		return "candidate,current_stage"
-	case ApplicationsListRequestExpandCandidateCurrentStageRejectReason:
-		return "candidate,current_stage,reject_reason"
-	case ApplicationsListRequestExpandCandidateJob:
-		return "candidate,job"
-	case ApplicationsListRequestExpandCandidateJobCreditedTo:
-		return "candidate,job,credited_to"
-	case ApplicationsListRequestExpandCandidateJobCreditedToCurrentStage:
-		return "candidate,job,credited_to,current_stage"
-	case ApplicationsListRequestExpandCandidateJobCreditedToCurrentStageRejectReason:
-		return "candidate,job,credited_to,current_stage,reject_reason"
-	case ApplicationsListRequestExpandCandidateJobCreditedToRejectReason:
-		return "candidate,job,credited_to,reject_reason"
-	case ApplicationsListRequestExpandCandidateJobCurrentStage:
-		return "candidate,job,current_stage"
-	case ApplicationsListRequestExpandCandidateJobCurrentStageRejectReason:
-		return "candidate,job,current_stage,reject_reason"
-	case ApplicationsListRequestExpandCandidateJobRejectReason:
-		return "candidate,job,reject_reason"
-	case ApplicationsListRequestExpandCandidateRejectReason:
-		return "candidate,reject_reason"
-	case ApplicationsListRequestExpandCreditedTo:
-		return "credited_to"
-	case ApplicationsListRequestExpandCreditedToCurrentStage:
-		return "credited_to,current_stage"
-	case ApplicationsListRequestExpandCreditedToCurrentStageRejectReason:
-		return "credited_to,current_stage,reject_reason"
-	case ApplicationsListRequestExpandCreditedToRejectReason:
-		return "credited_to,reject_reason"
-	case ApplicationsListRequestExpandCurrentStage:
-		return "current_stage"
-	case ApplicationsListRequestExpandCurrentStageRejectReason:
-		return "current_stage,reject_reason"
-	case ApplicationsListRequestExpandJob:
-		return "job"
-	case ApplicationsListRequestExpandJobCreditedTo:
-		return "job,credited_to"
-	case ApplicationsListRequestExpandJobCreditedToCurrentStage:
-		return "job,credited_to,current_stage"
-	case ApplicationsListRequestExpandJobCreditedToCurrentStageRejectReason:
-		return "job,credited_to,current_stage,reject_reason"
-	case ApplicationsListRequestExpandJobCreditedToRejectReason:
-		return "job,credited_to,reject_reason"
-	case ApplicationsListRequestExpandJobCurrentStage:
-		return "job,current_stage"
-	case ApplicationsListRequestExpandJobCurrentStageRejectReason:
-		return "job,current_stage,reject_reason"
-	case ApplicationsListRequestExpandJobRejectReason:
-		return "job,reject_reason"
-	case ApplicationsListRequestExpandRejectReason:
-		return "reject_reason"
-	}
-}
-
-func (a ApplicationsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ApplicationsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "candidate":
-		value := ApplicationsListRequestExpandCandidate
-		*a = value
-	case "candidate,credited_to":
-		value := ApplicationsListRequestExpandCandidateCreditedTo
-		*a = value
-	case "candidate,credited_to,current_stage":
-		value := ApplicationsListRequestExpandCandidateCreditedToCurrentStage
-		*a = value
-	case "candidate,credited_to,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandCandidateCreditedToCurrentStageRejectReason
-		*a = value
-	case "candidate,credited_to,reject_reason":
-		value := ApplicationsListRequestExpandCandidateCreditedToRejectReason
-		*a = value
-	case "candidate,current_stage":
-		value := ApplicationsListRequestExpandCandidateCurrentStage
-		*a = value
-	case "candidate,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandCandidateCurrentStageRejectReason
-		*a = value
-	case "candidate,job":
-		value := ApplicationsListRequestExpandCandidateJob
-		*a = value
-	case "candidate,job,credited_to":
-		value := ApplicationsListRequestExpandCandidateJobCreditedTo
-		*a = value
-	case "candidate,job,credited_to,current_stage":
-		value := ApplicationsListRequestExpandCandidateJobCreditedToCurrentStage
-		*a = value
-	case "candidate,job,credited_to,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandCandidateJobCreditedToCurrentStageRejectReason
-		*a = value
-	case "candidate,job,credited_to,reject_reason":
-		value := ApplicationsListRequestExpandCandidateJobCreditedToRejectReason
-		*a = value
-	case "candidate,job,current_stage":
-		value := ApplicationsListRequestExpandCandidateJobCurrentStage
-		*a = value
-	case "candidate,job,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandCandidateJobCurrentStageRejectReason
-		*a = value
-	case "candidate,job,reject_reason":
-		value := ApplicationsListRequestExpandCandidateJobRejectReason
-		*a = value
-	case "candidate,reject_reason":
-		value := ApplicationsListRequestExpandCandidateRejectReason
-		*a = value
-	case "credited_to":
-		value := ApplicationsListRequestExpandCreditedTo
-		*a = value
-	case "credited_to,current_stage":
-		value := ApplicationsListRequestExpandCreditedToCurrentStage
-		*a = value
-	case "credited_to,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandCreditedToCurrentStageRejectReason
-		*a = value
-	case "credited_to,reject_reason":
-		value := ApplicationsListRequestExpandCreditedToRejectReason
-		*a = value
-	case "current_stage":
-		value := ApplicationsListRequestExpandCurrentStage
-		*a = value
-	case "current_stage,reject_reason":
-		value := ApplicationsListRequestExpandCurrentStageRejectReason
-		*a = value
-	case "job":
-		value := ApplicationsListRequestExpandJob
-		*a = value
-	case "job,credited_to":
-		value := ApplicationsListRequestExpandJobCreditedTo
-		*a = value
-	case "job,credited_to,current_stage":
-		value := ApplicationsListRequestExpandJobCreditedToCurrentStage
-		*a = value
-	case "job,credited_to,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandJobCreditedToCurrentStageRejectReason
-		*a = value
-	case "job,credited_to,reject_reason":
-		value := ApplicationsListRequestExpandJobCreditedToRejectReason
-		*a = value
-	case "job,current_stage":
-		value := ApplicationsListRequestExpandJobCurrentStage
-		*a = value
-	case "job,current_stage,reject_reason":
-		value := ApplicationsListRequestExpandJobCurrentStageRejectReason
-		*a = value
-	case "job,reject_reason":
-		value := ApplicationsListRequestExpandJobRejectReason
-		*a = value
-	case "reject_reason":
-		value := ApplicationsListRequestExpandRejectReason
-		*a = value
-	}
-	return nil
-}
-
-type ApplicationsRetrieveRequestExpand uint
-
-const (
-	ApplicationsRetrieveRequestExpandCandidate ApplicationsRetrieveRequestExpand = iota + 1
-	ApplicationsRetrieveRequestExpandCandidateCreditedTo
-	ApplicationsRetrieveRequestExpandCandidateCreditedToCurrentStage
-	ApplicationsRetrieveRequestExpandCandidateCreditedToCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandCandidateCreditedToRejectReason
-	ApplicationsRetrieveRequestExpandCandidateCurrentStage
-	ApplicationsRetrieveRequestExpandCandidateCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandCandidateJob
-	ApplicationsRetrieveRequestExpandCandidateJobCreditedTo
-	ApplicationsRetrieveRequestExpandCandidateJobCreditedToCurrentStage
-	ApplicationsRetrieveRequestExpandCandidateJobCreditedToCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandCandidateJobCreditedToRejectReason
-	ApplicationsRetrieveRequestExpandCandidateJobCurrentStage
-	ApplicationsRetrieveRequestExpandCandidateJobCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandCandidateJobRejectReason
-	ApplicationsRetrieveRequestExpandCandidateRejectReason
-	ApplicationsRetrieveRequestExpandCreditedTo
-	ApplicationsRetrieveRequestExpandCreditedToCurrentStage
-	ApplicationsRetrieveRequestExpandCreditedToCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandCreditedToRejectReason
-	ApplicationsRetrieveRequestExpandCurrentStage
-	ApplicationsRetrieveRequestExpandCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandJob
-	ApplicationsRetrieveRequestExpandJobCreditedTo
-	ApplicationsRetrieveRequestExpandJobCreditedToCurrentStage
-	ApplicationsRetrieveRequestExpandJobCreditedToCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandJobCreditedToRejectReason
-	ApplicationsRetrieveRequestExpandJobCurrentStage
-	ApplicationsRetrieveRequestExpandJobCurrentStageRejectReason
-	ApplicationsRetrieveRequestExpandJobRejectReason
-	ApplicationsRetrieveRequestExpandRejectReason
-)
-
-func (a ApplicationsRetrieveRequestExpand) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ApplicationsRetrieveRequestExpandCandidate:
-		return "candidate"
-	case ApplicationsRetrieveRequestExpandCandidateCreditedTo:
-		return "candidate,credited_to"
-	case ApplicationsRetrieveRequestExpandCandidateCreditedToCurrentStage:
-		return "candidate,credited_to,current_stage"
-	case ApplicationsRetrieveRequestExpandCandidateCreditedToCurrentStageRejectReason:
-		return "candidate,credited_to,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateCreditedToRejectReason:
-		return "candidate,credited_to,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateCurrentStage:
-		return "candidate,current_stage"
-	case ApplicationsRetrieveRequestExpandCandidateCurrentStageRejectReason:
-		return "candidate,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateJob:
-		return "candidate,job"
-	case ApplicationsRetrieveRequestExpandCandidateJobCreditedTo:
-		return "candidate,job,credited_to"
-	case ApplicationsRetrieveRequestExpandCandidateJobCreditedToCurrentStage:
-		return "candidate,job,credited_to,current_stage"
-	case ApplicationsRetrieveRequestExpandCandidateJobCreditedToCurrentStageRejectReason:
-		return "candidate,job,credited_to,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateJobCreditedToRejectReason:
-		return "candidate,job,credited_to,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateJobCurrentStage:
-		return "candidate,job,current_stage"
-	case ApplicationsRetrieveRequestExpandCandidateJobCurrentStageRejectReason:
-		return "candidate,job,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateJobRejectReason:
-		return "candidate,job,reject_reason"
-	case ApplicationsRetrieveRequestExpandCandidateRejectReason:
-		return "candidate,reject_reason"
-	case ApplicationsRetrieveRequestExpandCreditedTo:
-		return "credited_to"
-	case ApplicationsRetrieveRequestExpandCreditedToCurrentStage:
-		return "credited_to,current_stage"
-	case ApplicationsRetrieveRequestExpandCreditedToCurrentStageRejectReason:
-		return "credited_to,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandCreditedToRejectReason:
-		return "credited_to,reject_reason"
-	case ApplicationsRetrieveRequestExpandCurrentStage:
-		return "current_stage"
-	case ApplicationsRetrieveRequestExpandCurrentStageRejectReason:
-		return "current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandJob:
-		return "job"
-	case ApplicationsRetrieveRequestExpandJobCreditedTo:
-		return "job,credited_to"
-	case ApplicationsRetrieveRequestExpandJobCreditedToCurrentStage:
-		return "job,credited_to,current_stage"
-	case ApplicationsRetrieveRequestExpandJobCreditedToCurrentStageRejectReason:
-		return "job,credited_to,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandJobCreditedToRejectReason:
-		return "job,credited_to,reject_reason"
-	case ApplicationsRetrieveRequestExpandJobCurrentStage:
-		return "job,current_stage"
-	case ApplicationsRetrieveRequestExpandJobCurrentStageRejectReason:
-		return "job,current_stage,reject_reason"
-	case ApplicationsRetrieveRequestExpandJobRejectReason:
-		return "job,reject_reason"
-	case ApplicationsRetrieveRequestExpandRejectReason:
-		return "reject_reason"
-	}
-}
-
-func (a ApplicationsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ApplicationsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "candidate":
-		value := ApplicationsRetrieveRequestExpandCandidate
-		*a = value
-	case "candidate,credited_to":
-		value := ApplicationsRetrieveRequestExpandCandidateCreditedTo
-		*a = value
-	case "candidate,credited_to,current_stage":
-		value := ApplicationsRetrieveRequestExpandCandidateCreditedToCurrentStage
-		*a = value
-	case "candidate,credited_to,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateCreditedToCurrentStageRejectReason
-		*a = value
-	case "candidate,credited_to,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateCreditedToRejectReason
-		*a = value
-	case "candidate,current_stage":
-		value := ApplicationsRetrieveRequestExpandCandidateCurrentStage
-		*a = value
-	case "candidate,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateCurrentStageRejectReason
-		*a = value
-	case "candidate,job":
-		value := ApplicationsRetrieveRequestExpandCandidateJob
-		*a = value
-	case "candidate,job,credited_to":
-		value := ApplicationsRetrieveRequestExpandCandidateJobCreditedTo
-		*a = value
-	case "candidate,job,credited_to,current_stage":
-		value := ApplicationsRetrieveRequestExpandCandidateJobCreditedToCurrentStage
-		*a = value
-	case "candidate,job,credited_to,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateJobCreditedToCurrentStageRejectReason
-		*a = value
-	case "candidate,job,credited_to,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateJobCreditedToRejectReason
-		*a = value
-	case "candidate,job,current_stage":
-		value := ApplicationsRetrieveRequestExpandCandidateJobCurrentStage
-		*a = value
-	case "candidate,job,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateJobCurrentStageRejectReason
-		*a = value
-	case "candidate,job,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateJobRejectReason
-		*a = value
-	case "candidate,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCandidateRejectReason
-		*a = value
-	case "credited_to":
-		value := ApplicationsRetrieveRequestExpandCreditedTo
-		*a = value
-	case "credited_to,current_stage":
-		value := ApplicationsRetrieveRequestExpandCreditedToCurrentStage
-		*a = value
-	case "credited_to,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCreditedToCurrentStageRejectReason
-		*a = value
-	case "credited_to,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCreditedToRejectReason
-		*a = value
-	case "current_stage":
-		value := ApplicationsRetrieveRequestExpandCurrentStage
-		*a = value
-	case "current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandCurrentStageRejectReason
-		*a = value
-	case "job":
-		value := ApplicationsRetrieveRequestExpandJob
-		*a = value
-	case "job,credited_to":
-		value := ApplicationsRetrieveRequestExpandJobCreditedTo
-		*a = value
-	case "job,credited_to,current_stage":
-		value := ApplicationsRetrieveRequestExpandJobCreditedToCurrentStage
-		*a = value
-	case "job,credited_to,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandJobCreditedToCurrentStageRejectReason
-		*a = value
-	case "job,credited_to,reject_reason":
-		value := ApplicationsRetrieveRequestExpandJobCreditedToRejectReason
-		*a = value
-	case "job,current_stage":
-		value := ApplicationsRetrieveRequestExpandJobCurrentStage
-		*a = value
-	case "job,current_stage,reject_reason":
-		value := ApplicationsRetrieveRequestExpandJobCurrentStageRejectReason
-		*a = value
-	case "job,reject_reason":
-		value := ApplicationsRetrieveRequestExpandJobRejectReason
-		*a = value
-	case "reject_reason":
-		value := ApplicationsRetrieveRequestExpandRejectReason
-		*a = value
-	}
-	return nil
-}
-
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
 }
 
 // # The Attachment Object
+//
 // ### Description
+//
 // The `Attachment` object is used to represent a file attached to a candidate.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Attachments` endpoint and view attachments accessible by a company.
 type Attachment struct {
 	Id *string `json:"id,omitempty"`
@@ -1944,10 +1367,10 @@ type Attachment struct {
 	Candidate *string `json:"candidate,omitempty"`
 	// The attachment's type.
 	//
-	// * `RESUME` - RESUME
-	// * `COVER_LETTER` - COVER_LETTER
-	// * `OFFER_LETTER` - OFFER_LETTER
-	// * `OTHER` - OTHER
+	// - `RESUME` - RESUME
+	// - `COVER_LETTER` - COVER_LETTER
+	// - `OFFER_LETTER` - OFFER_LETTER
+	// - `OTHER` - OTHER
 	AttachmentType   *AttachmentAttachmentType `json:"attachment_type,omitempty"`
 	RemoteWasDeleted *bool                     `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time                `json:"created_at,omitempty"`
@@ -1959,10 +1382,10 @@ type Attachment struct {
 
 // The attachment's type.
 //
-// * `RESUME` - RESUME
-// * `COVER_LETTER` - COVER_LETTER
-// * `OFFER_LETTER` - OFFER_LETTER
-// * `OTHER` - OTHER
+// - `RESUME` - RESUME
+// - `COVER_LETTER` - COVER_LETTER
+// - `OFFER_LETTER` - OFFER_LETTER
+// - `OTHER` - OTHER
 type AttachmentAttachmentType struct {
 	typeName           string
 	AttachmentTypeEnum AttachmentTypeEnum
@@ -2021,9 +1444,13 @@ func (a *AttachmentAttachmentType) Accept(visitor AttachmentAttachmentTypeVisito
 }
 
 // # The Attachment Object
+//
 // ### Description
+//
 // The `Attachment` object is used to represent a file attached to a candidate.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Attachments` endpoint and view attachments accessible by a company.
 type AttachmentRequest struct {
 	// The attachment's name.
@@ -2033,10 +1460,10 @@ type AttachmentRequest struct {
 	Candidate *string `json:"candidate,omitempty"`
 	// The attachment's type.
 	//
-	// * `RESUME` - RESUME
-	// * `COVER_LETTER` - COVER_LETTER
-	// * `OFFER_LETTER` - OFFER_LETTER
-	// * `OTHER` - OTHER
+	// - `RESUME` - RESUME
+	// - `COVER_LETTER` - COVER_LETTER
+	// - `OFFER_LETTER` - OFFER_LETTER
+	// - `OTHER` - OTHER
 	AttachmentType      *AttachmentRequestAttachmentType `json:"attachment_type,omitempty"`
 	IntegrationParams   map[string]any                   `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                   `json:"linked_account_params,omitempty"`
@@ -2044,10 +1471,10 @@ type AttachmentRequest struct {
 
 // The attachment's type.
 //
-// * `RESUME` - RESUME
-// * `COVER_LETTER` - COVER_LETTER
-// * `OFFER_LETTER` - OFFER_LETTER
-// * `OTHER` - OTHER
+// - `RESUME` - RESUME
+// - `COVER_LETTER` - COVER_LETTER
+// - `OFFER_LETTER` - OFFER_LETTER
+// - `OTHER` - OTHER
 type AttachmentRequestAttachmentType struct {
 	typeName           string
 	AttachmentTypeEnum AttachmentTypeEnum
@@ -2112,10 +1539,10 @@ type AttachmentResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
-// * `RESUME` - RESUME
-// * `COVER_LETTER` - COVER_LETTER
-// * `OFFER_LETTER` - OFFER_LETTER
-// * `OTHER` - OTHER
+// - `RESUME` - RESUME
+// - `COVER_LETTER` - COVER_LETTER
+// - `OFFER_LETTER` - OFFER_LETTER
+// - `OTHER` - OTHER
 type AttachmentTypeEnum uint
 
 const (
@@ -2174,40 +1601,46 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// * `ADMIN` - ADMIN
-	// * `DEVELOPER` - DEVELOPER
-	// * `MEMBER` - MEMBER
-	// * `API` - API
-	// * `SYSTEM` - SYSTEM
-	// * `MERGE_TEAM` - MERGE_TEAM
+	// - `ADMIN` - ADMIN
+	// - `DEVELOPER` - DEVELOPER
+	// - `MEMBER` - MEMBER
+	// - `API` - API
+	// - `SYSTEM` - SYSTEM
+	// - `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// * `INVITED_USER` - INVITED_USER
-	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// * `CREATED_DESTINATION` - CREATED_DESTINATION
-	// * `DELETED_DESTINATION` - DELETED_DESTINATION
-	// * `CHANGED_SCOPES` - CHANGED_SCOPES
-	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// * `RESET_PASSWORD` - RESET_PASSWORD
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// - `INVITED_USER` - INVITED_USER
+	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// - `CREATED_DESTINATION` - CREATED_DESTINATION
+	// - `DELETED_DESTINATION` - DELETED_DESTINATION
+	// - `CHANGED_SCOPES` - CHANGED_SCOPES
+	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// - `RESET_PASSWORD` - RESET_PASSWORD
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -2215,30 +1648,36 @@ type AuditLogEvent struct {
 
 // Designates the type of event that occurred.
 //
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -2298,12 +1737,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -2362,10 +1801,13 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
+//
 // ### Description
+//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
+//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
@@ -2374,9 +1816,13 @@ type AvailableActions struct {
 }
 
 // # The Candidate Object
+//
 // ### Description
+//
 // The `Candidate` object is used to represent profile information about a given Candidate. Because it is specific to a Candidate, this information stays constant across applications.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Candidates` endpoint and filter by `ID` to show all candidates.
 type Candidate struct {
 	Id *string `json:"id,omitempty"`
@@ -2534,9 +1980,13 @@ func (c *CandidateAttachmentsItem) Accept(visitor CandidateAttachmentsItemVisito
 }
 
 // # The Candidate Object
+//
 // ### Description
+//
 // The `Candidate` object is used to represent profile information about a given Candidate. Because it is specific to a Candidate, this information stays constant across applications.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Candidates` endpoint and filter by `ID` to show all candidates.
 type CandidateRequest struct {
 	// The candidate's first name.
@@ -2690,101 +2140,13 @@ type CandidateResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
-type CandidatesListRequestExpand uint
-
-const (
-	CandidatesListRequestExpandApplications CandidatesListRequestExpand = iota + 1
-	CandidatesListRequestExpandApplicationsAttachments
-	CandidatesListRequestExpandAttachments
-)
-
-func (c CandidatesListRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CandidatesListRequestExpandApplications:
-		return "applications"
-	case CandidatesListRequestExpandApplicationsAttachments:
-		return "applications,attachments"
-	case CandidatesListRequestExpandAttachments:
-		return "attachments"
-	}
-}
-
-func (c CandidatesListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CandidatesListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "applications":
-		value := CandidatesListRequestExpandApplications
-		*c = value
-	case "applications,attachments":
-		value := CandidatesListRequestExpandApplicationsAttachments
-		*c = value
-	case "attachments":
-		value := CandidatesListRequestExpandAttachments
-		*c = value
-	}
-	return nil
-}
-
-type CandidatesRetrieveRequestExpand uint
-
-const (
-	CandidatesRetrieveRequestExpandApplications CandidatesRetrieveRequestExpand = iota + 1
-	CandidatesRetrieveRequestExpandApplicationsAttachments
-	CandidatesRetrieveRequestExpandAttachments
-)
-
-func (c CandidatesRetrieveRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CandidatesRetrieveRequestExpandApplications:
-		return "applications"
-	case CandidatesRetrieveRequestExpandApplicationsAttachments:
-		return "applications,attachments"
-	case CandidatesRetrieveRequestExpandAttachments:
-		return "attachments"
-	}
-}
-
-func (c CandidatesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CandidatesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "applications":
-		value := CandidatesRetrieveRequestExpandApplications
-		*c = value
-	case "applications,attachments":
-		value := CandidatesRetrieveRequestExpandApplicationsAttachments
-		*c = value
-	case "attachments":
-		value := CandidatesRetrieveRequestExpandAttachments
-		*c = value
-	}
-	return nil
-}
-
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
 type CategoriesEnum uint
 
 const (
@@ -2853,13 +2215,13 @@ func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
 type CategoryEnum uint
 
 const (
@@ -2939,7 +2301,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -2947,13 +2309,13 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// * `BOOLEAN` - BOOLEAN
-	// * `DATE` - DATE
-	// * `DATE_TIME` - DATE_TIME
-	// * `INTEGER` - INTEGER
-	// * `FLOAT` - FLOAT
-	// * `STRING` - STRING
-	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// - `BOOLEAN` - BOOLEAN
+	// - `DATE` - DATE
+	// - `DATE_TIME` - DATE_TIME
+	// - `INTEGER` - INTEGER
+	// - `FLOAT` - FLOAT
+	// - `STRING` - STRING
+	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
@@ -2961,13 +2323,13 @@ type ConditionSchema struct {
 
 // The type of value(s) that can be set for this condition.
 //
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -3025,13 +2387,13 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionTypeEnum uint
 
 const (
@@ -3101,10 +2463,13 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The DataPassthrough Object
+//
 // ### Description
+//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
+//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -3133,9 +2498,13 @@ type DebugModelLogSummary struct {
 }
 
 // # The Department Object
+//
 // ### Description
+//
 // The `Department` object is used to represent a department within a company.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Departments` endpoint and view the departments within a company.
 type Department struct {
 	Id *string `json:"id,omitempty"`
@@ -3152,9 +2521,9 @@ type Department struct {
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 }
 
-// * `YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY` - YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY
-// * `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
-// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
+// - `YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY` - YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY
+// - `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
+// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 type DisabilityStatusEnum uint
 
 const (
@@ -3200,9 +2569,13 @@ func (d *DisabilityStatusEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The EEOC Object
+//
 // ### Description
+//
 // The `EEOC` object is used to represent the Equal Employment Opportunity Commission information for a candidate (race, gender, veteran status, disability status).
+//
 // ### Usage Example
+//
 // Fetch from the `LIST EEOCs` endpoint and filter by `candidate` to show all EEOC information for a candidate.
 type Eeoc struct {
 	Id *string `json:"id,omitempty"`
@@ -3214,34 +2587,34 @@ type Eeoc struct {
 	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 	// The candidate's race.
 	//
-	// * `AMERICAN_INDIAN_OR_ALASKAN_NATIVE` - AMERICAN_INDIAN_OR_ALASKAN_NATIVE
-	// * `ASIAN` - ASIAN
-	// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-	// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-	// * `WHITE` - WHITE
-	// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-	// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-	// * `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
+	// - `AMERICAN_INDIAN_OR_ALASKAN_NATIVE` - AMERICAN_INDIAN_OR_ALASKAN_NATIVE
+	// - `ASIAN` - ASIAN
+	// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+	// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+	// - `WHITE` - WHITE
+	// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+	// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+	// - `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
 	Race *EeocRace `json:"race,omitempty"`
 	// The candidate's gender.
 	//
-	// * `MALE` - MALE
-	// * `FEMALE` - FEMALE
-	// * `NON-BINARY` - NON-BINARY
-	// * `OTHER` - OTHER
-	// * `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
+	// - `MALE` - MALE
+	// - `FEMALE` - FEMALE
+	// - `NON-BINARY` - NON-BINARY
+	// - `OTHER` - OTHER
+	// - `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
 	Gender *EeocGender `json:"gender,omitempty"`
 	// The candidate's veteran status.
 	//
-	// * `I_AM_NOT_A_PROTECTED_VETERAN` - I_AM_NOT_A_PROTECTED_VETERAN
-	// * `I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN` - I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN
-	// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
+	// - `I_AM_NOT_A_PROTECTED_VETERAN` - I_AM_NOT_A_PROTECTED_VETERAN
+	// - `I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN` - I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN
+	// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 	VeteranStatus *EeocVeteranStatus `json:"veteran_status,omitempty"`
 	// The candidate's disability status.
 	//
-	// * `YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY` - YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY
-	// * `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
-	// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
+	// - `YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY` - YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY
+	// - `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
+	// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 	DisabilityStatus *EeocDisabilityStatus `json:"disability_status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
@@ -3312,9 +2685,9 @@ func (e *EeocCandidate) Accept(visitor EeocCandidateVisitor) error {
 
 // The candidate's disability status.
 //
-// * `YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY` - YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY
-// * `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
-// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
+// - `YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY` - YES_I_HAVE_A_DISABILITY_OR_PREVIOUSLY_HAD_A_DISABILITY
+// - `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
+// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 type EeocDisabilityStatus struct {
 	typeName             string
 	DisabilityStatusEnum DisabilityStatusEnum
@@ -3374,11 +2747,11 @@ func (e *EeocDisabilityStatus) Accept(visitor EeocDisabilityStatusVisitor) error
 
 // The candidate's gender.
 //
-// * `MALE` - MALE
-// * `FEMALE` - FEMALE
-// * `NON-BINARY` - NON-BINARY
-// * `OTHER` - OTHER
-// * `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
+// - `MALE` - MALE
+// - `FEMALE` - FEMALE
+// - `NON-BINARY` - NON-BINARY
+// - `OTHER` - OTHER
+// - `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
 type EeocGender struct {
 	typeName   string
 	GenderEnum GenderEnum
@@ -3438,14 +2811,14 @@ func (e *EeocGender) Accept(visitor EeocGenderVisitor) error {
 
 // The candidate's race.
 //
-// * `AMERICAN_INDIAN_OR_ALASKAN_NATIVE` - AMERICAN_INDIAN_OR_ALASKAN_NATIVE
-// * `ASIAN` - ASIAN
-// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-// * `WHITE` - WHITE
-// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-// * `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
+// - `AMERICAN_INDIAN_OR_ALASKAN_NATIVE` - AMERICAN_INDIAN_OR_ALASKAN_NATIVE
+// - `ASIAN` - ASIAN
+// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+// - `WHITE` - WHITE
+// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+// - `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
 type EeocRace struct {
 	typeName string
 	RaceEnum RaceEnum
@@ -3505,9 +2878,9 @@ func (e *EeocRace) Accept(visitor EeocRaceVisitor) error {
 
 // The candidate's veteran status.
 //
-// * `I_AM_NOT_A_PROTECTED_VETERAN` - I_AM_NOT_A_PROTECTED_VETERAN
-// * `I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN` - I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN
-// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
+// - `I_AM_NOT_A_PROTECTED_VETERAN` - I_AM_NOT_A_PROTECTED_VETERAN
+// - `I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN` - I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN
+// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 type EeocVeteranStatus struct {
 	typeName          string
 	VeteranStatusEnum VeteranStatusEnum
@@ -3565,483 +2938,23 @@ func (e *EeocVeteranStatus) Accept(visitor EeocVeteranStatusVisitor) error {
 	}
 }
 
-type EeocsListRequestRemoteFields uint
-
-const (
-	EeocsListRequestRemoteFieldsDisabilityStatus EeocsListRequestRemoteFields = iota + 1
-	EeocsListRequestRemoteFieldsDisabilityStatusGender
-	EeocsListRequestRemoteFieldsDisabilityStatusGenderRace
-	EeocsListRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus
-	EeocsListRequestRemoteFieldsDisabilityStatusGenderVeteranStatus
-	EeocsListRequestRemoteFieldsDisabilityStatusRace
-	EeocsListRequestRemoteFieldsDisabilityStatusRaceVeteranStatus
-	EeocsListRequestRemoteFieldsDisabilityStatusVeteranStatus
-	EeocsListRequestRemoteFieldsGender
-	EeocsListRequestRemoteFieldsGenderRace
-	EeocsListRequestRemoteFieldsGenderRaceVeteranStatus
-	EeocsListRequestRemoteFieldsGenderVeteranStatus
-	EeocsListRequestRemoteFieldsRace
-	EeocsListRequestRemoteFieldsRaceVeteranStatus
-	EeocsListRequestRemoteFieldsVeteranStatus
-)
-
-func (e EeocsListRequestRemoteFields) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EeocsListRequestRemoteFieldsDisabilityStatus:
-		return "disability_status"
-	case EeocsListRequestRemoteFieldsDisabilityStatusGender:
-		return "disability_status,gender"
-	case EeocsListRequestRemoteFieldsDisabilityStatusGenderRace:
-		return "disability_status,gender,race"
-	case EeocsListRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus:
-		return "disability_status,gender,race,veteran_status"
-	case EeocsListRequestRemoteFieldsDisabilityStatusGenderVeteranStatus:
-		return "disability_status,gender,veteran_status"
-	case EeocsListRequestRemoteFieldsDisabilityStatusRace:
-		return "disability_status,race"
-	case EeocsListRequestRemoteFieldsDisabilityStatusRaceVeteranStatus:
-		return "disability_status,race,veteran_status"
-	case EeocsListRequestRemoteFieldsDisabilityStatusVeteranStatus:
-		return "disability_status,veteran_status"
-	case EeocsListRequestRemoteFieldsGender:
-		return "gender"
-	case EeocsListRequestRemoteFieldsGenderRace:
-		return "gender,race"
-	case EeocsListRequestRemoteFieldsGenderRaceVeteranStatus:
-		return "gender,race,veteran_status"
-	case EeocsListRequestRemoteFieldsGenderVeteranStatus:
-		return "gender,veteran_status"
-	case EeocsListRequestRemoteFieldsRace:
-		return "race"
-	case EeocsListRequestRemoteFieldsRaceVeteranStatus:
-		return "race,veteran_status"
-	case EeocsListRequestRemoteFieldsVeteranStatus:
-		return "veteran_status"
-	}
-}
-
-func (e EeocsListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EeocsListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "disability_status":
-		value := EeocsListRequestRemoteFieldsDisabilityStatus
-		*e = value
-	case "disability_status,gender":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusGender
-		*e = value
-	case "disability_status,gender,race":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusGenderRace
-		*e = value
-	case "disability_status,gender,race,veteran_status":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus
-		*e = value
-	case "disability_status,gender,veteran_status":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusGenderVeteranStatus
-		*e = value
-	case "disability_status,race":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusRace
-		*e = value
-	case "disability_status,race,veteran_status":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusRaceVeteranStatus
-		*e = value
-	case "disability_status,veteran_status":
-		value := EeocsListRequestRemoteFieldsDisabilityStatusVeteranStatus
-		*e = value
-	case "gender":
-		value := EeocsListRequestRemoteFieldsGender
-		*e = value
-	case "gender,race":
-		value := EeocsListRequestRemoteFieldsGenderRace
-		*e = value
-	case "gender,race,veteran_status":
-		value := EeocsListRequestRemoteFieldsGenderRaceVeteranStatus
-		*e = value
-	case "gender,veteran_status":
-		value := EeocsListRequestRemoteFieldsGenderVeteranStatus
-		*e = value
-	case "race":
-		value := EeocsListRequestRemoteFieldsRace
-		*e = value
-	case "race,veteran_status":
-		value := EeocsListRequestRemoteFieldsRaceVeteranStatus
-		*e = value
-	case "veteran_status":
-		value := EeocsListRequestRemoteFieldsVeteranStatus
-		*e = value
-	}
-	return nil
-}
-
-type EeocsListRequestShowEnumOrigins uint
-
-const (
-	EeocsListRequestShowEnumOriginsDisabilityStatus EeocsListRequestShowEnumOrigins = iota + 1
-	EeocsListRequestShowEnumOriginsDisabilityStatusGender
-	EeocsListRequestShowEnumOriginsDisabilityStatusGenderRace
-	EeocsListRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus
-	EeocsListRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus
-	EeocsListRequestShowEnumOriginsDisabilityStatusRace
-	EeocsListRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus
-	EeocsListRequestShowEnumOriginsDisabilityStatusVeteranStatus
-	EeocsListRequestShowEnumOriginsGender
-	EeocsListRequestShowEnumOriginsGenderRace
-	EeocsListRequestShowEnumOriginsGenderRaceVeteranStatus
-	EeocsListRequestShowEnumOriginsGenderVeteranStatus
-	EeocsListRequestShowEnumOriginsRace
-	EeocsListRequestShowEnumOriginsRaceVeteranStatus
-	EeocsListRequestShowEnumOriginsVeteranStatus
-)
-
-func (e EeocsListRequestShowEnumOrigins) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EeocsListRequestShowEnumOriginsDisabilityStatus:
-		return "disability_status"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusGender:
-		return "disability_status,gender"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusGenderRace:
-		return "disability_status,gender,race"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus:
-		return "disability_status,gender,race,veteran_status"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus:
-		return "disability_status,gender,veteran_status"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusRace:
-		return "disability_status,race"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus:
-		return "disability_status,race,veteran_status"
-	case EeocsListRequestShowEnumOriginsDisabilityStatusVeteranStatus:
-		return "disability_status,veteran_status"
-	case EeocsListRequestShowEnumOriginsGender:
-		return "gender"
-	case EeocsListRequestShowEnumOriginsGenderRace:
-		return "gender,race"
-	case EeocsListRequestShowEnumOriginsGenderRaceVeteranStatus:
-		return "gender,race,veteran_status"
-	case EeocsListRequestShowEnumOriginsGenderVeteranStatus:
-		return "gender,veteran_status"
-	case EeocsListRequestShowEnumOriginsRace:
-		return "race"
-	case EeocsListRequestShowEnumOriginsRaceVeteranStatus:
-		return "race,veteran_status"
-	case EeocsListRequestShowEnumOriginsVeteranStatus:
-		return "veteran_status"
-	}
-}
-
-func (e EeocsListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EeocsListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "disability_status":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatus
-		*e = value
-	case "disability_status,gender":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusGender
-		*e = value
-	case "disability_status,gender,race":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusGenderRace
-		*e = value
-	case "disability_status,gender,race,veteran_status":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus
-		*e = value
-	case "disability_status,gender,veteran_status":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus
-		*e = value
-	case "disability_status,race":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusRace
-		*e = value
-	case "disability_status,race,veteran_status":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus
-		*e = value
-	case "disability_status,veteran_status":
-		value := EeocsListRequestShowEnumOriginsDisabilityStatusVeteranStatus
-		*e = value
-	case "gender":
-		value := EeocsListRequestShowEnumOriginsGender
-		*e = value
-	case "gender,race":
-		value := EeocsListRequestShowEnumOriginsGenderRace
-		*e = value
-	case "gender,race,veteran_status":
-		value := EeocsListRequestShowEnumOriginsGenderRaceVeteranStatus
-		*e = value
-	case "gender,veteran_status":
-		value := EeocsListRequestShowEnumOriginsGenderVeteranStatus
-		*e = value
-	case "race":
-		value := EeocsListRequestShowEnumOriginsRace
-		*e = value
-	case "race,veteran_status":
-		value := EeocsListRequestShowEnumOriginsRaceVeteranStatus
-		*e = value
-	case "veteran_status":
-		value := EeocsListRequestShowEnumOriginsVeteranStatus
-		*e = value
-	}
-	return nil
-}
-
-type EeocsRetrieveRequestRemoteFields uint
-
-const (
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatus EeocsRetrieveRequestRemoteFields = iota + 1
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGender
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRace
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusRace
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusRaceVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsDisabilityStatusVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsGender
-	EeocsRetrieveRequestRemoteFieldsGenderRace
-	EeocsRetrieveRequestRemoteFieldsGenderRaceVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsGenderVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsRace
-	EeocsRetrieveRequestRemoteFieldsRaceVeteranStatus
-	EeocsRetrieveRequestRemoteFieldsVeteranStatus
-)
-
-func (e EeocsRetrieveRequestRemoteFields) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatus:
-		return "disability_status"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusGender:
-		return "disability_status,gender"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRace:
-		return "disability_status,gender,race"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus:
-		return "disability_status,gender,race,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderVeteranStatus:
-		return "disability_status,gender,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusRace:
-		return "disability_status,race"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusRaceVeteranStatus:
-		return "disability_status,race,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsDisabilityStatusVeteranStatus:
-		return "disability_status,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsGender:
-		return "gender"
-	case EeocsRetrieveRequestRemoteFieldsGenderRace:
-		return "gender,race"
-	case EeocsRetrieveRequestRemoteFieldsGenderRaceVeteranStatus:
-		return "gender,race,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsGenderVeteranStatus:
-		return "gender,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsRace:
-		return "race"
-	case EeocsRetrieveRequestRemoteFieldsRaceVeteranStatus:
-		return "race,veteran_status"
-	case EeocsRetrieveRequestRemoteFieldsVeteranStatus:
-		return "veteran_status"
-	}
-}
-
-func (e EeocsRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EeocsRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "disability_status":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatus
-		*e = value
-	case "disability_status,gender":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusGender
-		*e = value
-	case "disability_status,gender,race":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRace
-		*e = value
-	case "disability_status,gender,race,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus
-		*e = value
-	case "disability_status,gender,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderVeteranStatus
-		*e = value
-	case "disability_status,race":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusRace
-		*e = value
-	case "disability_status,race,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusRaceVeteranStatus
-		*e = value
-	case "disability_status,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsDisabilityStatusVeteranStatus
-		*e = value
-	case "gender":
-		value := EeocsRetrieveRequestRemoteFieldsGender
-		*e = value
-	case "gender,race":
-		value := EeocsRetrieveRequestRemoteFieldsGenderRace
-		*e = value
-	case "gender,race,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsGenderRaceVeteranStatus
-		*e = value
-	case "gender,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsGenderVeteranStatus
-		*e = value
-	case "race":
-		value := EeocsRetrieveRequestRemoteFieldsRace
-		*e = value
-	case "race,veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsRaceVeteranStatus
-		*e = value
-	case "veteran_status":
-		value := EeocsRetrieveRequestRemoteFieldsVeteranStatus
-		*e = value
-	}
-	return nil
-}
-
-type EeocsRetrieveRequestShowEnumOrigins uint
-
-const (
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatus EeocsRetrieveRequestShowEnumOrigins = iota + 1
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGender
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRace
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRace
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsGender
-	EeocsRetrieveRequestShowEnumOriginsGenderRace
-	EeocsRetrieveRequestShowEnumOriginsGenderRaceVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsGenderVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsRace
-	EeocsRetrieveRequestShowEnumOriginsRaceVeteranStatus
-	EeocsRetrieveRequestShowEnumOriginsVeteranStatus
-)
-
-func (e EeocsRetrieveRequestShowEnumOrigins) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatus:
-		return "disability_status"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGender:
-		return "disability_status,gender"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRace:
-		return "disability_status,gender,race"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus:
-		return "disability_status,gender,race,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus:
-		return "disability_status,gender,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRace:
-		return "disability_status,race"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus:
-		return "disability_status,race,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsDisabilityStatusVeteranStatus:
-		return "disability_status,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsGender:
-		return "gender"
-	case EeocsRetrieveRequestShowEnumOriginsGenderRace:
-		return "gender,race"
-	case EeocsRetrieveRequestShowEnumOriginsGenderRaceVeteranStatus:
-		return "gender,race,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsGenderVeteranStatus:
-		return "gender,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsRace:
-		return "race"
-	case EeocsRetrieveRequestShowEnumOriginsRaceVeteranStatus:
-		return "race,veteran_status"
-	case EeocsRetrieveRequestShowEnumOriginsVeteranStatus:
-		return "veteran_status"
-	}
-}
-
-func (e EeocsRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EeocsRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "disability_status":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatus
-		*e = value
-	case "disability_status,gender":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGender
-		*e = value
-	case "disability_status,gender,race":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRace
-		*e = value
-	case "disability_status,gender,race,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus
-		*e = value
-	case "disability_status,gender,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus
-		*e = value
-	case "disability_status,race":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRace
-		*e = value
-	case "disability_status,race,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus
-		*e = value
-	case "disability_status,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsDisabilityStatusVeteranStatus
-		*e = value
-	case "gender":
-		value := EeocsRetrieveRequestShowEnumOriginsGender
-		*e = value
-	case "gender,race":
-		value := EeocsRetrieveRequestShowEnumOriginsGenderRace
-		*e = value
-	case "gender,race,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsGenderRaceVeteranStatus
-		*e = value
-	case "gender,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsGenderVeteranStatus
-		*e = value
-	case "race":
-		value := EeocsRetrieveRequestShowEnumOriginsRace
-		*e = value
-	case "race,veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsRaceVeteranStatus
-		*e = value
-	case "veteran_status":
-		value := EeocsRetrieveRequestShowEnumOriginsVeteranStatus
-		*e = value
-	}
-	return nil
-}
-
 // # The EmailAddress Object
+//
 // ### Description
+//
 // The `EmailAddress` object is used to represent a candidate's email address.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Candidate` endpoint and view their email addresses.
 type EmailAddress struct {
 	// The email address.
 	Value *string `json:"value,omitempty"`
 	// The type of email address.
 	//
-	// * `PERSONAL` - PERSONAL
-	// * `WORK` - WORK
-	// * `OTHER` - OTHER
+	// - `PERSONAL` - PERSONAL
+	// - `WORK` - WORK
+	// - `OTHER` - OTHER
 	EmailAddressType *EmailAddressEmailAddressType `json:"email_address_type,omitempty"`
 	CreatedAt        *time.Time                    `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -4050,9 +2963,9 @@ type EmailAddress struct {
 
 // The type of email address.
 //
-// * `PERSONAL` - PERSONAL
-// * `WORK` - WORK
-// * `OTHER` - OTHER
+// - `PERSONAL` - PERSONAL
+// - `WORK` - WORK
+// - `OTHER` - OTHER
 type EmailAddressEmailAddressType struct {
 	typeName             string
 	EmailAddressTypeEnum EmailAddressTypeEnum
@@ -4111,18 +3024,22 @@ func (e *EmailAddressEmailAddressType) Accept(visitor EmailAddressEmailAddressTy
 }
 
 // # The EmailAddress Object
+//
 // ### Description
+//
 // The `EmailAddress` object is used to represent a candidate's email address.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Candidate` endpoint and view their email addresses.
 type EmailAddressRequest struct {
 	// The email address.
 	Value *string `json:"value,omitempty"`
 	// The type of email address.
 	//
-	// * `PERSONAL` - PERSONAL
-	// * `WORK` - WORK
-	// * `OTHER` - OTHER
+	// - `PERSONAL` - PERSONAL
+	// - `WORK` - WORK
+	// - `OTHER` - OTHER
 	EmailAddressType    *EmailAddressRequestEmailAddressType `json:"email_address_type,omitempty"`
 	IntegrationParams   map[string]any                       `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                       `json:"linked_account_params,omitempty"`
@@ -4130,9 +3047,9 @@ type EmailAddressRequest struct {
 
 // The type of email address.
 //
-// * `PERSONAL` - PERSONAL
-// * `WORK` - WORK
-// * `OTHER` - OTHER
+// - `PERSONAL` - PERSONAL
+// - `WORK` - WORK
+// - `OTHER` - OTHER
 type EmailAddressRequestEmailAddressType struct {
 	typeName             string
 	EmailAddressTypeEnum EmailAddressTypeEnum
@@ -4190,9 +3107,9 @@ func (e *EmailAddressRequestEmailAddressType) Accept(visitor EmailAddressRequest
 	}
 }
 
-// * `PERSONAL` - PERSONAL
-// * `WORK` - WORK
-// * `OTHER` - OTHER
+// - `PERSONAL` - PERSONAL
+// - `WORK` - WORK
+// - `OTHER` - OTHER
 type EmailAddressTypeEnum uint
 
 const (
@@ -4237,8 +3154,8 @@ func (e *EmailAddressTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `READ` - READ
-// * `WRITE` - WRITE
+// - `READ` - READ
+// - `WRITE` - WRITE
 type EnabledActionsEnum uint
 
 const (
@@ -4277,9 +3194,9 @@ func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
 type EncodingEnum uint
 
 const (
@@ -4331,30 +3248,36 @@ type ErrorValidationProblem struct {
 	ProblemType string                   `json:"problem_type"`
 }
 
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type EventTypeEnum uint
 
 const (
@@ -4382,6 +3305,12 @@ const (
 	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
 	EventTypeEnumDisabledRedactUnmappedDataForOrganization
 	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
+	EventTypeEnumCreatedIntegrationWideFieldMapping
+	EventTypeEnumCreatedLinkedAccountFieldMapping
+	EventTypeEnumChangedIntegrationWideFieldMapping
+	EventTypeEnumChangedLinkedAccountFieldMapping
+	EventTypeEnumDeletedIntegrationWideFieldMapping
+	EventTypeEnumDeletedLinkedAccountFieldMapping
 )
 
 func (e EventTypeEnum) String() string {
@@ -4436,6 +3365,18 @@ func (e EventTypeEnum) String() string {
 		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
 	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
 		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	case EventTypeEnumCreatedIntegrationWideFieldMapping:
+		return "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
+	case EventTypeEnumCreatedLinkedAccountFieldMapping:
+		return "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
+	case EventTypeEnumChangedIntegrationWideFieldMapping:
+		return "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
+	case EventTypeEnumChangedLinkedAccountFieldMapping:
+		return "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
+	case EventTypeEnumDeletedIntegrationWideFieldMapping:
+		return "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
+	case EventTypeEnumDeletedLinkedAccountFieldMapping:
+		return "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
 	}
 }
 
@@ -4521,15 +3462,33 @@ func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
 		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
 		*e = value
+	case "CREATED_INTEGRATION_WIDE_FIELD_MAPPING":
+		value := EventTypeEnumCreatedIntegrationWideFieldMapping
+		*e = value
+	case "CREATED_LINKED_ACCOUNT_FIELD_MAPPING":
+		value := EventTypeEnumCreatedLinkedAccountFieldMapping
+		*e = value
+	case "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING":
+		value := EventTypeEnumChangedIntegrationWideFieldMapping
+		*e = value
+	case "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING":
+		value := EventTypeEnumChangedLinkedAccountFieldMapping
+		*e = value
+	case "DELETED_INTEGRATION_WIDE_FIELD_MAPPING":
+		value := EventTypeEnumDeletedIntegrationWideFieldMapping
+		*e = value
+	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
+		value := EventTypeEnumDeletedLinkedAccountFieldMapping
+		*e = value
 	}
 	return nil
 }
 
-// * `MALE` - MALE
-// * `FEMALE` - FEMALE
-// * `NON-BINARY` - NON-BINARY
-// * `OTHER` - OTHER
-// * `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
+// - `MALE` - MALE
+// - `FEMALE` - FEMALE
+// - `NON-BINARY` - NON-BINARY
+// - `OTHER` - OTHER
+// - `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
 type GenderEnum uint
 
 const (
@@ -4586,244 +3545,12 @@ func (g *GenderEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type InterviewsListRequestExpand uint
-
-const (
-	InterviewsListRequestExpandApplication InterviewsListRequestExpand = iota + 1
-	InterviewsListRequestExpandApplicationJobInterviewStage
-	InterviewsListRequestExpandInterviewers
-	InterviewsListRequestExpandInterviewersApplication
-	InterviewsListRequestExpandInterviewersApplicationJobInterviewStage
-	InterviewsListRequestExpandInterviewersJobInterviewStage
-	InterviewsListRequestExpandInterviewersOrganizer
-	InterviewsListRequestExpandInterviewersOrganizerApplication
-	InterviewsListRequestExpandInterviewersOrganizerApplicationJobInterviewStage
-	InterviewsListRequestExpandInterviewersOrganizerJobInterviewStage
-	InterviewsListRequestExpandJobInterviewStage
-	InterviewsListRequestExpandOrganizer
-	InterviewsListRequestExpandOrganizerApplication
-	InterviewsListRequestExpandOrganizerApplicationJobInterviewStage
-	InterviewsListRequestExpandOrganizerJobInterviewStage
-)
-
-func (i InterviewsListRequestExpand) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case InterviewsListRequestExpandApplication:
-		return "application"
-	case InterviewsListRequestExpandApplicationJobInterviewStage:
-		return "application,job_interview_stage"
-	case InterviewsListRequestExpandInterviewers:
-		return "interviewers"
-	case InterviewsListRequestExpandInterviewersApplication:
-		return "interviewers,application"
-	case InterviewsListRequestExpandInterviewersApplicationJobInterviewStage:
-		return "interviewers,application,job_interview_stage"
-	case InterviewsListRequestExpandInterviewersJobInterviewStage:
-		return "interviewers,job_interview_stage"
-	case InterviewsListRequestExpandInterviewersOrganizer:
-		return "interviewers,organizer"
-	case InterviewsListRequestExpandInterviewersOrganizerApplication:
-		return "interviewers,organizer,application"
-	case InterviewsListRequestExpandInterviewersOrganizerApplicationJobInterviewStage:
-		return "interviewers,organizer,application,job_interview_stage"
-	case InterviewsListRequestExpandInterviewersOrganizerJobInterviewStage:
-		return "interviewers,organizer,job_interview_stage"
-	case InterviewsListRequestExpandJobInterviewStage:
-		return "job_interview_stage"
-	case InterviewsListRequestExpandOrganizer:
-		return "organizer"
-	case InterviewsListRequestExpandOrganizerApplication:
-		return "organizer,application"
-	case InterviewsListRequestExpandOrganizerApplicationJobInterviewStage:
-		return "organizer,application,job_interview_stage"
-	case InterviewsListRequestExpandOrganizerJobInterviewStage:
-		return "organizer,job_interview_stage"
-	}
-}
-
-func (i InterviewsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *InterviewsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "application":
-		value := InterviewsListRequestExpandApplication
-		*i = value
-	case "application,job_interview_stage":
-		value := InterviewsListRequestExpandApplicationJobInterviewStage
-		*i = value
-	case "interviewers":
-		value := InterviewsListRequestExpandInterviewers
-		*i = value
-	case "interviewers,application":
-		value := InterviewsListRequestExpandInterviewersApplication
-		*i = value
-	case "interviewers,application,job_interview_stage":
-		value := InterviewsListRequestExpandInterviewersApplicationJobInterviewStage
-		*i = value
-	case "interviewers,job_interview_stage":
-		value := InterviewsListRequestExpandInterviewersJobInterviewStage
-		*i = value
-	case "interviewers,organizer":
-		value := InterviewsListRequestExpandInterviewersOrganizer
-		*i = value
-	case "interviewers,organizer,application":
-		value := InterviewsListRequestExpandInterviewersOrganizerApplication
-		*i = value
-	case "interviewers,organizer,application,job_interview_stage":
-		value := InterviewsListRequestExpandInterviewersOrganizerApplicationJobInterviewStage
-		*i = value
-	case "interviewers,organizer,job_interview_stage":
-		value := InterviewsListRequestExpandInterviewersOrganizerJobInterviewStage
-		*i = value
-	case "job_interview_stage":
-		value := InterviewsListRequestExpandJobInterviewStage
-		*i = value
-	case "organizer":
-		value := InterviewsListRequestExpandOrganizer
-		*i = value
-	case "organizer,application":
-		value := InterviewsListRequestExpandOrganizerApplication
-		*i = value
-	case "organizer,application,job_interview_stage":
-		value := InterviewsListRequestExpandOrganizerApplicationJobInterviewStage
-		*i = value
-	case "organizer,job_interview_stage":
-		value := InterviewsListRequestExpandOrganizerJobInterviewStage
-		*i = value
-	}
-	return nil
-}
-
-type InterviewsRetrieveRequestExpand uint
-
-const (
-	InterviewsRetrieveRequestExpandApplication InterviewsRetrieveRequestExpand = iota + 1
-	InterviewsRetrieveRequestExpandApplicationJobInterviewStage
-	InterviewsRetrieveRequestExpandInterviewers
-	InterviewsRetrieveRequestExpandInterviewersApplication
-	InterviewsRetrieveRequestExpandInterviewersApplicationJobInterviewStage
-	InterviewsRetrieveRequestExpandInterviewersJobInterviewStage
-	InterviewsRetrieveRequestExpandInterviewersOrganizer
-	InterviewsRetrieveRequestExpandInterviewersOrganizerApplication
-	InterviewsRetrieveRequestExpandInterviewersOrganizerApplicationJobInterviewStage
-	InterviewsRetrieveRequestExpandInterviewersOrganizerJobInterviewStage
-	InterviewsRetrieveRequestExpandJobInterviewStage
-	InterviewsRetrieveRequestExpandOrganizer
-	InterviewsRetrieveRequestExpandOrganizerApplication
-	InterviewsRetrieveRequestExpandOrganizerApplicationJobInterviewStage
-	InterviewsRetrieveRequestExpandOrganizerJobInterviewStage
-)
-
-func (i InterviewsRetrieveRequestExpand) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case InterviewsRetrieveRequestExpandApplication:
-		return "application"
-	case InterviewsRetrieveRequestExpandApplicationJobInterviewStage:
-		return "application,job_interview_stage"
-	case InterviewsRetrieveRequestExpandInterviewers:
-		return "interviewers"
-	case InterviewsRetrieveRequestExpandInterviewersApplication:
-		return "interviewers,application"
-	case InterviewsRetrieveRequestExpandInterviewersApplicationJobInterviewStage:
-		return "interviewers,application,job_interview_stage"
-	case InterviewsRetrieveRequestExpandInterviewersJobInterviewStage:
-		return "interviewers,job_interview_stage"
-	case InterviewsRetrieveRequestExpandInterviewersOrganizer:
-		return "interviewers,organizer"
-	case InterviewsRetrieveRequestExpandInterviewersOrganizerApplication:
-		return "interviewers,organizer,application"
-	case InterviewsRetrieveRequestExpandInterviewersOrganizerApplicationJobInterviewStage:
-		return "interviewers,organizer,application,job_interview_stage"
-	case InterviewsRetrieveRequestExpandInterviewersOrganizerJobInterviewStage:
-		return "interviewers,organizer,job_interview_stage"
-	case InterviewsRetrieveRequestExpandJobInterviewStage:
-		return "job_interview_stage"
-	case InterviewsRetrieveRequestExpandOrganizer:
-		return "organizer"
-	case InterviewsRetrieveRequestExpandOrganizerApplication:
-		return "organizer,application"
-	case InterviewsRetrieveRequestExpandOrganizerApplicationJobInterviewStage:
-		return "organizer,application,job_interview_stage"
-	case InterviewsRetrieveRequestExpandOrganizerJobInterviewStage:
-		return "organizer,job_interview_stage"
-	}
-}
-
-func (i InterviewsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *InterviewsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "application":
-		value := InterviewsRetrieveRequestExpandApplication
-		*i = value
-	case "application,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandApplicationJobInterviewStage
-		*i = value
-	case "interviewers":
-		value := InterviewsRetrieveRequestExpandInterviewers
-		*i = value
-	case "interviewers,application":
-		value := InterviewsRetrieveRequestExpandInterviewersApplication
-		*i = value
-	case "interviewers,application,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandInterviewersApplicationJobInterviewStage
-		*i = value
-	case "interviewers,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandInterviewersJobInterviewStage
-		*i = value
-	case "interviewers,organizer":
-		value := InterviewsRetrieveRequestExpandInterviewersOrganizer
-		*i = value
-	case "interviewers,organizer,application":
-		value := InterviewsRetrieveRequestExpandInterviewersOrganizerApplication
-		*i = value
-	case "interviewers,organizer,application,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandInterviewersOrganizerApplicationJobInterviewStage
-		*i = value
-	case "interviewers,organizer,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandInterviewersOrganizerJobInterviewStage
-		*i = value
-	case "job_interview_stage":
-		value := InterviewsRetrieveRequestExpandJobInterviewStage
-		*i = value
-	case "organizer":
-		value := InterviewsRetrieveRequestExpandOrganizer
-		*i = value
-	case "organizer,application":
-		value := InterviewsRetrieveRequestExpandOrganizerApplication
-		*i = value
-	case "organizer,application,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandOrganizerApplicationJobInterviewStage
-		*i = value
-	case "organizer,job_interview_stage":
-		value := InterviewsRetrieveRequestExpandOrganizerJobInterviewStage
-		*i = value
-	}
-	return nil
-}
-
 type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
 	Status            *IssueStatus   `json:"status,omitempty"`
 	ErrorDescription  string         `json:"error_description"`
 	EndUser           map[string]any `json:"end_user,omitempty"`
@@ -4835,8 +3562,8 @@ type Issue struct {
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -4894,8 +3621,8 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
 type IssueStatusEnum uint
 
 const (
@@ -4934,48 +3661,14 @@ func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type IssuesListRequestStatus uint
-
-const (
-	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
-	IssuesListRequestStatusResolved
-)
-
-func (i IssuesListRequestStatus) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssuesListRequestStatusOngoing:
-		return "ONGOING"
-	case IssuesListRequestStatusResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ONGOING":
-		value := IssuesListRequestStatusOngoing
-		*i = value
-	case "RESOLVED":
-		value := IssuesListRequestStatusResolved
-		*i = value
-	}
-	return nil
-}
-
 // # The Job Object
+//
 // ### Description
+//
 // The `Job` object can be used to track any jobs that are currently or will be open/closed for applications.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Jobs` endpoint to show all job postings.
 type Job struct {
 	Id *string `json:"id,omitempty"`
@@ -4989,11 +3682,11 @@ type Job struct {
 	Code *string `json:"code,omitempty"`
 	// The job's status.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	// * `DRAFT` - DRAFT
-	// * `ARCHIVED` - ARCHIVED
-	// * `PENDING` - PENDING
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	// - `DRAFT` - DRAFT
+	// - `ARCHIVED` - ARCHIVED
+	// - `PENDING` - PENDING
 	Status         *JobStatus `json:"status,omitempty"`
 	JobPostingUrls []*Url     `json:"job_posting_urls,omitempty"`
 	// When the third party's job was created.
@@ -5134,9 +3827,13 @@ func (j *JobHiringManagersItem) Accept(visitor JobHiringManagersItemVisitor) err
 }
 
 // # The JobInterviewStage Object
+//
 // ### Description
+//
 // The `JobInterviewStage` object is used to represent a particular recruiting stage for an `Application`. A given `Application` typically has the `JobInterviewStage` object represented in the current_stage field.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST JobInterviewStages` endpoint and view the job interview stages used by a company.
 type JobInterviewStage struct {
 	Id *string `json:"id,omitempty"`
@@ -5331,11 +4028,11 @@ func (j *JobRecruitersItem) Accept(visitor JobRecruitersItemVisitor) error {
 
 // The job's status.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-// * `DRAFT` - DRAFT
-// * `ARCHIVED` - ARCHIVED
-// * `PENDING` - PENDING
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+// - `DRAFT` - DRAFT
+// - `ARCHIVED` - ARCHIVED
+// - `PENDING` - PENDING
 type JobStatus struct {
 	typeName      string
 	JobStatusEnum JobStatusEnum
@@ -5393,11 +4090,11 @@ func (j *JobStatus) Accept(visitor JobStatusVisitor) error {
 	}
 }
 
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-// * `DRAFT` - DRAFT
-// * `ARCHIVED` - ARCHIVED
-// * `PENDING` - PENDING
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+// - `DRAFT` - DRAFT
+// - `ARCHIVED` - ARCHIVED
+// - `PENDING` - PENDING
 type JobStatusEnum uint
 
 const (
@@ -5454,338 +4151,6 @@ func (j *JobStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type JobsListRequestExpand uint
-
-const (
-	JobsListRequestExpandDepartments JobsListRequestExpand = iota + 1
-	JobsListRequestExpandDepartmentsHiringManagers
-	JobsListRequestExpandDepartmentsHiringManagersRecruiters
-	JobsListRequestExpandDepartmentsOffices
-	JobsListRequestExpandDepartmentsOfficesHiringManagers
-	JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters
-	JobsListRequestExpandDepartmentsOfficesRecruiters
-	JobsListRequestExpandDepartmentsRecruiters
-	JobsListRequestExpandHiringManagers
-	JobsListRequestExpandHiringManagersRecruiters
-	JobsListRequestExpandOffices
-	JobsListRequestExpandOfficesHiringManagers
-	JobsListRequestExpandOfficesHiringManagersRecruiters
-	JobsListRequestExpandOfficesRecruiters
-	JobsListRequestExpandRecruiters
-)
-
-func (j JobsListRequestExpand) String() string {
-	switch j {
-	default:
-		return strconv.Itoa(int(j))
-	case JobsListRequestExpandDepartments:
-		return "departments"
-	case JobsListRequestExpandDepartmentsHiringManagers:
-		return "departments,hiring_managers"
-	case JobsListRequestExpandDepartmentsHiringManagersRecruiters:
-		return "departments,hiring_managers,recruiters"
-	case JobsListRequestExpandDepartmentsOffices:
-		return "departments,offices"
-	case JobsListRequestExpandDepartmentsOfficesHiringManagers:
-		return "departments,offices,hiring_managers"
-	case JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters:
-		return "departments,offices,hiring_managers,recruiters"
-	case JobsListRequestExpandDepartmentsOfficesRecruiters:
-		return "departments,offices,recruiters"
-	case JobsListRequestExpandDepartmentsRecruiters:
-		return "departments,recruiters"
-	case JobsListRequestExpandHiringManagers:
-		return "hiring_managers"
-	case JobsListRequestExpandHiringManagersRecruiters:
-		return "hiring_managers,recruiters"
-	case JobsListRequestExpandOffices:
-		return "offices"
-	case JobsListRequestExpandOfficesHiringManagers:
-		return "offices,hiring_managers"
-	case JobsListRequestExpandOfficesHiringManagersRecruiters:
-		return "offices,hiring_managers,recruiters"
-	case JobsListRequestExpandOfficesRecruiters:
-		return "offices,recruiters"
-	case JobsListRequestExpandRecruiters:
-		return "recruiters"
-	}
-}
-
-func (j JobsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", j.String())), nil
-}
-
-func (j *JobsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "departments":
-		value := JobsListRequestExpandDepartments
-		*j = value
-	case "departments,hiring_managers":
-		value := JobsListRequestExpandDepartmentsHiringManagers
-		*j = value
-	case "departments,hiring_managers,recruiters":
-		value := JobsListRequestExpandDepartmentsHiringManagersRecruiters
-		*j = value
-	case "departments,offices":
-		value := JobsListRequestExpandDepartmentsOffices
-		*j = value
-	case "departments,offices,hiring_managers":
-		value := JobsListRequestExpandDepartmentsOfficesHiringManagers
-		*j = value
-	case "departments,offices,hiring_managers,recruiters":
-		value := JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters
-		*j = value
-	case "departments,offices,recruiters":
-		value := JobsListRequestExpandDepartmentsOfficesRecruiters
-		*j = value
-	case "departments,recruiters":
-		value := JobsListRequestExpandDepartmentsRecruiters
-		*j = value
-	case "hiring_managers":
-		value := JobsListRequestExpandHiringManagers
-		*j = value
-	case "hiring_managers,recruiters":
-		value := JobsListRequestExpandHiringManagersRecruiters
-		*j = value
-	case "offices":
-		value := JobsListRequestExpandOffices
-		*j = value
-	case "offices,hiring_managers":
-		value := JobsListRequestExpandOfficesHiringManagers
-		*j = value
-	case "offices,hiring_managers,recruiters":
-		value := JobsListRequestExpandOfficesHiringManagersRecruiters
-		*j = value
-	case "offices,recruiters":
-		value := JobsListRequestExpandOfficesRecruiters
-		*j = value
-	case "recruiters":
-		value := JobsListRequestExpandRecruiters
-		*j = value
-	}
-	return nil
-}
-
-type JobsListRequestStatus uint
-
-const (
-	JobsListRequestStatusArchived JobsListRequestStatus = iota + 1
-	JobsListRequestStatusClosed
-	JobsListRequestStatusDraft
-	JobsListRequestStatusOpen
-	JobsListRequestStatusPending
-)
-
-func (j JobsListRequestStatus) String() string {
-	switch j {
-	default:
-		return strconv.Itoa(int(j))
-	case JobsListRequestStatusArchived:
-		return "ARCHIVED"
-	case JobsListRequestStatusClosed:
-		return "CLOSED"
-	case JobsListRequestStatusDraft:
-		return "DRAFT"
-	case JobsListRequestStatusOpen:
-		return "OPEN"
-	case JobsListRequestStatusPending:
-		return "PENDING"
-	}
-}
-
-func (j JobsListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", j.String())), nil
-}
-
-func (j *JobsListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ARCHIVED":
-		value := JobsListRequestStatusArchived
-		*j = value
-	case "CLOSED":
-		value := JobsListRequestStatusClosed
-		*j = value
-	case "DRAFT":
-		value := JobsListRequestStatusDraft
-		*j = value
-	case "OPEN":
-		value := JobsListRequestStatusOpen
-		*j = value
-	case "PENDING":
-		value := JobsListRequestStatusPending
-		*j = value
-	}
-	return nil
-}
-
-type JobsRetrieveRequestExpand uint
-
-const (
-	JobsRetrieveRequestExpandDepartments JobsRetrieveRequestExpand = iota + 1
-	JobsRetrieveRequestExpandDepartmentsHiringManagers
-	JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters
-	JobsRetrieveRequestExpandDepartmentsOffices
-	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers
-	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters
-	JobsRetrieveRequestExpandDepartmentsOfficesRecruiters
-	JobsRetrieveRequestExpandDepartmentsRecruiters
-	JobsRetrieveRequestExpandHiringManagers
-	JobsRetrieveRequestExpandHiringManagersRecruiters
-	JobsRetrieveRequestExpandOffices
-	JobsRetrieveRequestExpandOfficesHiringManagers
-	JobsRetrieveRequestExpandOfficesHiringManagersRecruiters
-	JobsRetrieveRequestExpandOfficesRecruiters
-	JobsRetrieveRequestExpandRecruiters
-)
-
-func (j JobsRetrieveRequestExpand) String() string {
-	switch j {
-	default:
-		return strconv.Itoa(int(j))
-	case JobsRetrieveRequestExpandDepartments:
-		return "departments"
-	case JobsRetrieveRequestExpandDepartmentsHiringManagers:
-		return "departments,hiring_managers"
-	case JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters:
-		return "departments,hiring_managers,recruiters"
-	case JobsRetrieveRequestExpandDepartmentsOffices:
-		return "departments,offices"
-	case JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers:
-		return "departments,offices,hiring_managers"
-	case JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters:
-		return "departments,offices,hiring_managers,recruiters"
-	case JobsRetrieveRequestExpandDepartmentsOfficesRecruiters:
-		return "departments,offices,recruiters"
-	case JobsRetrieveRequestExpandDepartmentsRecruiters:
-		return "departments,recruiters"
-	case JobsRetrieveRequestExpandHiringManagers:
-		return "hiring_managers"
-	case JobsRetrieveRequestExpandHiringManagersRecruiters:
-		return "hiring_managers,recruiters"
-	case JobsRetrieveRequestExpandOffices:
-		return "offices"
-	case JobsRetrieveRequestExpandOfficesHiringManagers:
-		return "offices,hiring_managers"
-	case JobsRetrieveRequestExpandOfficesHiringManagersRecruiters:
-		return "offices,hiring_managers,recruiters"
-	case JobsRetrieveRequestExpandOfficesRecruiters:
-		return "offices,recruiters"
-	case JobsRetrieveRequestExpandRecruiters:
-		return "recruiters"
-	}
-}
-
-func (j JobsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", j.String())), nil
-}
-
-func (j *JobsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "departments":
-		value := JobsRetrieveRequestExpandDepartments
-		*j = value
-	case "departments,hiring_managers":
-		value := JobsRetrieveRequestExpandDepartmentsHiringManagers
-		*j = value
-	case "departments,hiring_managers,recruiters":
-		value := JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters
-		*j = value
-	case "departments,offices":
-		value := JobsRetrieveRequestExpandDepartmentsOffices
-		*j = value
-	case "departments,offices,hiring_managers":
-		value := JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers
-		*j = value
-	case "departments,offices,hiring_managers,recruiters":
-		value := JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters
-		*j = value
-	case "departments,offices,recruiters":
-		value := JobsRetrieveRequestExpandDepartmentsOfficesRecruiters
-		*j = value
-	case "departments,recruiters":
-		value := JobsRetrieveRequestExpandDepartmentsRecruiters
-		*j = value
-	case "hiring_managers":
-		value := JobsRetrieveRequestExpandHiringManagers
-		*j = value
-	case "hiring_managers,recruiters":
-		value := JobsRetrieveRequestExpandHiringManagersRecruiters
-		*j = value
-	case "offices":
-		value := JobsRetrieveRequestExpandOffices
-		*j = value
-	case "offices,hiring_managers":
-		value := JobsRetrieveRequestExpandOfficesHiringManagers
-		*j = value
-	case "offices,hiring_managers,recruiters":
-		value := JobsRetrieveRequestExpandOfficesHiringManagersRecruiters
-		*j = value
-	case "offices,recruiters":
-		value := JobsRetrieveRequestExpandOfficesRecruiters
-		*j = value
-	case "recruiters":
-		value := JobsRetrieveRequestExpandRecruiters
-		*j = value
-	}
-	return nil
-}
-
-type JobsScreeningQuestionsListRequestExpand uint
-
-const (
-	JobsScreeningQuestionsListRequestExpandJob JobsScreeningQuestionsListRequestExpand = iota + 1
-	JobsScreeningQuestionsListRequestExpandOptions
-	JobsScreeningQuestionsListRequestExpandOptionsJob
-)
-
-func (j JobsScreeningQuestionsListRequestExpand) String() string {
-	switch j {
-	default:
-		return strconv.Itoa(int(j))
-	case JobsScreeningQuestionsListRequestExpandJob:
-		return "job"
-	case JobsScreeningQuestionsListRequestExpandOptions:
-		return "options"
-	case JobsScreeningQuestionsListRequestExpandOptionsJob:
-		return "options,job"
-	}
-}
-
-func (j JobsScreeningQuestionsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", j.String())), nil
-}
-
-func (j *JobsScreeningQuestionsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "job":
-		value := JobsScreeningQuestionsListRequestExpandJob
-		*j = value
-	case "options":
-		value := JobsScreeningQuestionsListRequestExpandOptions
-		*j = value
-	case "options,job":
-		value := JobsScreeningQuestionsListRequestExpandOptionsJob
-		*j = value
-	}
-	return nil
-}
-
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
@@ -5797,7 +4162,7 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
 	Operator string `json:"operator"`
@@ -5829,74 +4194,6 @@ type LinkedAccountStatus struct {
 	CanMakeRequest      bool   `json:"can_make_request"`
 }
 
-type LinkedAccountsListRequestCategory uint
-
-const (
-	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
-	LinkedAccountsListRequestCategoryAts
-	LinkedAccountsListRequestCategoryCrm
-	LinkedAccountsListRequestCategoryFilestorage
-	LinkedAccountsListRequestCategoryHris
-	LinkedAccountsListRequestCategoryMktg
-	LinkedAccountsListRequestCategoryTicketing
-)
-
-func (l LinkedAccountsListRequestCategory) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LinkedAccountsListRequestCategoryAccounting:
-		return "accounting"
-	case LinkedAccountsListRequestCategoryAts:
-		return "ats"
-	case LinkedAccountsListRequestCategoryCrm:
-		return "crm"
-	case LinkedAccountsListRequestCategoryFilestorage:
-		return "filestorage"
-	case LinkedAccountsListRequestCategoryHris:
-		return "hris"
-	case LinkedAccountsListRequestCategoryMktg:
-		return "mktg"
-	case LinkedAccountsListRequestCategoryTicketing:
-		return "ticketing"
-	}
-}
-
-func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "accounting":
-		value := LinkedAccountsListRequestCategoryAccounting
-		*l = value
-	case "ats":
-		value := LinkedAccountsListRequestCategoryAts
-		*l = value
-	case "crm":
-		value := LinkedAccountsListRequestCategoryCrm
-		*l = value
-	case "filestorage":
-		value := LinkedAccountsListRequestCategoryFilestorage
-		*l = value
-	case "hris":
-		value := LinkedAccountsListRequestCategoryHris
-		*l = value
-	case "mktg":
-		value := LinkedAccountsListRequestCategoryMktg
-		*l = value
-	case "ticketing":
-		value := LinkedAccountsListRequestCategoryTicketing
-		*l = value
-	}
-	return nil
-}
-
 type MetaResponse struct {
 	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
 	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
@@ -5905,13 +4202,13 @@ type MetaResponse struct {
 	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
 }
 
-// * `GET` - GET
-// * `OPTIONS` - OPTIONS
-// * `HEAD` - HEAD
-// * `POST` - POST
-// * `PUT` - PUT
-// * `PATCH` - PATCH
-// * `DELETE` - DELETE
+// - `GET` - GET
+// - `OPTIONS` - OPTIONS
+// - `HEAD` - HEAD
+// - `POST` - POST
+// - `PUT` - PUT
+// - `PATCH` - PATCH
+// - `DELETE` - DELETE
 type MethodEnum uint
 
 const (
@@ -5981,10 +4278,13 @@ func (m *MethodEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The ModelOperation Object
+//
 // ### Description
+//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
+//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
@@ -5994,10 +4294,13 @@ type ModelOperation struct {
 }
 
 // # The MultipartFormField Object
+//
 // ### Description
+//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
+//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -6006,9 +4309,9 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// * `RAW` - RAW
-	// * `BASE64` - BASE64
-	// * `GZIP_BASE64` - GZIP_BASE64
+	// - `RAW` - RAW
+	// - `BASE64` - BASE64
+	// - `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
@@ -6018,9 +4321,9 @@ type MultipartFormFieldRequest struct {
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -6079,9 +4382,13 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 }
 
 // # The Offer Object
+//
 // ### Description
+//
 // The `Offer` object is used to represent an offer for a candidate's application specific to a job.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Offers` endpoint and filter by `ID` to show all offers.
 type Offer struct {
 	Id *string `json:"id,omitempty"`
@@ -6101,15 +4408,15 @@ type Offer struct {
 	StartDate *time.Time `json:"start_date,omitempty"`
 	// The offer's status.
 	//
-	// * `DRAFT` - DRAFT
-	// * `APPROVAL-SENT` - APPROVAL-SENT
-	// * `APPROVED` - APPROVED
-	// * `SENT` - SENT
-	// * `SENT-MANUALLY` - SENT-MANUALLY
-	// * `OPENED` - OPENED
-	// * `DENIED` - DENIED
-	// * `SIGNED` - SIGNED
-	// * `DEPRECATED` - DEPRECATED
+	// - `DRAFT` - DRAFT
+	// - `APPROVAL-SENT` - APPROVAL-SENT
+	// - `APPROVED` - APPROVED
+	// - `SENT` - SENT
+	// - `SENT-MANUALLY` - SENT-MANUALLY
+	// - `OPENED` - OPENED
+	// - `DENIED` - DENIED
+	// - `SIGNED` - SIGNED
+	// - `DEPRECATED` - DEPRECATED
 	Status *OfferStatus `json:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
@@ -6238,15 +4545,15 @@ func (o *OfferCreator) Accept(visitor OfferCreatorVisitor) error {
 
 // The offer's status.
 //
-// * `DRAFT` - DRAFT
-// * `APPROVAL-SENT` - APPROVAL-SENT
-// * `APPROVED` - APPROVED
-// * `SENT` - SENT
-// * `SENT-MANUALLY` - SENT-MANUALLY
-// * `OPENED` - OPENED
-// * `DENIED` - DENIED
-// * `SIGNED` - SIGNED
-// * `DEPRECATED` - DEPRECATED
+// - `DRAFT` - DRAFT
+// - `APPROVAL-SENT` - APPROVAL-SENT
+// - `APPROVED` - APPROVED
+// - `SENT` - SENT
+// - `SENT-MANUALLY` - SENT-MANUALLY
+// - `OPENED` - OPENED
+// - `DENIED` - DENIED
+// - `SIGNED` - SIGNED
+// - `DEPRECATED` - DEPRECATED
 type OfferStatus struct {
 	typeName        string
 	OfferStatusEnum OfferStatusEnum
@@ -6304,15 +4611,15 @@ func (o *OfferStatus) Accept(visitor OfferStatusVisitor) error {
 	}
 }
 
-// * `DRAFT` - DRAFT
-// * `APPROVAL-SENT` - APPROVAL-SENT
-// * `APPROVED` - APPROVED
-// * `SENT` - SENT
-// * `SENT-MANUALLY` - SENT-MANUALLY
-// * `OPENED` - OPENED
-// * `DENIED` - DENIED
-// * `SIGNED` - SIGNED
-// * `DEPRECATED` - DEPRECATED
+// - `DRAFT` - DRAFT
+// - `APPROVAL-SENT` - APPROVAL-SENT
+// - `APPROVED` - APPROVED
+// - `SENT` - SENT
+// - `SENT-MANUALLY` - SENT-MANUALLY
+// - `OPENED` - OPENED
+// - `DENIED` - DENIED
+// - `SIGNED` - SIGNED
+// - `DEPRECATED` - DEPRECATED
 type OfferStatusEnum uint
 
 const (
@@ -6393,98 +4700,14 @@ func (o *OfferStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type OffersListRequestExpand uint
-
-const (
-	OffersListRequestExpandApplication OffersListRequestExpand = iota + 1
-	OffersListRequestExpandApplicationCreator
-	OffersListRequestExpandCreator
-)
-
-func (o OffersListRequestExpand) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OffersListRequestExpandApplication:
-		return "application"
-	case OffersListRequestExpandApplicationCreator:
-		return "application,creator"
-	case OffersListRequestExpandCreator:
-		return "creator"
-	}
-}
-
-func (o OffersListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OffersListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "application":
-		value := OffersListRequestExpandApplication
-		*o = value
-	case "application,creator":
-		value := OffersListRequestExpandApplicationCreator
-		*o = value
-	case "creator":
-		value := OffersListRequestExpandCreator
-		*o = value
-	}
-	return nil
-}
-
-type OffersRetrieveRequestExpand uint
-
-const (
-	OffersRetrieveRequestExpandApplication OffersRetrieveRequestExpand = iota + 1
-	OffersRetrieveRequestExpandApplicationCreator
-	OffersRetrieveRequestExpandCreator
-)
-
-func (o OffersRetrieveRequestExpand) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OffersRetrieveRequestExpandApplication:
-		return "application"
-	case OffersRetrieveRequestExpandApplicationCreator:
-		return "application,creator"
-	case OffersRetrieveRequestExpandCreator:
-		return "creator"
-	}
-}
-
-func (o OffersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OffersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "application":
-		value := OffersRetrieveRequestExpandApplication
-		*o = value
-	case "application,creator":
-		value := OffersRetrieveRequestExpandApplicationCreator
-		*o = value
-	case "creator":
-		value := OffersRetrieveRequestExpandCreator
-		*o = value
-	}
-	return nil
-}
-
 // # The Office Object
+//
 // ### Description
+//
 // The `Office` object is used to represent an office within a company. A given `Job` has the `Office` ID in its offices field.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Offices` endpoint and view the offices within a company.
 type Office struct {
 	Id *string `json:"id,omitempty"`
@@ -6510,11 +4733,11 @@ type OperatorSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 }
 
-// * `DEFINITELY_NO` - DEFINITELY_NO
-// * `NO` - NO
-// * `YES` - YES
-// * `STRONG_YES` - STRONG_YES
-// * `NO_DECISION` - NO_DECISION
+// - `DEFINITELY_NO` - DEFINITELY_NO
+// - `NO` - NO
+// - `YES` - YES
+// - `STRONG_YES` - STRONG_YES
+// - `NO_DECISION` - NO_DECISION
 type OverallRecommendationEnum uint
 
 const (
@@ -6698,9 +4921,13 @@ type PaginatedTagList struct {
 }
 
 // # The Candidate Object
+//
 // ### Description
+//
 // The `Candidate` object is used to represent profile information about a given Candidate. Because it is specific to a Candidate, this information stays constant across applications.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Candidates` endpoint and filter by `ID` to show all candidates.
 type PatchedCandidateRequest struct {
 	// The candidate's first name.
@@ -6734,20 +4961,24 @@ type PatchedCandidateRequest struct {
 }
 
 // # The PhoneNumber Object
+//
 // ### Description
+//
 // The `PhoneNumber` object is used to represent a candidate's phone number.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Candidate` endpoint and view their phone numbers.
 type PhoneNumber struct {
 	// The phone number.
 	Value *string `json:"value,omitempty"`
 	// The type of phone number.
 	//
-	// * `HOME` - HOME
-	// * `WORK` - WORK
-	// * `MOBILE` - MOBILE
-	// * `SKYPE` - SKYPE
-	// * `OTHER` - OTHER
+	// - `HOME` - HOME
+	// - `WORK` - WORK
+	// - `MOBILE` - MOBILE
+	// - `SKYPE` - SKYPE
+	// - `OTHER` - OTHER
 	PhoneNumberType *PhoneNumberPhoneNumberType `json:"phone_number_type,omitempty"`
 	CreatedAt       *time.Time                  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -6756,11 +4987,11 @@ type PhoneNumber struct {
 
 // The type of phone number.
 //
-// * `HOME` - HOME
-// * `WORK` - WORK
-// * `MOBILE` - MOBILE
-// * `SKYPE` - SKYPE
-// * `OTHER` - OTHER
+// - `HOME` - HOME
+// - `WORK` - WORK
+// - `MOBILE` - MOBILE
+// - `SKYPE` - SKYPE
+// - `OTHER` - OTHER
 type PhoneNumberPhoneNumberType struct {
 	typeName            string
 	PhoneNumberTypeEnum PhoneNumberTypeEnum
@@ -6819,20 +5050,24 @@ func (p *PhoneNumberPhoneNumberType) Accept(visitor PhoneNumberPhoneNumberTypeVi
 }
 
 // # The PhoneNumber Object
+//
 // ### Description
+//
 // The `PhoneNumber` object is used to represent a candidate's phone number.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Candidate` endpoint and view their phone numbers.
 type PhoneNumberRequest struct {
 	// The phone number.
 	Value *string `json:"value,omitempty"`
 	// The type of phone number.
 	//
-	// * `HOME` - HOME
-	// * `WORK` - WORK
-	// * `MOBILE` - MOBILE
-	// * `SKYPE` - SKYPE
-	// * `OTHER` - OTHER
+	// - `HOME` - HOME
+	// - `WORK` - WORK
+	// - `MOBILE` - MOBILE
+	// - `SKYPE` - SKYPE
+	// - `OTHER` - OTHER
 	PhoneNumberType     *PhoneNumberRequestPhoneNumberType `json:"phone_number_type,omitempty"`
 	IntegrationParams   map[string]any                     `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                     `json:"linked_account_params,omitempty"`
@@ -6840,11 +5075,11 @@ type PhoneNumberRequest struct {
 
 // The type of phone number.
 //
-// * `HOME` - HOME
-// * `WORK` - WORK
-// * `MOBILE` - MOBILE
-// * `SKYPE` - SKYPE
-// * `OTHER` - OTHER
+// - `HOME` - HOME
+// - `WORK` - WORK
+// - `MOBILE` - MOBILE
+// - `SKYPE` - SKYPE
+// - `OTHER` - OTHER
 type PhoneNumberRequestPhoneNumberType struct {
 	typeName            string
 	PhoneNumberTypeEnum PhoneNumberTypeEnum
@@ -6902,11 +5137,11 @@ func (p *PhoneNumberRequestPhoneNumberType) Accept(visitor PhoneNumberRequestPho
 	}
 }
 
-// * `HOME` - HOME
-// * `WORK` - WORK
-// * `MOBILE` - MOBILE
-// * `SKYPE` - SKYPE
-// * `OTHER` - OTHER
+// - `HOME` - HOME
+// - `WORK` - WORK
+// - `MOBILE` - MOBILE
+// - `SKYPE` - SKYPE
+// - `OTHER` - OTHER
 type PhoneNumberTypeEnum uint
 
 const (
@@ -6963,14 +5198,14 @@ func (p *PhoneNumberTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `AMERICAN_INDIAN_OR_ALASKAN_NATIVE` - AMERICAN_INDIAN_OR_ALASKAN_NATIVE
-// * `ASIAN` - ASIAN
-// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-// * `WHITE` - WHITE
-// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-// * `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
+// - `AMERICAN_INDIAN_OR_ALASKAN_NATIVE` - AMERICAN_INDIAN_OR_ALASKAN_NATIVE
+// - `ASIAN` - ASIAN
+// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+// - `WHITE` - WHITE
+// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+// - `DECLINE_TO_SELF_IDENTIFY` - DECLINE_TO_SELF_IDENTIFY
 type RaceEnum uint
 
 const (
@@ -7045,9 +5280,9 @@ func (r *RaceEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
-// * `GDPR` - GDPR
-// * `OTHER` - OTHER
+// - `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
+// - `GDPR` - GDPR
+// - `OTHER` - OTHER
 type ReasonEnum uint
 
 const (
@@ -7093,9 +5328,13 @@ func (r *ReasonEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The RejectReason Object
+//
 // ### Description
+//
 // The `RejectReason` object is used to represent a reason for rejecting an application. These can typically be configured within an ATS system.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST RejectReasons` endpoint and filter by `ID` to show all reasons.
 type RejectReason struct {
 	Id *string `json:"id,omitempty"`
@@ -7118,10 +5357,13 @@ type RemoteData struct {
 }
 
 // # The RemoteKey Object
+//
 // ### Description
+//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
+//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
@@ -7129,10 +5371,13 @@ type RemoteKey struct {
 }
 
 // # The RemoteResponse Object
+//
 // ### Description
+//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
+//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
 	Method          string                      `json:"method"`
@@ -7202,9 +5447,13 @@ func (r *RemoteResponseResponseType) Accept(visitor RemoteResponseResponseTypeVi
 }
 
 // # The RemoteUser Object
+//
 // ### Description
+//
 // The `RemoteUser` object is used to represent a user with a login to the ATS system.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST RemoteUsers` endpoint to show all users for a third party.
 type RemoteUser struct {
 	Id *string `json:"id,omitempty"`
@@ -7222,11 +5471,11 @@ type RemoteUser struct {
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// The user's role.
 	//
-	// * `SUPER_ADMIN` - SUPER_ADMIN
-	// * `ADMIN` - ADMIN
-	// * `TEAM_MEMBER` - TEAM_MEMBER
-	// * `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
-	// * `INTERVIEWER` - INTERVIEWER
+	// - `SUPER_ADMIN` - SUPER_ADMIN
+	// - `ADMIN` - ADMIN
+	// - `TEAM_MEMBER` - TEAM_MEMBER
+	// - `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
+	// - `INTERVIEWER` - INTERVIEWER
 	AccessRole *RemoteUserAccessRole `json:"access_role,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
@@ -7239,11 +5488,11 @@ type RemoteUser struct {
 
 // The user's role.
 //
-// * `SUPER_ADMIN` - SUPER_ADMIN
-// * `ADMIN` - ADMIN
-// * `TEAM_MEMBER` - TEAM_MEMBER
-// * `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
-// * `INTERVIEWER` - INTERVIEWER
+// - `SUPER_ADMIN` - SUPER_ADMIN
+// - `ADMIN` - ADMIN
+// - `TEAM_MEMBER` - TEAM_MEMBER
+// - `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
+// - `INTERVIEWER` - INTERVIEWER
 type RemoteUserAccessRole struct {
 	typeName       string
 	AccessRoleEnum AccessRoleEnum
@@ -7301,9 +5550,9 @@ func (r *RemoteUserAccessRole) Accept(visitor RemoteUserAccessRoleVisitor) error
 	}
 }
 
-// * `JSON` - JSON
-// * `XML` - XML
-// * `MULTIPART` - MULTIPART
+// - `JSON` - JSON
+// - `XML` - XML
+// - `MULTIPART` - MULTIPART
 type RequestFormatEnum uint
 
 const (
@@ -7348,8 +5597,8 @@ func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `JSON` - JSON
-// * `BASE64_GZIP` - BASE64_GZIP
+// - `JSON` - JSON
+// - `BASE64_GZIP` - BASE64_GZIP
 type ResponseTypeEnum uint
 
 const (
@@ -7388,12 +5637,12 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
 type RoleEnum uint
 
 const (
@@ -7457,9 +5706,13 @@ func (r *RoleEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The ScheduledInterview Object
+//
 // ### Description
+//
 // The `ScheduledInterview` object is used to represent a scheduled interview for a given candidate’s application to a job. An `Application` can have multiple `ScheduledInterview`s depending on the particular hiring process.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST ScheduledInterviews` endpoint and filter by `interviewers` to show all office locations.
 type ScheduledInterview struct {
 	Id *string `json:"id,omitempty"`
@@ -7485,9 +5738,9 @@ type ScheduledInterview struct {
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// The interview's status.
 	//
-	// * `SCHEDULED` - SCHEDULED
-	// * `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
-	// * `COMPLETE` - COMPLETE
+	// - `SCHEDULED` - SCHEDULED
+	// - `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
+	// - `COMPLETE` - COMPLETE
 	Status *ScheduledInterviewStatus `json:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
@@ -7730,9 +5983,13 @@ func (s *ScheduledInterviewOrganizer) Accept(visitor ScheduledInterviewOrganizer
 }
 
 // # The ScheduledInterview Object
+//
 // ### Description
+//
 // The `ScheduledInterview` object is used to represent a scheduled interview for a given candidate’s application to a job. An `Application` can have multiple `ScheduledInterview`s depending on the particular hiring process.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST ScheduledInterviews` endpoint and filter by `interviewers` to show all office locations.
 type ScheduledInterviewRequest struct {
 	// The application being interviewed.
@@ -7751,9 +6008,9 @@ type ScheduledInterviewRequest struct {
 	EndAt *time.Time `json:"end_at,omitempty"`
 	// The interview's status.
 	//
-	// * `SCHEDULED` - SCHEDULED
-	// * `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
-	// * `COMPLETE` - COMPLETE
+	// - `SCHEDULED` - SCHEDULED
+	// - `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
+	// - `COMPLETE` - COMPLETE
 	Status              *ScheduledInterviewRequestStatus `json:"status,omitempty"`
 	IntegrationParams   map[string]any                   `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                   `json:"linked_account_params,omitempty"`
@@ -7992,9 +6249,9 @@ func (s *ScheduledInterviewRequestOrganizer) Accept(visitor ScheduledInterviewRe
 
 // The interview's status.
 //
-// * `SCHEDULED` - SCHEDULED
-// * `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
-// * `COMPLETE` - COMPLETE
+// - `SCHEDULED` - SCHEDULED
+// - `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
+// - `COMPLETE` - COMPLETE
 type ScheduledInterviewRequestStatus struct {
 	typeName                     string
 	ScheduledInterviewStatusEnum ScheduledInterviewStatusEnum
@@ -8061,9 +6318,9 @@ type ScheduledInterviewResponse struct {
 
 // The interview's status.
 //
-// * `SCHEDULED` - SCHEDULED
-// * `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
-// * `COMPLETE` - COMPLETE
+// - `SCHEDULED` - SCHEDULED
+// - `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
+// - `COMPLETE` - COMPLETE
 type ScheduledInterviewStatus struct {
 	typeName                     string
 	ScheduledInterviewStatusEnum ScheduledInterviewStatusEnum
@@ -8121,9 +6378,9 @@ func (s *ScheduledInterviewStatus) Accept(visitor ScheduledInterviewStatusVisito
 	}
 }
 
-// * `SCHEDULED` - SCHEDULED
-// * `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
-// * `COMPLETE` - COMPLETE
+// - `SCHEDULED` - SCHEDULED
+// - `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
+// - `COMPLETE` - COMPLETE
 type ScheduledInterviewStatusEnum uint
 
 const (
@@ -8169,9 +6426,13 @@ func (s *ScheduledInterviewStatusEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Scorecard Object
+//
 // ### Description
+//
 // The `Scorecard` object is used to represent an interviewer's candidate recommendation based on a particular interview.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Scorecards` endpoint and filter by `application` to show all scorecard for an applicant.
 type Scorecard struct {
 	Id *string `json:"id,omitempty"`
@@ -8189,11 +6450,11 @@ type Scorecard struct {
 	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 	// The inteviewer's recommendation.
 	//
-	// * `DEFINITELY_NO` - DEFINITELY_NO
-	// * `NO` - NO
-	// * `YES` - YES
-	// * `STRONG_YES` - STRONG_YES
-	// * `NO_DECISION` - NO_DECISION
+	// - `DEFINITELY_NO` - DEFINITELY_NO
+	// - `NO` - NO
+	// - `YES` - YES
+	// - `STRONG_YES` - STRONG_YES
+	// - `NO_DECISION` - NO_DECISION
 	OverallRecommendation *ScorecardOverallRecommendation `json:"overall_recommendation,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
@@ -8380,11 +6641,11 @@ func (s *ScorecardInterviewer) Accept(visitor ScorecardInterviewerVisitor) error
 
 // The inteviewer's recommendation.
 //
-// * `DEFINITELY_NO` - DEFINITELY_NO
-// * `NO` - NO
-// * `YES` - YES
-// * `STRONG_YES` - STRONG_YES
-// * `NO_DECISION` - NO_DECISION
+// - `DEFINITELY_NO` - DEFINITELY_NO
+// - `NO` - NO
+// - `YES` - YES
+// - `STRONG_YES` - STRONG_YES
+// - `NO_DECISION` - NO_DECISION
 type ScorecardOverallRecommendation struct {
 	typeName                  string
 	OverallRecommendationEnum OverallRecommendationEnum
@@ -8442,147 +6703,14 @@ func (s *ScorecardOverallRecommendation) Accept(visitor ScorecardOverallRecommen
 	}
 }
 
-type ScorecardsListRequestExpand uint
-
-const (
-	ScorecardsListRequestExpandApplication ScorecardsListRequestExpand = iota + 1
-	ScorecardsListRequestExpandApplicationInterview
-	ScorecardsListRequestExpandApplicationInterviewInterviewer
-	ScorecardsListRequestExpandApplicationInterviewer
-	ScorecardsListRequestExpandInterview
-	ScorecardsListRequestExpandInterviewInterviewer
-	ScorecardsListRequestExpandInterviewer
-)
-
-func (s ScorecardsListRequestExpand) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case ScorecardsListRequestExpandApplication:
-		return "application"
-	case ScorecardsListRequestExpandApplicationInterview:
-		return "application,interview"
-	case ScorecardsListRequestExpandApplicationInterviewInterviewer:
-		return "application,interview,interviewer"
-	case ScorecardsListRequestExpandApplicationInterviewer:
-		return "application,interviewer"
-	case ScorecardsListRequestExpandInterview:
-		return "interview"
-	case ScorecardsListRequestExpandInterviewInterviewer:
-		return "interview,interviewer"
-	case ScorecardsListRequestExpandInterviewer:
-		return "interviewer"
-	}
-}
-
-func (s ScorecardsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *ScorecardsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "application":
-		value := ScorecardsListRequestExpandApplication
-		*s = value
-	case "application,interview":
-		value := ScorecardsListRequestExpandApplicationInterview
-		*s = value
-	case "application,interview,interviewer":
-		value := ScorecardsListRequestExpandApplicationInterviewInterviewer
-		*s = value
-	case "application,interviewer":
-		value := ScorecardsListRequestExpandApplicationInterviewer
-		*s = value
-	case "interview":
-		value := ScorecardsListRequestExpandInterview
-		*s = value
-	case "interview,interviewer":
-		value := ScorecardsListRequestExpandInterviewInterviewer
-		*s = value
-	case "interviewer":
-		value := ScorecardsListRequestExpandInterviewer
-		*s = value
-	}
-	return nil
-}
-
-type ScorecardsRetrieveRequestExpand uint
-
-const (
-	ScorecardsRetrieveRequestExpandApplication ScorecardsRetrieveRequestExpand = iota + 1
-	ScorecardsRetrieveRequestExpandApplicationInterview
-	ScorecardsRetrieveRequestExpandApplicationInterviewInterviewer
-	ScorecardsRetrieveRequestExpandApplicationInterviewer
-	ScorecardsRetrieveRequestExpandInterview
-	ScorecardsRetrieveRequestExpandInterviewInterviewer
-	ScorecardsRetrieveRequestExpandInterviewer
-)
-
-func (s ScorecardsRetrieveRequestExpand) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case ScorecardsRetrieveRequestExpandApplication:
-		return "application"
-	case ScorecardsRetrieveRequestExpandApplicationInterview:
-		return "application,interview"
-	case ScorecardsRetrieveRequestExpandApplicationInterviewInterviewer:
-		return "application,interview,interviewer"
-	case ScorecardsRetrieveRequestExpandApplicationInterviewer:
-		return "application,interviewer"
-	case ScorecardsRetrieveRequestExpandInterview:
-		return "interview"
-	case ScorecardsRetrieveRequestExpandInterviewInterviewer:
-		return "interview,interviewer"
-	case ScorecardsRetrieveRequestExpandInterviewer:
-		return "interviewer"
-	}
-}
-
-func (s ScorecardsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *ScorecardsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "application":
-		value := ScorecardsRetrieveRequestExpandApplication
-		*s = value
-	case "application,interview":
-		value := ScorecardsRetrieveRequestExpandApplicationInterview
-		*s = value
-	case "application,interview,interviewer":
-		value := ScorecardsRetrieveRequestExpandApplicationInterviewInterviewer
-		*s = value
-	case "application,interviewer":
-		value := ScorecardsRetrieveRequestExpandApplicationInterviewer
-		*s = value
-	case "interview":
-		value := ScorecardsRetrieveRequestExpandInterview
-		*s = value
-	case "interview,interviewer":
-		value := ScorecardsRetrieveRequestExpandInterviewInterviewer
-		*s = value
-	case "interviewer":
-		value := ScorecardsRetrieveRequestExpandInterviewer
-		*s = value
-	}
-	return nil
-}
-
 // # The ScreeningQuestion Object
+//
 // ### Description
+//
 // The `ScreeningQuestion` object is used to represent questions asked to screen candidates for a job.
 //
 // ### Usage Example
+//
 // TODO
 type ScreeningQuestion struct {
 	Id *string `json:"id,omitempty"`
@@ -8596,14 +6724,14 @@ type ScreeningQuestion struct {
 	Title *string `json:"title,omitempty"`
 	// The data type for the screening question.
 	//
-	// * `DATE` - DATE
-	// * `FILE` - FILE
-	// * `SINGLE_SELECT` - SINGLE_SELECT
-	// * `MULTI_SELECT` - MULTI_SELECT
-	// * `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
-	// * `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
-	// * `NUMERIC` - NUMERIC
-	// * `BOOLEAN` - BOOLEAN
+	// - `DATE` - DATE
+	// - `FILE` - FILE
+	// - `SINGLE_SELECT` - SINGLE_SELECT
+	// - `MULTI_SELECT` - MULTI_SELECT
+	// - `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+	// - `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+	// - `NUMERIC` - NUMERIC
+	// - `BOOLEAN` - BOOLEAN
 	Type *ScreeningQuestionType `json:"type,omitempty"`
 	// Whether or not the screening question is required.
 	Required  *bool      `json:"required,omitempty"`
@@ -8672,10 +6800,13 @@ func (s *ScreeningQuestionJob) Accept(visitor ScreeningQuestionJobVisitor) error
 }
 
 // # The ScreeningQuestionOption Object
+//
 // ### Description
-// The `ScreeningQuestionOption` object is used to represent options for a `ScreeningQuestion` object
+//
+// # The `ScreeningQuestionOption` object is used to represent options for a `ScreeningQuestion` object
 //
 // ### Usage Example
+//
 // TODO
 type ScreeningQuestionOption struct {
 	// The third-party API ID of the matching object.
@@ -8690,14 +6821,14 @@ type ScreeningQuestionOption struct {
 
 // The data type for the screening question.
 //
-// * `DATE` - DATE
-// * `FILE` - FILE
-// * `SINGLE_SELECT` - SINGLE_SELECT
-// * `MULTI_SELECT` - MULTI_SELECT
-// * `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
-// * `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
-// * `NUMERIC` - NUMERIC
-// * `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `FILE` - FILE
+// - `SINGLE_SELECT` - SINGLE_SELECT
+// - `MULTI_SELECT` - MULTI_SELECT
+// - `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+// - `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+// - `NUMERIC` - NUMERIC
+// - `BOOLEAN` - BOOLEAN
 type ScreeningQuestionType struct {
 	typeName string
 	TypeEnum TypeEnum
@@ -8755,8 +6886,8 @@ func (s *ScreeningQuestionType) Accept(visitor ScreeningQuestionTypeVisitor) err
 	}
 }
 
-// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// * `IN_LAST_SYNC` - IN_LAST_SYNC
+// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// - `IN_LAST_SYNC` - IN_LAST_SYNC
 type SelectiveSyncConfigurationsUsageEnum uint
 
 const (
@@ -8796,10 +6927,13 @@ func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error 
 }
 
 // # The SyncStatus Object
+//
 // ### Description
-// The `SyncStatus` object is used to represent the syncing state of an account
+//
+// # The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
+//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -8811,12 +6945,12 @@ type SyncStatus struct {
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
 }
 
-// * `SYNCING` - SYNCING
-// * `DONE` - DONE
-// * `FAILED` - FAILED
-// * `DISABLED` - DISABLED
-// * `PAUSED` - PAUSED
-// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+// - `SYNCING` - SYNCING
+// - `DONE` - DONE
+// - `FAILED` - FAILED
+// - `DISABLED` - DISABLED
+// - `PAUSED` - PAUSED
+// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
 type SyncStatusStatusEnum uint
 
 const (
@@ -8880,9 +7014,13 @@ func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Tag Object
+//
 // ### Description
+//
 // The `Tag` object is used to represent a tag for a candidate.
+//
 // ### Usage Example
+//
 // Fetch from the `LIST Tags` endpoint and view the tags used within a company.
 type Tag struct {
 	// The third-party API ID of the matching object.
@@ -8898,14 +7036,14 @@ type Tag struct {
 	RemoteData    []map[string]any `json:"remote_data,omitempty"`
 }
 
-// * `DATE` - DATE
-// * `FILE` - FILE
-// * `SINGLE_SELECT` - SINGLE_SELECT
-// * `MULTI_SELECT` - MULTI_SELECT
-// * `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
-// * `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
-// * `NUMERIC` - NUMERIC
-// * `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `FILE` - FILE
+// - `SINGLE_SELECT` - SINGLE_SELECT
+// - `MULTI_SELECT` - MULTI_SELECT
+// - `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+// - `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+// - `NUMERIC` - NUMERIC
+// - `BOOLEAN` - BOOLEAN
 type TypeEnum uint
 
 const (
@@ -8981,22 +7119,26 @@ func (t *TypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Url Object
+//
 // ### Description
+//
 // The `Url` object is used to represent hyperlinks associated with the parent model.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Candidate` endpoint and view their website urls.
 type Url struct {
 	// The site's url.
 	Value *string `json:"value,omitempty"`
 	// The type of site.
 	//
-	// * `PERSONAL` - PERSONAL
-	// * `COMPANY` - COMPANY
-	// * `PORTFOLIO` - PORTFOLIO
-	// * `BLOG` - BLOG
-	// * `SOCIAL_MEDIA` - SOCIAL_MEDIA
-	// * `OTHER` - OTHER
-	// * `JOB_POSTING` - JOB_POSTING
+	// - `PERSONAL` - PERSONAL
+	// - `COMPANY` - COMPANY
+	// - `PORTFOLIO` - PORTFOLIO
+	// - `BLOG` - BLOG
+	// - `SOCIAL_MEDIA` - SOCIAL_MEDIA
+	// - `OTHER` - OTHER
+	// - `JOB_POSTING` - JOB_POSTING
 	UrlType   *UrlUrlType `json:"url_type,omitempty"`
 	CreatedAt *time.Time  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -9004,22 +7146,26 @@ type Url struct {
 }
 
 // # The Url Object
+//
 // ### Description
+//
 // The `Url` object is used to represent hyperlinks associated with the parent model.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Candidate` endpoint and view their website urls.
 type UrlRequest struct {
 	// The site's url.
 	Value *string `json:"value,omitempty"`
 	// The type of site.
 	//
-	// * `PERSONAL` - PERSONAL
-	// * `COMPANY` - COMPANY
-	// * `PORTFOLIO` - PORTFOLIO
-	// * `BLOG` - BLOG
-	// * `SOCIAL_MEDIA` - SOCIAL_MEDIA
-	// * `OTHER` - OTHER
-	// * `JOB_POSTING` - JOB_POSTING
+	// - `PERSONAL` - PERSONAL
+	// - `COMPANY` - COMPANY
+	// - `PORTFOLIO` - PORTFOLIO
+	// - `BLOG` - BLOG
+	// - `SOCIAL_MEDIA` - SOCIAL_MEDIA
+	// - `OTHER` - OTHER
+	// - `JOB_POSTING` - JOB_POSTING
 	UrlType             *UrlRequestUrlType `json:"url_type,omitempty"`
 	IntegrationParams   map[string]any     `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any     `json:"linked_account_params,omitempty"`
@@ -9027,13 +7173,13 @@ type UrlRequest struct {
 
 // The type of site.
 //
-// * `PERSONAL` - PERSONAL
-// * `COMPANY` - COMPANY
-// * `PORTFOLIO` - PORTFOLIO
-// * `BLOG` - BLOG
-// * `SOCIAL_MEDIA` - SOCIAL_MEDIA
-// * `OTHER` - OTHER
-// * `JOB_POSTING` - JOB_POSTING
+// - `PERSONAL` - PERSONAL
+// - `COMPANY` - COMPANY
+// - `PORTFOLIO` - PORTFOLIO
+// - `BLOG` - BLOG
+// - `SOCIAL_MEDIA` - SOCIAL_MEDIA
+// - `OTHER` - OTHER
+// - `JOB_POSTING` - JOB_POSTING
 type UrlRequestUrlType struct {
 	typeName    string
 	UrlTypeEnum UrlTypeEnum
@@ -9091,13 +7237,13 @@ func (u *UrlRequestUrlType) Accept(visitor UrlRequestUrlTypeVisitor) error {
 	}
 }
 
-// * `PERSONAL` - PERSONAL
-// * `COMPANY` - COMPANY
-// * `PORTFOLIO` - PORTFOLIO
-// * `BLOG` - BLOG
-// * `SOCIAL_MEDIA` - SOCIAL_MEDIA
-// * `OTHER` - OTHER
-// * `JOB_POSTING` - JOB_POSTING
+// - `PERSONAL` - PERSONAL
+// - `COMPANY` - COMPANY
+// - `PORTFOLIO` - PORTFOLIO
+// - `BLOG` - BLOG
+// - `SOCIAL_MEDIA` - SOCIAL_MEDIA
+// - `OTHER` - OTHER
+// - `JOB_POSTING` - JOB_POSTING
 type UrlTypeEnum uint
 
 const (
@@ -9168,13 +7314,13 @@ func (u *UrlTypeEnum) UnmarshalJSON(data []byte) error {
 
 // The type of site.
 //
-// * `PERSONAL` - PERSONAL
-// * `COMPANY` - COMPANY
-// * `PORTFOLIO` - PORTFOLIO
-// * `BLOG` - BLOG
-// * `SOCIAL_MEDIA` - SOCIAL_MEDIA
-// * `OTHER` - OTHER
-// * `JOB_POSTING` - JOB_POSTING
+// - `PERSONAL` - PERSONAL
+// - `COMPANY` - COMPANY
+// - `PORTFOLIO` - PORTFOLIO
+// - `BLOG` - BLOG
+// - `SOCIAL_MEDIA` - SOCIAL_MEDIA
+// - `OTHER` - OTHER
+// - `JOB_POSTING` - JOB_POSTING
 type UrlUrlType struct {
 	typeName    string
 	UrlTypeEnum UrlTypeEnum
@@ -9236,9 +7382,9 @@ type ValidationProblemSource struct {
 	Pointer string `json:"pointer"`
 }
 
-// * `I_AM_NOT_A_PROTECTED_VETERAN` - I_AM_NOT_A_PROTECTED_VETERAN
-// * `I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN` - I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN
-// * `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
+// - `I_AM_NOT_A_PROTECTED_VETERAN` - I_AM_NOT_A_PROTECTED_VETERAN
+// - `I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN` - I_IDENTIFY_AS_ONE_OR_MORE_OF_THE_CLASSIFICATIONS_OF_A_PROTECTED_VETERAN
+// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 type VeteranStatusEnum uint
 
 const (
@@ -9283,9 +7429,9 @@ func (v *VeteranStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// * `ADMIN_ONLY` - ADMIN_ONLY
-// * `PUBLIC` - PUBLIC
-// * `PRIVATE` - PRIVATE
+// - `ADMIN_ONLY` - ADMIN_ONLY
+// - `PUBLIC` - PUBLIC
+// - `PRIVATE` - PRIVATE
 type VisibilityEnum uint
 
 const (

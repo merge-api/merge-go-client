@@ -38,7 +38,7 @@ func (c *client) List(ctx context.Context) ([]*filestorage.WebhookReceiver, erro
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/webhook-receivers"
+	endpointURL := baseURL + "/" + "webhook-receivers"
 
 	var response []*filestorage.WebhookReceiver
 	if err := core.DoRequest(
@@ -63,7 +63,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.WebhookReceive
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/webhook-receivers"
+	endpointURL := baseURL + "/" + "webhook-receivers"
 
 	var response *filestorage.WebhookReceiver
 	if err := core.DoRequest(

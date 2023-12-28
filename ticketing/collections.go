@@ -3,14 +3,17 @@
 package ticketing
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
 type CollectionsListRequest struct {
 	// If provided, will only return collections of the given type.
 	//
-	// * `LIST` - LIST
-	// * `PROJECT` - PROJECT
+	// - `LIST` - LIST
+	// - `PROJECT` - PROJECT
 	CollectionType *CollectionsListRequestCollectionType `json:"-"`
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-"`
@@ -49,6 +52,88 @@ type CollectionsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type CollectionsListRequestCollectionType uint
+
+const (
+	CollectionsListRequestCollectionTypeList CollectionsListRequestCollectionType = iota + 1
+	CollectionsListRequestCollectionTypeProject
+)
+
+func (c CollectionsListRequestCollectionType) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CollectionsListRequestCollectionTypeList:
+		return "LIST"
+	case CollectionsListRequestCollectionTypeProject:
+		return "PROJECT"
+	}
+}
+
+func (c CollectionsListRequestCollectionType) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CollectionsListRequestCollectionType) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "LIST":
+		value := CollectionsListRequestCollectionTypeList
+		*c = value
+	case "PROJECT":
+		value := CollectionsListRequestCollectionTypeProject
+		*c = value
+	}
+	return nil
+}
+
+type CollectionsUsersListRequestExpand uint
+
+const (
+	CollectionsUsersListRequestExpandRoles CollectionsUsersListRequestExpand = iota + 1
+	CollectionsUsersListRequestExpandTeams
+	CollectionsUsersListRequestExpandTeamsRoles
+)
+
+func (c CollectionsUsersListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CollectionsUsersListRequestExpandRoles:
+		return "roles"
+	case CollectionsUsersListRequestExpandTeams:
+		return "teams"
+	case CollectionsUsersListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (c CollectionsUsersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CollectionsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := CollectionsUsersListRequestExpandRoles
+		*c = value
+	case "teams":
+		value := CollectionsUsersListRequestExpandTeams
+		*c = value
+	case "teams,roles":
+		value := CollectionsUsersListRequestExpandTeamsRoles
+		*c = value
+	}
+	return nil
 }
 
 type CollectionsUsersListRequest struct {

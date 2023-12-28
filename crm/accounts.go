@@ -33,6 +33,8 @@ type AccountsListRequest struct {
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-"`
+	// If provided, will only return accounts with this name.
+	Name *string `json:"-"`
 	// If provided, will only return accounts with this owner.
 	OwnerId *string `json:"-"`
 	// Number of results to return per page.

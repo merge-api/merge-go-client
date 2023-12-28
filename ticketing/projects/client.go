@@ -42,7 +42,7 @@ func (c *client) List(ctx context.Context, request *ticketing.ProjectsListReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/projects"
+	endpointURL := baseURL + "/" + "projects"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -99,7 +99,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Pro
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/projects/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"projects/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -132,7 +132,7 @@ func (c *client) UsersList(ctx context.Context, parentId string, request *ticket
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/projects/%v/users", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"projects/%v/users", parentId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

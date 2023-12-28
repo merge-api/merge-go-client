@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.OfficesListRequest) (*at
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/offices"
+	endpointURL := baseURL + "/" + "offices"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -98,7 +98,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.OfficesRe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/offices/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"offices/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

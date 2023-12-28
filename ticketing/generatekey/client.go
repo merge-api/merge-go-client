@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.GenerateRemoteKe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/generate-key"
+	endpointURL := baseURL + "/" + "generate-key"
 
 	var response *ticketing.RemoteKey
 	if err := core.DoRequest(

@@ -3,6 +3,9 @@
 package hris
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -32,9 +35,9 @@ type EmployeesListRequest struct {
 	DisplayFullName *string `json:"-"`
 	// If provided, will only return employees with this employment status.
 	//
-	// * `ACTIVE` - ACTIVE
-	// * `PENDING` - PENDING
-	// * `INACTIVE` - INACTIVE
+	// - `ACTIVE` - ACTIVE
+	// - `PENDING` - PENDING
+	// - `INACTIVE` - INACTIVE
 	EmploymentStatus *EmployeesListRequestEmploymentStatus `json:"-"`
 	// If provided, will only return employees that have an employment of the specified employment_type.
 	EmploymentType *string `json:"-"`
@@ -101,4 +104,3681 @@ type EmployeesRetrieveRequest struct {
 	RemoteFields *EmployeesRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *EmployeesRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type EmployeesListRequestEmploymentStatus uint
+
+const (
+	EmployeesListRequestEmploymentStatusActive EmployeesListRequestEmploymentStatus = iota + 1
+	EmployeesListRequestEmploymentStatusInactive
+	EmployeesListRequestEmploymentStatusPending
+)
+
+func (e EmployeesListRequestEmploymentStatus) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesListRequestEmploymentStatusActive:
+		return "ACTIVE"
+	case EmployeesListRequestEmploymentStatusInactive:
+		return "INACTIVE"
+	case EmployeesListRequestEmploymentStatusPending:
+		return "PENDING"
+	}
+}
+
+func (e EmployeesListRequestEmploymentStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesListRequestEmploymentStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ACTIVE":
+		value := EmployeesListRequestEmploymentStatusActive
+		*e = value
+	case "INACTIVE":
+		value := EmployeesListRequestEmploymentStatusInactive
+		*e = value
+	case "PENDING":
+		value := EmployeesListRequestEmploymentStatusPending
+		*e = value
+	}
+	return nil
+}
+
+type EmployeesListRequestExpand uint
+
+const (
+	EmployeesListRequestExpandCompany EmployeesListRequestExpand = iota + 1
+	EmployeesListRequestExpandCompanyPayGroup
+	EmployeesListRequestExpandEmployments
+	EmployeesListRequestExpandEmploymentsCompany
+	EmployeesListRequestExpandEmploymentsCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroups
+	EmployeesListRequestExpandEmploymentsGroupsCompany
+	EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocation
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsManager
+	EmployeesListRequestExpandEmploymentsGroupsManagerCompany
+	EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeam
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsTeam
+	EmployeesListRequestExpandEmploymentsGroupsTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocation
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocation
+	EmployeesListRequestExpandEmploymentsHomeLocationCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationManager
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationTeam
+	EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
+	EmployeesListRequestExpandEmploymentsManager
+	EmployeesListRequestExpandEmploymentsManagerCompany
+	EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsManagerPayGroup
+	EmployeesListRequestExpandEmploymentsManagerTeam
+	EmployeesListRequestExpandEmploymentsManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsPayGroup
+	EmployeesListRequestExpandEmploymentsTeam
+	EmployeesListRequestExpandEmploymentsTeamCompany
+	EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsTeamPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocation
+	EmployeesListRequestExpandEmploymentsWorkLocationCompany
+	EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationManager
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationTeam
+	EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany
+	EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup
+	EmployeesListRequestExpandGroups
+	EmployeesListRequestExpandGroupsCompany
+	EmployeesListRequestExpandGroupsCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocation
+	EmployeesListRequestExpandGroupsHomeLocationCompany
+	EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationManager
+	EmployeesListRequestExpandGroupsHomeLocationManagerCompany
+	EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeam
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationTeam
+	EmployeesListRequestExpandGroupsHomeLocationTeamCompany
+	EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocation
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
+	EmployeesListRequestExpandGroupsManager
+	EmployeesListRequestExpandGroupsManagerCompany
+	EmployeesListRequestExpandGroupsManagerCompanyPayGroup
+	EmployeesListRequestExpandGroupsManagerPayGroup
+	EmployeesListRequestExpandGroupsManagerTeam
+	EmployeesListRequestExpandGroupsManagerTeamCompany
+	EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsManagerTeamPayGroup
+	EmployeesListRequestExpandGroupsPayGroup
+	EmployeesListRequestExpandGroupsTeam
+	EmployeesListRequestExpandGroupsTeamCompany
+	EmployeesListRequestExpandGroupsTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsTeamPayGroup
+	EmployeesListRequestExpandGroupsWorkLocation
+	EmployeesListRequestExpandGroupsWorkLocationCompany
+	EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationManager
+	EmployeesListRequestExpandGroupsWorkLocationManagerCompany
+	EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeam
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationTeam
+	EmployeesListRequestExpandGroupsWorkLocationTeamCompany
+	EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup
+	EmployeesListRequestExpandHomeLocation
+	EmployeesListRequestExpandHomeLocationCompany
+	EmployeesListRequestExpandHomeLocationCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationManager
+	EmployeesListRequestExpandHomeLocationManagerCompany
+	EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationManagerPayGroup
+	EmployeesListRequestExpandHomeLocationManagerTeam
+	EmployeesListRequestExpandHomeLocationManagerTeamCompany
+	EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationManagerTeamPayGroup
+	EmployeesListRequestExpandHomeLocationPayGroup
+	EmployeesListRequestExpandHomeLocationTeam
+	EmployeesListRequestExpandHomeLocationTeamCompany
+	EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationTeamPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocation
+	EmployeesListRequestExpandHomeLocationWorkLocationCompany
+	EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationManager
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationTeam
+	EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany
+	EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup
+	EmployeesListRequestExpandManager
+	EmployeesListRequestExpandManagerCompany
+	EmployeesListRequestExpandManagerCompanyPayGroup
+	EmployeesListRequestExpandManagerPayGroup
+	EmployeesListRequestExpandManagerTeam
+	EmployeesListRequestExpandManagerTeamCompany
+	EmployeesListRequestExpandManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandManagerTeamPayGroup
+	EmployeesListRequestExpandPayGroup
+	EmployeesListRequestExpandTeam
+	EmployeesListRequestExpandTeamCompany
+	EmployeesListRequestExpandTeamCompanyPayGroup
+	EmployeesListRequestExpandTeamPayGroup
+	EmployeesListRequestExpandWorkLocation
+	EmployeesListRequestExpandWorkLocationCompany
+	EmployeesListRequestExpandWorkLocationCompanyPayGroup
+	EmployeesListRequestExpandWorkLocationManager
+	EmployeesListRequestExpandWorkLocationManagerCompany
+	EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup
+	EmployeesListRequestExpandWorkLocationManagerPayGroup
+	EmployeesListRequestExpandWorkLocationManagerTeam
+	EmployeesListRequestExpandWorkLocationManagerTeamCompany
+	EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup
+	EmployeesListRequestExpandWorkLocationManagerTeamPayGroup
+	EmployeesListRequestExpandWorkLocationPayGroup
+	EmployeesListRequestExpandWorkLocationTeam
+	EmployeesListRequestExpandWorkLocationTeamCompany
+	EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup
+	EmployeesListRequestExpandWorkLocationTeamPayGroup
+)
+
+func (e EmployeesListRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesListRequestExpandCompany:
+		return "company"
+	case EmployeesListRequestExpandCompanyPayGroup:
+		return "company,pay_group"
+	case EmployeesListRequestExpandEmployments:
+		return "employments"
+	case EmployeesListRequestExpandEmploymentsCompany:
+		return "employments,company"
+	case EmployeesListRequestExpandEmploymentsCompanyPayGroup:
+		return "employments,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroups:
+		return "employments,groups"
+	case EmployeesListRequestExpandEmploymentsGroupsCompany:
+		return "employments,groups,company"
+	case EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup:
+		return "employments,groups,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocation:
+		return "employments,groups,home_location"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany:
+		return "employments,groups,home_location,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup:
+		return "employments,groups,home_location,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager:
+		return "employments,groups,home_location,manager"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany:
+		return "employments,groups,home_location,manager,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup:
+		return "employments,groups,home_location,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup:
+		return "employments,groups,home_location,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam:
+		return "employments,groups,home_location,manager,team"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany:
+		return "employments,groups,home_location,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup:
+		return "employments,groups,home_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup:
+		return "employments,groups,home_location,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup:
+		return "employments,groups,home_location,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam:
+		return "employments,groups,home_location,team"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany:
+		return "employments,groups,home_location,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup:
+		return "employments,groups,home_location,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup:
+		return "employments,groups,home_location,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation:
+		return "employments,groups,home_location,work_location"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany:
+		return "employments,groups,home_location,work_location,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup:
+		return "employments,groups,home_location,work_location,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager:
+		return "employments,groups,home_location,work_location,manager"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany:
+		return "employments,groups,home_location,work_location,manager,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "employments,groups,home_location,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup:
+		return "employments,groups,home_location,work_location,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam:
+		return "employments,groups,home_location,work_location,manager,team"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany:
+		return "employments,groups,home_location,work_location,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,groups,home_location,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup:
+		return "employments,groups,home_location,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup:
+		return "employments,groups,home_location,work_location,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam:
+		return "employments,groups,home_location,work_location,team"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany:
+		return "employments,groups,home_location,work_location,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "employments,groups,home_location,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup:
+		return "employments,groups,home_location,work_location,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsManager:
+		return "employments,groups,manager"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerCompany:
+		return "employments,groups,manager,company"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup:
+		return "employments,groups,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup:
+		return "employments,groups,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerTeam:
+		return "employments,groups,manager,team"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany:
+		return "employments,groups,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup:
+		return "employments,groups,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup:
+		return "employments,groups,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsPayGroup:
+		return "employments,groups,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsTeam:
+		return "employments,groups,team"
+	case EmployeesListRequestExpandEmploymentsGroupsTeamCompany:
+		return "employments,groups,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup:
+		return "employments,groups,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup:
+		return "employments,groups,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocation:
+		return "employments,groups,work_location"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany:
+		return "employments,groups,work_location,company"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup:
+		return "employments,groups,work_location,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager:
+		return "employments,groups,work_location,manager"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany:
+		return "employments,groups,work_location,manager,company"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup:
+		return "employments,groups,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup:
+		return "employments,groups,work_location,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam:
+		return "employments,groups,work_location,manager,team"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany:
+		return "employments,groups,work_location,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,groups,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup:
+		return "employments,groups,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup:
+		return "employments,groups,work_location,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam:
+		return "employments,groups,work_location,team"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany:
+		return "employments,groups,work_location,team,company"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup:
+		return "employments,groups,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup:
+		return "employments,groups,work_location,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocation:
+		return "employments,home_location"
+	case EmployeesListRequestExpandEmploymentsHomeLocationCompany:
+		return "employments,home_location,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup:
+		return "employments,home_location,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManager:
+		return "employments,home_location,manager"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany:
+		return "employments,home_location,manager,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup:
+		return "employments,home_location,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup:
+		return "employments,home_location,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam:
+		return "employments,home_location,manager,team"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany:
+		return "employments,home_location,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup:
+		return "employments,home_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup:
+		return "employments,home_location,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationPayGroup:
+		return "employments,home_location,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationTeam:
+		return "employments,home_location,team"
+	case EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany:
+		return "employments,home_location,team,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup:
+		return "employments,home_location,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup:
+		return "employments,home_location,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation:
+		return "employments,home_location,work_location"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany:
+		return "employments,home_location,work_location,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup:
+		return "employments,home_location,work_location,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager:
+		return "employments,home_location,work_location,manager"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany:
+		return "employments,home_location,work_location,manager,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "employments,home_location,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup:
+		return "employments,home_location,work_location,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam:
+		return "employments,home_location,work_location,manager,team"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany:
+		return "employments,home_location,work_location,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,home_location,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup:
+		return "employments,home_location,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup:
+		return "employments,home_location,work_location,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam:
+		return "employments,home_location,work_location,team"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany:
+		return "employments,home_location,work_location,team,company"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "employments,home_location,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup:
+		return "employments,home_location,work_location,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsManager:
+		return "employments,manager"
+	case EmployeesListRequestExpandEmploymentsManagerCompany:
+		return "employments,manager,company"
+	case EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup:
+		return "employments,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsManagerPayGroup:
+		return "employments,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsManagerTeam:
+		return "employments,manager,team"
+	case EmployeesListRequestExpandEmploymentsManagerTeamCompany:
+		return "employments,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup:
+		return "employments,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsManagerTeamPayGroup:
+		return "employments,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsPayGroup:
+		return "employments,pay_group"
+	case EmployeesListRequestExpandEmploymentsTeam:
+		return "employments,team"
+	case EmployeesListRequestExpandEmploymentsTeamCompany:
+		return "employments,team,company"
+	case EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup:
+		return "employments,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsTeamPayGroup:
+		return "employments,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocation:
+		return "employments,work_location"
+	case EmployeesListRequestExpandEmploymentsWorkLocationCompany:
+		return "employments,work_location,company"
+	case EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup:
+		return "employments,work_location,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManager:
+		return "employments,work_location,manager"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany:
+		return "employments,work_location,manager,company"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup:
+		return "employments,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup:
+		return "employments,work_location,manager,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam:
+		return "employments,work_location,manager,team"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany:
+		return "employments,work_location,manager,team,company"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup:
+		return "employments,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationPayGroup:
+		return "employments,work_location,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationTeam:
+		return "employments,work_location,team"
+	case EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany:
+		return "employments,work_location,team,company"
+	case EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup:
+		return "employments,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup:
+		return "employments,work_location,team,pay_group"
+	case EmployeesListRequestExpandGroups:
+		return "groups"
+	case EmployeesListRequestExpandGroupsCompany:
+		return "groups,company"
+	case EmployeesListRequestExpandGroupsCompanyPayGroup:
+		return "groups,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocation:
+		return "groups,home_location"
+	case EmployeesListRequestExpandGroupsHomeLocationCompany:
+		return "groups,home_location,company"
+	case EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup:
+		return "groups,home_location,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationManager:
+		return "groups,home_location,manager"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerCompany:
+		return "groups,home_location,manager,company"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup:
+		return "groups,home_location,manager,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup:
+		return "groups,home_location,manager,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerTeam:
+		return "groups,home_location,manager,team"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany:
+		return "groups,home_location,manager,team,company"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup:
+		return "groups,home_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup:
+		return "groups,home_location,manager,team,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationPayGroup:
+		return "groups,home_location,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationTeam:
+		return "groups,home_location,team"
+	case EmployeesListRequestExpandGroupsHomeLocationTeamCompany:
+		return "groups,home_location,team,company"
+	case EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup:
+		return "groups,home_location,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup:
+		return "groups,home_location,team,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocation:
+		return "groups,home_location,work_location"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany:
+		return "groups,home_location,work_location,company"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup:
+		return "groups,home_location,work_location,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager:
+		return "groups,home_location,work_location,manager"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany:
+		return "groups,home_location,work_location,manager,company"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "groups,home_location,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup:
+		return "groups,home_location,work_location,manager,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam:
+		return "groups,home_location,work_location,manager,team"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany:
+		return "groups,home_location,work_location,manager,team,company"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "groups,home_location,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup:
+		return "groups,home_location,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup:
+		return "groups,home_location,work_location,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam:
+		return "groups,home_location,work_location,team"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany:
+		return "groups,home_location,work_location,team,company"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "groups,home_location,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup:
+		return "groups,home_location,work_location,team,pay_group"
+	case EmployeesListRequestExpandGroupsManager:
+		return "groups,manager"
+	case EmployeesListRequestExpandGroupsManagerCompany:
+		return "groups,manager,company"
+	case EmployeesListRequestExpandGroupsManagerCompanyPayGroup:
+		return "groups,manager,company,pay_group"
+	case EmployeesListRequestExpandGroupsManagerPayGroup:
+		return "groups,manager,pay_group"
+	case EmployeesListRequestExpandGroupsManagerTeam:
+		return "groups,manager,team"
+	case EmployeesListRequestExpandGroupsManagerTeamCompany:
+		return "groups,manager,team,company"
+	case EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup:
+		return "groups,manager,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsManagerTeamPayGroup:
+		return "groups,manager,team,pay_group"
+	case EmployeesListRequestExpandGroupsPayGroup:
+		return "groups,pay_group"
+	case EmployeesListRequestExpandGroupsTeam:
+		return "groups,team"
+	case EmployeesListRequestExpandGroupsTeamCompany:
+		return "groups,team,company"
+	case EmployeesListRequestExpandGroupsTeamCompanyPayGroup:
+		return "groups,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsTeamPayGroup:
+		return "groups,team,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocation:
+		return "groups,work_location"
+	case EmployeesListRequestExpandGroupsWorkLocationCompany:
+		return "groups,work_location,company"
+	case EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup:
+		return "groups,work_location,company,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationManager:
+		return "groups,work_location,manager"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerCompany:
+		return "groups,work_location,manager,company"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup:
+		return "groups,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup:
+		return "groups,work_location,manager,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerTeam:
+		return "groups,work_location,manager,team"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany:
+		return "groups,work_location,manager,team,company"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup:
+		return "groups,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup:
+		return "groups,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationPayGroup:
+		return "groups,work_location,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationTeam:
+		return "groups,work_location,team"
+	case EmployeesListRequestExpandGroupsWorkLocationTeamCompany:
+		return "groups,work_location,team,company"
+	case EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup:
+		return "groups,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup:
+		return "groups,work_location,team,pay_group"
+	case EmployeesListRequestExpandHomeLocation:
+		return "home_location"
+	case EmployeesListRequestExpandHomeLocationCompany:
+		return "home_location,company"
+	case EmployeesListRequestExpandHomeLocationCompanyPayGroup:
+		return "home_location,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationManager:
+		return "home_location,manager"
+	case EmployeesListRequestExpandHomeLocationManagerCompany:
+		return "home_location,manager,company"
+	case EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup:
+		return "home_location,manager,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationManagerPayGroup:
+		return "home_location,manager,pay_group"
+	case EmployeesListRequestExpandHomeLocationManagerTeam:
+		return "home_location,manager,team"
+	case EmployeesListRequestExpandHomeLocationManagerTeamCompany:
+		return "home_location,manager,team,company"
+	case EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup:
+		return "home_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationManagerTeamPayGroup:
+		return "home_location,manager,team,pay_group"
+	case EmployeesListRequestExpandHomeLocationPayGroup:
+		return "home_location,pay_group"
+	case EmployeesListRequestExpandHomeLocationTeam:
+		return "home_location,team"
+	case EmployeesListRequestExpandHomeLocationTeamCompany:
+		return "home_location,team,company"
+	case EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup:
+		return "home_location,team,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationTeamPayGroup:
+		return "home_location,team,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocation:
+		return "home_location,work_location"
+	case EmployeesListRequestExpandHomeLocationWorkLocationCompany:
+		return "home_location,work_location,company"
+	case EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup:
+		return "home_location,work_location,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManager:
+		return "home_location,work_location,manager"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany:
+		return "home_location,work_location,manager,company"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "home_location,work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup:
+		return "home_location,work_location,manager,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam:
+		return "home_location,work_location,manager,team"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany:
+		return "home_location,work_location,manager,team,company"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "home_location,work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup:
+		return "home_location,work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationPayGroup:
+		return "home_location,work_location,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationTeam:
+		return "home_location,work_location,team"
+	case EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany:
+		return "home_location,work_location,team,company"
+	case EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "home_location,work_location,team,company,pay_group"
+	case EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup:
+		return "home_location,work_location,team,pay_group"
+	case EmployeesListRequestExpandManager:
+		return "manager"
+	case EmployeesListRequestExpandManagerCompany:
+		return "manager,company"
+	case EmployeesListRequestExpandManagerCompanyPayGroup:
+		return "manager,company,pay_group"
+	case EmployeesListRequestExpandManagerPayGroup:
+		return "manager,pay_group"
+	case EmployeesListRequestExpandManagerTeam:
+		return "manager,team"
+	case EmployeesListRequestExpandManagerTeamCompany:
+		return "manager,team,company"
+	case EmployeesListRequestExpandManagerTeamCompanyPayGroup:
+		return "manager,team,company,pay_group"
+	case EmployeesListRequestExpandManagerTeamPayGroup:
+		return "manager,team,pay_group"
+	case EmployeesListRequestExpandPayGroup:
+		return "pay_group"
+	case EmployeesListRequestExpandTeam:
+		return "team"
+	case EmployeesListRequestExpandTeamCompany:
+		return "team,company"
+	case EmployeesListRequestExpandTeamCompanyPayGroup:
+		return "team,company,pay_group"
+	case EmployeesListRequestExpandTeamPayGroup:
+		return "team,pay_group"
+	case EmployeesListRequestExpandWorkLocation:
+		return "work_location"
+	case EmployeesListRequestExpandWorkLocationCompany:
+		return "work_location,company"
+	case EmployeesListRequestExpandWorkLocationCompanyPayGroup:
+		return "work_location,company,pay_group"
+	case EmployeesListRequestExpandWorkLocationManager:
+		return "work_location,manager"
+	case EmployeesListRequestExpandWorkLocationManagerCompany:
+		return "work_location,manager,company"
+	case EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup:
+		return "work_location,manager,company,pay_group"
+	case EmployeesListRequestExpandWorkLocationManagerPayGroup:
+		return "work_location,manager,pay_group"
+	case EmployeesListRequestExpandWorkLocationManagerTeam:
+		return "work_location,manager,team"
+	case EmployeesListRequestExpandWorkLocationManagerTeamCompany:
+		return "work_location,manager,team,company"
+	case EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup:
+		return "work_location,manager,team,company,pay_group"
+	case EmployeesListRequestExpandWorkLocationManagerTeamPayGroup:
+		return "work_location,manager,team,pay_group"
+	case EmployeesListRequestExpandWorkLocationPayGroup:
+		return "work_location,pay_group"
+	case EmployeesListRequestExpandWorkLocationTeam:
+		return "work_location,team"
+	case EmployeesListRequestExpandWorkLocationTeamCompany:
+		return "work_location,team,company"
+	case EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup:
+		return "work_location,team,company,pay_group"
+	case EmployeesListRequestExpandWorkLocationTeamPayGroup:
+		return "work_location,team,pay_group"
+	}
+}
+
+func (e EmployeesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "company":
+		value := EmployeesListRequestExpandCompany
+		*e = value
+	case "company,pay_group":
+		value := EmployeesListRequestExpandCompanyPayGroup
+		*e = value
+	case "employments":
+		value := EmployeesListRequestExpandEmployments
+		*e = value
+	case "employments,company":
+		value := EmployeesListRequestExpandEmploymentsCompany
+		*e = value
+	case "employments,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsCompanyPayGroup
+		*e = value
+	case "employments,groups":
+		value := EmployeesListRequestExpandEmploymentsGroups
+		*e = value
+	case "employments,groups,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsCompany
+		*e = value
+	case "employments,groups,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocation
+		*e = value
+	case "employments,groups,home_location,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany
+		*e = value
+	case "employments,groups,home_location,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,manager":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager
+		*e = value
+	case "employments,groups,home_location,manager,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany
+		*e = value
+	case "employments,groups,home_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
+		*e = value
+	case "employments,groups,home_location,manager,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam
+		*e = value
+	case "employments,groups,home_location,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
+		*e = value
+	case "employments,groups,home_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
+		*e = value
+	case "employments,groups,home_location,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup
+		*e = value
+	case "employments,groups,home_location,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam
+		*e = value
+	case "employments,groups,home_location,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany
+		*e = value
+	case "employments,groups,home_location,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation
+		*e = value
+	case "employments,groups,home_location,work_location,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
+		*e = value
+	case "employments,groups,home_location,work_location,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
+		*e = value
+	case "employments,groups,home_location,work_location,manager,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "employments,groups,home_location,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
+		*e = value
+	case "employments,groups,home_location,work_location,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "employments,groups,home_location,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "employments,groups,manager":
+		value := EmployeesListRequestExpandEmploymentsGroupsManager
+		*e = value
+	case "employments,groups,manager,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerCompany
+		*e = value
+	case "employments,groups,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup
+		*e = value
+	case "employments,groups,manager,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeam
+		*e = value
+	case "employments,groups,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany
+		*e = value
+	case "employments,groups,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup
+		*e = value
+	case "employments,groups,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsPayGroup
+		*e = value
+	case "employments,groups,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsTeam
+		*e = value
+	case "employments,groups,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsTeamCompany
+		*e = value
+	case "employments,groups,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup
+		*e = value
+	case "employments,groups,work_location":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocation
+		*e = value
+	case "employments,groups,work_location,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany
+		*e = value
+	case "employments,groups,work_location,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,manager":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager
+		*e = value
+	case "employments,groups,work_location,manager,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany
+		*e = value
+	case "employments,groups,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
+		*e = value
+	case "employments,groups,work_location,manager,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam
+		*e = value
+	case "employments,groups,work_location,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,groups,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,groups,work_location,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup
+		*e = value
+	case "employments,groups,work_location,team":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam
+		*e = value
+	case "employments,groups,work_location,team,company":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany
+		*e = value
+	case "employments,groups,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
+		*e = value
+	case "employments,home_location":
+		value := EmployeesListRequestExpandEmploymentsHomeLocation
+		*e = value
+	case "employments,home_location,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationCompany
+		*e = value
+	case "employments,home_location,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup
+		*e = value
+	case "employments,home_location,manager":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManager
+		*e = value
+	case "employments,home_location,manager,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany
+		*e = value
+	case "employments,home_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,home_location,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup
+		*e = value
+	case "employments,home_location,manager,team":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam
+		*e = value
+	case "employments,home_location,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany
+		*e = value
+	case "employments,home_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
+		*e = value
+	case "employments,home_location,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationPayGroup
+		*e = value
+	case "employments,home_location,team":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationTeam
+		*e = value
+	case "employments,home_location,team,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany
+		*e = value
+	case "employments,home_location,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup
+		*e = value
+	case "employments,home_location,work_location":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation
+		*e = value
+	case "employments,home_location,work_location,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany
+		*e = value
+	case "employments,home_location,work_location,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager
+		*e = value
+	case "employments,home_location,work_location,manager,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "employments,home_location,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager,team":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "employments,home_location,work_location,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,home_location,work_location,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
+		*e = value
+	case "employments,home_location,work_location,team":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam
+		*e = value
+	case "employments,home_location,work_location,team,company":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "employments,home_location,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "employments,manager":
+		value := EmployeesListRequestExpandEmploymentsManager
+		*e = value
+	case "employments,manager,company":
+		value := EmployeesListRequestExpandEmploymentsManagerCompany
+		*e = value
+	case "employments,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup
+		*e = value
+	case "employments,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsManagerPayGroup
+		*e = value
+	case "employments,manager,team":
+		value := EmployeesListRequestExpandEmploymentsManagerTeam
+		*e = value
+	case "employments,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsManagerTeamCompany
+		*e = value
+	case "employments,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsManagerTeamPayGroup
+		*e = value
+	case "employments,pay_group":
+		value := EmployeesListRequestExpandEmploymentsPayGroup
+		*e = value
+	case "employments,team":
+		value := EmployeesListRequestExpandEmploymentsTeam
+		*e = value
+	case "employments,team,company":
+		value := EmployeesListRequestExpandEmploymentsTeamCompany
+		*e = value
+	case "employments,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup
+		*e = value
+	case "employments,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsTeamPayGroup
+		*e = value
+	case "employments,work_location":
+		value := EmployeesListRequestExpandEmploymentsWorkLocation
+		*e = value
+	case "employments,work_location,company":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationCompany
+		*e = value
+	case "employments,work_location,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,work_location,manager":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManager
+		*e = value
+	case "employments,work_location,manager,company":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany
+		*e = value
+	case "employments,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup
+		*e = value
+	case "employments,work_location,manager,team":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam
+		*e = value
+	case "employments,work_location,manager,team,company":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,work_location,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationPayGroup
+		*e = value
+	case "employments,work_location,team":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationTeam
+		*e = value
+	case "employments,work_location,team,company":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany
+		*e = value
+	case "employments,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,work_location,team,pay_group":
+		value := EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup
+		*e = value
+	case "groups":
+		value := EmployeesListRequestExpandGroups
+		*e = value
+	case "groups,company":
+		value := EmployeesListRequestExpandGroupsCompany
+		*e = value
+	case "groups,company,pay_group":
+		value := EmployeesListRequestExpandGroupsCompanyPayGroup
+		*e = value
+	case "groups,home_location":
+		value := EmployeesListRequestExpandGroupsHomeLocation
+		*e = value
+	case "groups,home_location,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationCompany
+		*e = value
+	case "groups,home_location,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup
+		*e = value
+	case "groups,home_location,manager":
+		value := EmployeesListRequestExpandGroupsHomeLocationManager
+		*e = value
+	case "groups,home_location,manager,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerCompany
+		*e = value
+	case "groups,home_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "groups,home_location,manager,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup
+		*e = value
+	case "groups,home_location,manager,team":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeam
+		*e = value
+	case "groups,home_location,manager,team,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany
+		*e = value
+	case "groups,home_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup
+		*e = value
+	case "groups,home_location,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationPayGroup
+		*e = value
+	case "groups,home_location,team":
+		value := EmployeesListRequestExpandGroupsHomeLocationTeam
+		*e = value
+	case "groups,home_location,team,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationTeamCompany
+		*e = value
+	case "groups,home_location,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,team,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup
+		*e = value
+	case "groups,home_location,work_location":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocation
+		*e = value
+	case "groups,home_location,work_location,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany
+		*e = value
+	case "groups,home_location,work_location,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager
+		*e = value
+	case "groups,home_location,work_location,manager,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "groups,home_location,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager,team":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "groups,home_location,work_location,manager,team,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "groups,home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "groups,home_location,work_location,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup
+		*e = value
+	case "groups,home_location,work_location,team":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam
+		*e = value
+	case "groups,home_location,work_location,team,company":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "groups,home_location,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,team,pay_group":
+		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "groups,manager":
+		value := EmployeesListRequestExpandGroupsManager
+		*e = value
+	case "groups,manager,company":
+		value := EmployeesListRequestExpandGroupsManagerCompany
+		*e = value
+	case "groups,manager,company,pay_group":
+		value := EmployeesListRequestExpandGroupsManagerCompanyPayGroup
+		*e = value
+	case "groups,manager,pay_group":
+		value := EmployeesListRequestExpandGroupsManagerPayGroup
+		*e = value
+	case "groups,manager,team":
+		value := EmployeesListRequestExpandGroupsManagerTeam
+		*e = value
+	case "groups,manager,team,company":
+		value := EmployeesListRequestExpandGroupsManagerTeamCompany
+		*e = value
+	case "groups,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,manager,team,pay_group":
+		value := EmployeesListRequestExpandGroupsManagerTeamPayGroup
+		*e = value
+	case "groups,pay_group":
+		value := EmployeesListRequestExpandGroupsPayGroup
+		*e = value
+	case "groups,team":
+		value := EmployeesListRequestExpandGroupsTeam
+		*e = value
+	case "groups,team,company":
+		value := EmployeesListRequestExpandGroupsTeamCompany
+		*e = value
+	case "groups,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsTeamCompanyPayGroup
+		*e = value
+	case "groups,team,pay_group":
+		value := EmployeesListRequestExpandGroupsTeamPayGroup
+		*e = value
+	case "groups,work_location":
+		value := EmployeesListRequestExpandGroupsWorkLocation
+		*e = value
+	case "groups,work_location,company":
+		value := EmployeesListRequestExpandGroupsWorkLocationCompany
+		*e = value
+	case "groups,work_location,company,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup
+		*e = value
+	case "groups,work_location,manager":
+		value := EmployeesListRequestExpandGroupsWorkLocationManager
+		*e = value
+	case "groups,work_location,manager,company":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerCompany
+		*e = value
+	case "groups,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "groups,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup
+		*e = value
+	case "groups,work_location,manager,team":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeam
+		*e = value
+	case "groups,work_location,manager,team,company":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany
+		*e = value
+	case "groups,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup
+		*e = value
+	case "groups,work_location,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationPayGroup
+		*e = value
+	case "groups,work_location,team":
+		value := EmployeesListRequestExpandGroupsWorkLocationTeam
+		*e = value
+	case "groups,work_location,team,company":
+		value := EmployeesListRequestExpandGroupsWorkLocationTeamCompany
+		*e = value
+	case "groups,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "groups,work_location,team,pay_group":
+		value := EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup
+		*e = value
+	case "home_location":
+		value := EmployeesListRequestExpandHomeLocation
+		*e = value
+	case "home_location,company":
+		value := EmployeesListRequestExpandHomeLocationCompany
+		*e = value
+	case "home_location,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationCompanyPayGroup
+		*e = value
+	case "home_location,manager":
+		value := EmployeesListRequestExpandHomeLocationManager
+		*e = value
+	case "home_location,manager,company":
+		value := EmployeesListRequestExpandHomeLocationManagerCompany
+		*e = value
+	case "home_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "home_location,manager,pay_group":
+		value := EmployeesListRequestExpandHomeLocationManagerPayGroup
+		*e = value
+	case "home_location,manager,team":
+		value := EmployeesListRequestExpandHomeLocationManagerTeam
+		*e = value
+	case "home_location,manager,team,company":
+		value := EmployeesListRequestExpandHomeLocationManagerTeamCompany
+		*e = value
+	case "home_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "home_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandHomeLocationManagerTeamPayGroup
+		*e = value
+	case "home_location,pay_group":
+		value := EmployeesListRequestExpandHomeLocationPayGroup
+		*e = value
+	case "home_location,team":
+		value := EmployeesListRequestExpandHomeLocationTeam
+		*e = value
+	case "home_location,team,company":
+		value := EmployeesListRequestExpandHomeLocationTeamCompany
+		*e = value
+	case "home_location,team,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "home_location,team,pay_group":
+		value := EmployeesListRequestExpandHomeLocationTeamPayGroup
+		*e = value
+	case "home_location,work_location":
+		value := EmployeesListRequestExpandHomeLocationWorkLocation
+		*e = value
+	case "home_location,work_location,company":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationCompany
+		*e = value
+	case "home_location,work_location,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "home_location,work_location,manager":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManager
+		*e = value
+	case "home_location,work_location,manager,company":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "home_location,work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "home_location,work_location,manager,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "home_location,work_location,manager,team":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "home_location,work_location,manager,team,company":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "home_location,work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "home_location,work_location,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationPayGroup
+		*e = value
+	case "home_location,work_location,team":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationTeam
+		*e = value
+	case "home_location,work_location,team,company":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "home_location,work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "home_location,work_location,team,pay_group":
+		value := EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "manager":
+		value := EmployeesListRequestExpandManager
+		*e = value
+	case "manager,company":
+		value := EmployeesListRequestExpandManagerCompany
+		*e = value
+	case "manager,company,pay_group":
+		value := EmployeesListRequestExpandManagerCompanyPayGroup
+		*e = value
+	case "manager,pay_group":
+		value := EmployeesListRequestExpandManagerPayGroup
+		*e = value
+	case "manager,team":
+		value := EmployeesListRequestExpandManagerTeam
+		*e = value
+	case "manager,team,company":
+		value := EmployeesListRequestExpandManagerTeamCompany
+		*e = value
+	case "manager,team,company,pay_group":
+		value := EmployeesListRequestExpandManagerTeamCompanyPayGroup
+		*e = value
+	case "manager,team,pay_group":
+		value := EmployeesListRequestExpandManagerTeamPayGroup
+		*e = value
+	case "pay_group":
+		value := EmployeesListRequestExpandPayGroup
+		*e = value
+	case "team":
+		value := EmployeesListRequestExpandTeam
+		*e = value
+	case "team,company":
+		value := EmployeesListRequestExpandTeamCompany
+		*e = value
+	case "team,company,pay_group":
+		value := EmployeesListRequestExpandTeamCompanyPayGroup
+		*e = value
+	case "team,pay_group":
+		value := EmployeesListRequestExpandTeamPayGroup
+		*e = value
+	case "work_location":
+		value := EmployeesListRequestExpandWorkLocation
+		*e = value
+	case "work_location,company":
+		value := EmployeesListRequestExpandWorkLocationCompany
+		*e = value
+	case "work_location,company,pay_group":
+		value := EmployeesListRequestExpandWorkLocationCompanyPayGroup
+		*e = value
+	case "work_location,manager":
+		value := EmployeesListRequestExpandWorkLocationManager
+		*e = value
+	case "work_location,manager,company":
+		value := EmployeesListRequestExpandWorkLocationManagerCompany
+		*e = value
+	case "work_location,manager,company,pay_group":
+		value := EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "work_location,manager,pay_group":
+		value := EmployeesListRequestExpandWorkLocationManagerPayGroup
+		*e = value
+	case "work_location,manager,team":
+		value := EmployeesListRequestExpandWorkLocationManagerTeam
+		*e = value
+	case "work_location,manager,team,company":
+		value := EmployeesListRequestExpandWorkLocationManagerTeamCompany
+		*e = value
+	case "work_location,manager,team,company,pay_group":
+		value := EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "work_location,manager,team,pay_group":
+		value := EmployeesListRequestExpandWorkLocationManagerTeamPayGroup
+		*e = value
+	case "work_location,pay_group":
+		value := EmployeesListRequestExpandWorkLocationPayGroup
+		*e = value
+	case "work_location,team":
+		value := EmployeesListRequestExpandWorkLocationTeam
+		*e = value
+	case "work_location,team,company":
+		value := EmployeesListRequestExpandWorkLocationTeamCompany
+		*e = value
+	case "work_location,team,company,pay_group":
+		value := EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "work_location,team,pay_group":
+		value := EmployeesListRequestExpandWorkLocationTeamPayGroup
+		*e = value
+	}
+	return nil
+}
+
+type EmployeesListRequestRemoteFields uint
+
+const (
+	EmployeesListRequestRemoteFieldsEmploymentStatus EmployeesListRequestRemoteFields = iota + 1
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
+	EmployeesListRequestRemoteFieldsEmploymentStatusGender
+	EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
+	EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus
+	EmployeesListRequestRemoteFieldsEthnicity
+	EmployeesListRequestRemoteFieldsEthnicityGender
+	EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus
+	EmployeesListRequestRemoteFieldsEthnicityMaritalStatus
+	EmployeesListRequestRemoteFieldsGender
+	EmployeesListRequestRemoteFieldsGenderMaritalStatus
+	EmployeesListRequestRemoteFieldsMaritalStatus
+)
+
+func (e EmployeesListRequestRemoteFields) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesListRequestRemoteFieldsEmploymentStatus:
+		return "employment_status"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity:
+		return "employment_status,ethnicity"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender:
+		return "employment_status,ethnicity,gender"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus:
+		return "employment_status,ethnicity,gender,marital_status"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus:
+		return "employment_status,ethnicity,marital_status"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusGender:
+		return "employment_status,gender"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus:
+		return "employment_status,gender,marital_status"
+	case EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus:
+		return "employment_status,marital_status"
+	case EmployeesListRequestRemoteFieldsEthnicity:
+		return "ethnicity"
+	case EmployeesListRequestRemoteFieldsEthnicityGender:
+		return "ethnicity,gender"
+	case EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus:
+		return "ethnicity,gender,marital_status"
+	case EmployeesListRequestRemoteFieldsEthnicityMaritalStatus:
+		return "ethnicity,marital_status"
+	case EmployeesListRequestRemoteFieldsGender:
+		return "gender"
+	case EmployeesListRequestRemoteFieldsGenderMaritalStatus:
+		return "gender,marital_status"
+	case EmployeesListRequestRemoteFieldsMaritalStatus:
+		return "marital_status"
+	}
+}
+
+func (e EmployeesListRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesListRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_status":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatus
+		*e = value
+	case "employment_status,ethnicity":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity
+		*e = value
+	case "employment_status,ethnicity,gender":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender
+		*e = value
+	case "employment_status,ethnicity,gender,marital_status":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
+		*e = value
+	case "employment_status,ethnicity,marital_status":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
+		*e = value
+	case "employment_status,gender":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusGender
+		*e = value
+	case "employment_status,gender,marital_status":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
+		*e = value
+	case "employment_status,marital_status":
+		value := EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus
+		*e = value
+	case "ethnicity":
+		value := EmployeesListRequestRemoteFieldsEthnicity
+		*e = value
+	case "ethnicity,gender":
+		value := EmployeesListRequestRemoteFieldsEthnicityGender
+		*e = value
+	case "ethnicity,gender,marital_status":
+		value := EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus
+		*e = value
+	case "ethnicity,marital_status":
+		value := EmployeesListRequestRemoteFieldsEthnicityMaritalStatus
+		*e = value
+	case "gender":
+		value := EmployeesListRequestRemoteFieldsGender
+		*e = value
+	case "gender,marital_status":
+		value := EmployeesListRequestRemoteFieldsGenderMaritalStatus
+		*e = value
+	case "marital_status":
+		value := EmployeesListRequestRemoteFieldsMaritalStatus
+		*e = value
+	}
+	return nil
+}
+
+type EmployeesListRequestShowEnumOrigins uint
+
+const (
+	EmployeesListRequestShowEnumOriginsEmploymentStatus EmployeesListRequestShowEnumOrigins = iota + 1
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
+	EmployeesListRequestShowEnumOriginsEmploymentStatusGender
+	EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
+	EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus
+	EmployeesListRequestShowEnumOriginsEthnicity
+	EmployeesListRequestShowEnumOriginsEthnicityGender
+	EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus
+	EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus
+	EmployeesListRequestShowEnumOriginsGender
+	EmployeesListRequestShowEnumOriginsGenderMaritalStatus
+	EmployeesListRequestShowEnumOriginsMaritalStatus
+)
+
+func (e EmployeesListRequestShowEnumOrigins) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesListRequestShowEnumOriginsEmploymentStatus:
+		return "employment_status"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity:
+		return "employment_status,ethnicity"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender:
+		return "employment_status,ethnicity,gender"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus:
+		return "employment_status,ethnicity,gender,marital_status"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus:
+		return "employment_status,ethnicity,marital_status"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusGender:
+		return "employment_status,gender"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus:
+		return "employment_status,gender,marital_status"
+	case EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus:
+		return "employment_status,marital_status"
+	case EmployeesListRequestShowEnumOriginsEthnicity:
+		return "ethnicity"
+	case EmployeesListRequestShowEnumOriginsEthnicityGender:
+		return "ethnicity,gender"
+	case EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus:
+		return "ethnicity,gender,marital_status"
+	case EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus:
+		return "ethnicity,marital_status"
+	case EmployeesListRequestShowEnumOriginsGender:
+		return "gender"
+	case EmployeesListRequestShowEnumOriginsGenderMaritalStatus:
+		return "gender,marital_status"
+	case EmployeesListRequestShowEnumOriginsMaritalStatus:
+		return "marital_status"
+	}
+}
+
+func (e EmployeesListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_status":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatus
+		*e = value
+	case "employment_status,ethnicity":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity
+		*e = value
+	case "employment_status,ethnicity,gender":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender
+		*e = value
+	case "employment_status,ethnicity,gender,marital_status":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
+		*e = value
+	case "employment_status,ethnicity,marital_status":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
+		*e = value
+	case "employment_status,gender":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusGender
+		*e = value
+	case "employment_status,gender,marital_status":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
+		*e = value
+	case "employment_status,marital_status":
+		value := EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus
+		*e = value
+	case "ethnicity":
+		value := EmployeesListRequestShowEnumOriginsEthnicity
+		*e = value
+	case "ethnicity,gender":
+		value := EmployeesListRequestShowEnumOriginsEthnicityGender
+		*e = value
+	case "ethnicity,gender,marital_status":
+		value := EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus
+		*e = value
+	case "ethnicity,marital_status":
+		value := EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus
+		*e = value
+	case "gender":
+		value := EmployeesListRequestShowEnumOriginsGender
+		*e = value
+	case "gender,marital_status":
+		value := EmployeesListRequestShowEnumOriginsGenderMaritalStatus
+		*e = value
+	case "marital_status":
+		value := EmployeesListRequestShowEnumOriginsMaritalStatus
+		*e = value
+	}
+	return nil
+}
+
+type EmployeesRetrieveRequestExpand uint
+
+const (
+	EmployeesRetrieveRequestExpandCompany EmployeesRetrieveRequestExpand = iota + 1
+	EmployeesRetrieveRequestExpandCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmployments
+	EmployeesRetrieveRequestExpandEmploymentsCompany
+	EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroups
+	EmployeesRetrieveRequestExpandEmploymentsGroupsCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManager
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocation
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsManager
+	EmployeesRetrieveRequestExpandEmploymentsManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsTeam
+	EmployeesRetrieveRequestExpandEmploymentsTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocation
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandGroups
+	EmployeesRetrieveRequestExpandGroupsCompany
+	EmployeesRetrieveRequestExpandGroupsCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocation
+	EmployeesRetrieveRequestExpandGroupsHomeLocationCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManager
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeam
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsManager
+	EmployeesRetrieveRequestExpandGroupsManagerCompany
+	EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsManagerPayGroup
+	EmployeesRetrieveRequestExpandGroupsManagerTeam
+	EmployeesRetrieveRequestExpandGroupsManagerTeamCompany
+	EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsPayGroup
+	EmployeesRetrieveRequestExpandGroupsTeam
+	EmployeesRetrieveRequestExpandGroupsTeamCompany
+	EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocation
+	EmployeesRetrieveRequestExpandGroupsWorkLocationCompany
+	EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManager
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeam
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandHomeLocation
+	EmployeesRetrieveRequestExpandHomeLocationCompany
+	EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationManager
+	EmployeesRetrieveRequestExpandHomeLocationManagerCompany
+	EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeam
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationTeam
+	EmployeesRetrieveRequestExpandHomeLocationTeamCompany
+	EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocation
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup
+	EmployeesRetrieveRequestExpandManager
+	EmployeesRetrieveRequestExpandManagerCompany
+	EmployeesRetrieveRequestExpandManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandManagerPayGroup
+	EmployeesRetrieveRequestExpandManagerTeam
+	EmployeesRetrieveRequestExpandManagerTeamCompany
+	EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandPayGroup
+	EmployeesRetrieveRequestExpandTeam
+	EmployeesRetrieveRequestExpandTeamCompany
+	EmployeesRetrieveRequestExpandTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandTeamPayGroup
+	EmployeesRetrieveRequestExpandWorkLocation
+	EmployeesRetrieveRequestExpandWorkLocationCompany
+	EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationManager
+	EmployeesRetrieveRequestExpandWorkLocationManagerCompany
+	EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeam
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationTeam
+	EmployeesRetrieveRequestExpandWorkLocationTeamCompany
+	EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup
+	EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup
+)
+
+func (e EmployeesRetrieveRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesRetrieveRequestExpandCompany:
+		return "company"
+	case EmployeesRetrieveRequestExpandCompanyPayGroup:
+		return "company,pay_group"
+	case EmployeesRetrieveRequestExpandEmployments:
+		return "employments"
+	case EmployeesRetrieveRequestExpandEmploymentsCompany:
+		return "employments,company"
+	case EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup:
+		return "employments,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroups:
+		return "employments,groups"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsCompany:
+		return "employments,groups,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup:
+		return "employments,groups,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation:
+		return "employments,groups,home_location"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany:
+		return "employments,groups,home_location,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup:
+		return "employments,groups,home_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager:
+		return "employments,groups,home_location,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany:
+		return "employments,groups,home_location,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup:
+		return "employments,groups,home_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup:
+		return "employments,groups,home_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam:
+		return "employments,groups,home_location,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany:
+		return "employments,groups,home_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup:
+		return "employments,groups,home_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup:
+		return "employments,groups,home_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup:
+		return "employments,groups,home_location,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam:
+		return "employments,groups,home_location,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany:
+		return "employments,groups,home_location,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup:
+		return "employments,groups,home_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup:
+		return "employments,groups,home_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation:
+		return "employments,groups,home_location,work_location"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany:
+		return "employments,groups,home_location,work_location,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup:
+		return "employments,groups,home_location,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager:
+		return "employments,groups,home_location,work_location,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany:
+		return "employments,groups,home_location,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "employments,groups,home_location,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup:
+		return "employments,groups,home_location,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam:
+		return "employments,groups,home_location,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany:
+		return "employments,groups,home_location,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,groups,home_location,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup:
+		return "employments,groups,home_location,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup:
+		return "employments,groups,home_location,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam:
+		return "employments,groups,home_location,work_location,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany:
+		return "employments,groups,home_location,work_location,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "employments,groups,home_location,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup:
+		return "employments,groups,home_location,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManager:
+		return "employments,groups,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany:
+		return "employments,groups,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup:
+		return "employments,groups,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup:
+		return "employments,groups,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam:
+		return "employments,groups,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany:
+		return "employments,groups,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup:
+		return "employments,groups,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup:
+		return "employments,groups,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup:
+		return "employments,groups,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeam:
+		return "employments,groups,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany:
+		return "employments,groups,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup:
+		return "employments,groups,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup:
+		return "employments,groups,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation:
+		return "employments,groups,work_location"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany:
+		return "employments,groups,work_location,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup:
+		return "employments,groups,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager:
+		return "employments,groups,work_location,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany:
+		return "employments,groups,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup:
+		return "employments,groups,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup:
+		return "employments,groups,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam:
+		return "employments,groups,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany:
+		return "employments,groups,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,groups,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup:
+		return "employments,groups,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup:
+		return "employments,groups,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam:
+		return "employments,groups,work_location,team"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany:
+		return "employments,groups,work_location,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup:
+		return "employments,groups,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup:
+		return "employments,groups,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocation:
+		return "employments,home_location"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany:
+		return "employments,home_location,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup:
+		return "employments,home_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager:
+		return "employments,home_location,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany:
+		return "employments,home_location,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup:
+		return "employments,home_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup:
+		return "employments,home_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam:
+		return "employments,home_location,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany:
+		return "employments,home_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup:
+		return "employments,home_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup:
+		return "employments,home_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup:
+		return "employments,home_location,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam:
+		return "employments,home_location,team"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany:
+		return "employments,home_location,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup:
+		return "employments,home_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup:
+		return "employments,home_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation:
+		return "employments,home_location,work_location"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany:
+		return "employments,home_location,work_location,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup:
+		return "employments,home_location,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager:
+		return "employments,home_location,work_location,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany:
+		return "employments,home_location,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "employments,home_location,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup:
+		return "employments,home_location,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam:
+		return "employments,home_location,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany:
+		return "employments,home_location,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,home_location,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup:
+		return "employments,home_location,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup:
+		return "employments,home_location,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam:
+		return "employments,home_location,work_location,team"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany:
+		return "employments,home_location,work_location,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "employments,home_location,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup:
+		return "employments,home_location,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsManager:
+		return "employments,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerCompany:
+		return "employments,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup:
+		return "employments,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup:
+		return "employments,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerTeam:
+		return "employments,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany:
+		return "employments,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup:
+		return "employments,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup:
+		return "employments,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsPayGroup:
+		return "employments,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsTeam:
+		return "employments,team"
+	case EmployeesRetrieveRequestExpandEmploymentsTeamCompany:
+		return "employments,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup:
+		return "employments,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup:
+		return "employments,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocation:
+		return "employments,work_location"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany:
+		return "employments,work_location,company"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup:
+		return "employments,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager:
+		return "employments,work_location,manager"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany:
+		return "employments,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup:
+		return "employments,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup:
+		return "employments,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam:
+		return "employments,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany:
+		return "employments,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup:
+		return "employments,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup:
+		return "employments,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup:
+		return "employments,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam:
+		return "employments,work_location,team"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany:
+		return "employments,work_location,team,company"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup:
+		return "employments,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup:
+		return "employments,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroups:
+		return "groups"
+	case EmployeesRetrieveRequestExpandGroupsCompany:
+		return "groups,company"
+	case EmployeesRetrieveRequestExpandGroupsCompanyPayGroup:
+		return "groups,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocation:
+		return "groups,home_location"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationCompany:
+		return "groups,home_location,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup:
+		return "groups,home_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManager:
+		return "groups,home_location,manager"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany:
+		return "groups,home_location,manager,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup:
+		return "groups,home_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup:
+		return "groups,home_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam:
+		return "groups,home_location,manager,team"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany:
+		return "groups,home_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup:
+		return "groups,home_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup:
+		return "groups,home_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup:
+		return "groups,home_location,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeam:
+		return "groups,home_location,team"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany:
+		return "groups,home_location,team,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup:
+		return "groups,home_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup:
+		return "groups,home_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation:
+		return "groups,home_location,work_location"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany:
+		return "groups,home_location,work_location,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup:
+		return "groups,home_location,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager:
+		return "groups,home_location,work_location,manager"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany:
+		return "groups,home_location,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "groups,home_location,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup:
+		return "groups,home_location,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam:
+		return "groups,home_location,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany:
+		return "groups,home_location,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "groups,home_location,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup:
+		return "groups,home_location,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup:
+		return "groups,home_location,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam:
+		return "groups,home_location,work_location,team"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany:
+		return "groups,home_location,work_location,team,company"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "groups,home_location,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup:
+		return "groups,home_location,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsManager:
+		return "groups,manager"
+	case EmployeesRetrieveRequestExpandGroupsManagerCompany:
+		return "groups,manager,company"
+	case EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup:
+		return "groups,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsManagerPayGroup:
+		return "groups,manager,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsManagerTeam:
+		return "groups,manager,team"
+	case EmployeesRetrieveRequestExpandGroupsManagerTeamCompany:
+		return "groups,manager,team,company"
+	case EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup:
+		return "groups,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup:
+		return "groups,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsPayGroup:
+		return "groups,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsTeam:
+		return "groups,team"
+	case EmployeesRetrieveRequestExpandGroupsTeamCompany:
+		return "groups,team,company"
+	case EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup:
+		return "groups,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsTeamPayGroup:
+		return "groups,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocation:
+		return "groups,work_location"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationCompany:
+		return "groups,work_location,company"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup:
+		return "groups,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManager:
+		return "groups,work_location,manager"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany:
+		return "groups,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup:
+		return "groups,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup:
+		return "groups,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam:
+		return "groups,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany:
+		return "groups,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup:
+		return "groups,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup:
+		return "groups,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup:
+		return "groups,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeam:
+		return "groups,work_location,team"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany:
+		return "groups,work_location,team,company"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup:
+		return "groups,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup:
+		return "groups,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocation:
+		return "home_location"
+	case EmployeesRetrieveRequestExpandHomeLocationCompany:
+		return "home_location,company"
+	case EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup:
+		return "home_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationManager:
+		return "home_location,manager"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerCompany:
+		return "home_location,manager,company"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup:
+		return "home_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup:
+		return "home_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerTeam:
+		return "home_location,manager,team"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany:
+		return "home_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup:
+		return "home_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup:
+		return "home_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationPayGroup:
+		return "home_location,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationTeam:
+		return "home_location,team"
+	case EmployeesRetrieveRequestExpandHomeLocationTeamCompany:
+		return "home_location,team,company"
+	case EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup:
+		return "home_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup:
+		return "home_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocation:
+		return "home_location,work_location"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany:
+		return "home_location,work_location,company"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup:
+		return "home_location,work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager:
+		return "home_location,work_location,manager"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany:
+		return "home_location,work_location,manager,company"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup:
+		return "home_location,work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup:
+		return "home_location,work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam:
+		return "home_location,work_location,manager,team"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany:
+		return "home_location,work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup:
+		return "home_location,work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup:
+		return "home_location,work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup:
+		return "home_location,work_location,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam:
+		return "home_location,work_location,team"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany:
+		return "home_location,work_location,team,company"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup:
+		return "home_location,work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup:
+		return "home_location,work_location,team,pay_group"
+	case EmployeesRetrieveRequestExpandManager:
+		return "manager"
+	case EmployeesRetrieveRequestExpandManagerCompany:
+		return "manager,company"
+	case EmployeesRetrieveRequestExpandManagerCompanyPayGroup:
+		return "manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandManagerPayGroup:
+		return "manager,pay_group"
+	case EmployeesRetrieveRequestExpandManagerTeam:
+		return "manager,team"
+	case EmployeesRetrieveRequestExpandManagerTeamCompany:
+		return "manager,team,company"
+	case EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup:
+		return "manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandManagerTeamPayGroup:
+		return "manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandPayGroup:
+		return "pay_group"
+	case EmployeesRetrieveRequestExpandTeam:
+		return "team"
+	case EmployeesRetrieveRequestExpandTeamCompany:
+		return "team,company"
+	case EmployeesRetrieveRequestExpandTeamCompanyPayGroup:
+		return "team,company,pay_group"
+	case EmployeesRetrieveRequestExpandTeamPayGroup:
+		return "team,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocation:
+		return "work_location"
+	case EmployeesRetrieveRequestExpandWorkLocationCompany:
+		return "work_location,company"
+	case EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup:
+		return "work_location,company,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationManager:
+		return "work_location,manager"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerCompany:
+		return "work_location,manager,company"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup:
+		return "work_location,manager,company,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup:
+		return "work_location,manager,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerTeam:
+		return "work_location,manager,team"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany:
+		return "work_location,manager,team,company"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup:
+		return "work_location,manager,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup:
+		return "work_location,manager,team,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationPayGroup:
+		return "work_location,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationTeam:
+		return "work_location,team"
+	case EmployeesRetrieveRequestExpandWorkLocationTeamCompany:
+		return "work_location,team,company"
+	case EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup:
+		return "work_location,team,company,pay_group"
+	case EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup:
+		return "work_location,team,pay_group"
+	}
+}
+
+func (e EmployeesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "company":
+		value := EmployeesRetrieveRequestExpandCompany
+		*e = value
+	case "company,pay_group":
+		value := EmployeesRetrieveRequestExpandCompanyPayGroup
+		*e = value
+	case "employments":
+		value := EmployeesRetrieveRequestExpandEmployments
+		*e = value
+	case "employments,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsCompany
+		*e = value
+	case "employments,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup
+		*e = value
+	case "employments,groups":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroups
+		*e = value
+	case "employments,groups,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsCompany
+		*e = value
+	case "employments,groups,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation
+		*e = value
+	case "employments,groups,home_location,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany
+		*e = value
+	case "employments,groups,home_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager
+		*e = value
+	case "employments,groups,home_location,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany
+		*e = value
+	case "employments,groups,home_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
+		*e = value
+	case "employments,groups,home_location,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam
+		*e = value
+	case "employments,groups,home_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
+		*e = value
+	case "employments,groups,home_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
+		*e = value
+	case "employments,groups,home_location,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup
+		*e = value
+	case "employments,groups,home_location,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam
+		*e = value
+	case "employments,groups,home_location,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany
+		*e = value
+	case "employments,groups,home_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation
+		*e = value
+	case "employments,groups,home_location,work_location,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
+		*e = value
+	case "employments,groups,home_location,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
+		*e = value
+	case "employments,groups,home_location,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "employments,groups,home_location,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
+		*e = value
+	case "employments,groups,home_location,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "employments,groups,home_location,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,home_location,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "employments,groups,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManager
+		*e = value
+	case "employments,groups,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany
+		*e = value
+	case "employments,groups,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup
+		*e = value
+	case "employments,groups,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam
+		*e = value
+	case "employments,groups,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany
+		*e = value
+	case "employments,groups,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup
+		*e = value
+	case "employments,groups,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup
+		*e = value
+	case "employments,groups,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeam
+		*e = value
+	case "employments,groups,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany
+		*e = value
+	case "employments,groups,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup
+		*e = value
+	case "employments,groups,work_location":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation
+		*e = value
+	case "employments,groups,work_location,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany
+		*e = value
+	case "employments,groups,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager
+		*e = value
+	case "employments,groups,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany
+		*e = value
+	case "employments,groups,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
+		*e = value
+	case "employments,groups,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam
+		*e = value
+	case "employments,groups,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,groups,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,groups,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup
+		*e = value
+	case "employments,groups,work_location,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam
+		*e = value
+	case "employments,groups,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany
+		*e = value
+	case "employments,groups,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,groups,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
+		*e = value
+	case "employments,home_location":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocation
+		*e = value
+	case "employments,home_location,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany
+		*e = value
+	case "employments,home_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup
+		*e = value
+	case "employments,home_location,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager
+		*e = value
+	case "employments,home_location,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany
+		*e = value
+	case "employments,home_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,home_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup
+		*e = value
+	case "employments,home_location,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam
+		*e = value
+	case "employments,home_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany
+		*e = value
+	case "employments,home_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
+		*e = value
+	case "employments,home_location,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup
+		*e = value
+	case "employments,home_location,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam
+		*e = value
+	case "employments,home_location,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany
+		*e = value
+	case "employments,home_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup
+		*e = value
+	case "employments,home_location,work_location":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation
+		*e = value
+	case "employments,home_location,work_location,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany
+		*e = value
+	case "employments,home_location,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager
+		*e = value
+	case "employments,home_location,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "employments,home_location,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "employments,home_location,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,home_location,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
+		*e = value
+	case "employments,home_location,work_location,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam
+		*e = value
+	case "employments,home_location,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "employments,home_location,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,home_location,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "employments,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsManager
+		*e = value
+	case "employments,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerCompany
+		*e = value
+	case "employments,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup
+		*e = value
+	case "employments,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup
+		*e = value
+	case "employments,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeam
+		*e = value
+	case "employments,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany
+		*e = value
+	case "employments,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup
+		*e = value
+	case "employments,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsPayGroup
+		*e = value
+	case "employments,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsTeam
+		*e = value
+	case "employments,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsTeamCompany
+		*e = value
+	case "employments,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup
+		*e = value
+	case "employments,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup
+		*e = value
+	case "employments,work_location":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocation
+		*e = value
+	case "employments,work_location,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany
+		*e = value
+	case "employments,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup
+		*e = value
+	case "employments,work_location,manager":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager
+		*e = value
+	case "employments,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany
+		*e = value
+	case "employments,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "employments,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup
+		*e = value
+	case "employments,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam
+		*e = value
+	case "employments,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany
+		*e = value
+	case "employments,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "employments,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
+		*e = value
+	case "employments,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup
+		*e = value
+	case "employments,work_location,team":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam
+		*e = value
+	case "employments,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany
+		*e = value
+	case "employments,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "employments,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup
+		*e = value
+	case "groups":
+		value := EmployeesRetrieveRequestExpandGroups
+		*e = value
+	case "groups,company":
+		value := EmployeesRetrieveRequestExpandGroupsCompany
+		*e = value
+	case "groups,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsCompanyPayGroup
+		*e = value
+	case "groups,home_location":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocation
+		*e = value
+	case "groups,home_location,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationCompany
+		*e = value
+	case "groups,home_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup
+		*e = value
+	case "groups,home_location,manager":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManager
+		*e = value
+	case "groups,home_location,manager,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany
+		*e = value
+	case "groups,home_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "groups,home_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup
+		*e = value
+	case "groups,home_location,manager,team":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam
+		*e = value
+	case "groups,home_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany
+		*e = value
+	case "groups,home_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup
+		*e = value
+	case "groups,home_location,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup
+		*e = value
+	case "groups,home_location,team":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeam
+		*e = value
+	case "groups,home_location,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany
+		*e = value
+	case "groups,home_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup
+		*e = value
+	case "groups,home_location,work_location":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation
+		*e = value
+	case "groups,home_location,work_location,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany
+		*e = value
+	case "groups,home_location,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager
+		*e = value
+	case "groups,home_location,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "groups,home_location,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "groups,home_location,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "groups,home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "groups,home_location,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup
+		*e = value
+	case "groups,home_location,work_location,team":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam
+		*e = value
+	case "groups,home_location,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "groups,home_location,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "groups,home_location,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "groups,manager":
+		value := EmployeesRetrieveRequestExpandGroupsManager
+		*e = value
+	case "groups,manager,company":
+		value := EmployeesRetrieveRequestExpandGroupsManagerCompany
+		*e = value
+	case "groups,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup
+		*e = value
+	case "groups,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsManagerPayGroup
+		*e = value
+	case "groups,manager,team":
+		value := EmployeesRetrieveRequestExpandGroupsManagerTeam
+		*e = value
+	case "groups,manager,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsManagerTeamCompany
+		*e = value
+	case "groups,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup
+		*e = value
+	case "groups,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsPayGroup
+		*e = value
+	case "groups,team":
+		value := EmployeesRetrieveRequestExpandGroupsTeam
+		*e = value
+	case "groups,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsTeamCompany
+		*e = value
+	case "groups,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup
+		*e = value
+	case "groups,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsTeamPayGroup
+		*e = value
+	case "groups,work_location":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocation
+		*e = value
+	case "groups,work_location,company":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationCompany
+		*e = value
+	case "groups,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup
+		*e = value
+	case "groups,work_location,manager":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManager
+		*e = value
+	case "groups,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany
+		*e = value
+	case "groups,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "groups,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup
+		*e = value
+	case "groups,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam
+		*e = value
+	case "groups,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany
+		*e = value
+	case "groups,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "groups,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup
+		*e = value
+	case "groups,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup
+		*e = value
+	case "groups,work_location,team":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeam
+		*e = value
+	case "groups,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany
+		*e = value
+	case "groups,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "groups,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup
+		*e = value
+	case "home_location":
+		value := EmployeesRetrieveRequestExpandHomeLocation
+		*e = value
+	case "home_location,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationCompany
+		*e = value
+	case "home_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup
+		*e = value
+	case "home_location,manager":
+		value := EmployeesRetrieveRequestExpandHomeLocationManager
+		*e = value
+	case "home_location,manager,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerCompany
+		*e = value
+	case "home_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup
+		*e = value
+	case "home_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup
+		*e = value
+	case "home_location,manager,team":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeam
+		*e = value
+	case "home_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany
+		*e = value
+	case "home_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "home_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup
+		*e = value
+	case "home_location,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationPayGroup
+		*e = value
+	case "home_location,team":
+		value := EmployeesRetrieveRequestExpandHomeLocationTeam
+		*e = value
+	case "home_location,team,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationTeamCompany
+		*e = value
+	case "home_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup
+		*e = value
+	case "home_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup
+		*e = value
+	case "home_location,work_location":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocation
+		*e = value
+	case "home_location,work_location,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany
+		*e = value
+	case "home_location,work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup
+		*e = value
+	case "home_location,work_location,manager":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager
+		*e = value
+	case "home_location,work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany
+		*e = value
+	case "home_location,work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "home_location,work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup
+		*e = value
+	case "home_location,work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam
+		*e = value
+	case "home_location,work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany
+		*e = value
+	case "home_location,work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "home_location,work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
+		*e = value
+	case "home_location,work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup
+		*e = value
+	case "home_location,work_location,team":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam
+		*e = value
+	case "home_location,work_location,team,company":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany
+		*e = value
+	case "home_location,work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "home_location,work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup
+		*e = value
+	case "manager":
+		value := EmployeesRetrieveRequestExpandManager
+		*e = value
+	case "manager,company":
+		value := EmployeesRetrieveRequestExpandManagerCompany
+		*e = value
+	case "manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandManagerCompanyPayGroup
+		*e = value
+	case "manager,pay_group":
+		value := EmployeesRetrieveRequestExpandManagerPayGroup
+		*e = value
+	case "manager,team":
+		value := EmployeesRetrieveRequestExpandManagerTeam
+		*e = value
+	case "manager,team,company":
+		value := EmployeesRetrieveRequestExpandManagerTeamCompany
+		*e = value
+	case "manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup
+		*e = value
+	case "manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandManagerTeamPayGroup
+		*e = value
+	case "pay_group":
+		value := EmployeesRetrieveRequestExpandPayGroup
+		*e = value
+	case "team":
+		value := EmployeesRetrieveRequestExpandTeam
+		*e = value
+	case "team,company":
+		value := EmployeesRetrieveRequestExpandTeamCompany
+		*e = value
+	case "team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandTeamCompanyPayGroup
+		*e = value
+	case "team,pay_group":
+		value := EmployeesRetrieveRequestExpandTeamPayGroup
+		*e = value
+	case "work_location":
+		value := EmployeesRetrieveRequestExpandWorkLocation
+		*e = value
+	case "work_location,company":
+		value := EmployeesRetrieveRequestExpandWorkLocationCompany
+		*e = value
+	case "work_location,company,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup
+		*e = value
+	case "work_location,manager":
+		value := EmployeesRetrieveRequestExpandWorkLocationManager
+		*e = value
+	case "work_location,manager,company":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerCompany
+		*e = value
+	case "work_location,manager,company,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup
+		*e = value
+	case "work_location,manager,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup
+		*e = value
+	case "work_location,manager,team":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeam
+		*e = value
+	case "work_location,manager,team,company":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany
+		*e = value
+	case "work_location,manager,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup
+		*e = value
+	case "work_location,manager,team,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup
+		*e = value
+	case "work_location,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationPayGroup
+		*e = value
+	case "work_location,team":
+		value := EmployeesRetrieveRequestExpandWorkLocationTeam
+		*e = value
+	case "work_location,team,company":
+		value := EmployeesRetrieveRequestExpandWorkLocationTeamCompany
+		*e = value
+	case "work_location,team,company,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup
+		*e = value
+	case "work_location,team,pay_group":
+		value := EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup
+		*e = value
+	}
+	return nil
+}
+
+type EmployeesRetrieveRequestRemoteFields uint
+
+const (
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatus EmployeesRetrieveRequestRemoteFields = iota + 1
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsEthnicity
+	EmployeesRetrieveRequestRemoteFieldsEthnicityGender
+	EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsGender
+	EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus
+	EmployeesRetrieveRequestRemoteFieldsMaritalStatus
+)
+
+func (e EmployeesRetrieveRequestRemoteFields) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatus:
+		return "employment_status"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity:
+		return "employment_status,ethnicity"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender:
+		return "employment_status,ethnicity,gender"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus:
+		return "employment_status,ethnicity,gender,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus:
+		return "employment_status,ethnicity,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender:
+		return "employment_status,gender"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus:
+		return "employment_status,gender,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus:
+		return "employment_status,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsEthnicity:
+		return "ethnicity"
+	case EmployeesRetrieveRequestRemoteFieldsEthnicityGender:
+		return "ethnicity,gender"
+	case EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus:
+		return "ethnicity,gender,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus:
+		return "ethnicity,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsGender:
+		return "gender"
+	case EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus:
+		return "gender,marital_status"
+	case EmployeesRetrieveRequestRemoteFieldsMaritalStatus:
+		return "marital_status"
+	}
+}
+
+func (e EmployeesRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatus
+		*e = value
+	case "employment_status,ethnicity":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity
+		*e = value
+	case "employment_status,ethnicity,gender":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender
+		*e = value
+	case "employment_status,ethnicity,gender,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
+		*e = value
+	case "employment_status,ethnicity,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
+		*e = value
+	case "employment_status,gender":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender
+		*e = value
+	case "employment_status,gender,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
+		*e = value
+	case "employment_status,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus
+		*e = value
+	case "ethnicity":
+		value := EmployeesRetrieveRequestRemoteFieldsEthnicity
+		*e = value
+	case "ethnicity,gender":
+		value := EmployeesRetrieveRequestRemoteFieldsEthnicityGender
+		*e = value
+	case "ethnicity,gender,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus
+		*e = value
+	case "ethnicity,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus
+		*e = value
+	case "gender":
+		value := EmployeesRetrieveRequestRemoteFieldsGender
+		*e = value
+	case "gender,marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus
+		*e = value
+	case "marital_status":
+		value := EmployeesRetrieveRequestRemoteFieldsMaritalStatus
+		*e = value
+	}
+	return nil
+}
+
+type EmployeesRetrieveRequestShowEnumOrigins uint
+
+const (
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus EmployeesRetrieveRequestShowEnumOrigins = iota + 1
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsEthnicity
+	EmployeesRetrieveRequestShowEnumOriginsEthnicityGender
+	EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsGender
+	EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus
+	EmployeesRetrieveRequestShowEnumOriginsMaritalStatus
+)
+
+func (e EmployeesRetrieveRequestShowEnumOrigins) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus:
+		return "employment_status"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity:
+		return "employment_status,ethnicity"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender:
+		return "employment_status,ethnicity,gender"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus:
+		return "employment_status,ethnicity,gender,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus:
+		return "employment_status,ethnicity,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender:
+		return "employment_status,gender"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus:
+		return "employment_status,gender,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus:
+		return "employment_status,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsEthnicity:
+		return "ethnicity"
+	case EmployeesRetrieveRequestShowEnumOriginsEthnicityGender:
+		return "ethnicity,gender"
+	case EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus:
+		return "ethnicity,gender,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus:
+		return "ethnicity,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsGender:
+		return "gender"
+	case EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus:
+		return "gender,marital_status"
+	case EmployeesRetrieveRequestShowEnumOriginsMaritalStatus:
+		return "marital_status"
+	}
+}
+
+func (e EmployeesRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EmployeesRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "employment_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus
+		*e = value
+	case "employment_status,ethnicity":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity
+		*e = value
+	case "employment_status,ethnicity,gender":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender
+		*e = value
+	case "employment_status,ethnicity,gender,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
+		*e = value
+	case "employment_status,ethnicity,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
+		*e = value
+	case "employment_status,gender":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender
+		*e = value
+	case "employment_status,gender,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
+		*e = value
+	case "employment_status,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus
+		*e = value
+	case "ethnicity":
+		value := EmployeesRetrieveRequestShowEnumOriginsEthnicity
+		*e = value
+	case "ethnicity,gender":
+		value := EmployeesRetrieveRequestShowEnumOriginsEthnicityGender
+		*e = value
+	case "ethnicity,gender,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus
+		*e = value
+	case "ethnicity,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus
+		*e = value
+	case "gender":
+		value := EmployeesRetrieveRequestShowEnumOriginsGender
+		*e = value
+	case "gender,marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus
+		*e = value
+	case "marital_status":
+		value := EmployeesRetrieveRequestShowEnumOriginsMaritalStatus
+		*e = value
+	}
+	return nil
+}
+
+type IgnoreCommonModelRequestReason struct {
+	typeName   string
+	ReasonEnum ReasonEnum
+	String     string
+}
+
+func NewIgnoreCommonModelRequestReasonFromReasonEnum(value ReasonEnum) *IgnoreCommonModelRequestReason {
+	return &IgnoreCommonModelRequestReason{typeName: "reasonEnum", ReasonEnum: value}
+}
+
+func NewIgnoreCommonModelRequestReasonFromString(value string) *IgnoreCommonModelRequestReason {
+	return &IgnoreCommonModelRequestReason{typeName: "string", String: value}
+}
+
+func (i *IgnoreCommonModelRequestReason) UnmarshalJSON(data []byte) error {
+	var valueReasonEnum ReasonEnum
+	if err := json.Unmarshal(data, &valueReasonEnum); err == nil {
+		i.typeName = "reasonEnum"
+		i.ReasonEnum = valueReasonEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i IgnoreCommonModelRequestReason) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "reasonEnum":
+		return json.Marshal(i.ReasonEnum)
+	case "string":
+		return json.Marshal(i.String)
+	}
+}
+
+type IgnoreCommonModelRequestReasonVisitor interface {
+	VisitReasonEnum(ReasonEnum) error
+	VisitString(string) error
+}
+
+func (i *IgnoreCommonModelRequestReason) Accept(visitor IgnoreCommonModelRequestReasonVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "reasonEnum":
+		return visitor.VisitReasonEnum(i.ReasonEnum)
+	case "string":
+		return visitor.VisitString(i.String)
+	}
 }

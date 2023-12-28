@@ -38,7 +38,7 @@ func (c *client) List(ctx context.Context) ([]*hris.WebhookReceiver, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/webhook-receivers"
+	endpointURL := baseURL + "/" + "webhook-receivers"
 
 	var response []*hris.WebhookReceiver
 	if err := core.DoRequest(
@@ -63,7 +63,7 @@ func (c *client) Create(ctx context.Context, request *hris.WebhookReceiverReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/webhook-receivers"
+	endpointURL := baseURL + "/" + "webhook-receivers"
 
 	var response *hris.WebhookReceiver
 	if err := core.DoRequest(

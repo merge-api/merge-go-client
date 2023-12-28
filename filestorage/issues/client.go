@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *filestorage.IssuesListReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/issues"
+	endpointURL := baseURL + "/" + "issues"
 
 	queryParams := make(url.Values)
 	if request.AccountToken != nil {
@@ -110,7 +110,7 @@ func (c *client) Retrieve(ctx context.Context, id string) (*filestorage.Issue, e
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/issues/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"issues/%v", id)
 
 	var response *filestorage.Issue
 	if err := core.DoRequest(

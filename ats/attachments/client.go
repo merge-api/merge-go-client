@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *ats.AttachmentsListRequest) 
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/attachments"
+	endpointURL := baseURL + "/" + "attachments"
 
 	queryParams := make(url.Values)
 	if request.CandidateId != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *ats.AttachmentEndpointRequ
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/attachments"
+	endpointURL := baseURL + "/" + "attachments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Attachmen
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/attachments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"attachments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -190,7 +190,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/attachments/meta/post"
+	endpointURL := baseURL + "/" + "attachments/meta/post"
 
 	var response *ats.MetaResponse
 	if err := core.DoRequest(

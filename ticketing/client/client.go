@@ -23,6 +23,7 @@ import (
 	passthrough "github.com/merge-api/merge-go-client/ticketing/passthrough"
 	projects "github.com/merge-api/merge-go-client/ticketing/projects"
 	regeneratekey "github.com/merge-api/merge-go-client/ticketing/regeneratekey"
+	roles "github.com/merge-api/merge-go-client/ticketing/roles"
 	selectivesync "github.com/merge-api/merge-go-client/ticketing/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/ticketing/syncstatus"
 	tags "github.com/merge-api/merge-go-client/ticketing/tags"
@@ -52,6 +53,7 @@ type Client interface {
 	Passthrough() passthrough.Client
 	Projects() projects.Client
 	RegenerateKey() regeneratekey.Client
+	Roles() roles.Client
 	SelectiveSync() selectivesync.Client
 	SyncStatus() syncstatus.Client
 	ForceResync() forceresync.Client
@@ -89,6 +91,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		passthroughClient:      passthrough.NewClient(opts...),
 		projectsClient:         projects.NewClient(opts...),
 		regenerateKeyClient:    regeneratekey.NewClient(opts...),
+		rolesClient:            roles.NewClient(opts...),
 		selectiveSyncClient:    selectivesync.NewClient(opts...),
 		syncStatusClient:       syncstatus.NewClient(opts...),
 		forceResyncClient:      forceresync.NewClient(opts...),
@@ -122,6 +125,7 @@ type client struct {
 	passthroughClient      passthrough.Client
 	projectsClient         projects.Client
 	regenerateKeyClient    regeneratekey.Client
+	rolesClient            roles.Client
 	selectiveSyncClient    selectivesync.Client
 	syncStatusClient       syncstatus.Client
 	forceResyncClient      forceresync.Client
@@ -202,6 +206,10 @@ func (c *client) Projects() projects.Client {
 
 func (c *client) RegenerateKey() regeneratekey.Client {
 	return c.regenerateKeyClient
+}
+
+func (c *client) Roles() roles.Client {
+	return c.rolesClient
 }
 
 func (c *client) SelectiveSync() selectivesync.Client {

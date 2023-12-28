@@ -3,6 +3,9 @@
 package ats
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -46,4 +49,92 @@ type OffersRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type OffersListRequestExpand uint
+
+const (
+	OffersListRequestExpandApplication OffersListRequestExpand = iota + 1
+	OffersListRequestExpandApplicationCreator
+	OffersListRequestExpandCreator
+)
+
+func (o OffersListRequestExpand) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OffersListRequestExpandApplication:
+		return "application"
+	case OffersListRequestExpandApplicationCreator:
+		return "application,creator"
+	case OffersListRequestExpandCreator:
+		return "creator"
+	}
+}
+
+func (o OffersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OffersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "application":
+		value := OffersListRequestExpandApplication
+		*o = value
+	case "application,creator":
+		value := OffersListRequestExpandApplicationCreator
+		*o = value
+	case "creator":
+		value := OffersListRequestExpandCreator
+		*o = value
+	}
+	return nil
+}
+
+type OffersRetrieveRequestExpand uint
+
+const (
+	OffersRetrieveRequestExpandApplication OffersRetrieveRequestExpand = iota + 1
+	OffersRetrieveRequestExpandApplicationCreator
+	OffersRetrieveRequestExpandCreator
+)
+
+func (o OffersRetrieveRequestExpand) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OffersRetrieveRequestExpandApplication:
+		return "application"
+	case OffersRetrieveRequestExpandApplicationCreator:
+		return "application,creator"
+	case OffersRetrieveRequestExpandCreator:
+		return "creator"
+	}
+}
+
+func (o OffersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OffersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "application":
+		value := OffersRetrieveRequestExpandApplication
+		*o = value
+	case "application,creator":
+		value := OffersRetrieveRequestExpandApplicationCreator
+		*o = value
+	case "creator":
+		value := OffersRetrieveRequestExpandCreator
+		*o = value
+	}
+	return nil
 }

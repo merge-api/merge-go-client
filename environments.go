@@ -7,9 +7,11 @@ package api
 // ClientOption to override the client's default environment,
 // if any.
 var Environments = struct {
-	Production string
-	Sandbox    string
+	Production   string
+	Sandbox      string
+	ProductionEu string
 }{
-	Production: "https://api.merge.dev",
-	Sandbox:    "https://api-sandbox.merge.dev",
+	Production:   "https://api.merge.dev",
+	Sandbox:      "https://api-sandbox.merge.dev",
+	ProductionEu: "https://api-eu.merge.dev",
 }

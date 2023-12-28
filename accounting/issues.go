@@ -3,6 +3,9 @@
 package accounting
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -30,7 +33,45 @@ type IssuesListRequest struct {
 	StartDate *string `json:"-"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
 	Status *IssuesListRequestStatus `json:"-"`
+}
+
+type IssuesListRequestStatus uint
+
+const (
+	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
+	IssuesListRequestStatusResolved
+)
+
+func (i IssuesListRequestStatus) String() string {
+	switch i {
+	default:
+		return strconv.Itoa(int(i))
+	case IssuesListRequestStatusOngoing:
+		return "ONGOING"
+	case IssuesListRequestStatusResolved:
+		return "RESOLVED"
+	}
+}
+
+func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", i.String())), nil
+}
+
+func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ONGOING":
+		value := IssuesListRequestStatusOngoing
+		*i = value
+	case "RESOLVED":
+		value := IssuesListRequestStatusResolved
+		*i = value
+	}
+	return nil
 }

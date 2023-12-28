@@ -3,6 +3,9 @@
 package hris
 
 import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
 	time "time"
 )
 
@@ -50,4 +53,42 @@ type TimesheetEntriesListRequest struct {
 type TimesheetEntriesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type TimesheetEntriesListRequestOrderBy uint
+
+const (
+	TimesheetEntriesListRequestOrderByStartTimeDescending TimesheetEntriesListRequestOrderBy = iota + 1
+	TimesheetEntriesListRequestOrderByStartTimeAscending
+)
+
+func (t TimesheetEntriesListRequestOrderBy) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TimesheetEntriesListRequestOrderByStartTimeDescending:
+		return "-start_time"
+	case TimesheetEntriesListRequestOrderByStartTimeAscending:
+		return "start_time"
+	}
+}
+
+func (t TimesheetEntriesListRequestOrderBy) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TimesheetEntriesListRequestOrderBy) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "-start_time":
+		value := TimesheetEntriesListRequestOrderByStartTimeDescending
+		*t = value
+	case "start_time":
+		value := TimesheetEntriesListRequestOrderByStartTimeAscending
+		*t = value
+	}
+	return nil
 }

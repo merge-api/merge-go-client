@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *ats.AuditTrailListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/audit-trail"
+	endpointURL := baseURL + "/" + "audit-trail"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {
