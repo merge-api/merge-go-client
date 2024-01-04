@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*accounting.AccountDetails, erro
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "account-details"
+	endpointURL := baseURL + "/" + "api/accounting/v1/account-details"
 
 	var response *accounting.AccountDetails
 	if err := core.DoRequest(

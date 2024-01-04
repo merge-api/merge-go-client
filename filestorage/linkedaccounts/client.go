@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *filestorage.LinkedAccountsLi
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "linked-accounts"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/linked-accounts"
 
 	queryParams := make(url.Values)
 	if request.Category != nil {

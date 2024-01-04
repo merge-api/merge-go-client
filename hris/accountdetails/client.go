@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*hris.AccountDetails, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "account-details"
+	endpointURL := baseURL + "/" + "api/hris/v1/account-details"
 
 	var response *hris.AccountDetails
 	if err := core.DoRequest(

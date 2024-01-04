@@ -40,7 +40,7 @@ func (c *client) List(ctx context.Context, request *ats.TagsListRequest) (*ats.P
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "tags"
+	endpointURL := baseURL + "/" + "api/ats/v1/tags"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {

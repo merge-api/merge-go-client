@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*accounting.AvailableActions, er
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "available-actions"
+	endpointURL := baseURL + "/" + "api/accounting/v1/available-actions"
 
 	var response *accounting.AvailableActions
 	if err := core.DoRequest(

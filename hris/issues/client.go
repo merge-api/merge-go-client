@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.IssuesListRequest) (*hr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "issues"
+	endpointURL := baseURL + "/" + "api/hris/v1/issues"
 
 	queryParams := make(url.Values)
 	if request.AccountToken != nil {
@@ -110,7 +110,7 @@ func (c *client) Retrieve(ctx context.Context, id string) (*hris.Issue, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"issues/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/issues/%v", id)
 
 	var response *hris.Issue
 	if err := core.DoRequest(

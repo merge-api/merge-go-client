@@ -38,7 +38,7 @@ func (c *client) List(ctx context.Context) ([]*ticketing.WebhookReceiver, error)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/webhook-receivers"
 
 	var response []*ticketing.WebhookReceiver
 	if err := core.DoRequest(
@@ -63,7 +63,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.WebhookReceiverR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/webhook-receivers"
 
 	var response *ticketing.WebhookReceiver
 	if err := core.DoRequest(

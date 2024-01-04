@@ -38,7 +38,7 @@ func (c *client) Retrieve(ctx context.Context, publicToken string) (*filestorage
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"account-token/%v", publicToken)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/account-token/%v", publicToken)
 
 	var response *filestorage.AccountToken
 	if err := core.DoRequest(

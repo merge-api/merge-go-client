@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.DataPassthroughR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "passthrough"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/passthrough"
 
 	var response *ticketing.RemoteResponse
 	if err := core.DoRequest(

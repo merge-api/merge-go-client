@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ticketing.RolesListRequest) 
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "roles"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/roles"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -98,7 +98,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Rol
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"roles/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/roles/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

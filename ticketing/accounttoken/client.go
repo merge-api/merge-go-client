@@ -38,7 +38,7 @@ func (c *client) Retrieve(ctx context.Context, publicToken string) (*ticketing.A
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"account-token/%v", publicToken)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/account-token/%v", publicToken)
 
 	var response *ticketing.AccountToken
 	if err := core.DoRequest(

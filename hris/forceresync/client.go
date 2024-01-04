@@ -37,7 +37,7 @@ func (c *client) SyncStatusResyncCreate(ctx context.Context) ([]*hris.SyncStatus
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "sync-status/resync"
+	endpointURL := baseURL + "/" + "api/hris/v1/sync-status/resync"
 
 	var response []*hris.SyncStatus
 	if err := core.DoRequest(

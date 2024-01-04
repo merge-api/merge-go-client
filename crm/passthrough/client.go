@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *crm.DataPassthroughRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "passthrough"
+	endpointURL := baseURL + "/" + "api/crm/v1/passthrough"
 
 	var response *crm.RemoteResponse
 	if err := core.DoRequest(

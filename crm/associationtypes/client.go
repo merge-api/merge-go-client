@@ -43,7 +43,7 @@ func (c *client) CustomObjectClassesAssociationTypesList(ctx context.Context, cu
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/association-types", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -103,7 +103,7 @@ func (c *client) CustomObjectClassesAssociationTypesCreate(ctx context.Context, 
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/association-types", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -139,7 +139,7 @@ func (c *client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/association-types/%v", customObjectClassId, id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types/%v", customObjectClassId, id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -175,7 +175,7 @@ func (c *client) CustomObjectClassesAssociationTypesMetaPostRetrieve(ctx context
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/association-types/meta/post", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types/meta/post", customObjectClassId)
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(

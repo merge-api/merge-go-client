@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *crm.UsersListRequest) (*crm.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "users"
+	endpointURL := baseURL + "/" + "api/crm/v1/users"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -103,7 +103,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.UsersRetr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"users/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/users/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -139,7 +139,7 @@ func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *crm.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"users/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/users/ignore/%v", modelId)
 
 	if err := core.DoRequest(
 		ctx,
@@ -163,7 +163,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.UsersR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "users/remote-field-classes"
+	endpointURL := baseURL + "/" + "api/crm/v1/users/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

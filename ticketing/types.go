@@ -9,9 +9,9 @@ import (
 	time "time"
 )
 
-// - `PRIVATE` - PRIVATE
-// - `COMPANY` - COMPANY
-// - `PUBLIC` - PUBLIC
+// * `PRIVATE` - PRIVATE
+// * `COMPANY` - COMPANY
+// * `PUBLIC` - PUBLIC
 type AccessLevelEnum uint
 
 const (
@@ -57,15 +57,12 @@ func (a *AccessLevelEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Account Object
-//
 // ### Description
-//
 // The `Account` object is used to represent the account that a ticket is associated with.
 //
 // The account is a company that may be a customer. This does not represent the company that is receiving the ticket.
 //
 // ### Usage Example
-//
 // TODO
 type Account struct {
 	Id *string `json:"id,omitempty"`
@@ -100,13 +97,10 @@ type AccountDetails struct {
 }
 
 // # The LinkedAccount Object
-//
 // ### Description
-//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
-//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -134,9 +128,9 @@ type AccountDetailsAndActionsIntegration struct {
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
 }
 
-// - `COMPLETE` - COMPLETE
-// - `INCOMPLETE` - INCOMPLETE
-// - `RELINK_NEEDED` - RELINK_NEEDED
+// * `COMPLETE` - COMPLETE
+// * `INCOMPLETE` - INCOMPLETE
+// * `RELINK_NEEDED` - RELINK_NEEDED
 type AccountDetailsAndActionsStatusEnum uint
 
 const (
@@ -211,13 +205,10 @@ type AsyncPassthroughReciept struct {
 }
 
 // # The Attachment Object
-//
 // ### Description
-//
 // The `Attachment` object is used to represent an attachment for a ticket.
 //
 // ### Usage Example
-//
 // TODO
 type Attachment struct {
 	Id *string `json:"id,omitempty"`
@@ -244,13 +235,10 @@ type Attachment struct {
 }
 
 // # The Attachment Object
-//
 // ### Description
-//
 // The `Attachment` object is used to represent an attachment for a ticket.
 //
 // ### Usage Example
-//
 // TODO
 type AttachmentRequest struct {
 	// The attachment's name. It is required to include the file extension in the attachment's name.
@@ -391,46 +379,46 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// - `ADMIN` - ADMIN
-	// - `DEVELOPER` - DEVELOPER
-	// - `MEMBER` - MEMBER
-	// - `API` - API
-	// - `SYSTEM` - SYSTEM
-	// - `MERGE_TEAM` - MERGE_TEAM
+	// * `ADMIN` - ADMIN
+	// * `DEVELOPER` - DEVELOPER
+	// * `MEMBER` - MEMBER
+	// * `API` - API
+	// * `SYSTEM` - SYSTEM
+	// * `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// - `INVITED_USER` - INVITED_USER
-	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// - `CREATED_DESTINATION` - CREATED_DESTINATION
-	// - `DELETED_DESTINATION` - DELETED_DESTINATION
-	// - `CHANGED_SCOPES` - CHANGED_SCOPES
-	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// - `RESET_PASSWORD` - RESET_PASSWORD
-	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// * `INVITED_USER` - INVITED_USER
+	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// * `CREATED_DESTINATION` - CREATED_DESTINATION
+	// * `DELETED_DESTINATION` - DELETED_DESTINATION
+	// * `CHANGED_SCOPES` - CHANGED_SCOPES
+	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// * `RESET_PASSWORD` - RESET_PASSWORD
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -438,36 +426,36 @@ type AuditLogEvent struct {
 
 // Designates the type of event that occurred.
 //
-// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// - `INVITED_USER` - INVITED_USER
-// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// - `CREATED_DESTINATION` - CREATED_DESTINATION
-// - `DELETED_DESTINATION` - DELETED_DESTINATION
-// - `CHANGED_SCOPES` - CHANGED_SCOPES
-// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// - `RESET_PASSWORD` - RESET_PASSWORD
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -527,12 +515,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// - `ADMIN` - ADMIN
-// - `DEVELOPER` - DEVELOPER
-// - `MEMBER` - MEMBER
-// - `API` - API
-// - `SYSTEM` - SYSTEM
-// - `MERGE_TEAM` - MERGE_TEAM
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -591,13 +579,10 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
-//
 // ### Description
-//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
-//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
@@ -605,13 +590,13 @@ type AvailableActions struct {
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
 }
 
-// - `hris` - hris
-// - `ats` - ats
-// - `accounting` - accounting
-// - `ticketing` - ticketing
-// - `crm` - crm
-// - `mktg` - mktg
-// - `filestorage` - filestorage
+// * `hris` - hris
+// * `ats` - ats
+// * `accounting` - accounting
+// * `ticketing` - ticketing
+// * `crm` - crm
+// * `mktg` - mktg
+// * `filestorage` - filestorage
 type CategoriesEnum uint
 
 const (
@@ -680,13 +665,13 @@ func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `hris` - hris
-// - `ats` - ats
-// - `accounting` - accounting
-// - `ticketing` - ticketing
-// - `crm` - crm
-// - `mktg` - mktg
-// - `filestorage` - filestorage
+// * `hris` - hris
+// * `ats` - ats
+// * `accounting` - accounting
+// * `ticketing` - ticketing
+// * `crm` - crm
+// * `mktg` - mktg
+// * `filestorage` - filestorage
 type CategoryEnum uint
 
 const (
@@ -756,14 +741,11 @@ func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Collection Object
-//
 // ### Description
-//
 // The `Collection` object is used to represent collections of tickets. Collections may include other collections as
 // sub collections.
 //
 // ### Usage Example
-//
 // TODO
 type Collection struct {
 	Id *string `json:"id,omitempty"`
@@ -775,8 +757,8 @@ type Collection struct {
 	Description *string `json:"description,omitempty"`
 	// The collection's type.
 	//
-	// - `LIST` - LIST
-	// - `PROJECT` - PROJECT
+	// * `LIST` - LIST
+	// * `PROJECT` - PROJECT
 	CollectionType *CollectionCollectionType `json:"collection_type,omitempty"`
 	// The parent collection for this collection.
 	ParentCollection *CollectionParentCollection `json:"parent_collection,omitempty"`
@@ -784,9 +766,9 @@ type Collection struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The level of access a User has to the Collection and its sub-objects.
 	//
-	// - `PRIVATE` - PRIVATE
-	// - `COMPANY` - COMPANY
-	// - `PUBLIC` - PUBLIC
+	// * `PRIVATE` - PRIVATE
+	// * `COMPANY` - COMPANY
+	// * `PUBLIC` - PUBLIC
 	AccessLevel *CollectionAccessLevel `json:"access_level,omitempty"`
 	CreatedAt   *time.Time             `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -797,9 +779,9 @@ type Collection struct {
 
 // The level of access a User has to the Collection and its sub-objects.
 //
-// - `PRIVATE` - PRIVATE
-// - `COMPANY` - COMPANY
-// - `PUBLIC` - PUBLIC
+// * `PRIVATE` - PRIVATE
+// * `COMPANY` - COMPANY
+// * `PUBLIC` - PUBLIC
 type CollectionAccessLevel struct {
 	typeName        string
 	AccessLevelEnum AccessLevelEnum
@@ -859,8 +841,8 @@ func (c *CollectionAccessLevel) Accept(visitor CollectionAccessLevelVisitor) err
 
 // The collection's type.
 //
-// - `LIST` - LIST
-// - `PROJECT` - PROJECT
+// * `LIST` - LIST
+// * `PROJECT` - PROJECT
 type CollectionCollectionType struct {
 	typeName           string
 	CollectionTypeEnum CollectionTypeEnum
@@ -976,8 +958,8 @@ func (c *CollectionParentCollection) Accept(visitor CollectionParentCollectionVi
 	}
 }
 
-// - `LIST` - LIST
-// - `PROJECT` - PROJECT
+// * `LIST` - LIST
+// * `PROJECT` - PROJECT
 type CollectionTypeEnum uint
 
 const (
@@ -1016,14 +998,93 @@ func (c *CollectionTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type CollectionsListRequestCollectionType uint
+
+const (
+	CollectionsListRequestCollectionTypeList CollectionsListRequestCollectionType = iota + 1
+	CollectionsListRequestCollectionTypeProject
+)
+
+func (c CollectionsListRequestCollectionType) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CollectionsListRequestCollectionTypeList:
+		return "LIST"
+	case CollectionsListRequestCollectionTypeProject:
+		return "PROJECT"
+	}
+}
+
+func (c CollectionsListRequestCollectionType) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CollectionsListRequestCollectionType) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "LIST":
+		value := CollectionsListRequestCollectionTypeList
+		*c = value
+	case "PROJECT":
+		value := CollectionsListRequestCollectionTypeProject
+		*c = value
+	}
+	return nil
+}
+
+type CollectionsUsersListRequestExpand uint
+
+const (
+	CollectionsUsersListRequestExpandRoles CollectionsUsersListRequestExpand = iota + 1
+	CollectionsUsersListRequestExpandTeams
+	CollectionsUsersListRequestExpandTeamsRoles
+)
+
+func (c CollectionsUsersListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CollectionsUsersListRequestExpandRoles:
+		return "roles"
+	case CollectionsUsersListRequestExpandTeams:
+		return "teams"
+	case CollectionsUsersListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (c CollectionsUsersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CollectionsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := CollectionsUsersListRequestExpandRoles
+		*c = value
+	case "teams":
+		value := CollectionsUsersListRequestExpandTeams
+		*c = value
+	case "teams,roles":
+		value := CollectionsUsersListRequestExpandTeamsRoles
+		*c = value
+	}
+	return nil
+}
+
 // # The Comment Object
-//
 // ### Description
-//
 // The `Comment` object is used to represent a comment on a ticket.
 //
 // ### Usage Example
-//
 // TODO
 type Comment struct {
 	Id *string `json:"id,omitempty"`
@@ -1110,13 +1171,10 @@ func (c *CommentContact) Accept(visitor CommentContactVisitor) error {
 }
 
 // # The Comment Object
-//
 // ### Description
-//
 // The `Comment` object is used to represent a comment on a ticket.
 //
 // ### Usage Example
-//
 // TODO
 type CommentRequest struct {
 	// The author of the Comment, if the author is a User.
@@ -1432,6 +1490,142 @@ func (c *CommentUser) Accept(visitor CommentUserVisitor) error {
 	}
 }
 
+type CommentsListRequestExpand uint
+
+const (
+	CommentsListRequestExpandContact CommentsListRequestExpand = iota + 1
+	CommentsListRequestExpandContactTicket
+	CommentsListRequestExpandTicket
+	CommentsListRequestExpandUser
+	CommentsListRequestExpandUserContact
+	CommentsListRequestExpandUserContactTicket
+	CommentsListRequestExpandUserTicket
+)
+
+func (c CommentsListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CommentsListRequestExpandContact:
+		return "contact"
+	case CommentsListRequestExpandContactTicket:
+		return "contact,ticket"
+	case CommentsListRequestExpandTicket:
+		return "ticket"
+	case CommentsListRequestExpandUser:
+		return "user"
+	case CommentsListRequestExpandUserContact:
+		return "user,contact"
+	case CommentsListRequestExpandUserContactTicket:
+		return "user,contact,ticket"
+	case CommentsListRequestExpandUserTicket:
+		return "user,ticket"
+	}
+}
+
+func (c CommentsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CommentsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "contact":
+		value := CommentsListRequestExpandContact
+		*c = value
+	case "contact,ticket":
+		value := CommentsListRequestExpandContactTicket
+		*c = value
+	case "ticket":
+		value := CommentsListRequestExpandTicket
+		*c = value
+	case "user":
+		value := CommentsListRequestExpandUser
+		*c = value
+	case "user,contact":
+		value := CommentsListRequestExpandUserContact
+		*c = value
+	case "user,contact,ticket":
+		value := CommentsListRequestExpandUserContactTicket
+		*c = value
+	case "user,ticket":
+		value := CommentsListRequestExpandUserTicket
+		*c = value
+	}
+	return nil
+}
+
+type CommentsRetrieveRequestExpand uint
+
+const (
+	CommentsRetrieveRequestExpandContact CommentsRetrieveRequestExpand = iota + 1
+	CommentsRetrieveRequestExpandContactTicket
+	CommentsRetrieveRequestExpandTicket
+	CommentsRetrieveRequestExpandUser
+	CommentsRetrieveRequestExpandUserContact
+	CommentsRetrieveRequestExpandUserContactTicket
+	CommentsRetrieveRequestExpandUserTicket
+)
+
+func (c CommentsRetrieveRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case CommentsRetrieveRequestExpandContact:
+		return "contact"
+	case CommentsRetrieveRequestExpandContactTicket:
+		return "contact,ticket"
+	case CommentsRetrieveRequestExpandTicket:
+		return "ticket"
+	case CommentsRetrieveRequestExpandUser:
+		return "user"
+	case CommentsRetrieveRequestExpandUserContact:
+		return "user,contact"
+	case CommentsRetrieveRequestExpandUserContactTicket:
+		return "user,contact,ticket"
+	case CommentsRetrieveRequestExpandUserTicket:
+		return "user,ticket"
+	}
+}
+
+func (c CommentsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *CommentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "contact":
+		value := CommentsRetrieveRequestExpandContact
+		*c = value
+	case "contact,ticket":
+		value := CommentsRetrieveRequestExpandContactTicket
+		*c = value
+	case "ticket":
+		value := CommentsRetrieveRequestExpandTicket
+		*c = value
+	case "user":
+		value := CommentsRetrieveRequestExpandUser
+		*c = value
+	case "user,contact":
+		value := CommentsRetrieveRequestExpandUserContact
+		*c = value
+	case "user,contact,ticket":
+		value := CommentsRetrieveRequestExpandUserContactTicket
+		*c = value
+	case "user,ticket":
+		value := CommentsRetrieveRequestExpandUserTicket
+		*c = value
+	}
+	return nil
+}
+
 type CommonModelScopesBodyRequest struct {
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
@@ -1443,7 +1637,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
+	// User-facing *native condition* name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -1451,13 +1645,13 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// - `BOOLEAN` - BOOLEAN
-	// - `DATE` - DATE
-	// - `DATE_TIME` - DATE_TIME
-	// - `INTEGER` - INTEGER
-	// - `FLOAT` - FLOAT
-	// - `STRING` - STRING
-	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// * `BOOLEAN` - BOOLEAN
+	// * `DATE` - DATE
+	// * `DATE_TIME` - DATE_TIME
+	// * `INTEGER` - INTEGER
+	// * `FLOAT` - FLOAT
+	// * `STRING` - STRING
+	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
@@ -1465,13 +1659,13 @@ type ConditionSchema struct {
 
 // The type of value(s) that can be set for this condition.
 //
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// * `BOOLEAN` - BOOLEAN
+// * `DATE` - DATE
+// * `DATE_TIME` - DATE_TIME
+// * `INTEGER` - INTEGER
+// * `FLOAT` - FLOAT
+// * `STRING` - STRING
+// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -1529,13 +1723,13 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// * `BOOLEAN` - BOOLEAN
+// * `DATE` - DATE
+// * `DATE_TIME` - DATE_TIME
+// * `INTEGER` - INTEGER
+// * `FLOAT` - FLOAT
+// * `STRING` - STRING
+// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionTypeEnum uint
 
 const (
@@ -1605,13 +1799,10 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Contact Object
-//
 // ### Description
-//
 // The `Contact` object is used to represent the customer, lead, or external user that a ticket is associated with.
 //
 // ### Usage Example
-//
 // TODO
 type Contact struct {
 	Id *string `json:"id,omitempty"`
@@ -1695,13 +1886,10 @@ func (c *ContactAccount) Accept(visitor ContactAccountVisitor) error {
 }
 
 // # The DataPassthrough Object
-//
 // ### Description
-//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
-//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -1729,8 +1917,8 @@ type DebugModelLogSummary struct {
 	StatusCode int    `json:"status_code"`
 }
 
-// - `READ` - READ
-// - `WRITE` - WRITE
+// * `READ` - READ
+// * `WRITE` - WRITE
 type EnabledActionsEnum uint
 
 const (
@@ -1769,9 +1957,9 @@ func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `RAW` - RAW
-// - `BASE64` - BASE64
-// - `GZIP_BASE64` - GZIP_BASE64
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
 type EncodingEnum uint
 
 const (
@@ -1823,36 +2011,36 @@ type ErrorValidationProblem struct {
 	ProblemType string                   `json:"problem_type"`
 }
 
-// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// - `INVITED_USER` - INVITED_USER
-// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// - `CREATED_DESTINATION` - CREATED_DESTINATION
-// - `DELETED_DESTINATION` - DELETED_DESTINATION
-// - `CHANGED_SCOPES` - CHANGED_SCOPES
-// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// - `RESET_PASSWORD` - RESET_PASSWORD
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type EventTypeEnum uint
 
 const (
@@ -2059,12 +2247,12 @@ func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `string` - string
-// - `number` - number
-// - `date` - date
-// - `datetime` - datetime
-// - `bool` - bool
-// - `list` - list
+// * `string` - string
+// * `number` - number
+// * `date` - date
+// * `datetime` - datetime
+// * `bool` - bool
+// * `list` - list
 type FieldFormatEnum uint
 
 const (
@@ -2127,12 +2315,12 @@ func (f *FieldFormatEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `string` - string
-// - `number` - number
-// - `date` - date
-// - `datetime` - datetime
-// - `bool` - bool
-// - `list` - list
+// * `string` - string
+// * `number` - number
+// * `date` - date
+// * `datetime` - datetime
+// * `bool` - bool
+// * `list` - list
 type FieldTypeEnum uint
 
 const (
@@ -2199,8 +2387,8 @@ type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// - `ONGOING` - ONGOING
-	// - `RESOLVED` - RESOLVED
+	// * `ONGOING` - ONGOING
+	// * `RESOLVED` - RESOLVED
 	Status            *IssueStatus   `json:"status,omitempty"`
 	ErrorDescription  string         `json:"error_description"`
 	EndUser           map[string]any `json:"end_user,omitempty"`
@@ -2212,8 +2400,8 @@ type Issue struct {
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// - `ONGOING` - ONGOING
-// - `RESOLVED` - RESOLVED
+// * `ONGOING` - ONGOING
+// * `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -2271,8 +2459,8 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// - `ONGOING` - ONGOING
-// - `RESOLVED` - RESOLVED
+// * `ONGOING` - ONGOING
+// * `RESOLVED` - RESOLVED
 type IssueStatusEnum uint
 
 const (
@@ -2311,12 +2499,50 @@ func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `string` - uuid
-// - `number` - url
-// - `date` - email
-// - `datetime` - phone
-// - `bool` - currency
-// - `list` - decimal
+type IssuesListRequestStatus uint
+
+const (
+	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
+	IssuesListRequestStatusResolved
+)
+
+func (i IssuesListRequestStatus) String() string {
+	switch i {
+	default:
+		return strconv.Itoa(int(i))
+	case IssuesListRequestStatusOngoing:
+		return "ONGOING"
+	case IssuesListRequestStatusResolved:
+		return "RESOLVED"
+	}
+}
+
+func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", i.String())), nil
+}
+
+func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ONGOING":
+		value := IssuesListRequestStatusOngoing
+		*i = value
+	case "RESOLVED":
+		value := IssuesListRequestStatusResolved
+		*i = value
+	}
+	return nil
+}
+
+// * `string` - uuid
+// * `number` - url
+// * `date` - email
+// * `datetime` - phone
+// * `bool` - currency
+// * `list` - decimal
 type ItemFormatEnum uint
 
 const (
@@ -2385,12 +2611,12 @@ type ItemSchema struct {
 	ItemChoices []string        `json:"item_choices,omitempty"`
 }
 
-// - `string` - string
-// - `number` - number
-// - `date` - date
-// - `datetime` - datetime
-// - `bool` - bool
-// - `list` - list
+// * `string` - string
+// * `number` - number
+// * `date` - date
+// * `datetime` - datetime
+// * `bool` - bool
+// * `list` - list
 type ItemTypeEnum uint
 
 const (
@@ -2464,7 +2690,7 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
+	// User-facing *native condition* name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
 	Operator string `json:"operator"`
@@ -2496,6 +2722,74 @@ type LinkedAccountStatus struct {
 	CanMakeRequest      bool   `json:"can_make_request"`
 }
 
+type LinkedAccountsListRequestCategory uint
+
+const (
+	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
+	LinkedAccountsListRequestCategoryAts
+	LinkedAccountsListRequestCategoryCrm
+	LinkedAccountsListRequestCategoryFilestorage
+	LinkedAccountsListRequestCategoryHris
+	LinkedAccountsListRequestCategoryMktg
+	LinkedAccountsListRequestCategoryTicketing
+)
+
+func (l LinkedAccountsListRequestCategory) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LinkedAccountsListRequestCategoryAccounting:
+		return "accounting"
+	case LinkedAccountsListRequestCategoryAts:
+		return "ats"
+	case LinkedAccountsListRequestCategoryCrm:
+		return "crm"
+	case LinkedAccountsListRequestCategoryFilestorage:
+		return "filestorage"
+	case LinkedAccountsListRequestCategoryHris:
+		return "hris"
+	case LinkedAccountsListRequestCategoryMktg:
+		return "mktg"
+	case LinkedAccountsListRequestCategoryTicketing:
+		return "ticketing"
+	}
+}
+
+func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "accounting":
+		value := LinkedAccountsListRequestCategoryAccounting
+		*l = value
+	case "ats":
+		value := LinkedAccountsListRequestCategoryAts
+		*l = value
+	case "crm":
+		value := LinkedAccountsListRequestCategoryCrm
+		*l = value
+	case "filestorage":
+		value := LinkedAccountsListRequestCategoryFilestorage
+		*l = value
+	case "hris":
+		value := LinkedAccountsListRequestCategoryHris
+		*l = value
+	case "mktg":
+		value := LinkedAccountsListRequestCategoryMktg
+		*l = value
+	case "ticketing":
+		value := LinkedAccountsListRequestCategoryTicketing
+		*l = value
+	}
+	return nil
+}
+
 type MetaResponse struct {
 	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
 	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
@@ -2504,13 +2798,13 @@ type MetaResponse struct {
 	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
 }
 
-// - `GET` - GET
-// - `OPTIONS` - OPTIONS
-// - `HEAD` - HEAD
-// - `POST` - POST
-// - `PUT` - PUT
-// - `PATCH` - PATCH
-// - `DELETE` - DELETE
+// * `GET` - GET
+// * `OPTIONS` - OPTIONS
+// * `HEAD` - HEAD
+// * `POST` - POST
+// * `PUT` - PUT
+// * `PATCH` - PATCH
+// * `DELETE` - DELETE
 type MethodEnum uint
 
 const (
@@ -2580,13 +2874,10 @@ func (m *MethodEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The ModelOperation Object
-//
 // ### Description
-//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
-//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
@@ -2596,13 +2887,10 @@ type ModelOperation struct {
 }
 
 // # The MultipartFormField Object
-//
 // ### Description
-//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
-//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -2611,9 +2899,9 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// - `RAW` - RAW
-	// - `BASE64` - BASE64
-	// - `GZIP_BASE64` - GZIP_BASE64
+	// * `RAW` - RAW
+	// * `BASE64` - BASE64
+	// * `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
@@ -2623,9 +2911,9 @@ type MultipartFormFieldRequest struct {
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// - `RAW` - RAW
-// - `BASE64` - BASE64
-// - `GZIP_BASE64` - GZIP_BASE64
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -2793,13 +3081,10 @@ type PaginatedUserList struct {
 }
 
 // # The Ticket Object
-//
 // ### Description
-//
 // The `Ticket` object is used to represent a ticket or a task within a system.
 //
 // ### Usage Example
-//
 // TODO
 type PatchedTicketRequest struct {
 	// The ticket's name.
@@ -2811,10 +3096,10 @@ type PatchedTicketRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
 	//
-	// - `OPEN` - OPEN
-	// - `CLOSED` - CLOSED
-	// - `IN_PROGRESS` - IN_PROGRESS
-	// - `ON_HOLD` - ON_HOLD
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
+	// * `IN_PROGRESS` - IN_PROGRESS
+	// * `ON_HOLD` - ON_HOLD
 	Status *PatchedTicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string   `json:"description,omitempty"`
@@ -2834,10 +3119,10 @@ type PatchedTicketRequest struct {
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
 	//
-	// - `URGENT` - URGENT
-	// - `HIGH` - HIGH
-	// - `NORMAL` - NORMAL
-	// - `LOW` - LOW
+	// * `URGENT` - URGENT
+	// * `HIGH` - HIGH
+	// * `NORMAL` - NORMAL
+	// * `LOW` - LOW
 	Priority            *PatchedTicketRequestPriority `json:"priority,omitempty"`
 	IntegrationParams   map[string]any                `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any                `json:"linked_account_params,omitempty"`
@@ -2846,10 +3131,10 @@ type PatchedTicketRequest struct {
 
 // The priority or urgency of the Ticket.
 //
-// - `URGENT` - URGENT
-// - `HIGH` - HIGH
-// - `NORMAL` - NORMAL
-// - `LOW` - LOW
+// * `URGENT` - URGENT
+// * `HIGH` - HIGH
+// * `NORMAL` - NORMAL
+// * `LOW` - LOW
 type PatchedTicketRequestPriority struct {
 	typeName     string
 	PriorityEnum PriorityEnum
@@ -2909,10 +3194,10 @@ func (p *PatchedTicketRequestPriority) Accept(visitor PatchedTicketRequestPriori
 
 // The current status of the ticket.
 //
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
-// - `IN_PROGRESS` - IN_PROGRESS
-// - `ON_HOLD` - ON_HOLD
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
+// * `IN_PROGRESS` - IN_PROGRESS
+// * `ON_HOLD` - ON_HOLD
 type PatchedTicketRequestStatus struct {
 	typeName         string
 	TicketStatusEnum TicketStatusEnum
@@ -2970,10 +3255,10 @@ func (p *PatchedTicketRequestStatus) Accept(visitor PatchedTicketRequestStatusVi
 	}
 }
 
-// - `URGENT` - URGENT
-// - `HIGH` - HIGH
-// - `NORMAL` - NORMAL
-// - `LOW` - LOW
+// * `URGENT` - URGENT
+// * `HIGH` - HIGH
+// * `NORMAL` - NORMAL
+// * `LOW` - LOW
 type PriorityEnum uint
 
 const (
@@ -3025,13 +3310,10 @@ func (p *PriorityEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Project Object
-//
 // ### Description
-//
 // Please use the `Collection` model. This model will be fully deprecated on 3/30/2024.
 //
 // ### Usage Example
-//
 // TODO
 type Project struct {
 	Id *string `json:"id,omitempty"`
@@ -3048,6 +3330,50 @@ type Project struct {
 	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
 	FieldMappings map[string]any `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+}
+
+type ProjectsUsersListRequestExpand uint
+
+const (
+	ProjectsUsersListRequestExpandRoles ProjectsUsersListRequestExpand = iota + 1
+	ProjectsUsersListRequestExpandTeams
+	ProjectsUsersListRequestExpandTeamsRoles
+)
+
+func (p ProjectsUsersListRequestExpand) String() string {
+	switch p {
+	default:
+		return strconv.Itoa(int(p))
+	case ProjectsUsersListRequestExpandRoles:
+		return "roles"
+	case ProjectsUsersListRequestExpandTeams:
+		return "teams"
+	case ProjectsUsersListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (p ProjectsUsersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", p.String())), nil
+}
+
+func (p *ProjectsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := ProjectsUsersListRequestExpandRoles
+		*p = value
+	case "teams":
+		value := ProjectsUsersListRequestExpandTeams
+		*p = value
+	case "teams,roles":
+		value := ProjectsUsersListRequestExpandTeamsRoles
+		*p = value
+	}
+	return nil
 }
 
 type RemoteData struct {
@@ -3312,13 +3638,10 @@ func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRe
 }
 
 // # The RemoteKey Object
-//
 // ### Description
-//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
-//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
@@ -3326,13 +3649,10 @@ type RemoteKey struct {
 }
 
 // # The RemoteResponse Object
-//
 // ### Description
-//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
-//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
 	Method          string            `json:"method"`
@@ -3344,9 +3664,9 @@ type RemoteResponse struct {
 	Headers         map[string]any    `json:"headers,omitempty"`
 }
 
-// - `JSON` - JSON
-// - `XML` - XML
-// - `MULTIPART` - MULTIPART
+// * `JSON` - JSON
+// * `XML` - XML
+// * `MULTIPART` - MULTIPART
 type RequestFormatEnum uint
 
 const (
@@ -3391,8 +3711,8 @@ func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `JSON` - JSON
-// - `BASE64_GZIP` - BASE64_GZIP
+// * `JSON` - JSON
+// * `BASE64_GZIP` - BASE64_GZIP
 type ResponseTypeEnum uint
 
 const (
@@ -3432,13 +3752,10 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Role Object
-//
 // ### Description
-//
 // The `Role` object is used to represent the set of actions & access that a user with this role is allowed to perform.
 //
 // ### Usage Example
-//
 // TODO
 type Role struct {
 	Id *string `json:"id,omitempty"`
@@ -3450,9 +3767,9 @@ type Role struct {
 	TicketActions []*RoleTicketActionsItem `json:"ticket_actions,omitempty"`
 	// The level of Ticket access that a User with this Role can perform.
 	//
-	// - `ALL` - ALL
-	// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
-	// - `TEAM_ONLY` - TEAM_ONLY
+	// * `ALL` - ALL
+	// * `ASSIGNED_ONLY` - ASSIGNED_ONLY
+	// * `TEAM_ONLY` - TEAM_ONLY
 	TicketAccess *RoleTicketAccess `json:"ticket_access,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
@@ -3463,12 +3780,12 @@ type Role struct {
 	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
 }
 
-// - `ADMIN` - ADMIN
-// - `DEVELOPER` - DEVELOPER
-// - `MEMBER` - MEMBER
-// - `API` - API
-// - `SYSTEM` - SYSTEM
-// - `MERGE_TEAM` - MERGE_TEAM
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
 type RoleEnum uint
 
 const (
@@ -3533,9 +3850,9 @@ func (r *RoleEnum) UnmarshalJSON(data []byte) error {
 
 // The level of Ticket access that a User with this Role can perform.
 //
-// - `ALL` - ALL
-// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
-// - `TEAM_ONLY` - TEAM_ONLY
+// * `ALL` - ALL
+// * `ASSIGNED_ONLY` - ASSIGNED_ONLY
+// * `TEAM_ONLY` - TEAM_ONLY
 type RoleTicketAccess struct {
 	typeName         string
 	String           string
@@ -3650,8 +3967,8 @@ func (r *RoleTicketActionsItem) Accept(visitor RoleTicketActionsItemVisitor) err
 	}
 }
 
-// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// - `IN_LAST_SYNC` - IN_LAST_SYNC
+// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// * `IN_LAST_SYNC` - IN_LAST_SYNC
 type SelectiveSyncConfigurationsUsageEnum uint
 
 const (
@@ -3691,13 +4008,10 @@ func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error 
 }
 
 // # The SyncStatus Object
-//
 // ### Description
-//
-// # The `SyncStatus` object is used to represent the syncing state of an account
+// The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
-//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -3709,12 +4023,12 @@ type SyncStatus struct {
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
 }
 
-// - `SYNCING` - SYNCING
-// - `DONE` - DONE
-// - `FAILED` - FAILED
-// - `DISABLED` - DISABLED
-// - `PAUSED` - PAUSED
-// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+// * `SYNCING` - SYNCING
+// * `DONE` - DONE
+// * `FAILED` - FAILED
+// * `DISABLED` - DISABLED
+// * `PAUSED` - PAUSED
+// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
 type SyncStatusStatusEnum uint
 
 const (
@@ -3778,13 +4092,10 @@ func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Tag Object
-//
 // ### Description
-//
 // The `Tag` object is used to represent a tag or label for a ticket.
 //
 // ### Usage Example
-//
 // TODO
 type Tag struct {
 	// The third-party API ID of the matching object.
@@ -3801,13 +4112,10 @@ type Tag struct {
 }
 
 // # The Team Object
-//
 // ### Description
-//
 // The `Team` object is used to represent a team within the company receiving the ticket.
 //
 // ### Usage Example
-//
 // TODO
 type Team struct {
 	Id *string `json:"id,omitempty"`
@@ -3827,13 +4135,10 @@ type Team struct {
 }
 
 // # The Ticket Object
-//
 // ### Description
-//
 // The `Ticket` object is used to represent a ticket or a task within a system.
 //
 // ### Usage Example
-//
 // TODO
 type Ticket struct {
 	Id *string `json:"id,omitempty"`
@@ -3848,10 +4153,10 @@ type Ticket struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
 	//
-	// - `OPEN` - OPEN
-	// - `CLOSED` - CLOSED
-	// - `IN_PROGRESS` - IN_PROGRESS
-	// - `ON_HOLD` - ON_HOLD
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
+	// * `IN_PROGRESS` - IN_PROGRESS
+	// * `ON_HOLD` - ON_HOLD
 	Status *TicketStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string                  `json:"description,omitempty"`
@@ -3877,10 +4182,10 @@ type Ticket struct {
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
 	//
-	// - `URGENT` - URGENT
-	// - `HIGH` - HIGH
-	// - `NORMAL` - NORMAL
-	// - `LOW` - LOW
+	// * `URGENT` - URGENT
+	// * `HIGH` - HIGH
+	// * `NORMAL` - NORMAL
+	// * `LOW` - LOW
 	Priority  *TicketPriority `json:"priority,omitempty"`
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -3890,9 +4195,9 @@ type Ticket struct {
 	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
 }
 
-// - `ALL` - ALL
-// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
-// - `TEAM_ONLY` - TEAM_ONLY
+// * `ALL` - ALL
+// * `ASSIGNED_ONLY` - ASSIGNED_ONLY
+// * `TEAM_ONLY` - TEAM_ONLY
 type TicketAccessEnum uint
 
 const (
@@ -3995,12 +4300,12 @@ func (t *TicketAccount) Accept(visitor TicketAccountVisitor) error {
 	}
 }
 
-// - `VIEW` - VIEW
-// - `CREATE` - CREATE
-// - `EDIT` - EDIT
-// - `DELETE` - DELETE
-// - `CLOSE` - CLOSE
-// - `ASSIGN` - ASSIGN
+// * `VIEW` - VIEW
+// * `CREATE` - CREATE
+// * `EDIT` - EDIT
+// * `DELETE` - DELETE
+// * `CLOSE` - CLOSE
+// * `ASSIGN` - ASSIGN
 type TicketActionsEnum uint
 
 const (
@@ -4410,10 +4715,10 @@ func (t *TicketParentTicket) Accept(visitor TicketParentTicketVisitor) error {
 
 // The priority or urgency of the Ticket.
 //
-// - `URGENT` - URGENT
-// - `HIGH` - HIGH
-// - `NORMAL` - NORMAL
-// - `LOW` - LOW
+// * `URGENT` - URGENT
+// * `HIGH` - HIGH
+// * `NORMAL` - NORMAL
+// * `LOW` - LOW
 type TicketPriority struct {
 	typeName     string
 	PriorityEnum PriorityEnum
@@ -4472,13 +4777,10 @@ func (t *TicketPriority) Accept(visitor TicketPriorityVisitor) error {
 }
 
 // # The Ticket Object
-//
 // ### Description
-//
 // The `Ticket` object is used to represent a ticket or a task within a system.
 //
 // ### Usage Example
-//
 // TODO
 type TicketRequest struct {
 	// The ticket's name.
@@ -4490,10 +4792,10 @@ type TicketRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
 	//
-	// - `OPEN` - OPEN
-	// - `CLOSED` - CLOSED
-	// - `IN_PROGRESS` - IN_PROGRESS
-	// - `ON_HOLD` - ON_HOLD
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
+	// * `IN_PROGRESS` - IN_PROGRESS
+	// * `ON_HOLD` - ON_HOLD
 	Status *TicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string                         `json:"description,omitempty"`
@@ -4514,10 +4816,10 @@ type TicketRequest struct {
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
 	//
-	// - `URGENT` - URGENT
-	// - `HIGH` - HIGH
-	// - `NORMAL` - NORMAL
-	// - `LOW` - LOW
+	// * `URGENT` - URGENT
+	// * `HIGH` - HIGH
+	// * `NORMAL` - NORMAL
+	// * `LOW` - LOW
 	Priority            *TicketRequestPriority `json:"priority,omitempty"`
 	IntegrationParams   map[string]any         `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any         `json:"linked_account_params,omitempty"`
@@ -4929,10 +5231,10 @@ func (t *TicketRequestParentTicket) Accept(visitor TicketRequestParentTicketVisi
 
 // The priority or urgency of the Ticket.
 //
-// - `URGENT` - URGENT
-// - `HIGH` - HIGH
-// - `NORMAL` - NORMAL
-// - `LOW` - LOW
+// * `URGENT` - URGENT
+// * `HIGH` - HIGH
+// * `NORMAL` - NORMAL
+// * `LOW` - LOW
 type TicketRequestPriority struct {
 	typeName     string
 	PriorityEnum PriorityEnum
@@ -4992,10 +5294,10 @@ func (t *TicketRequestPriority) Accept(visitor TicketRequestPriorityVisitor) err
 
 // The current status of the ticket.
 //
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
-// - `IN_PROGRESS` - IN_PROGRESS
-// - `ON_HOLD` - ON_HOLD
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
+// * `IN_PROGRESS` - IN_PROGRESS
+// * `ON_HOLD` - ON_HOLD
 type TicketRequestStatus struct {
 	typeName         string
 	TicketStatusEnum TicketStatusEnum
@@ -5062,10 +5364,10 @@ type TicketResponse struct {
 
 // The current status of the ticket.
 //
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
-// - `IN_PROGRESS` - IN_PROGRESS
-// - `ON_HOLD` - ON_HOLD
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
+// * `IN_PROGRESS` - IN_PROGRESS
+// * `ON_HOLD` - ON_HOLD
 type TicketStatus struct {
 	typeName         string
 	TicketStatusEnum TicketStatusEnum
@@ -5123,10 +5425,10 @@ func (t *TicketStatus) Accept(visitor TicketStatusVisitor) error {
 	}
 }
 
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
-// - `IN_PROGRESS` - IN_PROGRESS
-// - `ON_HOLD` - ON_HOLD
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
+// * `IN_PROGRESS` - IN_PROGRESS
+// * `ON_HOLD` - ON_HOLD
 type TicketStatusEnum uint
 
 const (
@@ -5184,14 +5486,2003 @@ type TicketingAttachmentResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
+type TicketsCollaboratorsListRequestExpand uint
+
+const (
+	TicketsCollaboratorsListRequestExpandRoles TicketsCollaboratorsListRequestExpand = iota + 1
+	TicketsCollaboratorsListRequestExpandTeams
+	TicketsCollaboratorsListRequestExpandTeamsRoles
+)
+
+func (t TicketsCollaboratorsListRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsCollaboratorsListRequestExpandRoles:
+		return "roles"
+	case TicketsCollaboratorsListRequestExpandTeams:
+		return "teams"
+	case TicketsCollaboratorsListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (t TicketsCollaboratorsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsCollaboratorsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := TicketsCollaboratorsListRequestExpandRoles
+		*t = value
+	case "teams":
+		value := TicketsCollaboratorsListRequestExpandTeams
+		*t = value
+	case "teams,roles":
+		value := TicketsCollaboratorsListRequestExpandTeamsRoles
+		*t = value
+	}
+	return nil
+}
+
+type TicketsListRequestExpand uint
+
+const (
+	TicketsListRequestExpandAccount TicketsListRequestExpand = iota + 1
+	TicketsListRequestExpandAccountContact
+	TicketsListRequestExpandAccountContactCreator
+	TicketsListRequestExpandAccountContactCreatorParentTicket
+	TicketsListRequestExpandAccountContactParentTicket
+	TicketsListRequestExpandAccountCreator
+	TicketsListRequestExpandAccountCreatorParentTicket
+	TicketsListRequestExpandAccountParentTicket
+	TicketsListRequestExpandAssignees
+	TicketsListRequestExpandAssigneesAccount
+	TicketsListRequestExpandAssigneesAccountContact
+	TicketsListRequestExpandAssigneesAccountContactCreator
+	TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket
+	TicketsListRequestExpandAssigneesAccountContactParentTicket
+	TicketsListRequestExpandAssigneesAccountCreator
+	TicketsListRequestExpandAssigneesAccountCreatorParentTicket
+	TicketsListRequestExpandAssigneesAccountParentTicket
+	TicketsListRequestExpandAssigneesCollections
+	TicketsListRequestExpandAssigneesCollectionsAccount
+	TicketsListRequestExpandAssigneesCollectionsAccountContact
+	TicketsListRequestExpandAssigneesCollectionsAccountContactCreator
+	TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
+	TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket
+	TicketsListRequestExpandAssigneesCollectionsAccountCreator
+	TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket
+	TicketsListRequestExpandAssigneesCollectionsAccountParentTicket
+	TicketsListRequestExpandAssigneesCollectionsContact
+	TicketsListRequestExpandAssigneesCollectionsContactCreator
+	TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket
+	TicketsListRequestExpandAssigneesCollectionsContactParentTicket
+	TicketsListRequestExpandAssigneesCollectionsCreator
+	TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket
+	TicketsListRequestExpandAssigneesCollectionsParentTicket
+	TicketsListRequestExpandAssigneesContact
+	TicketsListRequestExpandAssigneesContactCreator
+	TicketsListRequestExpandAssigneesContactCreatorParentTicket
+	TicketsListRequestExpandAssigneesContactParentTicket
+	TicketsListRequestExpandAssigneesCreator
+	TicketsListRequestExpandAssigneesCreatorParentTicket
+	TicketsListRequestExpandAssigneesParentTicket
+	TicketsListRequestExpandAttachments
+	TicketsListRequestExpandAttachmentsAccount
+	TicketsListRequestExpandAttachmentsAccountContact
+	TicketsListRequestExpandAttachmentsAccountContactCreator
+	TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAccountContactParentTicket
+	TicketsListRequestExpandAttachmentsAccountCreator
+	TicketsListRequestExpandAttachmentsAccountCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAccountParentTicket
+	TicketsListRequestExpandAttachmentsAssignees
+	TicketsListRequestExpandAttachmentsAssigneesAccount
+	TicketsListRequestExpandAttachmentsAssigneesAccountContact
+	TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator
+	TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesAccountCreator
+	TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollections
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContact
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesContact
+	TicketsListRequestExpandAttachmentsAssigneesContactCreator
+	TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesContactParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesCreator
+	TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket
+	TicketsListRequestExpandAttachmentsAssigneesParentTicket
+	TicketsListRequestExpandAttachmentsCollections
+	TicketsListRequestExpandAttachmentsCollectionsAccount
+	TicketsListRequestExpandAttachmentsCollectionsAccountContact
+	TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator
+	TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsAccountCreator
+	TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsContact
+	TicketsListRequestExpandAttachmentsCollectionsContactCreator
+	TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsContactParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsCreator
+	TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket
+	TicketsListRequestExpandAttachmentsCollectionsParentTicket
+	TicketsListRequestExpandAttachmentsContact
+	TicketsListRequestExpandAttachmentsContactCreator
+	TicketsListRequestExpandAttachmentsContactCreatorParentTicket
+	TicketsListRequestExpandAttachmentsContactParentTicket
+	TicketsListRequestExpandAttachmentsCreator
+	TicketsListRequestExpandAttachmentsCreatorParentTicket
+	TicketsListRequestExpandAttachmentsParentTicket
+	TicketsListRequestExpandCollections
+	TicketsListRequestExpandCollectionsAccount
+	TicketsListRequestExpandCollectionsAccountContact
+	TicketsListRequestExpandCollectionsAccountContactCreator
+	TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket
+	TicketsListRequestExpandCollectionsAccountContactParentTicket
+	TicketsListRequestExpandCollectionsAccountCreator
+	TicketsListRequestExpandCollectionsAccountCreatorParentTicket
+	TicketsListRequestExpandCollectionsAccountParentTicket
+	TicketsListRequestExpandCollectionsContact
+	TicketsListRequestExpandCollectionsContactCreator
+	TicketsListRequestExpandCollectionsContactCreatorParentTicket
+	TicketsListRequestExpandCollectionsContactParentTicket
+	TicketsListRequestExpandCollectionsCreator
+	TicketsListRequestExpandCollectionsCreatorParentTicket
+	TicketsListRequestExpandCollectionsParentTicket
+	TicketsListRequestExpandContact
+	TicketsListRequestExpandContactCreator
+	TicketsListRequestExpandContactCreatorParentTicket
+	TicketsListRequestExpandContactParentTicket
+	TicketsListRequestExpandCreator
+	TicketsListRequestExpandCreatorParentTicket
+	TicketsListRequestExpandParentTicket
+)
+
+func (t TicketsListRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsListRequestExpandAccount:
+		return "account"
+	case TicketsListRequestExpandAccountContact:
+		return "account,contact"
+	case TicketsListRequestExpandAccountContactCreator:
+		return "account,contact,creator"
+	case TicketsListRequestExpandAccountContactCreatorParentTicket:
+		return "account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAccountContactParentTicket:
+		return "account,contact,parent_ticket"
+	case TicketsListRequestExpandAccountCreator:
+		return "account,creator"
+	case TicketsListRequestExpandAccountCreatorParentTicket:
+		return "account,creator,parent_ticket"
+	case TicketsListRequestExpandAccountParentTicket:
+		return "account,parent_ticket"
+	case TicketsListRequestExpandAssignees:
+		return "assignees"
+	case TicketsListRequestExpandAssigneesAccount:
+		return "assignees,account"
+	case TicketsListRequestExpandAssigneesAccountContact:
+		return "assignees,account,contact"
+	case TicketsListRequestExpandAssigneesAccountContactCreator:
+		return "assignees,account,contact,creator"
+	case TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket:
+		return "assignees,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesAccountContactParentTicket:
+		return "assignees,account,contact,parent_ticket"
+	case TicketsListRequestExpandAssigneesAccountCreator:
+		return "assignees,account,creator"
+	case TicketsListRequestExpandAssigneesAccountCreatorParentTicket:
+		return "assignees,account,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesAccountParentTicket:
+		return "assignees,account,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollections:
+		return "assignees,collections"
+	case TicketsListRequestExpandAssigneesCollectionsAccount:
+		return "assignees,collections,account"
+	case TicketsListRequestExpandAssigneesCollectionsAccountContact:
+		return "assignees,collections,account,contact"
+	case TicketsListRequestExpandAssigneesCollectionsAccountContactCreator:
+		return "assignees,collections,account,contact,creator"
+	case TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket:
+		return "assignees,collections,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket:
+		return "assignees,collections,account,contact,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsAccountCreator:
+		return "assignees,collections,account,creator"
+	case TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket:
+		return "assignees,collections,account,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsAccountParentTicket:
+		return "assignees,collections,account,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsContact:
+		return "assignees,collections,contact"
+	case TicketsListRequestExpandAssigneesCollectionsContactCreator:
+		return "assignees,collections,contact,creator"
+	case TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket:
+		return "assignees,collections,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsContactParentTicket:
+		return "assignees,collections,contact,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsCreator:
+		return "assignees,collections,creator"
+	case TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket:
+		return "assignees,collections,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesCollectionsParentTicket:
+		return "assignees,collections,parent_ticket"
+	case TicketsListRequestExpandAssigneesContact:
+		return "assignees,contact"
+	case TicketsListRequestExpandAssigneesContactCreator:
+		return "assignees,contact,creator"
+	case TicketsListRequestExpandAssigneesContactCreatorParentTicket:
+		return "assignees,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesContactParentTicket:
+		return "assignees,contact,parent_ticket"
+	case TicketsListRequestExpandAssigneesCreator:
+		return "assignees,creator"
+	case TicketsListRequestExpandAssigneesCreatorParentTicket:
+		return "assignees,creator,parent_ticket"
+	case TicketsListRequestExpandAssigneesParentTicket:
+		return "assignees,parent_ticket"
+	case TicketsListRequestExpandAttachments:
+		return "attachments"
+	case TicketsListRequestExpandAttachmentsAccount:
+		return "attachments,account"
+	case TicketsListRequestExpandAttachmentsAccountContact:
+		return "attachments,account,contact"
+	case TicketsListRequestExpandAttachmentsAccountContactCreator:
+		return "attachments,account,contact,creator"
+	case TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket:
+		return "attachments,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAccountContactParentTicket:
+		return "attachments,account,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAccountCreator:
+		return "attachments,account,creator"
+	case TicketsListRequestExpandAttachmentsAccountCreatorParentTicket:
+		return "attachments,account,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAccountParentTicket:
+		return "attachments,account,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssignees:
+		return "attachments,assignees"
+	case TicketsListRequestExpandAttachmentsAssigneesAccount:
+		return "attachments,assignees,account"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountContact:
+		return "attachments,assignees,account,contact"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator:
+		return "attachments,assignees,account,contact,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket:
+		return "attachments,assignees,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket:
+		return "attachments,assignees,account,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountCreator:
+		return "attachments,assignees,account,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket:
+		return "attachments,assignees,account,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket:
+		return "attachments,assignees,account,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollections:
+		return "attachments,assignees,collections"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount:
+		return "attachments,assignees,collections,account"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact:
+		return "attachments,assignees,collections,account,contact"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator:
+		return "attachments,assignees,collections,account,contact,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket:
+		return "attachments,assignees,collections,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket:
+		return "attachments,assignees,collections,account,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator:
+		return "attachments,assignees,collections,account,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket:
+		return "attachments,assignees,collections,account,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket:
+		return "attachments,assignees,collections,account,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContact:
+		return "attachments,assignees,collections,contact"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator:
+		return "attachments,assignees,collections,contact,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket:
+		return "attachments,assignees,collections,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket:
+		return "attachments,assignees,collections,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator:
+		return "attachments,assignees,collections,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket:
+		return "attachments,assignees,collections,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket:
+		return "attachments,assignees,collections,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesContact:
+		return "attachments,assignees,contact"
+	case TicketsListRequestExpandAttachmentsAssigneesContactCreator:
+		return "attachments,assignees,contact,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket:
+		return "attachments,assignees,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesContactParentTicket:
+		return "attachments,assignees,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesCreator:
+		return "attachments,assignees,creator"
+	case TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket:
+		return "attachments,assignees,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsAssigneesParentTicket:
+		return "attachments,assignees,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollections:
+		return "attachments,collections"
+	case TicketsListRequestExpandAttachmentsCollectionsAccount:
+		return "attachments,collections,account"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountContact:
+		return "attachments,collections,account,contact"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator:
+		return "attachments,collections,account,contact,creator"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket:
+		return "attachments,collections,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket:
+		return "attachments,collections,account,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountCreator:
+		return "attachments,collections,account,creator"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket:
+		return "attachments,collections,account,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket:
+		return "attachments,collections,account,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsContact:
+		return "attachments,collections,contact"
+	case TicketsListRequestExpandAttachmentsCollectionsContactCreator:
+		return "attachments,collections,contact,creator"
+	case TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket:
+		return "attachments,collections,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsContactParentTicket:
+		return "attachments,collections,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsCreator:
+		return "attachments,collections,creator"
+	case TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket:
+		return "attachments,collections,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCollectionsParentTicket:
+		return "attachments,collections,parent_ticket"
+	case TicketsListRequestExpandAttachmentsContact:
+		return "attachments,contact"
+	case TicketsListRequestExpandAttachmentsContactCreator:
+		return "attachments,contact,creator"
+	case TicketsListRequestExpandAttachmentsContactCreatorParentTicket:
+		return "attachments,contact,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsContactParentTicket:
+		return "attachments,contact,parent_ticket"
+	case TicketsListRequestExpandAttachmentsCreator:
+		return "attachments,creator"
+	case TicketsListRequestExpandAttachmentsCreatorParentTicket:
+		return "attachments,creator,parent_ticket"
+	case TicketsListRequestExpandAttachmentsParentTicket:
+		return "attachments,parent_ticket"
+	case TicketsListRequestExpandCollections:
+		return "collections"
+	case TicketsListRequestExpandCollectionsAccount:
+		return "collections,account"
+	case TicketsListRequestExpandCollectionsAccountContact:
+		return "collections,account,contact"
+	case TicketsListRequestExpandCollectionsAccountContactCreator:
+		return "collections,account,contact,creator"
+	case TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket:
+		return "collections,account,contact,creator,parent_ticket"
+	case TicketsListRequestExpandCollectionsAccountContactParentTicket:
+		return "collections,account,contact,parent_ticket"
+	case TicketsListRequestExpandCollectionsAccountCreator:
+		return "collections,account,creator"
+	case TicketsListRequestExpandCollectionsAccountCreatorParentTicket:
+		return "collections,account,creator,parent_ticket"
+	case TicketsListRequestExpandCollectionsAccountParentTicket:
+		return "collections,account,parent_ticket"
+	case TicketsListRequestExpandCollectionsContact:
+		return "collections,contact"
+	case TicketsListRequestExpandCollectionsContactCreator:
+		return "collections,contact,creator"
+	case TicketsListRequestExpandCollectionsContactCreatorParentTicket:
+		return "collections,contact,creator,parent_ticket"
+	case TicketsListRequestExpandCollectionsContactParentTicket:
+		return "collections,contact,parent_ticket"
+	case TicketsListRequestExpandCollectionsCreator:
+		return "collections,creator"
+	case TicketsListRequestExpandCollectionsCreatorParentTicket:
+		return "collections,creator,parent_ticket"
+	case TicketsListRequestExpandCollectionsParentTicket:
+		return "collections,parent_ticket"
+	case TicketsListRequestExpandContact:
+		return "contact"
+	case TicketsListRequestExpandContactCreator:
+		return "contact,creator"
+	case TicketsListRequestExpandContactCreatorParentTicket:
+		return "contact,creator,parent_ticket"
+	case TicketsListRequestExpandContactParentTicket:
+		return "contact,parent_ticket"
+	case TicketsListRequestExpandCreator:
+		return "creator"
+	case TicketsListRequestExpandCreatorParentTicket:
+		return "creator,parent_ticket"
+	case TicketsListRequestExpandParentTicket:
+		return "parent_ticket"
+	}
+}
+
+func (t TicketsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := TicketsListRequestExpandAccount
+		*t = value
+	case "account,contact":
+		value := TicketsListRequestExpandAccountContact
+		*t = value
+	case "account,contact,creator":
+		value := TicketsListRequestExpandAccountContactCreator
+		*t = value
+	case "account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAccountContactCreatorParentTicket
+		*t = value
+	case "account,contact,parent_ticket":
+		value := TicketsListRequestExpandAccountContactParentTicket
+		*t = value
+	case "account,creator":
+		value := TicketsListRequestExpandAccountCreator
+		*t = value
+	case "account,creator,parent_ticket":
+		value := TicketsListRequestExpandAccountCreatorParentTicket
+		*t = value
+	case "account,parent_ticket":
+		value := TicketsListRequestExpandAccountParentTicket
+		*t = value
+	case "assignees":
+		value := TicketsListRequestExpandAssignees
+		*t = value
+	case "assignees,account":
+		value := TicketsListRequestExpandAssigneesAccount
+		*t = value
+	case "assignees,account,contact":
+		value := TicketsListRequestExpandAssigneesAccountContact
+		*t = value
+	case "assignees,account,contact,creator":
+		value := TicketsListRequestExpandAssigneesAccountContactCreator
+		*t = value
+	case "assignees,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket
+		*t = value
+	case "assignees,account,contact,parent_ticket":
+		value := TicketsListRequestExpandAssigneesAccountContactParentTicket
+		*t = value
+	case "assignees,account,creator":
+		value := TicketsListRequestExpandAssigneesAccountCreator
+		*t = value
+	case "assignees,account,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesAccountCreatorParentTicket
+		*t = value
+	case "assignees,account,parent_ticket":
+		value := TicketsListRequestExpandAssigneesAccountParentTicket
+		*t = value
+	case "assignees,collections":
+		value := TicketsListRequestExpandAssigneesCollections
+		*t = value
+	case "assignees,collections,account":
+		value := TicketsListRequestExpandAssigneesCollectionsAccount
+		*t = value
+	case "assignees,collections,account,contact":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountContact
+		*t = value
+	case "assignees,collections,account,contact,creator":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountContactCreator
+		*t = value
+	case "assignees,collections,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "assignees,collections,account,contact,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket
+		*t = value
+	case "assignees,collections,account,creator":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountCreator
+		*t = value
+	case "assignees,collections,account,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket
+		*t = value
+	case "assignees,collections,account,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsAccountParentTicket
+		*t = value
+	case "assignees,collections,contact":
+		value := TicketsListRequestExpandAssigneesCollectionsContact
+		*t = value
+	case "assignees,collections,contact,creator":
+		value := TicketsListRequestExpandAssigneesCollectionsContactCreator
+		*t = value
+	case "assignees,collections,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket
+		*t = value
+	case "assignees,collections,contact,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsContactParentTicket
+		*t = value
+	case "assignees,collections,creator":
+		value := TicketsListRequestExpandAssigneesCollectionsCreator
+		*t = value
+	case "assignees,collections,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket
+		*t = value
+	case "assignees,collections,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCollectionsParentTicket
+		*t = value
+	case "assignees,contact":
+		value := TicketsListRequestExpandAssigneesContact
+		*t = value
+	case "assignees,contact,creator":
+		value := TicketsListRequestExpandAssigneesContactCreator
+		*t = value
+	case "assignees,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesContactCreatorParentTicket
+		*t = value
+	case "assignees,contact,parent_ticket":
+		value := TicketsListRequestExpandAssigneesContactParentTicket
+		*t = value
+	case "assignees,creator":
+		value := TicketsListRequestExpandAssigneesCreator
+		*t = value
+	case "assignees,creator,parent_ticket":
+		value := TicketsListRequestExpandAssigneesCreatorParentTicket
+		*t = value
+	case "assignees,parent_ticket":
+		value := TicketsListRequestExpandAssigneesParentTicket
+		*t = value
+	case "attachments":
+		value := TicketsListRequestExpandAttachments
+		*t = value
+	case "attachments,account":
+		value := TicketsListRequestExpandAttachmentsAccount
+		*t = value
+	case "attachments,account,contact":
+		value := TicketsListRequestExpandAttachmentsAccountContact
+		*t = value
+	case "attachments,account,contact,creator":
+		value := TicketsListRequestExpandAttachmentsAccountContactCreator
+		*t = value
+	case "attachments,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,account,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAccountContactParentTicket
+		*t = value
+	case "attachments,account,creator":
+		value := TicketsListRequestExpandAttachmentsAccountCreator
+		*t = value
+	case "attachments,account,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAccountCreatorParentTicket
+		*t = value
+	case "attachments,account,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAccountParentTicket
+		*t = value
+	case "attachments,assignees":
+		value := TicketsListRequestExpandAttachmentsAssignees
+		*t = value
+	case "attachments,assignees,account":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccount
+		*t = value
+	case "attachments,assignees,account,contact":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountContact
+		*t = value
+	case "attachments,assignees,account,contact,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator
+		*t = value
+	case "attachments,assignees,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,account,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket
+		*t = value
+	case "attachments,assignees,account,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountCreator
+		*t = value
+	case "attachments,assignees,account,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
+		*t = value
+	case "attachments,assignees,account,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket
+		*t = value
+	case "attachments,assignees,collections":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollections
+		*t = value
+	case "attachments,assignees,collections,account":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount
+		*t = value
+	case "attachments,assignees,collections,account,contact":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact
+		*t = value
+	case "attachments,assignees,collections,account,contact,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
+		*t = value
+	case "attachments,assignees,collections,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,account,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
+		*t = value
+	case "attachments,assignees,collections,account,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator
+		*t = value
+	case "attachments,assignees,collections,account,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,account,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
+		*t = value
+	case "attachments,assignees,collections,contact":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContact
+		*t = value
+	case "attachments,assignees,collections,contact,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator
+		*t = value
+	case "attachments,assignees,collections,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
+		*t = value
+	case "attachments,assignees,collections,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator
+		*t = value
+	case "attachments,assignees,collections,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket
+		*t = value
+	case "attachments,assignees,contact":
+		value := TicketsListRequestExpandAttachmentsAssigneesContact
+		*t = value
+	case "attachments,assignees,contact,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesContactCreator
+		*t = value
+	case "attachments,assignees,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesContactParentTicket
+		*t = value
+	case "attachments,assignees,creator":
+		value := TicketsListRequestExpandAttachmentsAssigneesCreator
+		*t = value
+	case "attachments,assignees,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket
+		*t = value
+	case "attachments,assignees,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsAssigneesParentTicket
+		*t = value
+	case "attachments,collections":
+		value := TicketsListRequestExpandAttachmentsCollections
+		*t = value
+	case "attachments,collections,account":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccount
+		*t = value
+	case "attachments,collections,account,contact":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountContact
+		*t = value
+	case "attachments,collections,account,contact,creator":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator
+		*t = value
+	case "attachments,collections,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,collections,account,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket
+		*t = value
+	case "attachments,collections,account,creator":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountCreator
+		*t = value
+	case "attachments,collections,account,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
+		*t = value
+	case "attachments,collections,account,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket
+		*t = value
+	case "attachments,collections,contact":
+		value := TicketsListRequestExpandAttachmentsCollectionsContact
+		*t = value
+	case "attachments,collections,contact,creator":
+		value := TicketsListRequestExpandAttachmentsCollectionsContactCreator
+		*t = value
+	case "attachments,collections,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket
+		*t = value
+	case "attachments,collections,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsContactParentTicket
+		*t = value
+	case "attachments,collections,creator":
+		value := TicketsListRequestExpandAttachmentsCollectionsCreator
+		*t = value
+	case "attachments,collections,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket
+		*t = value
+	case "attachments,collections,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCollectionsParentTicket
+		*t = value
+	case "attachments,contact":
+		value := TicketsListRequestExpandAttachmentsContact
+		*t = value
+	case "attachments,contact,creator":
+		value := TicketsListRequestExpandAttachmentsContactCreator
+		*t = value
+	case "attachments,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsContactCreatorParentTicket
+		*t = value
+	case "attachments,contact,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsContactParentTicket
+		*t = value
+	case "attachments,creator":
+		value := TicketsListRequestExpandAttachmentsCreator
+		*t = value
+	case "attachments,creator,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsCreatorParentTicket
+		*t = value
+	case "attachments,parent_ticket":
+		value := TicketsListRequestExpandAttachmentsParentTicket
+		*t = value
+	case "collections":
+		value := TicketsListRequestExpandCollections
+		*t = value
+	case "collections,account":
+		value := TicketsListRequestExpandCollectionsAccount
+		*t = value
+	case "collections,account,contact":
+		value := TicketsListRequestExpandCollectionsAccountContact
+		*t = value
+	case "collections,account,contact,creator":
+		value := TicketsListRequestExpandCollectionsAccountContactCreator
+		*t = value
+	case "collections,account,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "collections,account,contact,parent_ticket":
+		value := TicketsListRequestExpandCollectionsAccountContactParentTicket
+		*t = value
+	case "collections,account,creator":
+		value := TicketsListRequestExpandCollectionsAccountCreator
+		*t = value
+	case "collections,account,creator,parent_ticket":
+		value := TicketsListRequestExpandCollectionsAccountCreatorParentTicket
+		*t = value
+	case "collections,account,parent_ticket":
+		value := TicketsListRequestExpandCollectionsAccountParentTicket
+		*t = value
+	case "collections,contact":
+		value := TicketsListRequestExpandCollectionsContact
+		*t = value
+	case "collections,contact,creator":
+		value := TicketsListRequestExpandCollectionsContactCreator
+		*t = value
+	case "collections,contact,creator,parent_ticket":
+		value := TicketsListRequestExpandCollectionsContactCreatorParentTicket
+		*t = value
+	case "collections,contact,parent_ticket":
+		value := TicketsListRequestExpandCollectionsContactParentTicket
+		*t = value
+	case "collections,creator":
+		value := TicketsListRequestExpandCollectionsCreator
+		*t = value
+	case "collections,creator,parent_ticket":
+		value := TicketsListRequestExpandCollectionsCreatorParentTicket
+		*t = value
+	case "collections,parent_ticket":
+		value := TicketsListRequestExpandCollectionsParentTicket
+		*t = value
+	case "contact":
+		value := TicketsListRequestExpandContact
+		*t = value
+	case "contact,creator":
+		value := TicketsListRequestExpandContactCreator
+		*t = value
+	case "contact,creator,parent_ticket":
+		value := TicketsListRequestExpandContactCreatorParentTicket
+		*t = value
+	case "contact,parent_ticket":
+		value := TicketsListRequestExpandContactParentTicket
+		*t = value
+	case "creator":
+		value := TicketsListRequestExpandCreator
+		*t = value
+	case "creator,parent_ticket":
+		value := TicketsListRequestExpandCreatorParentTicket
+		*t = value
+	case "parent_ticket":
+		value := TicketsListRequestExpandParentTicket
+		*t = value
+	}
+	return nil
+}
+
+type TicketsListRequestPriority uint
+
+const (
+	TicketsListRequestPriorityHigh TicketsListRequestPriority = iota + 1
+	TicketsListRequestPriorityLow
+	TicketsListRequestPriorityNormal
+	TicketsListRequestPriorityUrgent
+)
+
+func (t TicketsListRequestPriority) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsListRequestPriorityHigh:
+		return "HIGH"
+	case TicketsListRequestPriorityLow:
+		return "LOW"
+	case TicketsListRequestPriorityNormal:
+		return "NORMAL"
+	case TicketsListRequestPriorityUrgent:
+		return "URGENT"
+	}
+}
+
+func (t TicketsListRequestPriority) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsListRequestPriority) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "HIGH":
+		value := TicketsListRequestPriorityHigh
+		*t = value
+	case "LOW":
+		value := TicketsListRequestPriorityLow
+		*t = value
+	case "NORMAL":
+		value := TicketsListRequestPriorityNormal
+		*t = value
+	case "URGENT":
+		value := TicketsListRequestPriorityUrgent
+		*t = value
+	}
+	return nil
+}
+
+type TicketsListRequestRemoteFields uint
+
+const (
+	TicketsListRequestRemoteFieldsPriority TicketsListRequestRemoteFields = iota + 1
+	TicketsListRequestRemoteFieldsPriorityStatus
+	TicketsListRequestRemoteFieldsPriorityStatusTicketType
+	TicketsListRequestRemoteFieldsPriorityTicketType
+	TicketsListRequestRemoteFieldsStatus
+	TicketsListRequestRemoteFieldsStatusTicketType
+	TicketsListRequestRemoteFieldsTicketType
+)
+
+func (t TicketsListRequestRemoteFields) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsListRequestRemoteFieldsPriority:
+		return "priority"
+	case TicketsListRequestRemoteFieldsPriorityStatus:
+		return "priority,status"
+	case TicketsListRequestRemoteFieldsPriorityStatusTicketType:
+		return "priority,status,ticket_type"
+	case TicketsListRequestRemoteFieldsPriorityTicketType:
+		return "priority,ticket_type"
+	case TicketsListRequestRemoteFieldsStatus:
+		return "status"
+	case TicketsListRequestRemoteFieldsStatusTicketType:
+		return "status,ticket_type"
+	case TicketsListRequestRemoteFieldsTicketType:
+		return "ticket_type"
+	}
+}
+
+func (t TicketsListRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsListRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "priority":
+		value := TicketsListRequestRemoteFieldsPriority
+		*t = value
+	case "priority,status":
+		value := TicketsListRequestRemoteFieldsPriorityStatus
+		*t = value
+	case "priority,status,ticket_type":
+		value := TicketsListRequestRemoteFieldsPriorityStatusTicketType
+		*t = value
+	case "priority,ticket_type":
+		value := TicketsListRequestRemoteFieldsPriorityTicketType
+		*t = value
+	case "status":
+		value := TicketsListRequestRemoteFieldsStatus
+		*t = value
+	case "status,ticket_type":
+		value := TicketsListRequestRemoteFieldsStatusTicketType
+		*t = value
+	case "ticket_type":
+		value := TicketsListRequestRemoteFieldsTicketType
+		*t = value
+	}
+	return nil
+}
+
+type TicketsListRequestShowEnumOrigins uint
+
+const (
+	TicketsListRequestShowEnumOriginsPriority TicketsListRequestShowEnumOrigins = iota + 1
+	TicketsListRequestShowEnumOriginsPriorityStatus
+	TicketsListRequestShowEnumOriginsPriorityStatusTicketType
+	TicketsListRequestShowEnumOriginsPriorityTicketType
+	TicketsListRequestShowEnumOriginsStatus
+	TicketsListRequestShowEnumOriginsStatusTicketType
+	TicketsListRequestShowEnumOriginsTicketType
+)
+
+func (t TicketsListRequestShowEnumOrigins) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsListRequestShowEnumOriginsPriority:
+		return "priority"
+	case TicketsListRequestShowEnumOriginsPriorityStatus:
+		return "priority,status"
+	case TicketsListRequestShowEnumOriginsPriorityStatusTicketType:
+		return "priority,status,ticket_type"
+	case TicketsListRequestShowEnumOriginsPriorityTicketType:
+		return "priority,ticket_type"
+	case TicketsListRequestShowEnumOriginsStatus:
+		return "status"
+	case TicketsListRequestShowEnumOriginsStatusTicketType:
+		return "status,ticket_type"
+	case TicketsListRequestShowEnumOriginsTicketType:
+		return "ticket_type"
+	}
+}
+
+func (t TicketsListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "priority":
+		value := TicketsListRequestShowEnumOriginsPriority
+		*t = value
+	case "priority,status":
+		value := TicketsListRequestShowEnumOriginsPriorityStatus
+		*t = value
+	case "priority,status,ticket_type":
+		value := TicketsListRequestShowEnumOriginsPriorityStatusTicketType
+		*t = value
+	case "priority,ticket_type":
+		value := TicketsListRequestShowEnumOriginsPriorityTicketType
+		*t = value
+	case "status":
+		value := TicketsListRequestShowEnumOriginsStatus
+		*t = value
+	case "status,ticket_type":
+		value := TicketsListRequestShowEnumOriginsStatusTicketType
+		*t = value
+	case "ticket_type":
+		value := TicketsListRequestShowEnumOriginsTicketType
+		*t = value
+	}
+	return nil
+}
+
+type TicketsListRequestStatus uint
+
+const (
+	TicketsListRequestStatusClosed TicketsListRequestStatus = iota + 1
+	TicketsListRequestStatusInProgress
+	TicketsListRequestStatusOnHold
+	TicketsListRequestStatusOpen
+)
+
+func (t TicketsListRequestStatus) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsListRequestStatusClosed:
+		return "CLOSED"
+	case TicketsListRequestStatusInProgress:
+		return "IN_PROGRESS"
+	case TicketsListRequestStatusOnHold:
+		return "ON_HOLD"
+	case TicketsListRequestStatusOpen:
+		return "OPEN"
+	}
+}
+
+func (t TicketsListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "CLOSED":
+		value := TicketsListRequestStatusClosed
+		*t = value
+	case "IN_PROGRESS":
+		value := TicketsListRequestStatusInProgress
+		*t = value
+	case "ON_HOLD":
+		value := TicketsListRequestStatusOnHold
+		*t = value
+	case "OPEN":
+		value := TicketsListRequestStatusOpen
+		*t = value
+	}
+	return nil
+}
+
+type TicketsRetrieveRequestExpand uint
+
+const (
+	TicketsRetrieveRequestExpandAccount TicketsRetrieveRequestExpand = iota + 1
+	TicketsRetrieveRequestExpandAccountContact
+	TicketsRetrieveRequestExpandAccountContactCreator
+	TicketsRetrieveRequestExpandAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAccountContactParentTicket
+	TicketsRetrieveRequestExpandAccountCreator
+	TicketsRetrieveRequestExpandAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAccountParentTicket
+	TicketsRetrieveRequestExpandAssignees
+	TicketsRetrieveRequestExpandAssigneesAccount
+	TicketsRetrieveRequestExpandAssigneesAccountContact
+	TicketsRetrieveRequestExpandAssigneesAccountContactCreator
+	TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket
+	TicketsRetrieveRequestExpandAssigneesAccountCreator
+	TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesAccountParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollections
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccount
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsContact
+	TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator
+	TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsCreator
+	TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket
+	TicketsRetrieveRequestExpandAssigneesContact
+	TicketsRetrieveRequestExpandAssigneesContactCreator
+	TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesContactParentTicket
+	TicketsRetrieveRequestExpandAssigneesCreator
+	TicketsRetrieveRequestExpandAssigneesCreatorParentTicket
+	TicketsRetrieveRequestExpandAssigneesParentTicket
+	TicketsRetrieveRequestExpandAttachments
+	TicketsRetrieveRequestExpandAttachmentsAccount
+	TicketsRetrieveRequestExpandAttachmentsAccountContact
+	TicketsRetrieveRequestExpandAttachmentsAccountContactCreator
+	TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAccountCreator
+	TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAccountParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssignees
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccount
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollections
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContact
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCreator
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollections
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccount
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContact
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsCreator
+	TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket
+	TicketsRetrieveRequestExpandAttachmentsContact
+	TicketsRetrieveRequestExpandAttachmentsContactCreator
+	TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsContactParentTicket
+	TicketsRetrieveRequestExpandAttachmentsCreator
+	TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket
+	TicketsRetrieveRequestExpandAttachmentsParentTicket
+	TicketsRetrieveRequestExpandCollections
+	TicketsRetrieveRequestExpandCollectionsAccount
+	TicketsRetrieveRequestExpandCollectionsAccountContact
+	TicketsRetrieveRequestExpandCollectionsAccountContactCreator
+	TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket
+	TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket
+	TicketsRetrieveRequestExpandCollectionsAccountCreator
+	TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket
+	TicketsRetrieveRequestExpandCollectionsAccountParentTicket
+	TicketsRetrieveRequestExpandCollectionsContact
+	TicketsRetrieveRequestExpandCollectionsContactCreator
+	TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket
+	TicketsRetrieveRequestExpandCollectionsContactParentTicket
+	TicketsRetrieveRequestExpandCollectionsCreator
+	TicketsRetrieveRequestExpandCollectionsCreatorParentTicket
+	TicketsRetrieveRequestExpandCollectionsParentTicket
+	TicketsRetrieveRequestExpandContact
+	TicketsRetrieveRequestExpandContactCreator
+	TicketsRetrieveRequestExpandContactCreatorParentTicket
+	TicketsRetrieveRequestExpandContactParentTicket
+	TicketsRetrieveRequestExpandCreator
+	TicketsRetrieveRequestExpandCreatorParentTicket
+	TicketsRetrieveRequestExpandParentTicket
+)
+
+func (t TicketsRetrieveRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsRetrieveRequestExpandAccount:
+		return "account"
+	case TicketsRetrieveRequestExpandAccountContact:
+		return "account,contact"
+	case TicketsRetrieveRequestExpandAccountContactCreator:
+		return "account,contact,creator"
+	case TicketsRetrieveRequestExpandAccountContactCreatorParentTicket:
+		return "account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAccountContactParentTicket:
+		return "account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAccountCreator:
+		return "account,creator"
+	case TicketsRetrieveRequestExpandAccountCreatorParentTicket:
+		return "account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAccountParentTicket:
+		return "account,parent_ticket"
+	case TicketsRetrieveRequestExpandAssignees:
+		return "assignees"
+	case TicketsRetrieveRequestExpandAssigneesAccount:
+		return "assignees,account"
+	case TicketsRetrieveRequestExpandAssigneesAccountContact:
+		return "assignees,account,contact"
+	case TicketsRetrieveRequestExpandAssigneesAccountContactCreator:
+		return "assignees,account,contact,creator"
+	case TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket:
+		return "assignees,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket:
+		return "assignees,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesAccountCreator:
+		return "assignees,account,creator"
+	case TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket:
+		return "assignees,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesAccountParentTicket:
+		return "assignees,account,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollections:
+		return "assignees,collections"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccount:
+		return "assignees,collections,account"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact:
+		return "assignees,collections,account,contact"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator:
+		return "assignees,collections,account,contact,creator"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket:
+		return "assignees,collections,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket:
+		return "assignees,collections,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator:
+		return "assignees,collections,account,creator"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket:
+		return "assignees,collections,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket:
+		return "assignees,collections,account,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsContact:
+		return "assignees,collections,contact"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator:
+		return "assignees,collections,contact,creator"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket:
+		return "assignees,collections,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket:
+		return "assignees,collections,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsCreator:
+		return "assignees,collections,creator"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket:
+		return "assignees,collections,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket:
+		return "assignees,collections,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesContact:
+		return "assignees,contact"
+	case TicketsRetrieveRequestExpandAssigneesContactCreator:
+		return "assignees,contact,creator"
+	case TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket:
+		return "assignees,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesContactParentTicket:
+		return "assignees,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesCreator:
+		return "assignees,creator"
+	case TicketsRetrieveRequestExpandAssigneesCreatorParentTicket:
+		return "assignees,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAssigneesParentTicket:
+		return "assignees,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachments:
+		return "attachments"
+	case TicketsRetrieveRequestExpandAttachmentsAccount:
+		return "attachments,account"
+	case TicketsRetrieveRequestExpandAttachmentsAccountContact:
+		return "attachments,account,contact"
+	case TicketsRetrieveRequestExpandAttachmentsAccountContactCreator:
+		return "attachments,account,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket:
+		return "attachments,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket:
+		return "attachments,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAccountCreator:
+		return "attachments,account,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket:
+		return "attachments,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAccountParentTicket:
+		return "attachments,account,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssignees:
+		return "attachments,assignees"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccount:
+		return "attachments,assignees,account"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact:
+		return "attachments,assignees,account,contact"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator:
+		return "attachments,assignees,account,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket:
+		return "attachments,assignees,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket:
+		return "attachments,assignees,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator:
+		return "attachments,assignees,account,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket:
+		return "attachments,assignees,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket:
+		return "attachments,assignees,account,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollections:
+		return "attachments,assignees,collections"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount:
+		return "attachments,assignees,collections,account"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact:
+		return "attachments,assignees,collections,account,contact"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator:
+		return "attachments,assignees,collections,account,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket:
+		return "attachments,assignees,collections,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket:
+		return "attachments,assignees,collections,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator:
+		return "attachments,assignees,collections,account,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket:
+		return "attachments,assignees,collections,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket:
+		return "attachments,assignees,collections,account,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact:
+		return "attachments,assignees,collections,contact"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator:
+		return "attachments,assignees,collections,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket:
+		return "attachments,assignees,collections,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket:
+		return "attachments,assignees,collections,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator:
+		return "attachments,assignees,collections,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket:
+		return "attachments,assignees,collections,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket:
+		return "attachments,assignees,collections,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesContact:
+		return "attachments,assignees,contact"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator:
+		return "attachments,assignees,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket:
+		return "attachments,assignees,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket:
+		return "attachments,assignees,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCreator:
+		return "attachments,assignees,creator"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket:
+		return "attachments,assignees,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket:
+		return "attachments,assignees,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollections:
+		return "attachments,collections"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccount:
+		return "attachments,collections,account"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact:
+		return "attachments,collections,account,contact"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator:
+		return "attachments,collections,account,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket:
+		return "attachments,collections,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket:
+		return "attachments,collections,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator:
+		return "attachments,collections,account,creator"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket:
+		return "attachments,collections,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket:
+		return "attachments,collections,account,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsContact:
+		return "attachments,collections,contact"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator:
+		return "attachments,collections,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket:
+		return "attachments,collections,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket:
+		return "attachments,collections,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsCreator:
+		return "attachments,collections,creator"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket:
+		return "attachments,collections,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket:
+		return "attachments,collections,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsContact:
+		return "attachments,contact"
+	case TicketsRetrieveRequestExpandAttachmentsContactCreator:
+		return "attachments,contact,creator"
+	case TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket:
+		return "attachments,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsContactParentTicket:
+		return "attachments,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsCreator:
+		return "attachments,creator"
+	case TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket:
+		return "attachments,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandAttachmentsParentTicket:
+		return "attachments,parent_ticket"
+	case TicketsRetrieveRequestExpandCollections:
+		return "collections"
+	case TicketsRetrieveRequestExpandCollectionsAccount:
+		return "collections,account"
+	case TicketsRetrieveRequestExpandCollectionsAccountContact:
+		return "collections,account,contact"
+	case TicketsRetrieveRequestExpandCollectionsAccountContactCreator:
+		return "collections,account,contact,creator"
+	case TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket:
+		return "collections,account,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket:
+		return "collections,account,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsAccountCreator:
+		return "collections,account,creator"
+	case TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket:
+		return "collections,account,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsAccountParentTicket:
+		return "collections,account,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsContact:
+		return "collections,contact"
+	case TicketsRetrieveRequestExpandCollectionsContactCreator:
+		return "collections,contact,creator"
+	case TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket:
+		return "collections,contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsContactParentTicket:
+		return "collections,contact,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsCreator:
+		return "collections,creator"
+	case TicketsRetrieveRequestExpandCollectionsCreatorParentTicket:
+		return "collections,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandCollectionsParentTicket:
+		return "collections,parent_ticket"
+	case TicketsRetrieveRequestExpandContact:
+		return "contact"
+	case TicketsRetrieveRequestExpandContactCreator:
+		return "contact,creator"
+	case TicketsRetrieveRequestExpandContactCreatorParentTicket:
+		return "contact,creator,parent_ticket"
+	case TicketsRetrieveRequestExpandContactParentTicket:
+		return "contact,parent_ticket"
+	case TicketsRetrieveRequestExpandCreator:
+		return "creator"
+	case TicketsRetrieveRequestExpandCreatorParentTicket:
+		return "creator,parent_ticket"
+	case TicketsRetrieveRequestExpandParentTicket:
+		return "parent_ticket"
+	}
+}
+
+func (t TicketsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := TicketsRetrieveRequestExpandAccount
+		*t = value
+	case "account,contact":
+		value := TicketsRetrieveRequestExpandAccountContact
+		*t = value
+	case "account,contact,creator":
+		value := TicketsRetrieveRequestExpandAccountContactCreator
+		*t = value
+	case "account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAccountContactCreatorParentTicket
+		*t = value
+	case "account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAccountContactParentTicket
+		*t = value
+	case "account,creator":
+		value := TicketsRetrieveRequestExpandAccountCreator
+		*t = value
+	case "account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAccountCreatorParentTicket
+		*t = value
+	case "account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAccountParentTicket
+		*t = value
+	case "assignees":
+		value := TicketsRetrieveRequestExpandAssignees
+		*t = value
+	case "assignees,account":
+		value := TicketsRetrieveRequestExpandAssigneesAccount
+		*t = value
+	case "assignees,account,contact":
+		value := TicketsRetrieveRequestExpandAssigneesAccountContact
+		*t = value
+	case "assignees,account,contact,creator":
+		value := TicketsRetrieveRequestExpandAssigneesAccountContactCreator
+		*t = value
+	case "assignees,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket
+		*t = value
+	case "assignees,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket
+		*t = value
+	case "assignees,account,creator":
+		value := TicketsRetrieveRequestExpandAssigneesAccountCreator
+		*t = value
+	case "assignees,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket
+		*t = value
+	case "assignees,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesAccountParentTicket
+		*t = value
+	case "assignees,collections":
+		value := TicketsRetrieveRequestExpandAssigneesCollections
+		*t = value
+	case "assignees,collections,account":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccount
+		*t = value
+	case "assignees,collections,account,contact":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact
+		*t = value
+	case "assignees,collections,account,contact,creator":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator
+		*t = value
+	case "assignees,collections,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "assignees,collections,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket
+		*t = value
+	case "assignees,collections,account,creator":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator
+		*t = value
+	case "assignees,collections,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket
+		*t = value
+	case "assignees,collections,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket
+		*t = value
+	case "assignees,collections,contact":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsContact
+		*t = value
+	case "assignees,collections,contact,creator":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator
+		*t = value
+	case "assignees,collections,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket
+		*t = value
+	case "assignees,collections,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket
+		*t = value
+	case "assignees,collections,creator":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsCreator
+		*t = value
+	case "assignees,collections,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket
+		*t = value
+	case "assignees,collections,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket
+		*t = value
+	case "assignees,contact":
+		value := TicketsRetrieveRequestExpandAssigneesContact
+		*t = value
+	case "assignees,contact,creator":
+		value := TicketsRetrieveRequestExpandAssigneesContactCreator
+		*t = value
+	case "assignees,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket
+		*t = value
+	case "assignees,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesContactParentTicket
+		*t = value
+	case "assignees,creator":
+		value := TicketsRetrieveRequestExpandAssigneesCreator
+		*t = value
+	case "assignees,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesCreatorParentTicket
+		*t = value
+	case "assignees,parent_ticket":
+		value := TicketsRetrieveRequestExpandAssigneesParentTicket
+		*t = value
+	case "attachments":
+		value := TicketsRetrieveRequestExpandAttachments
+		*t = value
+	case "attachments,account":
+		value := TicketsRetrieveRequestExpandAttachmentsAccount
+		*t = value
+	case "attachments,account,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountContact
+		*t = value
+	case "attachments,account,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountContactCreator
+		*t = value
+	case "attachments,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket
+		*t = value
+	case "attachments,account,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountCreator
+		*t = value
+	case "attachments,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket
+		*t = value
+	case "attachments,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAccountParentTicket
+		*t = value
+	case "attachments,assignees":
+		value := TicketsRetrieveRequestExpandAttachmentsAssignees
+		*t = value
+	case "attachments,assignees,account":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccount
+		*t = value
+	case "attachments,assignees,account,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact
+		*t = value
+	case "attachments,assignees,account,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator
+		*t = value
+	case "attachments,assignees,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket
+		*t = value
+	case "attachments,assignees,account,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator
+		*t = value
+	case "attachments,assignees,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
+		*t = value
+	case "attachments,assignees,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket
+		*t = value
+	case "attachments,assignees,collections":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollections
+		*t = value
+	case "attachments,assignees,collections,account":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount
+		*t = value
+	case "attachments,assignees,collections,account,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact
+		*t = value
+	case "attachments,assignees,collections,account,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
+		*t = value
+	case "attachments,assignees,collections,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
+		*t = value
+	case "attachments,assignees,collections,account,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator
+		*t = value
+	case "attachments,assignees,collections,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
+		*t = value
+	case "attachments,assignees,collections,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact
+		*t = value
+	case "attachments,assignees,collections,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator
+		*t = value
+	case "attachments,assignees,collections,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
+		*t = value
+	case "attachments,assignees,collections,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator
+		*t = value
+	case "attachments,assignees,collections,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
+		*t = value
+	case "attachments,assignees,collections,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket
+		*t = value
+	case "attachments,assignees,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContact
+		*t = value
+	case "attachments,assignees,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator
+		*t = value
+	case "attachments,assignees,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket
+		*t = value
+	case "attachments,assignees,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket
+		*t = value
+	case "attachments,assignees,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCreator
+		*t = value
+	case "attachments,assignees,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket
+		*t = value
+	case "attachments,assignees,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket
+		*t = value
+	case "attachments,collections":
+		value := TicketsRetrieveRequestExpandAttachmentsCollections
+		*t = value
+	case "attachments,collections,account":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccount
+		*t = value
+	case "attachments,collections,account,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact
+		*t = value
+	case "attachments,collections,account,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator
+		*t = value
+	case "attachments,collections,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "attachments,collections,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket
+		*t = value
+	case "attachments,collections,account,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator
+		*t = value
+	case "attachments,collections,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
+		*t = value
+	case "attachments,collections,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket
+		*t = value
+	case "attachments,collections,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContact
+		*t = value
+	case "attachments,collections,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator
+		*t = value
+	case "attachments,collections,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket
+		*t = value
+	case "attachments,collections,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket
+		*t = value
+	case "attachments,collections,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsCreator
+		*t = value
+	case "attachments,collections,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket
+		*t = value
+	case "attachments,collections,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket
+		*t = value
+	case "attachments,contact":
+		value := TicketsRetrieveRequestExpandAttachmentsContact
+		*t = value
+	case "attachments,contact,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsContactCreator
+		*t = value
+	case "attachments,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket
+		*t = value
+	case "attachments,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsContactParentTicket
+		*t = value
+	case "attachments,creator":
+		value := TicketsRetrieveRequestExpandAttachmentsCreator
+		*t = value
+	case "attachments,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket
+		*t = value
+	case "attachments,parent_ticket":
+		value := TicketsRetrieveRequestExpandAttachmentsParentTicket
+		*t = value
+	case "collections":
+		value := TicketsRetrieveRequestExpandCollections
+		*t = value
+	case "collections,account":
+		value := TicketsRetrieveRequestExpandCollectionsAccount
+		*t = value
+	case "collections,account,contact":
+		value := TicketsRetrieveRequestExpandCollectionsAccountContact
+		*t = value
+	case "collections,account,contact,creator":
+		value := TicketsRetrieveRequestExpandCollectionsAccountContactCreator
+		*t = value
+	case "collections,account,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket
+		*t = value
+	case "collections,account,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket
+		*t = value
+	case "collections,account,creator":
+		value := TicketsRetrieveRequestExpandCollectionsAccountCreator
+		*t = value
+	case "collections,account,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket
+		*t = value
+	case "collections,account,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsAccountParentTicket
+		*t = value
+	case "collections,contact":
+		value := TicketsRetrieveRequestExpandCollectionsContact
+		*t = value
+	case "collections,contact,creator":
+		value := TicketsRetrieveRequestExpandCollectionsContactCreator
+		*t = value
+	case "collections,contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket
+		*t = value
+	case "collections,contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsContactParentTicket
+		*t = value
+	case "collections,creator":
+		value := TicketsRetrieveRequestExpandCollectionsCreator
+		*t = value
+	case "collections,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsCreatorParentTicket
+		*t = value
+	case "collections,parent_ticket":
+		value := TicketsRetrieveRequestExpandCollectionsParentTicket
+		*t = value
+	case "contact":
+		value := TicketsRetrieveRequestExpandContact
+		*t = value
+	case "contact,creator":
+		value := TicketsRetrieveRequestExpandContactCreator
+		*t = value
+	case "contact,creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandContactCreatorParentTicket
+		*t = value
+	case "contact,parent_ticket":
+		value := TicketsRetrieveRequestExpandContactParentTicket
+		*t = value
+	case "creator":
+		value := TicketsRetrieveRequestExpandCreator
+		*t = value
+	case "creator,parent_ticket":
+		value := TicketsRetrieveRequestExpandCreatorParentTicket
+		*t = value
+	case "parent_ticket":
+		value := TicketsRetrieveRequestExpandParentTicket
+		*t = value
+	}
+	return nil
+}
+
+type TicketsRetrieveRequestRemoteFields uint
+
+const (
+	TicketsRetrieveRequestRemoteFieldsPriority TicketsRetrieveRequestRemoteFields = iota + 1
+	TicketsRetrieveRequestRemoteFieldsPriorityStatus
+	TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType
+	TicketsRetrieveRequestRemoteFieldsPriorityTicketType
+	TicketsRetrieveRequestRemoteFieldsStatus
+	TicketsRetrieveRequestRemoteFieldsStatusTicketType
+	TicketsRetrieveRequestRemoteFieldsTicketType
+)
+
+func (t TicketsRetrieveRequestRemoteFields) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsRetrieveRequestRemoteFieldsPriority:
+		return "priority"
+	case TicketsRetrieveRequestRemoteFieldsPriorityStatus:
+		return "priority,status"
+	case TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType:
+		return "priority,status,ticket_type"
+	case TicketsRetrieveRequestRemoteFieldsPriorityTicketType:
+		return "priority,ticket_type"
+	case TicketsRetrieveRequestRemoteFieldsStatus:
+		return "status"
+	case TicketsRetrieveRequestRemoteFieldsStatusTicketType:
+		return "status,ticket_type"
+	case TicketsRetrieveRequestRemoteFieldsTicketType:
+		return "ticket_type"
+	}
+}
+
+func (t TicketsRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "priority":
+		value := TicketsRetrieveRequestRemoteFieldsPriority
+		*t = value
+	case "priority,status":
+		value := TicketsRetrieveRequestRemoteFieldsPriorityStatus
+		*t = value
+	case "priority,status,ticket_type":
+		value := TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType
+		*t = value
+	case "priority,ticket_type":
+		value := TicketsRetrieveRequestRemoteFieldsPriorityTicketType
+		*t = value
+	case "status":
+		value := TicketsRetrieveRequestRemoteFieldsStatus
+		*t = value
+	case "status,ticket_type":
+		value := TicketsRetrieveRequestRemoteFieldsStatusTicketType
+		*t = value
+	case "ticket_type":
+		value := TicketsRetrieveRequestRemoteFieldsTicketType
+		*t = value
+	}
+	return nil
+}
+
+type TicketsRetrieveRequestShowEnumOrigins uint
+
+const (
+	TicketsRetrieveRequestShowEnumOriginsPriority TicketsRetrieveRequestShowEnumOrigins = iota + 1
+	TicketsRetrieveRequestShowEnumOriginsPriorityStatus
+	TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType
+	TicketsRetrieveRequestShowEnumOriginsPriorityTicketType
+	TicketsRetrieveRequestShowEnumOriginsStatus
+	TicketsRetrieveRequestShowEnumOriginsStatusTicketType
+	TicketsRetrieveRequestShowEnumOriginsTicketType
+)
+
+func (t TicketsRetrieveRequestShowEnumOrigins) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TicketsRetrieveRequestShowEnumOriginsPriority:
+		return "priority"
+	case TicketsRetrieveRequestShowEnumOriginsPriorityStatus:
+		return "priority,status"
+	case TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType:
+		return "priority,status,ticket_type"
+	case TicketsRetrieveRequestShowEnumOriginsPriorityTicketType:
+		return "priority,ticket_type"
+	case TicketsRetrieveRequestShowEnumOriginsStatus:
+		return "status"
+	case TicketsRetrieveRequestShowEnumOriginsStatusTicketType:
+		return "status,ticket_type"
+	case TicketsRetrieveRequestShowEnumOriginsTicketType:
+		return "ticket_type"
+	}
+}
+
+func (t TicketsRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TicketsRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "priority":
+		value := TicketsRetrieveRequestShowEnumOriginsPriority
+		*t = value
+	case "priority,status":
+		value := TicketsRetrieveRequestShowEnumOriginsPriorityStatus
+		*t = value
+	case "priority,status,ticket_type":
+		value := TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType
+		*t = value
+	case "priority,ticket_type":
+		value := TicketsRetrieveRequestShowEnumOriginsPriorityTicketType
+		*t = value
+	case "status":
+		value := TicketsRetrieveRequestShowEnumOriginsStatus
+		*t = value
+	case "status,ticket_type":
+		value := TicketsRetrieveRequestShowEnumOriginsStatusTicketType
+		*t = value
+	case "ticket_type":
+		value := TicketsRetrieveRequestShowEnumOriginsTicketType
+		*t = value
+	}
+	return nil
+}
+
 // # The User Object
-//
 // ### Description
-//
 // The `User` object is used to represent an employee within a company.
 //
 // ### Usage Example
-//
 // TODO
 type User struct {
 	Id *string `json:"id,omitempty"`
@@ -5328,6 +7619,94 @@ func (u *UserTeamsItem) Accept(visitor UserTeamsItemVisitor) error {
 	case "team":
 		return visitor.VisitTeam(u.Team)
 	}
+}
+
+type UsersListRequestExpand uint
+
+const (
+	UsersListRequestExpandRoles UsersListRequestExpand = iota + 1
+	UsersListRequestExpandTeams
+	UsersListRequestExpandTeamsRoles
+)
+
+func (u UsersListRequestExpand) String() string {
+	switch u {
+	default:
+		return strconv.Itoa(int(u))
+	case UsersListRequestExpandRoles:
+		return "roles"
+	case UsersListRequestExpandTeams:
+		return "teams"
+	case UsersListRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (u UsersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", u.String())), nil
+}
+
+func (u *UsersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := UsersListRequestExpandRoles
+		*u = value
+	case "teams":
+		value := UsersListRequestExpandTeams
+		*u = value
+	case "teams,roles":
+		value := UsersListRequestExpandTeamsRoles
+		*u = value
+	}
+	return nil
+}
+
+type UsersRetrieveRequestExpand uint
+
+const (
+	UsersRetrieveRequestExpandRoles UsersRetrieveRequestExpand = iota + 1
+	UsersRetrieveRequestExpandTeams
+	UsersRetrieveRequestExpandTeamsRoles
+)
+
+func (u UsersRetrieveRequestExpand) String() string {
+	switch u {
+	default:
+		return strconv.Itoa(int(u))
+	case UsersRetrieveRequestExpandRoles:
+		return "roles"
+	case UsersRetrieveRequestExpandTeams:
+		return "teams"
+	case UsersRetrieveRequestExpandTeamsRoles:
+		return "teams,roles"
+	}
+}
+
+func (u UsersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", u.String())), nil
+}
+
+func (u *UsersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "roles":
+		value := UsersRetrieveRequestExpandRoles
+		*u = value
+	case "teams":
+		value := UsersRetrieveRequestExpandTeams
+		*u = value
+	case "teams,roles":
+		value := UsersRetrieveRequestExpandTeamsRoles
+		*u = value
+	}
+	return nil
 }
 
 type ValidationProblemSource struct {

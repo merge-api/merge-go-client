@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.DepartmentsListRequest) 
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "departments"
+	endpointURL := baseURL + "/" + "api/ats/v1/departments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -98,7 +98,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Departmen
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"departments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/departments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

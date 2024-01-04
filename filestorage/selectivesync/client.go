@@ -41,7 +41,7 @@ func (c *client) ConfigurationsList(ctx context.Context) ([]*filestorage.LinkedA
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "selective-sync/configurations"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/selective-sync/configurations"
 
 	var response []*filestorage.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -66,7 +66,7 @@ func (c *client) ConfigurationsUpdate(ctx context.Context, request *filestorage.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "selective-sync/configurations"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/selective-sync/configurations"
 
 	var response []*filestorage.LinkedAccountSelectiveSyncConfiguration
 	if err := core.DoRequest(
@@ -91,7 +91,7 @@ func (c *client) MetaList(ctx context.Context, request *filestorage.SelectiveSyn
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "selective-sync/meta"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

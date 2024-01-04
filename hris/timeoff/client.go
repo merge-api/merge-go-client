@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *hris.TimeOffListRequest) (*h
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "time-off"
+	endpointURL := baseURL + "/" + "api/hris/v1/time-off"
 
 	queryParams := make(url.Values)
 	if request.ApproverId != nil {
@@ -121,7 +121,7 @@ func (c *client) Create(ctx context.Context, request *hris.TimeOffEndpointReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "time-off"
+	endpointURL := baseURL + "/" + "api/hris/v1/time-off"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -157,7 +157,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.TimeOffR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"time-off/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/time-off/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -199,7 +199,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, erro
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "time-off/meta/post"
+	endpointURL := baseURL + "/" + "api/hris/v1/time-off/meta/post"
 
 	var response *hris.MetaResponse
 	if err := core.DoRequest(

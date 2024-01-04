@@ -44,7 +44,7 @@ func (c *client) List(ctx context.Context, request *crm.NotesListRequest) (*crm.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "notes"
+	endpointURL := baseURL + "/" + "api/crm/v1/notes"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -119,7 +119,7 @@ func (c *client) Create(ctx context.Context, request *crm.NoteEndpointRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "notes"
+	endpointURL := baseURL + "/" + "api/crm/v1/notes"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -155,7 +155,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.NotesRetr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"notes/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/notes/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -194,7 +194,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "notes/meta/post"
+	endpointURL := baseURL + "/" + "api/crm/v1/notes/meta/post"
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -219,7 +219,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.NotesR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "notes/remote-field-classes"
+	endpointURL := baseURL + "/" + "api/crm/v1/notes/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

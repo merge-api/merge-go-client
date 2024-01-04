@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *accounting.SyncStatusListReq
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "sync-status"
+	endpointURL := baseURL + "/" + "api/accounting/v1/sync-status"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

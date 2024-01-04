@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.TeamsListRequest) (*hri
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "teams"
+	endpointURL := baseURL + "/" + "api/hris/v1/teams"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -104,7 +104,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.TeamsRet
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"teams/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/teams/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

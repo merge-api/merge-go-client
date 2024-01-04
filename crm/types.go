@@ -10,13 +10,9 @@ import (
 )
 
 // # The Account Object
-//
 // ### Description
-//
 // The `Account` object is used to represent a company in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type Account struct {
 	// The account's owner.
@@ -67,13 +63,10 @@ type AccountDetails struct {
 }
 
 // # The LinkedAccount Object
-//
 // ### Description
-//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
-//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -101,9 +94,9 @@ type AccountDetailsAndActionsIntegration struct {
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
 }
 
-// - `COMPLETE` - COMPLETE
-// - `INCOMPLETE` - INCOMPLETE
-// - `RELINK_NEEDED` - RELINK_NEEDED
+// * `COMPLETE` - COMPLETE
+// * `INCOMPLETE` - INCOMPLETE
+// * `RELINK_NEEDED` - RELINK_NEEDED
 type AccountDetailsAndActionsStatusEnum uint
 
 const (
@@ -227,13 +220,9 @@ func (a *AccountOwner) Accept(visitor AccountOwnerVisitor) error {
 }
 
 // # The Account Object
-//
 // ### Description
-//
 // The `Account` object is used to represent a company in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type AccountRequest struct {
 	// The account's owner.
@@ -318,9 +307,9 @@ type AccountToken struct {
 	Integration  *AccountIntegration `json:"integration,omitempty"`
 }
 
-// - `CALL` - CALL
-// - `MEETING` - MEETING
-// - `EMAIL` - EMAIL
+// * `CALL` - CALL
+// * `MEETING` - MEETING
+// * `EMAIL` - EMAIL
 type ActivityTypeEnum uint
 
 const (
@@ -366,13 +355,9 @@ func (a *ActivityTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Address Object
-//
 // ### Description
-//
 // The `Address` object is used to represent an entity's address.
-//
 // ### Usage Example
-//
 // TODO
 type Address struct {
 	// Line 1 of the address's street.
@@ -387,260 +372,260 @@ type Address struct {
 	PostalCode *string `json:"postal_code,omitempty"`
 	// The address's country.
 	//
-	// - `AF` - Afghanistan
-	// - `AX` - Åland Islands
-	// - `AL` - Albania
-	// - `DZ` - Algeria
-	// - `AS` - American Samoa
-	// - `AD` - Andorra
-	// - `AO` - Angola
-	// - `AI` - Anguilla
-	// - `AQ` - Antarctica
-	// - `AG` - Antigua and Barbuda
-	// - `AR` - Argentina
-	// - `AM` - Armenia
-	// - `AW` - Aruba
-	// - `AU` - Australia
-	// - `AT` - Austria
-	// - `AZ` - Azerbaijan
-	// - `BS` - Bahamas
-	// - `BH` - Bahrain
-	// - `BD` - Bangladesh
-	// - `BB` - Barbados
-	// - `BY` - Belarus
-	// - `BE` - Belgium
-	// - `BZ` - Belize
-	// - `BJ` - Benin
-	// - `BM` - Bermuda
-	// - `BT` - Bhutan
-	// - `BO` - Bolivia
-	// - `BQ` - Bonaire, Sint Eustatius and Saba
-	// - `BA` - Bosnia and Herzegovina
-	// - `BW` - Botswana
-	// - `BV` - Bouvet Island
-	// - `BR` - Brazil
-	// - `IO` - British Indian Ocean Territory
-	// - `BN` - Brunei
-	// - `BG` - Bulgaria
-	// - `BF` - Burkina Faso
-	// - `BI` - Burundi
-	// - `CV` - Cabo Verde
-	// - `KH` - Cambodia
-	// - `CM` - Cameroon
-	// - `CA` - Canada
-	// - `KY` - Cayman Islands
-	// - `CF` - Central African Republic
-	// - `TD` - Chad
-	// - `CL` - Chile
-	// - `CN` - China
-	// - `CX` - Christmas Island
-	// - `CC` - Cocos (Keeling) Islands
-	// - `CO` - Colombia
-	// - `KM` - Comoros
-	// - `CG` - Congo
-	// - `CD` - Congo (the Democratic Republic of the)
-	// - `CK` - Cook Islands
-	// - `CR` - Costa Rica
-	// - `CI` - Côte d'Ivoire
-	// - `HR` - Croatia
-	// - `CU` - Cuba
-	// - `CW` - Curaçao
-	// - `CY` - Cyprus
-	// - `CZ` - Czechia
-	// - `DK` - Denmark
-	// - `DJ` - Djibouti
-	// - `DM` - Dominica
-	// - `DO` - Dominican Republic
-	// - `EC` - Ecuador
-	// - `EG` - Egypt
-	// - `SV` - El Salvador
-	// - `GQ` - Equatorial Guinea
-	// - `ER` - Eritrea
-	// - `EE` - Estonia
-	// - `SZ` - Eswatini
-	// - `ET` - Ethiopia
-	// - `FK` - Falkland Islands (Malvinas)
-	// - `FO` - Faroe Islands
-	// - `FJ` - Fiji
-	// - `FI` - Finland
-	// - `FR` - France
-	// - `GF` - French Guiana
-	// - `PF` - French Polynesia
-	// - `TF` - French Southern Territories
-	// - `GA` - Gabon
-	// - `GM` - Gambia
-	// - `GE` - Georgia
-	// - `DE` - Germany
-	// - `GH` - Ghana
-	// - `GI` - Gibraltar
-	// - `GR` - Greece
-	// - `GL` - Greenland
-	// - `GD` - Grenada
-	// - `GP` - Guadeloupe
-	// - `GU` - Guam
-	// - `GT` - Guatemala
-	// - `GG` - Guernsey
-	// - `GN` - Guinea
-	// - `GW` - Guinea-Bissau
-	// - `GY` - Guyana
-	// - `HT` - Haiti
-	// - `HM` - Heard Island and McDonald Islands
-	// - `VA` - Holy See
-	// - `HN` - Honduras
-	// - `HK` - Hong Kong
-	// - `HU` - Hungary
-	// - `IS` - Iceland
-	// - `IN` - India
-	// - `ID` - Indonesia
-	// - `IR` - Iran
-	// - `IQ` - Iraq
-	// - `IE` - Ireland
-	// - `IM` - Isle of Man
-	// - `IL` - Israel
-	// - `IT` - Italy
-	// - `JM` - Jamaica
-	// - `JP` - Japan
-	// - `JE` - Jersey
-	// - `JO` - Jordan
-	// - `KZ` - Kazakhstan
-	// - `KE` - Kenya
-	// - `KI` - Kiribati
-	// - `KW` - Kuwait
-	// - `KG` - Kyrgyzstan
-	// - `LA` - Laos
-	// - `LV` - Latvia
-	// - `LB` - Lebanon
-	// - `LS` - Lesotho
-	// - `LR` - Liberia
-	// - `LY` - Libya
-	// - `LI` - Liechtenstein
-	// - `LT` - Lithuania
-	// - `LU` - Luxembourg
-	// - `MO` - Macao
-	// - `MG` - Madagascar
-	// - `MW` - Malawi
-	// - `MY` - Malaysia
-	// - `MV` - Maldives
-	// - `ML` - Mali
-	// - `MT` - Malta
-	// - `MH` - Marshall Islands
-	// - `MQ` - Martinique
-	// - `MR` - Mauritania
-	// - `MU` - Mauritius
-	// - `YT` - Mayotte
-	// - `MX` - Mexico
-	// - `FM` - Micronesia (Federated States of)
-	// - `MD` - Moldova
-	// - `MC` - Monaco
-	// - `MN` - Mongolia
-	// - `ME` - Montenegro
-	// - `MS` - Montserrat
-	// - `MA` - Morocco
-	// - `MZ` - Mozambique
-	// - `MM` - Myanmar
-	// - `NA` - Namibia
-	// - `NR` - Nauru
-	// - `NP` - Nepal
-	// - `NL` - Netherlands
-	// - `NC` - New Caledonia
-	// - `NZ` - New Zealand
-	// - `NI` - Nicaragua
-	// - `NE` - Niger
-	// - `NG` - Nigeria
-	// - `NU` - Niue
-	// - `NF` - Norfolk Island
-	// - `KP` - North Korea
-	// - `MK` - North Macedonia
-	// - `MP` - Northern Mariana Islands
-	// - `NO` - Norway
-	// - `OM` - Oman
-	// - `PK` - Pakistan
-	// - `PW` - Palau
-	// - `PS` - Palestine, State of
-	// - `PA` - Panama
-	// - `PG` - Papua New Guinea
-	// - `PY` - Paraguay
-	// - `PE` - Peru
-	// - `PH` - Philippines
-	// - `PN` - Pitcairn
-	// - `PL` - Poland
-	// - `PT` - Portugal
-	// - `PR` - Puerto Rico
-	// - `QA` - Qatar
-	// - `RE` - Réunion
-	// - `RO` - Romania
-	// - `RU` - Russia
-	// - `RW` - Rwanda
-	// - `BL` - Saint Barthélemy
-	// - `SH` - Saint Helena, Ascension and Tristan da Cunha
-	// - `KN` - Saint Kitts and Nevis
-	// - `LC` - Saint Lucia
-	// - `MF` - Saint Martin (French part)
-	// - `PM` - Saint Pierre and Miquelon
-	// - `VC` - Saint Vincent and the Grenadines
-	// - `WS` - Samoa
-	// - `SM` - San Marino
-	// - `ST` - Sao Tome and Principe
-	// - `SA` - Saudi Arabia
-	// - `SN` - Senegal
-	// - `RS` - Serbia
-	// - `SC` - Seychelles
-	// - `SL` - Sierra Leone
-	// - `SG` - Singapore
-	// - `SX` - Sint Maarten (Dutch part)
-	// - `SK` - Slovakia
-	// - `SI` - Slovenia
-	// - `SB` - Solomon Islands
-	// - `SO` - Somalia
-	// - `ZA` - South Africa
-	// - `GS` - South Georgia and the South Sandwich Islands
-	// - `KR` - South Korea
-	// - `SS` - South Sudan
-	// - `ES` - Spain
-	// - `LK` - Sri Lanka
-	// - `SD` - Sudan
-	// - `SR` - Suriname
-	// - `SJ` - Svalbard and Jan Mayen
-	// - `SE` - Sweden
-	// - `CH` - Switzerland
-	// - `SY` - Syria
-	// - `TW` - Taiwan
-	// - `TJ` - Tajikistan
-	// - `TZ` - Tanzania
-	// - `TH` - Thailand
-	// - `TL` - Timor-Leste
-	// - `TG` - Togo
-	// - `TK` - Tokelau
-	// - `TO` - Tonga
-	// - `TT` - Trinidad and Tobago
-	// - `TN` - Tunisia
-	// - `TR` - Turkey
-	// - `TM` - Turkmenistan
-	// - `TC` - Turks and Caicos Islands
-	// - `TV` - Tuvalu
-	// - `UG` - Uganda
-	// - `UA` - Ukraine
-	// - `AE` - United Arab Emirates
-	// - `GB` - United Kingdom
-	// - `UM` - United States Minor Outlying Islands
-	// - `US` - United States of America
-	// - `UY` - Uruguay
-	// - `UZ` - Uzbekistan
-	// - `VU` - Vanuatu
-	// - `VE` - Venezuela
-	// - `VN` - Vietnam
-	// - `VG` - Virgin Islands (British)
-	// - `VI` - Virgin Islands (U.S.)
-	// - `WF` - Wallis and Futuna
-	// - `EH` - Western Sahara
-	// - `YE` - Yemen
-	// - `ZM` - Zambia
-	// - `ZW` - Zimbabwe
+	// * `AF` - Afghanistan
+	// * `AX` - Åland Islands
+	// * `AL` - Albania
+	// * `DZ` - Algeria
+	// * `AS` - American Samoa
+	// * `AD` - Andorra
+	// * `AO` - Angola
+	// * `AI` - Anguilla
+	// * `AQ` - Antarctica
+	// * `AG` - Antigua and Barbuda
+	// * `AR` - Argentina
+	// * `AM` - Armenia
+	// * `AW` - Aruba
+	// * `AU` - Australia
+	// * `AT` - Austria
+	// * `AZ` - Azerbaijan
+	// * `BS` - Bahamas
+	// * `BH` - Bahrain
+	// * `BD` - Bangladesh
+	// * `BB` - Barbados
+	// * `BY` - Belarus
+	// * `BE` - Belgium
+	// * `BZ` - Belize
+	// * `BJ` - Benin
+	// * `BM` - Bermuda
+	// * `BT` - Bhutan
+	// * `BO` - Bolivia
+	// * `BQ` - Bonaire, Sint Eustatius and Saba
+	// * `BA` - Bosnia and Herzegovina
+	// * `BW` - Botswana
+	// * `BV` - Bouvet Island
+	// * `BR` - Brazil
+	// * `IO` - British Indian Ocean Territory
+	// * `BN` - Brunei
+	// * `BG` - Bulgaria
+	// * `BF` - Burkina Faso
+	// * `BI` - Burundi
+	// * `CV` - Cabo Verde
+	// * `KH` - Cambodia
+	// * `CM` - Cameroon
+	// * `CA` - Canada
+	// * `KY` - Cayman Islands
+	// * `CF` - Central African Republic
+	// * `TD` - Chad
+	// * `CL` - Chile
+	// * `CN` - China
+	// * `CX` - Christmas Island
+	// * `CC` - Cocos (Keeling) Islands
+	// * `CO` - Colombia
+	// * `KM` - Comoros
+	// * `CG` - Congo
+	// * `CD` - Congo (the Democratic Republic of the)
+	// * `CK` - Cook Islands
+	// * `CR` - Costa Rica
+	// * `CI` - Côte d'Ivoire
+	// * `HR` - Croatia
+	// * `CU` - Cuba
+	// * `CW` - Curaçao
+	// * `CY` - Cyprus
+	// * `CZ` - Czechia
+	// * `DK` - Denmark
+	// * `DJ` - Djibouti
+	// * `DM` - Dominica
+	// * `DO` - Dominican Republic
+	// * `EC` - Ecuador
+	// * `EG` - Egypt
+	// * `SV` - El Salvador
+	// * `GQ` - Equatorial Guinea
+	// * `ER` - Eritrea
+	// * `EE` - Estonia
+	// * `SZ` - Eswatini
+	// * `ET` - Ethiopia
+	// * `FK` - Falkland Islands (Malvinas)
+	// * `FO` - Faroe Islands
+	// * `FJ` - Fiji
+	// * `FI` - Finland
+	// * `FR` - France
+	// * `GF` - French Guiana
+	// * `PF` - French Polynesia
+	// * `TF` - French Southern Territories
+	// * `GA` - Gabon
+	// * `GM` - Gambia
+	// * `GE` - Georgia
+	// * `DE` - Germany
+	// * `GH` - Ghana
+	// * `GI` - Gibraltar
+	// * `GR` - Greece
+	// * `GL` - Greenland
+	// * `GD` - Grenada
+	// * `GP` - Guadeloupe
+	// * `GU` - Guam
+	// * `GT` - Guatemala
+	// * `GG` - Guernsey
+	// * `GN` - Guinea
+	// * `GW` - Guinea-Bissau
+	// * `GY` - Guyana
+	// * `HT` - Haiti
+	// * `HM` - Heard Island and McDonald Islands
+	// * `VA` - Holy See
+	// * `HN` - Honduras
+	// * `HK` - Hong Kong
+	// * `HU` - Hungary
+	// * `IS` - Iceland
+	// * `IN` - India
+	// * `ID` - Indonesia
+	// * `IR` - Iran
+	// * `IQ` - Iraq
+	// * `IE` - Ireland
+	// * `IM` - Isle of Man
+	// * `IL` - Israel
+	// * `IT` - Italy
+	// * `JM` - Jamaica
+	// * `JP` - Japan
+	// * `JE` - Jersey
+	// * `JO` - Jordan
+	// * `KZ` - Kazakhstan
+	// * `KE` - Kenya
+	// * `KI` - Kiribati
+	// * `KW` - Kuwait
+	// * `KG` - Kyrgyzstan
+	// * `LA` - Laos
+	// * `LV` - Latvia
+	// * `LB` - Lebanon
+	// * `LS` - Lesotho
+	// * `LR` - Liberia
+	// * `LY` - Libya
+	// * `LI` - Liechtenstein
+	// * `LT` - Lithuania
+	// * `LU` - Luxembourg
+	// * `MO` - Macao
+	// * `MG` - Madagascar
+	// * `MW` - Malawi
+	// * `MY` - Malaysia
+	// * `MV` - Maldives
+	// * `ML` - Mali
+	// * `MT` - Malta
+	// * `MH` - Marshall Islands
+	// * `MQ` - Martinique
+	// * `MR` - Mauritania
+	// * `MU` - Mauritius
+	// * `YT` - Mayotte
+	// * `MX` - Mexico
+	// * `FM` - Micronesia (Federated States of)
+	// * `MD` - Moldova
+	// * `MC` - Monaco
+	// * `MN` - Mongolia
+	// * `ME` - Montenegro
+	// * `MS` - Montserrat
+	// * `MA` - Morocco
+	// * `MZ` - Mozambique
+	// * `MM` - Myanmar
+	// * `NA` - Namibia
+	// * `NR` - Nauru
+	// * `NP` - Nepal
+	// * `NL` - Netherlands
+	// * `NC` - New Caledonia
+	// * `NZ` - New Zealand
+	// * `NI` - Nicaragua
+	// * `NE` - Niger
+	// * `NG` - Nigeria
+	// * `NU` - Niue
+	// * `NF` - Norfolk Island
+	// * `KP` - North Korea
+	// * `MK` - North Macedonia
+	// * `MP` - Northern Mariana Islands
+	// * `NO` - Norway
+	// * `OM` - Oman
+	// * `PK` - Pakistan
+	// * `PW` - Palau
+	// * `PS` - Palestine, State of
+	// * `PA` - Panama
+	// * `PG` - Papua New Guinea
+	// * `PY` - Paraguay
+	// * `PE` - Peru
+	// * `PH` - Philippines
+	// * `PN` - Pitcairn
+	// * `PL` - Poland
+	// * `PT` - Portugal
+	// * `PR` - Puerto Rico
+	// * `QA` - Qatar
+	// * `RE` - Réunion
+	// * `RO` - Romania
+	// * `RU` - Russia
+	// * `RW` - Rwanda
+	// * `BL` - Saint Barthélemy
+	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+	// * `KN` - Saint Kitts and Nevis
+	// * `LC` - Saint Lucia
+	// * `MF` - Saint Martin (French part)
+	// * `PM` - Saint Pierre and Miquelon
+	// * `VC` - Saint Vincent and the Grenadines
+	// * `WS` - Samoa
+	// * `SM` - San Marino
+	// * `ST` - Sao Tome and Principe
+	// * `SA` - Saudi Arabia
+	// * `SN` - Senegal
+	// * `RS` - Serbia
+	// * `SC` - Seychelles
+	// * `SL` - Sierra Leone
+	// * `SG` - Singapore
+	// * `SX` - Sint Maarten (Dutch part)
+	// * `SK` - Slovakia
+	// * `SI` - Slovenia
+	// * `SB` - Solomon Islands
+	// * `SO` - Somalia
+	// * `ZA` - South Africa
+	// * `GS` - South Georgia and the South Sandwich Islands
+	// * `KR` - South Korea
+	// * `SS` - South Sudan
+	// * `ES` - Spain
+	// * `LK` - Sri Lanka
+	// * `SD` - Sudan
+	// * `SR` - Suriname
+	// * `SJ` - Svalbard and Jan Mayen
+	// * `SE` - Sweden
+	// * `CH` - Switzerland
+	// * `SY` - Syria
+	// * `TW` - Taiwan
+	// * `TJ` - Tajikistan
+	// * `TZ` - Tanzania
+	// * `TH` - Thailand
+	// * `TL` - Timor-Leste
+	// * `TG` - Togo
+	// * `TK` - Tokelau
+	// * `TO` - Tonga
+	// * `TT` - Trinidad and Tobago
+	// * `TN` - Tunisia
+	// * `TR` - Turkey
+	// * `TM` - Turkmenistan
+	// * `TC` - Turks and Caicos Islands
+	// * `TV` - Tuvalu
+	// * `UG` - Uganda
+	// * `UA` - Ukraine
+	// * `AE` - United Arab Emirates
+	// * `GB` - United Kingdom
+	// * `UM` - United States Minor Outlying Islands
+	// * `US` - United States of America
+	// * `UY` - Uruguay
+	// * `UZ` - Uzbekistan
+	// * `VU` - Vanuatu
+	// * `VE` - Venezuela
+	// * `VN` - Vietnam
+	// * `VG` - Virgin Islands (British)
+	// * `VI` - Virgin Islands (U.S.)
+	// * `WF` - Wallis and Futuna
+	// * `EH` - Western Sahara
+	// * `YE` - Yemen
+	// * `ZM` - Zambia
+	// * `ZW` - Zimbabwe
 	Country *AddressCountry `json:"country,omitempty"`
 	// The address type.
 	//
-	// - `BILLING` - BILLING
-	// - `SHIPPING` - SHIPPING
+	// * `BILLING` - BILLING
+	// * `SHIPPING` - SHIPPING
 	AddressType *AddressAddressType `json:"address_type,omitempty"`
 	CreatedAt   *time.Time          `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
@@ -649,8 +634,8 @@ type Address struct {
 
 // The address type.
 //
-// - `BILLING` - BILLING
-// - `SHIPPING` - SHIPPING
+// * `BILLING` - BILLING
+// * `SHIPPING` - SHIPPING
 type AddressAddressType struct {
 	typeName        string
 	AddressTypeEnum AddressTypeEnum
@@ -710,255 +695,255 @@ func (a *AddressAddressType) Accept(visitor AddressAddressTypeVisitor) error {
 
 // The address's country.
 //
-// - `AF` - Afghanistan
-// - `AX` - Åland Islands
-// - `AL` - Albania
-// - `DZ` - Algeria
-// - `AS` - American Samoa
-// - `AD` - Andorra
-// - `AO` - Angola
-// - `AI` - Anguilla
-// - `AQ` - Antarctica
-// - `AG` - Antigua and Barbuda
-// - `AR` - Argentina
-// - `AM` - Armenia
-// - `AW` - Aruba
-// - `AU` - Australia
-// - `AT` - Austria
-// - `AZ` - Azerbaijan
-// - `BS` - Bahamas
-// - `BH` - Bahrain
-// - `BD` - Bangladesh
-// - `BB` - Barbados
-// - `BY` - Belarus
-// - `BE` - Belgium
-// - `BZ` - Belize
-// - `BJ` - Benin
-// - `BM` - Bermuda
-// - `BT` - Bhutan
-// - `BO` - Bolivia
-// - `BQ` - Bonaire, Sint Eustatius and Saba
-// - `BA` - Bosnia and Herzegovina
-// - `BW` - Botswana
-// - `BV` - Bouvet Island
-// - `BR` - Brazil
-// - `IO` - British Indian Ocean Territory
-// - `BN` - Brunei
-// - `BG` - Bulgaria
-// - `BF` - Burkina Faso
-// - `BI` - Burundi
-// - `CV` - Cabo Verde
-// - `KH` - Cambodia
-// - `CM` - Cameroon
-// - `CA` - Canada
-// - `KY` - Cayman Islands
-// - `CF` - Central African Republic
-// - `TD` - Chad
-// - `CL` - Chile
-// - `CN` - China
-// - `CX` - Christmas Island
-// - `CC` - Cocos (Keeling) Islands
-// - `CO` - Colombia
-// - `KM` - Comoros
-// - `CG` - Congo
-// - `CD` - Congo (the Democratic Republic of the)
-// - `CK` - Cook Islands
-// - `CR` - Costa Rica
-// - `CI` - Côte d'Ivoire
-// - `HR` - Croatia
-// - `CU` - Cuba
-// - `CW` - Curaçao
-// - `CY` - Cyprus
-// - `CZ` - Czechia
-// - `DK` - Denmark
-// - `DJ` - Djibouti
-// - `DM` - Dominica
-// - `DO` - Dominican Republic
-// - `EC` - Ecuador
-// - `EG` - Egypt
-// - `SV` - El Salvador
-// - `GQ` - Equatorial Guinea
-// - `ER` - Eritrea
-// - `EE` - Estonia
-// - `SZ` - Eswatini
-// - `ET` - Ethiopia
-// - `FK` - Falkland Islands (Malvinas)
-// - `FO` - Faroe Islands
-// - `FJ` - Fiji
-// - `FI` - Finland
-// - `FR` - France
-// - `GF` - French Guiana
-// - `PF` - French Polynesia
-// - `TF` - French Southern Territories
-// - `GA` - Gabon
-// - `GM` - Gambia
-// - `GE` - Georgia
-// - `DE` - Germany
-// - `GH` - Ghana
-// - `GI` - Gibraltar
-// - `GR` - Greece
-// - `GL` - Greenland
-// - `GD` - Grenada
-// - `GP` - Guadeloupe
-// - `GU` - Guam
-// - `GT` - Guatemala
-// - `GG` - Guernsey
-// - `GN` - Guinea
-// - `GW` - Guinea-Bissau
-// - `GY` - Guyana
-// - `HT` - Haiti
-// - `HM` - Heard Island and McDonald Islands
-// - `VA` - Holy See
-// - `HN` - Honduras
-// - `HK` - Hong Kong
-// - `HU` - Hungary
-// - `IS` - Iceland
-// - `IN` - India
-// - `ID` - Indonesia
-// - `IR` - Iran
-// - `IQ` - Iraq
-// - `IE` - Ireland
-// - `IM` - Isle of Man
-// - `IL` - Israel
-// - `IT` - Italy
-// - `JM` - Jamaica
-// - `JP` - Japan
-// - `JE` - Jersey
-// - `JO` - Jordan
-// - `KZ` - Kazakhstan
-// - `KE` - Kenya
-// - `KI` - Kiribati
-// - `KW` - Kuwait
-// - `KG` - Kyrgyzstan
-// - `LA` - Laos
-// - `LV` - Latvia
-// - `LB` - Lebanon
-// - `LS` - Lesotho
-// - `LR` - Liberia
-// - `LY` - Libya
-// - `LI` - Liechtenstein
-// - `LT` - Lithuania
-// - `LU` - Luxembourg
-// - `MO` - Macao
-// - `MG` - Madagascar
-// - `MW` - Malawi
-// - `MY` - Malaysia
-// - `MV` - Maldives
-// - `ML` - Mali
-// - `MT` - Malta
-// - `MH` - Marshall Islands
-// - `MQ` - Martinique
-// - `MR` - Mauritania
-// - `MU` - Mauritius
-// - `YT` - Mayotte
-// - `MX` - Mexico
-// - `FM` - Micronesia (Federated States of)
-// - `MD` - Moldova
-// - `MC` - Monaco
-// - `MN` - Mongolia
-// - `ME` - Montenegro
-// - `MS` - Montserrat
-// - `MA` - Morocco
-// - `MZ` - Mozambique
-// - `MM` - Myanmar
-// - `NA` - Namibia
-// - `NR` - Nauru
-// - `NP` - Nepal
-// - `NL` - Netherlands
-// - `NC` - New Caledonia
-// - `NZ` - New Zealand
-// - `NI` - Nicaragua
-// - `NE` - Niger
-// - `NG` - Nigeria
-// - `NU` - Niue
-// - `NF` - Norfolk Island
-// - `KP` - North Korea
-// - `MK` - North Macedonia
-// - `MP` - Northern Mariana Islands
-// - `NO` - Norway
-// - `OM` - Oman
-// - `PK` - Pakistan
-// - `PW` - Palau
-// - `PS` - Palestine, State of
-// - `PA` - Panama
-// - `PG` - Papua New Guinea
-// - `PY` - Paraguay
-// - `PE` - Peru
-// - `PH` - Philippines
-// - `PN` - Pitcairn
-// - `PL` - Poland
-// - `PT` - Portugal
-// - `PR` - Puerto Rico
-// - `QA` - Qatar
-// - `RE` - Réunion
-// - `RO` - Romania
-// - `RU` - Russia
-// - `RW` - Rwanda
-// - `BL` - Saint Barthélemy
-// - `SH` - Saint Helena, Ascension and Tristan da Cunha
-// - `KN` - Saint Kitts and Nevis
-// - `LC` - Saint Lucia
-// - `MF` - Saint Martin (French part)
-// - `PM` - Saint Pierre and Miquelon
-// - `VC` - Saint Vincent and the Grenadines
-// - `WS` - Samoa
-// - `SM` - San Marino
-// - `ST` - Sao Tome and Principe
-// - `SA` - Saudi Arabia
-// - `SN` - Senegal
-// - `RS` - Serbia
-// - `SC` - Seychelles
-// - `SL` - Sierra Leone
-// - `SG` - Singapore
-// - `SX` - Sint Maarten (Dutch part)
-// - `SK` - Slovakia
-// - `SI` - Slovenia
-// - `SB` - Solomon Islands
-// - `SO` - Somalia
-// - `ZA` - South Africa
-// - `GS` - South Georgia and the South Sandwich Islands
-// - `KR` - South Korea
-// - `SS` - South Sudan
-// - `ES` - Spain
-// - `LK` - Sri Lanka
-// - `SD` - Sudan
-// - `SR` - Suriname
-// - `SJ` - Svalbard and Jan Mayen
-// - `SE` - Sweden
-// - `CH` - Switzerland
-// - `SY` - Syria
-// - `TW` - Taiwan
-// - `TJ` - Tajikistan
-// - `TZ` - Tanzania
-// - `TH` - Thailand
-// - `TL` - Timor-Leste
-// - `TG` - Togo
-// - `TK` - Tokelau
-// - `TO` - Tonga
-// - `TT` - Trinidad and Tobago
-// - `TN` - Tunisia
-// - `TR` - Turkey
-// - `TM` - Turkmenistan
-// - `TC` - Turks and Caicos Islands
-// - `TV` - Tuvalu
-// - `UG` - Uganda
-// - `UA` - Ukraine
-// - `AE` - United Arab Emirates
-// - `GB` - United Kingdom
-// - `UM` - United States Minor Outlying Islands
-// - `US` - United States of America
-// - `UY` - Uruguay
-// - `UZ` - Uzbekistan
-// - `VU` - Vanuatu
-// - `VE` - Venezuela
-// - `VN` - Vietnam
-// - `VG` - Virgin Islands (British)
-// - `VI` - Virgin Islands (U.S.)
-// - `WF` - Wallis and Futuna
-// - `EH` - Western Sahara
-// - `YE` - Yemen
-// - `ZM` - Zambia
-// - `ZW` - Zimbabwe
+// * `AF` - Afghanistan
+// * `AX` - Åland Islands
+// * `AL` - Albania
+// * `DZ` - Algeria
+// * `AS` - American Samoa
+// * `AD` - Andorra
+// * `AO` - Angola
+// * `AI` - Anguilla
+// * `AQ` - Antarctica
+// * `AG` - Antigua and Barbuda
+// * `AR` - Argentina
+// * `AM` - Armenia
+// * `AW` - Aruba
+// * `AU` - Australia
+// * `AT` - Austria
+// * `AZ` - Azerbaijan
+// * `BS` - Bahamas
+// * `BH` - Bahrain
+// * `BD` - Bangladesh
+// * `BB` - Barbados
+// * `BY` - Belarus
+// * `BE` - Belgium
+// * `BZ` - Belize
+// * `BJ` - Benin
+// * `BM` - Bermuda
+// * `BT` - Bhutan
+// * `BO` - Bolivia
+// * `BQ` - Bonaire, Sint Eustatius and Saba
+// * `BA` - Bosnia and Herzegovina
+// * `BW` - Botswana
+// * `BV` - Bouvet Island
+// * `BR` - Brazil
+// * `IO` - British Indian Ocean Territory
+// * `BN` - Brunei
+// * `BG` - Bulgaria
+// * `BF` - Burkina Faso
+// * `BI` - Burundi
+// * `CV` - Cabo Verde
+// * `KH` - Cambodia
+// * `CM` - Cameroon
+// * `CA` - Canada
+// * `KY` - Cayman Islands
+// * `CF` - Central African Republic
+// * `TD` - Chad
+// * `CL` - Chile
+// * `CN` - China
+// * `CX` - Christmas Island
+// * `CC` - Cocos (Keeling) Islands
+// * `CO` - Colombia
+// * `KM` - Comoros
+// * `CG` - Congo
+// * `CD` - Congo (the Democratic Republic of the)
+// * `CK` - Cook Islands
+// * `CR` - Costa Rica
+// * `CI` - Côte d'Ivoire
+// * `HR` - Croatia
+// * `CU` - Cuba
+// * `CW` - Curaçao
+// * `CY` - Cyprus
+// * `CZ` - Czechia
+// * `DK` - Denmark
+// * `DJ` - Djibouti
+// * `DM` - Dominica
+// * `DO` - Dominican Republic
+// * `EC` - Ecuador
+// * `EG` - Egypt
+// * `SV` - El Salvador
+// * `GQ` - Equatorial Guinea
+// * `ER` - Eritrea
+// * `EE` - Estonia
+// * `SZ` - Eswatini
+// * `ET` - Ethiopia
+// * `FK` - Falkland Islands (Malvinas)
+// * `FO` - Faroe Islands
+// * `FJ` - Fiji
+// * `FI` - Finland
+// * `FR` - France
+// * `GF` - French Guiana
+// * `PF` - French Polynesia
+// * `TF` - French Southern Territories
+// * `GA` - Gabon
+// * `GM` - Gambia
+// * `GE` - Georgia
+// * `DE` - Germany
+// * `GH` - Ghana
+// * `GI` - Gibraltar
+// * `GR` - Greece
+// * `GL` - Greenland
+// * `GD` - Grenada
+// * `GP` - Guadeloupe
+// * `GU` - Guam
+// * `GT` - Guatemala
+// * `GG` - Guernsey
+// * `GN` - Guinea
+// * `GW` - Guinea-Bissau
+// * `GY` - Guyana
+// * `HT` - Haiti
+// * `HM` - Heard Island and McDonald Islands
+// * `VA` - Holy See
+// * `HN` - Honduras
+// * `HK` - Hong Kong
+// * `HU` - Hungary
+// * `IS` - Iceland
+// * `IN` - India
+// * `ID` - Indonesia
+// * `IR` - Iran
+// * `IQ` - Iraq
+// * `IE` - Ireland
+// * `IM` - Isle of Man
+// * `IL` - Israel
+// * `IT` - Italy
+// * `JM` - Jamaica
+// * `JP` - Japan
+// * `JE` - Jersey
+// * `JO` - Jordan
+// * `KZ` - Kazakhstan
+// * `KE` - Kenya
+// * `KI` - Kiribati
+// * `KW` - Kuwait
+// * `KG` - Kyrgyzstan
+// * `LA` - Laos
+// * `LV` - Latvia
+// * `LB` - Lebanon
+// * `LS` - Lesotho
+// * `LR` - Liberia
+// * `LY` - Libya
+// * `LI` - Liechtenstein
+// * `LT` - Lithuania
+// * `LU` - Luxembourg
+// * `MO` - Macao
+// * `MG` - Madagascar
+// * `MW` - Malawi
+// * `MY` - Malaysia
+// * `MV` - Maldives
+// * `ML` - Mali
+// * `MT` - Malta
+// * `MH` - Marshall Islands
+// * `MQ` - Martinique
+// * `MR` - Mauritania
+// * `MU` - Mauritius
+// * `YT` - Mayotte
+// * `MX` - Mexico
+// * `FM` - Micronesia (Federated States of)
+// * `MD` - Moldova
+// * `MC` - Monaco
+// * `MN` - Mongolia
+// * `ME` - Montenegro
+// * `MS` - Montserrat
+// * `MA` - Morocco
+// * `MZ` - Mozambique
+// * `MM` - Myanmar
+// * `NA` - Namibia
+// * `NR` - Nauru
+// * `NP` - Nepal
+// * `NL` - Netherlands
+// * `NC` - New Caledonia
+// * `NZ` - New Zealand
+// * `NI` - Nicaragua
+// * `NE` - Niger
+// * `NG` - Nigeria
+// * `NU` - Niue
+// * `NF` - Norfolk Island
+// * `KP` - North Korea
+// * `MK` - North Macedonia
+// * `MP` - Northern Mariana Islands
+// * `NO` - Norway
+// * `OM` - Oman
+// * `PK` - Pakistan
+// * `PW` - Palau
+// * `PS` - Palestine, State of
+// * `PA` - Panama
+// * `PG` - Papua New Guinea
+// * `PY` - Paraguay
+// * `PE` - Peru
+// * `PH` - Philippines
+// * `PN` - Pitcairn
+// * `PL` - Poland
+// * `PT` - Portugal
+// * `PR` - Puerto Rico
+// * `QA` - Qatar
+// * `RE` - Réunion
+// * `RO` - Romania
+// * `RU` - Russia
+// * `RW` - Rwanda
+// * `BL` - Saint Barthélemy
+// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+// * `KN` - Saint Kitts and Nevis
+// * `LC` - Saint Lucia
+// * `MF` - Saint Martin (French part)
+// * `PM` - Saint Pierre and Miquelon
+// * `VC` - Saint Vincent and the Grenadines
+// * `WS` - Samoa
+// * `SM` - San Marino
+// * `ST` - Sao Tome and Principe
+// * `SA` - Saudi Arabia
+// * `SN` - Senegal
+// * `RS` - Serbia
+// * `SC` - Seychelles
+// * `SL` - Sierra Leone
+// * `SG` - Singapore
+// * `SX` - Sint Maarten (Dutch part)
+// * `SK` - Slovakia
+// * `SI` - Slovenia
+// * `SB` - Solomon Islands
+// * `SO` - Somalia
+// * `ZA` - South Africa
+// * `GS` - South Georgia and the South Sandwich Islands
+// * `KR` - South Korea
+// * `SS` - South Sudan
+// * `ES` - Spain
+// * `LK` - Sri Lanka
+// * `SD` - Sudan
+// * `SR` - Suriname
+// * `SJ` - Svalbard and Jan Mayen
+// * `SE` - Sweden
+// * `CH` - Switzerland
+// * `SY` - Syria
+// * `TW` - Taiwan
+// * `TJ` - Tajikistan
+// * `TZ` - Tanzania
+// * `TH` - Thailand
+// * `TL` - Timor-Leste
+// * `TG` - Togo
+// * `TK` - Tokelau
+// * `TO` - Tonga
+// * `TT` - Trinidad and Tobago
+// * `TN` - Tunisia
+// * `TR` - Turkey
+// * `TM` - Turkmenistan
+// * `TC` - Turks and Caicos Islands
+// * `TV` - Tuvalu
+// * `UG` - Uganda
+// * `UA` - Ukraine
+// * `AE` - United Arab Emirates
+// * `GB` - United Kingdom
+// * `UM` - United States Minor Outlying Islands
+// * `US` - United States of America
+// * `UY` - Uruguay
+// * `UZ` - Uzbekistan
+// * `VU` - Vanuatu
+// * `VE` - Venezuela
+// * `VN` - Vietnam
+// * `VG` - Virgin Islands (British)
+// * `VI` - Virgin Islands (U.S.)
+// * `WF` - Wallis and Futuna
+// * `EH` - Western Sahara
+// * `YE` - Yemen
+// * `ZM` - Zambia
+// * `ZW` - Zimbabwe
 type AddressCountry struct {
 	typeName    string
 	CountryEnum CountryEnum
@@ -1017,13 +1002,9 @@ func (a *AddressCountry) Accept(visitor AddressCountryVisitor) error {
 }
 
 // # The Address Object
-//
 // ### Description
-//
 // The `Address` object is used to represent an entity's address.
-//
 // ### Usage Example
-//
 // TODO
 type AddressRequest struct {
 	// Line 1 of the address's street.
@@ -1038,260 +1019,260 @@ type AddressRequest struct {
 	PostalCode *string `json:"postal_code,omitempty"`
 	// The address's country.
 	//
-	// - `AF` - Afghanistan
-	// - `AX` - Åland Islands
-	// - `AL` - Albania
-	// - `DZ` - Algeria
-	// - `AS` - American Samoa
-	// - `AD` - Andorra
-	// - `AO` - Angola
-	// - `AI` - Anguilla
-	// - `AQ` - Antarctica
-	// - `AG` - Antigua and Barbuda
-	// - `AR` - Argentina
-	// - `AM` - Armenia
-	// - `AW` - Aruba
-	// - `AU` - Australia
-	// - `AT` - Austria
-	// - `AZ` - Azerbaijan
-	// - `BS` - Bahamas
-	// - `BH` - Bahrain
-	// - `BD` - Bangladesh
-	// - `BB` - Barbados
-	// - `BY` - Belarus
-	// - `BE` - Belgium
-	// - `BZ` - Belize
-	// - `BJ` - Benin
-	// - `BM` - Bermuda
-	// - `BT` - Bhutan
-	// - `BO` - Bolivia
-	// - `BQ` - Bonaire, Sint Eustatius and Saba
-	// - `BA` - Bosnia and Herzegovina
-	// - `BW` - Botswana
-	// - `BV` - Bouvet Island
-	// - `BR` - Brazil
-	// - `IO` - British Indian Ocean Territory
-	// - `BN` - Brunei
-	// - `BG` - Bulgaria
-	// - `BF` - Burkina Faso
-	// - `BI` - Burundi
-	// - `CV` - Cabo Verde
-	// - `KH` - Cambodia
-	// - `CM` - Cameroon
-	// - `CA` - Canada
-	// - `KY` - Cayman Islands
-	// - `CF` - Central African Republic
-	// - `TD` - Chad
-	// - `CL` - Chile
-	// - `CN` - China
-	// - `CX` - Christmas Island
-	// - `CC` - Cocos (Keeling) Islands
-	// - `CO` - Colombia
-	// - `KM` - Comoros
-	// - `CG` - Congo
-	// - `CD` - Congo (the Democratic Republic of the)
-	// - `CK` - Cook Islands
-	// - `CR` - Costa Rica
-	// - `CI` - Côte d'Ivoire
-	// - `HR` - Croatia
-	// - `CU` - Cuba
-	// - `CW` - Curaçao
-	// - `CY` - Cyprus
-	// - `CZ` - Czechia
-	// - `DK` - Denmark
-	// - `DJ` - Djibouti
-	// - `DM` - Dominica
-	// - `DO` - Dominican Republic
-	// - `EC` - Ecuador
-	// - `EG` - Egypt
-	// - `SV` - El Salvador
-	// - `GQ` - Equatorial Guinea
-	// - `ER` - Eritrea
-	// - `EE` - Estonia
-	// - `SZ` - Eswatini
-	// - `ET` - Ethiopia
-	// - `FK` - Falkland Islands (Malvinas)
-	// - `FO` - Faroe Islands
-	// - `FJ` - Fiji
-	// - `FI` - Finland
-	// - `FR` - France
-	// - `GF` - French Guiana
-	// - `PF` - French Polynesia
-	// - `TF` - French Southern Territories
-	// - `GA` - Gabon
-	// - `GM` - Gambia
-	// - `GE` - Georgia
-	// - `DE` - Germany
-	// - `GH` - Ghana
-	// - `GI` - Gibraltar
-	// - `GR` - Greece
-	// - `GL` - Greenland
-	// - `GD` - Grenada
-	// - `GP` - Guadeloupe
-	// - `GU` - Guam
-	// - `GT` - Guatemala
-	// - `GG` - Guernsey
-	// - `GN` - Guinea
-	// - `GW` - Guinea-Bissau
-	// - `GY` - Guyana
-	// - `HT` - Haiti
-	// - `HM` - Heard Island and McDonald Islands
-	// - `VA` - Holy See
-	// - `HN` - Honduras
-	// - `HK` - Hong Kong
-	// - `HU` - Hungary
-	// - `IS` - Iceland
-	// - `IN` - India
-	// - `ID` - Indonesia
-	// - `IR` - Iran
-	// - `IQ` - Iraq
-	// - `IE` - Ireland
-	// - `IM` - Isle of Man
-	// - `IL` - Israel
-	// - `IT` - Italy
-	// - `JM` - Jamaica
-	// - `JP` - Japan
-	// - `JE` - Jersey
-	// - `JO` - Jordan
-	// - `KZ` - Kazakhstan
-	// - `KE` - Kenya
-	// - `KI` - Kiribati
-	// - `KW` - Kuwait
-	// - `KG` - Kyrgyzstan
-	// - `LA` - Laos
-	// - `LV` - Latvia
-	// - `LB` - Lebanon
-	// - `LS` - Lesotho
-	// - `LR` - Liberia
-	// - `LY` - Libya
-	// - `LI` - Liechtenstein
-	// - `LT` - Lithuania
-	// - `LU` - Luxembourg
-	// - `MO` - Macao
-	// - `MG` - Madagascar
-	// - `MW` - Malawi
-	// - `MY` - Malaysia
-	// - `MV` - Maldives
-	// - `ML` - Mali
-	// - `MT` - Malta
-	// - `MH` - Marshall Islands
-	// - `MQ` - Martinique
-	// - `MR` - Mauritania
-	// - `MU` - Mauritius
-	// - `YT` - Mayotte
-	// - `MX` - Mexico
-	// - `FM` - Micronesia (Federated States of)
-	// - `MD` - Moldova
-	// - `MC` - Monaco
-	// - `MN` - Mongolia
-	// - `ME` - Montenegro
-	// - `MS` - Montserrat
-	// - `MA` - Morocco
-	// - `MZ` - Mozambique
-	// - `MM` - Myanmar
-	// - `NA` - Namibia
-	// - `NR` - Nauru
-	// - `NP` - Nepal
-	// - `NL` - Netherlands
-	// - `NC` - New Caledonia
-	// - `NZ` - New Zealand
-	// - `NI` - Nicaragua
-	// - `NE` - Niger
-	// - `NG` - Nigeria
-	// - `NU` - Niue
-	// - `NF` - Norfolk Island
-	// - `KP` - North Korea
-	// - `MK` - North Macedonia
-	// - `MP` - Northern Mariana Islands
-	// - `NO` - Norway
-	// - `OM` - Oman
-	// - `PK` - Pakistan
-	// - `PW` - Palau
-	// - `PS` - Palestine, State of
-	// - `PA` - Panama
-	// - `PG` - Papua New Guinea
-	// - `PY` - Paraguay
-	// - `PE` - Peru
-	// - `PH` - Philippines
-	// - `PN` - Pitcairn
-	// - `PL` - Poland
-	// - `PT` - Portugal
-	// - `PR` - Puerto Rico
-	// - `QA` - Qatar
-	// - `RE` - Réunion
-	// - `RO` - Romania
-	// - `RU` - Russia
-	// - `RW` - Rwanda
-	// - `BL` - Saint Barthélemy
-	// - `SH` - Saint Helena, Ascension and Tristan da Cunha
-	// - `KN` - Saint Kitts and Nevis
-	// - `LC` - Saint Lucia
-	// - `MF` - Saint Martin (French part)
-	// - `PM` - Saint Pierre and Miquelon
-	// - `VC` - Saint Vincent and the Grenadines
-	// - `WS` - Samoa
-	// - `SM` - San Marino
-	// - `ST` - Sao Tome and Principe
-	// - `SA` - Saudi Arabia
-	// - `SN` - Senegal
-	// - `RS` - Serbia
-	// - `SC` - Seychelles
-	// - `SL` - Sierra Leone
-	// - `SG` - Singapore
-	// - `SX` - Sint Maarten (Dutch part)
-	// - `SK` - Slovakia
-	// - `SI` - Slovenia
-	// - `SB` - Solomon Islands
-	// - `SO` - Somalia
-	// - `ZA` - South Africa
-	// - `GS` - South Georgia and the South Sandwich Islands
-	// - `KR` - South Korea
-	// - `SS` - South Sudan
-	// - `ES` - Spain
-	// - `LK` - Sri Lanka
-	// - `SD` - Sudan
-	// - `SR` - Suriname
-	// - `SJ` - Svalbard and Jan Mayen
-	// - `SE` - Sweden
-	// - `CH` - Switzerland
-	// - `SY` - Syria
-	// - `TW` - Taiwan
-	// - `TJ` - Tajikistan
-	// - `TZ` - Tanzania
-	// - `TH` - Thailand
-	// - `TL` - Timor-Leste
-	// - `TG` - Togo
-	// - `TK` - Tokelau
-	// - `TO` - Tonga
-	// - `TT` - Trinidad and Tobago
-	// - `TN` - Tunisia
-	// - `TR` - Turkey
-	// - `TM` - Turkmenistan
-	// - `TC` - Turks and Caicos Islands
-	// - `TV` - Tuvalu
-	// - `UG` - Uganda
-	// - `UA` - Ukraine
-	// - `AE` - United Arab Emirates
-	// - `GB` - United Kingdom
-	// - `UM` - United States Minor Outlying Islands
-	// - `US` - United States of America
-	// - `UY` - Uruguay
-	// - `UZ` - Uzbekistan
-	// - `VU` - Vanuatu
-	// - `VE` - Venezuela
-	// - `VN` - Vietnam
-	// - `VG` - Virgin Islands (British)
-	// - `VI` - Virgin Islands (U.S.)
-	// - `WF` - Wallis and Futuna
-	// - `EH` - Western Sahara
-	// - `YE` - Yemen
-	// - `ZM` - Zambia
-	// - `ZW` - Zimbabwe
+	// * `AF` - Afghanistan
+	// * `AX` - Åland Islands
+	// * `AL` - Albania
+	// * `DZ` - Algeria
+	// * `AS` - American Samoa
+	// * `AD` - Andorra
+	// * `AO` - Angola
+	// * `AI` - Anguilla
+	// * `AQ` - Antarctica
+	// * `AG` - Antigua and Barbuda
+	// * `AR` - Argentina
+	// * `AM` - Armenia
+	// * `AW` - Aruba
+	// * `AU` - Australia
+	// * `AT` - Austria
+	// * `AZ` - Azerbaijan
+	// * `BS` - Bahamas
+	// * `BH` - Bahrain
+	// * `BD` - Bangladesh
+	// * `BB` - Barbados
+	// * `BY` - Belarus
+	// * `BE` - Belgium
+	// * `BZ` - Belize
+	// * `BJ` - Benin
+	// * `BM` - Bermuda
+	// * `BT` - Bhutan
+	// * `BO` - Bolivia
+	// * `BQ` - Bonaire, Sint Eustatius and Saba
+	// * `BA` - Bosnia and Herzegovina
+	// * `BW` - Botswana
+	// * `BV` - Bouvet Island
+	// * `BR` - Brazil
+	// * `IO` - British Indian Ocean Territory
+	// * `BN` - Brunei
+	// * `BG` - Bulgaria
+	// * `BF` - Burkina Faso
+	// * `BI` - Burundi
+	// * `CV` - Cabo Verde
+	// * `KH` - Cambodia
+	// * `CM` - Cameroon
+	// * `CA` - Canada
+	// * `KY` - Cayman Islands
+	// * `CF` - Central African Republic
+	// * `TD` - Chad
+	// * `CL` - Chile
+	// * `CN` - China
+	// * `CX` - Christmas Island
+	// * `CC` - Cocos (Keeling) Islands
+	// * `CO` - Colombia
+	// * `KM` - Comoros
+	// * `CG` - Congo
+	// * `CD` - Congo (the Democratic Republic of the)
+	// * `CK` - Cook Islands
+	// * `CR` - Costa Rica
+	// * `CI` - Côte d'Ivoire
+	// * `HR` - Croatia
+	// * `CU` - Cuba
+	// * `CW` - Curaçao
+	// * `CY` - Cyprus
+	// * `CZ` - Czechia
+	// * `DK` - Denmark
+	// * `DJ` - Djibouti
+	// * `DM` - Dominica
+	// * `DO` - Dominican Republic
+	// * `EC` - Ecuador
+	// * `EG` - Egypt
+	// * `SV` - El Salvador
+	// * `GQ` - Equatorial Guinea
+	// * `ER` - Eritrea
+	// * `EE` - Estonia
+	// * `SZ` - Eswatini
+	// * `ET` - Ethiopia
+	// * `FK` - Falkland Islands (Malvinas)
+	// * `FO` - Faroe Islands
+	// * `FJ` - Fiji
+	// * `FI` - Finland
+	// * `FR` - France
+	// * `GF` - French Guiana
+	// * `PF` - French Polynesia
+	// * `TF` - French Southern Territories
+	// * `GA` - Gabon
+	// * `GM` - Gambia
+	// * `GE` - Georgia
+	// * `DE` - Germany
+	// * `GH` - Ghana
+	// * `GI` - Gibraltar
+	// * `GR` - Greece
+	// * `GL` - Greenland
+	// * `GD` - Grenada
+	// * `GP` - Guadeloupe
+	// * `GU` - Guam
+	// * `GT` - Guatemala
+	// * `GG` - Guernsey
+	// * `GN` - Guinea
+	// * `GW` - Guinea-Bissau
+	// * `GY` - Guyana
+	// * `HT` - Haiti
+	// * `HM` - Heard Island and McDonald Islands
+	// * `VA` - Holy See
+	// * `HN` - Honduras
+	// * `HK` - Hong Kong
+	// * `HU` - Hungary
+	// * `IS` - Iceland
+	// * `IN` - India
+	// * `ID` - Indonesia
+	// * `IR` - Iran
+	// * `IQ` - Iraq
+	// * `IE` - Ireland
+	// * `IM` - Isle of Man
+	// * `IL` - Israel
+	// * `IT` - Italy
+	// * `JM` - Jamaica
+	// * `JP` - Japan
+	// * `JE` - Jersey
+	// * `JO` - Jordan
+	// * `KZ` - Kazakhstan
+	// * `KE` - Kenya
+	// * `KI` - Kiribati
+	// * `KW` - Kuwait
+	// * `KG` - Kyrgyzstan
+	// * `LA` - Laos
+	// * `LV` - Latvia
+	// * `LB` - Lebanon
+	// * `LS` - Lesotho
+	// * `LR` - Liberia
+	// * `LY` - Libya
+	// * `LI` - Liechtenstein
+	// * `LT` - Lithuania
+	// * `LU` - Luxembourg
+	// * `MO` - Macao
+	// * `MG` - Madagascar
+	// * `MW` - Malawi
+	// * `MY` - Malaysia
+	// * `MV` - Maldives
+	// * `ML` - Mali
+	// * `MT` - Malta
+	// * `MH` - Marshall Islands
+	// * `MQ` - Martinique
+	// * `MR` - Mauritania
+	// * `MU` - Mauritius
+	// * `YT` - Mayotte
+	// * `MX` - Mexico
+	// * `FM` - Micronesia (Federated States of)
+	// * `MD` - Moldova
+	// * `MC` - Monaco
+	// * `MN` - Mongolia
+	// * `ME` - Montenegro
+	// * `MS` - Montserrat
+	// * `MA` - Morocco
+	// * `MZ` - Mozambique
+	// * `MM` - Myanmar
+	// * `NA` - Namibia
+	// * `NR` - Nauru
+	// * `NP` - Nepal
+	// * `NL` - Netherlands
+	// * `NC` - New Caledonia
+	// * `NZ` - New Zealand
+	// * `NI` - Nicaragua
+	// * `NE` - Niger
+	// * `NG` - Nigeria
+	// * `NU` - Niue
+	// * `NF` - Norfolk Island
+	// * `KP` - North Korea
+	// * `MK` - North Macedonia
+	// * `MP` - Northern Mariana Islands
+	// * `NO` - Norway
+	// * `OM` - Oman
+	// * `PK` - Pakistan
+	// * `PW` - Palau
+	// * `PS` - Palestine, State of
+	// * `PA` - Panama
+	// * `PG` - Papua New Guinea
+	// * `PY` - Paraguay
+	// * `PE` - Peru
+	// * `PH` - Philippines
+	// * `PN` - Pitcairn
+	// * `PL` - Poland
+	// * `PT` - Portugal
+	// * `PR` - Puerto Rico
+	// * `QA` - Qatar
+	// * `RE` - Réunion
+	// * `RO` - Romania
+	// * `RU` - Russia
+	// * `RW` - Rwanda
+	// * `BL` - Saint Barthélemy
+	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+	// * `KN` - Saint Kitts and Nevis
+	// * `LC` - Saint Lucia
+	// * `MF` - Saint Martin (French part)
+	// * `PM` - Saint Pierre and Miquelon
+	// * `VC` - Saint Vincent and the Grenadines
+	// * `WS` - Samoa
+	// * `SM` - San Marino
+	// * `ST` - Sao Tome and Principe
+	// * `SA` - Saudi Arabia
+	// * `SN` - Senegal
+	// * `RS` - Serbia
+	// * `SC` - Seychelles
+	// * `SL` - Sierra Leone
+	// * `SG` - Singapore
+	// * `SX` - Sint Maarten (Dutch part)
+	// * `SK` - Slovakia
+	// * `SI` - Slovenia
+	// * `SB` - Solomon Islands
+	// * `SO` - Somalia
+	// * `ZA` - South Africa
+	// * `GS` - South Georgia and the South Sandwich Islands
+	// * `KR` - South Korea
+	// * `SS` - South Sudan
+	// * `ES` - Spain
+	// * `LK` - Sri Lanka
+	// * `SD` - Sudan
+	// * `SR` - Suriname
+	// * `SJ` - Svalbard and Jan Mayen
+	// * `SE` - Sweden
+	// * `CH` - Switzerland
+	// * `SY` - Syria
+	// * `TW` - Taiwan
+	// * `TJ` - Tajikistan
+	// * `TZ` - Tanzania
+	// * `TH` - Thailand
+	// * `TL` - Timor-Leste
+	// * `TG` - Togo
+	// * `TK` - Tokelau
+	// * `TO` - Tonga
+	// * `TT` - Trinidad and Tobago
+	// * `TN` - Tunisia
+	// * `TR` - Turkey
+	// * `TM` - Turkmenistan
+	// * `TC` - Turks and Caicos Islands
+	// * `TV` - Tuvalu
+	// * `UG` - Uganda
+	// * `UA` - Ukraine
+	// * `AE` - United Arab Emirates
+	// * `GB` - United Kingdom
+	// * `UM` - United States Minor Outlying Islands
+	// * `US` - United States of America
+	// * `UY` - Uruguay
+	// * `UZ` - Uzbekistan
+	// * `VU` - Vanuatu
+	// * `VE` - Venezuela
+	// * `VN` - Vietnam
+	// * `VG` - Virgin Islands (British)
+	// * `VI` - Virgin Islands (U.S.)
+	// * `WF` - Wallis and Futuna
+	// * `EH` - Western Sahara
+	// * `YE` - Yemen
+	// * `ZM` - Zambia
+	// * `ZW` - Zimbabwe
 	Country *AddressRequestCountry `json:"country,omitempty"`
 	// The address type.
 	//
-	// - `BILLING` - BILLING
-	// - `SHIPPING` - SHIPPING
+	// * `BILLING` - BILLING
+	// * `SHIPPING` - SHIPPING
 	AddressType         *AddressRequestAddressType `json:"address_type,omitempty"`
 	IntegrationParams   map[string]any             `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any             `json:"linked_account_params,omitempty"`
@@ -1299,8 +1280,8 @@ type AddressRequest struct {
 
 // The address type.
 //
-// - `BILLING` - BILLING
-// - `SHIPPING` - SHIPPING
+// * `BILLING` - BILLING
+// * `SHIPPING` - SHIPPING
 type AddressRequestAddressType struct {
 	typeName        string
 	AddressTypeEnum AddressTypeEnum
@@ -1360,255 +1341,255 @@ func (a *AddressRequestAddressType) Accept(visitor AddressRequestAddressTypeVisi
 
 // The address's country.
 //
-// - `AF` - Afghanistan
-// - `AX` - Åland Islands
-// - `AL` - Albania
-// - `DZ` - Algeria
-// - `AS` - American Samoa
-// - `AD` - Andorra
-// - `AO` - Angola
-// - `AI` - Anguilla
-// - `AQ` - Antarctica
-// - `AG` - Antigua and Barbuda
-// - `AR` - Argentina
-// - `AM` - Armenia
-// - `AW` - Aruba
-// - `AU` - Australia
-// - `AT` - Austria
-// - `AZ` - Azerbaijan
-// - `BS` - Bahamas
-// - `BH` - Bahrain
-// - `BD` - Bangladesh
-// - `BB` - Barbados
-// - `BY` - Belarus
-// - `BE` - Belgium
-// - `BZ` - Belize
-// - `BJ` - Benin
-// - `BM` - Bermuda
-// - `BT` - Bhutan
-// - `BO` - Bolivia
-// - `BQ` - Bonaire, Sint Eustatius and Saba
-// - `BA` - Bosnia and Herzegovina
-// - `BW` - Botswana
-// - `BV` - Bouvet Island
-// - `BR` - Brazil
-// - `IO` - British Indian Ocean Territory
-// - `BN` - Brunei
-// - `BG` - Bulgaria
-// - `BF` - Burkina Faso
-// - `BI` - Burundi
-// - `CV` - Cabo Verde
-// - `KH` - Cambodia
-// - `CM` - Cameroon
-// - `CA` - Canada
-// - `KY` - Cayman Islands
-// - `CF` - Central African Republic
-// - `TD` - Chad
-// - `CL` - Chile
-// - `CN` - China
-// - `CX` - Christmas Island
-// - `CC` - Cocos (Keeling) Islands
-// - `CO` - Colombia
-// - `KM` - Comoros
-// - `CG` - Congo
-// - `CD` - Congo (the Democratic Republic of the)
-// - `CK` - Cook Islands
-// - `CR` - Costa Rica
-// - `CI` - Côte d'Ivoire
-// - `HR` - Croatia
-// - `CU` - Cuba
-// - `CW` - Curaçao
-// - `CY` - Cyprus
-// - `CZ` - Czechia
-// - `DK` - Denmark
-// - `DJ` - Djibouti
-// - `DM` - Dominica
-// - `DO` - Dominican Republic
-// - `EC` - Ecuador
-// - `EG` - Egypt
-// - `SV` - El Salvador
-// - `GQ` - Equatorial Guinea
-// - `ER` - Eritrea
-// - `EE` - Estonia
-// - `SZ` - Eswatini
-// - `ET` - Ethiopia
-// - `FK` - Falkland Islands (Malvinas)
-// - `FO` - Faroe Islands
-// - `FJ` - Fiji
-// - `FI` - Finland
-// - `FR` - France
-// - `GF` - French Guiana
-// - `PF` - French Polynesia
-// - `TF` - French Southern Territories
-// - `GA` - Gabon
-// - `GM` - Gambia
-// - `GE` - Georgia
-// - `DE` - Germany
-// - `GH` - Ghana
-// - `GI` - Gibraltar
-// - `GR` - Greece
-// - `GL` - Greenland
-// - `GD` - Grenada
-// - `GP` - Guadeloupe
-// - `GU` - Guam
-// - `GT` - Guatemala
-// - `GG` - Guernsey
-// - `GN` - Guinea
-// - `GW` - Guinea-Bissau
-// - `GY` - Guyana
-// - `HT` - Haiti
-// - `HM` - Heard Island and McDonald Islands
-// - `VA` - Holy See
-// - `HN` - Honduras
-// - `HK` - Hong Kong
-// - `HU` - Hungary
-// - `IS` - Iceland
-// - `IN` - India
-// - `ID` - Indonesia
-// - `IR` - Iran
-// - `IQ` - Iraq
-// - `IE` - Ireland
-// - `IM` - Isle of Man
-// - `IL` - Israel
-// - `IT` - Italy
-// - `JM` - Jamaica
-// - `JP` - Japan
-// - `JE` - Jersey
-// - `JO` - Jordan
-// - `KZ` - Kazakhstan
-// - `KE` - Kenya
-// - `KI` - Kiribati
-// - `KW` - Kuwait
-// - `KG` - Kyrgyzstan
-// - `LA` - Laos
-// - `LV` - Latvia
-// - `LB` - Lebanon
-// - `LS` - Lesotho
-// - `LR` - Liberia
-// - `LY` - Libya
-// - `LI` - Liechtenstein
-// - `LT` - Lithuania
-// - `LU` - Luxembourg
-// - `MO` - Macao
-// - `MG` - Madagascar
-// - `MW` - Malawi
-// - `MY` - Malaysia
-// - `MV` - Maldives
-// - `ML` - Mali
-// - `MT` - Malta
-// - `MH` - Marshall Islands
-// - `MQ` - Martinique
-// - `MR` - Mauritania
-// - `MU` - Mauritius
-// - `YT` - Mayotte
-// - `MX` - Mexico
-// - `FM` - Micronesia (Federated States of)
-// - `MD` - Moldova
-// - `MC` - Monaco
-// - `MN` - Mongolia
-// - `ME` - Montenegro
-// - `MS` - Montserrat
-// - `MA` - Morocco
-// - `MZ` - Mozambique
-// - `MM` - Myanmar
-// - `NA` - Namibia
-// - `NR` - Nauru
-// - `NP` - Nepal
-// - `NL` - Netherlands
-// - `NC` - New Caledonia
-// - `NZ` - New Zealand
-// - `NI` - Nicaragua
-// - `NE` - Niger
-// - `NG` - Nigeria
-// - `NU` - Niue
-// - `NF` - Norfolk Island
-// - `KP` - North Korea
-// - `MK` - North Macedonia
-// - `MP` - Northern Mariana Islands
-// - `NO` - Norway
-// - `OM` - Oman
-// - `PK` - Pakistan
-// - `PW` - Palau
-// - `PS` - Palestine, State of
-// - `PA` - Panama
-// - `PG` - Papua New Guinea
-// - `PY` - Paraguay
-// - `PE` - Peru
-// - `PH` - Philippines
-// - `PN` - Pitcairn
-// - `PL` - Poland
-// - `PT` - Portugal
-// - `PR` - Puerto Rico
-// - `QA` - Qatar
-// - `RE` - Réunion
-// - `RO` - Romania
-// - `RU` - Russia
-// - `RW` - Rwanda
-// - `BL` - Saint Barthélemy
-// - `SH` - Saint Helena, Ascension and Tristan da Cunha
-// - `KN` - Saint Kitts and Nevis
-// - `LC` - Saint Lucia
-// - `MF` - Saint Martin (French part)
-// - `PM` - Saint Pierre and Miquelon
-// - `VC` - Saint Vincent and the Grenadines
-// - `WS` - Samoa
-// - `SM` - San Marino
-// - `ST` - Sao Tome and Principe
-// - `SA` - Saudi Arabia
-// - `SN` - Senegal
-// - `RS` - Serbia
-// - `SC` - Seychelles
-// - `SL` - Sierra Leone
-// - `SG` - Singapore
-// - `SX` - Sint Maarten (Dutch part)
-// - `SK` - Slovakia
-// - `SI` - Slovenia
-// - `SB` - Solomon Islands
-// - `SO` - Somalia
-// - `ZA` - South Africa
-// - `GS` - South Georgia and the South Sandwich Islands
-// - `KR` - South Korea
-// - `SS` - South Sudan
-// - `ES` - Spain
-// - `LK` - Sri Lanka
-// - `SD` - Sudan
-// - `SR` - Suriname
-// - `SJ` - Svalbard and Jan Mayen
-// - `SE` - Sweden
-// - `CH` - Switzerland
-// - `SY` - Syria
-// - `TW` - Taiwan
-// - `TJ` - Tajikistan
-// - `TZ` - Tanzania
-// - `TH` - Thailand
-// - `TL` - Timor-Leste
-// - `TG` - Togo
-// - `TK` - Tokelau
-// - `TO` - Tonga
-// - `TT` - Trinidad and Tobago
-// - `TN` - Tunisia
-// - `TR` - Turkey
-// - `TM` - Turkmenistan
-// - `TC` - Turks and Caicos Islands
-// - `TV` - Tuvalu
-// - `UG` - Uganda
-// - `UA` - Ukraine
-// - `AE` - United Arab Emirates
-// - `GB` - United Kingdom
-// - `UM` - United States Minor Outlying Islands
-// - `US` - United States of America
-// - `UY` - Uruguay
-// - `UZ` - Uzbekistan
-// - `VU` - Vanuatu
-// - `VE` - Venezuela
-// - `VN` - Vietnam
-// - `VG` - Virgin Islands (British)
-// - `VI` - Virgin Islands (U.S.)
-// - `WF` - Wallis and Futuna
-// - `EH` - Western Sahara
-// - `YE` - Yemen
-// - `ZM` - Zambia
-// - `ZW` - Zimbabwe
+// * `AF` - Afghanistan
+// * `AX` - Åland Islands
+// * `AL` - Albania
+// * `DZ` - Algeria
+// * `AS` - American Samoa
+// * `AD` - Andorra
+// * `AO` - Angola
+// * `AI` - Anguilla
+// * `AQ` - Antarctica
+// * `AG` - Antigua and Barbuda
+// * `AR` - Argentina
+// * `AM` - Armenia
+// * `AW` - Aruba
+// * `AU` - Australia
+// * `AT` - Austria
+// * `AZ` - Azerbaijan
+// * `BS` - Bahamas
+// * `BH` - Bahrain
+// * `BD` - Bangladesh
+// * `BB` - Barbados
+// * `BY` - Belarus
+// * `BE` - Belgium
+// * `BZ` - Belize
+// * `BJ` - Benin
+// * `BM` - Bermuda
+// * `BT` - Bhutan
+// * `BO` - Bolivia
+// * `BQ` - Bonaire, Sint Eustatius and Saba
+// * `BA` - Bosnia and Herzegovina
+// * `BW` - Botswana
+// * `BV` - Bouvet Island
+// * `BR` - Brazil
+// * `IO` - British Indian Ocean Territory
+// * `BN` - Brunei
+// * `BG` - Bulgaria
+// * `BF` - Burkina Faso
+// * `BI` - Burundi
+// * `CV` - Cabo Verde
+// * `KH` - Cambodia
+// * `CM` - Cameroon
+// * `CA` - Canada
+// * `KY` - Cayman Islands
+// * `CF` - Central African Republic
+// * `TD` - Chad
+// * `CL` - Chile
+// * `CN` - China
+// * `CX` - Christmas Island
+// * `CC` - Cocos (Keeling) Islands
+// * `CO` - Colombia
+// * `KM` - Comoros
+// * `CG` - Congo
+// * `CD` - Congo (the Democratic Republic of the)
+// * `CK` - Cook Islands
+// * `CR` - Costa Rica
+// * `CI` - Côte d'Ivoire
+// * `HR` - Croatia
+// * `CU` - Cuba
+// * `CW` - Curaçao
+// * `CY` - Cyprus
+// * `CZ` - Czechia
+// * `DK` - Denmark
+// * `DJ` - Djibouti
+// * `DM` - Dominica
+// * `DO` - Dominican Republic
+// * `EC` - Ecuador
+// * `EG` - Egypt
+// * `SV` - El Salvador
+// * `GQ` - Equatorial Guinea
+// * `ER` - Eritrea
+// * `EE` - Estonia
+// * `SZ` - Eswatini
+// * `ET` - Ethiopia
+// * `FK` - Falkland Islands (Malvinas)
+// * `FO` - Faroe Islands
+// * `FJ` - Fiji
+// * `FI` - Finland
+// * `FR` - France
+// * `GF` - French Guiana
+// * `PF` - French Polynesia
+// * `TF` - French Southern Territories
+// * `GA` - Gabon
+// * `GM` - Gambia
+// * `GE` - Georgia
+// * `DE` - Germany
+// * `GH` - Ghana
+// * `GI` - Gibraltar
+// * `GR` - Greece
+// * `GL` - Greenland
+// * `GD` - Grenada
+// * `GP` - Guadeloupe
+// * `GU` - Guam
+// * `GT` - Guatemala
+// * `GG` - Guernsey
+// * `GN` - Guinea
+// * `GW` - Guinea-Bissau
+// * `GY` - Guyana
+// * `HT` - Haiti
+// * `HM` - Heard Island and McDonald Islands
+// * `VA` - Holy See
+// * `HN` - Honduras
+// * `HK` - Hong Kong
+// * `HU` - Hungary
+// * `IS` - Iceland
+// * `IN` - India
+// * `ID` - Indonesia
+// * `IR` - Iran
+// * `IQ` - Iraq
+// * `IE` - Ireland
+// * `IM` - Isle of Man
+// * `IL` - Israel
+// * `IT` - Italy
+// * `JM` - Jamaica
+// * `JP` - Japan
+// * `JE` - Jersey
+// * `JO` - Jordan
+// * `KZ` - Kazakhstan
+// * `KE` - Kenya
+// * `KI` - Kiribati
+// * `KW` - Kuwait
+// * `KG` - Kyrgyzstan
+// * `LA` - Laos
+// * `LV` - Latvia
+// * `LB` - Lebanon
+// * `LS` - Lesotho
+// * `LR` - Liberia
+// * `LY` - Libya
+// * `LI` - Liechtenstein
+// * `LT` - Lithuania
+// * `LU` - Luxembourg
+// * `MO` - Macao
+// * `MG` - Madagascar
+// * `MW` - Malawi
+// * `MY` - Malaysia
+// * `MV` - Maldives
+// * `ML` - Mali
+// * `MT` - Malta
+// * `MH` - Marshall Islands
+// * `MQ` - Martinique
+// * `MR` - Mauritania
+// * `MU` - Mauritius
+// * `YT` - Mayotte
+// * `MX` - Mexico
+// * `FM` - Micronesia (Federated States of)
+// * `MD` - Moldova
+// * `MC` - Monaco
+// * `MN` - Mongolia
+// * `ME` - Montenegro
+// * `MS` - Montserrat
+// * `MA` - Morocco
+// * `MZ` - Mozambique
+// * `MM` - Myanmar
+// * `NA` - Namibia
+// * `NR` - Nauru
+// * `NP` - Nepal
+// * `NL` - Netherlands
+// * `NC` - New Caledonia
+// * `NZ` - New Zealand
+// * `NI` - Nicaragua
+// * `NE` - Niger
+// * `NG` - Nigeria
+// * `NU` - Niue
+// * `NF` - Norfolk Island
+// * `KP` - North Korea
+// * `MK` - North Macedonia
+// * `MP` - Northern Mariana Islands
+// * `NO` - Norway
+// * `OM` - Oman
+// * `PK` - Pakistan
+// * `PW` - Palau
+// * `PS` - Palestine, State of
+// * `PA` - Panama
+// * `PG` - Papua New Guinea
+// * `PY` - Paraguay
+// * `PE` - Peru
+// * `PH` - Philippines
+// * `PN` - Pitcairn
+// * `PL` - Poland
+// * `PT` - Portugal
+// * `PR` - Puerto Rico
+// * `QA` - Qatar
+// * `RE` - Réunion
+// * `RO` - Romania
+// * `RU` - Russia
+// * `RW` - Rwanda
+// * `BL` - Saint Barthélemy
+// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+// * `KN` - Saint Kitts and Nevis
+// * `LC` - Saint Lucia
+// * `MF` - Saint Martin (French part)
+// * `PM` - Saint Pierre and Miquelon
+// * `VC` - Saint Vincent and the Grenadines
+// * `WS` - Samoa
+// * `SM` - San Marino
+// * `ST` - Sao Tome and Principe
+// * `SA` - Saudi Arabia
+// * `SN` - Senegal
+// * `RS` - Serbia
+// * `SC` - Seychelles
+// * `SL` - Sierra Leone
+// * `SG` - Singapore
+// * `SX` - Sint Maarten (Dutch part)
+// * `SK` - Slovakia
+// * `SI` - Slovenia
+// * `SB` - Solomon Islands
+// * `SO` - Somalia
+// * `ZA` - South Africa
+// * `GS` - South Georgia and the South Sandwich Islands
+// * `KR` - South Korea
+// * `SS` - South Sudan
+// * `ES` - Spain
+// * `LK` - Sri Lanka
+// * `SD` - Sudan
+// * `SR` - Suriname
+// * `SJ` - Svalbard and Jan Mayen
+// * `SE` - Sweden
+// * `CH` - Switzerland
+// * `SY` - Syria
+// * `TW` - Taiwan
+// * `TJ` - Tajikistan
+// * `TZ` - Tanzania
+// * `TH` - Thailand
+// * `TL` - Timor-Leste
+// * `TG` - Togo
+// * `TK` - Tokelau
+// * `TO` - Tonga
+// * `TT` - Trinidad and Tobago
+// * `TN` - Tunisia
+// * `TR` - Turkey
+// * `TM` - Turkmenistan
+// * `TC` - Turks and Caicos Islands
+// * `TV` - Tuvalu
+// * `UG` - Uganda
+// * `UA` - Ukraine
+// * `AE` - United Arab Emirates
+// * `GB` - United Kingdom
+// * `UM` - United States Minor Outlying Islands
+// * `US` - United States of America
+// * `UY` - Uruguay
+// * `UZ` - Uzbekistan
+// * `VU` - Vanuatu
+// * `VE` - Venezuela
+// * `VN` - Vietnam
+// * `VG` - Virgin Islands (British)
+// * `VI` - Virgin Islands (U.S.)
+// * `WF` - Wallis and Futuna
+// * `EH` - Western Sahara
+// * `YE` - Yemen
+// * `ZM` - Zambia
+// * `ZW` - Zimbabwe
 type AddressRequestCountry struct {
 	typeName    string
 	CountryEnum CountryEnum
@@ -1666,8 +1647,8 @@ func (a *AddressRequestCountry) Accept(visitor AddressRequestCountryVisitor) err
 	}
 }
 
-// - `BILLING` - BILLING
-// - `SHIPPING` - SHIPPING
+// * `BILLING` - BILLING
+// * `SHIPPING` - SHIPPING
 type AddressTypeEnum uint
 
 const (
@@ -1707,13 +1688,9 @@ func (a *AddressTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Association Object
-//
 // ### Description
-//
 // The `Association` record refers to an instance of an Association Type.
-//
 // ### Usage Example
-//
 // TODO
 type Association struct {
 	SourceObject    map[string]any              `json:"source_object,omitempty"`
@@ -1790,13 +1767,9 @@ type AssociationSubType struct {
 }
 
 // # The AssociationType Object
-//
 // ### Description
-//
 // The `Association Type` object represents the relationship between two objects.
-//
 // ### Usage Example
-//
 // TODO
 type AssociationType struct {
 	SourceObjectClass   map[string]any              `json:"source_object_class,omitempty"`
@@ -1891,46 +1864,46 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// - `ADMIN` - ADMIN
-	// - `DEVELOPER` - DEVELOPER
-	// - `MEMBER` - MEMBER
-	// - `API` - API
-	// - `SYSTEM` - SYSTEM
-	// - `MERGE_TEAM` - MERGE_TEAM
+	// * `ADMIN` - ADMIN
+	// * `DEVELOPER` - DEVELOPER
+	// * `MEMBER` - MEMBER
+	// * `API` - API
+	// * `SYSTEM` - SYSTEM
+	// * `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// - `INVITED_USER` - INVITED_USER
-	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// - `CREATED_DESTINATION` - CREATED_DESTINATION
-	// - `DELETED_DESTINATION` - DELETED_DESTINATION
-	// - `CHANGED_SCOPES` - CHANGED_SCOPES
-	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// - `RESET_PASSWORD` - RESET_PASSWORD
-	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// * `INVITED_USER` - INVITED_USER
+	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// * `CREATED_DESTINATION` - CREATED_DESTINATION
+	// * `DELETED_DESTINATION` - DELETED_DESTINATION
+	// * `CHANGED_SCOPES` - CHANGED_SCOPES
+	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// * `RESET_PASSWORD` - RESET_PASSWORD
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -1938,36 +1911,36 @@ type AuditLogEvent struct {
 
 // Designates the type of event that occurred.
 //
-// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// - `INVITED_USER` - INVITED_USER
-// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// - `CREATED_DESTINATION` - CREATED_DESTINATION
-// - `DELETED_DESTINATION` - DELETED_DESTINATION
-// - `CHANGED_SCOPES` - CHANGED_SCOPES
-// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// - `RESET_PASSWORD` - RESET_PASSWORD
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -2027,12 +2000,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// - `ADMIN` - ADMIN
-// - `DEVELOPER` - DEVELOPER
-// - `MEMBER` - MEMBER
-// - `API` - API
-// - `SYSTEM` - SYSTEM
-// - `MERGE_TEAM` - MERGE_TEAM
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -2091,13 +2064,10 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
-//
 // ### Description
-//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
-//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
@@ -2105,10 +2075,10 @@ type AvailableActions struct {
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
 }
 
-// - `ONE_TO_ONE` - ONE_TO_ONE
-// - `MANY_TO_ONE` - MANY_TO_ONE
-// - `MANY_TO_MANY` - MANY_TO_MANY
-// - `ONE_TO_MANY` - ONE_TO_MANY
+// * `ONE_TO_ONE` - ONE_TO_ONE
+// * `MANY_TO_ONE` - MANY_TO_ONE
+// * `MANY_TO_MANY` - MANY_TO_MANY
+// * `ONE_TO_MANY` - ONE_TO_MANY
 type CardinalityEnum uint
 
 const (
@@ -2159,13 +2129,13 @@ func (c *CardinalityEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `hris` - hris
-// - `ats` - ats
-// - `accounting` - accounting
-// - `ticketing` - ticketing
-// - `crm` - crm
-// - `mktg` - mktg
-// - `filestorage` - filestorage
+// * `hris` - hris
+// * `ats` - ats
+// * `accounting` - accounting
+// * `ticketing` - ticketing
+// * `crm` - crm
+// * `mktg` - mktg
+// * `filestorage` - filestorage
 type CategoriesEnum uint
 
 const (
@@ -2234,13 +2204,13 @@ func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `hris` - hris
-// - `ats` - ats
-// - `accounting` - accounting
-// - `ticketing` - ticketing
-// - `crm` - crm
-// - `mktg` - mktg
-// - `filestorage` - filestorage
+// * `hris` - hris
+// * `ats` - ats
+// * `accounting` - accounting
+// * `ticketing` - ticketing
+// * `crm` - crm
+// * `mktg` - mktg
+// * `filestorage` - filestorage
 type CategoryEnum uint
 
 const (
@@ -2320,7 +2290,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
+	// User-facing *native condition* name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -2328,13 +2298,13 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// - `BOOLEAN` - BOOLEAN
-	// - `DATE` - DATE
-	// - `DATE_TIME` - DATE_TIME
-	// - `INTEGER` - INTEGER
-	// - `FLOAT` - FLOAT
-	// - `STRING` - STRING
-	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// * `BOOLEAN` - BOOLEAN
+	// * `DATE` - DATE
+	// * `DATE_TIME` - DATE_TIME
+	// * `INTEGER` - INTEGER
+	// * `FLOAT` - FLOAT
+	// * `STRING` - STRING
+	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
@@ -2342,13 +2312,13 @@ type ConditionSchema struct {
 
 // The type of value(s) that can be set for this condition.
 //
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// * `BOOLEAN` - BOOLEAN
+// * `DATE` - DATE
+// * `DATE_TIME` - DATE_TIME
+// * `INTEGER` - INTEGER
+// * `FLOAT` - FLOAT
+// * `STRING` - STRING
+// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -2406,13 +2376,13 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// * `BOOLEAN` - BOOLEAN
+// * `DATE` - DATE
+// * `DATE_TIME` - DATE_TIME
+// * `INTEGER` - INTEGER
+// * `FLOAT` - FLOAT
+// * `STRING` - STRING
+// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionTypeEnum uint
 
 const (
@@ -2482,13 +2452,9 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Contact Object
-//
 // ### Description
-//
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type Contact struct {
 	// The contact's first name.
@@ -2635,13 +2601,9 @@ func (c *ContactOwner) Accept(visitor ContactOwnerVisitor) error {
 }
 
 // # The Contact Object
-//
 // ### Description
-//
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type ContactRequest struct {
 	// The contact's first name.
@@ -2778,255 +2740,343 @@ func (c *ContactRequestOwner) Accept(visitor ContactRequestOwnerVisitor) error {
 	}
 }
 
-// - `AF` - Afghanistan
-// - `AX` - Åland Islands
-// - `AL` - Albania
-// - `DZ` - Algeria
-// - `AS` - American Samoa
-// - `AD` - Andorra
-// - `AO` - Angola
-// - `AI` - Anguilla
-// - `AQ` - Antarctica
-// - `AG` - Antigua and Barbuda
-// - `AR` - Argentina
-// - `AM` - Armenia
-// - `AW` - Aruba
-// - `AU` - Australia
-// - `AT` - Austria
-// - `AZ` - Azerbaijan
-// - `BS` - Bahamas
-// - `BH` - Bahrain
-// - `BD` - Bangladesh
-// - `BB` - Barbados
-// - `BY` - Belarus
-// - `BE` - Belgium
-// - `BZ` - Belize
-// - `BJ` - Benin
-// - `BM` - Bermuda
-// - `BT` - Bhutan
-// - `BO` - Bolivia
-// - `BQ` - Bonaire, Sint Eustatius and Saba
-// - `BA` - Bosnia and Herzegovina
-// - `BW` - Botswana
-// - `BV` - Bouvet Island
-// - `BR` - Brazil
-// - `IO` - British Indian Ocean Territory
-// - `BN` - Brunei
-// - `BG` - Bulgaria
-// - `BF` - Burkina Faso
-// - `BI` - Burundi
-// - `CV` - Cabo Verde
-// - `KH` - Cambodia
-// - `CM` - Cameroon
-// - `CA` - Canada
-// - `KY` - Cayman Islands
-// - `CF` - Central African Republic
-// - `TD` - Chad
-// - `CL` - Chile
-// - `CN` - China
-// - `CX` - Christmas Island
-// - `CC` - Cocos (Keeling) Islands
-// - `CO` - Colombia
-// - `KM` - Comoros
-// - `CG` - Congo
-// - `CD` - Congo (the Democratic Republic of the)
-// - `CK` - Cook Islands
-// - `CR` - Costa Rica
-// - `CI` - Côte d'Ivoire
-// - `HR` - Croatia
-// - `CU` - Cuba
-// - `CW` - Curaçao
-// - `CY` - Cyprus
-// - `CZ` - Czechia
-// - `DK` - Denmark
-// - `DJ` - Djibouti
-// - `DM` - Dominica
-// - `DO` - Dominican Republic
-// - `EC` - Ecuador
-// - `EG` - Egypt
-// - `SV` - El Salvador
-// - `GQ` - Equatorial Guinea
-// - `ER` - Eritrea
-// - `EE` - Estonia
-// - `SZ` - Eswatini
-// - `ET` - Ethiopia
-// - `FK` - Falkland Islands (Malvinas)
-// - `FO` - Faroe Islands
-// - `FJ` - Fiji
-// - `FI` - Finland
-// - `FR` - France
-// - `GF` - French Guiana
-// - `PF` - French Polynesia
-// - `TF` - French Southern Territories
-// - `GA` - Gabon
-// - `GM` - Gambia
-// - `GE` - Georgia
-// - `DE` - Germany
-// - `GH` - Ghana
-// - `GI` - Gibraltar
-// - `GR` - Greece
-// - `GL` - Greenland
-// - `GD` - Grenada
-// - `GP` - Guadeloupe
-// - `GU` - Guam
-// - `GT` - Guatemala
-// - `GG` - Guernsey
-// - `GN` - Guinea
-// - `GW` - Guinea-Bissau
-// - `GY` - Guyana
-// - `HT` - Haiti
-// - `HM` - Heard Island and McDonald Islands
-// - `VA` - Holy See
-// - `HN` - Honduras
-// - `HK` - Hong Kong
-// - `HU` - Hungary
-// - `IS` - Iceland
-// - `IN` - India
-// - `ID` - Indonesia
-// - `IR` - Iran
-// - `IQ` - Iraq
-// - `IE` - Ireland
-// - `IM` - Isle of Man
-// - `IL` - Israel
-// - `IT` - Italy
-// - `JM` - Jamaica
-// - `JP` - Japan
-// - `JE` - Jersey
-// - `JO` - Jordan
-// - `KZ` - Kazakhstan
-// - `KE` - Kenya
-// - `KI` - Kiribati
-// - `KW` - Kuwait
-// - `KG` - Kyrgyzstan
-// - `LA` - Laos
-// - `LV` - Latvia
-// - `LB` - Lebanon
-// - `LS` - Lesotho
-// - `LR` - Liberia
-// - `LY` - Libya
-// - `LI` - Liechtenstein
-// - `LT` - Lithuania
-// - `LU` - Luxembourg
-// - `MO` - Macao
-// - `MG` - Madagascar
-// - `MW` - Malawi
-// - `MY` - Malaysia
-// - `MV` - Maldives
-// - `ML` - Mali
-// - `MT` - Malta
-// - `MH` - Marshall Islands
-// - `MQ` - Martinique
-// - `MR` - Mauritania
-// - `MU` - Mauritius
-// - `YT` - Mayotte
-// - `MX` - Mexico
-// - `FM` - Micronesia (Federated States of)
-// - `MD` - Moldova
-// - `MC` - Monaco
-// - `MN` - Mongolia
-// - `ME` - Montenegro
-// - `MS` - Montserrat
-// - `MA` - Morocco
-// - `MZ` - Mozambique
-// - `MM` - Myanmar
-// - `NA` - Namibia
-// - `NR` - Nauru
-// - `NP` - Nepal
-// - `NL` - Netherlands
-// - `NC` - New Caledonia
-// - `NZ` - New Zealand
-// - `NI` - Nicaragua
-// - `NE` - Niger
-// - `NG` - Nigeria
-// - `NU` - Niue
-// - `NF` - Norfolk Island
-// - `KP` - North Korea
-// - `MK` - North Macedonia
-// - `MP` - Northern Mariana Islands
-// - `NO` - Norway
-// - `OM` - Oman
-// - `PK` - Pakistan
-// - `PW` - Palau
-// - `PS` - Palestine, State of
-// - `PA` - Panama
-// - `PG` - Papua New Guinea
-// - `PY` - Paraguay
-// - `PE` - Peru
-// - `PH` - Philippines
-// - `PN` - Pitcairn
-// - `PL` - Poland
-// - `PT` - Portugal
-// - `PR` - Puerto Rico
-// - `QA` - Qatar
-// - `RE` - Réunion
-// - `RO` - Romania
-// - `RU` - Russia
-// - `RW` - Rwanda
-// - `BL` - Saint Barthélemy
-// - `SH` - Saint Helena, Ascension and Tristan da Cunha
-// - `KN` - Saint Kitts and Nevis
-// - `LC` - Saint Lucia
-// - `MF` - Saint Martin (French part)
-// - `PM` - Saint Pierre and Miquelon
-// - `VC` - Saint Vincent and the Grenadines
-// - `WS` - Samoa
-// - `SM` - San Marino
-// - `ST` - Sao Tome and Principe
-// - `SA` - Saudi Arabia
-// - `SN` - Senegal
-// - `RS` - Serbia
-// - `SC` - Seychelles
-// - `SL` - Sierra Leone
-// - `SG` - Singapore
-// - `SX` - Sint Maarten (Dutch part)
-// - `SK` - Slovakia
-// - `SI` - Slovenia
-// - `SB` - Solomon Islands
-// - `SO` - Somalia
-// - `ZA` - South Africa
-// - `GS` - South Georgia and the South Sandwich Islands
-// - `KR` - South Korea
-// - `SS` - South Sudan
-// - `ES` - Spain
-// - `LK` - Sri Lanka
-// - `SD` - Sudan
-// - `SR` - Suriname
-// - `SJ` - Svalbard and Jan Mayen
-// - `SE` - Sweden
-// - `CH` - Switzerland
-// - `SY` - Syria
-// - `TW` - Taiwan
-// - `TJ` - Tajikistan
-// - `TZ` - Tanzania
-// - `TH` - Thailand
-// - `TL` - Timor-Leste
-// - `TG` - Togo
-// - `TK` - Tokelau
-// - `TO` - Tonga
-// - `TT` - Trinidad and Tobago
-// - `TN` - Tunisia
-// - `TR` - Turkey
-// - `TM` - Turkmenistan
-// - `TC` - Turks and Caicos Islands
-// - `TV` - Tuvalu
-// - `UG` - Uganda
-// - `UA` - Ukraine
-// - `AE` - United Arab Emirates
-// - `GB` - United Kingdom
-// - `UM` - United States Minor Outlying Islands
-// - `US` - United States of America
-// - `UY` - Uruguay
-// - `UZ` - Uzbekistan
-// - `VU` - Vanuatu
-// - `VE` - Venezuela
-// - `VN` - Vietnam
-// - `VG` - Virgin Islands (British)
-// - `VI` - Virgin Islands (U.S.)
-// - `WF` - Wallis and Futuna
-// - `EH` - Western Sahara
-// - `YE` - Yemen
-// - `ZM` - Zambia
-// - `ZW` - Zimbabwe
+type ContactsListRequestExpand uint
+
+const (
+	ContactsListRequestExpandAccount ContactsListRequestExpand = iota + 1
+	ContactsListRequestExpandAccountOwner
+	ContactsListRequestExpandOwner
+)
+
+func (c ContactsListRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case ContactsListRequestExpandAccount:
+		return "account"
+	case ContactsListRequestExpandAccountOwner:
+		return "account,owner"
+	case ContactsListRequestExpandOwner:
+		return "owner"
+	}
+}
+
+func (c ContactsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *ContactsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := ContactsListRequestExpandAccount
+		*c = value
+	case "account,owner":
+		value := ContactsListRequestExpandAccountOwner
+		*c = value
+	case "owner":
+		value := ContactsListRequestExpandOwner
+		*c = value
+	}
+	return nil
+}
+
+type ContactsRetrieveRequestExpand uint
+
+const (
+	ContactsRetrieveRequestExpandAccount ContactsRetrieveRequestExpand = iota + 1
+	ContactsRetrieveRequestExpandAccountOwner
+	ContactsRetrieveRequestExpandOwner
+)
+
+func (c ContactsRetrieveRequestExpand) String() string {
+	switch c {
+	default:
+		return strconv.Itoa(int(c))
+	case ContactsRetrieveRequestExpandAccount:
+		return "account"
+	case ContactsRetrieveRequestExpandAccountOwner:
+		return "account,owner"
+	case ContactsRetrieveRequestExpandOwner:
+		return "owner"
+	}
+}
+
+func (c ContactsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", c.String())), nil
+}
+
+func (c *ContactsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := ContactsRetrieveRequestExpandAccount
+		*c = value
+	case "account,owner":
+		value := ContactsRetrieveRequestExpandAccountOwner
+		*c = value
+	case "owner":
+		value := ContactsRetrieveRequestExpandOwner
+		*c = value
+	}
+	return nil
+}
+
+// * `AF` - Afghanistan
+// * `AX` - Åland Islands
+// * `AL` - Albania
+// * `DZ` - Algeria
+// * `AS` - American Samoa
+// * `AD` - Andorra
+// * `AO` - Angola
+// * `AI` - Anguilla
+// * `AQ` - Antarctica
+// * `AG` - Antigua and Barbuda
+// * `AR` - Argentina
+// * `AM` - Armenia
+// * `AW` - Aruba
+// * `AU` - Australia
+// * `AT` - Austria
+// * `AZ` - Azerbaijan
+// * `BS` - Bahamas
+// * `BH` - Bahrain
+// * `BD` - Bangladesh
+// * `BB` - Barbados
+// * `BY` - Belarus
+// * `BE` - Belgium
+// * `BZ` - Belize
+// * `BJ` - Benin
+// * `BM` - Bermuda
+// * `BT` - Bhutan
+// * `BO` - Bolivia
+// * `BQ` - Bonaire, Sint Eustatius and Saba
+// * `BA` - Bosnia and Herzegovina
+// * `BW` - Botswana
+// * `BV` - Bouvet Island
+// * `BR` - Brazil
+// * `IO` - British Indian Ocean Territory
+// * `BN` - Brunei
+// * `BG` - Bulgaria
+// * `BF` - Burkina Faso
+// * `BI` - Burundi
+// * `CV` - Cabo Verde
+// * `KH` - Cambodia
+// * `CM` - Cameroon
+// * `CA` - Canada
+// * `KY` - Cayman Islands
+// * `CF` - Central African Republic
+// * `TD` - Chad
+// * `CL` - Chile
+// * `CN` - China
+// * `CX` - Christmas Island
+// * `CC` - Cocos (Keeling) Islands
+// * `CO` - Colombia
+// * `KM` - Comoros
+// * `CG` - Congo
+// * `CD` - Congo (the Democratic Republic of the)
+// * `CK` - Cook Islands
+// * `CR` - Costa Rica
+// * `CI` - Côte d'Ivoire
+// * `HR` - Croatia
+// * `CU` - Cuba
+// * `CW` - Curaçao
+// * `CY` - Cyprus
+// * `CZ` - Czechia
+// * `DK` - Denmark
+// * `DJ` - Djibouti
+// * `DM` - Dominica
+// * `DO` - Dominican Republic
+// * `EC` - Ecuador
+// * `EG` - Egypt
+// * `SV` - El Salvador
+// * `GQ` - Equatorial Guinea
+// * `ER` - Eritrea
+// * `EE` - Estonia
+// * `SZ` - Eswatini
+// * `ET` - Ethiopia
+// * `FK` - Falkland Islands (Malvinas)
+// * `FO` - Faroe Islands
+// * `FJ` - Fiji
+// * `FI` - Finland
+// * `FR` - France
+// * `GF` - French Guiana
+// * `PF` - French Polynesia
+// * `TF` - French Southern Territories
+// * `GA` - Gabon
+// * `GM` - Gambia
+// * `GE` - Georgia
+// * `DE` - Germany
+// * `GH` - Ghana
+// * `GI` - Gibraltar
+// * `GR` - Greece
+// * `GL` - Greenland
+// * `GD` - Grenada
+// * `GP` - Guadeloupe
+// * `GU` - Guam
+// * `GT` - Guatemala
+// * `GG` - Guernsey
+// * `GN` - Guinea
+// * `GW` - Guinea-Bissau
+// * `GY` - Guyana
+// * `HT` - Haiti
+// * `HM` - Heard Island and McDonald Islands
+// * `VA` - Holy See
+// * `HN` - Honduras
+// * `HK` - Hong Kong
+// * `HU` - Hungary
+// * `IS` - Iceland
+// * `IN` - India
+// * `ID` - Indonesia
+// * `IR` - Iran
+// * `IQ` - Iraq
+// * `IE` - Ireland
+// * `IM` - Isle of Man
+// * `IL` - Israel
+// * `IT` - Italy
+// * `JM` - Jamaica
+// * `JP` - Japan
+// * `JE` - Jersey
+// * `JO` - Jordan
+// * `KZ` - Kazakhstan
+// * `KE` - Kenya
+// * `KI` - Kiribati
+// * `KW` - Kuwait
+// * `KG` - Kyrgyzstan
+// * `LA` - Laos
+// * `LV` - Latvia
+// * `LB` - Lebanon
+// * `LS` - Lesotho
+// * `LR` - Liberia
+// * `LY` - Libya
+// * `LI` - Liechtenstein
+// * `LT` - Lithuania
+// * `LU` - Luxembourg
+// * `MO` - Macao
+// * `MG` - Madagascar
+// * `MW` - Malawi
+// * `MY` - Malaysia
+// * `MV` - Maldives
+// * `ML` - Mali
+// * `MT` - Malta
+// * `MH` - Marshall Islands
+// * `MQ` - Martinique
+// * `MR` - Mauritania
+// * `MU` - Mauritius
+// * `YT` - Mayotte
+// * `MX` - Mexico
+// * `FM` - Micronesia (Federated States of)
+// * `MD` - Moldova
+// * `MC` - Monaco
+// * `MN` - Mongolia
+// * `ME` - Montenegro
+// * `MS` - Montserrat
+// * `MA` - Morocco
+// * `MZ` - Mozambique
+// * `MM` - Myanmar
+// * `NA` - Namibia
+// * `NR` - Nauru
+// * `NP` - Nepal
+// * `NL` - Netherlands
+// * `NC` - New Caledonia
+// * `NZ` - New Zealand
+// * `NI` - Nicaragua
+// * `NE` - Niger
+// * `NG` - Nigeria
+// * `NU` - Niue
+// * `NF` - Norfolk Island
+// * `KP` - North Korea
+// * `MK` - North Macedonia
+// * `MP` - Northern Mariana Islands
+// * `NO` - Norway
+// * `OM` - Oman
+// * `PK` - Pakistan
+// * `PW` - Palau
+// * `PS` - Palestine, State of
+// * `PA` - Panama
+// * `PG` - Papua New Guinea
+// * `PY` - Paraguay
+// * `PE` - Peru
+// * `PH` - Philippines
+// * `PN` - Pitcairn
+// * `PL` - Poland
+// * `PT` - Portugal
+// * `PR` - Puerto Rico
+// * `QA` - Qatar
+// * `RE` - Réunion
+// * `RO` - Romania
+// * `RU` - Russia
+// * `RW` - Rwanda
+// * `BL` - Saint Barthélemy
+// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+// * `KN` - Saint Kitts and Nevis
+// * `LC` - Saint Lucia
+// * `MF` - Saint Martin (French part)
+// * `PM` - Saint Pierre and Miquelon
+// * `VC` - Saint Vincent and the Grenadines
+// * `WS` - Samoa
+// * `SM` - San Marino
+// * `ST` - Sao Tome and Principe
+// * `SA` - Saudi Arabia
+// * `SN` - Senegal
+// * `RS` - Serbia
+// * `SC` - Seychelles
+// * `SL` - Sierra Leone
+// * `SG` - Singapore
+// * `SX` - Sint Maarten (Dutch part)
+// * `SK` - Slovakia
+// * `SI` - Slovenia
+// * `SB` - Solomon Islands
+// * `SO` - Somalia
+// * `ZA` - South Africa
+// * `GS` - South Georgia and the South Sandwich Islands
+// * `KR` - South Korea
+// * `SS` - South Sudan
+// * `ES` - Spain
+// * `LK` - Sri Lanka
+// * `SD` - Sudan
+// * `SR` - Suriname
+// * `SJ` - Svalbard and Jan Mayen
+// * `SE` - Sweden
+// * `CH` - Switzerland
+// * `SY` - Syria
+// * `TW` - Taiwan
+// * `TJ` - Tajikistan
+// * `TZ` - Tanzania
+// * `TH` - Thailand
+// * `TL` - Timor-Leste
+// * `TG` - Togo
+// * `TK` - Tokelau
+// * `TO` - Tonga
+// * `TT` - Trinidad and Tobago
+// * `TN` - Tunisia
+// * `TR` - Turkey
+// * `TM` - Turkmenistan
+// * `TC` - Turks and Caicos Islands
+// * `TV` - Tuvalu
+// * `UG` - Uganda
+// * `UA` - Ukraine
+// * `AE` - United Arab Emirates
+// * `GB` - United Kingdom
+// * `UM` - United States Minor Outlying Islands
+// * `US` - United States of America
+// * `UY` - Uruguay
+// * `UZ` - Uzbekistan
+// * `VU` - Vanuatu
+// * `VE` - Venezuela
+// * `VN` - Vietnam
+// * `VG` - Virgin Islands (British)
+// * `VI` - Virgin Islands (U.S.)
+// * `WF` - Wallis and Futuna
+// * `EH` - Western Sahara
+// * `YE` - Yemen
+// * `ZM` - Zambia
+// * `ZW` - Zimbabwe
 type CountryEnum uint
 
 const (
@@ -4576,13 +4626,9 @@ type CrmCustomObjectResponse struct {
 }
 
 // # The CustomObject Object
-//
 // ### Description
-//
 // The `Custom Object` record refers to an instance of a Custom Object Class.
-//
 // ### Usage Example
-//
 // TODO
 type CustomObject struct {
 	ObjectClass *string        `json:"object_class,omitempty"`
@@ -4597,13 +4643,9 @@ type CustomObject struct {
 }
 
 // # The Custom Object Class Object
-//
 // ### Description
-//
 // The `Custom Object Class` object is used to represent a Custom Object Schema in the remote system.
-//
 // ### Usage Example
-//
 // TODO
 type CustomObjectClass struct {
 	Name             *string                                 `json:"name,omitempty"`
@@ -4623,13 +4665,10 @@ type CustomObjectRequest struct {
 }
 
 // # The DataPassthrough Object
-//
 // ### Description
-//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
-//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -4657,8 +4696,8 @@ type DebugModelLogSummary struct {
 	StatusCode int    `json:"status_code"`
 }
 
-// - `INBOUND` - INBOUND
-// - `OUTBOUND` - OUTBOUND
+// * `INBOUND` - INBOUND
+// * `OUTBOUND` - OUTBOUND
 type DirectionEnum uint
 
 const (
@@ -4698,13 +4737,9 @@ func (d *DirectionEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The EmailAddress Object
-//
 // ### Description
-//
 // The `EmailAddress` object is used to represent an entity's email address.
-//
 // ### Usage Example
-//
 // Fetch from the `GET Contact` endpoint and view their email addresses.
 type EmailAddress struct {
 	// The email address.
@@ -4717,13 +4752,9 @@ type EmailAddress struct {
 }
 
 // # The EmailAddress Object
-//
 // ### Description
-//
 // The `EmailAddress` object is used to represent an entity's email address.
-//
 // ### Usage Example
-//
 // Fetch from the `GET Contact` endpoint and view their email addresses.
 type EmailAddressRequest struct {
 	// The email address.
@@ -4734,8 +4765,8 @@ type EmailAddressRequest struct {
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
 }
 
-// - `READ` - READ
-// - `WRITE` - WRITE
+// * `READ` - READ
+// * `WRITE` - WRITE
 type EnabledActionsEnum uint
 
 const (
@@ -4774,9 +4805,9 @@ func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `RAW` - RAW
-// - `BASE64` - BASE64
-// - `GZIP_BASE64` - GZIP_BASE64
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
 type EncodingEnum uint
 
 const (
@@ -4822,13 +4853,9 @@ func (e *EncodingEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Engagement Object
-//
 // ### Description
-//
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type Engagement struct {
 	// The engagement's owner.
@@ -4839,8 +4866,8 @@ type Engagement struct {
 	Subject *string `json:"subject,omitempty"`
 	// The engagement's direction.
 	//
-	// - `INBOUND` - INBOUND
-	// - `OUTBOUND` - OUTBOUND
+	// * `INBOUND` - INBOUND
+	// * `OUTBOUND` - OUTBOUND
 	Direction *EngagementDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
 	EngagementType *EngagementEngagementType `json:"engagement_type,omitempty"`
@@ -4981,8 +5008,8 @@ func (e *EngagementContactsItem) Accept(visitor EngagementContactsItemVisitor) e
 
 // The engagement's direction.
 //
-// - `INBOUND` - INBOUND
-// - `OUTBOUND` - OUTBOUND
+// * `INBOUND` - INBOUND
+// * `OUTBOUND` - OUTBOUND
 type EngagementDirection struct {
 	typeName      string
 	DirectionEnum DirectionEnum
@@ -5157,13 +5184,9 @@ func (e *EngagementOwner) Accept(visitor EngagementOwnerVisitor) error {
 }
 
 // # The Engagement Object
-//
 // ### Description
-//
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type EngagementRequest struct {
 	// The engagement's owner.
@@ -5174,8 +5197,8 @@ type EngagementRequest struct {
 	Subject *string `json:"subject,omitempty"`
 	// The engagement's direction.
 	//
-	// - `INBOUND` - INBOUND
-	// - `OUTBOUND` - OUTBOUND
+	// * `INBOUND` - INBOUND
+	// * `OUTBOUND` - OUTBOUND
 	Direction *EngagementRequestDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
 	EngagementType *EngagementRequestEngagementType `json:"engagement_type,omitempty"`
@@ -5308,8 +5331,8 @@ func (e *EngagementRequestContactsItem) Accept(visitor EngagementRequestContacts
 
 // The engagement's direction.
 //
-// - `INBOUND` - INBOUND
-// - `OUTBOUND` - OUTBOUND
+// * `INBOUND` - INBOUND
+// * `OUTBOUND` - OUTBOUND
 type EngagementRequestDirection struct {
 	typeName      string
 	DirectionEnum DirectionEnum
@@ -5491,20 +5514,16 @@ type EngagementResponse struct {
 }
 
 // # The Engagement Type Object
-//
 // ### Description
-//
 // The `Engagement Type` object is used to represent an interaction activity. A given `Engagement` typically has an `Engagement Type` object represented in the engagement_type field.
-//
 // ### Usage Example
-//
 // TODO
 type EngagementType struct {
 	// The engagement type's activity type.
 	//
-	// - `CALL` - CALL
-	// - `MEETING` - MEETING
-	// - `EMAIL` - EMAIL
+	// * `CALL` - CALL
+	// * `MEETING` - MEETING
+	// * `EMAIL` - EMAIL
 	ActivityType *EngagementTypeActivityType `json:"activity_type,omitempty"`
 	// The engagement type's name.
 	Name *string `json:"name,omitempty"`
@@ -5519,9 +5538,9 @@ type EngagementType struct {
 
 // The engagement type's activity type.
 //
-// - `CALL` - CALL
-// - `MEETING` - MEETING
-// - `EMAIL` - EMAIL
+// * `CALL` - CALL
+// * `MEETING` - MEETING
+// * `EMAIL` - EMAIL
 type EngagementTypeActivityType struct {
 	typeName         string
 	ActivityTypeEnum ActivityTypeEnum
@@ -5579,6 +5598,238 @@ func (e *EngagementTypeActivityType) Accept(visitor EngagementTypeActivityTypeVi
 	}
 }
 
+type EngagementsListRequestExpand uint
+
+const (
+	EngagementsListRequestExpandAccount EngagementsListRequestExpand = iota + 1
+	EngagementsListRequestExpandAccountEngagementType
+	EngagementsListRequestExpandContacts
+	EngagementsListRequestExpandContactsAccount
+	EngagementsListRequestExpandContactsAccountEngagementType
+	EngagementsListRequestExpandContactsEngagementType
+	EngagementsListRequestExpandContactsOwner
+	EngagementsListRequestExpandContactsOwnerAccount
+	EngagementsListRequestExpandContactsOwnerAccountEngagementType
+	EngagementsListRequestExpandContactsOwnerEngagementType
+	EngagementsListRequestExpandEngagementType
+	EngagementsListRequestExpandOwner
+	EngagementsListRequestExpandOwnerAccount
+	EngagementsListRequestExpandOwnerAccountEngagementType
+	EngagementsListRequestExpandOwnerEngagementType
+)
+
+func (e EngagementsListRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EngagementsListRequestExpandAccount:
+		return "account"
+	case EngagementsListRequestExpandAccountEngagementType:
+		return "account,engagement_type"
+	case EngagementsListRequestExpandContacts:
+		return "contacts"
+	case EngagementsListRequestExpandContactsAccount:
+		return "contacts,account"
+	case EngagementsListRequestExpandContactsAccountEngagementType:
+		return "contacts,account,engagement_type"
+	case EngagementsListRequestExpandContactsEngagementType:
+		return "contacts,engagement_type"
+	case EngagementsListRequestExpandContactsOwner:
+		return "contacts,owner"
+	case EngagementsListRequestExpandContactsOwnerAccount:
+		return "contacts,owner,account"
+	case EngagementsListRequestExpandContactsOwnerAccountEngagementType:
+		return "contacts,owner,account,engagement_type"
+	case EngagementsListRequestExpandContactsOwnerEngagementType:
+		return "contacts,owner,engagement_type"
+	case EngagementsListRequestExpandEngagementType:
+		return "engagement_type"
+	case EngagementsListRequestExpandOwner:
+		return "owner"
+	case EngagementsListRequestExpandOwnerAccount:
+		return "owner,account"
+	case EngagementsListRequestExpandOwnerAccountEngagementType:
+		return "owner,account,engagement_type"
+	case EngagementsListRequestExpandOwnerEngagementType:
+		return "owner,engagement_type"
+	}
+}
+
+func (e EngagementsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EngagementsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := EngagementsListRequestExpandAccount
+		*e = value
+	case "account,engagement_type":
+		value := EngagementsListRequestExpandAccountEngagementType
+		*e = value
+	case "contacts":
+		value := EngagementsListRequestExpandContacts
+		*e = value
+	case "contacts,account":
+		value := EngagementsListRequestExpandContactsAccount
+		*e = value
+	case "contacts,account,engagement_type":
+		value := EngagementsListRequestExpandContactsAccountEngagementType
+		*e = value
+	case "contacts,engagement_type":
+		value := EngagementsListRequestExpandContactsEngagementType
+		*e = value
+	case "contacts,owner":
+		value := EngagementsListRequestExpandContactsOwner
+		*e = value
+	case "contacts,owner,account":
+		value := EngagementsListRequestExpandContactsOwnerAccount
+		*e = value
+	case "contacts,owner,account,engagement_type":
+		value := EngagementsListRequestExpandContactsOwnerAccountEngagementType
+		*e = value
+	case "contacts,owner,engagement_type":
+		value := EngagementsListRequestExpandContactsOwnerEngagementType
+		*e = value
+	case "engagement_type":
+		value := EngagementsListRequestExpandEngagementType
+		*e = value
+	case "owner":
+		value := EngagementsListRequestExpandOwner
+		*e = value
+	case "owner,account":
+		value := EngagementsListRequestExpandOwnerAccount
+		*e = value
+	case "owner,account,engagement_type":
+		value := EngagementsListRequestExpandOwnerAccountEngagementType
+		*e = value
+	case "owner,engagement_type":
+		value := EngagementsListRequestExpandOwnerEngagementType
+		*e = value
+	}
+	return nil
+}
+
+type EngagementsRetrieveRequestExpand uint
+
+const (
+	EngagementsRetrieveRequestExpandAccount EngagementsRetrieveRequestExpand = iota + 1
+	EngagementsRetrieveRequestExpandAccountEngagementType
+	EngagementsRetrieveRequestExpandContacts
+	EngagementsRetrieveRequestExpandContactsAccount
+	EngagementsRetrieveRequestExpandContactsAccountEngagementType
+	EngagementsRetrieveRequestExpandContactsEngagementType
+	EngagementsRetrieveRequestExpandContactsOwner
+	EngagementsRetrieveRequestExpandContactsOwnerAccount
+	EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType
+	EngagementsRetrieveRequestExpandContactsOwnerEngagementType
+	EngagementsRetrieveRequestExpandEngagementType
+	EngagementsRetrieveRequestExpandOwner
+	EngagementsRetrieveRequestExpandOwnerAccount
+	EngagementsRetrieveRequestExpandOwnerAccountEngagementType
+	EngagementsRetrieveRequestExpandOwnerEngagementType
+)
+
+func (e EngagementsRetrieveRequestExpand) String() string {
+	switch e {
+	default:
+		return strconv.Itoa(int(e))
+	case EngagementsRetrieveRequestExpandAccount:
+		return "account"
+	case EngagementsRetrieveRequestExpandAccountEngagementType:
+		return "account,engagement_type"
+	case EngagementsRetrieveRequestExpandContacts:
+		return "contacts"
+	case EngagementsRetrieveRequestExpandContactsAccount:
+		return "contacts,account"
+	case EngagementsRetrieveRequestExpandContactsAccountEngagementType:
+		return "contacts,account,engagement_type"
+	case EngagementsRetrieveRequestExpandContactsEngagementType:
+		return "contacts,engagement_type"
+	case EngagementsRetrieveRequestExpandContactsOwner:
+		return "contacts,owner"
+	case EngagementsRetrieveRequestExpandContactsOwnerAccount:
+		return "contacts,owner,account"
+	case EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType:
+		return "contacts,owner,account,engagement_type"
+	case EngagementsRetrieveRequestExpandContactsOwnerEngagementType:
+		return "contacts,owner,engagement_type"
+	case EngagementsRetrieveRequestExpandEngagementType:
+		return "engagement_type"
+	case EngagementsRetrieveRequestExpandOwner:
+		return "owner"
+	case EngagementsRetrieveRequestExpandOwnerAccount:
+		return "owner,account"
+	case EngagementsRetrieveRequestExpandOwnerAccountEngagementType:
+		return "owner,account,engagement_type"
+	case EngagementsRetrieveRequestExpandOwnerEngagementType:
+		return "owner,engagement_type"
+	}
+}
+
+func (e EngagementsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", e.String())), nil
+}
+
+func (e *EngagementsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := EngagementsRetrieveRequestExpandAccount
+		*e = value
+	case "account,engagement_type":
+		value := EngagementsRetrieveRequestExpandAccountEngagementType
+		*e = value
+	case "contacts":
+		value := EngagementsRetrieveRequestExpandContacts
+		*e = value
+	case "contacts,account":
+		value := EngagementsRetrieveRequestExpandContactsAccount
+		*e = value
+	case "contacts,account,engagement_type":
+		value := EngagementsRetrieveRequestExpandContactsAccountEngagementType
+		*e = value
+	case "contacts,engagement_type":
+		value := EngagementsRetrieveRequestExpandContactsEngagementType
+		*e = value
+	case "contacts,owner":
+		value := EngagementsRetrieveRequestExpandContactsOwner
+		*e = value
+	case "contacts,owner,account":
+		value := EngagementsRetrieveRequestExpandContactsOwnerAccount
+		*e = value
+	case "contacts,owner,account,engagement_type":
+		value := EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType
+		*e = value
+	case "contacts,owner,engagement_type":
+		value := EngagementsRetrieveRequestExpandContactsOwnerEngagementType
+		*e = value
+	case "engagement_type":
+		value := EngagementsRetrieveRequestExpandEngagementType
+		*e = value
+	case "owner":
+		value := EngagementsRetrieveRequestExpandOwner
+		*e = value
+	case "owner,account":
+		value := EngagementsRetrieveRequestExpandOwnerAccount
+		*e = value
+	case "owner,account,engagement_type":
+		value := EngagementsRetrieveRequestExpandOwnerAccountEngagementType
+		*e = value
+	case "owner,engagement_type":
+		value := EngagementsRetrieveRequestExpandOwnerEngagementType
+		*e = value
+	}
+	return nil
+}
+
 type ErrorValidationProblem struct {
 	Source      *ValidationProblemSource `json:"source,omitempty"`
 	Title       string                   `json:"title"`
@@ -5586,36 +5837,36 @@ type ErrorValidationProblem struct {
 	ProblemType string                   `json:"problem_type"`
 }
 
-// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// - `INVITED_USER` - INVITED_USER
-// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// - `CREATED_DESTINATION` - CREATED_DESTINATION
-// - `DELETED_DESTINATION` - DELETED_DESTINATION
-// - `CHANGED_SCOPES` - CHANGED_SCOPES
-// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// - `RESET_PASSWORD` - RESET_PASSWORD
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type EventTypeEnum uint
 
 const (
@@ -5822,12 +6073,12 @@ func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `string` - string
-// - `number` - number
-// - `date` - date
-// - `datetime` - datetime
-// - `bool` - bool
-// - `list` - list
+// * `string` - string
+// * `number` - number
+// * `date` - date
+// * `datetime` - datetime
+// * `bool` - bool
+// * `list` - list
 type FieldFormatEnum uint
 
 const (
@@ -5890,12 +6141,12 @@ func (f *FieldFormatEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `string` - string
-// - `number` - number
-// - `date` - date
-// - `datetime` - datetime
-// - `bool` - bool
-// - `list` - list
+// * `string` - string
+// * `number` - number
+// * `date` - date
+// * `datetime` - datetime
+// * `bool` - bool
+// * `list` - list
 type FieldTypeEnum uint
 
 const (
@@ -5967,8 +6218,8 @@ type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// - `ONGOING` - ONGOING
-	// - `RESOLVED` - RESOLVED
+	// * `ONGOING` - ONGOING
+	// * `RESOLVED` - RESOLVED
 	Status            *IssueStatus   `json:"status,omitempty"`
 	ErrorDescription  string         `json:"error_description"`
 	EndUser           map[string]any `json:"end_user,omitempty"`
@@ -5980,8 +6231,8 @@ type Issue struct {
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// - `ONGOING` - ONGOING
-// - `RESOLVED` - RESOLVED
+// * `ONGOING` - ONGOING
+// * `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -6039,8 +6290,8 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// - `ONGOING` - ONGOING
-// - `RESOLVED` - RESOLVED
+// * `ONGOING` - ONGOING
+// * `RESOLVED` - RESOLVED
 type IssueStatusEnum uint
 
 const (
@@ -6079,12 +6330,50 @@ func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `string` - uuid
-// - `number` - url
-// - `date` - email
-// - `datetime` - phone
-// - `bool` - currency
-// - `list` - decimal
+type IssuesListRequestStatus uint
+
+const (
+	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
+	IssuesListRequestStatusResolved
+)
+
+func (i IssuesListRequestStatus) String() string {
+	switch i {
+	default:
+		return strconv.Itoa(int(i))
+	case IssuesListRequestStatusOngoing:
+		return "ONGOING"
+	case IssuesListRequestStatusResolved:
+		return "RESOLVED"
+	}
+}
+
+func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", i.String())), nil
+}
+
+func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ONGOING":
+		value := IssuesListRequestStatusOngoing
+		*i = value
+	case "RESOLVED":
+		value := IssuesListRequestStatusResolved
+		*i = value
+	}
+	return nil
+}
+
+// * `string` - uuid
+// * `number` - url
+// * `date` - email
+// * `datetime` - phone
+// * `bool` - currency
+// * `list` - decimal
 type ItemFormatEnum uint
 
 const (
@@ -6153,12 +6442,12 @@ type ItemSchema struct {
 	ItemChoices []string        `json:"item_choices,omitempty"`
 }
 
-// - `string` - string
-// - `number` - number
-// - `date` - date
-// - `datetime` - datetime
-// - `bool` - bool
-// - `list` - list
+// * `string` - string
+// * `number` - number
+// * `date` - date
+// * `datetime` - datetime
+// * `bool` - bool
+// * `list` - list
 type ItemTypeEnum uint
 
 const (
@@ -6222,13 +6511,9 @@ func (i *ItemTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Lead Object
-//
 // ### Description
-//
 // The `Lead` object is used to represent an individual who is a potential customer.
-//
 // ### Usage Example
-//
 // TODO
 type Lead struct {
 	// The lead's owner.
@@ -6443,13 +6728,9 @@ func (l *LeadOwner) Accept(visitor LeadOwnerVisitor) error {
 }
 
 // # The Lead Object
-//
 // ### Description
-//
 // The `Lead` object is used to represent an individual who is a potential customer.
-//
 // ### Usage Example
-//
 // TODO
 type LeadRequest struct {
 	// The lead's owner.
@@ -6659,6 +6940,142 @@ type LeadResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
+type LeadsListRequestExpand uint
+
+const (
+	LeadsListRequestExpandConvertedAccount LeadsListRequestExpand = iota + 1
+	LeadsListRequestExpandConvertedContact
+	LeadsListRequestExpandConvertedContactConvertedAccount
+	LeadsListRequestExpandOwner
+	LeadsListRequestExpandOwnerConvertedAccount
+	LeadsListRequestExpandOwnerConvertedContact
+	LeadsListRequestExpandOwnerConvertedContactConvertedAccount
+)
+
+func (l LeadsListRequestExpand) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LeadsListRequestExpandConvertedAccount:
+		return "converted_account"
+	case LeadsListRequestExpandConvertedContact:
+		return "converted_contact"
+	case LeadsListRequestExpandConvertedContactConvertedAccount:
+		return "converted_contact,converted_account"
+	case LeadsListRequestExpandOwner:
+		return "owner"
+	case LeadsListRequestExpandOwnerConvertedAccount:
+		return "owner,converted_account"
+	case LeadsListRequestExpandOwnerConvertedContact:
+		return "owner,converted_contact"
+	case LeadsListRequestExpandOwnerConvertedContactConvertedAccount:
+		return "owner,converted_contact,converted_account"
+	}
+}
+
+func (l LeadsListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LeadsListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "converted_account":
+		value := LeadsListRequestExpandConvertedAccount
+		*l = value
+	case "converted_contact":
+		value := LeadsListRequestExpandConvertedContact
+		*l = value
+	case "converted_contact,converted_account":
+		value := LeadsListRequestExpandConvertedContactConvertedAccount
+		*l = value
+	case "owner":
+		value := LeadsListRequestExpandOwner
+		*l = value
+	case "owner,converted_account":
+		value := LeadsListRequestExpandOwnerConvertedAccount
+		*l = value
+	case "owner,converted_contact":
+		value := LeadsListRequestExpandOwnerConvertedContact
+		*l = value
+	case "owner,converted_contact,converted_account":
+		value := LeadsListRequestExpandOwnerConvertedContactConvertedAccount
+		*l = value
+	}
+	return nil
+}
+
+type LeadsRetrieveRequestExpand uint
+
+const (
+	LeadsRetrieveRequestExpandConvertedAccount LeadsRetrieveRequestExpand = iota + 1
+	LeadsRetrieveRequestExpandConvertedContact
+	LeadsRetrieveRequestExpandConvertedContactConvertedAccount
+	LeadsRetrieveRequestExpandOwner
+	LeadsRetrieveRequestExpandOwnerConvertedAccount
+	LeadsRetrieveRequestExpandOwnerConvertedContact
+	LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount
+)
+
+func (l LeadsRetrieveRequestExpand) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LeadsRetrieveRequestExpandConvertedAccount:
+		return "converted_account"
+	case LeadsRetrieveRequestExpandConvertedContact:
+		return "converted_contact"
+	case LeadsRetrieveRequestExpandConvertedContactConvertedAccount:
+		return "converted_contact,converted_account"
+	case LeadsRetrieveRequestExpandOwner:
+		return "owner"
+	case LeadsRetrieveRequestExpandOwnerConvertedAccount:
+		return "owner,converted_account"
+	case LeadsRetrieveRequestExpandOwnerConvertedContact:
+		return "owner,converted_contact"
+	case LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount:
+		return "owner,converted_contact,converted_account"
+	}
+}
+
+func (l LeadsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LeadsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "converted_account":
+		value := LeadsRetrieveRequestExpandConvertedAccount
+		*l = value
+	case "converted_contact":
+		value := LeadsRetrieveRequestExpandConvertedContact
+		*l = value
+	case "converted_contact,converted_account":
+		value := LeadsRetrieveRequestExpandConvertedContactConvertedAccount
+		*l = value
+	case "owner":
+		value := LeadsRetrieveRequestExpandOwner
+		*l = value
+	case "owner,converted_account":
+		value := LeadsRetrieveRequestExpandOwnerConvertedAccount
+		*l = value
+	case "owner,converted_contact":
+		value := LeadsRetrieveRequestExpandOwnerConvertedContact
+		*l = value
+	case "owner,converted_contact,converted_account":
+		value := LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount
+		*l = value
+	}
+	return nil
+}
+
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
@@ -6670,7 +7087,7 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
+	// User-facing *native condition* name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
 	Operator string `json:"operator"`
@@ -6702,6 +7119,74 @@ type LinkedAccountStatus struct {
 	CanMakeRequest      bool   `json:"can_make_request"`
 }
 
+type LinkedAccountsListRequestCategory uint
+
+const (
+	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
+	LinkedAccountsListRequestCategoryAts
+	LinkedAccountsListRequestCategoryCrm
+	LinkedAccountsListRequestCategoryFilestorage
+	LinkedAccountsListRequestCategoryHris
+	LinkedAccountsListRequestCategoryMktg
+	LinkedAccountsListRequestCategoryTicketing
+)
+
+func (l LinkedAccountsListRequestCategory) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LinkedAccountsListRequestCategoryAccounting:
+		return "accounting"
+	case LinkedAccountsListRequestCategoryAts:
+		return "ats"
+	case LinkedAccountsListRequestCategoryCrm:
+		return "crm"
+	case LinkedAccountsListRequestCategoryFilestorage:
+		return "filestorage"
+	case LinkedAccountsListRequestCategoryHris:
+		return "hris"
+	case LinkedAccountsListRequestCategoryMktg:
+		return "mktg"
+	case LinkedAccountsListRequestCategoryTicketing:
+		return "ticketing"
+	}
+}
+
+func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "accounting":
+		value := LinkedAccountsListRequestCategoryAccounting
+		*l = value
+	case "ats":
+		value := LinkedAccountsListRequestCategoryAts
+		*l = value
+	case "crm":
+		value := LinkedAccountsListRequestCategoryCrm
+		*l = value
+	case "filestorage":
+		value := LinkedAccountsListRequestCategoryFilestorage
+		*l = value
+	case "hris":
+		value := LinkedAccountsListRequestCategoryHris
+		*l = value
+	case "mktg":
+		value := LinkedAccountsListRequestCategoryMktg
+		*l = value
+	case "ticketing":
+		value := LinkedAccountsListRequestCategoryTicketing
+		*l = value
+	}
+	return nil
+}
+
 type MetaResponse struct {
 	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
 	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
@@ -6710,13 +7195,13 @@ type MetaResponse struct {
 	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
 }
 
-// - `GET` - GET
-// - `OPTIONS` - OPTIONS
-// - `HEAD` - HEAD
-// - `POST` - POST
-// - `PUT` - PUT
-// - `PATCH` - PATCH
-// - `DELETE` - DELETE
+// * `GET` - GET
+// * `OPTIONS` - OPTIONS
+// * `HEAD` - HEAD
+// * `POST` - POST
+// * `PUT` - PUT
+// * `PATCH` - PATCH
+// * `DELETE` - DELETE
 type MethodEnum uint
 
 const (
@@ -6786,13 +7271,10 @@ func (m *MethodEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The ModelOperation Object
-//
 // ### Description
-//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
-//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
@@ -6802,13 +7284,10 @@ type ModelOperation struct {
 }
 
 // # The MultipartFormField Object
-//
 // ### Description
-//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
-//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -6817,9 +7296,9 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// - `RAW` - RAW
-	// - `BASE64` - BASE64
-	// - `GZIP_BASE64` - GZIP_BASE64
+	// * `RAW` - RAW
+	// * `BASE64` - BASE64
+	// * `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
@@ -6829,9 +7308,9 @@ type MultipartFormFieldRequest struct {
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// - `RAW` - RAW
-// - `BASE64` - BASE64
-// - `GZIP_BASE64` - GZIP_BASE64
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -6890,13 +7369,9 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 }
 
 // # The Note Object
-//
 // ### Description
-//
 // The `Note` object is used to represent a note on another object.
-//
 // ### Usage Example
-//
 // TODO
 type Note struct {
 	// The note's owner.
@@ -7158,13 +7633,9 @@ func (n *NoteOwner) Accept(visitor NoteOwnerVisitor) error {
 }
 
 // # The Note Object
-//
 // ### Description
-//
 // The `Note` object is used to represent a note on another object.
-//
 // ### Usage Example
-//
 // TODO
 type NoteRequest struct {
 	// The note's owner.
@@ -7421,6 +7892,238 @@ type NoteResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
+type NotesListRequestExpand uint
+
+const (
+	NotesListRequestExpandAccount NotesListRequestExpand = iota + 1
+	NotesListRequestExpandAccountOpportunity
+	NotesListRequestExpandContact
+	NotesListRequestExpandContactAccount
+	NotesListRequestExpandContactAccountOpportunity
+	NotesListRequestExpandContactOpportunity
+	NotesListRequestExpandOpportunity
+	NotesListRequestExpandOwner
+	NotesListRequestExpandOwnerAccount
+	NotesListRequestExpandOwnerAccountOpportunity
+	NotesListRequestExpandOwnerContact
+	NotesListRequestExpandOwnerContactAccount
+	NotesListRequestExpandOwnerContactAccountOpportunity
+	NotesListRequestExpandOwnerContactOpportunity
+	NotesListRequestExpandOwnerOpportunity
+)
+
+func (n NotesListRequestExpand) String() string {
+	switch n {
+	default:
+		return strconv.Itoa(int(n))
+	case NotesListRequestExpandAccount:
+		return "account"
+	case NotesListRequestExpandAccountOpportunity:
+		return "account,opportunity"
+	case NotesListRequestExpandContact:
+		return "contact"
+	case NotesListRequestExpandContactAccount:
+		return "contact,account"
+	case NotesListRequestExpandContactAccountOpportunity:
+		return "contact,account,opportunity"
+	case NotesListRequestExpandContactOpportunity:
+		return "contact,opportunity"
+	case NotesListRequestExpandOpportunity:
+		return "opportunity"
+	case NotesListRequestExpandOwner:
+		return "owner"
+	case NotesListRequestExpandOwnerAccount:
+		return "owner,account"
+	case NotesListRequestExpandOwnerAccountOpportunity:
+		return "owner,account,opportunity"
+	case NotesListRequestExpandOwnerContact:
+		return "owner,contact"
+	case NotesListRequestExpandOwnerContactAccount:
+		return "owner,contact,account"
+	case NotesListRequestExpandOwnerContactAccountOpportunity:
+		return "owner,contact,account,opportunity"
+	case NotesListRequestExpandOwnerContactOpportunity:
+		return "owner,contact,opportunity"
+	case NotesListRequestExpandOwnerOpportunity:
+		return "owner,opportunity"
+	}
+}
+
+func (n NotesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", n.String())), nil
+}
+
+func (n *NotesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := NotesListRequestExpandAccount
+		*n = value
+	case "account,opportunity":
+		value := NotesListRequestExpandAccountOpportunity
+		*n = value
+	case "contact":
+		value := NotesListRequestExpandContact
+		*n = value
+	case "contact,account":
+		value := NotesListRequestExpandContactAccount
+		*n = value
+	case "contact,account,opportunity":
+		value := NotesListRequestExpandContactAccountOpportunity
+		*n = value
+	case "contact,opportunity":
+		value := NotesListRequestExpandContactOpportunity
+		*n = value
+	case "opportunity":
+		value := NotesListRequestExpandOpportunity
+		*n = value
+	case "owner":
+		value := NotesListRequestExpandOwner
+		*n = value
+	case "owner,account":
+		value := NotesListRequestExpandOwnerAccount
+		*n = value
+	case "owner,account,opportunity":
+		value := NotesListRequestExpandOwnerAccountOpportunity
+		*n = value
+	case "owner,contact":
+		value := NotesListRequestExpandOwnerContact
+		*n = value
+	case "owner,contact,account":
+		value := NotesListRequestExpandOwnerContactAccount
+		*n = value
+	case "owner,contact,account,opportunity":
+		value := NotesListRequestExpandOwnerContactAccountOpportunity
+		*n = value
+	case "owner,contact,opportunity":
+		value := NotesListRequestExpandOwnerContactOpportunity
+		*n = value
+	case "owner,opportunity":
+		value := NotesListRequestExpandOwnerOpportunity
+		*n = value
+	}
+	return nil
+}
+
+type NotesRetrieveRequestExpand uint
+
+const (
+	NotesRetrieveRequestExpandAccount NotesRetrieveRequestExpand = iota + 1
+	NotesRetrieveRequestExpandAccountOpportunity
+	NotesRetrieveRequestExpandContact
+	NotesRetrieveRequestExpandContactAccount
+	NotesRetrieveRequestExpandContactAccountOpportunity
+	NotesRetrieveRequestExpandContactOpportunity
+	NotesRetrieveRequestExpandOpportunity
+	NotesRetrieveRequestExpandOwner
+	NotesRetrieveRequestExpandOwnerAccount
+	NotesRetrieveRequestExpandOwnerAccountOpportunity
+	NotesRetrieveRequestExpandOwnerContact
+	NotesRetrieveRequestExpandOwnerContactAccount
+	NotesRetrieveRequestExpandOwnerContactAccountOpportunity
+	NotesRetrieveRequestExpandOwnerContactOpportunity
+	NotesRetrieveRequestExpandOwnerOpportunity
+)
+
+func (n NotesRetrieveRequestExpand) String() string {
+	switch n {
+	default:
+		return strconv.Itoa(int(n))
+	case NotesRetrieveRequestExpandAccount:
+		return "account"
+	case NotesRetrieveRequestExpandAccountOpportunity:
+		return "account,opportunity"
+	case NotesRetrieveRequestExpandContact:
+		return "contact"
+	case NotesRetrieveRequestExpandContactAccount:
+		return "contact,account"
+	case NotesRetrieveRequestExpandContactAccountOpportunity:
+		return "contact,account,opportunity"
+	case NotesRetrieveRequestExpandContactOpportunity:
+		return "contact,opportunity"
+	case NotesRetrieveRequestExpandOpportunity:
+		return "opportunity"
+	case NotesRetrieveRequestExpandOwner:
+		return "owner"
+	case NotesRetrieveRequestExpandOwnerAccount:
+		return "owner,account"
+	case NotesRetrieveRequestExpandOwnerAccountOpportunity:
+		return "owner,account,opportunity"
+	case NotesRetrieveRequestExpandOwnerContact:
+		return "owner,contact"
+	case NotesRetrieveRequestExpandOwnerContactAccount:
+		return "owner,contact,account"
+	case NotesRetrieveRequestExpandOwnerContactAccountOpportunity:
+		return "owner,contact,account,opportunity"
+	case NotesRetrieveRequestExpandOwnerContactOpportunity:
+		return "owner,contact,opportunity"
+	case NotesRetrieveRequestExpandOwnerOpportunity:
+		return "owner,opportunity"
+	}
+}
+
+func (n NotesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", n.String())), nil
+}
+
+func (n *NotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := NotesRetrieveRequestExpandAccount
+		*n = value
+	case "account,opportunity":
+		value := NotesRetrieveRequestExpandAccountOpportunity
+		*n = value
+	case "contact":
+		value := NotesRetrieveRequestExpandContact
+		*n = value
+	case "contact,account":
+		value := NotesRetrieveRequestExpandContactAccount
+		*n = value
+	case "contact,account,opportunity":
+		value := NotesRetrieveRequestExpandContactAccountOpportunity
+		*n = value
+	case "contact,opportunity":
+		value := NotesRetrieveRequestExpandContactOpportunity
+		*n = value
+	case "opportunity":
+		value := NotesRetrieveRequestExpandOpportunity
+		*n = value
+	case "owner":
+		value := NotesRetrieveRequestExpandOwner
+		*n = value
+	case "owner,account":
+		value := NotesRetrieveRequestExpandOwnerAccount
+		*n = value
+	case "owner,account,opportunity":
+		value := NotesRetrieveRequestExpandOwnerAccountOpportunity
+		*n = value
+	case "owner,contact":
+		value := NotesRetrieveRequestExpandOwnerContact
+		*n = value
+	case "owner,contact,account":
+		value := NotesRetrieveRequestExpandOwnerContactAccount
+		*n = value
+	case "owner,contact,account,opportunity":
+		value := NotesRetrieveRequestExpandOwnerContactAccountOpportunity
+		*n = value
+	case "owner,contact,opportunity":
+		value := NotesRetrieveRequestExpandOwnerContactOpportunity
+		*n = value
+	case "owner,opportunity":
+		value := NotesRetrieveRequestExpandOwnerOpportunity
+		*n = value
+	}
+	return nil
+}
+
 type ObjectClassDescriptionRequest struct {
 	Id         string         `json:"id"`
 	OriginType OriginTypeEnum `json:"origin_type,omitempty"`
@@ -7433,14 +8136,190 @@ type OperatorSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 }
 
+type OpportunitiesListRequestExpand uint
+
+const (
+	OpportunitiesListRequestExpandAccount OpportunitiesListRequestExpand = iota + 1
+	OpportunitiesListRequestExpandOwner
+	OpportunitiesListRequestExpandOwnerAccount
+	OpportunitiesListRequestExpandOwnerStage
+	OpportunitiesListRequestExpandOwnerStageAccount
+	OpportunitiesListRequestExpandStage
+	OpportunitiesListRequestExpandStageAccount
+)
+
+func (o OpportunitiesListRequestExpand) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OpportunitiesListRequestExpandAccount:
+		return "account"
+	case OpportunitiesListRequestExpandOwner:
+		return "owner"
+	case OpportunitiesListRequestExpandOwnerAccount:
+		return "owner,account"
+	case OpportunitiesListRequestExpandOwnerStage:
+		return "owner,stage"
+	case OpportunitiesListRequestExpandOwnerStageAccount:
+		return "owner,stage,account"
+	case OpportunitiesListRequestExpandStage:
+		return "stage"
+	case OpportunitiesListRequestExpandStageAccount:
+		return "stage,account"
+	}
+}
+
+func (o OpportunitiesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OpportunitiesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := OpportunitiesListRequestExpandAccount
+		*o = value
+	case "owner":
+		value := OpportunitiesListRequestExpandOwner
+		*o = value
+	case "owner,account":
+		value := OpportunitiesListRequestExpandOwnerAccount
+		*o = value
+	case "owner,stage":
+		value := OpportunitiesListRequestExpandOwnerStage
+		*o = value
+	case "owner,stage,account":
+		value := OpportunitiesListRequestExpandOwnerStageAccount
+		*o = value
+	case "stage":
+		value := OpportunitiesListRequestExpandStage
+		*o = value
+	case "stage,account":
+		value := OpportunitiesListRequestExpandStageAccount
+		*o = value
+	}
+	return nil
+}
+
+type OpportunitiesListRequestStatus uint
+
+const (
+	OpportunitiesListRequestStatusLost OpportunitiesListRequestStatus = iota + 1
+	OpportunitiesListRequestStatusOpen
+	OpportunitiesListRequestStatusWon
+)
+
+func (o OpportunitiesListRequestStatus) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OpportunitiesListRequestStatusLost:
+		return "LOST"
+	case OpportunitiesListRequestStatusOpen:
+		return "OPEN"
+	case OpportunitiesListRequestStatusWon:
+		return "WON"
+	}
+}
+
+func (o OpportunitiesListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OpportunitiesListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "LOST":
+		value := OpportunitiesListRequestStatusLost
+		*o = value
+	case "OPEN":
+		value := OpportunitiesListRequestStatusOpen
+		*o = value
+	case "WON":
+		value := OpportunitiesListRequestStatusWon
+		*o = value
+	}
+	return nil
+}
+
+type OpportunitiesRetrieveRequestExpand uint
+
+const (
+	OpportunitiesRetrieveRequestExpandAccount OpportunitiesRetrieveRequestExpand = iota + 1
+	OpportunitiesRetrieveRequestExpandOwner
+	OpportunitiesRetrieveRequestExpandOwnerAccount
+	OpportunitiesRetrieveRequestExpandOwnerStage
+	OpportunitiesRetrieveRequestExpandOwnerStageAccount
+	OpportunitiesRetrieveRequestExpandStage
+	OpportunitiesRetrieveRequestExpandStageAccount
+)
+
+func (o OpportunitiesRetrieveRequestExpand) String() string {
+	switch o {
+	default:
+		return strconv.Itoa(int(o))
+	case OpportunitiesRetrieveRequestExpandAccount:
+		return "account"
+	case OpportunitiesRetrieveRequestExpandOwner:
+		return "owner"
+	case OpportunitiesRetrieveRequestExpandOwnerAccount:
+		return "owner,account"
+	case OpportunitiesRetrieveRequestExpandOwnerStage:
+		return "owner,stage"
+	case OpportunitiesRetrieveRequestExpandOwnerStageAccount:
+		return "owner,stage,account"
+	case OpportunitiesRetrieveRequestExpandStage:
+		return "stage"
+	case OpportunitiesRetrieveRequestExpandStageAccount:
+		return "stage,account"
+	}
+}
+
+func (o OpportunitiesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", o.String())), nil
+}
+
+func (o *OpportunitiesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := OpportunitiesRetrieveRequestExpandAccount
+		*o = value
+	case "owner":
+		value := OpportunitiesRetrieveRequestExpandOwner
+		*o = value
+	case "owner,account":
+		value := OpportunitiesRetrieveRequestExpandOwnerAccount
+		*o = value
+	case "owner,stage":
+		value := OpportunitiesRetrieveRequestExpandOwnerStage
+		*o = value
+	case "owner,stage,account":
+		value := OpportunitiesRetrieveRequestExpandOwnerStageAccount
+		*o = value
+	case "stage":
+		value := OpportunitiesRetrieveRequestExpandStage
+		*o = value
+	case "stage,account":
+		value := OpportunitiesRetrieveRequestExpandStageAccount
+		*o = value
+	}
+	return nil
+}
+
 // # The Opportunity Object
-//
 // ### Description
-//
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type Opportunity struct {
 	// The opportunity's name.
@@ -7457,9 +8336,9 @@ type Opportunity struct {
 	Stage *OpportunityStage `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
-	// - `OPEN` - OPEN
-	// - `WON` - WON
-	// - `LOST` - LOST
+	// * `OPEN` - OPEN
+	// * `WON` - WON
+	// * `LOST` - LOST
 	Status *OpportunityStatus `json:"status,omitempty"`
 	// When the opportunity's last activity occurred.
 	LastActivityAt *time.Time `json:"last_activity_at,omitempty"`
@@ -7596,13 +8475,9 @@ func (o *OpportunityOwner) Accept(visitor OpportunityOwnerVisitor) error {
 }
 
 // # The Opportunity Object
-//
 // ### Description
-//
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type OpportunityRequest struct {
 	// The opportunity's name.
@@ -7619,9 +8494,9 @@ type OpportunityRequest struct {
 	Stage *OpportunityRequestStage `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
-	// - `OPEN` - OPEN
-	// - `WON` - WON
-	// - `LOST` - LOST
+	// * `OPEN` - OPEN
+	// * `WON` - WON
+	// * `LOST` - LOST
 	Status *OpportunityRequestStatus `json:"status,omitempty"`
 	// When the opportunity's last activity occurred.
 	LastActivityAt *time.Time `json:"last_activity_at,omitempty"`
@@ -7808,9 +8683,9 @@ func (o *OpportunityRequestStage) Accept(visitor OpportunityRequestStageVisitor)
 
 // The opportunity's status.
 //
-// - `OPEN` - OPEN
-// - `WON` - WON
-// - `LOST` - LOST
+// * `OPEN` - OPEN
+// * `WON` - WON
+// * `LOST` - LOST
 type OpportunityRequestStatus struct {
 	typeName              string
 	OpportunityStatusEnum OpportunityStatusEnum
@@ -7935,9 +8810,9 @@ func (o *OpportunityStage) Accept(visitor OpportunityStageVisitor) error {
 
 // The opportunity's status.
 //
-// - `OPEN` - OPEN
-// - `WON` - WON
-// - `LOST` - LOST
+// * `OPEN` - OPEN
+// * `WON` - WON
+// * `LOST` - LOST
 type OpportunityStatus struct {
 	typeName              string
 	OpportunityStatusEnum OpportunityStatusEnum
@@ -7995,9 +8870,9 @@ func (o *OpportunityStatus) Accept(visitor OpportunityStatusVisitor) error {
 	}
 }
 
-// - `OPEN` - OPEN
-// - `WON` - WON
-// - `LOST` - LOST
+// * `OPEN` - OPEN
+// * `WON` - WON
+// * `LOST` - LOST
 type OpportunityStatusEnum uint
 
 const (
@@ -8042,9 +8917,9 @@ func (o *OpportunityStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `CUSTOM_OBJECT` - CUSTOM_OBJECT
-// - `COMMON_MODEL` - COMMON_MODEL
-// - `REMOTE_ONLY_MODEL` - REMOTE_ONLY_MODEL
+// * `CUSTOM_OBJECT` - CUSTOM_OBJECT
+// * `COMMON_MODEL` - COMMON_MODEL
+// * `REMOTE_ONLY_MODEL` - REMOTE_ONLY_MODEL
 type OriginTypeEnum uint
 
 const (
@@ -8210,13 +9085,9 @@ type PaginatedUserList struct {
 }
 
 // # The Account Object
-//
 // ### Description
-//
 // The `Account` object is used to represent a company in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type PatchedAccountRequest struct {
 	// The account's owner.
@@ -8239,13 +9110,9 @@ type PatchedAccountRequest struct {
 }
 
 // # The Contact Object
-//
 // ### Description
-//
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type PatchedContactRequest struct {
 	// The contact's first name.
@@ -8325,13 +9192,9 @@ func (p *PatchedContactRequestOwner) Accept(visitor PatchedContactRequestOwnerVi
 }
 
 // # The Engagement Object
-//
 // ### Description
-//
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type PatchedEngagementRequest struct {
 	// The engagement's owner.
@@ -8342,8 +9205,8 @@ type PatchedEngagementRequest struct {
 	Subject *string `json:"subject,omitempty"`
 	// The engagement's direction.
 	//
-	// - `INBOUND` - INBOUND
-	// - `OUTBOUND` - OUTBOUND
+	// * `INBOUND` - INBOUND
+	// * `OUTBOUND` - OUTBOUND
 	Direction *PatchedEngagementRequestDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
 	EngagementType *string `json:"engagement_type,omitempty"`
@@ -8361,8 +9224,8 @@ type PatchedEngagementRequest struct {
 
 // The engagement's direction.
 //
-// - `INBOUND` - INBOUND
-// - `OUTBOUND` - OUTBOUND
+// * `INBOUND` - INBOUND
+// * `OUTBOUND` - OUTBOUND
 type PatchedEngagementRequestDirection struct {
 	typeName      string
 	DirectionEnum DirectionEnum
@@ -8421,13 +9284,9 @@ func (p *PatchedEngagementRequestDirection) Accept(visitor PatchedEngagementRequ
 }
 
 // # The Opportunity Object
-//
 // ### Description
-//
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type PatchedOpportunityRequest struct {
 	// The opportunity's name.
@@ -8444,9 +9303,9 @@ type PatchedOpportunityRequest struct {
 	Stage *string `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
-	// - `OPEN` - OPEN
-	// - `WON` - WON
-	// - `LOST` - LOST
+	// * `OPEN` - OPEN
+	// * `WON` - WON
+	// * `LOST` - LOST
 	Status *PatchedOpportunityRequestStatus `json:"status,omitempty"`
 	// When the opportunity's last activity occurred.
 	LastActivityAt *time.Time `json:"last_activity_at,omitempty"`
@@ -8459,9 +9318,9 @@ type PatchedOpportunityRequest struct {
 
 // The opportunity's status.
 //
-// - `OPEN` - OPEN
-// - `WON` - WON
-// - `LOST` - LOST
+// * `OPEN` - OPEN
+// * `WON` - WON
+// * `LOST` - LOST
 type PatchedOpportunityRequestStatus struct {
 	typeName              string
 	OpportunityStatusEnum OpportunityStatusEnum
@@ -8520,13 +9379,9 @@ func (p *PatchedOpportunityRequestStatus) Accept(visitor PatchedOpportunityReque
 }
 
 // # The Task Object
-//
 // ### Description
-//
 // The `Task` object is used to represent a task, such as a to-do item.
-//
 // ### Usage Example
-//
 // TODO
 type PatchedTaskRequest struct {
 	// The task's subject.
@@ -8545,8 +9400,8 @@ type PatchedTaskRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The task's status.
 	//
-	// - `OPEN` - OPEN
-	// - `CLOSED` - CLOSED
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
 	Status              *PatchedTaskRequestStatus `json:"status,omitempty"`
 	IntegrationParams   map[string]any            `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any            `json:"linked_account_params,omitempty"`
@@ -8555,8 +9410,8 @@ type PatchedTaskRequest struct {
 
 // The task's status.
 //
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
 type PatchedTaskRequestStatus struct {
 	typeName       string
 	TaskStatusEnum TaskStatusEnum
@@ -8615,13 +9470,9 @@ func (p *PatchedTaskRequestStatus) Accept(visitor PatchedTaskRequestStatusVisito
 }
 
 // # The PhoneNumber Object
-//
 // ### Description
-//
 // The `PhoneNumber` object is used to represent an entity's phone number.
-//
 // ### Usage Example
-//
 // Fetch from the `GET Contact` endpoint and view their phone numbers.
 type PhoneNumber struct {
 	// The phone number.
@@ -8634,13 +9485,9 @@ type PhoneNumber struct {
 }
 
 // # The PhoneNumber Object
-//
 // ### Description
-//
 // The `PhoneNumber` object is used to represent an entity's phone number.
-//
 // ### Usage Example
-//
 // Fetch from the `GET Contact` endpoint and view their phone numbers.
 type PhoneNumberRequest struct {
 	// The phone number.
@@ -8651,9 +9498,9 @@ type PhoneNumberRequest struct {
 	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
 }
 
-// - `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
-// - `GDPR` - GDPR
-// - `OTHER` - OTHER
+// * `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
+// * `GDPR` - GDPR
+// * `OTHER` - OTHER
 type ReasonEnum uint
 
 const (
@@ -9099,13 +9946,10 @@ func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRe
 }
 
 // # The RemoteKey Object
-//
 // ### Description
-//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
-//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
@@ -9113,13 +9957,10 @@ type RemoteKey struct {
 }
 
 // # The RemoteResponse Object
-//
 // ### Description
-//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
-//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
 	Method          string            `json:"method"`
@@ -9131,9 +9972,9 @@ type RemoteResponse struct {
 	Headers         map[string]any    `json:"headers,omitempty"`
 }
 
-// - `JSON` - JSON
-// - `XML` - XML
-// - `MULTIPART` - MULTIPART
+// * `JSON` - JSON
+// * `XML` - XML
+// * `MULTIPART` - MULTIPART
 type RequestFormatEnum uint
 
 const (
@@ -9178,8 +10019,8 @@ func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `JSON` - JSON
-// - `BASE64_GZIP` - BASE64_GZIP
+// * `JSON` - JSON
+// * `BASE64_GZIP` - BASE64_GZIP
 type ResponseTypeEnum uint
 
 const (
@@ -9218,12 +10059,12 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `ADMIN` - ADMIN
-// - `DEVELOPER` - DEVELOPER
-// - `MEMBER` - MEMBER
-// - `API` - API
-// - `SYSTEM` - SYSTEM
-// - `MERGE_TEAM` - MERGE_TEAM
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
 type RoleEnum uint
 
 const (
@@ -9286,8 +10127,8 @@ func (r *RoleEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// - `IN_LAST_SYNC` - IN_LAST_SYNC
+// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// * `IN_LAST_SYNC` - IN_LAST_SYNC
 type SelectiveSyncConfigurationsUsageEnum uint
 
 const (
@@ -9327,13 +10168,9 @@ func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error 
 }
 
 // # The Stage Object
-//
 // ### Description
-//
 // The `Stage` object is used to represent the stage of an opportunity.
-//
 // ### Usage Example
-//
 // TODO
 type Stage struct {
 	// The stage's name.
@@ -9352,13 +10189,10 @@ type Stage struct {
 }
 
 // # The SyncStatus Object
-//
 // ### Description
-//
-// # The `SyncStatus` object is used to represent the syncing state of an account
+// The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
-//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -9370,12 +10204,12 @@ type SyncStatus struct {
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
 }
 
-// - `SYNCING` - SYNCING
-// - `DONE` - DONE
-// - `FAILED` - FAILED
-// - `DISABLED` - DISABLED
-// - `PAUSED` - PAUSED
-// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+// * `SYNCING` - SYNCING
+// * `DONE` - DONE
+// * `FAILED` - FAILED
+// * `DISABLED` - DISABLED
+// * `PAUSED` - PAUSED
+// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
 type SyncStatusStatusEnum uint
 
 const (
@@ -9439,13 +10273,9 @@ func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The Task Object
-//
 // ### Description
-//
 // The `Task` object is used to represent a task, such as a to-do item.
-//
 // ### Usage Example
-//
 // TODO
 type Task struct {
 	// The task's subject.
@@ -9464,8 +10294,8 @@ type Task struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The task's status.
 	//
-	// - `OPEN` - OPEN
-	// - `CLOSED` - CLOSED
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
 	Status *TaskStatus `json:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
@@ -9655,13 +10485,9 @@ func (t *TaskOwner) Accept(visitor TaskOwnerVisitor) error {
 }
 
 // # The Task Object
-//
 // ### Description
-//
 // The `Task` object is used to represent a task, such as a to-do item.
-//
 // ### Usage Example
-//
 // TODO
 type TaskRequest struct {
 	// The task's subject.
@@ -9680,8 +10506,8 @@ type TaskRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The task's status.
 	//
-	// - `OPEN` - OPEN
-	// - `CLOSED` - CLOSED
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
 	Status              *TaskRequestStatus    `json:"status,omitempty"`
 	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
@@ -9864,8 +10690,8 @@ func (t *TaskRequestOwner) Accept(visitor TaskRequestOwnerVisitor) error {
 
 // The task's status.
 //
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
 type TaskRequestStatus struct {
 	typeName       string
 	TaskStatusEnum TaskStatusEnum
@@ -9932,8 +10758,8 @@ type TaskResponse struct {
 
 // The task's status.
 //
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
 type TaskStatus struct {
 	typeName       string
 	TaskStatusEnum TaskStatusEnum
@@ -9991,8 +10817,8 @@ func (t *TaskStatus) Accept(visitor TaskStatusVisitor) error {
 	}
 }
 
-// - `OPEN` - OPEN
-// - `CLOSED` - CLOSED
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
 type TaskStatusEnum uint
 
 const (
@@ -10031,14 +10857,146 @@ func (t *TaskStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type TasksListRequestExpand uint
+
+const (
+	TasksListRequestExpandAccount TasksListRequestExpand = iota + 1
+	TasksListRequestExpandAccountOpportunity
+	TasksListRequestExpandOpportunity
+	TasksListRequestExpandOwner
+	TasksListRequestExpandOwnerAccount
+	TasksListRequestExpandOwnerAccountOpportunity
+	TasksListRequestExpandOwnerOpportunity
+)
+
+func (t TasksListRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TasksListRequestExpandAccount:
+		return "account"
+	case TasksListRequestExpandAccountOpportunity:
+		return "account,opportunity"
+	case TasksListRequestExpandOpportunity:
+		return "opportunity"
+	case TasksListRequestExpandOwner:
+		return "owner"
+	case TasksListRequestExpandOwnerAccount:
+		return "owner,account"
+	case TasksListRequestExpandOwnerAccountOpportunity:
+		return "owner,account,opportunity"
+	case TasksListRequestExpandOwnerOpportunity:
+		return "owner,opportunity"
+	}
+}
+
+func (t TasksListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TasksListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := TasksListRequestExpandAccount
+		*t = value
+	case "account,opportunity":
+		value := TasksListRequestExpandAccountOpportunity
+		*t = value
+	case "opportunity":
+		value := TasksListRequestExpandOpportunity
+		*t = value
+	case "owner":
+		value := TasksListRequestExpandOwner
+		*t = value
+	case "owner,account":
+		value := TasksListRequestExpandOwnerAccount
+		*t = value
+	case "owner,account,opportunity":
+		value := TasksListRequestExpandOwnerAccountOpportunity
+		*t = value
+	case "owner,opportunity":
+		value := TasksListRequestExpandOwnerOpportunity
+		*t = value
+	}
+	return nil
+}
+
+type TasksRetrieveRequestExpand uint
+
+const (
+	TasksRetrieveRequestExpandAccount TasksRetrieveRequestExpand = iota + 1
+	TasksRetrieveRequestExpandAccountOpportunity
+	TasksRetrieveRequestExpandOpportunity
+	TasksRetrieveRequestExpandOwner
+	TasksRetrieveRequestExpandOwnerAccount
+	TasksRetrieveRequestExpandOwnerAccountOpportunity
+	TasksRetrieveRequestExpandOwnerOpportunity
+)
+
+func (t TasksRetrieveRequestExpand) String() string {
+	switch t {
+	default:
+		return strconv.Itoa(int(t))
+	case TasksRetrieveRequestExpandAccount:
+		return "account"
+	case TasksRetrieveRequestExpandAccountOpportunity:
+		return "account,opportunity"
+	case TasksRetrieveRequestExpandOpportunity:
+		return "opportunity"
+	case TasksRetrieveRequestExpandOwner:
+		return "owner"
+	case TasksRetrieveRequestExpandOwnerAccount:
+		return "owner,account"
+	case TasksRetrieveRequestExpandOwnerAccountOpportunity:
+		return "owner,account,opportunity"
+	case TasksRetrieveRequestExpandOwnerOpportunity:
+		return "owner,opportunity"
+	}
+}
+
+func (t TasksRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", t.String())), nil
+}
+
+func (t *TasksRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "account":
+		value := TasksRetrieveRequestExpandAccount
+		*t = value
+	case "account,opportunity":
+		value := TasksRetrieveRequestExpandAccountOpportunity
+		*t = value
+	case "opportunity":
+		value := TasksRetrieveRequestExpandOpportunity
+		*t = value
+	case "owner":
+		value := TasksRetrieveRequestExpandOwner
+		*t = value
+	case "owner,account":
+		value := TasksRetrieveRequestExpandOwnerAccount
+		*t = value
+	case "owner,account,opportunity":
+		value := TasksRetrieveRequestExpandOwnerAccountOpportunity
+		*t = value
+	case "owner,opportunity":
+		value := TasksRetrieveRequestExpandOwnerOpportunity
+		*t = value
+	}
+	return nil
+}
+
 // # The User Object
-//
 // ### Description
-//
 // The `User` object is used to represent a user with a login to the CRM system.
-//
 // ### Usage Example
-//
 // TODO
 type User struct {
 	// The user's name.

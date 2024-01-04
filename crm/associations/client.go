@@ -41,7 +41,7 @@ func (c *client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Co
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects/%v/associations", customObjectClassId, objectId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v/associations", customObjectClassId, objectId)
 
 	queryParams := make(url.Values)
 	if request.AssociationTypeId != nil {
@@ -104,7 +104,7 @@ func (c *client) CustomObjectClassesCustomObjectsAssociationsUpdate(ctx context.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v/custom-objects/%v/associations/%v/%v/%v", associationTypeId, sourceClassId, sourceObjectId, targetClassId, targetObjectId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v/associations/%v/%v/%v", associationTypeId, sourceClassId, sourceObjectId, targetClassId, targetObjectId)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {

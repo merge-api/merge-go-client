@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *crm.IssuesListRequest) (*crm
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "issues"
+	endpointURL := baseURL + "/" + "api/crm/v1/issues"
 
 	queryParams := make(url.Values)
 	if request.AccountToken != nil {
@@ -110,7 +110,7 @@ func (c *client) Retrieve(ctx context.Context, id string) (*crm.Issue, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"issues/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/issues/%v", id)
 
 	var response *crm.Issue
 	if err := core.DoRequest(

@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*ticketing.AvailableActions, err
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "available-actions"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/available-actions"
 
 	var response *ticketing.AvailableActions
 	if err := core.DoRequest(

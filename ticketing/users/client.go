@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ticketing.UsersListRequest) 
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "users"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/users"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -104,7 +104,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Use
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"users/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/users/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

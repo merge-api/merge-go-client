@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.ScorecardsListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "scorecards"
+	endpointURL := baseURL + "/" + "api/ats/v1/scorecards"
 
 	queryParams := make(url.Values)
 	if request.ApplicationId != nil {
@@ -116,7 +116,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Scorecard
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"scorecards/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/scorecards/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*ticketing.AccountDetails, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "account-details"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/account-details"
 
 	var response *ticketing.AccountDetails
 	if err := core.DoRequest(

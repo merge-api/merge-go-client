@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *accounting.ExpensesListReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "expenses"
+	endpointURL := baseURL + "/" + "api/accounting/v1/expenses"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *accounting.ExpenseEndpoint
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "expenses"
+	endpointURL := baseURL + "/" + "api/accounting/v1/expenses"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ex
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"expenses/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/expenses/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -184,7 +184,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "expenses/meta/post"
+	endpointURL := baseURL + "/" + "api/accounting/v1/expenses/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := core.DoRequest(

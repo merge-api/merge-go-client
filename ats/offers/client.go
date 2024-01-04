@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.OffersListRequest) (*ats
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "offers"
+	endpointURL := baseURL + "/" + "api/ats/v1/offers"
 
 	queryParams := make(url.Values)
 	if request.ApplicationId != nil {
@@ -113,7 +113,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.OffersRet
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"offers/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/offers/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

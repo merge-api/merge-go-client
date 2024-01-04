@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.RejectReasonsListRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "reject-reasons"
+	endpointURL := baseURL + "/" + "api/ats/v1/reject-reasons"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -98,7 +98,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.RejectRea
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"reject-reasons/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/reject-reasons/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

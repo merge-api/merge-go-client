@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*filestorage.AvailableActions, e
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "available-actions"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/available-actions"
 
 	var response *filestorage.AvailableActions
 	if err := core.DoRequest(

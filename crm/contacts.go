@@ -3,9 +3,6 @@
 package crm
 
 import (
-	json "encoding/json"
-	fmt "fmt"
-	strconv "strconv"
 	time "time"
 )
 
@@ -76,92 +73,4 @@ type ContactsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
-}
-
-type ContactsListRequestExpand uint
-
-const (
-	ContactsListRequestExpandAccount ContactsListRequestExpand = iota + 1
-	ContactsListRequestExpandAccountOwner
-	ContactsListRequestExpandOwner
-)
-
-func (c ContactsListRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ContactsListRequestExpandAccount:
-		return "account"
-	case ContactsListRequestExpandAccountOwner:
-		return "account,owner"
-	case ContactsListRequestExpandOwner:
-		return "owner"
-	}
-}
-
-func (c ContactsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ContactsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := ContactsListRequestExpandAccount
-		*c = value
-	case "account,owner":
-		value := ContactsListRequestExpandAccountOwner
-		*c = value
-	case "owner":
-		value := ContactsListRequestExpandOwner
-		*c = value
-	}
-	return nil
-}
-
-type ContactsRetrieveRequestExpand uint
-
-const (
-	ContactsRetrieveRequestExpandAccount ContactsRetrieveRequestExpand = iota + 1
-	ContactsRetrieveRequestExpandAccountOwner
-	ContactsRetrieveRequestExpandOwner
-)
-
-func (c ContactsRetrieveRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ContactsRetrieveRequestExpandAccount:
-		return "account"
-	case ContactsRetrieveRequestExpandAccountOwner:
-		return "account,owner"
-	case ContactsRetrieveRequestExpandOwner:
-		return "owner"
-	}
-}
-
-func (c ContactsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ContactsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := ContactsRetrieveRequestExpandAccount
-		*c = value
-	case "account,owner":
-		value := ContactsRetrieveRequestExpandAccountOwner
-		*c = value
-	case "owner":
-		value := ContactsRetrieveRequestExpandOwner
-		*c = value
-	}
-	return nil
 }

@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *accounting.CashFlowStatement
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "cash-flow-statements"
+	endpointURL := baseURL + "/" + "api/accounting/v1/cash-flow-statements"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -104,7 +104,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ca
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"cash-flow-statements/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/cash-flow-statements/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

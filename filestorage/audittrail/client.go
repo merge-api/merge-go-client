@@ -39,7 +39,7 @@ func (c *client) List(ctx context.Context, request *filestorage.AuditTrailListRe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "audit-trail"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/audit-trail"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

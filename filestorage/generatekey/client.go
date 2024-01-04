@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.GenerateRemote
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "generate-key"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/generate-key"
 
 	var response *filestorage.RemoteKey
 	if err := core.DoRequest(

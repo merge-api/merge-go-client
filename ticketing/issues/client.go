@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ticketing.IssuesListRequest)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "issues"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/issues"
 
 	queryParams := make(url.Values)
 	if request.AccountToken != nil {
@@ -110,7 +110,7 @@ func (c *client) Retrieve(ctx context.Context, id string) (*ticketing.Issue, err
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"issues/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/issues/%v", id)
 
 	var response *ticketing.Issue
 	if err := core.DoRequest(

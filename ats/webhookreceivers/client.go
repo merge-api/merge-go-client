@@ -38,7 +38,7 @@ func (c *client) List(ctx context.Context) ([]*ats.WebhookReceiver, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/ats/v1/webhook-receivers"
 
 	var response []*ats.WebhookReceiver
 	if err := core.DoRequest(
@@ -63,7 +63,7 @@ func (c *client) Create(ctx context.Context, request *ats.WebhookReceiverRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/ats/v1/webhook-receivers"
 
 	var response *ats.WebhookReceiver
 	if err := core.DoRequest(

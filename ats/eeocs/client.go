@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.EeocsListRequest) (*ats.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "eeocs"
+	endpointURL := baseURL + "/" + "api/ats/v1/eeocs"
 
 	queryParams := make(url.Values)
 	if request.CandidateId != nil {
@@ -110,7 +110,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.EeocsRetr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"eeocs/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/eeocs/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

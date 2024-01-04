@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *ticketing.AttachmentsListReq
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "attachments"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *ticketing.TicketingAttachm
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "attachments"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Att
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"attachments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/attachments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -184,7 +184,7 @@ func (c *client) DownloadRetrieve(ctx context.Context, id string, request *ticke
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"attachments/%v/download", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/attachments/%v/download", id)
 
 	queryParams := make(url.Values)
 	if request.MimeType != nil {
@@ -217,7 +217,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse,
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "attachments/meta/post"
+	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := core.DoRequest(

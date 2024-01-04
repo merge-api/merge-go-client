@@ -38,7 +38,7 @@ func (c *client) Retrieve(ctx context.Context, publicToken string) (*crm.Account
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"account-token/%v", publicToken)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/account-token/%v", publicToken)
 
 	var response *crm.AccountToken
 	if err := core.DoRequest(

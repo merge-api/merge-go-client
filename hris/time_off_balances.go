@@ -3,9 +3,6 @@
 package hris
 
 import (
-	json "encoding/json"
-	fmt "fmt"
-	strconv "strconv"
 	time "time"
 )
 
@@ -32,12 +29,12 @@ type TimeOffBalancesListRequest struct {
 	PageSize *int `json:"-"`
 	// If provided, will only return TimeOffBalance with this policy type. Options: ('VACATION', 'SICK', 'PERSONAL', 'JURY_DUTY', 'VOLUNTEER', 'BEREAVEMENT')
 	//
-	// - `VACATION` - VACATION
-	// - `SICK` - SICK
-	// - `PERSONAL` - PERSONAL
-	// - `JURY_DUTY` - JURY_DUTY
-	// - `VOLUNTEER` - VOLUNTEER
-	// - `BEREAVEMENT` - BEREAVEMENT
+	// * `VACATION` - VACATION
+	// * `SICK` - SICK
+	// * `PERSONAL` - PERSONAL
+	// * `JURY_DUTY` - JURY_DUTY
+	// * `VOLUNTEER` - VOLUNTEER
+	// * `BEREAVEMENT` - BEREAVEMENT
 	PolicyType *TimeOffBalancesListRequestPolicyType `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-"`
@@ -56,66 +53,4 @@ type TimeOffBalancesRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
-}
-
-type TimeOffBalancesListRequestPolicyType uint
-
-const (
-	TimeOffBalancesListRequestPolicyTypeBereavement TimeOffBalancesListRequestPolicyType = iota + 1
-	TimeOffBalancesListRequestPolicyTypeJuryDuty
-	TimeOffBalancesListRequestPolicyTypePersonal
-	TimeOffBalancesListRequestPolicyTypeSick
-	TimeOffBalancesListRequestPolicyTypeVacation
-	TimeOffBalancesListRequestPolicyTypeVolunteer
-)
-
-func (t TimeOffBalancesListRequestPolicyType) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffBalancesListRequestPolicyTypeBereavement:
-		return "BEREAVEMENT"
-	case TimeOffBalancesListRequestPolicyTypeJuryDuty:
-		return "JURY_DUTY"
-	case TimeOffBalancesListRequestPolicyTypePersonal:
-		return "PERSONAL"
-	case TimeOffBalancesListRequestPolicyTypeSick:
-		return "SICK"
-	case TimeOffBalancesListRequestPolicyTypeVacation:
-		return "VACATION"
-	case TimeOffBalancesListRequestPolicyTypeVolunteer:
-		return "VOLUNTEER"
-	}
-}
-
-func (t TimeOffBalancesListRequestPolicyType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffBalancesListRequestPolicyType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "BEREAVEMENT":
-		value := TimeOffBalancesListRequestPolicyTypeBereavement
-		*t = value
-	case "JURY_DUTY":
-		value := TimeOffBalancesListRequestPolicyTypeJuryDuty
-		*t = value
-	case "PERSONAL":
-		value := TimeOffBalancesListRequestPolicyTypePersonal
-		*t = value
-	case "SICK":
-		value := TimeOffBalancesListRequestPolicyTypeSick
-		*t = value
-	case "VACATION":
-		value := TimeOffBalancesListRequestPolicyTypeVacation
-		*t = value
-	case "VOLUNTEER":
-		value := TimeOffBalancesListRequestPolicyTypeVolunteer
-		*t = value
-	}
-	return nil
 }
