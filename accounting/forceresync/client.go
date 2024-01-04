@@ -37,7 +37,7 @@ func (c *client) SyncStatusResyncCreate(ctx context.Context) ([]*accounting.Sync
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "sync-status/resync"
+	endpointURL := baseURL + "/" + "api/accounting/v1/sync-status/resync"
 
 	var response []*accounting.SyncStatus
 	if err := core.DoRequest(

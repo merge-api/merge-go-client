@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *ats.GenerateRemoteKeyReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "generate-key"
+	endpointURL := baseURL + "/" + "api/ats/v1/generate-key"
 
 	var response *ats.RemoteKey
 	if err := core.DoRequest(

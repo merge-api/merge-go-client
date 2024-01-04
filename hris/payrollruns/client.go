@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.PayrollRunsListRequest)
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "payroll-runs"
+	endpointURL := baseURL + "/" + "api/hris/v1/payroll-runs"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -119,7 +119,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.PayrollR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"payroll-runs/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/payroll-runs/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

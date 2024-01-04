@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *crm.CustomObjectClassesListR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "custom-object-classes"
+	endpointURL := baseURL + "/" + "api/crm/v1/custom-object-classes"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -101,7 +101,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.CustomObj
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"custom-object-classes/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

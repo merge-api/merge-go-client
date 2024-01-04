@@ -38,7 +38,7 @@ func (c *client) List(ctx context.Context) ([]*crm.WebhookReceiver, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/crm/v1/webhook-receivers"
 
 	var response []*crm.WebhookReceiver
 	if err := core.DoRequest(
@@ -63,7 +63,7 @@ func (c *client) Create(ctx context.Context, request *crm.WebhookReceiverRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/crm/v1/webhook-receivers"
 
 	var response *crm.WebhookReceiver
 	if err := core.DoRequest(

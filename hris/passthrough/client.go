@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *hris.DataPassthroughReques
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "passthrough"
+	endpointURL := baseURL + "/" + "api/hris/v1/passthrough"
 
 	var response *hris.RemoteResponse
 	if err := core.DoRequest(

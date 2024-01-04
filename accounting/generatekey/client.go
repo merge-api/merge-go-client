@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *accounting.GenerateRemoteK
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "generate-key"
+	endpointURL := baseURL + "/" + "api/accounting/v1/generate-key"
 
 	var response *accounting.RemoteKey
 	if err := core.DoRequest(

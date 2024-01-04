@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *accounting.JournalEntriesLis
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "journal-entries"
+	endpointURL := baseURL + "/" + "api/accounting/v1/journal-entries"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -112,7 +112,7 @@ func (c *client) Create(ctx context.Context, request *accounting.JournalEntryEnd
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "journal-entries"
+	endpointURL := baseURL + "/" + "api/accounting/v1/journal-entries"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -148,7 +148,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Jo
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"journal-entries/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/journal-entries/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -184,7 +184,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "journal-entries/meta/post"
+	endpointURL := baseURL + "/" + "api/accounting/v1/journal-entries/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := core.DoRequest(

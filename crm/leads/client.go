@@ -44,7 +44,7 @@ func (c *client) List(ctx context.Context, request *crm.LeadsListRequest) (*crm.
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "leads"
+	endpointURL := baseURL + "/" + "api/crm/v1/leads"
 
 	queryParams := make(url.Values)
 	if request.ConvertedAccountId != nil {
@@ -122,7 +122,7 @@ func (c *client) Create(ctx context.Context, request *crm.LeadEndpointRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "leads"
+	endpointURL := baseURL + "/" + "api/crm/v1/leads"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -158,7 +158,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.LeadsRetr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"leads/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/leads/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -197,7 +197,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "leads/meta/post"
+	endpointURL := baseURL + "/" + "api/crm/v1/leads/meta/post"
 
 	var response *crm.MetaResponse
 	if err := core.DoRequest(
@@ -222,7 +222,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.LeadsR
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "leads/remote-field-classes"
+	endpointURL := baseURL + "/" + "api/crm/v1/leads/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

@@ -46,7 +46,7 @@ func (c *client) List(ctx context.Context, request *filestorage.FilesListRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "files"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/files"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -115,7 +115,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.FileStorageFil
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "files"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/files"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -151,7 +151,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.F
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"files/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/files/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -187,7 +187,7 @@ func (c *client) DownloadRetrieve(ctx context.Context, id string, request *files
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"files/%v/download", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/files/%v/download", id)
 
 	queryParams := make(url.Values)
 	if request.MimeType != nil {
@@ -220,7 +220,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaRespons
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "files/meta/post"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/files/meta/post"
 
 	var response *filestorage.MetaResponse
 	if err := core.DoRequest(

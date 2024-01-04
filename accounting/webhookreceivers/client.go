@@ -38,7 +38,7 @@ func (c *client) List(ctx context.Context) ([]*accounting.WebhookReceiver, error
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/accounting/v1/webhook-receivers"
 
 	var response []*accounting.WebhookReceiver
 	if err := core.DoRequest(
@@ -63,7 +63,7 @@ func (c *client) Create(ctx context.Context, request *accounting.WebhookReceiver
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "webhook-receivers"
+	endpointURL := baseURL + "/" + "api/accounting/v1/webhook-receivers"
 
 	var response *accounting.WebhookReceiver
 	if err := core.DoRequest(

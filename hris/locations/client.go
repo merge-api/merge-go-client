@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *hris.LocationsListRequest) (
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "locations"
+	endpointURL := baseURL + "/" + "api/hris/v1/locations"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -107,7 +107,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.Location
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"locations/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/locations/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

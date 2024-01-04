@@ -3,9 +3,6 @@
 package hris
 
 import (
-	json "encoding/json"
-	fmt "fmt"
-	strconv "strconv"
 	time "time"
 )
 
@@ -49,92 +46,4 @@ type EmployeePayrollRunsRetrieveRequest struct {
 	Expand *EmployeePayrollRunsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
-}
-
-type EmployeePayrollRunsListRequestExpand uint
-
-const (
-	EmployeePayrollRunsListRequestExpandEmployee EmployeePayrollRunsListRequestExpand = iota + 1
-	EmployeePayrollRunsListRequestExpandEmployeePayrollRun
-	EmployeePayrollRunsListRequestExpandPayrollRun
-)
-
-func (e EmployeePayrollRunsListRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeePayrollRunsListRequestExpandEmployee:
-		return "employee"
-	case EmployeePayrollRunsListRequestExpandEmployeePayrollRun:
-		return "employee,payroll_run"
-	case EmployeePayrollRunsListRequestExpandPayrollRun:
-		return "payroll_run"
-	}
-}
-
-func (e EmployeePayrollRunsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeePayrollRunsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employee":
-		value := EmployeePayrollRunsListRequestExpandEmployee
-		*e = value
-	case "employee,payroll_run":
-		value := EmployeePayrollRunsListRequestExpandEmployeePayrollRun
-		*e = value
-	case "payroll_run":
-		value := EmployeePayrollRunsListRequestExpandPayrollRun
-		*e = value
-	}
-	return nil
-}
-
-type EmployeePayrollRunsRetrieveRequestExpand uint
-
-const (
-	EmployeePayrollRunsRetrieveRequestExpandEmployee EmployeePayrollRunsRetrieveRequestExpand = iota + 1
-	EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun
-	EmployeePayrollRunsRetrieveRequestExpandPayrollRun
-)
-
-func (e EmployeePayrollRunsRetrieveRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeePayrollRunsRetrieveRequestExpandEmployee:
-		return "employee"
-	case EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun:
-		return "employee,payroll_run"
-	case EmployeePayrollRunsRetrieveRequestExpandPayrollRun:
-		return "payroll_run"
-	}
-}
-
-func (e EmployeePayrollRunsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeePayrollRunsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employee":
-		value := EmployeePayrollRunsRetrieveRequestExpandEmployee
-		*e = value
-	case "employee,payroll_run":
-		value := EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun
-		*e = value
-	case "payroll_run":
-		value := EmployeePayrollRunsRetrieveRequestExpandPayrollRun
-		*e = value
-	}
-	return nil
 }

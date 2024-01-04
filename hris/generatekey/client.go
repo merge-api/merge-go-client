@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *hris.GenerateRemoteKeyRequ
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "generate-key"
+	endpointURL := baseURL + "/" + "api/hris/v1/generate-key"
 
 	var response *hris.RemoteKey
 	if err := core.DoRequest(

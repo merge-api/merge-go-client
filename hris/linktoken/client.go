@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *hris.EndUserDetailsRequest
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "link-token"
+	endpointURL := baseURL + "/" + "api/hris/v1/link-token"
 
 	var response *hris.LinkToken
 	if err := core.DoRequest(

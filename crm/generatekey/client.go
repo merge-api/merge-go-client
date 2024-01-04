@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *crm.GenerateRemoteKeyReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "generate-key"
+	endpointURL := baseURL + "/" + "api/crm/v1/generate-key"
 
 	var response *crm.RemoteKey
 	if err := core.DoRequest(

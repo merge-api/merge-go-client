@@ -25,13 +25,10 @@ type AccountDetails struct {
 }
 
 // # The LinkedAccount Object
-//
 // ### Description
-//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
-//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -59,9 +56,9 @@ type AccountDetailsAndActionsIntegration struct {
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
 }
 
-// - `COMPLETE` - COMPLETE
-// - `INCOMPLETE` - INCOMPLETE
-// - `RELINK_NEEDED` - RELINK_NEEDED
+// * `COMPLETE` - COMPLETE
+// * `INCOMPLETE` - INCOMPLETE
+// * `RELINK_NEEDED` - RELINK_NEEDED
 type AccountDetailsAndActionsStatusEnum uint
 
 const (
@@ -143,46 +140,46 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// - `ADMIN` - ADMIN
-	// - `DEVELOPER` - DEVELOPER
-	// - `MEMBER` - MEMBER
-	// - `API` - API
-	// - `SYSTEM` - SYSTEM
-	// - `MERGE_TEAM` - MERGE_TEAM
+	// * `ADMIN` - ADMIN
+	// * `DEVELOPER` - DEVELOPER
+	// * `MEMBER` - MEMBER
+	// * `API` - API
+	// * `SYSTEM` - SYSTEM
+	// * `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// - `INVITED_USER` - INVITED_USER
-	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// - `CREATED_DESTINATION` - CREATED_DESTINATION
-	// - `DELETED_DESTINATION` - DELETED_DESTINATION
-	// - `CHANGED_SCOPES` - CHANGED_SCOPES
-	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// - `RESET_PASSWORD` - RESET_PASSWORD
-	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// * `INVITED_USER` - INVITED_USER
+	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// * `CREATED_DESTINATION` - CREATED_DESTINATION
+	// * `DELETED_DESTINATION` - DELETED_DESTINATION
+	// * `CHANGED_SCOPES` - CHANGED_SCOPES
+	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// * `RESET_PASSWORD` - RESET_PASSWORD
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -190,36 +187,36 @@ type AuditLogEvent struct {
 
 // Designates the type of event that occurred.
 //
-// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// - `INVITED_USER` - INVITED_USER
-// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// - `CREATED_DESTINATION` - CREATED_DESTINATION
-// - `DELETED_DESTINATION` - DELETED_DESTINATION
-// - `CHANGED_SCOPES` - CHANGED_SCOPES
-// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// - `RESET_PASSWORD` - RESET_PASSWORD
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -279,12 +276,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// - `ADMIN` - ADMIN
-// - `DEVELOPER` - DEVELOPER
-// - `MEMBER` - MEMBER
-// - `API` - API
-// - `SYSTEM` - SYSTEM
-// - `MERGE_TEAM` - MERGE_TEAM
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -343,13 +340,10 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
-//
 // ### Description
-//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
-//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
@@ -357,13 +351,13 @@ type AvailableActions struct {
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
 }
 
-// - `hris` - hris
-// - `ats` - ats
-// - `accounting` - accounting
-// - `ticketing` - ticketing
-// - `crm` - crm
-// - `mktg` - mktg
-// - `filestorage` - filestorage
+// * `hris` - hris
+// * `ats` - ats
+// * `accounting` - accounting
+// * `ticketing` - ticketing
+// * `crm` - crm
+// * `mktg` - mktg
+// * `filestorage` - filestorage
 type CategoriesEnum uint
 
 const (
@@ -432,13 +426,13 @@ func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `hris` - hris
-// - `ats` - ats
-// - `accounting` - accounting
-// - `ticketing` - ticketing
-// - `crm` - crm
-// - `mktg` - mktg
-// - `filestorage` - filestorage
+// * `hris` - hris
+// * `ats` - ats
+// * `accounting` - accounting
+// * `ticketing` - ticketing
+// * `crm` - crm
+// * `mktg` - mktg
+// * `filestorage` - filestorage
 type CategoryEnum uint
 
 const (
@@ -518,7 +512,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
+	// User-facing *native condition* name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -526,13 +520,13 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// - `BOOLEAN` - BOOLEAN
-	// - `DATE` - DATE
-	// - `DATE_TIME` - DATE_TIME
-	// - `INTEGER` - INTEGER
-	// - `FLOAT` - FLOAT
-	// - `STRING` - STRING
-	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// * `BOOLEAN` - BOOLEAN
+	// * `DATE` - DATE
+	// * `DATE_TIME` - DATE_TIME
+	// * `INTEGER` - INTEGER
+	// * `FLOAT` - FLOAT
+	// * `STRING` - STRING
+	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
@@ -540,13 +534,13 @@ type ConditionSchema struct {
 
 // The type of value(s) that can be set for this condition.
 //
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// * `BOOLEAN` - BOOLEAN
+// * `DATE` - DATE
+// * `DATE_TIME` - DATE_TIME
+// * `INTEGER` - INTEGER
+// * `FLOAT` - FLOAT
+// * `STRING` - STRING
+// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -604,13 +598,13 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// * `BOOLEAN` - BOOLEAN
+// * `DATE` - DATE
+// * `DATE_TIME` - DATE_TIME
+// * `INTEGER` - INTEGER
+// * `FLOAT` - FLOAT
+// * `STRING` - STRING
+// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionTypeEnum uint
 
 const (
@@ -680,13 +674,10 @@ func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The DataPassthrough Object
-//
 // ### Description
-//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
-//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -715,13 +706,9 @@ type DebugModelLogSummary struct {
 }
 
 // # The Drive Object
-//
 // ### Description
-//
 // The `Drive` object is used to represent a drive that contains the folders and files in the user's workspace.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/drives` endpoint and view their drives.
 type Drive struct {
 	Id *string `json:"id,omitempty"`
@@ -742,8 +729,8 @@ type Drive struct {
 	RemoteData    []map[string]any `json:"remote_data,omitempty"`
 }
 
-// - `READ` - READ
-// - `WRITE` - WRITE
+// * `READ` - READ
+// * `WRITE` - WRITE
 type EnabledActionsEnum uint
 
 const (
@@ -782,9 +769,9 @@ func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `RAW` - RAW
-// - `BASE64` - BASE64
-// - `GZIP_BASE64` - GZIP_BASE64
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
 type EncodingEnum uint
 
 const (
@@ -836,36 +823,36 @@ type ErrorValidationProblem struct {
 	ProblemType string                   `json:"problem_type"`
 }
 
-// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// - `INVITED_USER` - INVITED_USER
-// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// - `CREATED_DESTINATION` - CREATED_DESTINATION
-// - `DELETED_DESTINATION` - DELETED_DESTINATION
-// - `CHANGED_SCOPES` - CHANGED_SCOPES
-// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// - `RESET_PASSWORD` - RESET_PASSWORD
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// * `INVITED_USER` - INVITED_USER
+// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// * `CREATED_DESTINATION` - CREATED_DESTINATION
+// * `DELETED_DESTINATION` - DELETED_DESTINATION
+// * `CHANGED_SCOPES` - CHANGED_SCOPES
+// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// * `RESET_PASSWORD` - RESET_PASSWORD
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type EventTypeEnum uint
 
 const (
@@ -1073,13 +1060,9 @@ func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The File Object
-//
 // ### Description
-//
 // The `File` object is used to represent a file in the workspace. The Object typically exists under a folder or drive, if it exists.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/files` endpoint and view their files.
 type File struct {
 	Id *string `json:"id,omitempty"`
@@ -1364,13 +1347,9 @@ func (f *FilePermissionsItem) Accept(visitor FilePermissionsItemVisitor) error {
 }
 
 // # The File Object
-//
 // ### Description
-//
 // The `File` object is used to represent a file in the workspace. The Object typically exists under a folder or drive, if it exists.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/files` endpoint and view their files.
 type FileRequest struct {
 	// The file's name.
@@ -1656,14 +1635,146 @@ type FileStorageFolderResponse struct {
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
 }
 
+type FilesListRequestExpand uint
+
+const (
+	FilesListRequestExpandDrive FilesListRequestExpand = iota + 1
+	FilesListRequestExpandFolder
+	FilesListRequestExpandFolderDrive
+	FilesListRequestExpandPermissions
+	FilesListRequestExpandPermissionsDrive
+	FilesListRequestExpandPermissionsFolder
+	FilesListRequestExpandPermissionsFolderDrive
+)
+
+func (f FilesListRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FilesListRequestExpandDrive:
+		return "drive"
+	case FilesListRequestExpandFolder:
+		return "folder"
+	case FilesListRequestExpandFolderDrive:
+		return "folder,drive"
+	case FilesListRequestExpandPermissions:
+		return "permissions"
+	case FilesListRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FilesListRequestExpandPermissionsFolder:
+		return "permissions,folder"
+	case FilesListRequestExpandPermissionsFolderDrive:
+		return "permissions,folder,drive"
+	}
+}
+
+func (f FilesListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FilesListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FilesListRequestExpandDrive
+		*f = value
+	case "folder":
+		value := FilesListRequestExpandFolder
+		*f = value
+	case "folder,drive":
+		value := FilesListRequestExpandFolderDrive
+		*f = value
+	case "permissions":
+		value := FilesListRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FilesListRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,folder":
+		value := FilesListRequestExpandPermissionsFolder
+		*f = value
+	case "permissions,folder,drive":
+		value := FilesListRequestExpandPermissionsFolderDrive
+		*f = value
+	}
+	return nil
+}
+
+type FilesRetrieveRequestExpand uint
+
+const (
+	FilesRetrieveRequestExpandDrive FilesRetrieveRequestExpand = iota + 1
+	FilesRetrieveRequestExpandFolder
+	FilesRetrieveRequestExpandFolderDrive
+	FilesRetrieveRequestExpandPermissions
+	FilesRetrieveRequestExpandPermissionsDrive
+	FilesRetrieveRequestExpandPermissionsFolder
+	FilesRetrieveRequestExpandPermissionsFolderDrive
+)
+
+func (f FilesRetrieveRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FilesRetrieveRequestExpandDrive:
+		return "drive"
+	case FilesRetrieveRequestExpandFolder:
+		return "folder"
+	case FilesRetrieveRequestExpandFolderDrive:
+		return "folder,drive"
+	case FilesRetrieveRequestExpandPermissions:
+		return "permissions"
+	case FilesRetrieveRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FilesRetrieveRequestExpandPermissionsFolder:
+		return "permissions,folder"
+	case FilesRetrieveRequestExpandPermissionsFolderDrive:
+		return "permissions,folder,drive"
+	}
+}
+
+func (f FilesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FilesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FilesRetrieveRequestExpandDrive
+		*f = value
+	case "folder":
+		value := FilesRetrieveRequestExpandFolder
+		*f = value
+	case "folder,drive":
+		value := FilesRetrieveRequestExpandFolderDrive
+		*f = value
+	case "permissions":
+		value := FilesRetrieveRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FilesRetrieveRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,folder":
+		value := FilesRetrieveRequestExpandPermissionsFolder
+		*f = value
+	case "permissions,folder,drive":
+		value := FilesRetrieveRequestExpandPermissionsFolderDrive
+		*f = value
+	}
+	return nil
+}
+
 // # The Folder Object
-//
 // ### Description
-//
 // The `Folder` object is used to represent a collection of files and/or folders in the workspace. Could be within a drive, if it exists.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/folders` endpoint and view their folders.
 type Folder struct {
 	Id *string `json:"id,omitempty"`
@@ -1944,13 +2055,9 @@ func (f *FolderPermissionsItem) Accept(visitor FolderPermissionsItemVisitor) err
 }
 
 // # The Folder Object
-//
 // ### Description
-//
 // The `Folder` object is used to represent a collection of files and/or folders in the workspace. Could be within a drive, if it exists.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/folders` endpoint and view their folders.
 type FolderRequest struct {
 	// The folder's name.
@@ -2218,14 +2325,146 @@ func (f *FolderRequestPermissionsItem) Accept(visitor FolderRequestPermissionsIt
 	}
 }
 
+type FoldersListRequestExpand uint
+
+const (
+	FoldersListRequestExpandDrive FoldersListRequestExpand = iota + 1
+	FoldersListRequestExpandParentFolder
+	FoldersListRequestExpandParentFolderDrive
+	FoldersListRequestExpandPermissions
+	FoldersListRequestExpandPermissionsDrive
+	FoldersListRequestExpandPermissionsParentFolder
+	FoldersListRequestExpandPermissionsParentFolderDrive
+)
+
+func (f FoldersListRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FoldersListRequestExpandDrive:
+		return "drive"
+	case FoldersListRequestExpandParentFolder:
+		return "parent_folder"
+	case FoldersListRequestExpandParentFolderDrive:
+		return "parent_folder,drive"
+	case FoldersListRequestExpandPermissions:
+		return "permissions"
+	case FoldersListRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FoldersListRequestExpandPermissionsParentFolder:
+		return "permissions,parent_folder"
+	case FoldersListRequestExpandPermissionsParentFolderDrive:
+		return "permissions,parent_folder,drive"
+	}
+}
+
+func (f FoldersListRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FoldersListRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FoldersListRequestExpandDrive
+		*f = value
+	case "parent_folder":
+		value := FoldersListRequestExpandParentFolder
+		*f = value
+	case "parent_folder,drive":
+		value := FoldersListRequestExpandParentFolderDrive
+		*f = value
+	case "permissions":
+		value := FoldersListRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FoldersListRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,parent_folder":
+		value := FoldersListRequestExpandPermissionsParentFolder
+		*f = value
+	case "permissions,parent_folder,drive":
+		value := FoldersListRequestExpandPermissionsParentFolderDrive
+		*f = value
+	}
+	return nil
+}
+
+type FoldersRetrieveRequestExpand uint
+
+const (
+	FoldersRetrieveRequestExpandDrive FoldersRetrieveRequestExpand = iota + 1
+	FoldersRetrieveRequestExpandParentFolder
+	FoldersRetrieveRequestExpandParentFolderDrive
+	FoldersRetrieveRequestExpandPermissions
+	FoldersRetrieveRequestExpandPermissionsDrive
+	FoldersRetrieveRequestExpandPermissionsParentFolder
+	FoldersRetrieveRequestExpandPermissionsParentFolderDrive
+)
+
+func (f FoldersRetrieveRequestExpand) String() string {
+	switch f {
+	default:
+		return strconv.Itoa(int(f))
+	case FoldersRetrieveRequestExpandDrive:
+		return "drive"
+	case FoldersRetrieveRequestExpandParentFolder:
+		return "parent_folder"
+	case FoldersRetrieveRequestExpandParentFolderDrive:
+		return "parent_folder,drive"
+	case FoldersRetrieveRequestExpandPermissions:
+		return "permissions"
+	case FoldersRetrieveRequestExpandPermissionsDrive:
+		return "permissions,drive"
+	case FoldersRetrieveRequestExpandPermissionsParentFolder:
+		return "permissions,parent_folder"
+	case FoldersRetrieveRequestExpandPermissionsParentFolderDrive:
+		return "permissions,parent_folder,drive"
+	}
+}
+
+func (f FoldersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", f.String())), nil
+}
+
+func (f *FoldersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "drive":
+		value := FoldersRetrieveRequestExpandDrive
+		*f = value
+	case "parent_folder":
+		value := FoldersRetrieveRequestExpandParentFolder
+		*f = value
+	case "parent_folder,drive":
+		value := FoldersRetrieveRequestExpandParentFolderDrive
+		*f = value
+	case "permissions":
+		value := FoldersRetrieveRequestExpandPermissions
+		*f = value
+	case "permissions,drive":
+		value := FoldersRetrieveRequestExpandPermissionsDrive
+		*f = value
+	case "permissions,parent_folder":
+		value := FoldersRetrieveRequestExpandPermissionsParentFolder
+		*f = value
+	case "permissions,parent_folder,drive":
+		value := FoldersRetrieveRequestExpandPermissionsParentFolderDrive
+		*f = value
+	}
+	return nil
+}
+
 // # The Group Object
-//
 // ### Description
-//
 // The `Group` object is used to represent any subset of `User`s. This can extend to company domains as well.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/groups` endpoint and view their groups.
 type Group struct {
 	Id *string `json:"id,omitempty"`
@@ -2248,8 +2487,8 @@ type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// - `ONGOING` - ONGOING
-	// - `RESOLVED` - RESOLVED
+	// * `ONGOING` - ONGOING
+	// * `RESOLVED` - RESOLVED
 	Status            *IssueStatus   `json:"status,omitempty"`
 	ErrorDescription  string         `json:"error_description"`
 	EndUser           map[string]any `json:"end_user,omitempty"`
@@ -2261,8 +2500,8 @@ type Issue struct {
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// - `ONGOING` - ONGOING
-// - `RESOLVED` - RESOLVED
+// * `ONGOING` - ONGOING
+// * `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -2320,8 +2559,8 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// - `ONGOING` - ONGOING
-// - `RESOLVED` - RESOLVED
+// * `ONGOING` - ONGOING
+// * `RESOLVED` - RESOLVED
 type IssueStatusEnum uint
 
 const (
@@ -2360,6 +2599,44 @@ func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type IssuesListRequestStatus uint
+
+const (
+	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
+	IssuesListRequestStatusResolved
+)
+
+func (i IssuesListRequestStatus) String() string {
+	switch i {
+	default:
+		return strconv.Itoa(int(i))
+	case IssuesListRequestStatusOngoing:
+		return "ONGOING"
+	case IssuesListRequestStatusResolved:
+		return "RESOLVED"
+	}
+}
+
+func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", i.String())), nil
+}
+
+func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "ONGOING":
+		value := IssuesListRequestStatusOngoing
+		*i = value
+	case "RESOLVED":
+		value := IssuesListRequestStatusResolved
+		*i = value
+	}
+	return nil
+}
+
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
@@ -2371,7 +2648,7 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
+	// User-facing *native condition* name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
 	Operator string `json:"operator"`
@@ -2403,6 +2680,74 @@ type LinkedAccountStatus struct {
 	CanMakeRequest      bool   `json:"can_make_request"`
 }
 
+type LinkedAccountsListRequestCategory uint
+
+const (
+	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
+	LinkedAccountsListRequestCategoryAts
+	LinkedAccountsListRequestCategoryCrm
+	LinkedAccountsListRequestCategoryFilestorage
+	LinkedAccountsListRequestCategoryHris
+	LinkedAccountsListRequestCategoryMktg
+	LinkedAccountsListRequestCategoryTicketing
+)
+
+func (l LinkedAccountsListRequestCategory) String() string {
+	switch l {
+	default:
+		return strconv.Itoa(int(l))
+	case LinkedAccountsListRequestCategoryAccounting:
+		return "accounting"
+	case LinkedAccountsListRequestCategoryAts:
+		return "ats"
+	case LinkedAccountsListRequestCategoryCrm:
+		return "crm"
+	case LinkedAccountsListRequestCategoryFilestorage:
+		return "filestorage"
+	case LinkedAccountsListRequestCategoryHris:
+		return "hris"
+	case LinkedAccountsListRequestCategoryMktg:
+		return "mktg"
+	case LinkedAccountsListRequestCategoryTicketing:
+		return "ticketing"
+	}
+}
+
+func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", l.String())), nil
+}
+
+func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "accounting":
+		value := LinkedAccountsListRequestCategoryAccounting
+		*l = value
+	case "ats":
+		value := LinkedAccountsListRequestCategoryAts
+		*l = value
+	case "crm":
+		value := LinkedAccountsListRequestCategoryCrm
+		*l = value
+	case "filestorage":
+		value := LinkedAccountsListRequestCategoryFilestorage
+		*l = value
+	case "hris":
+		value := LinkedAccountsListRequestCategoryHris
+		*l = value
+	case "mktg":
+		value := LinkedAccountsListRequestCategoryMktg
+		*l = value
+	case "ticketing":
+		value := LinkedAccountsListRequestCategoryTicketing
+		*l = value
+	}
+	return nil
+}
+
 type MetaResponse struct {
 	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
 	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
@@ -2411,13 +2756,13 @@ type MetaResponse struct {
 	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
 }
 
-// - `GET` - GET
-// - `OPTIONS` - OPTIONS
-// - `HEAD` - HEAD
-// - `POST` - POST
-// - `PUT` - PUT
-// - `PATCH` - PATCH
-// - `DELETE` - DELETE
+// * `GET` - GET
+// * `OPTIONS` - OPTIONS
+// * `HEAD` - HEAD
+// * `POST` - POST
+// * `PUT` - PUT
+// * `PATCH` - PATCH
+// * `DELETE` - DELETE
 type MethodEnum uint
 
 const (
@@ -2487,13 +2832,10 @@ func (m *MethodEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The ModelOperation Object
-//
 // ### Description
-//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
-//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
@@ -2503,13 +2845,10 @@ type ModelOperation struct {
 }
 
 // # The MultipartFormField Object
-//
 // ### Description
-//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
-//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -2518,9 +2857,9 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// - `RAW` - RAW
-	// - `BASE64` - BASE64
-	// - `GZIP_BASE64` - GZIP_BASE64
+	// * `RAW` - RAW
+	// * `BASE64` - BASE64
+	// * `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
@@ -2530,9 +2869,9 @@ type MultipartFormFieldRequest struct {
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// - `RAW` - RAW
-// - `BASE64` - BASE64
-// - `GZIP_BASE64` - GZIP_BASE64
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -2658,13 +2997,10 @@ type PaginatedUserList struct {
 }
 
 // # The Permission Object
-//
 // ### Description
-//
 // The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default.
 //
 // ### Usage Example
-//
 // Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
 type Permission struct {
 	Id *string `json:"id,omitempty"`
@@ -2676,10 +3012,10 @@ type Permission struct {
 	Group *PermissionGroup `json:"group,omitempty"`
 	// Denotes what type of people have access to the file.
 	//
-	// - `USER` - USER
-	// - `GROUP` - GROUP
-	// - `COMPANY` - COMPANY
-	// - `ANYONE` - ANYONE
+	// * `USER` - USER
+	// * `GROUP` - GROUP
+	// * `COMPANY` - COMPANY
+	// * `ANYONE` - ANYONE
 	Type *PermissionType `json:"type,omitempty"`
 	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
 	Roles     []*PermissionRolesItem `json:"roles,omitempty"`
@@ -2747,13 +3083,10 @@ func (p *PermissionGroup) Accept(visitor PermissionGroupVisitor) error {
 }
 
 // # The Permission Object
-//
 // ### Description
-//
 // The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default.
 //
 // ### Usage Example
-//
 // Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
 type PermissionRequest struct {
 	// The third-party API ID of the matching object.
@@ -2764,10 +3097,10 @@ type PermissionRequest struct {
 	Group *PermissionRequestGroup `json:"group,omitempty"`
 	// Denotes what type of people have access to the file.
 	//
-	// - `USER` - USER
-	// - `GROUP` - GROUP
-	// - `COMPANY` - COMPANY
-	// - `ANYONE` - ANYONE
+	// * `USER` - USER
+	// * `GROUP` - GROUP
+	// * `COMPANY` - COMPANY
+	// * `ANYONE` - ANYONE
 	Type *PermissionRequestType `json:"type,omitempty"`
 	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
 	Roles               []*PermissionRequestRolesItem `json:"roles,omitempty"`
@@ -2835,9 +3168,9 @@ func (p *PermissionRequestGroup) Accept(visitor PermissionRequestGroupVisitor) e
 
 // The permissions that the user or group has for the File or Folder.
 //
-// - `READ` - READ
-// - `WRITE` - WRITE
-// - `OWNER` - OWNER
+// * `READ` - READ
+// * `WRITE` - WRITE
+// * `OWNER` - OWNER
 type PermissionRequestRolesItem struct {
 	typeName  string
 	RolesEnum RolesEnum
@@ -2897,10 +3230,10 @@ func (p *PermissionRequestRolesItem) Accept(visitor PermissionRequestRolesItemVi
 
 // Denotes what type of people have access to the file.
 //
-// - `USER` - USER
-// - `GROUP` - GROUP
-// - `COMPANY` - COMPANY
-// - `ANYONE` - ANYONE
+// * `USER` - USER
+// * `GROUP` - GROUP
+// * `COMPANY` - COMPANY
+// * `ANYONE` - ANYONE
 type PermissionRequestType struct {
 	typeName string
 	TypeEnum TypeEnum
@@ -3018,9 +3351,9 @@ func (p *PermissionRequestUser) Accept(visitor PermissionRequestUserVisitor) err
 
 // The permissions that the user or group has for the File or Folder.
 //
-// - `READ` - READ
-// - `WRITE` - WRITE
-// - `OWNER` - OWNER
+// * `READ` - READ
+// * `WRITE` - WRITE
+// * `OWNER` - OWNER
 type PermissionRolesItem struct {
 	typeName  string
 	RolesEnum RolesEnum
@@ -3080,10 +3413,10 @@ func (p *PermissionRolesItem) Accept(visitor PermissionRolesItemVisitor) error {
 
 // Denotes what type of people have access to the file.
 //
-// - `USER` - USER
-// - `GROUP` - GROUP
-// - `COMPANY` - COMPANY
-// - `ANYONE` - ANYONE
+// * `USER` - USER
+// * `GROUP` - GROUP
+// * `COMPANY` - COMPANY
+// * `ANYONE` - ANYONE
 type PermissionType struct {
 	typeName string
 	TypeEnum TypeEnum
@@ -3200,13 +3533,10 @@ func (p *PermissionUser) Accept(visitor PermissionUserVisitor) error {
 }
 
 // # The RemoteKey Object
-//
 // ### Description
-//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
-//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
@@ -3214,13 +3544,10 @@ type RemoteKey struct {
 }
 
 // # The RemoteResponse Object
-//
 // ### Description
-//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
-//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
 	Method          string            `json:"method"`
@@ -3232,9 +3559,9 @@ type RemoteResponse struct {
 	Headers         map[string]any    `json:"headers,omitempty"`
 }
 
-// - `JSON` - JSON
-// - `XML` - XML
-// - `MULTIPART` - MULTIPART
+// * `JSON` - JSON
+// * `XML` - XML
+// * `MULTIPART` - MULTIPART
 type RequestFormatEnum uint
 
 const (
@@ -3279,8 +3606,8 @@ func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `JSON` - JSON
-// - `BASE64_GZIP` - BASE64_GZIP
+// * `JSON` - JSON
+// * `BASE64_GZIP` - BASE64_GZIP
 type ResponseTypeEnum uint
 
 const (
@@ -3319,12 +3646,12 @@ func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `ADMIN` - ADMIN
-// - `DEVELOPER` - DEVELOPER
-// - `MEMBER` - MEMBER
-// - `API` - API
-// - `SYSTEM` - SYSTEM
-// - `MERGE_TEAM` - MERGE_TEAM
+// * `ADMIN` - ADMIN
+// * `DEVELOPER` - DEVELOPER
+// * `MEMBER` - MEMBER
+// * `API` - API
+// * `SYSTEM` - SYSTEM
+// * `MERGE_TEAM` - MERGE_TEAM
 type RoleEnum uint
 
 const (
@@ -3387,9 +3714,9 @@ func (r *RoleEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `READ` - READ
-// - `WRITE` - WRITE
-// - `OWNER` - OWNER
+// * `READ` - READ
+// * `WRITE` - WRITE
+// * `OWNER` - OWNER
 type RolesEnum uint
 
 const (
@@ -3434,8 +3761,8 @@ func (r *RolesEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// - `IN_LAST_SYNC` - IN_LAST_SYNC
+// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// * `IN_LAST_SYNC` - IN_LAST_SYNC
 type SelectiveSyncConfigurationsUsageEnum uint
 
 const (
@@ -3475,13 +3802,10 @@ func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error 
 }
 
 // # The SyncStatus Object
-//
 // ### Description
-//
-// # The `SyncStatus` object is used to represent the syncing state of an account
+// The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
-//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -3493,12 +3817,12 @@ type SyncStatus struct {
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
 }
 
-// - `SYNCING` - SYNCING
-// - `DONE` - DONE
-// - `FAILED` - FAILED
-// - `DISABLED` - DISABLED
-// - `PAUSED` - PAUSED
-// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+// * `SYNCING` - SYNCING
+// * `DONE` - DONE
+// * `FAILED` - FAILED
+// * `DISABLED` - DISABLED
+// * `PAUSED` - PAUSED
+// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
 type SyncStatusStatusEnum uint
 
 const (
@@ -3561,10 +3885,10 @@ func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// - `USER` - USER
-// - `GROUP` - GROUP
-// - `COMPANY` - COMPANY
-// - `ANYONE` - ANYONE
+// * `USER` - USER
+// * `GROUP` - GROUP
+// * `COMPANY` - COMPANY
+// * `ANYONE` - ANYONE
 type TypeEnum uint
 
 const (
@@ -3616,13 +3940,9 @@ func (t *TypeEnum) UnmarshalJSON(data []byte) error {
 }
 
 // # The User Object
-//
 // ### Description
-//
 // The `User` object is used to represent a user within the File Storage account.
-//
 // ### Usage Example
-//
 // Fetch from the `GET /api/filestorage/v1/users` endpoint and view their users.
 type User struct {
 	Id *string `json:"id,omitempty"`

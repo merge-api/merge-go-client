@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *accounting.CreditNotesListRe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "credit-notes"
+	endpointURL := baseURL + "/" + "api/accounting/v1/credit-notes"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -116,7 +116,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Cr
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"credit-notes/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/credit-notes/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

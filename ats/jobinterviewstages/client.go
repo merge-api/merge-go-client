@@ -41,7 +41,7 @@ func (c *client) List(ctx context.Context, request *ats.JobInterviewStagesListRe
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "job-interview-stages"
+	endpointURL := baseURL + "/" + "api/ats/v1/job-interview-stages"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -104,7 +104,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.JobInterv
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"job-interview-stages/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/job-interview-stages/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

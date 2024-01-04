@@ -38,7 +38,7 @@ func (c *client) Retrieve(ctx context.Context, publicToken string) (*hris.Accoun
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"account-token/%v", publicToken)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/account-token/%v", publicToken)
 
 	var response *hris.AccountToken
 	if err := core.DoRequest(

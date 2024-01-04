@@ -37,7 +37,7 @@ func (c *client) Create(ctx context.Context, request *filestorage.EndUserDetails
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "link-token"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/link-token"
 
 	var response *filestorage.LinkToken
 	if err := core.DoRequest(

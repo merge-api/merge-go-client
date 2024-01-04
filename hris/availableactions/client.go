@@ -37,7 +37,7 @@ func (c *client) Retrieve(ctx context.Context) (*hris.AvailableActions, error) {
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "available-actions"
+	endpointURL := baseURL + "/" + "api/hris/v1/available-actions"
 
 	var response *hris.AvailableActions
 	if err := core.DoRequest(

@@ -37,7 +37,7 @@ func (c *client) SyncStatusResyncCreate(ctx context.Context) ([]*filestorage.Syn
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "sync-status/resync"
+	endpointURL := baseURL + "/" + "api/filestorage/v1/sync-status/resync"
 
 	var response []*filestorage.SyncStatus
 	if err := core.DoRequest(

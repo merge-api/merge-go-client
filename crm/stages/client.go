@@ -42,7 +42,7 @@ func (c *client) List(ctx context.Context, request *crm.StagesListRequest) (*crm
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "stages"
+	endpointURL := baseURL + "/" + "api/crm/v1/stages"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -102,7 +102,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.StagesRet
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"stages/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/stages/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -138,7 +138,7 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.Stages
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "stages/remote-field-classes"
+	endpointURL := baseURL + "/" + "api/crm/v1/stages/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

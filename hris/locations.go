@@ -3,9 +3,6 @@
 package hris
 
 import (
-	json "encoding/json"
-	fmt "fmt"
-	strconv "strconv"
 	time "time"
 )
 
@@ -22,8 +19,8 @@ type LocationsListRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// If provided, will only return locations with this location_type
 	//
-	// - `HOME` - HOME
-	// - `WORK` - WORK
+	// * `HOME` - HOME
+	// * `WORK` - WORK
 	LocationType *LocationsListRequestLocationType `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
@@ -46,42 +43,4 @@ type LocationsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
-}
-
-type LocationsListRequestLocationType uint
-
-const (
-	LocationsListRequestLocationTypeHome LocationsListRequestLocationType = iota + 1
-	LocationsListRequestLocationTypeWork
-)
-
-func (l LocationsListRequestLocationType) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LocationsListRequestLocationTypeHome:
-		return "HOME"
-	case LocationsListRequestLocationTypeWork:
-		return "WORK"
-	}
-}
-
-func (l LocationsListRequestLocationType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LocationsListRequestLocationType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "HOME":
-		value := LocationsListRequestLocationTypeHome
-		*l = value
-	case "WORK":
-		value := LocationsListRequestLocationTypeWork
-		*l = value
-	}
-	return nil
 }

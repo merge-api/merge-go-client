@@ -43,7 +43,7 @@ func (c *client) List(ctx context.Context, request *accounting.ContactsListReque
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "contacts"
+	endpointURL := baseURL + "/" + "api/accounting/v1/contacts"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -118,7 +118,7 @@ func (c *client) Create(ctx context.Context, request *accounting.ContactEndpoint
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "contacts"
+	endpointURL := baseURL + "/" + "api/accounting/v1/contacts"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -154,7 +154,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Co
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"contacts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/contacts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -196,7 +196,7 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "contacts/meta/post"
+	endpointURL := baseURL + "/" + "api/accounting/v1/contacts/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := core.DoRequest(
