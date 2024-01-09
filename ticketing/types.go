@@ -3377,8 +3377,8 @@ func (p *ProjectsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
 }
 
 type RemoteData struct {
-	Path string         `json:"path"`
-	Data map[string]any `json:"data,omitempty"`
+	Path string `json:"path"`
+	Data *any   `json:"data,omitempty"`
 }
 
 type RemoteField struct {
