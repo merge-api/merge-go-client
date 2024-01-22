@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -34,4 +35,54 @@ type CompanyInfoRetrieveRequest struct {
 	Expand *CompanyInfoRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type CompanyInfoListRequestExpand string
+
+const (
+	CompanyInfoListRequestExpandAddresses             CompanyInfoListRequestExpand = "addresses"
+	CompanyInfoListRequestExpandAddressesPhoneNumbers CompanyInfoListRequestExpand = "addresses,phone_numbers"
+	CompanyInfoListRequestExpandPhoneNumbers          CompanyInfoListRequestExpand = "phone_numbers"
+)
+
+func NewCompanyInfoListRequestExpandFromString(s string) (CompanyInfoListRequestExpand, error) {
+	switch s {
+	case "addresses":
+		return CompanyInfoListRequestExpandAddresses, nil
+	case "addresses,phone_numbers":
+		return CompanyInfoListRequestExpandAddressesPhoneNumbers, nil
+	case "phone_numbers":
+		return CompanyInfoListRequestExpandPhoneNumbers, nil
+	}
+	var t CompanyInfoListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CompanyInfoListRequestExpand) Ptr() *CompanyInfoListRequestExpand {
+	return &c
+}
+
+type CompanyInfoRetrieveRequestExpand string
+
+const (
+	CompanyInfoRetrieveRequestExpandAddresses             CompanyInfoRetrieveRequestExpand = "addresses"
+	CompanyInfoRetrieveRequestExpandAddressesPhoneNumbers CompanyInfoRetrieveRequestExpand = "addresses,phone_numbers"
+	CompanyInfoRetrieveRequestExpandPhoneNumbers          CompanyInfoRetrieveRequestExpand = "phone_numbers"
+)
+
+func NewCompanyInfoRetrieveRequestExpandFromString(s string) (CompanyInfoRetrieveRequestExpand, error) {
+	switch s {
+	case "addresses":
+		return CompanyInfoRetrieveRequestExpandAddresses, nil
+	case "addresses,phone_numbers":
+		return CompanyInfoRetrieveRequestExpandAddressesPhoneNumbers, nil
+	case "phone_numbers":
+		return CompanyInfoRetrieveRequestExpandPhoneNumbers, nil
+	}
+	var t CompanyInfoRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CompanyInfoRetrieveRequestExpand) Ptr() *CompanyInfoRetrieveRequestExpand {
+	return &c
 }

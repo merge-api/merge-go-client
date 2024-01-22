@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -49,8 +50,8 @@ type InvoicesListRequest struct {
 	ShowEnumOrigins *string `json:"-"`
 	// If provided, will only return Invoices with this type
 	//
-	// * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
-	// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+	// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
 	Type *InvoicesListRequestType `json:"-"`
 }
 
@@ -63,4 +64,1588 @@ type InvoicesRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type InvoicesListRequestExpand string
+
+const (
+	InvoicesListRequestExpandAccountingPeriod                                                                               InvoicesListRequestExpand = "accounting_period"
+	InvoicesListRequestExpandAppliedPayments                                                                                InvoicesListRequestExpand = "applied_payments"
+	InvoicesListRequestExpandAppliedPaymentsAccountingPeriod                                                                InvoicesListRequestExpand = "applied_payments,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsCompany                                                                         InvoicesListRequestExpand = "applied_payments,company"
+	InvoicesListRequestExpandAppliedPaymentsCompanyAccountingPeriod                                                         InvoicesListRequestExpand = "applied_payments,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsContact                                                                         InvoicesListRequestExpand = "applied_payments,contact"
+	InvoicesListRequestExpandAppliedPaymentsContactAccountingPeriod                                                         InvoicesListRequestExpand = "applied_payments,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsContactCompany                                                                  InvoicesListRequestExpand = "applied_payments,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod                                                  InvoicesListRequestExpand = "applied_payments,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItems                                                                       InvoicesListRequestExpand = "applied_payments,line_items"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod                                                       InvoicesListRequestExpand = "applied_payments,line_items,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsCompany                                                                InvoicesListRequestExpand = "applied_payments,line_items,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod                                                InvoicesListRequestExpand = "applied_payments,line_items,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContact                                                                InvoicesListRequestExpand = "applied_payments,line_items,contact"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod                                                InvoicesListRequestExpand = "applied_payments,line_items,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompany                                                         InvoicesListRequestExpand = "applied_payments,line_items,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod                                         InvoicesListRequestExpand = "applied_payments,line_items,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrders                                                         InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod                                         InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany                                                  InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod                                  InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact                                                  InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,contact"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod                                  InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany                                           InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod                           InvoicesListRequestExpand = "applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategories                                                     InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod                                     InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany                                              InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                              InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact                                              InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,contact"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                              InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany                                       InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod                       InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders                                       InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod                       InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany                                InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact                                InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany                         InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod         InvoicesListRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrders                                                                  InvoicesListRequestExpand = "applied_payments,purchase_orders"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod                                                  InvoicesListRequestExpand = "applied_payments,purchase_orders,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompany                                                           InvoicesListRequestExpand = "applied_payments,purchase_orders,company"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod                                           InvoicesListRequestExpand = "applied_payments,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContact                                                           InvoicesListRequestExpand = "applied_payments,purchase_orders,contact"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod                                           InvoicesListRequestExpand = "applied_payments,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompany                                                    InvoicesListRequestExpand = "applied_payments,purchase_orders,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod                                    InvoicesListRequestExpand = "applied_payments,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategories                                                              InvoicesListRequestExpand = "applied_payments,tracking_categories"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod                                              InvoicesListRequestExpand = "applied_payments,tracking_categories,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompany                                                       InvoicesListRequestExpand = "applied_payments,tracking_categories,company"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                                       InvoicesListRequestExpand = "applied_payments,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContact                                                       InvoicesListRequestExpand = "applied_payments,tracking_categories,contact"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod                                       InvoicesListRequestExpand = "applied_payments,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany                                                InvoicesListRequestExpand = "applied_payments,tracking_categories,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod                                InvoicesListRequestExpand = "applied_payments,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders                                                InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod                                InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany                                         InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                         InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact                                         InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                         InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany                                  InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                  InvoicesListRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandCompany                                                                                        InvoicesListRequestExpand = "company"
+	InvoicesListRequestExpandCompanyAccountingPeriod                                                                        InvoicesListRequestExpand = "company,accounting_period"
+	InvoicesListRequestExpandContact                                                                                        InvoicesListRequestExpand = "contact"
+	InvoicesListRequestExpandContactAccountingPeriod                                                                        InvoicesListRequestExpand = "contact,accounting_period"
+	InvoicesListRequestExpandContactCompany                                                                                 InvoicesListRequestExpand = "contact,company"
+	InvoicesListRequestExpandContactCompanyAccountingPeriod                                                                 InvoicesListRequestExpand = "contact,company,accounting_period"
+	InvoicesListRequestExpandLineItems                                                                                      InvoicesListRequestExpand = "line_items"
+	InvoicesListRequestExpandLineItemsAccountingPeriod                                                                      InvoicesListRequestExpand = "line_items,accounting_period"
+	InvoicesListRequestExpandLineItemsCompany                                                                               InvoicesListRequestExpand = "line_items,company"
+	InvoicesListRequestExpandLineItemsCompanyAccountingPeriod                                                               InvoicesListRequestExpand = "line_items,company,accounting_period"
+	InvoicesListRequestExpandLineItemsContact                                                                               InvoicesListRequestExpand = "line_items,contact"
+	InvoicesListRequestExpandLineItemsContactAccountingPeriod                                                               InvoicesListRequestExpand = "line_items,contact,accounting_period"
+	InvoicesListRequestExpandLineItemsContactCompany                                                                        InvoicesListRequestExpand = "line_items,contact,company"
+	InvoicesListRequestExpandLineItemsContactCompanyAccountingPeriod                                                        InvoicesListRequestExpand = "line_items,contact,company,accounting_period"
+	InvoicesListRequestExpandLineItemsPurchaseOrders                                                                        InvoicesListRequestExpand = "line_items,purchase_orders"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersAccountingPeriod                                                        InvoicesListRequestExpand = "line_items,purchase_orders,accounting_period"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersCompany                                                                 InvoicesListRequestExpand = "line_items,purchase_orders,company"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersCompanyAccountingPeriod                                                 InvoicesListRequestExpand = "line_items,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersContact                                                                 InvoicesListRequestExpand = "line_items,purchase_orders,contact"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersContactAccountingPeriod                                                 InvoicesListRequestExpand = "line_items,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersContactCompany                                                          InvoicesListRequestExpand = "line_items,purchase_orders,contact,company"
+	InvoicesListRequestExpandLineItemsPurchaseOrdersContactCompanyAccountingPeriod                                          InvoicesListRequestExpand = "line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategories                                                                    InvoicesListRequestExpand = "line_items,tracking_categories"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesAccountingPeriod                                                    InvoicesListRequestExpand = "line_items,tracking_categories,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesCompany                                                             InvoicesListRequestExpand = "line_items,tracking_categories,company"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod                                             InvoicesListRequestExpand = "line_items,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesContact                                                             InvoicesListRequestExpand = "line_items,tracking_categories,contact"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod                                             InvoicesListRequestExpand = "line_items,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesContactCompany                                                      InvoicesListRequestExpand = "line_items,tracking_categories,contact,company"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod                                      InvoicesListRequestExpand = "line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrders                                                      InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod                                      InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompany                                               InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                               InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContact                                               InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                               InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompany                                        InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                        InvoicesListRequestExpand = "line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPayments                                                                                       InvoicesListRequestExpand = "payments"
+	InvoicesListRequestExpandPaymentsAccountingPeriod                                                                       InvoicesListRequestExpand = "payments,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPayments                                                                        InvoicesListRequestExpand = "payments,applied_payments"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod                                                        InvoicesListRequestExpand = "payments,applied_payments,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsCompany                                                                 InvoicesListRequestExpand = "payments,applied_payments,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod                                                 InvoicesListRequestExpand = "payments,applied_payments,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContact                                                                 InvoicesListRequestExpand = "payments,applied_payments,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod                                                 InvoicesListRequestExpand = "payments,applied_payments,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompany                                                          InvoicesListRequestExpand = "payments,applied_payments,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod                                          InvoicesListRequestExpand = "payments,applied_payments,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItems                                                               InvoicesListRequestExpand = "payments,applied_payments,line_items"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod                                               InvoicesListRequestExpand = "payments,applied_payments,line_items,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany                                                        InvoicesListRequestExpand = "payments,applied_payments,line_items,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod                                        InvoicesListRequestExpand = "payments,applied_payments,line_items,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContact                                                        InvoicesListRequestExpand = "payments,applied_payments,line_items,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod                                        InvoicesListRequestExpand = "payments,applied_payments,line_items,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany                                                 InvoicesListRequestExpand = "payments,applied_payments,line_items,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod                                 InvoicesListRequestExpand = "payments,applied_payments,line_items,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders                                                 InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod                                 InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany                                          InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod                          InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact                                          InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod                          InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany                                   InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod                   InvoicesListRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories                                             InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod                             InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany                                      InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                      InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact                                      InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                      InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany                               InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod               InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders                               InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod               InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany                        InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod        InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact                        InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod        InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany                 InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod InvoicesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrders                                                          InvoicesListRequestExpand = "payments,applied_payments,purchase_orders"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod                                          InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany                                                   InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod                                   InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact                                                   InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod                                   InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany                                            InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod                            InvoicesListRequestExpand = "payments,applied_payments,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategories                                                      InvoicesListRequestExpand = "payments,applied_payments,tracking_categories"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod                                      InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany                                               InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                               InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact                                               InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod                               InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany                                        InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod                        InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders                                        InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod                        InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany                                 InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                 InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact                                 InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                 InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany                          InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod          InvoicesListRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsCompany                                                                                InvoicesListRequestExpand = "payments,company"
+	InvoicesListRequestExpandPaymentsCompanyAccountingPeriod                                                                InvoicesListRequestExpand = "payments,company,accounting_period"
+	InvoicesListRequestExpandPaymentsContact                                                                                InvoicesListRequestExpand = "payments,contact"
+	InvoicesListRequestExpandPaymentsContactAccountingPeriod                                                                InvoicesListRequestExpand = "payments,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsContactCompany                                                                         InvoicesListRequestExpand = "payments,contact,company"
+	InvoicesListRequestExpandPaymentsContactCompanyAccountingPeriod                                                         InvoicesListRequestExpand = "payments,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItems                                                                              InvoicesListRequestExpand = "payments,line_items"
+	InvoicesListRequestExpandPaymentsLineItemsAccountingPeriod                                                              InvoicesListRequestExpand = "payments,line_items,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsCompany                                                                       InvoicesListRequestExpand = "payments,line_items,company"
+	InvoicesListRequestExpandPaymentsLineItemsCompanyAccountingPeriod                                                       InvoicesListRequestExpand = "payments,line_items,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsContact                                                                       InvoicesListRequestExpand = "payments,line_items,contact"
+	InvoicesListRequestExpandPaymentsLineItemsContactAccountingPeriod                                                       InvoicesListRequestExpand = "payments,line_items,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsContactCompany                                                                InvoicesListRequestExpand = "payments,line_items,contact,company"
+	InvoicesListRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod                                                InvoicesListRequestExpand = "payments,line_items,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrders                                                                InvoicesListRequestExpand = "payments,line_items,purchase_orders"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersAccountingPeriod                                                InvoicesListRequestExpand = "payments,line_items,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersCompany                                                         InvoicesListRequestExpand = "payments,line_items,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod                                         InvoicesListRequestExpand = "payments,line_items,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContact                                                         InvoicesListRequestExpand = "payments,line_items,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContactAccountingPeriod                                         InvoicesListRequestExpand = "payments,line_items,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContactCompany                                                  InvoicesListRequestExpand = "payments,line_items,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod                                  InvoicesListRequestExpand = "payments,line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategories                                                            InvoicesListRequestExpand = "payments,line_items,tracking_categories"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod                                            InvoicesListRequestExpand = "payments,line_items,tracking_categories,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesCompany                                                     InvoicesListRequestExpand = "payments,line_items,tracking_categories,company"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                                     InvoicesListRequestExpand = "payments,line_items,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContact                                                     InvoicesListRequestExpand = "payments,line_items,tracking_categories,contact"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                                     InvoicesListRequestExpand = "payments,line_items,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany                                              InvoicesListRequestExpand = "payments,line_items,tracking_categories,contact,company"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod                              InvoicesListRequestExpand = "payments,line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrders                                              InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod                              InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany                                       InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                       InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact                                       InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                       InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany                                InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                InvoicesListRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsPurchaseOrders                                                                         InvoicesListRequestExpand = "payments,purchase_orders"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersAccountingPeriod                                                         InvoicesListRequestExpand = "payments,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersCompany                                                                  InvoicesListRequestExpand = "payments,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersCompanyAccountingPeriod                                                  InvoicesListRequestExpand = "payments,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersContact                                                                  InvoicesListRequestExpand = "payments,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersContactAccountingPeriod                                                  InvoicesListRequestExpand = "payments,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersContactCompany                                                           InvoicesListRequestExpand = "payments,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsPurchaseOrdersContactCompanyAccountingPeriod                                           InvoicesListRequestExpand = "payments,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategories                                                                     InvoicesListRequestExpand = "payments,tracking_categories"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod                                                     InvoicesListRequestExpand = "payments,tracking_categories,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesCompany                                                              InvoicesListRequestExpand = "payments,tracking_categories,company"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod                                              InvoicesListRequestExpand = "payments,tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesContact                                                              InvoicesListRequestExpand = "payments,tracking_categories,contact"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod                                              InvoicesListRequestExpand = "payments,tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesContactCompany                                                       InvoicesListRequestExpand = "payments,tracking_categories,contact,company"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod                                       InvoicesListRequestExpand = "payments,tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrders                                                       InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod                                       InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompany                                                InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                                InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContact                                                InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                                InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompany                                         InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                         InvoicesListRequestExpand = "payments,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandPurchaseOrders                                                                                 InvoicesListRequestExpand = "purchase_orders"
+	InvoicesListRequestExpandPurchaseOrdersAccountingPeriod                                                                 InvoicesListRequestExpand = "purchase_orders,accounting_period"
+	InvoicesListRequestExpandPurchaseOrdersCompany                                                                          InvoicesListRequestExpand = "purchase_orders,company"
+	InvoicesListRequestExpandPurchaseOrdersCompanyAccountingPeriod                                                          InvoicesListRequestExpand = "purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandPurchaseOrdersContact                                                                          InvoicesListRequestExpand = "purchase_orders,contact"
+	InvoicesListRequestExpandPurchaseOrdersContactAccountingPeriod                                                          InvoicesListRequestExpand = "purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandPurchaseOrdersContactCompany                                                                   InvoicesListRequestExpand = "purchase_orders,contact,company"
+	InvoicesListRequestExpandPurchaseOrdersContactCompanyAccountingPeriod                                                   InvoicesListRequestExpand = "purchase_orders,contact,company,accounting_period"
+	InvoicesListRequestExpandTrackingCategories                                                                             InvoicesListRequestExpand = "tracking_categories"
+	InvoicesListRequestExpandTrackingCategoriesAccountingPeriod                                                             InvoicesListRequestExpand = "tracking_categories,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesCompany                                                                      InvoicesListRequestExpand = "tracking_categories,company"
+	InvoicesListRequestExpandTrackingCategoriesCompanyAccountingPeriod                                                      InvoicesListRequestExpand = "tracking_categories,company,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesContact                                                                      InvoicesListRequestExpand = "tracking_categories,contact"
+	InvoicesListRequestExpandTrackingCategoriesContactAccountingPeriod                                                      InvoicesListRequestExpand = "tracking_categories,contact,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesContactCompany                                                               InvoicesListRequestExpand = "tracking_categories,contact,company"
+	InvoicesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                                               InvoicesListRequestExpand = "tracking_categories,contact,company,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrders                                                               InvoicesListRequestExpand = "tracking_categories,purchase_orders"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersAccountingPeriod                                               InvoicesListRequestExpand = "tracking_categories,purchase_orders,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersCompany                                                        InvoicesListRequestExpand = "tracking_categories,purchase_orders,company"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                                        InvoicesListRequestExpand = "tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContact                                                        InvoicesListRequestExpand = "tracking_categories,purchase_orders,contact"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContactAccountingPeriod                                        InvoicesListRequestExpand = "tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContactCompany                                                 InvoicesListRequestExpand = "tracking_categories,purchase_orders,contact,company"
+	InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                                 InvoicesListRequestExpand = "tracking_categories,purchase_orders,contact,company,accounting_period"
+)
+
+func NewInvoicesListRequestExpandFromString(s string) (InvoicesListRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return InvoicesListRequestExpandAccountingPeriod, nil
+	case "applied_payments":
+		return InvoicesListRequestExpandAppliedPayments, nil
+	case "applied_payments,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsAccountingPeriod, nil
+	case "applied_payments,company":
+		return InvoicesListRequestExpandAppliedPaymentsCompany, nil
+	case "applied_payments,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsCompanyAccountingPeriod, nil
+	case "applied_payments,contact":
+		return InvoicesListRequestExpandAppliedPaymentsContact, nil
+	case "applied_payments,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsContactAccountingPeriod, nil
+	case "applied_payments,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsContactCompany, nil
+	case "applied_payments,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items":
+		return InvoicesListRequestExpandAppliedPaymentsLineItems, nil
+	case "applied_payments,line_items,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "applied_payments,line_items,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsCompany, nil
+	case "applied_payments,line_items,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,contact":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsContact, nil
+	case "applied_payments,line_items,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "applied_payments,line_items,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompany, nil
+	case "applied_payments,line_items,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrders, nil
+	case "applied_payments,line_items,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany, nil
+	case "applied_payments,line_items,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders,contact":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact, nil
+	case "applied_payments,line_items,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany, nil
+	case "applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategories, nil
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "applied_payments,purchase_orders":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrders, nil
+	case "applied_payments,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,purchase_orders,company":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompany, nil
+	case "applied_payments,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,purchase_orders,contact":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContact, nil
+	case "applied_payments,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,purchase_orders,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompany, nil
+	case "applied_payments,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategories, nil
+	case "applied_payments,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,tracking_categories,company":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompany, nil
+	case "applied_payments,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContact, nil
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders, nil
+	case "applied_payments,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "company":
+		return InvoicesListRequestExpandCompany, nil
+	case "company,accounting_period":
+		return InvoicesListRequestExpandCompanyAccountingPeriod, nil
+	case "contact":
+		return InvoicesListRequestExpandContact, nil
+	case "contact,accounting_period":
+		return InvoicesListRequestExpandContactAccountingPeriod, nil
+	case "contact,company":
+		return InvoicesListRequestExpandContactCompany, nil
+	case "contact,company,accounting_period":
+		return InvoicesListRequestExpandContactCompanyAccountingPeriod, nil
+	case "line_items":
+		return InvoicesListRequestExpandLineItems, nil
+	case "line_items,accounting_period":
+		return InvoicesListRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,company":
+		return InvoicesListRequestExpandLineItemsCompany, nil
+	case "line_items,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsCompanyAccountingPeriod, nil
+	case "line_items,contact":
+		return InvoicesListRequestExpandLineItemsContact, nil
+	case "line_items,contact,accounting_period":
+		return InvoicesListRequestExpandLineItemsContactAccountingPeriod, nil
+	case "line_items,contact,company":
+		return InvoicesListRequestExpandLineItemsContactCompany, nil
+	case "line_items,contact,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsContactCompanyAccountingPeriod, nil
+	case "line_items,purchase_orders":
+		return InvoicesListRequestExpandLineItemsPurchaseOrders, nil
+	case "line_items,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "line_items,purchase_orders,company":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersCompany, nil
+	case "line_items,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "line_items,purchase_orders,contact":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersContact, nil
+	case "line_items,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "line_items,purchase_orders,contact,company":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersContactCompany, nil
+	case "line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return InvoicesListRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,company":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesCompany, nil
+	case "line_items,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,contact":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesContact, nil
+	case "line_items,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "line_items,tracking_categories,contact,company":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesContactCompany, nil
+	case "line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments":
+		return InvoicesListRequestExpandPayments, nil
+	case "payments,accounting_period":
+		return InvoicesListRequestExpandPaymentsAccountingPeriod, nil
+	case "payments,applied_payments":
+		return InvoicesListRequestExpandPaymentsAppliedPayments, nil
+	case "payments,applied_payments,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod, nil
+	case "payments,applied_payments,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsCompany, nil
+	case "payments,applied_payments,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsContact, nil
+	case "payments,applied_payments,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod, nil
+	case "payments,applied_payments,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompany, nil
+	case "payments,applied_payments,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItems, nil
+	case "payments,applied_payments,line_items,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "payments,applied_payments,line_items,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany, nil
+	case "payments,applied_payments,line_items,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContact, nil
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany, nil
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders, nil
+	case "payments,applied_payments,line_items,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany, nil
+	case "payments,applied_payments,line_items,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories, nil
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrders, nil
+	case "payments,applied_payments,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany, nil
+	case "payments,applied_payments,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact, nil
+	case "payments,applied_payments,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategories, nil
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact, nil
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,company":
+		return InvoicesListRequestExpandPaymentsCompany, nil
+	case "payments,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsCompanyAccountingPeriod, nil
+	case "payments,contact":
+		return InvoicesListRequestExpandPaymentsContact, nil
+	case "payments,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsContactAccountingPeriod, nil
+	case "payments,contact,company":
+		return InvoicesListRequestExpandPaymentsContactCompany, nil
+	case "payments,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,line_items":
+		return InvoicesListRequestExpandPaymentsLineItems, nil
+	case "payments,line_items,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsAccountingPeriod, nil
+	case "payments,line_items,company":
+		return InvoicesListRequestExpandPaymentsLineItemsCompany, nil
+	case "payments,line_items,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,line_items,contact":
+		return InvoicesListRequestExpandPaymentsLineItemsContact, nil
+	case "payments,line_items,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,line_items,contact,company":
+		return InvoicesListRequestExpandPaymentsLineItemsContactCompany, nil
+	case "payments,line_items,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,line_items,purchase_orders":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrders, nil
+	case "payments,line_items,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "payments,line_items,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersCompany, nil
+	case "payments,line_items,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,line_items,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContact, nil
+	case "payments,line_items,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,line_items,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContactCompany, nil
+	case "payments,line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategories, nil
+	case "payments,line_items,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,company":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,line_items,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,line_items,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact,company":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,purchase_orders":
+		return InvoicesListRequestExpandPaymentsPurchaseOrders, nil
+	case "payments,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersAccountingPeriod, nil
+	case "payments,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersCompany, nil
+	case "payments,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersContact, nil
+	case "payments,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersContactCompany, nil
+	case "payments,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,tracking_categories":
+		return InvoicesListRequestExpandPaymentsTrackingCategories, nil
+	case "payments,tracking_categories,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,tracking_categories,company":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesCompany, nil
+	case "payments,tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,contact":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesContact, nil
+	case "payments,tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,tracking_categories,contact,company":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrders, nil
+	case "payments,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "purchase_orders":
+		return InvoicesListRequestExpandPurchaseOrders, nil
+	case "purchase_orders,accounting_period":
+		return InvoicesListRequestExpandPurchaseOrdersAccountingPeriod, nil
+	case "purchase_orders,company":
+		return InvoicesListRequestExpandPurchaseOrdersCompany, nil
+	case "purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandPurchaseOrdersCompanyAccountingPeriod, nil
+	case "purchase_orders,contact":
+		return InvoicesListRequestExpandPurchaseOrdersContact, nil
+	case "purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandPurchaseOrdersContactAccountingPeriod, nil
+	case "purchase_orders,contact,company":
+		return InvoicesListRequestExpandPurchaseOrdersContactCompany, nil
+	case "purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return InvoicesListRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return InvoicesListRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return InvoicesListRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories,contact,company":
+		return InvoicesListRequestExpandTrackingCategoriesContactCompany, nil
+	case "tracking_categories,contact,company,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "tracking_categories,purchase_orders":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrders, nil
+	case "tracking_categories,purchase_orders,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "tracking_categories,purchase_orders,company":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersCompany, nil
+	case "tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "tracking_categories,purchase_orders,contact":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContact, nil
+	case "tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "tracking_categories,purchase_orders,contact,company":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesListRequestExpandTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	}
+	var t InvoicesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InvoicesListRequestExpand) Ptr() *InvoicesListRequestExpand {
+	return &i
+}
+
+type InvoicesListRequestType string
+
+const (
+	InvoicesListRequestTypeAccountsPayable    InvoicesListRequestType = "ACCOUNTS_PAYABLE"
+	InvoicesListRequestTypeAccountsReceivable InvoicesListRequestType = "ACCOUNTS_RECEIVABLE"
+)
+
+func NewInvoicesListRequestTypeFromString(s string) (InvoicesListRequestType, error) {
+	switch s {
+	case "ACCOUNTS_PAYABLE":
+		return InvoicesListRequestTypeAccountsPayable, nil
+	case "ACCOUNTS_RECEIVABLE":
+		return InvoicesListRequestTypeAccountsReceivable, nil
+	}
+	var t InvoicesListRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InvoicesListRequestType) Ptr() *InvoicesListRequestType {
+	return &i
+}
+
+type InvoicesRetrieveRequestExpand string
+
+const (
+	InvoicesRetrieveRequestExpandAccountingPeriod                                                                               InvoicesRetrieveRequestExpand = "accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPayments                                                                                InvoicesRetrieveRequestExpand = "applied_payments"
+	InvoicesRetrieveRequestExpandAppliedPaymentsAccountingPeriod                                                                InvoicesRetrieveRequestExpand = "applied_payments,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsCompany                                                                         InvoicesRetrieveRequestExpand = "applied_payments,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod                                                         InvoicesRetrieveRequestExpand = "applied_payments,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsContact                                                                         InvoicesRetrieveRequestExpand = "applied_payments,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod                                                         InvoicesRetrieveRequestExpand = "applied_payments,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsContactCompany                                                                  InvoicesRetrieveRequestExpand = "applied_payments,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod                                                  InvoicesRetrieveRequestExpand = "applied_payments,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItems                                                                       InvoicesRetrieveRequestExpand = "applied_payments,line_items"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod                                                       InvoicesRetrieveRequestExpand = "applied_payments,line_items,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompany                                                                InvoicesRetrieveRequestExpand = "applied_payments,line_items,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod                                                InvoicesRetrieveRequestExpand = "applied_payments,line_items,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContact                                                                InvoicesRetrieveRequestExpand = "applied_payments,line_items,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod                                                InvoicesRetrieveRequestExpand = "applied_payments,line_items,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany                                                         InvoicesRetrieveRequestExpand = "applied_payments,line_items,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod                                         InvoicesRetrieveRequestExpand = "applied_payments,line_items,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrders                                                         InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod                                         InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany                                                  InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod                                  InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact                                                  InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod                                  InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany                                           InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod                           InvoicesRetrieveRequestExpand = "applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories                                                     InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod                                     InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany                                              InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                              InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact                                              InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                              InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany                                       InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod                       InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders                                       InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod                       InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany                                InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact                                InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany                         InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod         InvoicesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrders                                                                  InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod                                                  InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompany                                                           InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod                                           InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContact                                                           InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod                                           InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompany                                                    InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod                                    InvoicesRetrieveRequestExpand = "applied_payments,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategories                                                              InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod                                              InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany                                                       InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                                       InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact                                                       InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod                                       InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany                                                InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod                                InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders                                                InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod                                InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany                                         InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                         InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact                                         InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                         InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany                                  InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                  InvoicesRetrieveRequestExpand = "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandCompany                                                                                        InvoicesRetrieveRequestExpand = "company"
+	InvoicesRetrieveRequestExpandCompanyAccountingPeriod                                                                        InvoicesRetrieveRequestExpand = "company,accounting_period"
+	InvoicesRetrieveRequestExpandContact                                                                                        InvoicesRetrieveRequestExpand = "contact"
+	InvoicesRetrieveRequestExpandContactAccountingPeriod                                                                        InvoicesRetrieveRequestExpand = "contact,accounting_period"
+	InvoicesRetrieveRequestExpandContactCompany                                                                                 InvoicesRetrieveRequestExpand = "contact,company"
+	InvoicesRetrieveRequestExpandContactCompanyAccountingPeriod                                                                 InvoicesRetrieveRequestExpand = "contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItems                                                                                      InvoicesRetrieveRequestExpand = "line_items"
+	InvoicesRetrieveRequestExpandLineItemsAccountingPeriod                                                                      InvoicesRetrieveRequestExpand = "line_items,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsCompany                                                                               InvoicesRetrieveRequestExpand = "line_items,company"
+	InvoicesRetrieveRequestExpandLineItemsCompanyAccountingPeriod                                                               InvoicesRetrieveRequestExpand = "line_items,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsContact                                                                               InvoicesRetrieveRequestExpand = "line_items,contact"
+	InvoicesRetrieveRequestExpandLineItemsContactAccountingPeriod                                                               InvoicesRetrieveRequestExpand = "line_items,contact,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsContactCompany                                                                        InvoicesRetrieveRequestExpand = "line_items,contact,company"
+	InvoicesRetrieveRequestExpandLineItemsContactCompanyAccountingPeriod                                                        InvoicesRetrieveRequestExpand = "line_items,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrders                                                                        InvoicesRetrieveRequestExpand = "line_items,purchase_orders"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersAccountingPeriod                                                        InvoicesRetrieveRequestExpand = "line_items,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersCompany                                                                 InvoicesRetrieveRequestExpand = "line_items,purchase_orders,company"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersCompanyAccountingPeriod                                                 InvoicesRetrieveRequestExpand = "line_items,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContact                                                                 InvoicesRetrieveRequestExpand = "line_items,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContactAccountingPeriod                                                 InvoicesRetrieveRequestExpand = "line_items,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContactCompany                                                          InvoicesRetrieveRequestExpand = "line_items,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContactCompanyAccountingPeriod                                          InvoicesRetrieveRequestExpand = "line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategories                                                                    InvoicesRetrieveRequestExpand = "line_items,tracking_categories"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod                                                    InvoicesRetrieveRequestExpand = "line_items,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesCompany                                                             InvoicesRetrieveRequestExpand = "line_items,tracking_categories,company"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod                                             InvoicesRetrieveRequestExpand = "line_items,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContact                                                             InvoicesRetrieveRequestExpand = "line_items,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod                                             InvoicesRetrieveRequestExpand = "line_items,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompany                                                      InvoicesRetrieveRequestExpand = "line_items,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod                                      InvoicesRetrieveRequestExpand = "line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrders                                                      InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod                                      InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompany                                               InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                               InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContact                                               InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                               InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompany                                        InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                        InvoicesRetrieveRequestExpand = "line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPayments                                                                                       InvoicesRetrieveRequestExpand = "payments"
+	InvoicesRetrieveRequestExpandPaymentsAccountingPeriod                                                                       InvoicesRetrieveRequestExpand = "payments,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPayments                                                                        InvoicesRetrieveRequestExpand = "payments,applied_payments"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod                                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompany                                                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod                                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContact                                                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod                                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany                                                          InvoicesRetrieveRequestExpand = "payments,applied_payments,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod                                          InvoicesRetrieveRequestExpand = "payments,applied_payments,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems                                                               InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod                                               InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany                                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact                                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany                                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders                                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany                                          InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod                          InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact                                          InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod                          InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany                                   InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod                   InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories                                             InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod                             InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany                                      InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                      InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact                                      InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                      InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany                               InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod               InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders                               InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod               InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany                        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact                        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod        InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany                 InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod InvoicesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrders                                                          InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod                                          InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany                                                   InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod                                   InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact                                                   InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod                                   InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany                                            InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod                            InvoicesRetrieveRequestExpand = "payments,applied_payments,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories                                                      InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod                                      InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany                                               InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                               InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact                                               InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod                               InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod                        InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders                                        InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod                        InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                 InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact                                 InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                 InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany                          InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod          InvoicesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsCompany                                                                                InvoicesRetrieveRequestExpand = "payments,company"
+	InvoicesRetrieveRequestExpandPaymentsCompanyAccountingPeriod                                                                InvoicesRetrieveRequestExpand = "payments,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsContact                                                                                InvoicesRetrieveRequestExpand = "payments,contact"
+	InvoicesRetrieveRequestExpandPaymentsContactAccountingPeriod                                                                InvoicesRetrieveRequestExpand = "payments,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsContactCompany                                                                         InvoicesRetrieveRequestExpand = "payments,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsContactCompanyAccountingPeriod                                                         InvoicesRetrieveRequestExpand = "payments,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItems                                                                              InvoicesRetrieveRequestExpand = "payments,line_items"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsAccountingPeriod                                                              InvoicesRetrieveRequestExpand = "payments,line_items,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsCompany                                                                       InvoicesRetrieveRequestExpand = "payments,line_items,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsCompanyAccountingPeriod                                                       InvoicesRetrieveRequestExpand = "payments,line_items,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsContact                                                                       InvoicesRetrieveRequestExpand = "payments,line_items,contact"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsContactAccountingPeriod                                                       InvoicesRetrieveRequestExpand = "payments,line_items,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsContactCompany                                                                InvoicesRetrieveRequestExpand = "payments,line_items,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod                                                InvoicesRetrieveRequestExpand = "payments,line_items,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrders                                                                InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersAccountingPeriod                                                InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersCompany                                                         InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod                                         InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContact                                                         InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContactAccountingPeriod                                         InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContactCompany                                                  InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod                                  InvoicesRetrieveRequestExpand = "payments,line_items,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategories                                                            InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod                                            InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompany                                                     InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                                     InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContact                                                     InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                                     InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany                                              InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod                              InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrders                                              InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod                              InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany                                       InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                       InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact                                       InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                       InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany                                InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                InvoicesRetrieveRequestExpand = "payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrders                                                                         InvoicesRetrieveRequestExpand = "payments,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersAccountingPeriod                                                         InvoicesRetrieveRequestExpand = "payments,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersCompany                                                                  InvoicesRetrieveRequestExpand = "payments,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersCompanyAccountingPeriod                                                  InvoicesRetrieveRequestExpand = "payments,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContact                                                                  InvoicesRetrieveRequestExpand = "payments,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContactAccountingPeriod                                                  InvoicesRetrieveRequestExpand = "payments,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContactCompany                                                           InvoicesRetrieveRequestExpand = "payments,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContactCompanyAccountingPeriod                                           InvoicesRetrieveRequestExpand = "payments,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategories                                                                     InvoicesRetrieveRequestExpand = "payments,tracking_categories"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod                                                     InvoicesRetrieveRequestExpand = "payments,tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesCompany                                                              InvoicesRetrieveRequestExpand = "payments,tracking_categories,company"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod                                              InvoicesRetrieveRequestExpand = "payments,tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContact                                                              InvoicesRetrieveRequestExpand = "payments,tracking_categories,contact"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod                                              InvoicesRetrieveRequestExpand = "payments,tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompany                                                       InvoicesRetrieveRequestExpand = "payments,tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod                                       InvoicesRetrieveRequestExpand = "payments,tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrders                                                       InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod                                       InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompany                                                InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                                InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContact                                                InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod                                InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompany                                         InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                         InvoicesRetrieveRequestExpand = "payments,tracking_categories,purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandPurchaseOrders                                                                                 InvoicesRetrieveRequestExpand = "purchase_orders"
+	InvoicesRetrieveRequestExpandPurchaseOrdersAccountingPeriod                                                                 InvoicesRetrieveRequestExpand = "purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandPurchaseOrdersCompany                                                                          InvoicesRetrieveRequestExpand = "purchase_orders,company"
+	InvoicesRetrieveRequestExpandPurchaseOrdersCompanyAccountingPeriod                                                          InvoicesRetrieveRequestExpand = "purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandPurchaseOrdersContact                                                                          InvoicesRetrieveRequestExpand = "purchase_orders,contact"
+	InvoicesRetrieveRequestExpandPurchaseOrdersContactAccountingPeriod                                                          InvoicesRetrieveRequestExpand = "purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandPurchaseOrdersContactCompany                                                                   InvoicesRetrieveRequestExpand = "purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandPurchaseOrdersContactCompanyAccountingPeriod                                                   InvoicesRetrieveRequestExpand = "purchase_orders,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategories                                                                             InvoicesRetrieveRequestExpand = "tracking_categories"
+	InvoicesRetrieveRequestExpandTrackingCategoriesAccountingPeriod                                                             InvoicesRetrieveRequestExpand = "tracking_categories,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesCompany                                                                      InvoicesRetrieveRequestExpand = "tracking_categories,company"
+	InvoicesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod                                                      InvoicesRetrieveRequestExpand = "tracking_categories,company,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesContact                                                                      InvoicesRetrieveRequestExpand = "tracking_categories,contact"
+	InvoicesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod                                                      InvoicesRetrieveRequestExpand = "tracking_categories,contact,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesContactCompany                                                               InvoicesRetrieveRequestExpand = "tracking_categories,contact,company"
+	InvoicesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                                               InvoicesRetrieveRequestExpand = "tracking_categories,contact,company,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrders                                                               InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersAccountingPeriod                                               InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersCompany                                                        InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,company"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod                                        InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,company,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContact                                                        InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,contact"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContactAccountingPeriod                                        InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,contact,accounting_period"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContactCompany                                                 InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,contact,company"
+	InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod                                 InvoicesRetrieveRequestExpand = "tracking_categories,purchase_orders,contact,company,accounting_period"
+)
+
+func NewInvoicesRetrieveRequestExpandFromString(s string) (InvoicesRetrieveRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return InvoicesRetrieveRequestExpandAccountingPeriod, nil
+	case "applied_payments":
+		return InvoicesRetrieveRequestExpandAppliedPayments, nil
+	case "applied_payments,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsAccountingPeriod, nil
+	case "applied_payments,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsCompany, nil
+	case "applied_payments,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod, nil
+	case "applied_payments,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsContact, nil
+	case "applied_payments,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod, nil
+	case "applied_payments,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsContactCompany, nil
+	case "applied_payments,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItems, nil
+	case "applied_payments,line_items,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "applied_payments,line_items,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompany, nil
+	case "applied_payments,line_items,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContact, nil
+	case "applied_payments,line_items,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "applied_payments,line_items,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany, nil
+	case "applied_payments,line_items,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrders, nil
+	case "applied_payments,line_items,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompany, nil
+	case "applied_payments,line_items,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContact, nil
+	case "applied_payments,line_items,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,line_items,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompany, nil
+	case "applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories, nil
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "applied_payments,purchase_orders":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrders, nil
+	case "applied_payments,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompany, nil
+	case "applied_payments,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContact, nil
+	case "applied_payments,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompany, nil
+	case "applied_payments,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategories, nil
+	case "applied_payments,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany, nil
+	case "applied_payments,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact, nil
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrders, nil
+	case "applied_payments,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContact, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "company":
+		return InvoicesRetrieveRequestExpandCompany, nil
+	case "company,accounting_period":
+		return InvoicesRetrieveRequestExpandCompanyAccountingPeriod, nil
+	case "contact":
+		return InvoicesRetrieveRequestExpandContact, nil
+	case "contact,accounting_period":
+		return InvoicesRetrieveRequestExpandContactAccountingPeriod, nil
+	case "contact,company":
+		return InvoicesRetrieveRequestExpandContactCompany, nil
+	case "contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandContactCompanyAccountingPeriod, nil
+	case "line_items":
+		return InvoicesRetrieveRequestExpandLineItems, nil
+	case "line_items,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,company":
+		return InvoicesRetrieveRequestExpandLineItemsCompany, nil
+	case "line_items,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsCompanyAccountingPeriod, nil
+	case "line_items,contact":
+		return InvoicesRetrieveRequestExpandLineItemsContact, nil
+	case "line_items,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsContactAccountingPeriod, nil
+	case "line_items,contact,company":
+		return InvoicesRetrieveRequestExpandLineItemsContactCompany, nil
+	case "line_items,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsContactCompanyAccountingPeriod, nil
+	case "line_items,purchase_orders":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrders, nil
+	case "line_items,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "line_items,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersCompany, nil
+	case "line_items,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "line_items,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContact, nil
+	case "line_items,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "line_items,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContactCompany, nil
+	case "line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesCompany, nil
+	case "line_items,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContact, nil
+	case "line_items,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "line_items,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompany, nil
+	case "line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments":
+		return InvoicesRetrieveRequestExpandPayments, nil
+	case "payments,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAccountingPeriod, nil
+	case "payments,applied_payments":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPayments, nil
+	case "payments,applied_payments,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod, nil
+	case "payments,applied_payments,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompany, nil
+	case "payments,applied_payments,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContact, nil
+	case "payments,applied_payments,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod, nil
+	case "payments,applied_payments,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany, nil
+	case "payments,applied_payments,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems, nil
+	case "payments,applied_payments,line_items,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "payments,applied_payments,line_items,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany, nil
+	case "payments,applied_payments,line_items,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact, nil
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany, nil
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrders, nil
+	case "payments,applied_payments,line_items,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompany, nil
+	case "payments,applied_payments,line_items,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContact, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories, nil
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrders, nil
+	case "payments,applied_payments,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompany, nil
+	case "payments,applied_payments,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContact, nil
+	case "payments,applied_payments,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories, nil
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact, nil
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrders, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,applied_payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,company":
+		return InvoicesRetrieveRequestExpandPaymentsCompany, nil
+	case "payments,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsCompanyAccountingPeriod, nil
+	case "payments,contact":
+		return InvoicesRetrieveRequestExpandPaymentsContact, nil
+	case "payments,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsContactAccountingPeriod, nil
+	case "payments,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsContactCompany, nil
+	case "payments,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,line_items":
+		return InvoicesRetrieveRequestExpandPaymentsLineItems, nil
+	case "payments,line_items,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsAccountingPeriod, nil
+	case "payments,line_items,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsCompany, nil
+	case "payments,line_items,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,line_items,contact":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsContact, nil
+	case "payments,line_items,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,line_items,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsContactCompany, nil
+	case "payments,line_items,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,line_items,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrders, nil
+	case "payments,line_items,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersAccountingPeriod, nil
+	case "payments,line_items,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersCompany, nil
+	case "payments,line_items,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,line_items,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContact, nil
+	case "payments,line_items,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,line_items,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContactCompany, nil
+	case "payments,line_items,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategories, nil
+	case "payments,line_items,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,line_items,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,line_items,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,line_items,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrders, nil
+	case "payments,line_items,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,line_items,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,line_items,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrders, nil
+	case "payments,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersAccountingPeriod, nil
+	case "payments,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersCompany, nil
+	case "payments,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContact, nil
+	case "payments,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContactCompany, nil
+	case "payments,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "payments,tracking_categories":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategories, nil
+	case "payments,tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,tracking_categories,company":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesCompany, nil
+	case "payments,tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContact, nil
+	case "payments,tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrders, nil
+	case "payments,tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompany, nil
+	case "payments,tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContact, nil
+	case "payments,tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "payments,tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "payments,tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPaymentsTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "purchase_orders":
+		return InvoicesRetrieveRequestExpandPurchaseOrders, nil
+	case "purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersAccountingPeriod, nil
+	case "purchase_orders,company":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersCompany, nil
+	case "purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersCompanyAccountingPeriod, nil
+	case "purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersContact, nil
+	case "purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersContactAccountingPeriod, nil
+	case "purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersContactCompany, nil
+	case "purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandPurchaseOrdersContactCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return InvoicesRetrieveRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories,contact,company":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesContactCompany, nil
+	case "tracking_categories,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "tracking_categories,purchase_orders":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrders, nil
+	case "tracking_categories,purchase_orders,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersAccountingPeriod, nil
+	case "tracking_categories,purchase_orders,company":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersCompany, nil
+	case "tracking_categories,purchase_orders,company,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersCompanyAccountingPeriod, nil
+	case "tracking_categories,purchase_orders,contact":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContact, nil
+	case "tracking_categories,purchase_orders,contact,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContactAccountingPeriod, nil
+	case "tracking_categories,purchase_orders,contact,company":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContactCompany, nil
+	case "tracking_categories,purchase_orders,contact,company,accounting_period":
+		return InvoicesRetrieveRequestExpandTrackingCategoriesPurchaseOrdersContactCompanyAccountingPeriod, nil
+	}
+	var t InvoicesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InvoicesRetrieveRequestExpand) Ptr() *InvoicesRetrieveRequestExpand {
+	return &i
 }

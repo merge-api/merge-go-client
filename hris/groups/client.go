@@ -12,31 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *hris.GroupsListRequest) (*hris.PaginatedGroupList, error)
-	Retrieve(ctx context.Context, id string, request *hris.GroupsRetrieveRequest) (*hris.Group, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Group` objects.
-func (c *client) List(ctx context.Context, request *hris.GroupsListRequest) (*hris.PaginatedGroupList, error) {
+func (c *Client) List(ctx context.Context, request *hris.GroupsListRequest) (*hris.PaginatedGroupList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -69,13 +64,13 @@ func (c *client) List(ctx context.Context, request *hris.GroupsListRequest) (*hr
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}
 	if request.RemoteFields != nil {
-		queryParams.Add("remote_fields", fmt.Sprintf("%v", *request.RemoteFields))
+		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
 	}
 	if request.RemoteId != nil {
 		queryParams.Add("remote_id", fmt.Sprintf("%v", *request.RemoteId))
 	}
 	if request.ShowEnumOrigins != nil {
-		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
+		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", request.ShowEnumOrigins))
 	}
 	if request.Types != nil {
 		queryParams.Add("types", fmt.Sprintf("%v", *request.Types))
@@ -85,24 +80,22 @@ func (c *client) List(ctx context.Context, request *hris.GroupsListRequest) (*hr
 	}
 
 	var response *hris.PaginatedGroupList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `Group` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *hris.GroupsRetrieveRequest) (*hris.Group, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *hris.GroupsRetrieveRequest) (*hris.Group, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -114,28 +107,26 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.GroupsRe
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
 	if request.RemoteFields != nil {
-		queryParams.Add("remote_fields", fmt.Sprintf("%v", *request.RemoteFields))
+		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
 	}
 	if request.ShowEnumOrigins != nil {
-		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
+		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", request.ShowEnumOrigins))
 	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
 	}
 
 	var response *hris.Group
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

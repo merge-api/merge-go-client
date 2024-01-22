@@ -5,7 +5,7 @@ package filestorage
 import (
 	json "encoding/json"
 	fmt "fmt"
-	strconv "strconv"
+	core "github.com/merge-api/merge-go-client/core"
 	time "time"
 )
 
@@ -22,13 +22,41 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetails) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetails
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetails(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetails) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The LinkedAccount Object
+//
 // ### Description
+//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
+//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -43,6 +71,31 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetailsAndActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetailsAndActions(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetailsAndActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountDetailsAndActionsIntegration struct {
@@ -54,53 +107,59 @@ type AccountDetailsAndActionsIntegration struct {
 	Slug                     string            `json:"slug"`
 	PassthroughAvailable     bool              `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `COMPLETE` - COMPLETE
-// * `INCOMPLETE` - INCOMPLETE
-// * `RELINK_NEEDED` - RELINK_NEEDED
-type AccountDetailsAndActionsStatusEnum uint
-
-const (
-	AccountDetailsAndActionsStatusEnumComplete AccountDetailsAndActionsStatusEnum = iota + 1
-	AccountDetailsAndActionsStatusEnumIncomplete
-	AccountDetailsAndActionsStatusEnumRelinkNeeded
-)
-
-func (a AccountDetailsAndActionsStatusEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AccountDetailsAndActionsStatusEnumComplete:
-		return "COMPLETE"
-	case AccountDetailsAndActionsStatusEnumIncomplete:
-		return "INCOMPLETE"
-	case AccountDetailsAndActionsStatusEnumRelinkNeeded:
-		return "RELINK_NEEDED"
-	}
-}
-
-func (a AccountDetailsAndActionsStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AccountDetailsAndActionsStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AccountDetailsAndActionsIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActionsIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "COMPLETE":
-		value := AccountDetailsAndActionsStatusEnumComplete
-		*a = value
-	case "INCOMPLETE":
-		value := AccountDetailsAndActionsStatusEnumIncomplete
-		*a = value
-	case "RELINK_NEEDED":
-		value := AccountDetailsAndActionsStatusEnumRelinkNeeded
-		*a = value
-	}
+	*a = AccountDetailsAndActionsIntegration(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountDetailsAndActionsIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `COMPLETE` - COMPLETE
+// - `INCOMPLETE` - INCOMPLETE
+// - `RELINK_NEEDED` - RELINK_NEEDED
+type AccountDetailsAndActionsStatusEnum string
+
+const (
+	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
+	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
+	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+)
+
+func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
+	switch s {
+	case "COMPLETE":
+		return AccountDetailsAndActionsStatusEnumComplete, nil
+	case "INCOMPLETE":
+		return AccountDetailsAndActionsStatusEnumIncomplete, nil
+	case "RELINK_NEEDED":
+		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	}
+	var t AccountDetailsAndActionsStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatusEnum {
+	return &a
 }
 
 type AccountIntegration struct {
@@ -118,18 +177,93 @@ type AccountIntegration struct {
 	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
 	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
-	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
+	ApiEndpointsToDocumentationUrls map[string]interface{} `json:"api_endpoints_to_documentation_urls,omitempty"`
 	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
 	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountIntegration(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountToken struct {
 	AccountToken string              `json:"account_token"`
 	Integration  *AccountIntegration `json:"integration,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountToken(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountToken) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AsyncPassthroughReciept) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncPassthroughReciept
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncPassthroughReciept(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncPassthroughReciept) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AuditLogEvent struct {
@@ -140,83 +274,108 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// * `ADMIN` - ADMIN
-	// * `DEVELOPER` - DEVELOPER
-	// * `MEMBER` - MEMBER
-	// * `API` - API
-	// * `SYSTEM` - SYSTEM
-	// * `MERGE_TEAM` - MERGE_TEAM
+	// - `ADMIN` - ADMIN
+	// - `DEVELOPER` - DEVELOPER
+	// - `MEMBER` - MEMBER
+	// - `API` - API
+	// - `SYSTEM` - SYSTEM
+	// - `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// * `INVITED_USER` - INVITED_USER
-	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// * `CREATED_DESTINATION` - CREATED_DESTINATION
-	// * `DELETED_DESTINATION` - DELETED_DESTINATION
-	// * `CHANGED_SCOPES` - CHANGED_SCOPES
-	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// * `RESET_PASSWORD` - RESET_PASSWORD
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// - `INVITED_USER` - INVITED_USER
+	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// - `CREATED_DESTINATION` - CREATED_DESTINATION
+	// - `DELETED_DESTINATION` - DELETED_DESTINATION
+	// - `CHANGED_SCOPES` - CHANGED_SCOPES
+	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// - `RESET_PASSWORD` - RESET_PASSWORD
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AuditLogEvent) UnmarshalJSON(data []byte) error {
+	type unmarshaler AuditLogEvent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AuditLogEvent(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AuditLogEvent) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // Designates the type of event that occurred.
 //
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -276,12 +435,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -340,171 +499,162 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
+//
 // ### Description
+//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
+//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
 	PassthroughAvailable     bool                `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoriesEnum uint
-
-const (
-	CategoriesEnumHris CategoriesEnum = iota + 1
-	CategoriesEnumAts
-	CategoriesEnumAccounting
-	CategoriesEnumTicketing
-	CategoriesEnumCrm
-	CategoriesEnumMktg
-	CategoriesEnumFilestorage
-)
-
-func (c CategoriesEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoriesEnumHris:
-		return "hris"
-	case CategoriesEnumAts:
-		return "ats"
-	case CategoriesEnumAccounting:
-		return "accounting"
-	case CategoriesEnumTicketing:
-		return "ticketing"
-	case CategoriesEnumCrm:
-		return "crm"
-	case CategoriesEnumMktg:
-		return "mktg"
-	case CategoriesEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoriesEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AvailableActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AvailableActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "hris":
-		value := CategoriesEnumHris
-		*c = value
-	case "ats":
-		value := CategoriesEnumAts
-		*c = value
-	case "accounting":
-		value := CategoriesEnumAccounting
-		*c = value
-	case "ticketing":
-		value := CategoriesEnumTicketing
-		*c = value
-	case "crm":
-		value := CategoriesEnumCrm
-		*c = value
-	case "mktg":
-		value := CategoriesEnumMktg
-		*c = value
-	case "filestorage":
-		value := CategoriesEnumFilestorage
-		*c = value
-	}
+	*a = AvailableActions(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoryEnum uint
+func (a *AvailableActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoriesEnum string
 
 const (
-	CategoryEnumHris CategoryEnum = iota + 1
-	CategoryEnumAts
-	CategoryEnumAccounting
-	CategoryEnumTicketing
-	CategoryEnumCrm
-	CategoryEnumMktg
-	CategoryEnumFilestorage
+	CategoriesEnumHris        CategoriesEnum = "hris"
+	CategoriesEnumAts         CategoriesEnum = "ats"
+	CategoriesEnumAccounting  CategoriesEnum = "accounting"
+	CategoriesEnumTicketing   CategoriesEnum = "ticketing"
+	CategoriesEnumCrm         CategoriesEnum = "crm"
+	CategoriesEnumMktg        CategoriesEnum = "mktg"
+	CategoriesEnumFilestorage CategoriesEnum = "filestorage"
 )
 
-func (c CategoryEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoryEnumHris:
-		return "hris"
-	case CategoryEnumAts:
-		return "ats"
-	case CategoryEnumAccounting:
-		return "accounting"
-	case CategoryEnumTicketing:
-		return "ticketing"
-	case CategoryEnumCrm:
-		return "crm"
-	case CategoryEnumMktg:
-		return "mktg"
-	case CategoryEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoryEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCategoriesEnumFromString(s string) (CategoriesEnum, error) {
+	switch s {
 	case "hris":
-		value := CategoryEnumHris
-		*c = value
+		return CategoriesEnumHris, nil
 	case "ats":
-		value := CategoryEnumAts
-		*c = value
+		return CategoriesEnumAts, nil
 	case "accounting":
-		value := CategoryEnumAccounting
-		*c = value
+		return CategoriesEnumAccounting, nil
 	case "ticketing":
-		value := CategoryEnumTicketing
-		*c = value
+		return CategoriesEnumTicketing, nil
 	case "crm":
-		value := CategoryEnumCrm
-		*c = value
+		return CategoriesEnumCrm, nil
 	case "mktg":
-		value := CategoryEnumMktg
-		*c = value
+		return CategoriesEnumMktg, nil
 	case "filestorage":
-		value := CategoryEnumFilestorage
-		*c = value
+		return CategoriesEnumFilestorage, nil
 	}
-	return nil
+	var t CategoriesEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CategoriesEnum) Ptr() *CategoriesEnum {
+	return &c
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoryEnum string
+
+const (
+	CategoryEnumHris        CategoryEnum = "hris"
+	CategoryEnumAts         CategoryEnum = "ats"
+	CategoryEnumAccounting  CategoryEnum = "accounting"
+	CategoryEnumTicketing   CategoryEnum = "ticketing"
+	CategoryEnumCrm         CategoryEnum = "crm"
+	CategoryEnumMktg        CategoryEnum = "mktg"
+	CategoryEnumFilestorage CategoryEnum = "filestorage"
+)
+
+func NewCategoryEnumFromString(s string) (CategoryEnum, error) {
+	switch s {
+	case "hris":
+		return CategoryEnumHris, nil
+	case "ats":
+		return CategoryEnumAts, nil
+	case "accounting":
+		return CategoryEnumAccounting, nil
+	case "ticketing":
+		return CategoryEnumTicketing, nil
+	case "crm":
+		return CategoryEnumCrm, nil
+	case "mktg":
+		return CategoryEnumMktg, nil
+	case "filestorage":
+		return CategoryEnumFilestorage, nil
+	}
+	var t CategoryEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CategoryEnum) Ptr() *CategoryEnum {
+	return &c
 }
 
 type CommonModelScopesBodyRequest struct {
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
 	DisabledFields []string             `json:"disabled_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommonModelScopesBodyRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommonModelScopesBodyRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommonModelScopesBodyRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommonModelScopesBodyRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type ConditionSchema struct {
@@ -512,7 +662,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -520,27 +670,52 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// * `BOOLEAN` - BOOLEAN
-	// * `DATE` - DATE
-	// * `DATE_TIME` - DATE_TIME
-	// * `INTEGER` - INTEGER
-	// * `FLOAT` - FLOAT
-	// * `STRING` - STRING
-	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// - `BOOLEAN` - BOOLEAN
+	// - `DATE` - DATE
+	// - `DATE_TIME` - DATE_TIME
+	// - `INTEGER` - INTEGER
+	// - `FLOAT` - FLOAT
+	// - `STRING` - STRING
+	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *ConditionSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ConditionSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = ConditionSchema(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *ConditionSchema) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The type of value(s) that can be set for this condition.
 //
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -598,86 +773,58 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
-type ConditionTypeEnum uint
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+type ConditionTypeEnum string
 
 const (
-	ConditionTypeEnumBoolean ConditionTypeEnum = iota + 1
-	ConditionTypeEnumDate
-	ConditionTypeEnumDateTime
-	ConditionTypeEnumInteger
-	ConditionTypeEnumFloat
-	ConditionTypeEnumString
-	ConditionTypeEnumListOfStrings
+	ConditionTypeEnumBoolean       ConditionTypeEnum = "BOOLEAN"
+	ConditionTypeEnumDate          ConditionTypeEnum = "DATE"
+	ConditionTypeEnumDateTime      ConditionTypeEnum = "DATE_TIME"
+	ConditionTypeEnumInteger       ConditionTypeEnum = "INTEGER"
+	ConditionTypeEnumFloat         ConditionTypeEnum = "FLOAT"
+	ConditionTypeEnumString        ConditionTypeEnum = "STRING"
+	ConditionTypeEnumListOfStrings ConditionTypeEnum = "LIST_OF_STRINGS"
 )
 
-func (c ConditionTypeEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ConditionTypeEnumBoolean:
-		return "BOOLEAN"
-	case ConditionTypeEnumDate:
-		return "DATE"
-	case ConditionTypeEnumDateTime:
-		return "DATE_TIME"
-	case ConditionTypeEnumInteger:
-		return "INTEGER"
-	case ConditionTypeEnumFloat:
-		return "FLOAT"
-	case ConditionTypeEnumString:
-		return "STRING"
-	case ConditionTypeEnumListOfStrings:
-		return "LIST_OF_STRINGS"
-	}
-}
-
-func (c ConditionTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewConditionTypeEnumFromString(s string) (ConditionTypeEnum, error) {
+	switch s {
 	case "BOOLEAN":
-		value := ConditionTypeEnumBoolean
-		*c = value
+		return ConditionTypeEnumBoolean, nil
 	case "DATE":
-		value := ConditionTypeEnumDate
-		*c = value
+		return ConditionTypeEnumDate, nil
 	case "DATE_TIME":
-		value := ConditionTypeEnumDateTime
-		*c = value
+		return ConditionTypeEnumDateTime, nil
 	case "INTEGER":
-		value := ConditionTypeEnumInteger
-		*c = value
+		return ConditionTypeEnumInteger, nil
 	case "FLOAT":
-		value := ConditionTypeEnumFloat
-		*c = value
+		return ConditionTypeEnumFloat, nil
 	case "STRING":
-		value := ConditionTypeEnumString
-		*c = value
+		return ConditionTypeEnumString, nil
 	case "LIST_OF_STRINGS":
-		value := ConditionTypeEnumListOfStrings
-		*c = value
+		return ConditionTypeEnumListOfStrings, nil
 	}
-	return nil
+	var t ConditionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
+	return &c
 }
 
 // # The DataPassthrough Object
+//
 // ### Description
+//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
+//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -687,28 +834,107 @@ type DataPassthroughRequest struct {
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
-	Headers       map[string]any     `json:"headers,omitempty"`
-	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	Headers       map[string]interface{} `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum     `json:"request_format,omitempty"`
 	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
 	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DataPassthroughRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler DataPassthroughRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DataPassthroughRequest(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DataPassthroughRequest) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
 	LogSummary    *DebugModelLogSummary `json:"log_summary,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DebugModeLog) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModeLog
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DebugModeLog(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModeLog) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModelLogSummary struct {
 	Url        string `json:"url"`
 	Method     string `json:"method"`
 	StatusCode int    `json:"status_code"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DebugModelLogSummary) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModelLogSummary
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DebugModelLogSummary(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModelLogSummary) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 // # The Drive Object
+//
 // ### Description
+//
 // The `Drive` object is used to represent a drive that contains the folders and files in the user's workspace.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/drives` endpoint and view their drives.
 type Drive struct {
 	Id *string `json:"id,omitempty"`
@@ -724,96 +950,86 @@ type Drive struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
-	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `READ` - READ
-// * `WRITE` - WRITE
-type EnabledActionsEnum uint
-
-const (
-	EnabledActionsEnumRead EnabledActionsEnum = iota + 1
-	EnabledActionsEnumWrite
-)
-
-func (e EnabledActionsEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EnabledActionsEnumRead:
-		return "READ"
-	case EnabledActionsEnumWrite:
-		return "WRITE"
-	}
-}
-
-func (e EnabledActionsEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (d *Drive) UnmarshalJSON(data []byte) error {
+	type unmarshaler Drive
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*d = Drive(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *Drive) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
+// - `READ` - READ
+// - `WRITE` - WRITE
+type EnabledActionsEnum string
+
+const (
+	EnabledActionsEnumRead  EnabledActionsEnum = "READ"
+	EnabledActionsEnumWrite EnabledActionsEnum = "WRITE"
+)
+
+func NewEnabledActionsEnumFromString(s string) (EnabledActionsEnum, error) {
+	switch s {
 	case "READ":
-		value := EnabledActionsEnumRead
-		*e = value
+		return EnabledActionsEnumRead, nil
 	case "WRITE":
-		value := EnabledActionsEnumWrite
-		*e = value
+		return EnabledActionsEnumWrite, nil
 	}
-	return nil
+	var t EnabledActionsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
-type EncodingEnum uint
+func (e EnabledActionsEnum) Ptr() *EnabledActionsEnum {
+	return &e
+}
+
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
+type EncodingEnum string
 
 const (
-	EncodingEnumRaw EncodingEnum = iota + 1
-	EncodingEnumBase64
-	EncodingEnumGzipBase64
+	EncodingEnumRaw        EncodingEnum = "RAW"
+	EncodingEnumBase64     EncodingEnum = "BASE64"
+	EncodingEnumGzipBase64 EncodingEnum = "GZIP_BASE64"
 )
 
-func (e EncodingEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EncodingEnumRaw:
-		return "RAW"
-	case EncodingEnumBase64:
-		return "BASE64"
-	case EncodingEnumGzipBase64:
-		return "GZIP_BASE64"
-	}
-}
-
-func (e EncodingEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EncodingEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEncodingEnumFromString(s string) (EncodingEnum, error) {
+	switch s {
 	case "RAW":
-		value := EncodingEnumRaw
-		*e = value
+		return EncodingEnumRaw, nil
 	case "BASE64":
-		value := EncodingEnumBase64
-		*e = value
+		return EncodingEnumBase64, nil
 	case "GZIP_BASE64":
-		value := EncodingEnumGzipBase64
-		*e = value
+		return EncodingEnumGzipBase64, nil
 	}
-	return nil
+	var t EncodingEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EncodingEnum) Ptr() *EncodingEnum {
+	return &e
 }
 
 type ErrorValidationProblem struct {
@@ -821,248 +1037,177 @@ type ErrorValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
-type EventTypeEnum uint
-
-const (
-	EventTypeEnumCreatedRemoteProductionApiKey EventTypeEnum = iota + 1
-	EventTypeEnumDeletedRemoteProductionApiKey
-	EventTypeEnumCreatedTestApiKey
-	EventTypeEnumDeletedTestApiKey
-	EventTypeEnumRegeneratedProductionApiKey
-	EventTypeEnumInvitedUser
-	EventTypeEnumTwoFactorAuthEnabled
-	EventTypeEnumTwoFactorAuthDisabled
-	EventTypeEnumDeletedLinkedAccount
-	EventTypeEnumCreatedDestination
-	EventTypeEnumDeletedDestination
-	EventTypeEnumChangedScopes
-	EventTypeEnumChangedPersonalInformation
-	EventTypeEnumChangedOrganizationSettings
-	EventTypeEnumEnabledIntegration
-	EventTypeEnumDisabledIntegration
-	EventTypeEnumEnabledCategory
-	EventTypeEnumDisabledCategory
-	EventTypeEnumChangedPassword
-	EventTypeEnumResetPassword
-	EventTypeEnumEnabledRedactUnmappedDataForOrganization
-	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumDisabledRedactUnmappedDataForOrganization
-	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumCreatedIntegrationWideFieldMapping
-	EventTypeEnumCreatedLinkedAccountFieldMapping
-	EventTypeEnumChangedIntegrationWideFieldMapping
-	EventTypeEnumChangedLinkedAccountFieldMapping
-	EventTypeEnumDeletedIntegrationWideFieldMapping
-	EventTypeEnumDeletedLinkedAccountFieldMapping
-)
-
-func (e EventTypeEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EventTypeEnumCreatedRemoteProductionApiKey:
-		return "CREATED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumDeletedRemoteProductionApiKey:
-		return "DELETED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumCreatedTestApiKey:
-		return "CREATED_TEST_API_KEY"
-	case EventTypeEnumDeletedTestApiKey:
-		return "DELETED_TEST_API_KEY"
-	case EventTypeEnumRegeneratedProductionApiKey:
-		return "REGENERATED_PRODUCTION_API_KEY"
-	case EventTypeEnumInvitedUser:
-		return "INVITED_USER"
-	case EventTypeEnumTwoFactorAuthEnabled:
-		return "TWO_FACTOR_AUTH_ENABLED"
-	case EventTypeEnumTwoFactorAuthDisabled:
-		return "TWO_FACTOR_AUTH_DISABLED"
-	case EventTypeEnumDeletedLinkedAccount:
-		return "DELETED_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedDestination:
-		return "CREATED_DESTINATION"
-	case EventTypeEnumDeletedDestination:
-		return "DELETED_DESTINATION"
-	case EventTypeEnumChangedScopes:
-		return "CHANGED_SCOPES"
-	case EventTypeEnumChangedPersonalInformation:
-		return "CHANGED_PERSONAL_INFORMATION"
-	case EventTypeEnumChangedOrganizationSettings:
-		return "CHANGED_ORGANIZATION_SETTINGS"
-	case EventTypeEnumEnabledIntegration:
-		return "ENABLED_INTEGRATION"
-	case EventTypeEnumDisabledIntegration:
-		return "DISABLED_INTEGRATION"
-	case EventTypeEnumEnabledCategory:
-		return "ENABLED_CATEGORY"
-	case EventTypeEnumDisabledCategory:
-		return "DISABLED_CATEGORY"
-	case EventTypeEnumChangedPassword:
-		return "CHANGED_PASSWORD"
-	case EventTypeEnumResetPassword:
-		return "RESET_PASSWORD"
-	case EventTypeEnumEnabledRedactUnmappedDataForOrganization:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumDisabledRedactUnmappedDataForOrganization:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedIntegrationWideFieldMapping:
-		return "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumCreatedLinkedAccountFieldMapping:
-		return "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumChangedIntegrationWideFieldMapping:
-		return "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumChangedLinkedAccountFieldMapping:
-		return "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumDeletedIntegrationWideFieldMapping:
-		return "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumDeletedLinkedAccountFieldMapping:
-		return "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
-	}
-}
-
-func (e EventTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (e *ErrorValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler ErrorValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "CREATED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumCreatedRemoteProductionApiKey
-		*e = value
-	case "DELETED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumDeletedRemoteProductionApiKey
-		*e = value
-	case "CREATED_TEST_API_KEY":
-		value := EventTypeEnumCreatedTestApiKey
-		*e = value
-	case "DELETED_TEST_API_KEY":
-		value := EventTypeEnumDeletedTestApiKey
-		*e = value
-	case "REGENERATED_PRODUCTION_API_KEY":
-		value := EventTypeEnumRegeneratedProductionApiKey
-		*e = value
-	case "INVITED_USER":
-		value := EventTypeEnumInvitedUser
-		*e = value
-	case "TWO_FACTOR_AUTH_ENABLED":
-		value := EventTypeEnumTwoFactorAuthEnabled
-		*e = value
-	case "TWO_FACTOR_AUTH_DISABLED":
-		value := EventTypeEnumTwoFactorAuthDisabled
-		*e = value
-	case "DELETED_LINKED_ACCOUNT":
-		value := EventTypeEnumDeletedLinkedAccount
-		*e = value
-	case "CREATED_DESTINATION":
-		value := EventTypeEnumCreatedDestination
-		*e = value
-	case "DELETED_DESTINATION":
-		value := EventTypeEnumDeletedDestination
-		*e = value
-	case "CHANGED_SCOPES":
-		value := EventTypeEnumChangedScopes
-		*e = value
-	case "CHANGED_PERSONAL_INFORMATION":
-		value := EventTypeEnumChangedPersonalInformation
-		*e = value
-	case "CHANGED_ORGANIZATION_SETTINGS":
-		value := EventTypeEnumChangedOrganizationSettings
-		*e = value
-	case "ENABLED_INTEGRATION":
-		value := EventTypeEnumEnabledIntegration
-		*e = value
-	case "DISABLED_INTEGRATION":
-		value := EventTypeEnumDisabledIntegration
-		*e = value
-	case "ENABLED_CATEGORY":
-		value := EventTypeEnumEnabledCategory
-		*e = value
-	case "DISABLED_CATEGORY":
-		value := EventTypeEnumDisabledCategory
-		*e = value
-	case "CHANGED_PASSWORD":
-		value := EventTypeEnumChangedPassword
-		*e = value
-	case "RESET_PASSWORD":
-		value := EventTypeEnumResetPassword
-		*e = value
-	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumEnabledRedactUnmappedDataForOrganization
-		*e = value
-	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-		*e = value
-	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumDisabledRedactUnmappedDataForOrganization
-		*e = value
-	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-		*e = value
-	case "CREATED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumCreatedIntegrationWideFieldMapping
-		*e = value
-	case "CREATED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumCreatedLinkedAccountFieldMapping
-		*e = value
-	case "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumChangedIntegrationWideFieldMapping
-		*e = value
-	case "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumChangedLinkedAccountFieldMapping
-		*e = value
-	case "DELETED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumDeletedIntegrationWideFieldMapping
-		*e = value
-	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumDeletedLinkedAccountFieldMapping
-		*e = value
-	}
+	*e = ErrorValidationProblem(value)
+	e._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (e *ErrorValidationProblem) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+type EventTypeEnum string
+
+const (
+	EventTypeEnumCreatedRemoteProductionApiKey              EventTypeEnum = "CREATED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumDeletedRemoteProductionApiKey              EventTypeEnum = "DELETED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumCreatedTestApiKey                          EventTypeEnum = "CREATED_TEST_API_KEY"
+	EventTypeEnumDeletedTestApiKey                          EventTypeEnum = "DELETED_TEST_API_KEY"
+	EventTypeEnumRegeneratedProductionApiKey                EventTypeEnum = "REGENERATED_PRODUCTION_API_KEY"
+	EventTypeEnumInvitedUser                                EventTypeEnum = "INVITED_USER"
+	EventTypeEnumTwoFactorAuthEnabled                       EventTypeEnum = "TWO_FACTOR_AUTH_ENABLED"
+	EventTypeEnumTwoFactorAuthDisabled                      EventTypeEnum = "TWO_FACTOR_AUTH_DISABLED"
+	EventTypeEnumDeletedLinkedAccount                       EventTypeEnum = "DELETED_LINKED_ACCOUNT"
+	EventTypeEnumCreatedDestination                         EventTypeEnum = "CREATED_DESTINATION"
+	EventTypeEnumDeletedDestination                         EventTypeEnum = "DELETED_DESTINATION"
+	EventTypeEnumChangedScopes                              EventTypeEnum = "CHANGED_SCOPES"
+	EventTypeEnumChangedPersonalInformation                 EventTypeEnum = "CHANGED_PERSONAL_INFORMATION"
+	EventTypeEnumChangedOrganizationSettings                EventTypeEnum = "CHANGED_ORGANIZATION_SETTINGS"
+	EventTypeEnumEnabledIntegration                         EventTypeEnum = "ENABLED_INTEGRATION"
+	EventTypeEnumDisabledIntegration                        EventTypeEnum = "DISABLED_INTEGRATION"
+	EventTypeEnumEnabledCategory                            EventTypeEnum = "ENABLED_CATEGORY"
+	EventTypeEnumDisabledCategory                           EventTypeEnum = "DISABLED_CATEGORY"
+	EventTypeEnumChangedPassword                            EventTypeEnum = "CHANGED_PASSWORD"
+	EventTypeEnumResetPassword                              EventTypeEnum = "RESET_PASSWORD"
+	EventTypeEnumEnabledRedactUnmappedDataForOrganization   EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount  EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumDisabledRedactUnmappedDataForOrganization  EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumCreatedIntegrationWideFieldMapping         EventTypeEnum = "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountFieldMapping           EventTypeEnum = "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumChangedIntegrationWideFieldMapping         EventTypeEnum = "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+)
+
+func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
+	switch s {
+	case "CREATED_REMOTE_PRODUCTION_API_KEY":
+		return EventTypeEnumCreatedRemoteProductionApiKey, nil
+	case "DELETED_REMOTE_PRODUCTION_API_KEY":
+		return EventTypeEnumDeletedRemoteProductionApiKey, nil
+	case "CREATED_TEST_API_KEY":
+		return EventTypeEnumCreatedTestApiKey, nil
+	case "DELETED_TEST_API_KEY":
+		return EventTypeEnumDeletedTestApiKey, nil
+	case "REGENERATED_PRODUCTION_API_KEY":
+		return EventTypeEnumRegeneratedProductionApiKey, nil
+	case "INVITED_USER":
+		return EventTypeEnumInvitedUser, nil
+	case "TWO_FACTOR_AUTH_ENABLED":
+		return EventTypeEnumTwoFactorAuthEnabled, nil
+	case "TWO_FACTOR_AUTH_DISABLED":
+		return EventTypeEnumTwoFactorAuthDisabled, nil
+	case "DELETED_LINKED_ACCOUNT":
+		return EventTypeEnumDeletedLinkedAccount, nil
+	case "CREATED_DESTINATION":
+		return EventTypeEnumCreatedDestination, nil
+	case "DELETED_DESTINATION":
+		return EventTypeEnumDeletedDestination, nil
+	case "CHANGED_SCOPES":
+		return EventTypeEnumChangedScopes, nil
+	case "CHANGED_PERSONAL_INFORMATION":
+		return EventTypeEnumChangedPersonalInformation, nil
+	case "CHANGED_ORGANIZATION_SETTINGS":
+		return EventTypeEnumChangedOrganizationSettings, nil
+	case "ENABLED_INTEGRATION":
+		return EventTypeEnumEnabledIntegration, nil
+	case "DISABLED_INTEGRATION":
+		return EventTypeEnumDisabledIntegration, nil
+	case "ENABLED_CATEGORY":
+		return EventTypeEnumEnabledCategory, nil
+	case "DISABLED_CATEGORY":
+		return EventTypeEnumDisabledCategory, nil
+	case "CHANGED_PASSWORD":
+		return EventTypeEnumChangedPassword, nil
+	case "RESET_PASSWORD":
+		return EventTypeEnumResetPassword, nil
+	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
+		return EventTypeEnumEnabledRedactUnmappedDataForOrganization, nil
+	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
+		return EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount, nil
+	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
+		return EventTypeEnumDisabledRedactUnmappedDataForOrganization, nil
+	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
+		return EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount, nil
+	case "CREATED_INTEGRATION_WIDE_FIELD_MAPPING":
+		return EventTypeEnumCreatedIntegrationWideFieldMapping, nil
+	case "CREATED_LINKED_ACCOUNT_FIELD_MAPPING":
+		return EventTypeEnumCreatedLinkedAccountFieldMapping, nil
+	case "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING":
+		return EventTypeEnumChangedIntegrationWideFieldMapping, nil
+	case "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING":
+		return EventTypeEnumChangedLinkedAccountFieldMapping, nil
+	case "DELETED_INTEGRATION_WIDE_FIELD_MAPPING":
+		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
+	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
+		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	}
+	var t EventTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EventTypeEnum) Ptr() *EventTypeEnum {
+	return &e
+}
+
 // # The File Object
+//
 // ### Description
+//
 // The `File` object is used to represent a file in the workspace. The Object typically exists under a folder or drive, if it exists.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/files` endpoint and view their files.
 type File struct {
 	Id *string `json:"id,omitempty"`
@@ -1094,9 +1239,34 @@ type File struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
-	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *File) UnmarshalJSON(data []byte) error {
+	type unmarshaler File
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = File(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *File) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
 }
 
 // The drive that the file belongs to.
@@ -1219,7 +1389,7 @@ func (f *FileFolder) Accept(visitor FileFolderVisitor) error {
 type FilePermissions struct {
 	typeName                string
 	String                  string
-	Unknown                 any
+	Unknown                 interface{}
 	FilePermissionsItemList []*FilePermissionsItem
 }
 
@@ -1227,7 +1397,7 @@ func NewFilePermissionsFromString(value string) *FilePermissions {
 	return &FilePermissions{typeName: "string", String: value}
 }
 
-func NewFilePermissionsFromUnknown(value any) *FilePermissions {
+func NewFilePermissionsFromUnknown(value interface{}) *FilePermissions {
 	return &FilePermissions{typeName: "unknown", Unknown: value}
 }
 
@@ -1242,7 +1412,7 @@ func (f *FilePermissions) UnmarshalJSON(data []byte) error {
 		f.String = valueString
 		return nil
 	}
-	var valueUnknown any
+	var valueUnknown interface{}
 	if err := json.Unmarshal(data, &valueUnknown); err == nil {
 		f.typeName = "unknown"
 		f.Unknown = valueUnknown
@@ -1272,7 +1442,7 @@ func (f FilePermissions) MarshalJSON() ([]byte, error) {
 
 type FilePermissionsVisitor interface {
 	VisitString(string) error
-	VisitUnknown(any) error
+	VisitUnknown(interface{}) error
 	VisitFilePermissionsItemList([]*FilePermissionsItem) error
 }
 
@@ -1347,9 +1517,13 @@ func (f *FilePermissionsItem) Accept(visitor FilePermissionsItemVisitor) error {
 }
 
 // # The File Object
+//
 // ### Description
+//
 // The `File` object is used to represent a file in the workspace. The Object typically exists under a folder or drive, if it exists.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/files` endpoint and view their files.
 type FileRequest struct {
 	// The file's name.
@@ -1369,9 +1543,34 @@ type FileRequest struct {
 	// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /files`.
 	Permissions *FileRequestPermissions `json:"permissions,omitempty"`
 	// The drive that the file belongs to.
-	Drive               *FileRequestDrive `json:"drive,omitempty"`
-	IntegrationParams   map[string]any    `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any    `json:"linked_account_params,omitempty"`
+	Drive               *FileRequestDrive      `json:"drive,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FileRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler FileRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FileRequest(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FileRequest) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
 }
 
 // The drive that the file belongs to.
@@ -1494,7 +1693,7 @@ func (f *FileRequestFolder) Accept(visitor FileRequestFolderVisitor) error {
 type FileRequestPermissions struct {
 	typeName                       string
 	String                         string
-	Unknown                        any
+	Unknown                        interface{}
 	FileRequestPermissionsItemList []*FileRequestPermissionsItem
 }
 
@@ -1502,7 +1701,7 @@ func NewFileRequestPermissionsFromString(value string) *FileRequestPermissions {
 	return &FileRequestPermissions{typeName: "string", String: value}
 }
 
-func NewFileRequestPermissionsFromUnknown(value any) *FileRequestPermissions {
+func NewFileRequestPermissionsFromUnknown(value interface{}) *FileRequestPermissions {
 	return &FileRequestPermissions{typeName: "unknown", Unknown: value}
 }
 
@@ -1517,7 +1716,7 @@ func (f *FileRequestPermissions) UnmarshalJSON(data []byte) error {
 		f.String = valueString
 		return nil
 	}
-	var valueUnknown any
+	var valueUnknown interface{}
 	if err := json.Unmarshal(data, &valueUnknown); err == nil {
 		f.typeName = "unknown"
 		f.Unknown = valueUnknown
@@ -1547,7 +1746,7 @@ func (f FileRequestPermissions) MarshalJSON() ([]byte, error) {
 
 type FileRequestPermissionsVisitor interface {
 	VisitString(string) error
-	VisitUnknown(any) error
+	VisitUnknown(interface{}) error
 	VisitFileRequestPermissionsItemList([]*FileRequestPermissionsItem) error
 }
 
@@ -1626,6 +1825,31 @@ type FileStorageFileResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FileStorageFileResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler FileStorageFileResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FileStorageFileResponse(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FileStorageFileResponse) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
 }
 
 type FileStorageFolderResponse struct {
@@ -1633,148 +1857,41 @@ type FileStorageFolderResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type FilesListRequestExpand uint
-
-const (
-	FilesListRequestExpandDrive FilesListRequestExpand = iota + 1
-	FilesListRequestExpandFolder
-	FilesListRequestExpandFolderDrive
-	FilesListRequestExpandPermissions
-	FilesListRequestExpandPermissionsDrive
-	FilesListRequestExpandPermissionsFolder
-	FilesListRequestExpandPermissionsFolderDrive
-)
-
-func (f FilesListRequestExpand) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FilesListRequestExpandDrive:
-		return "drive"
-	case FilesListRequestExpandFolder:
-		return "folder"
-	case FilesListRequestExpandFolderDrive:
-		return "folder,drive"
-	case FilesListRequestExpandPermissions:
-		return "permissions"
-	case FilesListRequestExpandPermissionsDrive:
-		return "permissions,drive"
-	case FilesListRequestExpandPermissionsFolder:
-		return "permissions,folder"
-	case FilesListRequestExpandPermissionsFolderDrive:
-		return "permissions,folder,drive"
-	}
-}
-
-func (f FilesListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FilesListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (f *FileStorageFolderResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler FileStorageFolderResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "drive":
-		value := FilesListRequestExpandDrive
-		*f = value
-	case "folder":
-		value := FilesListRequestExpandFolder
-		*f = value
-	case "folder,drive":
-		value := FilesListRequestExpandFolderDrive
-		*f = value
-	case "permissions":
-		value := FilesListRequestExpandPermissions
-		*f = value
-	case "permissions,drive":
-		value := FilesListRequestExpandPermissionsDrive
-		*f = value
-	case "permissions,folder":
-		value := FilesListRequestExpandPermissionsFolder
-		*f = value
-	case "permissions,folder,drive":
-		value := FilesListRequestExpandPermissionsFolderDrive
-		*f = value
-	}
+	*f = FileStorageFolderResponse(value)
+	f._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-type FilesRetrieveRequestExpand uint
-
-const (
-	FilesRetrieveRequestExpandDrive FilesRetrieveRequestExpand = iota + 1
-	FilesRetrieveRequestExpandFolder
-	FilesRetrieveRequestExpandFolderDrive
-	FilesRetrieveRequestExpandPermissions
-	FilesRetrieveRequestExpandPermissionsDrive
-	FilesRetrieveRequestExpandPermissionsFolder
-	FilesRetrieveRequestExpandPermissionsFolderDrive
-)
-
-func (f FilesRetrieveRequestExpand) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FilesRetrieveRequestExpandDrive:
-		return "drive"
-	case FilesRetrieveRequestExpandFolder:
-		return "folder"
-	case FilesRetrieveRequestExpandFolderDrive:
-		return "folder,drive"
-	case FilesRetrieveRequestExpandPermissions:
-		return "permissions"
-	case FilesRetrieveRequestExpandPermissionsDrive:
-		return "permissions,drive"
-	case FilesRetrieveRequestExpandPermissionsFolder:
-		return "permissions,folder"
-	case FilesRetrieveRequestExpandPermissionsFolderDrive:
-		return "permissions,folder,drive"
+func (f *FileStorageFolderResponse) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
 	}
-}
-
-func (f FilesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FilesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
 	}
-	switch raw {
-	case "drive":
-		value := FilesRetrieveRequestExpandDrive
-		*f = value
-	case "folder":
-		value := FilesRetrieveRequestExpandFolder
-		*f = value
-	case "folder,drive":
-		value := FilesRetrieveRequestExpandFolderDrive
-		*f = value
-	case "permissions":
-		value := FilesRetrieveRequestExpandPermissions
-		*f = value
-	case "permissions,drive":
-		value := FilesRetrieveRequestExpandPermissionsDrive
-		*f = value
-	case "permissions,folder":
-		value := FilesRetrieveRequestExpandPermissionsFolder
-		*f = value
-	case "permissions,folder,drive":
-		value := FilesRetrieveRequestExpandPermissionsFolderDrive
-		*f = value
-	}
-	return nil
+	return fmt.Sprintf("%#v", f)
 }
 
 // # The Folder Object
+//
 // ### Description
+//
 // The `Folder` object is used to represent a collection of files and/or folders in the workspace. Could be within a drive, if it exists.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/folders` endpoint and view their folders.
 type Folder struct {
 	Id *string `json:"id,omitempty"`
@@ -1802,9 +1919,34 @@ type Folder struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
-	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *Folder) UnmarshalJSON(data []byte) error {
+	type unmarshaler Folder
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = Folder(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *Folder) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
 }
 
 // The drive that the folder belongs to.
@@ -1927,7 +2069,7 @@ func (f *FolderParentFolder) Accept(visitor FolderParentFolderVisitor) error {
 type FolderPermissions struct {
 	typeName                  string
 	String                    string
-	Unknown                   any
+	Unknown                   interface{}
 	FolderPermissionsItemList []*FolderPermissionsItem
 }
 
@@ -1935,7 +2077,7 @@ func NewFolderPermissionsFromString(value string) *FolderPermissions {
 	return &FolderPermissions{typeName: "string", String: value}
 }
 
-func NewFolderPermissionsFromUnknown(value any) *FolderPermissions {
+func NewFolderPermissionsFromUnknown(value interface{}) *FolderPermissions {
 	return &FolderPermissions{typeName: "unknown", Unknown: value}
 }
 
@@ -1950,7 +2092,7 @@ func (f *FolderPermissions) UnmarshalJSON(data []byte) error {
 		f.String = valueString
 		return nil
 	}
-	var valueUnknown any
+	var valueUnknown interface{}
 	if err := json.Unmarshal(data, &valueUnknown); err == nil {
 		f.typeName = "unknown"
 		f.Unknown = valueUnknown
@@ -1980,7 +2122,7 @@ func (f FolderPermissions) MarshalJSON() ([]byte, error) {
 
 type FolderPermissionsVisitor interface {
 	VisitString(string) error
-	VisitUnknown(any) error
+	VisitUnknown(interface{}) error
 	VisitFolderPermissionsItemList([]*FolderPermissionsItem) error
 }
 
@@ -2055,9 +2197,13 @@ func (f *FolderPermissionsItem) Accept(visitor FolderPermissionsItemVisitor) err
 }
 
 // # The Folder Object
+//
 // ### Description
+//
 // The `Folder` object is used to represent a collection of files and/or folders in the workspace. Could be within a drive, if it exists.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/folders` endpoint and view their folders.
 type FolderRequest struct {
 	// The folder's name.
@@ -2074,8 +2220,33 @@ type FolderRequest struct {
 	Drive *FolderRequestDrive `json:"drive,omitempty"`
 	// The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details under `GET /folders`.
 	Permissions         *FolderRequestPermissions `json:"permissions,omitempty"`
-	IntegrationParams   map[string]any            `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any            `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}    `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}    `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FolderRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler FolderRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FolderRequest(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FolderRequest) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
 }
 
 // The drive that the folder belongs to.
@@ -2198,7 +2369,7 @@ func (f *FolderRequestParentFolder) Accept(visitor FolderRequestParentFolderVisi
 type FolderRequestPermissions struct {
 	typeName                         string
 	String                           string
-	Unknown                          any
+	Unknown                          interface{}
 	FolderRequestPermissionsItemList []*FolderRequestPermissionsItem
 }
 
@@ -2206,7 +2377,7 @@ func NewFolderRequestPermissionsFromString(value string) *FolderRequestPermissio
 	return &FolderRequestPermissions{typeName: "string", String: value}
 }
 
-func NewFolderRequestPermissionsFromUnknown(value any) *FolderRequestPermissions {
+func NewFolderRequestPermissionsFromUnknown(value interface{}) *FolderRequestPermissions {
 	return &FolderRequestPermissions{typeName: "unknown", Unknown: value}
 }
 
@@ -2221,7 +2392,7 @@ func (f *FolderRequestPermissions) UnmarshalJSON(data []byte) error {
 		f.String = valueString
 		return nil
 	}
-	var valueUnknown any
+	var valueUnknown interface{}
 	if err := json.Unmarshal(data, &valueUnknown); err == nil {
 		f.typeName = "unknown"
 		f.Unknown = valueUnknown
@@ -2251,7 +2422,7 @@ func (f FolderRequestPermissions) MarshalJSON() ([]byte, error) {
 
 type FolderRequestPermissionsVisitor interface {
 	VisitString(string) error
-	VisitUnknown(any) error
+	VisitUnknown(interface{}) error
 	VisitFolderRequestPermissionsItemList([]*FolderRequestPermissionsItem) error
 }
 
@@ -2325,146 +2496,14 @@ func (f *FolderRequestPermissionsItem) Accept(visitor FolderRequestPermissionsIt
 	}
 }
 
-type FoldersListRequestExpand uint
-
-const (
-	FoldersListRequestExpandDrive FoldersListRequestExpand = iota + 1
-	FoldersListRequestExpandParentFolder
-	FoldersListRequestExpandParentFolderDrive
-	FoldersListRequestExpandPermissions
-	FoldersListRequestExpandPermissionsDrive
-	FoldersListRequestExpandPermissionsParentFolder
-	FoldersListRequestExpandPermissionsParentFolderDrive
-)
-
-func (f FoldersListRequestExpand) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FoldersListRequestExpandDrive:
-		return "drive"
-	case FoldersListRequestExpandParentFolder:
-		return "parent_folder"
-	case FoldersListRequestExpandParentFolderDrive:
-		return "parent_folder,drive"
-	case FoldersListRequestExpandPermissions:
-		return "permissions"
-	case FoldersListRequestExpandPermissionsDrive:
-		return "permissions,drive"
-	case FoldersListRequestExpandPermissionsParentFolder:
-		return "permissions,parent_folder"
-	case FoldersListRequestExpandPermissionsParentFolderDrive:
-		return "permissions,parent_folder,drive"
-	}
-}
-
-func (f FoldersListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FoldersListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "drive":
-		value := FoldersListRequestExpandDrive
-		*f = value
-	case "parent_folder":
-		value := FoldersListRequestExpandParentFolder
-		*f = value
-	case "parent_folder,drive":
-		value := FoldersListRequestExpandParentFolderDrive
-		*f = value
-	case "permissions":
-		value := FoldersListRequestExpandPermissions
-		*f = value
-	case "permissions,drive":
-		value := FoldersListRequestExpandPermissionsDrive
-		*f = value
-	case "permissions,parent_folder":
-		value := FoldersListRequestExpandPermissionsParentFolder
-		*f = value
-	case "permissions,parent_folder,drive":
-		value := FoldersListRequestExpandPermissionsParentFolderDrive
-		*f = value
-	}
-	return nil
-}
-
-type FoldersRetrieveRequestExpand uint
-
-const (
-	FoldersRetrieveRequestExpandDrive FoldersRetrieveRequestExpand = iota + 1
-	FoldersRetrieveRequestExpandParentFolder
-	FoldersRetrieveRequestExpandParentFolderDrive
-	FoldersRetrieveRequestExpandPermissions
-	FoldersRetrieveRequestExpandPermissionsDrive
-	FoldersRetrieveRequestExpandPermissionsParentFolder
-	FoldersRetrieveRequestExpandPermissionsParentFolderDrive
-)
-
-func (f FoldersRetrieveRequestExpand) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FoldersRetrieveRequestExpandDrive:
-		return "drive"
-	case FoldersRetrieveRequestExpandParentFolder:
-		return "parent_folder"
-	case FoldersRetrieveRequestExpandParentFolderDrive:
-		return "parent_folder,drive"
-	case FoldersRetrieveRequestExpandPermissions:
-		return "permissions"
-	case FoldersRetrieveRequestExpandPermissionsDrive:
-		return "permissions,drive"
-	case FoldersRetrieveRequestExpandPermissionsParentFolder:
-		return "permissions,parent_folder"
-	case FoldersRetrieveRequestExpandPermissionsParentFolderDrive:
-		return "permissions,parent_folder,drive"
-	}
-}
-
-func (f FoldersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FoldersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "drive":
-		value := FoldersRetrieveRequestExpandDrive
-		*f = value
-	case "parent_folder":
-		value := FoldersRetrieveRequestExpandParentFolder
-		*f = value
-	case "parent_folder,drive":
-		value := FoldersRetrieveRequestExpandParentFolderDrive
-		*f = value
-	case "permissions":
-		value := FoldersRetrieveRequestExpandPermissions
-		*f = value
-	case "permissions,drive":
-		value := FoldersRetrieveRequestExpandPermissionsDrive
-		*f = value
-	case "permissions,parent_folder":
-		value := FoldersRetrieveRequestExpandPermissionsParentFolder
-		*f = value
-	case "permissions,parent_folder,drive":
-		value := FoldersRetrieveRequestExpandPermissionsParentFolderDrive
-		*f = value
-	}
-	return nil
-}
-
 // # The Group Object
+//
 // ### Description
+//
 // The `Group` object is used to represent any subset of `User`s. This can extend to company domains as well.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/groups` endpoint and view their groups.
 type Group struct {
 	Id *string `json:"id,omitempty"`
@@ -2478,30 +2517,80 @@ type Group struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
-	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (g *Group) UnmarshalJSON(data []byte) error {
+	type unmarshaler Group
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = Group(value)
+	g._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *Group) String() string {
+	if len(g._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(g._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
-	Status            *IssueStatus   `json:"status,omitempty"`
-	ErrorDescription  string         `json:"error_description"`
-	EndUser           map[string]any `json:"end_user,omitempty"`
-	FirstIncidentTime *time.Time     `json:"first_incident_time,omitempty"`
-	LastIncidentTime  *time.Time     `json:"last_incident_time,omitempty"`
-	IsMuted           *bool          `json:"is_muted,omitempty"`
-	ErrorDetails      []string       `json:"error_details,omitempty"`
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
+	Status            *IssueStatus           `json:"status,omitempty"`
+	ErrorDescription  string                 `json:"error_description"`
+	EndUser           map[string]interface{} `json:"end_user,omitempty"`
+	FirstIncidentTime *time.Time             `json:"first_incident_time,omitempty"`
+	LastIncidentTime  *time.Time             `json:"last_incident_time,omitempty"`
+	IsMuted           *bool                  `json:"is_muted,omitempty"`
+	ErrorDetails      []string               `json:"error_details,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *Issue) UnmarshalJSON(data []byte) error {
+	type unmarshaler Issue
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = Issue(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *Issue) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -2559,88 +2648,59 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
-type IssueStatusEnum uint
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
+type IssueStatusEnum string
 
 const (
-	IssueStatusEnumOngoing IssueStatusEnum = iota + 1
-	IssueStatusEnumResolved
+	IssueStatusEnumOngoing  IssueStatusEnum = "ONGOING"
+	IssueStatusEnumResolved IssueStatusEnum = "RESOLVED"
 )
 
-func (i IssueStatusEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssueStatusEnumOngoing:
-		return "ONGOING"
-	case IssueStatusEnumResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssueStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewIssueStatusEnumFromString(s string) (IssueStatusEnum, error) {
+	switch s {
 	case "ONGOING":
-		value := IssueStatusEnumOngoing
-		*i = value
+		return IssueStatusEnumOngoing, nil
 	case "RESOLVED":
-		value := IssueStatusEnumResolved
-		*i = value
+		return IssueStatusEnumResolved, nil
 	}
-	return nil
+	var t IssueStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type IssuesListRequestStatus uint
-
-const (
-	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
-	IssuesListRequestStatusResolved
-)
-
-func (i IssuesListRequestStatus) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssuesListRequestStatusOngoing:
-		return "ONGOING"
-	case IssuesListRequestStatusResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ONGOING":
-		value := IssuesListRequestStatusOngoing
-		*i = value
-	case "RESOLVED":
-		value := IssuesListRequestStatusResolved
-		*i = value
-	}
-	return nil
+func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
+	return &i
 }
 
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
 	MagicLinkUrl    *string `json:"magic_link_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkToken(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkToken) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountCondition struct {
@@ -2648,207 +2708,289 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    *any   `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountCondition) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountCondition
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountCondition(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountCondition) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountConditionRequest struct {
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    any    `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountConditionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountConditionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountConditionRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountConditionRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfiguration struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountCondition `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfiguration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfiguration(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfigurationRequest struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountConditionRequest `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfigurationRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfigurationRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountStatus struct {
 	LinkedAccountStatus string `json:"linked_account_status"`
 	CanMakeRequest      bool   `json:"can_make_request"`
+
+	_rawJSON json.RawMessage
 }
 
-type LinkedAccountsListRequestCategory uint
-
-const (
-	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
-	LinkedAccountsListRequestCategoryAts
-	LinkedAccountsListRequestCategoryCrm
-	LinkedAccountsListRequestCategoryFilestorage
-	LinkedAccountsListRequestCategoryHris
-	LinkedAccountsListRequestCategoryMktg
-	LinkedAccountsListRequestCategoryTicketing
-)
-
-func (l LinkedAccountsListRequestCategory) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LinkedAccountsListRequestCategoryAccounting:
-		return "accounting"
-	case LinkedAccountsListRequestCategoryAts:
-		return "ats"
-	case LinkedAccountsListRequestCategoryCrm:
-		return "crm"
-	case LinkedAccountsListRequestCategoryFilestorage:
-		return "filestorage"
-	case LinkedAccountsListRequestCategoryHris:
-		return "hris"
-	case LinkedAccountsListRequestCategoryMktg:
-		return "mktg"
-	case LinkedAccountsListRequestCategoryTicketing:
-		return "ticketing"
-	}
-}
-
-func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (l *LinkedAccountStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "accounting":
-		value := LinkedAccountsListRequestCategoryAccounting
-		*l = value
-	case "ats":
-		value := LinkedAccountsListRequestCategoryAts
-		*l = value
-	case "crm":
-		value := LinkedAccountsListRequestCategoryCrm
-		*l = value
-	case "filestorage":
-		value := LinkedAccountsListRequestCategoryFilestorage
-		*l = value
-	case "hris":
-		value := LinkedAccountsListRequestCategoryHris
-		*l = value
-	case "mktg":
-		value := LinkedAccountsListRequestCategoryMktg
-		*l = value
-	case "ticketing":
-		value := LinkedAccountsListRequestCategoryTicketing
-		*l = value
-	}
+	*l = LinkedAccountStatus(value)
+	l._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (l *LinkedAccountStatus) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type MetaResponse struct {
-	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
-	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
-	Status                         *LinkedAccountStatus `json:"status,omitempty"`
-	HasConditionalParams           bool                 `json:"has_conditional_params"`
-	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
+	RequestSchema                  map[string]interface{} `json:"request_schema,omitempty"`
+	RemoteFieldClasses             map[string]interface{} `json:"remote_field_classes,omitempty"`
+	Status                         *LinkedAccountStatus   `json:"status,omitempty"`
+	HasConditionalParams           bool                   `json:"has_conditional_params"`
+	HasRequiredLinkedAccountParams bool                   `json:"has_required_linked_account_params"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `GET` - GET
-// * `OPTIONS` - OPTIONS
-// * `HEAD` - HEAD
-// * `POST` - POST
-// * `PUT` - PUT
-// * `PATCH` - PATCH
-// * `DELETE` - DELETE
-type MethodEnum uint
-
-const (
-	MethodEnumGet MethodEnum = iota + 1
-	MethodEnumOptions
-	MethodEnumHead
-	MethodEnumPost
-	MethodEnumPut
-	MethodEnumPatch
-	MethodEnumDelete
-)
-
-func (m MethodEnum) String() string {
-	switch m {
-	default:
-		return strconv.Itoa(int(m))
-	case MethodEnumGet:
-		return "GET"
-	case MethodEnumOptions:
-		return "OPTIONS"
-	case MethodEnumHead:
-		return "HEAD"
-	case MethodEnumPost:
-		return "POST"
-	case MethodEnumPut:
-		return "PUT"
-	case MethodEnumPatch:
-		return "PATCH"
-	case MethodEnumDelete:
-		return "DELETE"
-	}
-}
-
-func (m MethodEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", m.String())), nil
-}
-
-func (m *MethodEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (m *MetaResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler MetaResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "GET":
-		value := MethodEnumGet
-		*m = value
-	case "OPTIONS":
-		value := MethodEnumOptions
-		*m = value
-	case "HEAD":
-		value := MethodEnumHead
-		*m = value
-	case "POST":
-		value := MethodEnumPost
-		*m = value
-	case "PUT":
-		value := MethodEnumPut
-		*m = value
-	case "PATCH":
-		value := MethodEnumPatch
-		*m = value
-	case "DELETE":
-		value := MethodEnumDelete
-		*m = value
-	}
+	*m = MetaResponse(value)
+	m._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (m *MetaResponse) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
+}
+
+// - `GET` - GET
+// - `OPTIONS` - OPTIONS
+// - `HEAD` - HEAD
+// - `POST` - POST
+// - `PUT` - PUT
+// - `PATCH` - PATCH
+// - `DELETE` - DELETE
+type MethodEnum string
+
+const (
+	MethodEnumGet     MethodEnum = "GET"
+	MethodEnumOptions MethodEnum = "OPTIONS"
+	MethodEnumHead    MethodEnum = "HEAD"
+	MethodEnumPost    MethodEnum = "POST"
+	MethodEnumPut     MethodEnum = "PUT"
+	MethodEnumPatch   MethodEnum = "PATCH"
+	MethodEnumDelete  MethodEnum = "DELETE"
+)
+
+func NewMethodEnumFromString(s string) (MethodEnum, error) {
+	switch s {
+	case "GET":
+		return MethodEnumGet, nil
+	case "OPTIONS":
+		return MethodEnumOptions, nil
+	case "HEAD":
+		return MethodEnumHead, nil
+	case "POST":
+		return MethodEnumPost, nil
+	case "PUT":
+		return MethodEnumPut, nil
+	case "PATCH":
+		return MethodEnumPatch, nil
+	case "DELETE":
+		return MethodEnumDelete, nil
+	}
+	var t MethodEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (m MethodEnum) Ptr() *MethodEnum {
+	return &m
+}
+
 // # The ModelOperation Object
+//
 // ### Description
+//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
+//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
 	AvailableOperations    []string `json:"available_operations,omitempty"`
 	RequiredPostParameters []string `json:"required_post_parameters,omitempty"`
 	SupportedFields        []string `json:"supported_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *ModelOperation) UnmarshalJSON(data []byte) error {
+	type unmarshaler ModelOperation
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = ModelOperation(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *ModelOperation) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // # The MultipartFormField Object
+//
 // ### Description
+//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
+//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -2857,21 +2999,46 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// * `RAW` - RAW
-	// * `BASE64` - BASE64
-	// * `GZIP_BASE64` - GZIP_BASE64
+	// - `RAW` - RAW
+	// - `BASE64` - BASE64
+	// - `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
 	// The MIME type of the file, if the field is for a file.
 	ContentType *string `json:"content_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *MultipartFormFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler MultipartFormFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = MultipartFormFieldRequest(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *MultipartFormFieldRequest) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -2934,73 +3101,351 @@ type OperatorSchema struct {
 	Operator *string `json:"operator,omitempty"`
 	// Whether the operator can be repeated multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *OperatorSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler OperatorSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = OperatorSchema(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *OperatorSchema) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 type PaginatedAccountDetailsAndActionsList struct {
 	Next     *string                     `json:"next,omitempty"`
 	Previous *string                     `json:"previous,omitempty"`
 	Results  []*AccountDetailsAndActions `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAccountDetailsAndActionsList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAccountDetailsAndActionsList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAuditLogEventList struct {
 	Next     *string          `json:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty"`
 	Results  []*AuditLogEvent `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAuditLogEventList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAuditLogEventList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAuditLogEventList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAuditLogEventList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedConditionSchemaList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
 	Results  []*ConditionSchema `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedConditionSchemaList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedConditionSchemaList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedConditionSchemaList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedConditionSchemaList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedDriveList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Drive `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedDriveList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedDriveList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedDriveList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedDriveList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedFileList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*File `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedFileList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedFileList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedFileList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedFileList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedFolderList struct {
 	Next     *string   `json:"next,omitempty"`
 	Previous *string   `json:"previous,omitempty"`
 	Results  []*Folder `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedFolderList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedFolderList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedFolderList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedFolderList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedGroupList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Group `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedGroupList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedGroupList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedGroupList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedGroupList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedIssueList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Issue `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedIssueList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedIssueList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedIssueList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedIssueList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedSyncStatusList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*SyncStatus `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedSyncStatusList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedSyncStatusList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedSyncStatusList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedSyncStatusList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedUserList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*User `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedUserList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedUserList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedUserList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedUserList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // # The Permission Object
+//
 // ### Description
+//
 // The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default.
 //
 // ### Usage Example
+//
 // Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
 type Permission struct {
 	Id *string `json:"id,omitempty"`
@@ -3012,16 +3457,41 @@ type Permission struct {
 	Group *PermissionGroup `json:"group,omitempty"`
 	// Denotes what type of people have access to the file.
 	//
-	// * `USER` - USER
-	// * `GROUP` - GROUP
-	// * `COMPANY` - COMPANY
-	// * `ANYONE` - ANYONE
+	// - `USER` - USER
+	// - `GROUP` - GROUP
+	// - `COMPANY` - COMPANY
+	// - `ANYONE` - ANYONE
 	Type *PermissionType `json:"type,omitempty"`
 	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
 	Roles     []*PermissionRolesItem `json:"roles,omitempty"`
 	CreatedAt *time.Time             `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *Permission) UnmarshalJSON(data []byte) error {
+	type unmarshaler Permission
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = Permission(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *Permission) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The group that is granted this permission.
@@ -3083,10 +3553,13 @@ func (p *PermissionGroup) Accept(visitor PermissionGroupVisitor) error {
 }
 
 // # The Permission Object
+//
 // ### Description
+//
 // The Permission object is used to represent a user's or group's access to a File or Folder. Permissions are unexpanded by default.
 //
 // ### Usage Example
+//
 // Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
 type PermissionRequest struct {
 	// The third-party API ID of the matching object.
@@ -3097,15 +3570,40 @@ type PermissionRequest struct {
 	Group *PermissionRequestGroup `json:"group,omitempty"`
 	// Denotes what type of people have access to the file.
 	//
-	// * `USER` - USER
-	// * `GROUP` - GROUP
-	// * `COMPANY` - COMPANY
-	// * `ANYONE` - ANYONE
+	// - `USER` - USER
+	// - `GROUP` - GROUP
+	// - `COMPANY` - COMPANY
+	// - `ANYONE` - ANYONE
 	Type *PermissionRequestType `json:"type,omitempty"`
 	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
 	Roles               []*PermissionRequestRolesItem `json:"roles,omitempty"`
-	IntegrationParams   map[string]any                `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any                `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}        `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}        `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PermissionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PermissionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PermissionRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PermissionRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The group that is granted this permission.
@@ -3168,9 +3666,9 @@ func (p *PermissionRequestGroup) Accept(visitor PermissionRequestGroupVisitor) e
 
 // The permissions that the user or group has for the File or Folder.
 //
-// * `READ` - READ
-// * `WRITE` - WRITE
-// * `OWNER` - OWNER
+// - `READ` - READ
+// - `WRITE` - WRITE
+// - `OWNER` - OWNER
 type PermissionRequestRolesItem struct {
 	typeName  string
 	RolesEnum RolesEnum
@@ -3230,10 +3728,10 @@ func (p *PermissionRequestRolesItem) Accept(visitor PermissionRequestRolesItemVi
 
 // Denotes what type of people have access to the file.
 //
-// * `USER` - USER
-// * `GROUP` - GROUP
-// * `COMPANY` - COMPANY
-// * `ANYONE` - ANYONE
+// - `USER` - USER
+// - `GROUP` - GROUP
+// - `COMPANY` - COMPANY
+// - `ANYONE` - ANYONE
 type PermissionRequestType struct {
 	typeName string
 	TypeEnum TypeEnum
@@ -3351,9 +3849,9 @@ func (p *PermissionRequestUser) Accept(visitor PermissionRequestUserVisitor) err
 
 // The permissions that the user or group has for the File or Folder.
 //
-// * `READ` - READ
-// * `WRITE` - WRITE
-// * `OWNER` - OWNER
+// - `READ` - READ
+// - `WRITE` - WRITE
+// - `OWNER` - OWNER
 type PermissionRolesItem struct {
 	typeName  string
 	RolesEnum RolesEnum
@@ -3413,10 +3911,10 @@ func (p *PermissionRolesItem) Accept(visitor PermissionRolesItemVisitor) error {
 
 // Denotes what type of people have access to the file.
 //
-// * `USER` - USER
-// * `GROUP` - GROUP
-// * `COMPANY` - COMPANY
-// * `ANYONE` - ANYONE
+// - `USER` - USER
+// - `GROUP` - GROUP
+// - `COMPANY` - COMPANY
+// - `ANYONE` - ANYONE
 type PermissionType struct {
 	typeName string
 	TypeEnum TypeEnum
@@ -3533,279 +4031,240 @@ func (p *PermissionUser) Accept(visitor PermissionUserVisitor) error {
 }
 
 // # The RemoteKey Object
+//
 // ### Description
+//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
+//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
 	Key  string `json:"key"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteKey) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteKey
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteKey(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteKey) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 // # The RemoteResponse Object
+//
 // ### Description
+//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
+//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
-	Method          string            `json:"method"`
-	Path            string            `json:"path"`
-	Status          int               `json:"status"`
-	Response        any               `json:"response,omitempty"`
-	ResponseHeaders map[string]any    `json:"response_headers,omitempty"`
-	ResponseType    *ResponseTypeEnum `json:"response_type,omitempty"`
-	Headers         map[string]any    `json:"headers,omitempty"`
+	Method          string                 `json:"method"`
+	Path            string                 `json:"path"`
+	Status          int                    `json:"status"`
+	Response        interface{}            `json:"response,omitempty"`
+	ResponseHeaders map[string]interface{} `json:"response_headers,omitempty"`
+	ResponseType    *ResponseTypeEnum      `json:"response_type,omitempty"`
+	Headers         map[string]interface{} `json:"headers,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `JSON` - JSON
-// * `XML` - XML
-// * `MULTIPART` - MULTIPART
-type RequestFormatEnum uint
-
-const (
-	RequestFormatEnumJson RequestFormatEnum = iota + 1
-	RequestFormatEnumXml
-	RequestFormatEnumMultipart
-)
-
-func (r RequestFormatEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RequestFormatEnumJson:
-		return "JSON"
-	case RequestFormatEnumXml:
-		return "XML"
-	case RequestFormatEnumMultipart:
-		return "MULTIPART"
-	}
-}
-
-func (r RequestFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (r *RemoteResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "JSON":
-		value := RequestFormatEnumJson
-		*r = value
-	case "XML":
-		value := RequestFormatEnumXml
-		*r = value
-	case "MULTIPART":
-		value := RequestFormatEnumMultipart
-		*r = value
-	}
+	*r = RemoteResponse(value)
+	r._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-// * `JSON` - JSON
-// * `BASE64_GZIP` - BASE64_GZIP
-type ResponseTypeEnum uint
+func (r *RemoteResponse) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+// - `JSON` - JSON
+// - `XML` - XML
+// - `MULTIPART` - MULTIPART
+type RequestFormatEnum string
 
 const (
-	ResponseTypeEnumJson ResponseTypeEnum = iota + 1
-	ResponseTypeEnumBase64Gzip
+	RequestFormatEnumJson      RequestFormatEnum = "JSON"
+	RequestFormatEnumXml       RequestFormatEnum = "XML"
+	RequestFormatEnumMultipart RequestFormatEnum = "MULTIPART"
 )
 
-func (r ResponseTypeEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case ResponseTypeEnumJson:
-		return "JSON"
-	case ResponseTypeEnumBase64Gzip:
-		return "BASE64_GZIP"
-	}
-}
-
-func (r ResponseTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "JSON":
-		value := ResponseTypeEnumJson
-		*r = value
-	case "BASE64_GZIP":
-		value := ResponseTypeEnumBase64Gzip
-		*r = value
-	}
-	return nil
-}
-
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
-type RoleEnum uint
-
-const (
-	RoleEnumAdmin RoleEnum = iota + 1
-	RoleEnumDeveloper
-	RoleEnumMember
-	RoleEnumApi
-	RoleEnumSystem
-	RoleEnumMergeTeam
-)
-
-func (r RoleEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RoleEnumAdmin:
-		return "ADMIN"
-	case RoleEnumDeveloper:
-		return "DEVELOPER"
-	case RoleEnumMember:
-		return "MEMBER"
-	case RoleEnumApi:
-		return "API"
-	case RoleEnumSystem:
-		return "SYSTEM"
-	case RoleEnumMergeTeam:
-		return "MERGE_TEAM"
-	}
-}
-
-func (r RoleEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RoleEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ADMIN":
-		value := RoleEnumAdmin
-		*r = value
-	case "DEVELOPER":
-		value := RoleEnumDeveloper
-		*r = value
-	case "MEMBER":
-		value := RoleEnumMember
-		*r = value
-	case "API":
-		value := RoleEnumApi
-		*r = value
-	case "SYSTEM":
-		value := RoleEnumSystem
-		*r = value
-	case "MERGE_TEAM":
-		value := RoleEnumMergeTeam
-		*r = value
-	}
-	return nil
-}
-
-// * `READ` - READ
-// * `WRITE` - WRITE
-// * `OWNER` - OWNER
-type RolesEnum uint
-
-const (
-	RolesEnumRead RolesEnum = iota + 1
-	RolesEnumWrite
-	RolesEnumOwner
-)
-
-func (r RolesEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RolesEnumRead:
-		return "READ"
-	case RolesEnumWrite:
-		return "WRITE"
-	case RolesEnumOwner:
-		return "OWNER"
-	}
-}
-
-func (r RolesEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RolesEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "READ":
-		value := RolesEnumRead
-		*r = value
-	case "WRITE":
-		value := RolesEnumWrite
-		*r = value
-	case "OWNER":
-		value := RolesEnumOwner
-		*r = value
-	}
-	return nil
-}
-
-// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// * `IN_LAST_SYNC` - IN_LAST_SYNC
-type SelectiveSyncConfigurationsUsageEnum uint
-
-const (
-	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = iota + 1
-	SelectiveSyncConfigurationsUsageEnumInLastSync
-)
-
-func (s SelectiveSyncConfigurationsUsageEnum) String() string {
+func NewRequestFormatEnumFromString(s string) (RequestFormatEnum, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SelectiveSyncConfigurationsUsageEnumInNextSync:
-		return "IN_NEXT_SYNC"
-	case SelectiveSyncConfigurationsUsageEnumInLastSync:
-		return "IN_LAST_SYNC"
+	case "JSON":
+		return RequestFormatEnumJson, nil
+	case "XML":
+		return RequestFormatEnumXml, nil
+	case "MULTIPART":
+		return RequestFormatEnumMultipart, nil
 	}
+	var t RequestFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-func (s SelectiveSyncConfigurationsUsageEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
+func (r RequestFormatEnum) Ptr() *RequestFormatEnum {
+	return &r
 }
 
-func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+// - `JSON` - JSON
+// - `BASE64_GZIP` - BASE64_GZIP
+type ResponseTypeEnum string
+
+const (
+	ResponseTypeEnumJson       ResponseTypeEnum = "JSON"
+	ResponseTypeEnumBase64Gzip ResponseTypeEnum = "BASE64_GZIP"
+)
+
+func NewResponseTypeEnumFromString(s string) (ResponseTypeEnum, error) {
+	switch s {
+	case "JSON":
+		return ResponseTypeEnumJson, nil
+	case "BASE64_GZIP":
+		return ResponseTypeEnumBase64Gzip, nil
 	}
-	switch raw {
+	var t ResponseTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r ResponseTypeEnum) Ptr() *ResponseTypeEnum {
+	return &r
+}
+
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
+type RoleEnum string
+
+const (
+	RoleEnumAdmin     RoleEnum = "ADMIN"
+	RoleEnumDeveloper RoleEnum = "DEVELOPER"
+	RoleEnumMember    RoleEnum = "MEMBER"
+	RoleEnumApi       RoleEnum = "API"
+	RoleEnumSystem    RoleEnum = "SYSTEM"
+	RoleEnumMergeTeam RoleEnum = "MERGE_TEAM"
+)
+
+func NewRoleEnumFromString(s string) (RoleEnum, error) {
+	switch s {
+	case "ADMIN":
+		return RoleEnumAdmin, nil
+	case "DEVELOPER":
+		return RoleEnumDeveloper, nil
+	case "MEMBER":
+		return RoleEnumMember, nil
+	case "API":
+		return RoleEnumApi, nil
+	case "SYSTEM":
+		return RoleEnumSystem, nil
+	case "MERGE_TEAM":
+		return RoleEnumMergeTeam, nil
+	}
+	var t RoleEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RoleEnum) Ptr() *RoleEnum {
+	return &r
+}
+
+// - `READ` - READ
+// - `WRITE` - WRITE
+// - `OWNER` - OWNER
+type RolesEnum string
+
+const (
+	RolesEnumRead  RolesEnum = "READ"
+	RolesEnumWrite RolesEnum = "WRITE"
+	RolesEnumOwner RolesEnum = "OWNER"
+)
+
+func NewRolesEnumFromString(s string) (RolesEnum, error) {
+	switch s {
+	case "READ":
+		return RolesEnumRead, nil
+	case "WRITE":
+		return RolesEnumWrite, nil
+	case "OWNER":
+		return RolesEnumOwner, nil
+	}
+	var t RolesEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RolesEnum) Ptr() *RolesEnum {
+	return &r
+}
+
+// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// - `IN_LAST_SYNC` - IN_LAST_SYNC
+type SelectiveSyncConfigurationsUsageEnum string
+
+const (
+	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = "IN_NEXT_SYNC"
+	SelectiveSyncConfigurationsUsageEnumInLastSync SelectiveSyncConfigurationsUsageEnum = "IN_LAST_SYNC"
+)
+
+func NewSelectiveSyncConfigurationsUsageEnumFromString(s string) (SelectiveSyncConfigurationsUsageEnum, error) {
+	switch s {
 	case "IN_NEXT_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInNextSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInNextSync, nil
 	case "IN_LAST_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInLastSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInLastSync, nil
 	}
-	return nil
+	var t SelectiveSyncConfigurationsUsageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SelectiveSyncConfigurationsUsageEnum) Ptr() *SelectiveSyncConfigurationsUsageEnum {
+	return &s
 }
 
 // # The SyncStatus Object
+//
 // ### Description
-// The `SyncStatus` object is used to represent the syncing state of an account
+//
+// # The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
+//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -3815,134 +4274,113 @@ type SyncStatus struct {
 	Status                           SyncStatusStatusEnum                  `json:"status,omitempty"`
 	IsInitialSync                    bool                                  `json:"is_initial_sync"`
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `SYNCING` - SYNCING
-// * `DONE` - DONE
-// * `FAILED` - FAILED
-// * `DISABLED` - DISABLED
-// * `PAUSED` - PAUSED
-// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
-type SyncStatusStatusEnum uint
+func (s *SyncStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler SyncStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = SyncStatus(value)
+	s._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *SyncStatus) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// - `SYNCING` - SYNCING
+// - `DONE` - DONE
+// - `FAILED` - FAILED
+// - `DISABLED` - DISABLED
+// - `PAUSED` - PAUSED
+// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+type SyncStatusStatusEnum string
 
 const (
-	SyncStatusStatusEnumSyncing SyncStatusStatusEnum = iota + 1
-	SyncStatusStatusEnumDone
-	SyncStatusStatusEnumFailed
-	SyncStatusStatusEnumDisabled
-	SyncStatusStatusEnumPaused
-	SyncStatusStatusEnumPartiallySynced
+	SyncStatusStatusEnumSyncing         SyncStatusStatusEnum = "SYNCING"
+	SyncStatusStatusEnumDone            SyncStatusStatusEnum = "DONE"
+	SyncStatusStatusEnumFailed          SyncStatusStatusEnum = "FAILED"
+	SyncStatusStatusEnumDisabled        SyncStatusStatusEnum = "DISABLED"
+	SyncStatusStatusEnumPaused          SyncStatusStatusEnum = "PAUSED"
+	SyncStatusStatusEnumPartiallySynced SyncStatusStatusEnum = "PARTIALLY_SYNCED"
 )
 
-func (s SyncStatusStatusEnum) String() string {
+func NewSyncStatusStatusEnumFromString(s string) (SyncStatusStatusEnum, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SyncStatusStatusEnumSyncing:
-		return "SYNCING"
-	case SyncStatusStatusEnumDone:
-		return "DONE"
-	case SyncStatusStatusEnumFailed:
-		return "FAILED"
-	case SyncStatusStatusEnumDisabled:
-		return "DISABLED"
-	case SyncStatusStatusEnumPaused:
-		return "PAUSED"
-	case SyncStatusStatusEnumPartiallySynced:
-		return "PARTIALLY_SYNCED"
-	}
-}
-
-func (s SyncStatusStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
 	case "SYNCING":
-		value := SyncStatusStatusEnumSyncing
-		*s = value
+		return SyncStatusStatusEnumSyncing, nil
 	case "DONE":
-		value := SyncStatusStatusEnumDone
-		*s = value
+		return SyncStatusStatusEnumDone, nil
 	case "FAILED":
-		value := SyncStatusStatusEnumFailed
-		*s = value
+		return SyncStatusStatusEnumFailed, nil
 	case "DISABLED":
-		value := SyncStatusStatusEnumDisabled
-		*s = value
+		return SyncStatusStatusEnumDisabled, nil
 	case "PAUSED":
-		value := SyncStatusStatusEnumPaused
-		*s = value
+		return SyncStatusStatusEnumPaused, nil
 	case "PARTIALLY_SYNCED":
-		value := SyncStatusStatusEnumPartiallySynced
-		*s = value
+		return SyncStatusStatusEnumPartiallySynced, nil
 	}
-	return nil
+	var t SyncStatusStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `USER` - USER
-// * `GROUP` - GROUP
-// * `COMPANY` - COMPANY
-// * `ANYONE` - ANYONE
-type TypeEnum uint
+func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
+	return &s
+}
+
+// - `USER` - USER
+// - `GROUP` - GROUP
+// - `COMPANY` - COMPANY
+// - `ANYONE` - ANYONE
+type TypeEnum string
 
 const (
-	TypeEnumUser TypeEnum = iota + 1
-	TypeEnumGroup
-	TypeEnumCompany
-	TypeEnumAnyone
+	TypeEnumUser    TypeEnum = "USER"
+	TypeEnumGroup   TypeEnum = "GROUP"
+	TypeEnumCompany TypeEnum = "COMPANY"
+	TypeEnumAnyone  TypeEnum = "ANYONE"
 )
 
-func (t TypeEnum) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TypeEnumUser:
-		return "USER"
-	case TypeEnumGroup:
-		return "GROUP"
-	case TypeEnumCompany:
-		return "COMPANY"
-	case TypeEnumAnyone:
-		return "ANYONE"
-	}
-}
-
-func (t TypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewTypeEnumFromString(s string) (TypeEnum, error) {
+	switch s {
 	case "USER":
-		value := TypeEnumUser
-		*t = value
+		return TypeEnumUser, nil
 	case "GROUP":
-		value := TypeEnumGroup
-		*t = value
+		return TypeEnumGroup, nil
 	case "COMPANY":
-		value := TypeEnumCompany
-		*t = value
+		return TypeEnumCompany, nil
 	case "ANYONE":
-		value := TypeEnumAnyone
-		*t = value
+		return TypeEnumAnyone, nil
 	}
-	return nil
+	var t TypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TypeEnum) Ptr() *TypeEnum {
+	return &t
 }
 
 // # The User Object
+//
 // ### Description
+//
 // The `User` object is used to represent a user within the File Storage account.
+//
 // ### Usage Example
+//
 // Fetch from the `GET /api/filestorage/v1/users` endpoint and view their users.
 type User struct {
 	Id *string `json:"id,omitempty"`
@@ -3958,13 +4396,63 @@ type User struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
-	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (u *User) UnmarshalJSON(data []byte) error {
+	type unmarshaler User
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = User(value)
+	u._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *User) String() string {
+	if len(u._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(u._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
 }
 
 type ValidationProblemSource struct {
 	Pointer string `json:"pointer"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *ValidationProblemSource) UnmarshalJSON(data []byte) error {
+	type unmarshaler ValidationProblemSource
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = ValidationProblemSource(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *ValidationProblemSource) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
 }
 
 type WarningValidationProblem struct {
@@ -3972,10 +4460,60 @@ type WarningValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WarningValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler WarningValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WarningValidationProblem(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WarningValidationProblem) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }
 
 type WebhookReceiver struct {
 	Event    string  `json:"event"`
 	IsActive bool    `json:"is_active"`
 	Key      *string `json:"key,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WebhookReceiver) UnmarshalJSON(data []byte) error {
+	type unmarshaler WebhookReceiver
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WebhookReceiver(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WebhookReceiver) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }

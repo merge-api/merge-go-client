@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -44,4 +45,248 @@ type EeocsRetrieveRequest struct {
 	RemoteFields *EeocsRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *EeocsRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type EeocsListRequestRemoteFields string
+
+const (
+	EeocsListRequestRemoteFieldsDisabilityStatus                        EeocsListRequestRemoteFields = "disability_status"
+	EeocsListRequestRemoteFieldsDisabilityStatusGender                  EeocsListRequestRemoteFields = "disability_status,gender"
+	EeocsListRequestRemoteFieldsDisabilityStatusGenderRace              EeocsListRequestRemoteFields = "disability_status,gender,race"
+	EeocsListRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus EeocsListRequestRemoteFields = "disability_status,gender,race,veteran_status"
+	EeocsListRequestRemoteFieldsDisabilityStatusGenderVeteranStatus     EeocsListRequestRemoteFields = "disability_status,gender,veteran_status"
+	EeocsListRequestRemoteFieldsDisabilityStatusRace                    EeocsListRequestRemoteFields = "disability_status,race"
+	EeocsListRequestRemoteFieldsDisabilityStatusRaceVeteranStatus       EeocsListRequestRemoteFields = "disability_status,race,veteran_status"
+	EeocsListRequestRemoteFieldsDisabilityStatusVeteranStatus           EeocsListRequestRemoteFields = "disability_status,veteran_status"
+	EeocsListRequestRemoteFieldsGender                                  EeocsListRequestRemoteFields = "gender"
+	EeocsListRequestRemoteFieldsGenderRace                              EeocsListRequestRemoteFields = "gender,race"
+	EeocsListRequestRemoteFieldsGenderRaceVeteranStatus                 EeocsListRequestRemoteFields = "gender,race,veteran_status"
+	EeocsListRequestRemoteFieldsGenderVeteranStatus                     EeocsListRequestRemoteFields = "gender,veteran_status"
+	EeocsListRequestRemoteFieldsRace                                    EeocsListRequestRemoteFields = "race"
+	EeocsListRequestRemoteFieldsRaceVeteranStatus                       EeocsListRequestRemoteFields = "race,veteran_status"
+	EeocsListRequestRemoteFieldsVeteranStatus                           EeocsListRequestRemoteFields = "veteran_status"
+)
+
+func NewEeocsListRequestRemoteFieldsFromString(s string) (EeocsListRequestRemoteFields, error) {
+	switch s {
+	case "disability_status":
+		return EeocsListRequestRemoteFieldsDisabilityStatus, nil
+	case "disability_status,gender":
+		return EeocsListRequestRemoteFieldsDisabilityStatusGender, nil
+	case "disability_status,gender,race":
+		return EeocsListRequestRemoteFieldsDisabilityStatusGenderRace, nil
+	case "disability_status,gender,race,veteran_status":
+		return EeocsListRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus, nil
+	case "disability_status,gender,veteran_status":
+		return EeocsListRequestRemoteFieldsDisabilityStatusGenderVeteranStatus, nil
+	case "disability_status,race":
+		return EeocsListRequestRemoteFieldsDisabilityStatusRace, nil
+	case "disability_status,race,veteran_status":
+		return EeocsListRequestRemoteFieldsDisabilityStatusRaceVeteranStatus, nil
+	case "disability_status,veteran_status":
+		return EeocsListRequestRemoteFieldsDisabilityStatusVeteranStatus, nil
+	case "gender":
+		return EeocsListRequestRemoteFieldsGender, nil
+	case "gender,race":
+		return EeocsListRequestRemoteFieldsGenderRace, nil
+	case "gender,race,veteran_status":
+		return EeocsListRequestRemoteFieldsGenderRaceVeteranStatus, nil
+	case "gender,veteran_status":
+		return EeocsListRequestRemoteFieldsGenderVeteranStatus, nil
+	case "race":
+		return EeocsListRequestRemoteFieldsRace, nil
+	case "race,veteran_status":
+		return EeocsListRequestRemoteFieldsRaceVeteranStatus, nil
+	case "veteran_status":
+		return EeocsListRequestRemoteFieldsVeteranStatus, nil
+	}
+	var t EeocsListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EeocsListRequestRemoteFields) Ptr() *EeocsListRequestRemoteFields {
+	return &e
+}
+
+type EeocsListRequestShowEnumOrigins string
+
+const (
+	EeocsListRequestShowEnumOriginsDisabilityStatus                        EeocsListRequestShowEnumOrigins = "disability_status"
+	EeocsListRequestShowEnumOriginsDisabilityStatusGender                  EeocsListRequestShowEnumOrigins = "disability_status,gender"
+	EeocsListRequestShowEnumOriginsDisabilityStatusGenderRace              EeocsListRequestShowEnumOrigins = "disability_status,gender,race"
+	EeocsListRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus EeocsListRequestShowEnumOrigins = "disability_status,gender,race,veteran_status"
+	EeocsListRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus     EeocsListRequestShowEnumOrigins = "disability_status,gender,veteran_status"
+	EeocsListRequestShowEnumOriginsDisabilityStatusRace                    EeocsListRequestShowEnumOrigins = "disability_status,race"
+	EeocsListRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus       EeocsListRequestShowEnumOrigins = "disability_status,race,veteran_status"
+	EeocsListRequestShowEnumOriginsDisabilityStatusVeteranStatus           EeocsListRequestShowEnumOrigins = "disability_status,veteran_status"
+	EeocsListRequestShowEnumOriginsGender                                  EeocsListRequestShowEnumOrigins = "gender"
+	EeocsListRequestShowEnumOriginsGenderRace                              EeocsListRequestShowEnumOrigins = "gender,race"
+	EeocsListRequestShowEnumOriginsGenderRaceVeteranStatus                 EeocsListRequestShowEnumOrigins = "gender,race,veteran_status"
+	EeocsListRequestShowEnumOriginsGenderVeteranStatus                     EeocsListRequestShowEnumOrigins = "gender,veteran_status"
+	EeocsListRequestShowEnumOriginsRace                                    EeocsListRequestShowEnumOrigins = "race"
+	EeocsListRequestShowEnumOriginsRaceVeteranStatus                       EeocsListRequestShowEnumOrigins = "race,veteran_status"
+	EeocsListRequestShowEnumOriginsVeteranStatus                           EeocsListRequestShowEnumOrigins = "veteran_status"
+)
+
+func NewEeocsListRequestShowEnumOriginsFromString(s string) (EeocsListRequestShowEnumOrigins, error) {
+	switch s {
+	case "disability_status":
+		return EeocsListRequestShowEnumOriginsDisabilityStatus, nil
+	case "disability_status,gender":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusGender, nil
+	case "disability_status,gender,race":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusGenderRace, nil
+	case "disability_status,gender,race,veteran_status":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus, nil
+	case "disability_status,gender,veteran_status":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus, nil
+	case "disability_status,race":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusRace, nil
+	case "disability_status,race,veteran_status":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus, nil
+	case "disability_status,veteran_status":
+		return EeocsListRequestShowEnumOriginsDisabilityStatusVeteranStatus, nil
+	case "gender":
+		return EeocsListRequestShowEnumOriginsGender, nil
+	case "gender,race":
+		return EeocsListRequestShowEnumOriginsGenderRace, nil
+	case "gender,race,veteran_status":
+		return EeocsListRequestShowEnumOriginsGenderRaceVeteranStatus, nil
+	case "gender,veteran_status":
+		return EeocsListRequestShowEnumOriginsGenderVeteranStatus, nil
+	case "race":
+		return EeocsListRequestShowEnumOriginsRace, nil
+	case "race,veteran_status":
+		return EeocsListRequestShowEnumOriginsRaceVeteranStatus, nil
+	case "veteran_status":
+		return EeocsListRequestShowEnumOriginsVeteranStatus, nil
+	}
+	var t EeocsListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EeocsListRequestShowEnumOrigins) Ptr() *EeocsListRequestShowEnumOrigins {
+	return &e
+}
+
+type EeocsRetrieveRequestRemoteFields string
+
+const (
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatus                        EeocsRetrieveRequestRemoteFields = "disability_status"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGender                  EeocsRetrieveRequestRemoteFields = "disability_status,gender"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRace              EeocsRetrieveRequestRemoteFields = "disability_status,gender,race"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus EeocsRetrieveRequestRemoteFields = "disability_status,gender,race,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderVeteranStatus     EeocsRetrieveRequestRemoteFields = "disability_status,gender,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusRace                    EeocsRetrieveRequestRemoteFields = "disability_status,race"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusRaceVeteranStatus       EeocsRetrieveRequestRemoteFields = "disability_status,race,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsDisabilityStatusVeteranStatus           EeocsRetrieveRequestRemoteFields = "disability_status,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsGender                                  EeocsRetrieveRequestRemoteFields = "gender"
+	EeocsRetrieveRequestRemoteFieldsGenderRace                              EeocsRetrieveRequestRemoteFields = "gender,race"
+	EeocsRetrieveRequestRemoteFieldsGenderRaceVeteranStatus                 EeocsRetrieveRequestRemoteFields = "gender,race,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsGenderVeteranStatus                     EeocsRetrieveRequestRemoteFields = "gender,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsRace                                    EeocsRetrieveRequestRemoteFields = "race"
+	EeocsRetrieveRequestRemoteFieldsRaceVeteranStatus                       EeocsRetrieveRequestRemoteFields = "race,veteran_status"
+	EeocsRetrieveRequestRemoteFieldsVeteranStatus                           EeocsRetrieveRequestRemoteFields = "veteran_status"
+)
+
+func NewEeocsRetrieveRequestRemoteFieldsFromString(s string) (EeocsRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "disability_status":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatus, nil
+	case "disability_status,gender":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusGender, nil
+	case "disability_status,gender,race":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRace, nil
+	case "disability_status,gender,race,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderRaceVeteranStatus, nil
+	case "disability_status,gender,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusGenderVeteranStatus, nil
+	case "disability_status,race":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusRace, nil
+	case "disability_status,race,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusRaceVeteranStatus, nil
+	case "disability_status,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsDisabilityStatusVeteranStatus, nil
+	case "gender":
+		return EeocsRetrieveRequestRemoteFieldsGender, nil
+	case "gender,race":
+		return EeocsRetrieveRequestRemoteFieldsGenderRace, nil
+	case "gender,race,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsGenderRaceVeteranStatus, nil
+	case "gender,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsGenderVeteranStatus, nil
+	case "race":
+		return EeocsRetrieveRequestRemoteFieldsRace, nil
+	case "race,veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsRaceVeteranStatus, nil
+	case "veteran_status":
+		return EeocsRetrieveRequestRemoteFieldsVeteranStatus, nil
+	}
+	var t EeocsRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EeocsRetrieveRequestRemoteFields) Ptr() *EeocsRetrieveRequestRemoteFields {
+	return &e
+}
+
+type EeocsRetrieveRequestShowEnumOrigins string
+
+const (
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatus                        EeocsRetrieveRequestShowEnumOrigins = "disability_status"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGender                  EeocsRetrieveRequestShowEnumOrigins = "disability_status,gender"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRace              EeocsRetrieveRequestShowEnumOrigins = "disability_status,gender,race"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus EeocsRetrieveRequestShowEnumOrigins = "disability_status,gender,race,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus     EeocsRetrieveRequestShowEnumOrigins = "disability_status,gender,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRace                    EeocsRetrieveRequestShowEnumOrigins = "disability_status,race"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus       EeocsRetrieveRequestShowEnumOrigins = "disability_status,race,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsDisabilityStatusVeteranStatus           EeocsRetrieveRequestShowEnumOrigins = "disability_status,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsGender                                  EeocsRetrieveRequestShowEnumOrigins = "gender"
+	EeocsRetrieveRequestShowEnumOriginsGenderRace                              EeocsRetrieveRequestShowEnumOrigins = "gender,race"
+	EeocsRetrieveRequestShowEnumOriginsGenderRaceVeteranStatus                 EeocsRetrieveRequestShowEnumOrigins = "gender,race,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsGenderVeteranStatus                     EeocsRetrieveRequestShowEnumOrigins = "gender,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsRace                                    EeocsRetrieveRequestShowEnumOrigins = "race"
+	EeocsRetrieveRequestShowEnumOriginsRaceVeteranStatus                       EeocsRetrieveRequestShowEnumOrigins = "race,veteran_status"
+	EeocsRetrieveRequestShowEnumOriginsVeteranStatus                           EeocsRetrieveRequestShowEnumOrigins = "veteran_status"
+)
+
+func NewEeocsRetrieveRequestShowEnumOriginsFromString(s string) (EeocsRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "disability_status":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatus, nil
+	case "disability_status,gender":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGender, nil
+	case "disability_status,gender,race":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRace, nil
+	case "disability_status,gender,race,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderRaceVeteranStatus, nil
+	case "disability_status,gender,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusGenderVeteranStatus, nil
+	case "disability_status,race":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRace, nil
+	case "disability_status,race,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusRaceVeteranStatus, nil
+	case "disability_status,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsDisabilityStatusVeteranStatus, nil
+	case "gender":
+		return EeocsRetrieveRequestShowEnumOriginsGender, nil
+	case "gender,race":
+		return EeocsRetrieveRequestShowEnumOriginsGenderRace, nil
+	case "gender,race,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsGenderRaceVeteranStatus, nil
+	case "gender,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsGenderVeteranStatus, nil
+	case "race":
+		return EeocsRetrieveRequestShowEnumOriginsRace, nil
+	case "race,veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsRaceVeteranStatus, nil
+	case "veteran_status":
+		return EeocsRetrieveRequestShowEnumOriginsVeteranStatus, nil
+	}
+	var t EeocsRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EeocsRetrieveRequestShowEnumOrigins) Ptr() *EeocsRetrieveRequestShowEnumOrigins {
+	return &e
 }

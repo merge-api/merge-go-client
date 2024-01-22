@@ -12,31 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *hris.PayrollRunsListRequest) (*hris.PaginatedPayrollRunList, error)
-	Retrieve(ctx context.Context, id string, request *hris.PayrollRunsRetrieveRequest) (*hris.PayrollRun, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `PayrollRun` objects.
-func (c *client) List(ctx context.Context, request *hris.PayrollRunsListRequest) (*hris.PaginatedPayrollRunList, error) {
+func (c *Client) List(ctx context.Context, request *hris.PayrollRunsListRequest) (*hris.PaginatedPayrollRunList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -97,24 +92,22 @@ func (c *client) List(ctx context.Context, request *hris.PayrollRunsListRequest)
 	}
 
 	var response *hris.PaginatedPayrollRunList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `PayrollRun` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *hris.PayrollRunsRetrieveRequest) (*hris.PayrollRun, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *hris.PayrollRunsRetrieveRequest) (*hris.PayrollRun, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -136,18 +129,16 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.PayrollR
 	}
 
 	var response *hris.PayrollRun
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

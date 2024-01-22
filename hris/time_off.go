@@ -3,6 +3,7 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -43,22 +44,22 @@ type TimeOffListRequest struct {
 	RemoteId *string `json:"-"`
 	// If provided, will only return TimeOff with this request type. Options: ('VACATION', 'SICK', 'PERSONAL', 'JURY_DUTY', 'VOLUNTEER', 'BEREAVEMENT')
 	//
-	// * `VACATION` - VACATION
-	// * `SICK` - SICK
-	// * `PERSONAL` - PERSONAL
-	// * `JURY_DUTY` - JURY_DUTY
-	// * `VOLUNTEER` - VOLUNTEER
-	// * `BEREAVEMENT` - BEREAVEMENT
+	// - `VACATION` - VACATION
+	// - `SICK` - SICK
+	// - `PERSONAL` - PERSONAL
+	// - `JURY_DUTY` - JURY_DUTY
+	// - `VOLUNTEER` - VOLUNTEER
+	// - `BEREAVEMENT` - BEREAVEMENT
 	RequestType *TimeOffListRequestRequestType `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *TimeOffListRequestShowEnumOrigins `json:"-"`
 	// If provided, will only return TimeOff with this status. Options: ('REQUESTED', 'APPROVED', 'DECLINED', 'CANCELLED', 'DELETED')
 	//
-	// * `REQUESTED` - REQUESTED
-	// * `APPROVED` - APPROVED
-	// * `DECLINED` - DECLINED
-	// * `CANCELLED` - CANCELLED
-	// * `DELETED` - DELETED
+	// - `REQUESTED` - REQUESTED
+	// - `APPROVED` - APPROVED
+	// - `DECLINED` - DECLINED
+	// - `CANCELLED` - CANCELLED
+	// - `DELETED` - DELETED
 	Status *TimeOffListRequestStatus `json:"-"`
 }
 
@@ -71,4 +72,267 @@ type TimeOffRetrieveRequest struct {
 	RemoteFields *TimeOffRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *TimeOffRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type TimeOffListRequestExpand string
+
+const (
+	TimeOffListRequestExpandApprover         TimeOffListRequestExpand = "approver"
+	TimeOffListRequestExpandEmployee         TimeOffListRequestExpand = "employee"
+	TimeOffListRequestExpandEmployeeApprover TimeOffListRequestExpand = "employee,approver"
+)
+
+func NewTimeOffListRequestExpandFromString(s string) (TimeOffListRequestExpand, error) {
+	switch s {
+	case "approver":
+		return TimeOffListRequestExpandApprover, nil
+	case "employee":
+		return TimeOffListRequestExpandEmployee, nil
+	case "employee,approver":
+		return TimeOffListRequestExpandEmployeeApprover, nil
+	}
+	var t TimeOffListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffListRequestExpand) Ptr() *TimeOffListRequestExpand {
+	return &t
+}
+
+type TimeOffListRequestRemoteFields string
+
+const (
+	TimeOffListRequestRemoteFieldsRequestType            TimeOffListRequestRemoteFields = "request_type"
+	TimeOffListRequestRemoteFieldsRequestTypeStatus      TimeOffListRequestRemoteFields = "request_type,status"
+	TimeOffListRequestRemoteFieldsRequestTypeStatusUnits TimeOffListRequestRemoteFields = "request_type,status,units"
+	TimeOffListRequestRemoteFieldsRequestTypeUnits       TimeOffListRequestRemoteFields = "request_type,units"
+	TimeOffListRequestRemoteFieldsStatus                 TimeOffListRequestRemoteFields = "status"
+	TimeOffListRequestRemoteFieldsStatusUnits            TimeOffListRequestRemoteFields = "status,units"
+	TimeOffListRequestRemoteFieldsUnits                  TimeOffListRequestRemoteFields = "units"
+)
+
+func NewTimeOffListRequestRemoteFieldsFromString(s string) (TimeOffListRequestRemoteFields, error) {
+	switch s {
+	case "request_type":
+		return TimeOffListRequestRemoteFieldsRequestType, nil
+	case "request_type,status":
+		return TimeOffListRequestRemoteFieldsRequestTypeStatus, nil
+	case "request_type,status,units":
+		return TimeOffListRequestRemoteFieldsRequestTypeStatusUnits, nil
+	case "request_type,units":
+		return TimeOffListRequestRemoteFieldsRequestTypeUnits, nil
+	case "status":
+		return TimeOffListRequestRemoteFieldsStatus, nil
+	case "status,units":
+		return TimeOffListRequestRemoteFieldsStatusUnits, nil
+	case "units":
+		return TimeOffListRequestRemoteFieldsUnits, nil
+	}
+	var t TimeOffListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffListRequestRemoteFields) Ptr() *TimeOffListRequestRemoteFields {
+	return &t
+}
+
+type TimeOffListRequestRequestType string
+
+const (
+	TimeOffListRequestRequestTypeBereavement TimeOffListRequestRequestType = "BEREAVEMENT"
+	TimeOffListRequestRequestTypeJuryDuty    TimeOffListRequestRequestType = "JURY_DUTY"
+	TimeOffListRequestRequestTypePersonal    TimeOffListRequestRequestType = "PERSONAL"
+	TimeOffListRequestRequestTypeSick        TimeOffListRequestRequestType = "SICK"
+	TimeOffListRequestRequestTypeVacation    TimeOffListRequestRequestType = "VACATION"
+	TimeOffListRequestRequestTypeVolunteer   TimeOffListRequestRequestType = "VOLUNTEER"
+)
+
+func NewTimeOffListRequestRequestTypeFromString(s string) (TimeOffListRequestRequestType, error) {
+	switch s {
+	case "BEREAVEMENT":
+		return TimeOffListRequestRequestTypeBereavement, nil
+	case "JURY_DUTY":
+		return TimeOffListRequestRequestTypeJuryDuty, nil
+	case "PERSONAL":
+		return TimeOffListRequestRequestTypePersonal, nil
+	case "SICK":
+		return TimeOffListRequestRequestTypeSick, nil
+	case "VACATION":
+		return TimeOffListRequestRequestTypeVacation, nil
+	case "VOLUNTEER":
+		return TimeOffListRequestRequestTypeVolunteer, nil
+	}
+	var t TimeOffListRequestRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffListRequestRequestType) Ptr() *TimeOffListRequestRequestType {
+	return &t
+}
+
+type TimeOffListRequestShowEnumOrigins string
+
+const (
+	TimeOffListRequestShowEnumOriginsRequestType            TimeOffListRequestShowEnumOrigins = "request_type"
+	TimeOffListRequestShowEnumOriginsRequestTypeStatus      TimeOffListRequestShowEnumOrigins = "request_type,status"
+	TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits TimeOffListRequestShowEnumOrigins = "request_type,status,units"
+	TimeOffListRequestShowEnumOriginsRequestTypeUnits       TimeOffListRequestShowEnumOrigins = "request_type,units"
+	TimeOffListRequestShowEnumOriginsStatus                 TimeOffListRequestShowEnumOrigins = "status"
+	TimeOffListRequestShowEnumOriginsStatusUnits            TimeOffListRequestShowEnumOrigins = "status,units"
+	TimeOffListRequestShowEnumOriginsUnits                  TimeOffListRequestShowEnumOrigins = "units"
+)
+
+func NewTimeOffListRequestShowEnumOriginsFromString(s string) (TimeOffListRequestShowEnumOrigins, error) {
+	switch s {
+	case "request_type":
+		return TimeOffListRequestShowEnumOriginsRequestType, nil
+	case "request_type,status":
+		return TimeOffListRequestShowEnumOriginsRequestTypeStatus, nil
+	case "request_type,status,units":
+		return TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits, nil
+	case "request_type,units":
+		return TimeOffListRequestShowEnumOriginsRequestTypeUnits, nil
+	case "status":
+		return TimeOffListRequestShowEnumOriginsStatus, nil
+	case "status,units":
+		return TimeOffListRequestShowEnumOriginsStatusUnits, nil
+	case "units":
+		return TimeOffListRequestShowEnumOriginsUnits, nil
+	}
+	var t TimeOffListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffListRequestShowEnumOrigins) Ptr() *TimeOffListRequestShowEnumOrigins {
+	return &t
+}
+
+type TimeOffListRequestStatus string
+
+const (
+	TimeOffListRequestStatusApproved  TimeOffListRequestStatus = "APPROVED"
+	TimeOffListRequestStatusCancelled TimeOffListRequestStatus = "CANCELLED"
+	TimeOffListRequestStatusDeclined  TimeOffListRequestStatus = "DECLINED"
+	TimeOffListRequestStatusDeleted   TimeOffListRequestStatus = "DELETED"
+	TimeOffListRequestStatusRequested TimeOffListRequestStatus = "REQUESTED"
+)
+
+func NewTimeOffListRequestStatusFromString(s string) (TimeOffListRequestStatus, error) {
+	switch s {
+	case "APPROVED":
+		return TimeOffListRequestStatusApproved, nil
+	case "CANCELLED":
+		return TimeOffListRequestStatusCancelled, nil
+	case "DECLINED":
+		return TimeOffListRequestStatusDeclined, nil
+	case "DELETED":
+		return TimeOffListRequestStatusDeleted, nil
+	case "REQUESTED":
+		return TimeOffListRequestStatusRequested, nil
+	}
+	var t TimeOffListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffListRequestStatus) Ptr() *TimeOffListRequestStatus {
+	return &t
+}
+
+type TimeOffRetrieveRequestExpand string
+
+const (
+	TimeOffRetrieveRequestExpandApprover         TimeOffRetrieveRequestExpand = "approver"
+	TimeOffRetrieveRequestExpandEmployee         TimeOffRetrieveRequestExpand = "employee"
+	TimeOffRetrieveRequestExpandEmployeeApprover TimeOffRetrieveRequestExpand = "employee,approver"
+)
+
+func NewTimeOffRetrieveRequestExpandFromString(s string) (TimeOffRetrieveRequestExpand, error) {
+	switch s {
+	case "approver":
+		return TimeOffRetrieveRequestExpandApprover, nil
+	case "employee":
+		return TimeOffRetrieveRequestExpandEmployee, nil
+	case "employee,approver":
+		return TimeOffRetrieveRequestExpandEmployeeApprover, nil
+	}
+	var t TimeOffRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffRetrieveRequestExpand) Ptr() *TimeOffRetrieveRequestExpand {
+	return &t
+}
+
+type TimeOffRetrieveRequestRemoteFields string
+
+const (
+	TimeOffRetrieveRequestRemoteFieldsRequestType            TimeOffRetrieveRequestRemoteFields = "request_type"
+	TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus      TimeOffRetrieveRequestRemoteFields = "request_type,status"
+	TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits TimeOffRetrieveRequestRemoteFields = "request_type,status,units"
+	TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits       TimeOffRetrieveRequestRemoteFields = "request_type,units"
+	TimeOffRetrieveRequestRemoteFieldsStatus                 TimeOffRetrieveRequestRemoteFields = "status"
+	TimeOffRetrieveRequestRemoteFieldsStatusUnits            TimeOffRetrieveRequestRemoteFields = "status,units"
+	TimeOffRetrieveRequestRemoteFieldsUnits                  TimeOffRetrieveRequestRemoteFields = "units"
+)
+
+func NewTimeOffRetrieveRequestRemoteFieldsFromString(s string) (TimeOffRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "request_type":
+		return TimeOffRetrieveRequestRemoteFieldsRequestType, nil
+	case "request_type,status":
+		return TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus, nil
+	case "request_type,status,units":
+		return TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits, nil
+	case "request_type,units":
+		return TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits, nil
+	case "status":
+		return TimeOffRetrieveRequestRemoteFieldsStatus, nil
+	case "status,units":
+		return TimeOffRetrieveRequestRemoteFieldsStatusUnits, nil
+	case "units":
+		return TimeOffRetrieveRequestRemoteFieldsUnits, nil
+	}
+	var t TimeOffRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffRetrieveRequestRemoteFields) Ptr() *TimeOffRetrieveRequestRemoteFields {
+	return &t
+}
+
+type TimeOffRetrieveRequestShowEnumOrigins string
+
+const (
+	TimeOffRetrieveRequestShowEnumOriginsRequestType            TimeOffRetrieveRequestShowEnumOrigins = "request_type"
+	TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus      TimeOffRetrieveRequestShowEnumOrigins = "request_type,status"
+	TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits TimeOffRetrieveRequestShowEnumOrigins = "request_type,status,units"
+	TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits       TimeOffRetrieveRequestShowEnumOrigins = "request_type,units"
+	TimeOffRetrieveRequestShowEnumOriginsStatus                 TimeOffRetrieveRequestShowEnumOrigins = "status"
+	TimeOffRetrieveRequestShowEnumOriginsStatusUnits            TimeOffRetrieveRequestShowEnumOrigins = "status,units"
+	TimeOffRetrieveRequestShowEnumOriginsUnits                  TimeOffRetrieveRequestShowEnumOrigins = "units"
+)
+
+func NewTimeOffRetrieveRequestShowEnumOriginsFromString(s string) (TimeOffRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "request_type":
+		return TimeOffRetrieveRequestShowEnumOriginsRequestType, nil
+	case "request_type,status":
+		return TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus, nil
+	case "request_type,status,units":
+		return TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits, nil
+	case "request_type,units":
+		return TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits, nil
+	case "status":
+		return TimeOffRetrieveRequestShowEnumOriginsStatus, nil
+	case "status,units":
+		return TimeOffRetrieveRequestShowEnumOriginsStatusUnits, nil
+	case "units":
+		return TimeOffRetrieveRequestShowEnumOriginsUnits, nil
+	}
+	var t TimeOffRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffRetrieveRequestShowEnumOrigins) Ptr() *TimeOffRetrieveRequestShowEnumOrigins {
+	return &t
 }

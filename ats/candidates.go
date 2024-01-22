@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -65,4 +66,54 @@ type CandidatesRetrieveRequest struct {
 	Expand *CandidatesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type CandidatesListRequestExpand string
+
+const (
+	CandidatesListRequestExpandApplications            CandidatesListRequestExpand = "applications"
+	CandidatesListRequestExpandApplicationsAttachments CandidatesListRequestExpand = "applications,attachments"
+	CandidatesListRequestExpandAttachments             CandidatesListRequestExpand = "attachments"
+)
+
+func NewCandidatesListRequestExpandFromString(s string) (CandidatesListRequestExpand, error) {
+	switch s {
+	case "applications":
+		return CandidatesListRequestExpandApplications, nil
+	case "applications,attachments":
+		return CandidatesListRequestExpandApplicationsAttachments, nil
+	case "attachments":
+		return CandidatesListRequestExpandAttachments, nil
+	}
+	var t CandidatesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CandidatesListRequestExpand) Ptr() *CandidatesListRequestExpand {
+	return &c
+}
+
+type CandidatesRetrieveRequestExpand string
+
+const (
+	CandidatesRetrieveRequestExpandApplications            CandidatesRetrieveRequestExpand = "applications"
+	CandidatesRetrieveRequestExpandApplicationsAttachments CandidatesRetrieveRequestExpand = "applications,attachments"
+	CandidatesRetrieveRequestExpandAttachments             CandidatesRetrieveRequestExpand = "attachments"
+)
+
+func NewCandidatesRetrieveRequestExpandFromString(s string) (CandidatesRetrieveRequestExpand, error) {
+	switch s {
+	case "applications":
+		return CandidatesRetrieveRequestExpandApplications, nil
+	case "applications,attachments":
+		return CandidatesRetrieveRequestExpandApplicationsAttachments, nil
+	case "attachments":
+		return CandidatesRetrieveRequestExpandAttachments, nil
+	}
+	var t CandidatesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CandidatesRetrieveRequestExpand) Ptr() *CandidatesRetrieveRequestExpand {
+	return &c
 }

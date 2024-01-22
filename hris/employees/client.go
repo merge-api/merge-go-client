@@ -12,34 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *hris.EmployeesListRequest) (*hris.PaginatedEmployeeList, error)
-	Create(ctx context.Context, request *hris.EmployeeEndpointRequest) (*hris.EmployeeResponse, error)
-	Retrieve(ctx context.Context, id string, request *hris.EmployeesRetrieveRequest) (*hris.Employee, error)
-	IgnoreCreate(ctx context.Context, modelId string, request *hris.IgnoreCommonModelRequest) error
-	MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Employee` objects.
-func (c *client) List(ctx context.Context, request *hris.EmployeesListRequest) (*hris.PaginatedEmployeeList, error) {
+func (c *Client) List(ctx context.Context, request *hris.EmployeesListRequest) (*hris.PaginatedEmployeeList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -148,24 +140,22 @@ func (c *client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 	}
 
 	var response *hris.PaginatedEmployeeList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `Employee` object with the given values.
-func (c *client) Create(ctx context.Context, request *hris.EmployeeEndpointRequest) (*hris.EmployeeResponse, error) {
+func (c *Client) Create(ctx context.Context, request *hris.EmployeeEndpointRequest) (*hris.EmployeeResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -184,24 +174,23 @@ func (c *client) Create(ctx context.Context, request *hris.EmployeeEndpointReque
 	}
 
 	var response *hris.EmployeeResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `Employee` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *hris.EmployeesRetrieveRequest) (*hris.Employee, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *hris.EmployeesRetrieveRequest) (*hris.Employee, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -229,40 +218,36 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.Employee
 	}
 
 	var response *hris.Employee
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Ignores a specific row based on the `model_id` in the url. These records will have their properties set to null, and will not be updated in future syncs. The "reason" and "message" fields in the request body will be stored for audit purposes.
-func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *hris.IgnoreCommonModelRequest) error {
+func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *hris.IgnoreCommonModelRequest) error {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/employees/ignore/%v", modelId)
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		nil,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:     endpointURL,
+			Method:  http.MethodPost,
+			Headers: c.header,
+			Request: request,
+		},
 	); err != nil {
 		return err
 	}
@@ -270,7 +255,7 @@ func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *hris
 }
 
 // Returns metadata for `Employee` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -278,18 +263,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, erro
 	endpointURL := baseURL + "/" + "api/hris/v1/employees/meta/post"
 
 	var response *hris.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

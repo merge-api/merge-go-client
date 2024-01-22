@@ -3,6 +3,7 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -33,11 +34,11 @@ type PayrollRunsListRequest struct {
 	RemoteId *string `json:"-"`
 	// If provided, will only return PayrollRun's with this status. Options: ('REGULAR', 'OFF_CYCLE', 'CORRECTION', 'TERMINATION', 'SIGN_ON_BONUS')
 	//
-	// * `REGULAR` - REGULAR
-	// * `OFF_CYCLE` - OFF_CYCLE
-	// * `CORRECTION` - CORRECTION
-	// * `TERMINATION` - TERMINATION
-	// * `SIGN_ON_BONUS` - SIGN_ON_BONUS
+	// - `REGULAR` - REGULAR
+	// - `OFF_CYCLE` - OFF_CYCLE
+	// - `CORRECTION` - CORRECTION
+	// - `TERMINATION` - TERMINATION
+	// - `SIGN_ON_BONUS` - SIGN_ON_BONUS
 	RunType *PayrollRunsListRequestRunType `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *PayrollRunsListRequestShowEnumOrigins `json:"-"`
@@ -54,4 +55,135 @@ type PayrollRunsRetrieveRequest struct {
 	RemoteFields *PayrollRunsRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *PayrollRunsRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type PayrollRunsListRequestRemoteFields string
+
+const (
+	PayrollRunsListRequestRemoteFieldsRunState        PayrollRunsListRequestRemoteFields = "run_state"
+	PayrollRunsListRequestRemoteFieldsRunStateRunType PayrollRunsListRequestRemoteFields = "run_state,run_type"
+	PayrollRunsListRequestRemoteFieldsRunType         PayrollRunsListRequestRemoteFields = "run_type"
+)
+
+func NewPayrollRunsListRequestRemoteFieldsFromString(s string) (PayrollRunsListRequestRemoteFields, error) {
+	switch s {
+	case "run_state":
+		return PayrollRunsListRequestRemoteFieldsRunState, nil
+	case "run_state,run_type":
+		return PayrollRunsListRequestRemoteFieldsRunStateRunType, nil
+	case "run_type":
+		return PayrollRunsListRequestRemoteFieldsRunType, nil
+	}
+	var t PayrollRunsListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayrollRunsListRequestRemoteFields) Ptr() *PayrollRunsListRequestRemoteFields {
+	return &p
+}
+
+type PayrollRunsListRequestRunType string
+
+const (
+	PayrollRunsListRequestRunTypeCorrection  PayrollRunsListRequestRunType = "CORRECTION"
+	PayrollRunsListRequestRunTypeOffCycle    PayrollRunsListRequestRunType = "OFF_CYCLE"
+	PayrollRunsListRequestRunTypeRegular     PayrollRunsListRequestRunType = "REGULAR"
+	PayrollRunsListRequestRunTypeSignOnBonus PayrollRunsListRequestRunType = "SIGN_ON_BONUS"
+	PayrollRunsListRequestRunTypeTermination PayrollRunsListRequestRunType = "TERMINATION"
+)
+
+func NewPayrollRunsListRequestRunTypeFromString(s string) (PayrollRunsListRequestRunType, error) {
+	switch s {
+	case "CORRECTION":
+		return PayrollRunsListRequestRunTypeCorrection, nil
+	case "OFF_CYCLE":
+		return PayrollRunsListRequestRunTypeOffCycle, nil
+	case "REGULAR":
+		return PayrollRunsListRequestRunTypeRegular, nil
+	case "SIGN_ON_BONUS":
+		return PayrollRunsListRequestRunTypeSignOnBonus, nil
+	case "TERMINATION":
+		return PayrollRunsListRequestRunTypeTermination, nil
+	}
+	var t PayrollRunsListRequestRunType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayrollRunsListRequestRunType) Ptr() *PayrollRunsListRequestRunType {
+	return &p
+}
+
+type PayrollRunsListRequestShowEnumOrigins string
+
+const (
+	PayrollRunsListRequestShowEnumOriginsRunState        PayrollRunsListRequestShowEnumOrigins = "run_state"
+	PayrollRunsListRequestShowEnumOriginsRunStateRunType PayrollRunsListRequestShowEnumOrigins = "run_state,run_type"
+	PayrollRunsListRequestShowEnumOriginsRunType         PayrollRunsListRequestShowEnumOrigins = "run_type"
+)
+
+func NewPayrollRunsListRequestShowEnumOriginsFromString(s string) (PayrollRunsListRequestShowEnumOrigins, error) {
+	switch s {
+	case "run_state":
+		return PayrollRunsListRequestShowEnumOriginsRunState, nil
+	case "run_state,run_type":
+		return PayrollRunsListRequestShowEnumOriginsRunStateRunType, nil
+	case "run_type":
+		return PayrollRunsListRequestShowEnumOriginsRunType, nil
+	}
+	var t PayrollRunsListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayrollRunsListRequestShowEnumOrigins) Ptr() *PayrollRunsListRequestShowEnumOrigins {
+	return &p
+}
+
+type PayrollRunsRetrieveRequestRemoteFields string
+
+const (
+	PayrollRunsRetrieveRequestRemoteFieldsRunState        PayrollRunsRetrieveRequestRemoteFields = "run_state"
+	PayrollRunsRetrieveRequestRemoteFieldsRunStateRunType PayrollRunsRetrieveRequestRemoteFields = "run_state,run_type"
+	PayrollRunsRetrieveRequestRemoteFieldsRunType         PayrollRunsRetrieveRequestRemoteFields = "run_type"
+)
+
+func NewPayrollRunsRetrieveRequestRemoteFieldsFromString(s string) (PayrollRunsRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "run_state":
+		return PayrollRunsRetrieveRequestRemoteFieldsRunState, nil
+	case "run_state,run_type":
+		return PayrollRunsRetrieveRequestRemoteFieldsRunStateRunType, nil
+	case "run_type":
+		return PayrollRunsRetrieveRequestRemoteFieldsRunType, nil
+	}
+	var t PayrollRunsRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayrollRunsRetrieveRequestRemoteFields) Ptr() *PayrollRunsRetrieveRequestRemoteFields {
+	return &p
+}
+
+type PayrollRunsRetrieveRequestShowEnumOrigins string
+
+const (
+	PayrollRunsRetrieveRequestShowEnumOriginsRunState        PayrollRunsRetrieveRequestShowEnumOrigins = "run_state"
+	PayrollRunsRetrieveRequestShowEnumOriginsRunStateRunType PayrollRunsRetrieveRequestShowEnumOrigins = "run_state,run_type"
+	PayrollRunsRetrieveRequestShowEnumOriginsRunType         PayrollRunsRetrieveRequestShowEnumOrigins = "run_type"
+)
+
+func NewPayrollRunsRetrieveRequestShowEnumOriginsFromString(s string) (PayrollRunsRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "run_state":
+		return PayrollRunsRetrieveRequestShowEnumOriginsRunState, nil
+	case "run_state,run_type":
+		return PayrollRunsRetrieveRequestShowEnumOriginsRunStateRunType, nil
+	case "run_type":
+		return PayrollRunsRetrieveRequestShowEnumOriginsRunType, nil
+	}
+	var t PayrollRunsRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayrollRunsRetrieveRequestShowEnumOrigins) Ptr() *PayrollRunsRetrieveRequestShowEnumOrigins {
+	return &p
 }

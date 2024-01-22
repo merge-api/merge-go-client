@@ -12,33 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *accounting.AttachmentsListRequest) (*accounting.PaginatedAccountingAttachmentList, error)
-	Create(ctx context.Context, request *accounting.AccountingAttachmentEndpointRequest) (*accounting.AccountingAttachmentResponse, error)
-	Retrieve(ctx context.Context, id string, request *accounting.AttachmentsRetrieveRequest) (*accounting.AccountingAttachment, error)
-	MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `AccountingAttachment` objects.
-func (c *client) List(ctx context.Context, request *accounting.AttachmentsListRequest) (*accounting.PaginatedAccountingAttachmentList, error) {
+func (c *Client) List(ctx context.Context, request *accounting.AttachmentsListRequest) (*accounting.PaginatedAccountingAttachmentList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -81,24 +74,22 @@ func (c *client) List(ctx context.Context, request *accounting.AttachmentsListRe
 	}
 
 	var response *accounting.PaginatedAccountingAttachmentList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `AccountingAttachment` object with the given values.
-func (c *client) Create(ctx context.Context, request *accounting.AccountingAttachmentEndpointRequest) (*accounting.AccountingAttachmentResponse, error) {
+func (c *Client) Create(ctx context.Context, request *accounting.AccountingAttachmentEndpointRequest) (*accounting.AccountingAttachmentResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -117,24 +108,23 @@ func (c *client) Create(ctx context.Context, request *accounting.AccountingAttac
 	}
 
 	var response *accounting.AccountingAttachmentResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `AccountingAttachment` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *accounting.AttachmentsRetrieveRequest) (*accounting.AccountingAttachment, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.AttachmentsRetrieveRequest) (*accounting.AccountingAttachment, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -150,24 +140,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.At
 	}
 
 	var response *accounting.AccountingAttachment
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `AccountingAttachment` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -175,18 +163,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	endpointURL := baseURL + "/" + "api/accounting/v1/attachments/meta/post"
 
 	var response *accounting.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

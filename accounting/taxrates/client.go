@@ -12,31 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *accounting.TaxRatesListRequest) (*accounting.PaginatedTaxRateList, error)
-	Retrieve(ctx context.Context, id string, request *accounting.TaxRatesRetrieveRequest) (*accounting.TaxRate, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `TaxRate` objects.
-func (c *client) List(ctx context.Context, request *accounting.TaxRatesListRequest) (*accounting.PaginatedTaxRateList, error) {
+func (c *Client) List(ctx context.Context, request *accounting.TaxRatesListRequest) (*accounting.PaginatedTaxRateList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -57,7 +52,7 @@ func (c *client) List(ctx context.Context, request *accounting.TaxRatesListReque
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
@@ -82,24 +77,22 @@ func (c *client) List(ctx context.Context, request *accounting.TaxRatesListReque
 	}
 
 	var response *accounting.PaginatedTaxRateList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `TaxRate` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *accounting.TaxRatesRetrieveRequest) (*accounting.TaxRate, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.TaxRatesRetrieveRequest) (*accounting.TaxRate, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -108,7 +101,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ta
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
@@ -118,18 +111,16 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ta
 	}
 
 	var response *accounting.TaxRate
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

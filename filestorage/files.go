@@ -3,6 +3,7 @@
 package filestorage
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -53,4 +54,78 @@ type FilesRetrieveRequest struct {
 	Expand *FilesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type FilesListRequestExpand string
+
+const (
+	FilesListRequestExpandDrive                  FilesListRequestExpand = "drive"
+	FilesListRequestExpandFolder                 FilesListRequestExpand = "folder"
+	FilesListRequestExpandFolderDrive            FilesListRequestExpand = "folder,drive"
+	FilesListRequestExpandPermissions            FilesListRequestExpand = "permissions"
+	FilesListRequestExpandPermissionsDrive       FilesListRequestExpand = "permissions,drive"
+	FilesListRequestExpandPermissionsFolder      FilesListRequestExpand = "permissions,folder"
+	FilesListRequestExpandPermissionsFolderDrive FilesListRequestExpand = "permissions,folder,drive"
+)
+
+func NewFilesListRequestExpandFromString(s string) (FilesListRequestExpand, error) {
+	switch s {
+	case "drive":
+		return FilesListRequestExpandDrive, nil
+	case "folder":
+		return FilesListRequestExpandFolder, nil
+	case "folder,drive":
+		return FilesListRequestExpandFolderDrive, nil
+	case "permissions":
+		return FilesListRequestExpandPermissions, nil
+	case "permissions,drive":
+		return FilesListRequestExpandPermissionsDrive, nil
+	case "permissions,folder":
+		return FilesListRequestExpandPermissionsFolder, nil
+	case "permissions,folder,drive":
+		return FilesListRequestExpandPermissionsFolderDrive, nil
+	}
+	var t FilesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FilesListRequestExpand) Ptr() *FilesListRequestExpand {
+	return &f
+}
+
+type FilesRetrieveRequestExpand string
+
+const (
+	FilesRetrieveRequestExpandDrive                  FilesRetrieveRequestExpand = "drive"
+	FilesRetrieveRequestExpandFolder                 FilesRetrieveRequestExpand = "folder"
+	FilesRetrieveRequestExpandFolderDrive            FilesRetrieveRequestExpand = "folder,drive"
+	FilesRetrieveRequestExpandPermissions            FilesRetrieveRequestExpand = "permissions"
+	FilesRetrieveRequestExpandPermissionsDrive       FilesRetrieveRequestExpand = "permissions,drive"
+	FilesRetrieveRequestExpandPermissionsFolder      FilesRetrieveRequestExpand = "permissions,folder"
+	FilesRetrieveRequestExpandPermissionsFolderDrive FilesRetrieveRequestExpand = "permissions,folder,drive"
+)
+
+func NewFilesRetrieveRequestExpandFromString(s string) (FilesRetrieveRequestExpand, error) {
+	switch s {
+	case "drive":
+		return FilesRetrieveRequestExpandDrive, nil
+	case "folder":
+		return FilesRetrieveRequestExpandFolder, nil
+	case "folder,drive":
+		return FilesRetrieveRequestExpandFolderDrive, nil
+	case "permissions":
+		return FilesRetrieveRequestExpandPermissions, nil
+	case "permissions,drive":
+		return FilesRetrieveRequestExpandPermissionsDrive, nil
+	case "permissions,folder":
+		return FilesRetrieveRequestExpandPermissionsFolder, nil
+	case "permissions,folder,drive":
+		return FilesRetrieveRequestExpandPermissionsFolderDrive, nil
+	}
+	var t FilesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FilesRetrieveRequestExpand) Ptr() *FilesRetrieveRequestExpand {
+	return &f
 }

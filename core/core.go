@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -19,6 +20,17 @@ const (
 // HTTPClient is an interface for a subset of the *http.Client.
 type HTTPClient interface {
 	Do(*http.Request) (*http.Response, error)
+}
+
+// WriteMultipartJSON writes the given value as a JSON part.
+// This is used to serialize non-primitive multipart properties
+// (i.e. lists, objects, etc).
+func WriteMultipartJSON(writer *multipart.Writer, field string, value interface{}) error {
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return writer.WriteField(field, string(bytes))
 }
 
 // APIError is a lightweight wrapper around the standard error
@@ -64,31 +76,32 @@ func (a *APIError) Error() string {
 // typed API error (e.g. *APIError).
 type ErrorDecoder func(statusCode int, body io.Reader) error
 
-// DoRequest issues a JSON request to the given url.
-func DoRequest(
-	ctx context.Context,
-	client HTTPClient,
-	url string,
-	method string,
-	request any,
-	response any,
-	responseIsOptional bool,
-	endpointHeaders http.Header,
-	errorDecoder ErrorDecoder,
-) error {
-	var requestBody io.Reader
-	if request != nil {
-		if body, ok := request.(io.Reader); ok {
-			requestBody = body
-		} else {
-			requestBytes, err := json.Marshal(request)
-			if err != nil {
-				return err
-			}
-			requestBody = bytes.NewReader(requestBytes)
-		}
+// Caller calls APIs and deserializes their response, if any.
+type Caller struct {
+	client HTTPClient
+}
+
+// NewCaller returns a new *Caller backed by the given HTTP client.
+func NewCaller(client HTTPClient) *Caller {
+	return &Caller{
+		client: client,
 	}
-	req, err := newRequest(ctx, url, method, endpointHeaders, requestBody)
+}
+
+// CallParams represents the parameters used to issue an API call.
+type CallParams struct {
+	URL                string
+	Method             string
+	Headers            http.Header
+	Request            interface{}
+	Response           interface{}
+	ResponseIsOptional bool
+	ErrorDecoder       ErrorDecoder
+}
+
+// Call issues an API call according to the given call parameters.
+func (c *Caller) Call(ctx context.Context, params *CallParams) error {
+	req, err := newRequest(ctx, params.URL, params.Method, params.Headers, params.Request)
 	if err != nil {
 		return err
 	}
@@ -97,7 +110,8 @@ func DoRequest(
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	resp, err := client.Do(req)
+
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -112,43 +126,24 @@ func DoRequest(
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		if errorDecoder != nil {
-			// This endpoint has custom errors, so we'll
-			// attempt to unmarshal the error into a structured
-			// type based on the status code.
-			return errorDecoder(resp.StatusCode, resp.Body)
-		}
-		// This endpoint doesn't have any custom error
-		// types, so we just read the body as-is, and
-		// put it into a normal error.
-		bytes, err := io.ReadAll(resp.Body)
-		if err != nil && err != io.EOF {
-			return err
-		}
-		if err == io.EOF {
-			// The error didn't have a response body,
-			// so all we can do is return an error
-			// with the status code.
-			return NewAPIError(resp.StatusCode, nil)
-		}
-		return NewAPIError(resp.StatusCode, errors.New(string(bytes)))
+		return decodeError(resp, params.ErrorDecoder)
 	}
 
 	// Mutate the response parameter in-place.
-	if response != nil {
-		if writer, ok := response.(io.Writer); ok {
+	if params.Response != nil {
+		if writer, ok := params.Response.(io.Writer); ok {
 			_, err = io.Copy(writer, resp.Body)
 		} else {
-			err = json.NewDecoder(resp.Body).Decode(response)
+			err = json.NewDecoder(resp.Body).Decode(params.Response)
 		}
 		if err != nil {
 			if err == io.EOF {
-				if responseIsOptional {
+				if params.ResponseIsOptional {
 					// The response is optional, so we should ignore the
 					// io.EOF error
 					return nil
 				}
-				return fmt.Errorf("expected a %T response, but the server responded with nothing", response)
+				return fmt.Errorf("expected a %T response, but the server responded with nothing", params.Response)
 			}
 			return err
 		}
@@ -164,8 +159,12 @@ func newRequest(
 	url string,
 	method string,
 	endpointHeaders http.Header,
-	requestBody io.Reader,
+	request interface{},
 ) (*http.Request, error) {
+	requestBody, err := newRequestBody(request)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequestWithContext(ctx, method, url, requestBody)
 	if err != nil {
 		return nil, err
@@ -176,4 +175,46 @@ func newRequest(
 		req.Header[name] = values
 	}
 	return req, nil
+}
+
+// newRequestBody returns a new io.Reader that represents the HTTP request body.
+func newRequestBody(request interface{}) (io.Reader, error) {
+	var requestBody io.Reader
+	if request != nil {
+		if body, ok := request.(io.Reader); ok {
+			requestBody = body
+		} else {
+			requestBytes, err := json.Marshal(request)
+			if err != nil {
+				return nil, err
+			}
+			requestBody = bytes.NewReader(requestBytes)
+		}
+	}
+	return requestBody, nil
+}
+
+// decodeError decodes the error from the given HTTP response. Note that
+// it's the caller's responsibility to close the response body.
+func decodeError(response *http.Response, errorDecoder ErrorDecoder) error {
+	if errorDecoder != nil {
+		// This endpoint has custom errors, so we'll
+		// attempt to unmarshal the error into a structured
+		// type based on the status code.
+		return errorDecoder(response.StatusCode, response.Body)
+	}
+	// This endpoint doesn't have any custom error
+	// types, so we just read the body as-is, and
+	// put it into a normal error.
+	bytes, err := io.ReadAll(response.Body)
+	if err != nil && err != io.EOF {
+		return err
+	}
+	if err == io.EOF {
+		// The error didn't have a response body,
+		// so all we can do is return an error
+		// with the status code.
+		return NewAPIError(response.StatusCode, nil)
+	}
+	return NewAPIError(response.StatusCode, errors.New(string(bytes)))
 }

@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -46,4 +47,54 @@ type OffersRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type OffersListRequestExpand string
+
+const (
+	OffersListRequestExpandApplication        OffersListRequestExpand = "application"
+	OffersListRequestExpandApplicationCreator OffersListRequestExpand = "application,creator"
+	OffersListRequestExpandCreator            OffersListRequestExpand = "creator"
+)
+
+func NewOffersListRequestExpandFromString(s string) (OffersListRequestExpand, error) {
+	switch s {
+	case "application":
+		return OffersListRequestExpandApplication, nil
+	case "application,creator":
+		return OffersListRequestExpandApplicationCreator, nil
+	case "creator":
+		return OffersListRequestExpandCreator, nil
+	}
+	var t OffersListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OffersListRequestExpand) Ptr() *OffersListRequestExpand {
+	return &o
+}
+
+type OffersRetrieveRequestExpand string
+
+const (
+	OffersRetrieveRequestExpandApplication        OffersRetrieveRequestExpand = "application"
+	OffersRetrieveRequestExpandApplicationCreator OffersRetrieveRequestExpand = "application,creator"
+	OffersRetrieveRequestExpandCreator            OffersRetrieveRequestExpand = "creator"
+)
+
+func NewOffersRetrieveRequestExpandFromString(s string) (OffersRetrieveRequestExpand, error) {
+	switch s {
+	case "application":
+		return OffersRetrieveRequestExpandApplication, nil
+	case "application,creator":
+		return OffersRetrieveRequestExpandApplicationCreator, nil
+	case "creator":
+		return OffersRetrieveRequestExpandCreator, nil
+	}
+	var t OffersRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OffersRetrieveRequestExpand) Ptr() *OffersRetrieveRequestExpand {
+	return &o
 }

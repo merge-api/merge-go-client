@@ -12,33 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *accounting.ExpensesListRequest) (*accounting.PaginatedExpenseList, error)
-	Create(ctx context.Context, request *accounting.ExpenseEndpointRequest) (*accounting.ExpenseResponse, error)
-	Retrieve(ctx context.Context, id string, request *accounting.ExpensesRetrieveRequest) (*accounting.Expense, error)
-	MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Expense` objects.
-func (c *client) List(ctx context.Context, request *accounting.ExpensesListRequest) (*accounting.PaginatedExpenseList, error) {
+func (c *Client) List(ctx context.Context, request *accounting.ExpensesListRequest) (*accounting.PaginatedExpenseList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -90,24 +83,22 @@ func (c *client) List(ctx context.Context, request *accounting.ExpensesListReque
 	}
 
 	var response *accounting.PaginatedExpenseList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `Expense` object with the given values.
-func (c *client) Create(ctx context.Context, request *accounting.ExpenseEndpointRequest) (*accounting.ExpenseResponse, error) {
+func (c *Client) Create(ctx context.Context, request *accounting.ExpenseEndpointRequest) (*accounting.ExpenseResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -126,24 +117,23 @@ func (c *client) Create(ctx context.Context, request *accounting.ExpenseEndpoint
 	}
 
 	var response *accounting.ExpenseResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `Expense` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *accounting.ExpensesRetrieveRequest) (*accounting.Expense, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.ExpensesRetrieveRequest) (*accounting.Expense, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -162,24 +152,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ex
 	}
 
 	var response *accounting.Expense
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Expense` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -187,18 +175,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	endpointURL := baseURL + "/" + "api/accounting/v1/expenses/meta/post"
 
 	var response *accounting.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

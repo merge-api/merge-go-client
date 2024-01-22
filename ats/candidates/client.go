@@ -12,36 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *ats.CandidatesListRequest) (*ats.PaginatedCandidateList, error)
-	Create(ctx context.Context, request *ats.CandidateEndpointRequest) (*ats.CandidateResponse, error)
-	Retrieve(ctx context.Context, id string, request *ats.CandidatesRetrieveRequest) (*ats.Candidate, error)
-	PartialUpdate(ctx context.Context, id string, request *ats.PatchedCandidateEndpointRequest) (*ats.CandidateResponse, error)
-	IgnoreCreate(ctx context.Context, modelId string, request *ats.IgnoreCommonModelRequest) error
-	MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaResponse, error)
-	MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Candidate` objects.
-func (c *client) List(ctx context.Context, request *ats.CandidatesListRequest) (*ats.PaginatedCandidateList, error) {
+func (c *Client) List(ctx context.Context, request *ats.CandidatesListRequest) (*ats.PaginatedCandidateList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -96,24 +86,22 @@ func (c *client) List(ctx context.Context, request *ats.CandidatesListRequest) (
 	}
 
 	var response *ats.PaginatedCandidateList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates a `Candidate` object with the given values.
-func (c *client) Create(ctx context.Context, request *ats.CandidateEndpointRequest) (*ats.CandidateResponse, error) {
+func (c *Client) Create(ctx context.Context, request *ats.CandidateEndpointRequest) (*ats.CandidateResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -132,24 +120,23 @@ func (c *client) Create(ctx context.Context, request *ats.CandidateEndpointReque
 	}
 
 	var response *ats.CandidateResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `Candidate` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *ats.CandidatesRetrieveRequest) (*ats.Candidate, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *ats.CandidatesRetrieveRequest) (*ats.Candidate, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -168,24 +155,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ats.Candidate
 	}
 
 	var response *ats.Candidate
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Updates a `Candidate` object with the given `id`.
-func (c *client) PartialUpdate(ctx context.Context, id string, request *ats.PatchedCandidateEndpointRequest) (*ats.CandidateResponse, error) {
+func (c *Client) PartialUpdate(ctx context.Context, id string, request *ats.PatchedCandidateEndpointRequest) (*ats.CandidateResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -204,40 +189,37 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *ats.Patc
 	}
 
 	var response *ats.CandidateResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPatch,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPatch,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Ignores a specific row based on the `model_id` in the url. These records will have their properties set to null, and will not be updated in future syncs. The "reason" and "message" fields in the request body will be stored for audit purposes.
-func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *ats.IgnoreCommonModelRequest) error {
+func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *ats.IgnoreCommonModelRequest) error {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/ignore/%v", modelId)
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		nil,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:     endpointURL,
+			Method:  http.MethodPost,
+			Headers: c.header,
+			Request: request,
+		},
 	); err != nil {
 		return err
 	}
@@ -245,7 +227,7 @@ func (c *client) IgnoreCreate(ctx context.Context, modelId string, request *ats.
 }
 
 // Returns metadata for `Candidate` PATCHs.
-func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaResponse, error) {
+func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -253,24 +235,22 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaRes
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/meta/patch/%v", id)
 
 	var response *ats.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Candidate` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -278,18 +258,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error
 	endpointURL := baseURL + "/" + "api/ats/v1/candidates/meta/post"
 
 	var response *ats.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

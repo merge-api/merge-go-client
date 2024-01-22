@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -52,4 +53,414 @@ type PaymentsRetrieveRequest struct {
 	Expand *PaymentsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type PaymentsListRequestExpand string
+
+const (
+	PaymentsListRequestExpandAccount                                                               PaymentsListRequestExpand = "account"
+	PaymentsListRequestExpandAccountAccountingPeriod                                               PaymentsListRequestExpand = "account,accounting_period"
+	PaymentsListRequestExpandAccountCompany                                                        PaymentsListRequestExpand = "account,company"
+	PaymentsListRequestExpandAccountCompanyAccountingPeriod                                        PaymentsListRequestExpand = "account,company,accounting_period"
+	PaymentsListRequestExpandAccountingPeriod                                                      PaymentsListRequestExpand = "accounting_period"
+	PaymentsListRequestExpandAppliedToLines                                                        PaymentsListRequestExpand = "applied_to_lines"
+	PaymentsListRequestExpandAppliedToLinesAccount                                                 PaymentsListRequestExpand = "applied_to_lines,account"
+	PaymentsListRequestExpandAppliedToLinesAccountAccountingPeriod                                 PaymentsListRequestExpand = "applied_to_lines,account,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesAccountCompany                                          PaymentsListRequestExpand = "applied_to_lines,account,company"
+	PaymentsListRequestExpandAppliedToLinesAccountCompanyAccountingPeriod                          PaymentsListRequestExpand = "applied_to_lines,account,company,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesAccountingPeriod                                        PaymentsListRequestExpand = "applied_to_lines,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesCompany                                                 PaymentsListRequestExpand = "applied_to_lines,company"
+	PaymentsListRequestExpandAppliedToLinesCompanyAccountingPeriod                                 PaymentsListRequestExpand = "applied_to_lines,company,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesContact                                                 PaymentsListRequestExpand = "applied_to_lines,contact"
+	PaymentsListRequestExpandAppliedToLinesContactAccount                                          PaymentsListRequestExpand = "applied_to_lines,contact,account"
+	PaymentsListRequestExpandAppliedToLinesContactAccountAccountingPeriod                          PaymentsListRequestExpand = "applied_to_lines,contact,account,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesContactAccountCompany                                   PaymentsListRequestExpand = "applied_to_lines,contact,account,company"
+	PaymentsListRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod                   PaymentsListRequestExpand = "applied_to_lines,contact,account,company,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesContactAccountingPeriod                                 PaymentsListRequestExpand = "applied_to_lines,contact,accounting_period"
+	PaymentsListRequestExpandAppliedToLinesContactCompany                                          PaymentsListRequestExpand = "applied_to_lines,contact,company"
+	PaymentsListRequestExpandAppliedToLinesContactCompanyAccountingPeriod                          PaymentsListRequestExpand = "applied_to_lines,contact,company,accounting_period"
+	PaymentsListRequestExpandCompany                                                               PaymentsListRequestExpand = "company"
+	PaymentsListRequestExpandCompanyAccountingPeriod                                               PaymentsListRequestExpand = "company,accounting_period"
+	PaymentsListRequestExpandContact                                                               PaymentsListRequestExpand = "contact"
+	PaymentsListRequestExpandContactAccount                                                        PaymentsListRequestExpand = "contact,account"
+	PaymentsListRequestExpandContactAccountAccountingPeriod                                        PaymentsListRequestExpand = "contact,account,accounting_period"
+	PaymentsListRequestExpandContactAccountCompany                                                 PaymentsListRequestExpand = "contact,account,company"
+	PaymentsListRequestExpandContactAccountCompanyAccountingPeriod                                 PaymentsListRequestExpand = "contact,account,company,accounting_period"
+	PaymentsListRequestExpandContactAccountingPeriod                                               PaymentsListRequestExpand = "contact,accounting_period"
+	PaymentsListRequestExpandContactCompany                                                        PaymentsListRequestExpand = "contact,company"
+	PaymentsListRequestExpandContactCompanyAccountingPeriod                                        PaymentsListRequestExpand = "contact,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategories                                                    PaymentsListRequestExpand = "tracking_categories"
+	PaymentsListRequestExpandTrackingCategoriesAccount                                             PaymentsListRequestExpand = "tracking_categories,account"
+	PaymentsListRequestExpandTrackingCategoriesAccountAccountingPeriod                             PaymentsListRequestExpand = "tracking_categories,account,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAccountCompany                                      PaymentsListRequestExpand = "tracking_categories,account,company"
+	PaymentsListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod                      PaymentsListRequestExpand = "tracking_categories,account,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAccountingPeriod                                    PaymentsListRequestExpand = "tracking_categories,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLines                                      PaymentsListRequestExpand = "tracking_categories,applied_to_lines"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount                               PaymentsListRequestExpand = "tracking_categories,applied_to_lines,account"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod               PaymentsListRequestExpand = "tracking_categories,applied_to_lines,account,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany                        PaymentsListRequestExpand = "tracking_categories,applied_to_lines,account,company"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod        PaymentsListRequestExpand = "tracking_categories,applied_to_lines,account,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod                      PaymentsListRequestExpand = "tracking_categories,applied_to_lines,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany                               PaymentsListRequestExpand = "tracking_categories,applied_to_lines,company"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod               PaymentsListRequestExpand = "tracking_categories,applied_to_lines,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact                               PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount                        PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,account"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod        PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,account,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany                 PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,account,company"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,account,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod               PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany                        PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,company"
+	PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod        PaymentsListRequestExpand = "tracking_categories,applied_to_lines,contact,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesCompany                                             PaymentsListRequestExpand = "tracking_categories,company"
+	PaymentsListRequestExpandTrackingCategoriesCompanyAccountingPeriod                             PaymentsListRequestExpand = "tracking_categories,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesContact                                             PaymentsListRequestExpand = "tracking_categories,contact"
+	PaymentsListRequestExpandTrackingCategoriesContactAccount                                      PaymentsListRequestExpand = "tracking_categories,contact,account"
+	PaymentsListRequestExpandTrackingCategoriesContactAccountAccountingPeriod                      PaymentsListRequestExpand = "tracking_categories,contact,account,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesContactAccountCompany                               PaymentsListRequestExpand = "tracking_categories,contact,account,company"
+	PaymentsListRequestExpandTrackingCategoriesContactAccountCompanyAccountingPeriod               PaymentsListRequestExpand = "tracking_categories,contact,account,company,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesContactAccountingPeriod                             PaymentsListRequestExpand = "tracking_categories,contact,accounting_period"
+	PaymentsListRequestExpandTrackingCategoriesContactCompany                                      PaymentsListRequestExpand = "tracking_categories,contact,company"
+	PaymentsListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                      PaymentsListRequestExpand = "tracking_categories,contact,company,accounting_period"
+)
+
+func NewPaymentsListRequestExpandFromString(s string) (PaymentsListRequestExpand, error) {
+	switch s {
+	case "account":
+		return PaymentsListRequestExpandAccount, nil
+	case "account,accounting_period":
+		return PaymentsListRequestExpandAccountAccountingPeriod, nil
+	case "account,company":
+		return PaymentsListRequestExpandAccountCompany, nil
+	case "account,company,accounting_period":
+		return PaymentsListRequestExpandAccountCompanyAccountingPeriod, nil
+	case "accounting_period":
+		return PaymentsListRequestExpandAccountingPeriod, nil
+	case "applied_to_lines":
+		return PaymentsListRequestExpandAppliedToLines, nil
+	case "applied_to_lines,account":
+		return PaymentsListRequestExpandAppliedToLinesAccount, nil
+	case "applied_to_lines,account,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesAccountAccountingPeriod, nil
+	case "applied_to_lines,account,company":
+		return PaymentsListRequestExpandAppliedToLinesAccountCompany, nil
+	case "applied_to_lines,account,company,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesAccountCompanyAccountingPeriod, nil
+	case "applied_to_lines,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesAccountingPeriod, nil
+	case "applied_to_lines,company":
+		return PaymentsListRequestExpandAppliedToLinesCompany, nil
+	case "applied_to_lines,company,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesCompanyAccountingPeriod, nil
+	case "applied_to_lines,contact":
+		return PaymentsListRequestExpandAppliedToLinesContact, nil
+	case "applied_to_lines,contact,account":
+		return PaymentsListRequestExpandAppliedToLinesContactAccount, nil
+	case "applied_to_lines,contact,account,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesContactAccountAccountingPeriod, nil
+	case "applied_to_lines,contact,account,company":
+		return PaymentsListRequestExpandAppliedToLinesContactAccountCompany, nil
+	case "applied_to_lines,contact,account,company,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod, nil
+	case "applied_to_lines,contact,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesContactAccountingPeriod, nil
+	case "applied_to_lines,contact,company":
+		return PaymentsListRequestExpandAppliedToLinesContactCompany, nil
+	case "applied_to_lines,contact,company,accounting_period":
+		return PaymentsListRequestExpandAppliedToLinesContactCompanyAccountingPeriod, nil
+	case "company":
+		return PaymentsListRequestExpandCompany, nil
+	case "company,accounting_period":
+		return PaymentsListRequestExpandCompanyAccountingPeriod, nil
+	case "contact":
+		return PaymentsListRequestExpandContact, nil
+	case "contact,account":
+		return PaymentsListRequestExpandContactAccount, nil
+	case "contact,account,accounting_period":
+		return PaymentsListRequestExpandContactAccountAccountingPeriod, nil
+	case "contact,account,company":
+		return PaymentsListRequestExpandContactAccountCompany, nil
+	case "contact,account,company,accounting_period":
+		return PaymentsListRequestExpandContactAccountCompanyAccountingPeriod, nil
+	case "contact,accounting_period":
+		return PaymentsListRequestExpandContactAccountingPeriod, nil
+	case "contact,company":
+		return PaymentsListRequestExpandContactCompany, nil
+	case "contact,company,accounting_period":
+		return PaymentsListRequestExpandContactCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return PaymentsListRequestExpandTrackingCategories, nil
+	case "tracking_categories,account":
+		return PaymentsListRequestExpandTrackingCategoriesAccount, nil
+	case "tracking_categories,account,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAccountAccountingPeriod, nil
+	case "tracking_categories,account,company":
+		return PaymentsListRequestExpandTrackingCategoriesAccountCompany, nil
+	case "tracking_categories,account,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLines, nil
+	case "tracking_categories,applied_to_lines,account":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccount, nil
+	case "tracking_categories,applied_to_lines,account,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,account,company":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompany, nil
+	case "tracking_categories,applied_to_lines,account,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,company":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompany, nil
+	case "tracking_categories,applied_to_lines,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContact, nil
+	case "tracking_categories,applied_to_lines,contact,account":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccount, nil
+	case "tracking_categories,applied_to_lines,contact,account,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact,account,company":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany, nil
+	case "tracking_categories,applied_to_lines,contact,account,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact,company":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompany, nil
+	case "tracking_categories,applied_to_lines,contact,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod, nil
+	case "tracking_categories,company":
+		return PaymentsListRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return PaymentsListRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,account":
+		return PaymentsListRequestExpandTrackingCategoriesContactAccount, nil
+	case "tracking_categories,contact,account,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesContactAccountAccountingPeriod, nil
+	case "tracking_categories,contact,account,company":
+		return PaymentsListRequestExpandTrackingCategoriesContactAccountCompany, nil
+	case "tracking_categories,contact,account,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesContactAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,contact,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories,contact,company":
+		return PaymentsListRequestExpandTrackingCategoriesContactCompany, nil
+	case "tracking_categories,contact,company,accounting_period":
+		return PaymentsListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	}
+	var t PaymentsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PaymentsListRequestExpand) Ptr() *PaymentsListRequestExpand {
+	return &p
+}
+
+type PaymentsRetrieveRequestExpand string
+
+const (
+	PaymentsRetrieveRequestExpandAccount                                                               PaymentsRetrieveRequestExpand = "account"
+	PaymentsRetrieveRequestExpandAccountAccountingPeriod                                               PaymentsRetrieveRequestExpand = "account,accounting_period"
+	PaymentsRetrieveRequestExpandAccountCompany                                                        PaymentsRetrieveRequestExpand = "account,company"
+	PaymentsRetrieveRequestExpandAccountCompanyAccountingPeriod                                        PaymentsRetrieveRequestExpand = "account,company,accounting_period"
+	PaymentsRetrieveRequestExpandAccountingPeriod                                                      PaymentsRetrieveRequestExpand = "accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLines                                                        PaymentsRetrieveRequestExpand = "applied_to_lines"
+	PaymentsRetrieveRequestExpandAppliedToLinesAccount                                                 PaymentsRetrieveRequestExpand = "applied_to_lines,account"
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountAccountingPeriod                                 PaymentsRetrieveRequestExpand = "applied_to_lines,account,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany                                          PaymentsRetrieveRequestExpand = "applied_to_lines,account,company"
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountCompanyAccountingPeriod                          PaymentsRetrieveRequestExpand = "applied_to_lines,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesAccountingPeriod                                        PaymentsRetrieveRequestExpand = "applied_to_lines,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesCompany                                                 PaymentsRetrieveRequestExpand = "applied_to_lines,company"
+	PaymentsRetrieveRequestExpandAppliedToLinesCompanyAccountingPeriod                                 PaymentsRetrieveRequestExpand = "applied_to_lines,company,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesContact                                                 PaymentsRetrieveRequestExpand = "applied_to_lines,contact"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccount                                          PaymentsRetrieveRequestExpand = "applied_to_lines,contact,account"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountAccountingPeriod                          PaymentsRetrieveRequestExpand = "applied_to_lines,contact,account,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany                                   PaymentsRetrieveRequestExpand = "applied_to_lines,contact,account,company"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod                   PaymentsRetrieveRequestExpand = "applied_to_lines,contact,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactAccountingPeriod                                 PaymentsRetrieveRequestExpand = "applied_to_lines,contact,accounting_period"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactCompany                                          PaymentsRetrieveRequestExpand = "applied_to_lines,contact,company"
+	PaymentsRetrieveRequestExpandAppliedToLinesContactCompanyAccountingPeriod                          PaymentsRetrieveRequestExpand = "applied_to_lines,contact,company,accounting_period"
+	PaymentsRetrieveRequestExpandCompany                                                               PaymentsRetrieveRequestExpand = "company"
+	PaymentsRetrieveRequestExpandCompanyAccountingPeriod                                               PaymentsRetrieveRequestExpand = "company,accounting_period"
+	PaymentsRetrieveRequestExpandContact                                                               PaymentsRetrieveRequestExpand = "contact"
+	PaymentsRetrieveRequestExpandContactAccount                                                        PaymentsRetrieveRequestExpand = "contact,account"
+	PaymentsRetrieveRequestExpandContactAccountAccountingPeriod                                        PaymentsRetrieveRequestExpand = "contact,account,accounting_period"
+	PaymentsRetrieveRequestExpandContactAccountCompany                                                 PaymentsRetrieveRequestExpand = "contact,account,company"
+	PaymentsRetrieveRequestExpandContactAccountCompanyAccountingPeriod                                 PaymentsRetrieveRequestExpand = "contact,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandContactAccountingPeriod                                               PaymentsRetrieveRequestExpand = "contact,accounting_period"
+	PaymentsRetrieveRequestExpandContactCompany                                                        PaymentsRetrieveRequestExpand = "contact,company"
+	PaymentsRetrieveRequestExpandContactCompanyAccountingPeriod                                        PaymentsRetrieveRequestExpand = "contact,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategories                                                    PaymentsRetrieveRequestExpand = "tracking_categories"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAccount                                             PaymentsRetrieveRequestExpand = "tracking_categories,account"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod                             PaymentsRetrieveRequestExpand = "tracking_categories,account,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompany                                      PaymentsRetrieveRequestExpand = "tracking_categories,account,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod                      PaymentsRetrieveRequestExpand = "tracking_categories,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAccountingPeriod                                    PaymentsRetrieveRequestExpand = "tracking_categories,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines                                      PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount                               PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,account"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod               PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,account,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany                        PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,account,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod        PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod                      PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany                               PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod               PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact                               PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount                        PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,account"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod        PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,account,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany                 PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,account,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod               PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany                        PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod        PaymentsRetrieveRequestExpand = "tracking_categories,applied_to_lines,contact,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesCompany                                             PaymentsRetrieveRequestExpand = "tracking_categories,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod                             PaymentsRetrieveRequestExpand = "tracking_categories,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContact                                             PaymentsRetrieveRequestExpand = "tracking_categories,contact"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactAccount                                      PaymentsRetrieveRequestExpand = "tracking_categories,contact,account"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountAccountingPeriod                      PaymentsRetrieveRequestExpand = "tracking_categories,contact,account,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountCompany                               PaymentsRetrieveRequestExpand = "tracking_categories,contact,account,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountCompanyAccountingPeriod               PaymentsRetrieveRequestExpand = "tracking_categories,contact,account,company,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod                             PaymentsRetrieveRequestExpand = "tracking_categories,contact,accounting_period"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactCompany                                      PaymentsRetrieveRequestExpand = "tracking_categories,contact,company"
+	PaymentsRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                      PaymentsRetrieveRequestExpand = "tracking_categories,contact,company,accounting_period"
+)
+
+func NewPaymentsRetrieveRequestExpandFromString(s string) (PaymentsRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return PaymentsRetrieveRequestExpandAccount, nil
+	case "account,accounting_period":
+		return PaymentsRetrieveRequestExpandAccountAccountingPeriod, nil
+	case "account,company":
+		return PaymentsRetrieveRequestExpandAccountCompany, nil
+	case "account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandAccountCompanyAccountingPeriod, nil
+	case "accounting_period":
+		return PaymentsRetrieveRequestExpandAccountingPeriod, nil
+	case "applied_to_lines":
+		return PaymentsRetrieveRequestExpandAppliedToLines, nil
+	case "applied_to_lines,account":
+		return PaymentsRetrieveRequestExpandAppliedToLinesAccount, nil
+	case "applied_to_lines,account,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesAccountAccountingPeriod, nil
+	case "applied_to_lines,account,company":
+		return PaymentsRetrieveRequestExpandAppliedToLinesAccountCompany, nil
+	case "applied_to_lines,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesAccountCompanyAccountingPeriod, nil
+	case "applied_to_lines,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesAccountingPeriod, nil
+	case "applied_to_lines,company":
+		return PaymentsRetrieveRequestExpandAppliedToLinesCompany, nil
+	case "applied_to_lines,company,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesCompanyAccountingPeriod, nil
+	case "applied_to_lines,contact":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContact, nil
+	case "applied_to_lines,contact,account":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactAccount, nil
+	case "applied_to_lines,contact,account,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactAccountAccountingPeriod, nil
+	case "applied_to_lines,contact,account,company":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompany, nil
+	case "applied_to_lines,contact,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactAccountCompanyAccountingPeriod, nil
+	case "applied_to_lines,contact,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactAccountingPeriod, nil
+	case "applied_to_lines,contact,company":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactCompany, nil
+	case "applied_to_lines,contact,company,accounting_period":
+		return PaymentsRetrieveRequestExpandAppliedToLinesContactCompanyAccountingPeriod, nil
+	case "company":
+		return PaymentsRetrieveRequestExpandCompany, nil
+	case "company,accounting_period":
+		return PaymentsRetrieveRequestExpandCompanyAccountingPeriod, nil
+	case "contact":
+		return PaymentsRetrieveRequestExpandContact, nil
+	case "contact,account":
+		return PaymentsRetrieveRequestExpandContactAccount, nil
+	case "contact,account,accounting_period":
+		return PaymentsRetrieveRequestExpandContactAccountAccountingPeriod, nil
+	case "contact,account,company":
+		return PaymentsRetrieveRequestExpandContactAccountCompany, nil
+	case "contact,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandContactAccountCompanyAccountingPeriod, nil
+	case "contact,accounting_period":
+		return PaymentsRetrieveRequestExpandContactAccountingPeriod, nil
+	case "contact,company":
+		return PaymentsRetrieveRequestExpandContactCompany, nil
+	case "contact,company,accounting_period":
+		return PaymentsRetrieveRequestExpandContactCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return PaymentsRetrieveRequestExpandTrackingCategories, nil
+	case "tracking_categories,account":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAccount, nil
+	case "tracking_categories,account,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod, nil
+	case "tracking_categories,account,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompany, nil
+	case "tracking_categories,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLines, nil
+	case "tracking_categories,applied_to_lines,account":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccount, nil
+	case "tracking_categories,applied_to_lines,account,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,account,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompany, nil
+	case "tracking_categories,applied_to_lines,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompany, nil
+	case "tracking_categories,applied_to_lines,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesCompanyAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContact, nil
+	case "tracking_categories,applied_to_lines,contact,account":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccount, nil
+	case "tracking_categories,applied_to_lines,contact,account,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact,account,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompany, nil
+	case "tracking_categories,applied_to_lines,contact,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactAccountingPeriod, nil
+	case "tracking_categories,applied_to_lines,contact,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompany, nil
+	case "tracking_categories,applied_to_lines,contact,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesAppliedToLinesContactCompanyAccountingPeriod, nil
+	case "tracking_categories,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,account":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactAccount, nil
+	case "tracking_categories,contact,account,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountAccountingPeriod, nil
+	case "tracking_categories,contact,account,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountCompany, nil
+	case "tracking_categories,contact,account,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,contact,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories,contact,company":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactCompany, nil
+	case "tracking_categories,contact,company,accounting_period":
+		return PaymentsRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	}
+	var t PaymentsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PaymentsRetrieveRequestExpand) Ptr() *PaymentsRetrieveRequestExpand {
+	return &p
 }

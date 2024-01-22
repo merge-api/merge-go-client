@@ -12,32 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *crm.StagesListRequest) (*crm.PaginatedStageList, error)
-	Retrieve(ctx context.Context, id string, request *crm.StagesRetrieveRequest) (*crm.Stage, error)
-	RemoteFieldClassesList(ctx context.Context, request *crm.StagesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Stage` objects.
-func (c *client) List(ctx context.Context, request *crm.StagesListRequest) (*crm.PaginatedStageList, error) {
+func (c *Client) List(ctx context.Context, request *crm.StagesListRequest) (*crm.PaginatedStageList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -80,24 +74,22 @@ func (c *client) List(ctx context.Context, request *crm.StagesListRequest) (*crm
 	}
 
 	var response *crm.PaginatedStageList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `Stage` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *crm.StagesRetrieveRequest) (*crm.Stage, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *crm.StagesRetrieveRequest) (*crm.Stage, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -116,24 +108,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.StagesRet
 	}
 
 	var response *crm.Stage
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
-func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.StagesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
+func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.StagesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -161,18 +151,16 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.Stages
 	}
 
 	var response *crm.PaginatedRemoteFieldClassList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

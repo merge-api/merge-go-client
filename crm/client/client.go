@@ -37,233 +37,81 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	AccountDetails() accountdetails.Client
-	AccountToken() accounttoken.Client
-	Accounts() accounts.Client
-	AsyncPassthrough() asyncpassthrough.Client
-	AuditTrail() audittrail.Client
-	AvailableActions() availableactions.Client
-	Contacts() contacts.Client
-	CustomObjectClasses() customobjectclasses.Client
-	AssociationTypes() associationtypes.Client
-	CustomObjects() customobjects.Client
-	Associations() associations.Client
-	DeleteAccount() deleteaccount.Client
-	EngagementTypes() engagementtypes.Client
-	Engagements() engagements.Client
-	GenerateKey() generatekey.Client
-	Issues() issues.Client
-	Leads() leads.Client
-	LinkToken() linktoken.Client
-	LinkedAccounts() linkedaccounts.Client
-	Notes() notes.Client
-	Opportunities() opportunities.Client
-	Passthrough() passthrough.Client
-	RegenerateKey() regeneratekey.Client
-	SelectiveSync() selectivesync.Client
-	Stages() stages.Client
-	SyncStatus() syncstatus.Client
-	ForceResync() forceresync.Client
-	Tasks() tasks.Client
-	Users() users.Client
-	WebhookReceivers() webhookreceivers.Client
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
+
+	AccountDetails      *accountdetails.Client
+	AccountToken        *accounttoken.Client
+	Accounts            *accounts.Client
+	AsyncPassthrough    *asyncpassthrough.Client
+	AuditTrail          *audittrail.Client
+	AvailableActions    *availableactions.Client
+	Contacts            *contacts.Client
+	CustomObjectClasses *customobjectclasses.Client
+	AssociationTypes    *associationtypes.Client
+	CustomObjects       *customobjects.Client
+	Associations        *associations.Client
+	DeleteAccount       *deleteaccount.Client
+	EngagementTypes     *engagementtypes.Client
+	Engagements         *engagements.Client
+	GenerateKey         *generatekey.Client
+	Issues              *issues.Client
+	Leads               *leads.Client
+	LinkToken           *linktoken.Client
+	LinkedAccounts      *linkedaccounts.Client
+	Notes               *notes.Client
+	Opportunities       *opportunities.Client
+	Passthrough         *passthrough.Client
+	RegenerateKey       *regeneratekey.Client
+	SelectiveSync       *selectivesync.Client
+	Stages              *stages.Client
+	SyncStatus          *syncstatus.Client
+	ForceResync         *forceresync.Client
+	Tasks               *tasks.Client
+	Users               *users.Client
+	WebhookReceivers    *webhookreceivers.Client
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:                   options.BaseURL,
-		httpClient:                options.HTTPClient,
-		header:                    options.ToHeader(),
-		accountDetailsClient:      accountdetails.NewClient(opts...),
-		accountTokenClient:        accounttoken.NewClient(opts...),
-		accountsClient:            accounts.NewClient(opts...),
-		asyncPassthroughClient:    asyncpassthrough.NewClient(opts...),
-		auditTrailClient:          audittrail.NewClient(opts...),
-		availableActionsClient:    availableactions.NewClient(opts...),
-		contactsClient:            contacts.NewClient(opts...),
-		customObjectClassesClient: customobjectclasses.NewClient(opts...),
-		associationTypesClient:    associationtypes.NewClient(opts...),
-		customObjectsClient:       customobjects.NewClient(opts...),
-		associationsClient:        associations.NewClient(opts...),
-		deleteAccountClient:       deleteaccount.NewClient(opts...),
-		engagementTypesClient:     engagementtypes.NewClient(opts...),
-		engagementsClient:         engagements.NewClient(opts...),
-		generateKeyClient:         generatekey.NewClient(opts...),
-		issuesClient:              issues.NewClient(opts...),
-		leadsClient:               leads.NewClient(opts...),
-		linkTokenClient:           linktoken.NewClient(opts...),
-		linkedAccountsClient:      linkedaccounts.NewClient(opts...),
-		notesClient:               notes.NewClient(opts...),
-		opportunitiesClient:       opportunities.NewClient(opts...),
-		passthroughClient:         passthrough.NewClient(opts...),
-		regenerateKeyClient:       regeneratekey.NewClient(opts...),
-		selectiveSyncClient:       selectivesync.NewClient(opts...),
-		stagesClient:              stages.NewClient(opts...),
-		syncStatusClient:          syncstatus.NewClient(opts...),
-		forceResyncClient:         forceresync.NewClient(opts...),
-		tasksClient:               tasks.NewClient(opts...),
-		usersClient:               users.NewClient(opts...),
-		webhookReceiversClient:    webhookreceivers.NewClient(opts...),
+	return &Client{
+		baseURL:             options.BaseURL,
+		caller:              core.NewCaller(options.HTTPClient),
+		header:              options.ToHeader(),
+		AccountDetails:      accountdetails.NewClient(opts...),
+		AccountToken:        accounttoken.NewClient(opts...),
+		Accounts:            accounts.NewClient(opts...),
+		AsyncPassthrough:    asyncpassthrough.NewClient(opts...),
+		AuditTrail:          audittrail.NewClient(opts...),
+		AvailableActions:    availableactions.NewClient(opts...),
+		Contacts:            contacts.NewClient(opts...),
+		CustomObjectClasses: customobjectclasses.NewClient(opts...),
+		AssociationTypes:    associationtypes.NewClient(opts...),
+		CustomObjects:       customobjects.NewClient(opts...),
+		Associations:        associations.NewClient(opts...),
+		DeleteAccount:       deleteaccount.NewClient(opts...),
+		EngagementTypes:     engagementtypes.NewClient(opts...),
+		Engagements:         engagements.NewClient(opts...),
+		GenerateKey:         generatekey.NewClient(opts...),
+		Issues:              issues.NewClient(opts...),
+		Leads:               leads.NewClient(opts...),
+		LinkToken:           linktoken.NewClient(opts...),
+		LinkedAccounts:      linkedaccounts.NewClient(opts...),
+		Notes:               notes.NewClient(opts...),
+		Opportunities:       opportunities.NewClient(opts...),
+		Passthrough:         passthrough.NewClient(opts...),
+		RegenerateKey:       regeneratekey.NewClient(opts...),
+		SelectiveSync:       selectivesync.NewClient(opts...),
+		Stages:              stages.NewClient(opts...),
+		SyncStatus:          syncstatus.NewClient(opts...),
+		ForceResync:         forceresync.NewClient(opts...),
+		Tasks:               tasks.NewClient(opts...),
+		Users:               users.NewClient(opts...),
+		WebhookReceivers:    webhookreceivers.NewClient(opts...),
 	}
-}
-
-type client struct {
-	baseURL                   string
-	httpClient                core.HTTPClient
-	header                    http.Header
-	accountDetailsClient      accountdetails.Client
-	accountTokenClient        accounttoken.Client
-	accountsClient            accounts.Client
-	asyncPassthroughClient    asyncpassthrough.Client
-	auditTrailClient          audittrail.Client
-	availableActionsClient    availableactions.Client
-	contactsClient            contacts.Client
-	customObjectClassesClient customobjectclasses.Client
-	associationTypesClient    associationtypes.Client
-	customObjectsClient       customobjects.Client
-	associationsClient        associations.Client
-	deleteAccountClient       deleteaccount.Client
-	engagementTypesClient     engagementtypes.Client
-	engagementsClient         engagements.Client
-	generateKeyClient         generatekey.Client
-	issuesClient              issues.Client
-	leadsClient               leads.Client
-	linkTokenClient           linktoken.Client
-	linkedAccountsClient      linkedaccounts.Client
-	notesClient               notes.Client
-	opportunitiesClient       opportunities.Client
-	passthroughClient         passthrough.Client
-	regenerateKeyClient       regeneratekey.Client
-	selectiveSyncClient       selectivesync.Client
-	stagesClient              stages.Client
-	syncStatusClient          syncstatus.Client
-	forceResyncClient         forceresync.Client
-	tasksClient               tasks.Client
-	usersClient               users.Client
-	webhookReceiversClient    webhookreceivers.Client
-}
-
-func (c *client) AccountDetails() accountdetails.Client {
-	return c.accountDetailsClient
-}
-
-func (c *client) AccountToken() accounttoken.Client {
-	return c.accountTokenClient
-}
-
-func (c *client) Accounts() accounts.Client {
-	return c.accountsClient
-}
-
-func (c *client) AsyncPassthrough() asyncpassthrough.Client {
-	return c.asyncPassthroughClient
-}
-
-func (c *client) AuditTrail() audittrail.Client {
-	return c.auditTrailClient
-}
-
-func (c *client) AvailableActions() availableactions.Client {
-	return c.availableActionsClient
-}
-
-func (c *client) Contacts() contacts.Client {
-	return c.contactsClient
-}
-
-func (c *client) CustomObjectClasses() customobjectclasses.Client {
-	return c.customObjectClassesClient
-}
-
-func (c *client) AssociationTypes() associationtypes.Client {
-	return c.associationTypesClient
-}
-
-func (c *client) CustomObjects() customobjects.Client {
-	return c.customObjectsClient
-}
-
-func (c *client) Associations() associations.Client {
-	return c.associationsClient
-}
-
-func (c *client) DeleteAccount() deleteaccount.Client {
-	return c.deleteAccountClient
-}
-
-func (c *client) EngagementTypes() engagementtypes.Client {
-	return c.engagementTypesClient
-}
-
-func (c *client) Engagements() engagements.Client {
-	return c.engagementsClient
-}
-
-func (c *client) GenerateKey() generatekey.Client {
-	return c.generateKeyClient
-}
-
-func (c *client) Issues() issues.Client {
-	return c.issuesClient
-}
-
-func (c *client) Leads() leads.Client {
-	return c.leadsClient
-}
-
-func (c *client) LinkToken() linktoken.Client {
-	return c.linkTokenClient
-}
-
-func (c *client) LinkedAccounts() linkedaccounts.Client {
-	return c.linkedAccountsClient
-}
-
-func (c *client) Notes() notes.Client {
-	return c.notesClient
-}
-
-func (c *client) Opportunities() opportunities.Client {
-	return c.opportunitiesClient
-}
-
-func (c *client) Passthrough() passthrough.Client {
-	return c.passthroughClient
-}
-
-func (c *client) RegenerateKey() regeneratekey.Client {
-	return c.regenerateKeyClient
-}
-
-func (c *client) SelectiveSync() selectivesync.Client {
-	return c.selectiveSyncClient
-}
-
-func (c *client) Stages() stages.Client {
-	return c.stagesClient
-}
-
-func (c *client) SyncStatus() syncstatus.Client {
-	return c.syncStatusClient
-}
-
-func (c *client) ForceResync() forceresync.Client {
-	return c.forceResyncClient
-}
-
-func (c *client) Tasks() tasks.Client {
-	return c.tasksClient
-}
-
-func (c *client) Users() users.Client {
-	return c.usersClient
-}
-
-func (c *client) WebhookReceivers() webhookreceivers.Client {
-	return c.webhookReceiversClient
 }

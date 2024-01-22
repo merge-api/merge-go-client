@@ -5,64 +5,48 @@ package ticketing
 import (
 	json "encoding/json"
 	fmt "fmt"
-	strconv "strconv"
+	core "github.com/merge-api/merge-go-client/core"
 	time "time"
 )
 
-// * `PRIVATE` - PRIVATE
-// * `COMPANY` - COMPANY
-// * `PUBLIC` - PUBLIC
-type AccessLevelEnum uint
+// - `PRIVATE` - PRIVATE
+// - `COMPANY` - COMPANY
+// - `PUBLIC` - PUBLIC
+type AccessLevelEnum string
 
 const (
-	AccessLevelEnumPrivate AccessLevelEnum = iota + 1
-	AccessLevelEnumCompany
-	AccessLevelEnumPublic
+	AccessLevelEnumPrivate AccessLevelEnum = "PRIVATE"
+	AccessLevelEnumCompany AccessLevelEnum = "COMPANY"
+	AccessLevelEnumPublic  AccessLevelEnum = "PUBLIC"
 )
 
-func (a AccessLevelEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AccessLevelEnumPrivate:
-		return "PRIVATE"
-	case AccessLevelEnumCompany:
-		return "COMPANY"
-	case AccessLevelEnumPublic:
-		return "PUBLIC"
-	}
-}
-
-func (a AccessLevelEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AccessLevelEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewAccessLevelEnumFromString(s string) (AccessLevelEnum, error) {
+	switch s {
 	case "PRIVATE":
-		value := AccessLevelEnumPrivate
-		*a = value
+		return AccessLevelEnumPrivate, nil
 	case "COMPANY":
-		value := AccessLevelEnumCompany
-		*a = value
+		return AccessLevelEnumCompany, nil
 	case "PUBLIC":
-		value := AccessLevelEnumPublic
-		*a = value
+		return AccessLevelEnumPublic, nil
 	}
-	return nil
+	var t AccessLevelEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccessLevelEnum) Ptr() *AccessLevelEnum {
+	return &a
 }
 
 // # The Account Object
+//
 // ### Description
+//
 // The `Account` object is used to represent the account that a ticket is associated with.
 //
 // The account is a company that may be a customer. This does not represent the company that is receiving the ticket.
 //
 // ### Usage Example
+//
 // TODO
 type Account struct {
 	Id *string `json:"id,omitempty"`
@@ -76,9 +60,34 @@ type Account struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *Account) UnmarshalJSON(data []byte) error {
+	type unmarshaler Account
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = Account(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *Account) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountDetails struct {
@@ -94,13 +103,41 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetails) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetails
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetails(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetails) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The LinkedAccount Object
+//
 // ### Description
+//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
+//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -115,6 +152,31 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetailsAndActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetailsAndActions(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetailsAndActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountDetailsAndActionsIntegration struct {
@@ -126,53 +188,59 @@ type AccountDetailsAndActionsIntegration struct {
 	Slug                     string            `json:"slug"`
 	PassthroughAvailable     bool              `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `COMPLETE` - COMPLETE
-// * `INCOMPLETE` - INCOMPLETE
-// * `RELINK_NEEDED` - RELINK_NEEDED
-type AccountDetailsAndActionsStatusEnum uint
-
-const (
-	AccountDetailsAndActionsStatusEnumComplete AccountDetailsAndActionsStatusEnum = iota + 1
-	AccountDetailsAndActionsStatusEnumIncomplete
-	AccountDetailsAndActionsStatusEnumRelinkNeeded
-)
-
-func (a AccountDetailsAndActionsStatusEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AccountDetailsAndActionsStatusEnumComplete:
-		return "COMPLETE"
-	case AccountDetailsAndActionsStatusEnumIncomplete:
-		return "INCOMPLETE"
-	case AccountDetailsAndActionsStatusEnumRelinkNeeded:
-		return "RELINK_NEEDED"
-	}
-}
-
-func (a AccountDetailsAndActionsStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AccountDetailsAndActionsStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AccountDetailsAndActionsIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActionsIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "COMPLETE":
-		value := AccountDetailsAndActionsStatusEnumComplete
-		*a = value
-	case "INCOMPLETE":
-		value := AccountDetailsAndActionsStatusEnumIncomplete
-		*a = value
-	case "RELINK_NEEDED":
-		value := AccountDetailsAndActionsStatusEnumRelinkNeeded
-		*a = value
-	}
+	*a = AccountDetailsAndActionsIntegration(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountDetailsAndActionsIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `COMPLETE` - COMPLETE
+// - `INCOMPLETE` - INCOMPLETE
+// - `RELINK_NEEDED` - RELINK_NEEDED
+type AccountDetailsAndActionsStatusEnum string
+
+const (
+	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
+	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
+	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+)
+
+func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
+	switch s {
+	case "COMPLETE":
+		return AccountDetailsAndActionsStatusEnumComplete, nil
+	case "INCOMPLETE":
+		return AccountDetailsAndActionsStatusEnumIncomplete, nil
+	case "RELINK_NEEDED":
+		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	}
+	var t AccountDetailsAndActionsStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatusEnum {
+	return &a
 }
 
 type AccountIntegration struct {
@@ -190,25 +258,103 @@ type AccountIntegration struct {
 	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
 	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
-	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
+	ApiEndpointsToDocumentationUrls map[string]interface{} `json:"api_endpoints_to_documentation_urls,omitempty"`
 	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
 	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountIntegration(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountToken struct {
 	AccountToken string              `json:"account_token"`
 	Integration  *AccountIntegration `json:"integration,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountToken(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountToken) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AsyncPassthroughReciept) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncPassthroughReciept
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncPassthroughReciept(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncPassthroughReciept) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The Attachment Object
+//
 // ### Description
+//
 // The `Attachment` object is used to represent an attachment for a ticket.
 //
 // ### Usage Example
+//
 // TODO
 type Attachment struct {
 	Id *string `json:"id,omitempty"`
@@ -229,16 +375,44 @@ type Attachment struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *Attachment) UnmarshalJSON(data []byte) error {
+	type unmarshaler Attachment
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = Attachment(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *Attachment) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The Attachment Object
+//
 // ### Description
+//
 // The `Attachment` object is used to represent an attachment for a ticket.
 //
 // ### Usage Example
+//
 // TODO
 type AttachmentRequest struct {
 	// The attachment's name. It is required to include the file extension in the attachment's name.
@@ -250,9 +424,34 @@ type AttachmentRequest struct {
 	// The attachment's file format.
 	ContentType *string `json:"content_type,omitempty"`
 	// The user who uploaded the attachment.
-	UploadedBy          *string        `json:"uploaded_by,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	UploadedBy          *string                `json:"uploaded_by,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AttachmentRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler AttachmentRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AttachmentRequest(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AttachmentRequest) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // The ticket associated with the attachment.
@@ -379,83 +578,108 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// * `ADMIN` - ADMIN
-	// * `DEVELOPER` - DEVELOPER
-	// * `MEMBER` - MEMBER
-	// * `API` - API
-	// * `SYSTEM` - SYSTEM
-	// * `MERGE_TEAM` - MERGE_TEAM
+	// - `ADMIN` - ADMIN
+	// - `DEVELOPER` - DEVELOPER
+	// - `MEMBER` - MEMBER
+	// - `API` - API
+	// - `SYSTEM` - SYSTEM
+	// - `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// * `INVITED_USER` - INVITED_USER
-	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// * `CREATED_DESTINATION` - CREATED_DESTINATION
-	// * `DELETED_DESTINATION` - DELETED_DESTINATION
-	// * `CHANGED_SCOPES` - CHANGED_SCOPES
-	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// * `RESET_PASSWORD` - RESET_PASSWORD
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// - `INVITED_USER` - INVITED_USER
+	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// - `CREATED_DESTINATION` - CREATED_DESTINATION
+	// - `DELETED_DESTINATION` - DELETED_DESTINATION
+	// - `CHANGED_SCOPES` - CHANGED_SCOPES
+	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// - `RESET_PASSWORD` - RESET_PASSWORD
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AuditLogEvent) UnmarshalJSON(data []byte) error {
+	type unmarshaler AuditLogEvent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AuditLogEvent(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AuditLogEvent) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // Designates the type of event that occurred.
 //
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -515,12 +739,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -579,173 +803,142 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
+//
 // ### Description
+//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
+//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
 	PassthroughAvailable     bool                `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoriesEnum uint
-
-const (
-	CategoriesEnumHris CategoriesEnum = iota + 1
-	CategoriesEnumAts
-	CategoriesEnumAccounting
-	CategoriesEnumTicketing
-	CategoriesEnumCrm
-	CategoriesEnumMktg
-	CategoriesEnumFilestorage
-)
-
-func (c CategoriesEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoriesEnumHris:
-		return "hris"
-	case CategoriesEnumAts:
-		return "ats"
-	case CategoriesEnumAccounting:
-		return "accounting"
-	case CategoriesEnumTicketing:
-		return "ticketing"
-	case CategoriesEnumCrm:
-		return "crm"
-	case CategoriesEnumMktg:
-		return "mktg"
-	case CategoriesEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoriesEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AvailableActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AvailableActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "hris":
-		value := CategoriesEnumHris
-		*c = value
-	case "ats":
-		value := CategoriesEnumAts
-		*c = value
-	case "accounting":
-		value := CategoriesEnumAccounting
-		*c = value
-	case "ticketing":
-		value := CategoriesEnumTicketing
-		*c = value
-	case "crm":
-		value := CategoriesEnumCrm
-		*c = value
-	case "mktg":
-		value := CategoriesEnumMktg
-		*c = value
-	case "filestorage":
-		value := CategoriesEnumFilestorage
-		*c = value
-	}
+	*a = AvailableActions(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoryEnum uint
+func (a *AvailableActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoriesEnum string
 
 const (
-	CategoryEnumHris CategoryEnum = iota + 1
-	CategoryEnumAts
-	CategoryEnumAccounting
-	CategoryEnumTicketing
-	CategoryEnumCrm
-	CategoryEnumMktg
-	CategoryEnumFilestorage
+	CategoriesEnumHris        CategoriesEnum = "hris"
+	CategoriesEnumAts         CategoriesEnum = "ats"
+	CategoriesEnumAccounting  CategoriesEnum = "accounting"
+	CategoriesEnumTicketing   CategoriesEnum = "ticketing"
+	CategoriesEnumCrm         CategoriesEnum = "crm"
+	CategoriesEnumMktg        CategoriesEnum = "mktg"
+	CategoriesEnumFilestorage CategoriesEnum = "filestorage"
 )
 
-func (c CategoryEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoryEnumHris:
-		return "hris"
-	case CategoryEnumAts:
-		return "ats"
-	case CategoryEnumAccounting:
-		return "accounting"
-	case CategoryEnumTicketing:
-		return "ticketing"
-	case CategoryEnumCrm:
-		return "crm"
-	case CategoryEnumMktg:
-		return "mktg"
-	case CategoryEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoryEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCategoriesEnumFromString(s string) (CategoriesEnum, error) {
+	switch s {
 	case "hris":
-		value := CategoryEnumHris
-		*c = value
+		return CategoriesEnumHris, nil
 	case "ats":
-		value := CategoryEnumAts
-		*c = value
+		return CategoriesEnumAts, nil
 	case "accounting":
-		value := CategoryEnumAccounting
-		*c = value
+		return CategoriesEnumAccounting, nil
 	case "ticketing":
-		value := CategoryEnumTicketing
-		*c = value
+		return CategoriesEnumTicketing, nil
 	case "crm":
-		value := CategoryEnumCrm
-		*c = value
+		return CategoriesEnumCrm, nil
 	case "mktg":
-		value := CategoryEnumMktg
-		*c = value
+		return CategoriesEnumMktg, nil
 	case "filestorage":
-		value := CategoryEnumFilestorage
-		*c = value
+		return CategoriesEnumFilestorage, nil
 	}
-	return nil
+	var t CategoriesEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CategoriesEnum) Ptr() *CategoriesEnum {
+	return &c
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoryEnum string
+
+const (
+	CategoryEnumHris        CategoryEnum = "hris"
+	CategoryEnumAts         CategoryEnum = "ats"
+	CategoryEnumAccounting  CategoryEnum = "accounting"
+	CategoryEnumTicketing   CategoryEnum = "ticketing"
+	CategoryEnumCrm         CategoryEnum = "crm"
+	CategoryEnumMktg        CategoryEnum = "mktg"
+	CategoryEnumFilestorage CategoryEnum = "filestorage"
+)
+
+func NewCategoryEnumFromString(s string) (CategoryEnum, error) {
+	switch s {
+	case "hris":
+		return CategoryEnumHris, nil
+	case "ats":
+		return CategoryEnumAts, nil
+	case "accounting":
+		return CategoryEnumAccounting, nil
+	case "ticketing":
+		return CategoryEnumTicketing, nil
+	case "crm":
+		return CategoryEnumCrm, nil
+	case "mktg":
+		return CategoryEnumMktg, nil
+	case "filestorage":
+		return CategoryEnumFilestorage, nil
+	}
+	var t CategoryEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CategoryEnum) Ptr() *CategoryEnum {
+	return &c
 }
 
 // # The Collection Object
+//
 // ### Description
+//
 // The `Collection` object is used to represent collections of tickets. Collections may include other collections as
 // sub collections.
 //
 // ### Usage Example
+//
 // TODO
 type Collection struct {
 	Id *string `json:"id,omitempty"`
@@ -757,8 +950,8 @@ type Collection struct {
 	Description *string `json:"description,omitempty"`
 	// The collection's type.
 	//
-	// * `LIST` - LIST
-	// * `PROJECT` - PROJECT
+	// - `LIST` - LIST
+	// - `PROJECT` - PROJECT
 	CollectionType *CollectionCollectionType `json:"collection_type,omitempty"`
 	// The parent collection for this collection.
 	ParentCollection *CollectionParentCollection `json:"parent_collection,omitempty"`
@@ -766,22 +959,47 @@ type Collection struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The level of access a User has to the Collection and its sub-objects.
 	//
-	// * `PRIVATE` - PRIVATE
-	// * `COMPANY` - COMPANY
-	// * `PUBLIC` - PUBLIC
+	// - `PRIVATE` - PRIVATE
+	// - `COMPANY` - COMPANY
+	// - `PUBLIC` - PUBLIC
 	AccessLevel *CollectionAccessLevel `json:"access_level,omitempty"`
 	CreatedAt   *time.Time             `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *Collection) UnmarshalJSON(data []byte) error {
+	type unmarshaler Collection
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = Collection(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *Collection) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The level of access a User has to the Collection and its sub-objects.
 //
-// * `PRIVATE` - PRIVATE
-// * `COMPANY` - COMPANY
-// * `PUBLIC` - PUBLIC
+// - `PRIVATE` - PRIVATE
+// - `COMPANY` - COMPANY
+// - `PUBLIC` - PUBLIC
 type CollectionAccessLevel struct {
 	typeName        string
 	AccessLevelEnum AccessLevelEnum
@@ -841,8 +1059,8 @@ func (c *CollectionAccessLevel) Accept(visitor CollectionAccessLevelVisitor) err
 
 // The collection's type.
 //
-// * `LIST` - LIST
-// * `PROJECT` - PROJECT
+// - `LIST` - LIST
+// - `PROJECT` - PROJECT
 type CollectionCollectionType struct {
 	typeName           string
 	CollectionTypeEnum CollectionTypeEnum
@@ -958,133 +1176,38 @@ func (c *CollectionParentCollection) Accept(visitor CollectionParentCollectionVi
 	}
 }
 
-// * `LIST` - LIST
-// * `PROJECT` - PROJECT
-type CollectionTypeEnum uint
+// - `LIST` - LIST
+// - `PROJECT` - PROJECT
+type CollectionTypeEnum string
 
 const (
-	CollectionTypeEnumList CollectionTypeEnum = iota + 1
-	CollectionTypeEnumProject
+	CollectionTypeEnumList    CollectionTypeEnum = "LIST"
+	CollectionTypeEnumProject CollectionTypeEnum = "PROJECT"
 )
 
-func (c CollectionTypeEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CollectionTypeEnumList:
-		return "LIST"
-	case CollectionTypeEnumProject:
-		return "PROJECT"
-	}
-}
-
-func (c CollectionTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CollectionTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCollectionTypeEnumFromString(s string) (CollectionTypeEnum, error) {
+	switch s {
 	case "LIST":
-		value := CollectionTypeEnumList
-		*c = value
+		return CollectionTypeEnumList, nil
 	case "PROJECT":
-		value := CollectionTypeEnumProject
-		*c = value
+		return CollectionTypeEnumProject, nil
 	}
-	return nil
+	var t CollectionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type CollectionsListRequestCollectionType uint
-
-const (
-	CollectionsListRequestCollectionTypeList CollectionsListRequestCollectionType = iota + 1
-	CollectionsListRequestCollectionTypeProject
-)
-
-func (c CollectionsListRequestCollectionType) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CollectionsListRequestCollectionTypeList:
-		return "LIST"
-	case CollectionsListRequestCollectionTypeProject:
-		return "PROJECT"
-	}
-}
-
-func (c CollectionsListRequestCollectionType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CollectionsListRequestCollectionType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "LIST":
-		value := CollectionsListRequestCollectionTypeList
-		*c = value
-	case "PROJECT":
-		value := CollectionsListRequestCollectionTypeProject
-		*c = value
-	}
-	return nil
-}
-
-type CollectionsUsersListRequestExpand uint
-
-const (
-	CollectionsUsersListRequestExpandRoles CollectionsUsersListRequestExpand = iota + 1
-	CollectionsUsersListRequestExpandTeams
-	CollectionsUsersListRequestExpandTeamsRoles
-)
-
-func (c CollectionsUsersListRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CollectionsUsersListRequestExpandRoles:
-		return "roles"
-	case CollectionsUsersListRequestExpandTeams:
-		return "teams"
-	case CollectionsUsersListRequestExpandTeamsRoles:
-		return "teams,roles"
-	}
-}
-
-func (c CollectionsUsersListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CollectionsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "roles":
-		value := CollectionsUsersListRequestExpandRoles
-		*c = value
-	case "teams":
-		value := CollectionsUsersListRequestExpandTeams
-		*c = value
-	case "teams,roles":
-		value := CollectionsUsersListRequestExpandTeamsRoles
-		*c = value
-	}
-	return nil
+func (c CollectionTypeEnum) Ptr() *CollectionTypeEnum {
+	return &c
 }
 
 // # The Comment Object
+//
 // ### Description
+//
 // The `Comment` object is used to represent a comment on a ticket.
 //
 // ### Usage Example
+//
 // TODO
 type Comment struct {
 	Id *string `json:"id,omitempty"`
@@ -1107,9 +1230,34 @@ type Comment struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *Comment) UnmarshalJSON(data []byte) error {
+	type unmarshaler Comment
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = Comment(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *Comment) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The author of the Comment, if the author is a Contact.
@@ -1171,10 +1319,13 @@ func (c *CommentContact) Accept(visitor CommentContactVisitor) error {
 }
 
 // # The Comment Object
+//
 // ### Description
+//
 // The `Comment` object is used to represent a comment on a ticket.
 //
 // ### Usage Example
+//
 // TODO
 type CommentRequest struct {
 	// The author of the Comment, if the author is a User.
@@ -1188,9 +1339,34 @@ type CommentRequest struct {
 	// The ticket associated with the comment.
 	Ticket *CommentRequestTicket `json:"ticket,omitempty"`
 	// Whether or not the comment is internal.
-	IsPrivate           *bool          `json:"is_private,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	IsPrivate           *bool                  `json:"is_private,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommentRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommentRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommentRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommentRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The author of the Comment, if the author is a Contact.
@@ -1372,6 +1548,31 @@ type CommentResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommentResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommentResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommentResponse(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommentResponse) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The ticket associated with the comment.
@@ -1490,146 +1691,35 @@ func (c *CommentUser) Accept(visitor CommentUserVisitor) error {
 	}
 }
 
-type CommentsListRequestExpand uint
-
-const (
-	CommentsListRequestExpandContact CommentsListRequestExpand = iota + 1
-	CommentsListRequestExpandContactTicket
-	CommentsListRequestExpandTicket
-	CommentsListRequestExpandUser
-	CommentsListRequestExpandUserContact
-	CommentsListRequestExpandUserContactTicket
-	CommentsListRequestExpandUserTicket
-)
-
-func (c CommentsListRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CommentsListRequestExpandContact:
-		return "contact"
-	case CommentsListRequestExpandContactTicket:
-		return "contact,ticket"
-	case CommentsListRequestExpandTicket:
-		return "ticket"
-	case CommentsListRequestExpandUser:
-		return "user"
-	case CommentsListRequestExpandUserContact:
-		return "user,contact"
-	case CommentsListRequestExpandUserContactTicket:
-		return "user,contact,ticket"
-	case CommentsListRequestExpandUserTicket:
-		return "user,ticket"
-	}
-}
-
-func (c CommentsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CommentsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "contact":
-		value := CommentsListRequestExpandContact
-		*c = value
-	case "contact,ticket":
-		value := CommentsListRequestExpandContactTicket
-		*c = value
-	case "ticket":
-		value := CommentsListRequestExpandTicket
-		*c = value
-	case "user":
-		value := CommentsListRequestExpandUser
-		*c = value
-	case "user,contact":
-		value := CommentsListRequestExpandUserContact
-		*c = value
-	case "user,contact,ticket":
-		value := CommentsListRequestExpandUserContactTicket
-		*c = value
-	case "user,ticket":
-		value := CommentsListRequestExpandUserTicket
-		*c = value
-	}
-	return nil
-}
-
-type CommentsRetrieveRequestExpand uint
-
-const (
-	CommentsRetrieveRequestExpandContact CommentsRetrieveRequestExpand = iota + 1
-	CommentsRetrieveRequestExpandContactTicket
-	CommentsRetrieveRequestExpandTicket
-	CommentsRetrieveRequestExpandUser
-	CommentsRetrieveRequestExpandUserContact
-	CommentsRetrieveRequestExpandUserContactTicket
-	CommentsRetrieveRequestExpandUserTicket
-)
-
-func (c CommentsRetrieveRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CommentsRetrieveRequestExpandContact:
-		return "contact"
-	case CommentsRetrieveRequestExpandContactTicket:
-		return "contact,ticket"
-	case CommentsRetrieveRequestExpandTicket:
-		return "ticket"
-	case CommentsRetrieveRequestExpandUser:
-		return "user"
-	case CommentsRetrieveRequestExpandUserContact:
-		return "user,contact"
-	case CommentsRetrieveRequestExpandUserContactTicket:
-		return "user,contact,ticket"
-	case CommentsRetrieveRequestExpandUserTicket:
-		return "user,ticket"
-	}
-}
-
-func (c CommentsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CommentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "contact":
-		value := CommentsRetrieveRequestExpandContact
-		*c = value
-	case "contact,ticket":
-		value := CommentsRetrieveRequestExpandContactTicket
-		*c = value
-	case "ticket":
-		value := CommentsRetrieveRequestExpandTicket
-		*c = value
-	case "user":
-		value := CommentsRetrieveRequestExpandUser
-		*c = value
-	case "user,contact":
-		value := CommentsRetrieveRequestExpandUserContact
-		*c = value
-	case "user,contact,ticket":
-		value := CommentsRetrieveRequestExpandUserContactTicket
-		*c = value
-	case "user,ticket":
-		value := CommentsRetrieveRequestExpandUserTicket
-		*c = value
-	}
-	return nil
-}
-
 type CommonModelScopesBodyRequest struct {
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
 	DisabledFields []string             `json:"disabled_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommonModelScopesBodyRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommonModelScopesBodyRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommonModelScopesBodyRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommonModelScopesBodyRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type ConditionSchema struct {
@@ -1637,7 +1727,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -1645,27 +1735,52 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// * `BOOLEAN` - BOOLEAN
-	// * `DATE` - DATE
-	// * `DATE_TIME` - DATE_TIME
-	// * `INTEGER` - INTEGER
-	// * `FLOAT` - FLOAT
-	// * `STRING` - STRING
-	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// - `BOOLEAN` - BOOLEAN
+	// - `DATE` - DATE
+	// - `DATE_TIME` - DATE_TIME
+	// - `INTEGER` - INTEGER
+	// - `FLOAT` - FLOAT
+	// - `STRING` - STRING
+	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *ConditionSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ConditionSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = ConditionSchema(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *ConditionSchema) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The type of value(s) that can be set for this condition.
 //
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -1723,86 +1838,58 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
-type ConditionTypeEnum uint
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+type ConditionTypeEnum string
 
 const (
-	ConditionTypeEnumBoolean ConditionTypeEnum = iota + 1
-	ConditionTypeEnumDate
-	ConditionTypeEnumDateTime
-	ConditionTypeEnumInteger
-	ConditionTypeEnumFloat
-	ConditionTypeEnumString
-	ConditionTypeEnumListOfStrings
+	ConditionTypeEnumBoolean       ConditionTypeEnum = "BOOLEAN"
+	ConditionTypeEnumDate          ConditionTypeEnum = "DATE"
+	ConditionTypeEnumDateTime      ConditionTypeEnum = "DATE_TIME"
+	ConditionTypeEnumInteger       ConditionTypeEnum = "INTEGER"
+	ConditionTypeEnumFloat         ConditionTypeEnum = "FLOAT"
+	ConditionTypeEnumString        ConditionTypeEnum = "STRING"
+	ConditionTypeEnumListOfStrings ConditionTypeEnum = "LIST_OF_STRINGS"
 )
 
-func (c ConditionTypeEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ConditionTypeEnumBoolean:
-		return "BOOLEAN"
-	case ConditionTypeEnumDate:
-		return "DATE"
-	case ConditionTypeEnumDateTime:
-		return "DATE_TIME"
-	case ConditionTypeEnumInteger:
-		return "INTEGER"
-	case ConditionTypeEnumFloat:
-		return "FLOAT"
-	case ConditionTypeEnumString:
-		return "STRING"
-	case ConditionTypeEnumListOfStrings:
-		return "LIST_OF_STRINGS"
-	}
-}
-
-func (c ConditionTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewConditionTypeEnumFromString(s string) (ConditionTypeEnum, error) {
+	switch s {
 	case "BOOLEAN":
-		value := ConditionTypeEnumBoolean
-		*c = value
+		return ConditionTypeEnumBoolean, nil
 	case "DATE":
-		value := ConditionTypeEnumDate
-		*c = value
+		return ConditionTypeEnumDate, nil
 	case "DATE_TIME":
-		value := ConditionTypeEnumDateTime
-		*c = value
+		return ConditionTypeEnumDateTime, nil
 	case "INTEGER":
-		value := ConditionTypeEnumInteger
-		*c = value
+		return ConditionTypeEnumInteger, nil
 	case "FLOAT":
-		value := ConditionTypeEnumFloat
-		*c = value
+		return ConditionTypeEnumFloat, nil
 	case "STRING":
-		value := ConditionTypeEnumString
-		*c = value
+		return ConditionTypeEnumString, nil
 	case "LIST_OF_STRINGS":
-		value := ConditionTypeEnumListOfStrings
-		*c = value
+		return ConditionTypeEnumListOfStrings, nil
 	}
-	return nil
+	var t ConditionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
+	return &c
 }
 
 // # The Contact Object
+//
 // ### Description
+//
 // The `Contact` object is used to represent the customer, lead, or external user that a ticket is associated with.
 //
 // ### Usage Example
+//
 // TODO
 type Contact struct {
 	Id *string `json:"id,omitempty"`
@@ -1822,9 +1909,34 @@ type Contact struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *Contact) UnmarshalJSON(data []byte) error {
+	type unmarshaler Contact
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = Contact(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *Contact) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The contact's account.
@@ -1886,10 +1998,13 @@ func (c *ContactAccount) Accept(visitor ContactAccountVisitor) error {
 }
 
 // # The DataPassthrough Object
+//
 // ### Description
+//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
+//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -1899,109 +2014,149 @@ type DataPassthroughRequest struct {
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
-	Headers       map[string]any     `json:"headers,omitempty"`
-	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	Headers       map[string]interface{} `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum     `json:"request_format,omitempty"`
 	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
 	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DataPassthroughRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler DataPassthroughRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DataPassthroughRequest(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DataPassthroughRequest) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
 	LogSummary    *DebugModelLogSummary `json:"log_summary,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DebugModeLog) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModeLog
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DebugModeLog(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModeLog) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModelLogSummary struct {
 	Url        string `json:"url"`
 	Method     string `json:"method"`
 	StatusCode int    `json:"status_code"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `READ` - READ
-// * `WRITE` - WRITE
-type EnabledActionsEnum uint
-
-const (
-	EnabledActionsEnumRead EnabledActionsEnum = iota + 1
-	EnabledActionsEnumWrite
-)
-
-func (e EnabledActionsEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EnabledActionsEnumRead:
-		return "READ"
-	case EnabledActionsEnumWrite:
-		return "WRITE"
-	}
-}
-
-func (e EnabledActionsEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (d *DebugModelLogSummary) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModelLogSummary
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*d = DebugModelLogSummary(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModelLogSummary) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
+// - `READ` - READ
+// - `WRITE` - WRITE
+type EnabledActionsEnum string
+
+const (
+	EnabledActionsEnumRead  EnabledActionsEnum = "READ"
+	EnabledActionsEnumWrite EnabledActionsEnum = "WRITE"
+)
+
+func NewEnabledActionsEnumFromString(s string) (EnabledActionsEnum, error) {
+	switch s {
 	case "READ":
-		value := EnabledActionsEnumRead
-		*e = value
+		return EnabledActionsEnumRead, nil
 	case "WRITE":
-		value := EnabledActionsEnumWrite
-		*e = value
+		return EnabledActionsEnumWrite, nil
 	}
-	return nil
+	var t EnabledActionsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
-type EncodingEnum uint
+func (e EnabledActionsEnum) Ptr() *EnabledActionsEnum {
+	return &e
+}
+
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
+type EncodingEnum string
 
 const (
-	EncodingEnumRaw EncodingEnum = iota + 1
-	EncodingEnumBase64
-	EncodingEnumGzipBase64
+	EncodingEnumRaw        EncodingEnum = "RAW"
+	EncodingEnumBase64     EncodingEnum = "BASE64"
+	EncodingEnumGzipBase64 EncodingEnum = "GZIP_BASE64"
 )
 
-func (e EncodingEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EncodingEnumRaw:
-		return "RAW"
-	case EncodingEnumBase64:
-		return "BASE64"
-	case EncodingEnumGzipBase64:
-		return "GZIP_BASE64"
-	}
-}
-
-func (e EncodingEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EncodingEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEncodingEnumFromString(s string) (EncodingEnum, error) {
+	switch s {
 	case "RAW":
-		value := EncodingEnumRaw
-		*e = value
+		return EncodingEnumRaw, nil
 	case "BASE64":
-		value := EncodingEnumBase64
-		*e = value
+		return EncodingEnumBase64, nil
 	case "GZIP_BASE64":
-		value := EncodingEnumGzipBase64
-		*e = value
+		return EncodingEnumGzipBase64, nil
 	}
-	return nil
+	var t EncodingEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EncodingEnum) Ptr() *EncodingEnum {
+	return &e
 }
 
 type ErrorValidationProblem struct {
@@ -2009,399 +2164,293 @@ type ErrorValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
-type EventTypeEnum uint
-
-const (
-	EventTypeEnumCreatedRemoteProductionApiKey EventTypeEnum = iota + 1
-	EventTypeEnumDeletedRemoteProductionApiKey
-	EventTypeEnumCreatedTestApiKey
-	EventTypeEnumDeletedTestApiKey
-	EventTypeEnumRegeneratedProductionApiKey
-	EventTypeEnumInvitedUser
-	EventTypeEnumTwoFactorAuthEnabled
-	EventTypeEnumTwoFactorAuthDisabled
-	EventTypeEnumDeletedLinkedAccount
-	EventTypeEnumCreatedDestination
-	EventTypeEnumDeletedDestination
-	EventTypeEnumChangedScopes
-	EventTypeEnumChangedPersonalInformation
-	EventTypeEnumChangedOrganizationSettings
-	EventTypeEnumEnabledIntegration
-	EventTypeEnumDisabledIntegration
-	EventTypeEnumEnabledCategory
-	EventTypeEnumDisabledCategory
-	EventTypeEnumChangedPassword
-	EventTypeEnumResetPassword
-	EventTypeEnumEnabledRedactUnmappedDataForOrganization
-	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumDisabledRedactUnmappedDataForOrganization
-	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumCreatedIntegrationWideFieldMapping
-	EventTypeEnumCreatedLinkedAccountFieldMapping
-	EventTypeEnumChangedIntegrationWideFieldMapping
-	EventTypeEnumChangedLinkedAccountFieldMapping
-	EventTypeEnumDeletedIntegrationWideFieldMapping
-	EventTypeEnumDeletedLinkedAccountFieldMapping
-)
-
-func (e EventTypeEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EventTypeEnumCreatedRemoteProductionApiKey:
-		return "CREATED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumDeletedRemoteProductionApiKey:
-		return "DELETED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumCreatedTestApiKey:
-		return "CREATED_TEST_API_KEY"
-	case EventTypeEnumDeletedTestApiKey:
-		return "DELETED_TEST_API_KEY"
-	case EventTypeEnumRegeneratedProductionApiKey:
-		return "REGENERATED_PRODUCTION_API_KEY"
-	case EventTypeEnumInvitedUser:
-		return "INVITED_USER"
-	case EventTypeEnumTwoFactorAuthEnabled:
-		return "TWO_FACTOR_AUTH_ENABLED"
-	case EventTypeEnumTwoFactorAuthDisabled:
-		return "TWO_FACTOR_AUTH_DISABLED"
-	case EventTypeEnumDeletedLinkedAccount:
-		return "DELETED_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedDestination:
-		return "CREATED_DESTINATION"
-	case EventTypeEnumDeletedDestination:
-		return "DELETED_DESTINATION"
-	case EventTypeEnumChangedScopes:
-		return "CHANGED_SCOPES"
-	case EventTypeEnumChangedPersonalInformation:
-		return "CHANGED_PERSONAL_INFORMATION"
-	case EventTypeEnumChangedOrganizationSettings:
-		return "CHANGED_ORGANIZATION_SETTINGS"
-	case EventTypeEnumEnabledIntegration:
-		return "ENABLED_INTEGRATION"
-	case EventTypeEnumDisabledIntegration:
-		return "DISABLED_INTEGRATION"
-	case EventTypeEnumEnabledCategory:
-		return "ENABLED_CATEGORY"
-	case EventTypeEnumDisabledCategory:
-		return "DISABLED_CATEGORY"
-	case EventTypeEnumChangedPassword:
-		return "CHANGED_PASSWORD"
-	case EventTypeEnumResetPassword:
-		return "RESET_PASSWORD"
-	case EventTypeEnumEnabledRedactUnmappedDataForOrganization:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumDisabledRedactUnmappedDataForOrganization:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedIntegrationWideFieldMapping:
-		return "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumCreatedLinkedAccountFieldMapping:
-		return "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumChangedIntegrationWideFieldMapping:
-		return "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumChangedLinkedAccountFieldMapping:
-		return "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumDeletedIntegrationWideFieldMapping:
-		return "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumDeletedLinkedAccountFieldMapping:
-		return "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
-	}
-}
-
-func (e EventTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (e *ErrorValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler ErrorValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*e = ErrorValidationProblem(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *ErrorValidationProblem) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+type EventTypeEnum string
+
+const (
+	EventTypeEnumCreatedRemoteProductionApiKey              EventTypeEnum = "CREATED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumDeletedRemoteProductionApiKey              EventTypeEnum = "DELETED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumCreatedTestApiKey                          EventTypeEnum = "CREATED_TEST_API_KEY"
+	EventTypeEnumDeletedTestApiKey                          EventTypeEnum = "DELETED_TEST_API_KEY"
+	EventTypeEnumRegeneratedProductionApiKey                EventTypeEnum = "REGENERATED_PRODUCTION_API_KEY"
+	EventTypeEnumInvitedUser                                EventTypeEnum = "INVITED_USER"
+	EventTypeEnumTwoFactorAuthEnabled                       EventTypeEnum = "TWO_FACTOR_AUTH_ENABLED"
+	EventTypeEnumTwoFactorAuthDisabled                      EventTypeEnum = "TWO_FACTOR_AUTH_DISABLED"
+	EventTypeEnumDeletedLinkedAccount                       EventTypeEnum = "DELETED_LINKED_ACCOUNT"
+	EventTypeEnumCreatedDestination                         EventTypeEnum = "CREATED_DESTINATION"
+	EventTypeEnumDeletedDestination                         EventTypeEnum = "DELETED_DESTINATION"
+	EventTypeEnumChangedScopes                              EventTypeEnum = "CHANGED_SCOPES"
+	EventTypeEnumChangedPersonalInformation                 EventTypeEnum = "CHANGED_PERSONAL_INFORMATION"
+	EventTypeEnumChangedOrganizationSettings                EventTypeEnum = "CHANGED_ORGANIZATION_SETTINGS"
+	EventTypeEnumEnabledIntegration                         EventTypeEnum = "ENABLED_INTEGRATION"
+	EventTypeEnumDisabledIntegration                        EventTypeEnum = "DISABLED_INTEGRATION"
+	EventTypeEnumEnabledCategory                            EventTypeEnum = "ENABLED_CATEGORY"
+	EventTypeEnumDisabledCategory                           EventTypeEnum = "DISABLED_CATEGORY"
+	EventTypeEnumChangedPassword                            EventTypeEnum = "CHANGED_PASSWORD"
+	EventTypeEnumResetPassword                              EventTypeEnum = "RESET_PASSWORD"
+	EventTypeEnumEnabledRedactUnmappedDataForOrganization   EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount  EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumDisabledRedactUnmappedDataForOrganization  EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumCreatedIntegrationWideFieldMapping         EventTypeEnum = "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountFieldMapping           EventTypeEnum = "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumChangedIntegrationWideFieldMapping         EventTypeEnum = "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+)
+
+func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
+	switch s {
 	case "CREATED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumCreatedRemoteProductionApiKey
-		*e = value
+		return EventTypeEnumCreatedRemoteProductionApiKey, nil
 	case "DELETED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumDeletedRemoteProductionApiKey
-		*e = value
+		return EventTypeEnumDeletedRemoteProductionApiKey, nil
 	case "CREATED_TEST_API_KEY":
-		value := EventTypeEnumCreatedTestApiKey
-		*e = value
+		return EventTypeEnumCreatedTestApiKey, nil
 	case "DELETED_TEST_API_KEY":
-		value := EventTypeEnumDeletedTestApiKey
-		*e = value
+		return EventTypeEnumDeletedTestApiKey, nil
 	case "REGENERATED_PRODUCTION_API_KEY":
-		value := EventTypeEnumRegeneratedProductionApiKey
-		*e = value
+		return EventTypeEnumRegeneratedProductionApiKey, nil
 	case "INVITED_USER":
-		value := EventTypeEnumInvitedUser
-		*e = value
+		return EventTypeEnumInvitedUser, nil
 	case "TWO_FACTOR_AUTH_ENABLED":
-		value := EventTypeEnumTwoFactorAuthEnabled
-		*e = value
+		return EventTypeEnumTwoFactorAuthEnabled, nil
 	case "TWO_FACTOR_AUTH_DISABLED":
-		value := EventTypeEnumTwoFactorAuthDisabled
-		*e = value
+		return EventTypeEnumTwoFactorAuthDisabled, nil
 	case "DELETED_LINKED_ACCOUNT":
-		value := EventTypeEnumDeletedLinkedAccount
-		*e = value
+		return EventTypeEnumDeletedLinkedAccount, nil
 	case "CREATED_DESTINATION":
-		value := EventTypeEnumCreatedDestination
-		*e = value
+		return EventTypeEnumCreatedDestination, nil
 	case "DELETED_DESTINATION":
-		value := EventTypeEnumDeletedDestination
-		*e = value
+		return EventTypeEnumDeletedDestination, nil
 	case "CHANGED_SCOPES":
-		value := EventTypeEnumChangedScopes
-		*e = value
+		return EventTypeEnumChangedScopes, nil
 	case "CHANGED_PERSONAL_INFORMATION":
-		value := EventTypeEnumChangedPersonalInformation
-		*e = value
+		return EventTypeEnumChangedPersonalInformation, nil
 	case "CHANGED_ORGANIZATION_SETTINGS":
-		value := EventTypeEnumChangedOrganizationSettings
-		*e = value
+		return EventTypeEnumChangedOrganizationSettings, nil
 	case "ENABLED_INTEGRATION":
-		value := EventTypeEnumEnabledIntegration
-		*e = value
+		return EventTypeEnumEnabledIntegration, nil
 	case "DISABLED_INTEGRATION":
-		value := EventTypeEnumDisabledIntegration
-		*e = value
+		return EventTypeEnumDisabledIntegration, nil
 	case "ENABLED_CATEGORY":
-		value := EventTypeEnumEnabledCategory
-		*e = value
+		return EventTypeEnumEnabledCategory, nil
 	case "DISABLED_CATEGORY":
-		value := EventTypeEnumDisabledCategory
-		*e = value
+		return EventTypeEnumDisabledCategory, nil
 	case "CHANGED_PASSWORD":
-		value := EventTypeEnumChangedPassword
-		*e = value
+		return EventTypeEnumChangedPassword, nil
 	case "RESET_PASSWORD":
-		value := EventTypeEnumResetPassword
-		*e = value
+		return EventTypeEnumResetPassword, nil
 	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumEnabledRedactUnmappedDataForOrganization
-		*e = value
+		return EventTypeEnumEnabledRedactUnmappedDataForOrganization, nil
 	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-		*e = value
+		return EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount, nil
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumDisabledRedactUnmappedDataForOrganization
-		*e = value
+		return EventTypeEnumDisabledRedactUnmappedDataForOrganization, nil
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-		*e = value
+		return EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount, nil
 	case "CREATED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumCreatedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumCreatedIntegrationWideFieldMapping, nil
 	case "CREATED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumCreatedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumCreatedLinkedAccountFieldMapping, nil
 	case "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumChangedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumChangedIntegrationWideFieldMapping, nil
 	case "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumChangedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumChangedLinkedAccountFieldMapping, nil
 	case "DELETED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumDeletedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumDeletedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
 	}
-	return nil
+	var t EventTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `string` - string
-// * `number` - number
-// * `date` - date
-// * `datetime` - datetime
-// * `bool` - bool
-// * `list` - list
-type FieldFormatEnum uint
+func (e EventTypeEnum) Ptr() *EventTypeEnum {
+	return &e
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type FieldFormatEnum string
 
 const (
-	FieldFormatEnumString FieldFormatEnum = iota + 1
-	FieldFormatEnumNumber
-	FieldFormatEnumDate
-	FieldFormatEnumDatetime
-	FieldFormatEnumBool
-	FieldFormatEnumList
+	FieldFormatEnumString   FieldFormatEnum = "string"
+	FieldFormatEnumNumber   FieldFormatEnum = "number"
+	FieldFormatEnumDate     FieldFormatEnum = "date"
+	FieldFormatEnumDatetime FieldFormatEnum = "datetime"
+	FieldFormatEnumBool     FieldFormatEnum = "bool"
+	FieldFormatEnumList     FieldFormatEnum = "list"
 )
 
-func (f FieldFormatEnum) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FieldFormatEnumString:
-		return "string"
-	case FieldFormatEnumNumber:
-		return "number"
-	case FieldFormatEnumDate:
-		return "date"
-	case FieldFormatEnumDatetime:
-		return "datetime"
-	case FieldFormatEnumBool:
-		return "bool"
-	case FieldFormatEnumList:
-		return "list"
-	}
-}
-
-func (f FieldFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FieldFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewFieldFormatEnumFromString(s string) (FieldFormatEnum, error) {
+	switch s {
 	case "string":
-		value := FieldFormatEnumString
-		*f = value
+		return FieldFormatEnumString, nil
 	case "number":
-		value := FieldFormatEnumNumber
-		*f = value
+		return FieldFormatEnumNumber, nil
 	case "date":
-		value := FieldFormatEnumDate
-		*f = value
+		return FieldFormatEnumDate, nil
 	case "datetime":
-		value := FieldFormatEnumDatetime
-		*f = value
+		return FieldFormatEnumDatetime, nil
 	case "bool":
-		value := FieldFormatEnumBool
-		*f = value
+		return FieldFormatEnumBool, nil
 	case "list":
-		value := FieldFormatEnumList
-		*f = value
+		return FieldFormatEnumList, nil
 	}
-	return nil
+	var t FieldFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `string` - string
-// * `number` - number
-// * `date` - date
-// * `datetime` - datetime
-// * `bool` - bool
-// * `list` - list
-type FieldTypeEnum uint
+func (f FieldFormatEnum) Ptr() *FieldFormatEnum {
+	return &f
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type FieldTypeEnum string
 
 const (
-	FieldTypeEnumString FieldTypeEnum = iota + 1
-	FieldTypeEnumNumber
-	FieldTypeEnumDate
-	FieldTypeEnumDatetime
-	FieldTypeEnumBool
-	FieldTypeEnumList
+	FieldTypeEnumString   FieldTypeEnum = "string"
+	FieldTypeEnumNumber   FieldTypeEnum = "number"
+	FieldTypeEnumDate     FieldTypeEnum = "date"
+	FieldTypeEnumDatetime FieldTypeEnum = "datetime"
+	FieldTypeEnumBool     FieldTypeEnum = "bool"
+	FieldTypeEnumList     FieldTypeEnum = "list"
 )
 
-func (f FieldTypeEnum) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FieldTypeEnumString:
-		return "string"
-	case FieldTypeEnumNumber:
-		return "number"
-	case FieldTypeEnumDate:
-		return "date"
-	case FieldTypeEnumDatetime:
-		return "datetime"
-	case FieldTypeEnumBool:
-		return "bool"
-	case FieldTypeEnumList:
-		return "list"
-	}
-}
-
-func (f FieldTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FieldTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewFieldTypeEnumFromString(s string) (FieldTypeEnum, error) {
+	switch s {
 	case "string":
-		value := FieldTypeEnumString
-		*f = value
+		return FieldTypeEnumString, nil
 	case "number":
-		value := FieldTypeEnumNumber
-		*f = value
+		return FieldTypeEnumNumber, nil
 	case "date":
-		value := FieldTypeEnumDate
-		*f = value
+		return FieldTypeEnumDate, nil
 	case "datetime":
-		value := FieldTypeEnumDatetime
-		*f = value
+		return FieldTypeEnumDatetime, nil
 	case "bool":
-		value := FieldTypeEnumBool
-		*f = value
+		return FieldTypeEnumBool, nil
 	case "list":
-		value := FieldTypeEnumList
-		*f = value
+		return FieldTypeEnumList, nil
 	}
-	return nil
+	var t FieldTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FieldTypeEnum) Ptr() *FieldTypeEnum {
+	return &f
 }
 
 type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
-	Status            *IssueStatus   `json:"status,omitempty"`
-	ErrorDescription  string         `json:"error_description"`
-	EndUser           map[string]any `json:"end_user,omitempty"`
-	FirstIncidentTime *time.Time     `json:"first_incident_time,omitempty"`
-	LastIncidentTime  *time.Time     `json:"last_incident_time,omitempty"`
-	IsMuted           *bool          `json:"is_muted,omitempty"`
-	ErrorDetails      []string       `json:"error_details,omitempty"`
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
+	Status            *IssueStatus           `json:"status,omitempty"`
+	ErrorDescription  string                 `json:"error_description"`
+	EndUser           map[string]interface{} `json:"end_user,omitempty"`
+	FirstIncidentTime *time.Time             `json:"first_incident_time,omitempty"`
+	LastIncidentTime  *time.Time             `json:"last_incident_time,omitempty"`
+	IsMuted           *bool                  `json:"is_muted,omitempty"`
+	ErrorDetails      []string               `json:"error_details,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *Issue) UnmarshalJSON(data []byte) error {
+	type unmarshaler Issue
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = Issue(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *Issue) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -2459,230 +2508,170 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
-type IssueStatusEnum uint
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
+type IssueStatusEnum string
 
 const (
-	IssueStatusEnumOngoing IssueStatusEnum = iota + 1
-	IssueStatusEnumResolved
+	IssueStatusEnumOngoing  IssueStatusEnum = "ONGOING"
+	IssueStatusEnumResolved IssueStatusEnum = "RESOLVED"
 )
 
-func (i IssueStatusEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssueStatusEnumOngoing:
-		return "ONGOING"
-	case IssueStatusEnumResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssueStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewIssueStatusEnumFromString(s string) (IssueStatusEnum, error) {
+	switch s {
 	case "ONGOING":
-		value := IssueStatusEnumOngoing
-		*i = value
+		return IssueStatusEnumOngoing, nil
 	case "RESOLVED":
-		value := IssueStatusEnumResolved
-		*i = value
+		return IssueStatusEnumResolved, nil
 	}
-	return nil
+	var t IssueStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type IssuesListRequestStatus uint
+func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
+	return &i
+}
+
+// - `string` - uuid
+// - `number` - url
+// - `date` - email
+// - `datetime` - phone
+// - `bool` - currency
+// - `list` - decimal
+type ItemFormatEnum string
 
 const (
-	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
-	IssuesListRequestStatusResolved
+	ItemFormatEnumString   ItemFormatEnum = "string"
+	ItemFormatEnumNumber   ItemFormatEnum = "number"
+	ItemFormatEnumDate     ItemFormatEnum = "date"
+	ItemFormatEnumDatetime ItemFormatEnum = "datetime"
+	ItemFormatEnumBool     ItemFormatEnum = "bool"
+	ItemFormatEnumList     ItemFormatEnum = "list"
 )
 
-func (i IssuesListRequestStatus) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssuesListRequestStatusOngoing:
-		return "ONGOING"
-	case IssuesListRequestStatusResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ONGOING":
-		value := IssuesListRequestStatusOngoing
-		*i = value
-	case "RESOLVED":
-		value := IssuesListRequestStatusResolved
-		*i = value
-	}
-	return nil
-}
-
-// * `string` - uuid
-// * `number` - url
-// * `date` - email
-// * `datetime` - phone
-// * `bool` - currency
-// * `list` - decimal
-type ItemFormatEnum uint
-
-const (
-	ItemFormatEnumString ItemFormatEnum = iota + 1
-	ItemFormatEnumNumber
-	ItemFormatEnumDate
-	ItemFormatEnumDatetime
-	ItemFormatEnumBool
-	ItemFormatEnumList
-)
-
-func (i ItemFormatEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case ItemFormatEnumString:
-		return "string"
-	case ItemFormatEnumNumber:
-		return "number"
-	case ItemFormatEnumDate:
-		return "date"
-	case ItemFormatEnumDatetime:
-		return "datetime"
-	case ItemFormatEnumBool:
-		return "bool"
-	case ItemFormatEnumList:
-		return "list"
-	}
-}
-
-func (i ItemFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *ItemFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewItemFormatEnumFromString(s string) (ItemFormatEnum, error) {
+	switch s {
 	case "string":
-		value := ItemFormatEnumString
-		*i = value
+		return ItemFormatEnumString, nil
 	case "number":
-		value := ItemFormatEnumNumber
-		*i = value
+		return ItemFormatEnumNumber, nil
 	case "date":
-		value := ItemFormatEnumDate
-		*i = value
+		return ItemFormatEnumDate, nil
 	case "datetime":
-		value := ItemFormatEnumDatetime
-		*i = value
+		return ItemFormatEnumDatetime, nil
 	case "bool":
-		value := ItemFormatEnumBool
-		*i = value
+		return ItemFormatEnumBool, nil
 	case "list":
-		value := ItemFormatEnumList
-		*i = value
+		return ItemFormatEnumList, nil
 	}
-	return nil
+	var t ItemFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemFormatEnum) Ptr() *ItemFormatEnum {
+	return &i
 }
 
 type ItemSchema struct {
 	ItemType    *ItemTypeEnum   `json:"item_type,omitempty"`
 	ItemFormat  *ItemFormatEnum `json:"item_format,omitempty"`
 	ItemChoices []string        `json:"item_choices,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `string` - string
-// * `number` - number
-// * `date` - date
-// * `datetime` - datetime
-// * `bool` - bool
-// * `list` - list
-type ItemTypeEnum uint
-
-const (
-	ItemTypeEnumString ItemTypeEnum = iota + 1
-	ItemTypeEnumNumber
-	ItemTypeEnumDate
-	ItemTypeEnumDatetime
-	ItemTypeEnumBool
-	ItemTypeEnumList
-)
-
-func (i ItemTypeEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case ItemTypeEnumString:
-		return "string"
-	case ItemTypeEnumNumber:
-		return "number"
-	case ItemTypeEnumDate:
-		return "date"
-	case ItemTypeEnumDatetime:
-		return "datetime"
-	case ItemTypeEnumBool:
-		return "bool"
-	case ItemTypeEnumList:
-		return "list"
-	}
-}
-
-func (i ItemTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *ItemTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (i *ItemSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ItemSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "string":
-		value := ItemTypeEnumString
-		*i = value
-	case "number":
-		value := ItemTypeEnumNumber
-		*i = value
-	case "date":
-		value := ItemTypeEnumDate
-		*i = value
-	case "datetime":
-		value := ItemTypeEnumDatetime
-		*i = value
-	case "bool":
-		value := ItemTypeEnumBool
-		*i = value
-	case "list":
-		value := ItemTypeEnumList
-		*i = value
-	}
+	*i = ItemSchema(value)
+	i._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (i *ItemSchema) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type ItemTypeEnum string
+
+const (
+	ItemTypeEnumString   ItemTypeEnum = "string"
+	ItemTypeEnumNumber   ItemTypeEnum = "number"
+	ItemTypeEnumDate     ItemTypeEnum = "date"
+	ItemTypeEnumDatetime ItemTypeEnum = "datetime"
+	ItemTypeEnumBool     ItemTypeEnum = "bool"
+	ItemTypeEnumList     ItemTypeEnum = "list"
+)
+
+func NewItemTypeEnumFromString(s string) (ItemTypeEnum, error) {
+	switch s {
+	case "string":
+		return ItemTypeEnumString, nil
+	case "number":
+		return ItemTypeEnumNumber, nil
+	case "date":
+		return ItemTypeEnumDate, nil
+	case "datetime":
+		return ItemTypeEnumDatetime, nil
+	case "bool":
+		return ItemTypeEnumBool, nil
+	case "list":
+		return ItemTypeEnumList, nil
+	}
+	var t ItemTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemTypeEnum) Ptr() *ItemTypeEnum {
+	return &i
 }
 
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
 	MagicLinkUrl    *string `json:"magic_link_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkToken(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkToken) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountCondition struct {
@@ -2690,207 +2679,289 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    *any   `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountCondition) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountCondition
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountCondition(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountCondition) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountConditionRequest struct {
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    any    `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountConditionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountConditionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountConditionRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountConditionRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfiguration struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountCondition `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfiguration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfiguration(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfigurationRequest struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountConditionRequest `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfigurationRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfigurationRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountStatus struct {
 	LinkedAccountStatus string `json:"linked_account_status"`
 	CanMakeRequest      bool   `json:"can_make_request"`
+
+	_rawJSON json.RawMessage
 }
 
-type LinkedAccountsListRequestCategory uint
-
-const (
-	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
-	LinkedAccountsListRequestCategoryAts
-	LinkedAccountsListRequestCategoryCrm
-	LinkedAccountsListRequestCategoryFilestorage
-	LinkedAccountsListRequestCategoryHris
-	LinkedAccountsListRequestCategoryMktg
-	LinkedAccountsListRequestCategoryTicketing
-)
-
-func (l LinkedAccountsListRequestCategory) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LinkedAccountsListRequestCategoryAccounting:
-		return "accounting"
-	case LinkedAccountsListRequestCategoryAts:
-		return "ats"
-	case LinkedAccountsListRequestCategoryCrm:
-		return "crm"
-	case LinkedAccountsListRequestCategoryFilestorage:
-		return "filestorage"
-	case LinkedAccountsListRequestCategoryHris:
-		return "hris"
-	case LinkedAccountsListRequestCategoryMktg:
-		return "mktg"
-	case LinkedAccountsListRequestCategoryTicketing:
-		return "ticketing"
-	}
-}
-
-func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (l *LinkedAccountStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "accounting":
-		value := LinkedAccountsListRequestCategoryAccounting
-		*l = value
-	case "ats":
-		value := LinkedAccountsListRequestCategoryAts
-		*l = value
-	case "crm":
-		value := LinkedAccountsListRequestCategoryCrm
-		*l = value
-	case "filestorage":
-		value := LinkedAccountsListRequestCategoryFilestorage
-		*l = value
-	case "hris":
-		value := LinkedAccountsListRequestCategoryHris
-		*l = value
-	case "mktg":
-		value := LinkedAccountsListRequestCategoryMktg
-		*l = value
-	case "ticketing":
-		value := LinkedAccountsListRequestCategoryTicketing
-		*l = value
-	}
+	*l = LinkedAccountStatus(value)
+	l._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (l *LinkedAccountStatus) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type MetaResponse struct {
-	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
-	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
-	Status                         *LinkedAccountStatus `json:"status,omitempty"`
-	HasConditionalParams           bool                 `json:"has_conditional_params"`
-	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
+	RequestSchema                  map[string]interface{} `json:"request_schema,omitempty"`
+	RemoteFieldClasses             map[string]interface{} `json:"remote_field_classes,omitempty"`
+	Status                         *LinkedAccountStatus   `json:"status,omitempty"`
+	HasConditionalParams           bool                   `json:"has_conditional_params"`
+	HasRequiredLinkedAccountParams bool                   `json:"has_required_linked_account_params"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `GET` - GET
-// * `OPTIONS` - OPTIONS
-// * `HEAD` - HEAD
-// * `POST` - POST
-// * `PUT` - PUT
-// * `PATCH` - PATCH
-// * `DELETE` - DELETE
-type MethodEnum uint
-
-const (
-	MethodEnumGet MethodEnum = iota + 1
-	MethodEnumOptions
-	MethodEnumHead
-	MethodEnumPost
-	MethodEnumPut
-	MethodEnumPatch
-	MethodEnumDelete
-)
-
-func (m MethodEnum) String() string {
-	switch m {
-	default:
-		return strconv.Itoa(int(m))
-	case MethodEnumGet:
-		return "GET"
-	case MethodEnumOptions:
-		return "OPTIONS"
-	case MethodEnumHead:
-		return "HEAD"
-	case MethodEnumPost:
-		return "POST"
-	case MethodEnumPut:
-		return "PUT"
-	case MethodEnumPatch:
-		return "PATCH"
-	case MethodEnumDelete:
-		return "DELETE"
-	}
-}
-
-func (m MethodEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", m.String())), nil
-}
-
-func (m *MethodEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (m *MetaResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler MetaResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "GET":
-		value := MethodEnumGet
-		*m = value
-	case "OPTIONS":
-		value := MethodEnumOptions
-		*m = value
-	case "HEAD":
-		value := MethodEnumHead
-		*m = value
-	case "POST":
-		value := MethodEnumPost
-		*m = value
-	case "PUT":
-		value := MethodEnumPut
-		*m = value
-	case "PATCH":
-		value := MethodEnumPatch
-		*m = value
-	case "DELETE":
-		value := MethodEnumDelete
-		*m = value
-	}
+	*m = MetaResponse(value)
+	m._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (m *MetaResponse) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
+}
+
+// - `GET` - GET
+// - `OPTIONS` - OPTIONS
+// - `HEAD` - HEAD
+// - `POST` - POST
+// - `PUT` - PUT
+// - `PATCH` - PATCH
+// - `DELETE` - DELETE
+type MethodEnum string
+
+const (
+	MethodEnumGet     MethodEnum = "GET"
+	MethodEnumOptions MethodEnum = "OPTIONS"
+	MethodEnumHead    MethodEnum = "HEAD"
+	MethodEnumPost    MethodEnum = "POST"
+	MethodEnumPut     MethodEnum = "PUT"
+	MethodEnumPatch   MethodEnum = "PATCH"
+	MethodEnumDelete  MethodEnum = "DELETE"
+)
+
+func NewMethodEnumFromString(s string) (MethodEnum, error) {
+	switch s {
+	case "GET":
+		return MethodEnumGet, nil
+	case "OPTIONS":
+		return MethodEnumOptions, nil
+	case "HEAD":
+		return MethodEnumHead, nil
+	case "POST":
+		return MethodEnumPost, nil
+	case "PUT":
+		return MethodEnumPut, nil
+	case "PATCH":
+		return MethodEnumPatch, nil
+	case "DELETE":
+		return MethodEnumDelete, nil
+	}
+	var t MethodEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (m MethodEnum) Ptr() *MethodEnum {
+	return &m
+}
+
 // # The ModelOperation Object
+//
 // ### Description
+//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
+//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
 	AvailableOperations    []string `json:"available_operations,omitempty"`
 	RequiredPostParameters []string `json:"required_post_parameters,omitempty"`
 	SupportedFields        []string `json:"supported_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *ModelOperation) UnmarshalJSON(data []byte) error {
+	type unmarshaler ModelOperation
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = ModelOperation(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *ModelOperation) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // # The MultipartFormField Object
+//
 // ### Description
+//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
+//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -2899,21 +2970,46 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// * `RAW` - RAW
-	// * `BASE64` - BASE64
-	// * `GZIP_BASE64` - GZIP_BASE64
+	// - `RAW` - RAW
+	// - `BASE64` - BASE64
+	// - `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
 	// The MIME type of the file, if the field is for a file.
 	ContentType *string `json:"content_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *MultipartFormFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler MultipartFormFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = MultipartFormFieldRequest(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *MultipartFormFieldRequest) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -2976,115 +3072,568 @@ type OperatorSchema struct {
 	Operator *string `json:"operator,omitempty"`
 	// Whether the operator can be repeated multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *OperatorSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler OperatorSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = OperatorSchema(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *OperatorSchema) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 type PaginatedAccountDetailsAndActionsList struct {
 	Next     *string                     `json:"next,omitempty"`
 	Previous *string                     `json:"previous,omitempty"`
 	Results  []*AccountDetailsAndActions `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAccountDetailsAndActionsList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAccountDetailsAndActionsList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAccountList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Account `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAccountList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAccountList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAccountList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAccountList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAttachmentList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*Attachment `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAttachmentList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAttachmentList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAttachmentList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAttachmentList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAuditLogEventList struct {
 	Next     *string          `json:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty"`
 	Results  []*AuditLogEvent `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAuditLogEventList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAuditLogEventList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAuditLogEventList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAuditLogEventList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedCollectionList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*Collection `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedCollectionList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedCollectionList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedCollectionList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedCollectionList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedCommentList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Comment `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedCommentList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedCommentList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedCommentList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedCommentList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedConditionSchemaList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
 	Results  []*ConditionSchema `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedConditionSchemaList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedConditionSchemaList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedConditionSchemaList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedConditionSchemaList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedContactList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Contact `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedContactList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedContactList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedContactList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedContactList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedIssueList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Issue `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedIssueList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedIssueList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedIssueList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedIssueList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedProjectList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Project `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedProjectList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedProjectList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedProjectList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedProjectList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedRemoteFieldClassList struct {
 	Next     *string             `json:"next,omitempty"`
 	Previous *string             `json:"previous,omitempty"`
 	Results  []*RemoteFieldClass `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedRemoteFieldClassList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedRemoteFieldClassList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedRemoteFieldClassList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedRemoteFieldClassList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedRoleList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Role `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedRoleList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedRoleList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedRoleList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedRoleList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedSyncStatusList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*SyncStatus `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedSyncStatusList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedSyncStatusList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedSyncStatusList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedSyncStatusList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTagList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Tag  `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTagList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTagList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTagList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTagList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTeamList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Team `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTeamList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTeamList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTeamList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTeamList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTicketList struct {
 	Next     *string   `json:"next,omitempty"`
 	Previous *string   `json:"previous,omitempty"`
 	Results  []*Ticket `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTicketList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTicketList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTicketList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTicketList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedUserList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*User `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedUserList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedUserList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedUserList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedUserList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // # The Ticket Object
+//
 // ### Description
+//
 // The `Ticket` object is used to represent a ticket or a task within a system.
 //
 // ### Usage Example
+//
 // TODO
 type PatchedTicketRequest struct {
 	// The ticket's name.
@@ -3096,10 +3645,10 @@ type PatchedTicketRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	// * `IN_PROGRESS` - IN_PROGRESS
-	// * `ON_HOLD` - ON_HOLD
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	// - `IN_PROGRESS` - IN_PROGRESS
+	// - `ON_HOLD` - ON_HOLD
 	Status *PatchedTicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string   `json:"description,omitempty"`
@@ -3119,22 +3668,47 @@ type PatchedTicketRequest struct {
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
 	//
-	// * `URGENT` - URGENT
-	// * `HIGH` - HIGH
-	// * `NORMAL` - NORMAL
-	// * `LOW` - LOW
+	// - `URGENT` - URGENT
+	// - `HIGH` - HIGH
+	// - `NORMAL` - NORMAL
+	// - `LOW` - LOW
 	Priority            *PatchedTicketRequestPriority `json:"priority,omitempty"`
-	IntegrationParams   map[string]any                `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any                `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}        `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}        `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedTicketRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedTicketRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedTicketRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedTicketRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The priority or urgency of the Ticket.
 //
-// * `URGENT` - URGENT
-// * `HIGH` - HIGH
-// * `NORMAL` - NORMAL
-// * `LOW` - LOW
+// - `URGENT` - URGENT
+// - `HIGH` - HIGH
+// - `NORMAL` - NORMAL
+// - `LOW` - LOW
 type PatchedTicketRequestPriority struct {
 	typeName     string
 	PriorityEnum PriorityEnum
@@ -3194,10 +3768,10 @@ func (p *PatchedTicketRequestPriority) Accept(visitor PatchedTicketRequestPriori
 
 // The current status of the ticket.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-// * `IN_PROGRESS` - IN_PROGRESS
-// * `ON_HOLD` - ON_HOLD
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+// - `IN_PROGRESS` - IN_PROGRESS
+// - `ON_HOLD` - ON_HOLD
 type PatchedTicketRequestStatus struct {
 	typeName         string
 	TicketStatusEnum TicketStatusEnum
@@ -3255,65 +3829,46 @@ func (p *PatchedTicketRequestStatus) Accept(visitor PatchedTicketRequestStatusVi
 	}
 }
 
-// * `URGENT` - URGENT
-// * `HIGH` - HIGH
-// * `NORMAL` - NORMAL
-// * `LOW` - LOW
-type PriorityEnum uint
+// - `URGENT` - URGENT
+// - `HIGH` - HIGH
+// - `NORMAL` - NORMAL
+// - `LOW` - LOW
+type PriorityEnum string
 
 const (
-	PriorityEnumUrgent PriorityEnum = iota + 1
-	PriorityEnumHigh
-	PriorityEnumNormal
-	PriorityEnumLow
+	PriorityEnumUrgent PriorityEnum = "URGENT"
+	PriorityEnumHigh   PriorityEnum = "HIGH"
+	PriorityEnumNormal PriorityEnum = "NORMAL"
+	PriorityEnumLow    PriorityEnum = "LOW"
 )
 
-func (p PriorityEnum) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PriorityEnumUrgent:
-		return "URGENT"
-	case PriorityEnumHigh:
-		return "HIGH"
-	case PriorityEnumNormal:
-		return "NORMAL"
-	case PriorityEnumLow:
-		return "LOW"
-	}
-}
-
-func (p PriorityEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PriorityEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewPriorityEnumFromString(s string) (PriorityEnum, error) {
+	switch s {
 	case "URGENT":
-		value := PriorityEnumUrgent
-		*p = value
+		return PriorityEnumUrgent, nil
 	case "HIGH":
-		value := PriorityEnumHigh
-		*p = value
+		return PriorityEnumHigh, nil
 	case "NORMAL":
-		value := PriorityEnumNormal
-		*p = value
+		return PriorityEnumNormal, nil
 	case "LOW":
-		value := PriorityEnumLow
-		*p = value
+		return PriorityEnumLow, nil
 	}
-	return nil
+	var t PriorityEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PriorityEnum) Ptr() *PriorityEnum {
+	return &p
 }
 
 // # The Project Object
+//
 // ### Description
+//
 // Please use the `Collection` model. This model will be fully deprecated on 3/30/2024.
 //
 // ### Usage Example
+//
 // TODO
 type Project struct {
 	Id *string `json:"id,omitempty"`
@@ -3327,63 +3882,94 @@ type Project struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type ProjectsUsersListRequestExpand uint
-
-const (
-	ProjectsUsersListRequestExpandRoles ProjectsUsersListRequestExpand = iota + 1
-	ProjectsUsersListRequestExpandTeams
-	ProjectsUsersListRequestExpandTeamsRoles
-)
-
-func (p ProjectsUsersListRequestExpand) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case ProjectsUsersListRequestExpandRoles:
-		return "roles"
-	case ProjectsUsersListRequestExpandTeams:
-		return "teams"
-	case ProjectsUsersListRequestExpandTeamsRoles:
-		return "teams,roles"
-	}
-}
-
-func (p ProjectsUsersListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *ProjectsUsersListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (p *Project) UnmarshalJSON(data []byte) error {
+	type unmarshaler Project
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "roles":
-		value := ProjectsUsersListRequestExpandRoles
-		*p = value
-	case "teams":
-		value := ProjectsUsersListRequestExpandTeams
-		*p = value
-	case "teams,roles":
-		value := ProjectsUsersListRequestExpandTeamsRoles
-		*p = value
-	}
+	*p = Project(value)
+	p._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (p *Project) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
 type RemoteData struct {
-	Path string `json:"path"`
-	Data *any   `json:"data,omitempty"`
+	Path string      `json:"path"`
+	Data interface{} `json:"data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteData) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteData
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteData(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteData) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteField struct {
 	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            *any                         `json:"value,omitempty"`
+	Value            interface{}                  `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteField) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteField
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteField(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteField) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClass struct {
@@ -3397,11 +3983,61 @@ type RemoteFieldClass struct {
 	FieldFormat   *RemoteFieldClassFieldFormat        `json:"field_format,omitempty"`
 	FieldChoices  []*RemoteFieldClassFieldChoicesItem `json:"field_choices,omitempty"`
 	ItemSchema    *ItemSchema                         `json:"item_schema,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClass) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClass
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClass(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClass) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClassFieldChoicesItem struct {
-	Value       *any    `json:"value,omitempty"`
-	DisplayName *string `json:"display_name,omitempty"`
+	Value       interface{} `json:"value,omitempty"`
+	DisplayName *string     `json:"display_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClassFieldChoicesItem) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClassFieldChoicesItem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClassFieldChoicesItem(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClassFieldChoicesItem) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClassFieldFormat struct {
@@ -3578,6 +4214,31 @@ func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClass
 type RemoteFieldRequest struct {
 	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
 	Value            *string                             `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldRequest(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldRequest) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldRequestRemoteFieldClass struct {
@@ -3638,124 +4299,148 @@ func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRe
 }
 
 // # The RemoteKey Object
+//
 // ### Description
+//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
+//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
 	Key  string `json:"key"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteKey) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteKey
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteKey(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteKey) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 // # The RemoteResponse Object
+//
 // ### Description
+//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
+//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
-	Method          string            `json:"method"`
-	Path            string            `json:"path"`
-	Status          int               `json:"status"`
-	Response        any               `json:"response,omitempty"`
-	ResponseHeaders map[string]any    `json:"response_headers,omitempty"`
-	ResponseType    *ResponseTypeEnum `json:"response_type,omitempty"`
-	Headers         map[string]any    `json:"headers,omitempty"`
+	Method          string                 `json:"method"`
+	Path            string                 `json:"path"`
+	Status          int                    `json:"status"`
+	Response        interface{}            `json:"response,omitempty"`
+	ResponseHeaders map[string]interface{} `json:"response_headers,omitempty"`
+	ResponseType    *ResponseTypeEnum      `json:"response_type,omitempty"`
+	Headers         map[string]interface{} `json:"headers,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `JSON` - JSON
-// * `XML` - XML
-// * `MULTIPART` - MULTIPART
-type RequestFormatEnum uint
-
-const (
-	RequestFormatEnumJson RequestFormatEnum = iota + 1
-	RequestFormatEnumXml
-	RequestFormatEnumMultipart
-)
-
-func (r RequestFormatEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RequestFormatEnumJson:
-		return "JSON"
-	case RequestFormatEnumXml:
-		return "XML"
-	case RequestFormatEnumMultipart:
-		return "MULTIPART"
-	}
-}
-
-func (r RequestFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (r *RemoteResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*r = RemoteResponse(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteResponse) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+// - `JSON` - JSON
+// - `XML` - XML
+// - `MULTIPART` - MULTIPART
+type RequestFormatEnum string
+
+const (
+	RequestFormatEnumJson      RequestFormatEnum = "JSON"
+	RequestFormatEnumXml       RequestFormatEnum = "XML"
+	RequestFormatEnumMultipart RequestFormatEnum = "MULTIPART"
+)
+
+func NewRequestFormatEnumFromString(s string) (RequestFormatEnum, error) {
+	switch s {
 	case "JSON":
-		value := RequestFormatEnumJson
-		*r = value
+		return RequestFormatEnumJson, nil
 	case "XML":
-		value := RequestFormatEnumXml
-		*r = value
+		return RequestFormatEnumXml, nil
 	case "MULTIPART":
-		value := RequestFormatEnumMultipart
-		*r = value
+		return RequestFormatEnumMultipart, nil
 	}
-	return nil
+	var t RequestFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `JSON` - JSON
-// * `BASE64_GZIP` - BASE64_GZIP
-type ResponseTypeEnum uint
+func (r RequestFormatEnum) Ptr() *RequestFormatEnum {
+	return &r
+}
+
+// - `JSON` - JSON
+// - `BASE64_GZIP` - BASE64_GZIP
+type ResponseTypeEnum string
 
 const (
-	ResponseTypeEnumJson ResponseTypeEnum = iota + 1
-	ResponseTypeEnumBase64Gzip
+	ResponseTypeEnumJson       ResponseTypeEnum = "JSON"
+	ResponseTypeEnumBase64Gzip ResponseTypeEnum = "BASE64_GZIP"
 )
 
-func (r ResponseTypeEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case ResponseTypeEnumJson:
-		return "JSON"
-	case ResponseTypeEnumBase64Gzip:
-		return "BASE64_GZIP"
-	}
-}
-
-func (r ResponseTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewResponseTypeEnumFromString(s string) (ResponseTypeEnum, error) {
+	switch s {
 	case "JSON":
-		value := ResponseTypeEnumJson
-		*r = value
+		return ResponseTypeEnumJson, nil
 	case "BASE64_GZIP":
-		value := ResponseTypeEnumBase64Gzip
-		*r = value
+		return ResponseTypeEnumBase64Gzip, nil
 	}
-	return nil
+	var t ResponseTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r ResponseTypeEnum) Ptr() *ResponseTypeEnum {
+	return &r
 }
 
 // # The Role Object
+//
 // ### Description
+//
 // The `Role` object is used to represent the set of actions & access that a user with this role is allowed to perform.
 //
 // ### Usage Example
+//
 // TODO
 type Role struct {
 	Id *string `json:"id,omitempty"`
@@ -3767,92 +4452,89 @@ type Role struct {
 	TicketActions []*RoleTicketActionsItem `json:"ticket_actions,omitempty"`
 	// The level of Ticket access that a User with this Role can perform.
 	//
-	// * `ALL` - ALL
-	// * `ASSIGNED_ONLY` - ASSIGNED_ONLY
-	// * `TEAM_ONLY` - TEAM_ONLY
+	// - `ALL` - ALL
+	// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
+	// - `TEAM_ONLY` - TEAM_ONLY
 	TicketAccess *RoleTicketAccess `json:"ticket_access,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
-type RoleEnum uint
-
-const (
-	RoleEnumAdmin RoleEnum = iota + 1
-	RoleEnumDeveloper
-	RoleEnumMember
-	RoleEnumApi
-	RoleEnumSystem
-	RoleEnumMergeTeam
-)
-
-func (r RoleEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RoleEnumAdmin:
-		return "ADMIN"
-	case RoleEnumDeveloper:
-		return "DEVELOPER"
-	case RoleEnumMember:
-		return "MEMBER"
-	case RoleEnumApi:
-		return "API"
-	case RoleEnumSystem:
-		return "SYSTEM"
-	case RoleEnumMergeTeam:
-		return "MERGE_TEAM"
-	}
-}
-
-func (r RoleEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RoleEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (r *Role) UnmarshalJSON(data []byte) error {
+	type unmarshaler Role
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "ADMIN":
-		value := RoleEnumAdmin
-		*r = value
-	case "DEVELOPER":
-		value := RoleEnumDeveloper
-		*r = value
-	case "MEMBER":
-		value := RoleEnumMember
-		*r = value
-	case "API":
-		value := RoleEnumApi
-		*r = value
-	case "SYSTEM":
-		value := RoleEnumSystem
-		*r = value
-	case "MERGE_TEAM":
-		value := RoleEnumMergeTeam
-		*r = value
-	}
+	*r = Role(value)
+	r._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (r *Role) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
+type RoleEnum string
+
+const (
+	RoleEnumAdmin     RoleEnum = "ADMIN"
+	RoleEnumDeveloper RoleEnum = "DEVELOPER"
+	RoleEnumMember    RoleEnum = "MEMBER"
+	RoleEnumApi       RoleEnum = "API"
+	RoleEnumSystem    RoleEnum = "SYSTEM"
+	RoleEnumMergeTeam RoleEnum = "MERGE_TEAM"
+)
+
+func NewRoleEnumFromString(s string) (RoleEnum, error) {
+	switch s {
+	case "ADMIN":
+		return RoleEnumAdmin, nil
+	case "DEVELOPER":
+		return RoleEnumDeveloper, nil
+	case "MEMBER":
+		return RoleEnumMember, nil
+	case "API":
+		return RoleEnumApi, nil
+	case "SYSTEM":
+		return RoleEnumSystem, nil
+	case "MERGE_TEAM":
+		return RoleEnumMergeTeam, nil
+	}
+	var t RoleEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RoleEnum) Ptr() *RoleEnum {
+	return &r
 }
 
 // The level of Ticket access that a User with this Role can perform.
 //
-// * `ALL` - ALL
-// * `ASSIGNED_ONLY` - ASSIGNED_ONLY
-// * `TEAM_ONLY` - TEAM_ONLY
+// - `ALL` - ALL
+// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
+// - `TEAM_ONLY` - TEAM_ONLY
 type RoleTicketAccess struct {
 	typeName         string
 	String           string
@@ -3967,51 +4649,38 @@ func (r *RoleTicketActionsItem) Accept(visitor RoleTicketActionsItemVisitor) err
 	}
 }
 
-// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// * `IN_LAST_SYNC` - IN_LAST_SYNC
-type SelectiveSyncConfigurationsUsageEnum uint
+// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// - `IN_LAST_SYNC` - IN_LAST_SYNC
+type SelectiveSyncConfigurationsUsageEnum string
 
 const (
-	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = iota + 1
-	SelectiveSyncConfigurationsUsageEnumInLastSync
+	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = "IN_NEXT_SYNC"
+	SelectiveSyncConfigurationsUsageEnumInLastSync SelectiveSyncConfigurationsUsageEnum = "IN_LAST_SYNC"
 )
 
-func (s SelectiveSyncConfigurationsUsageEnum) String() string {
+func NewSelectiveSyncConfigurationsUsageEnumFromString(s string) (SelectiveSyncConfigurationsUsageEnum, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SelectiveSyncConfigurationsUsageEnumInNextSync:
-		return "IN_NEXT_SYNC"
-	case SelectiveSyncConfigurationsUsageEnumInLastSync:
-		return "IN_LAST_SYNC"
-	}
-}
-
-func (s SelectiveSyncConfigurationsUsageEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
 	case "IN_NEXT_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInNextSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInNextSync, nil
 	case "IN_LAST_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInLastSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInLastSync, nil
 	}
-	return nil
+	var t SelectiveSyncConfigurationsUsageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SelectiveSyncConfigurationsUsageEnum) Ptr() *SelectiveSyncConfigurationsUsageEnum {
+	return &s
 }
 
 // # The SyncStatus Object
+//
 // ### Description
-// The `SyncStatus` object is used to represent the syncing state of an account
+//
+// # The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
+//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -4021,81 +4690,81 @@ type SyncStatus struct {
 	Status                           SyncStatusStatusEnum                  `json:"status,omitempty"`
 	IsInitialSync                    bool                                  `json:"is_initial_sync"`
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `SYNCING` - SYNCING
-// * `DONE` - DONE
-// * `FAILED` - FAILED
-// * `DISABLED` - DISABLED
-// * `PAUSED` - PAUSED
-// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
-type SyncStatusStatusEnum uint
-
-const (
-	SyncStatusStatusEnumSyncing SyncStatusStatusEnum = iota + 1
-	SyncStatusStatusEnumDone
-	SyncStatusStatusEnumFailed
-	SyncStatusStatusEnumDisabled
-	SyncStatusStatusEnumPaused
-	SyncStatusStatusEnumPartiallySynced
-)
-
-func (s SyncStatusStatusEnum) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SyncStatusStatusEnumSyncing:
-		return "SYNCING"
-	case SyncStatusStatusEnumDone:
-		return "DONE"
-	case SyncStatusStatusEnumFailed:
-		return "FAILED"
-	case SyncStatusStatusEnumDisabled:
-		return "DISABLED"
-	case SyncStatusStatusEnumPaused:
-		return "PAUSED"
-	case SyncStatusStatusEnumPartiallySynced:
-		return "PARTIALLY_SYNCED"
-	}
-}
-
-func (s SyncStatusStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (s *SyncStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler SyncStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "SYNCING":
-		value := SyncStatusStatusEnumSyncing
-		*s = value
-	case "DONE":
-		value := SyncStatusStatusEnumDone
-		*s = value
-	case "FAILED":
-		value := SyncStatusStatusEnumFailed
-		*s = value
-	case "DISABLED":
-		value := SyncStatusStatusEnumDisabled
-		*s = value
-	case "PAUSED":
-		value := SyncStatusStatusEnumPaused
-		*s = value
-	case "PARTIALLY_SYNCED":
-		value := SyncStatusStatusEnumPartiallySynced
-		*s = value
-	}
+	*s = SyncStatus(value)
+	s._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (s *SyncStatus) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// - `SYNCING` - SYNCING
+// - `DONE` - DONE
+// - `FAILED` - FAILED
+// - `DISABLED` - DISABLED
+// - `PAUSED` - PAUSED
+// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+type SyncStatusStatusEnum string
+
+const (
+	SyncStatusStatusEnumSyncing         SyncStatusStatusEnum = "SYNCING"
+	SyncStatusStatusEnumDone            SyncStatusStatusEnum = "DONE"
+	SyncStatusStatusEnumFailed          SyncStatusStatusEnum = "FAILED"
+	SyncStatusStatusEnumDisabled        SyncStatusStatusEnum = "DISABLED"
+	SyncStatusStatusEnumPaused          SyncStatusStatusEnum = "PAUSED"
+	SyncStatusStatusEnumPartiallySynced SyncStatusStatusEnum = "PARTIALLY_SYNCED"
+)
+
+func NewSyncStatusStatusEnumFromString(s string) (SyncStatusStatusEnum, error) {
+	switch s {
+	case "SYNCING":
+		return SyncStatusStatusEnumSyncing, nil
+	case "DONE":
+		return SyncStatusStatusEnumDone, nil
+	case "FAILED":
+		return SyncStatusStatusEnumFailed, nil
+	case "DISABLED":
+		return SyncStatusStatusEnumDisabled, nil
+	case "PAUSED":
+		return SyncStatusStatusEnumPaused, nil
+	case "PARTIALLY_SYNCED":
+		return SyncStatusStatusEnumPartiallySynced, nil
+	}
+	var t SyncStatusStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
+	return &s
+}
+
 // # The Tag Object
+//
 // ### Description
+//
 // The `Tag` object is used to represent a tag or label for a ticket.
 //
 // ### Usage Example
+//
 // TODO
 type Tag struct {
 	// The third-party API ID of the matching object.
@@ -4106,16 +4775,44 @@ type Tag struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *Tag) UnmarshalJSON(data []byte) error {
+	type unmarshaler Tag
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = Tag(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *Tag) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // # The Team Object
+//
 // ### Description
+//
 // The `Team` object is used to represent a team within the company receiving the ticket.
 //
 // ### Usage Example
+//
 // TODO
 type Team struct {
 	Id *string `json:"id,omitempty"`
@@ -4129,16 +4826,44 @@ type Team struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *Team) UnmarshalJSON(data []byte) error {
+	type unmarshaler Team
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = Team(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *Team) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // # The Ticket Object
+//
 // ### Description
+//
 // The `Ticket` object is used to represent a ticket or a task within a system.
 //
 // ### Usage Example
+//
 // TODO
 type Ticket struct {
 	Id *string `json:"id,omitempty"`
@@ -4153,10 +4878,10 @@ type Ticket struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	// * `IN_PROGRESS` - IN_PROGRESS
-	// * `ON_HOLD` - ON_HOLD
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	// - `IN_PROGRESS` - IN_PROGRESS
+	// - `ON_HOLD` - ON_HOLD
 	Status *TicketStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string                  `json:"description,omitempty"`
@@ -4182,64 +4907,70 @@ type Ticket struct {
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
 	//
-	// * `URGENT` - URGENT
-	// * `HIGH` - HIGH
-	// * `NORMAL` - NORMAL
-	// * `LOW` - LOW
+	// - `URGENT` - URGENT
+	// - `HIGH` - HIGH
+	// - `NORMAL` - NORMAL
+	// - `LOW` - LOW
 	Priority  *TicketPriority `json:"priority,omitempty"`
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `ALL` - ALL
-// * `ASSIGNED_ONLY` - ASSIGNED_ONLY
-// * `TEAM_ONLY` - TEAM_ONLY
-type TicketAccessEnum uint
-
-const (
-	TicketAccessEnumAll TicketAccessEnum = iota + 1
-	TicketAccessEnumAssignedOnly
-	TicketAccessEnumTeamOnly
-)
-
-func (t TicketAccessEnum) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketAccessEnumAll:
-		return "ALL"
-	case TicketAccessEnumAssignedOnly:
-		return "ASSIGNED_ONLY"
-	case TicketAccessEnumTeamOnly:
-		return "TEAM_ONLY"
-	}
-}
-
-func (t TicketAccessEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketAccessEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (t *Ticket) UnmarshalJSON(data []byte) error {
+	type unmarshaler Ticket
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "ALL":
-		value := TicketAccessEnumAll
-		*t = value
-	case "ASSIGNED_ONLY":
-		value := TicketAccessEnumAssignedOnly
-		*t = value
-	case "TEAM_ONLY":
-		value := TicketAccessEnumTeamOnly
-		*t = value
-	}
+	*t = Ticket(value)
+	t._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (t *Ticket) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
+}
+
+// - `ALL` - ALL
+// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
+// - `TEAM_ONLY` - TEAM_ONLY
+type TicketAccessEnum string
+
+const (
+	TicketAccessEnumAll          TicketAccessEnum = "ALL"
+	TicketAccessEnumAssignedOnly TicketAccessEnum = "ASSIGNED_ONLY"
+	TicketAccessEnumTeamOnly     TicketAccessEnum = "TEAM_ONLY"
+)
+
+func NewTicketAccessEnumFromString(s string) (TicketAccessEnum, error) {
+	switch s {
+	case "ALL":
+		return TicketAccessEnumAll, nil
+	case "ASSIGNED_ONLY":
+		return TicketAccessEnumAssignedOnly, nil
+	case "TEAM_ONLY":
+		return TicketAccessEnumTeamOnly, nil
+	}
+	var t TicketAccessEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketAccessEnum) Ptr() *TicketAccessEnum {
+	return &t
 }
 
 // The account associated with the ticket.
@@ -4300,72 +5031,44 @@ func (t *TicketAccount) Accept(visitor TicketAccountVisitor) error {
 	}
 }
 
-// * `VIEW` - VIEW
-// * `CREATE` - CREATE
-// * `EDIT` - EDIT
-// * `DELETE` - DELETE
-// * `CLOSE` - CLOSE
-// * `ASSIGN` - ASSIGN
-type TicketActionsEnum uint
+// - `VIEW` - VIEW
+// - `CREATE` - CREATE
+// - `EDIT` - EDIT
+// - `DELETE` - DELETE
+// - `CLOSE` - CLOSE
+// - `ASSIGN` - ASSIGN
+type TicketActionsEnum string
 
 const (
-	TicketActionsEnumView TicketActionsEnum = iota + 1
-	TicketActionsEnumCreate
-	TicketActionsEnumEdit
-	TicketActionsEnumDelete
-	TicketActionsEnumClose
-	TicketActionsEnumAssign
+	TicketActionsEnumView   TicketActionsEnum = "VIEW"
+	TicketActionsEnumCreate TicketActionsEnum = "CREATE"
+	TicketActionsEnumEdit   TicketActionsEnum = "EDIT"
+	TicketActionsEnumDelete TicketActionsEnum = "DELETE"
+	TicketActionsEnumClose  TicketActionsEnum = "CLOSE"
+	TicketActionsEnumAssign TicketActionsEnum = "ASSIGN"
 )
 
-func (t TicketActionsEnum) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketActionsEnumView:
-		return "VIEW"
-	case TicketActionsEnumCreate:
-		return "CREATE"
-	case TicketActionsEnumEdit:
-		return "EDIT"
-	case TicketActionsEnumDelete:
-		return "DELETE"
-	case TicketActionsEnumClose:
-		return "CLOSE"
-	case TicketActionsEnumAssign:
-		return "ASSIGN"
-	}
-}
-
-func (t TicketActionsEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketActionsEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewTicketActionsEnumFromString(s string) (TicketActionsEnum, error) {
+	switch s {
 	case "VIEW":
-		value := TicketActionsEnumView
-		*t = value
+		return TicketActionsEnumView, nil
 	case "CREATE":
-		value := TicketActionsEnumCreate
-		*t = value
+		return TicketActionsEnumCreate, nil
 	case "EDIT":
-		value := TicketActionsEnumEdit
-		*t = value
+		return TicketActionsEnumEdit, nil
 	case "DELETE":
-		value := TicketActionsEnumDelete
-		*t = value
+		return TicketActionsEnumDelete, nil
 	case "CLOSE":
-		value := TicketActionsEnumClose
-		*t = value
+		return TicketActionsEnumClose, nil
 	case "ASSIGN":
-		value := TicketActionsEnumAssign
-		*t = value
+		return TicketActionsEnumAssign, nil
 	}
-	return nil
+	var t TicketActionsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketActionsEnum) Ptr() *TicketActionsEnum {
+	return &t
 }
 
 type TicketAssigneesItem struct {
@@ -4715,10 +5418,10 @@ func (t *TicketParentTicket) Accept(visitor TicketParentTicketVisitor) error {
 
 // The priority or urgency of the Ticket.
 //
-// * `URGENT` - URGENT
-// * `HIGH` - HIGH
-// * `NORMAL` - NORMAL
-// * `LOW` - LOW
+// - `URGENT` - URGENT
+// - `HIGH` - HIGH
+// - `NORMAL` - NORMAL
+// - `LOW` - LOW
 type TicketPriority struct {
 	typeName     string
 	PriorityEnum PriorityEnum
@@ -4777,10 +5480,13 @@ func (t *TicketPriority) Accept(visitor TicketPriorityVisitor) error {
 }
 
 // # The Ticket Object
+//
 // ### Description
+//
 // The `Ticket` object is used to represent a ticket or a task within a system.
 //
 // ### Usage Example
+//
 // TODO
 type TicketRequest struct {
 	// The ticket's name.
@@ -4792,10 +5498,10 @@ type TicketRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The current status of the ticket.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	// * `IN_PROGRESS` - IN_PROGRESS
-	// * `ON_HOLD` - ON_HOLD
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	// - `IN_PROGRESS` - IN_PROGRESS
+	// - `ON_HOLD` - ON_HOLD
 	Status *TicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string                         `json:"description,omitempty"`
@@ -4816,14 +5522,39 @@ type TicketRequest struct {
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
 	//
-	// * `URGENT` - URGENT
-	// * `HIGH` - HIGH
-	// * `NORMAL` - NORMAL
-	// * `LOW` - LOW
+	// - `URGENT` - URGENT
+	// - `HIGH` - HIGH
+	// - `NORMAL` - NORMAL
+	// - `LOW` - LOW
 	Priority            *TicketRequestPriority `json:"priority,omitempty"`
-	IntegrationParams   map[string]any         `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any         `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TicketRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler TicketRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TicketRequest(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TicketRequest) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The account associated with the ticket.
@@ -5231,10 +5962,10 @@ func (t *TicketRequestParentTicket) Accept(visitor TicketRequestParentTicketVisi
 
 // The priority or urgency of the Ticket.
 //
-// * `URGENT` - URGENT
-// * `HIGH` - HIGH
-// * `NORMAL` - NORMAL
-// * `LOW` - LOW
+// - `URGENT` - URGENT
+// - `HIGH` - HIGH
+// - `NORMAL` - NORMAL
+// - `LOW` - LOW
 type TicketRequestPriority struct {
 	typeName     string
 	PriorityEnum PriorityEnum
@@ -5294,10 +6025,10 @@ func (t *TicketRequestPriority) Accept(visitor TicketRequestPriorityVisitor) err
 
 // The current status of the ticket.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-// * `IN_PROGRESS` - IN_PROGRESS
-// * `ON_HOLD` - ON_HOLD
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+// - `IN_PROGRESS` - IN_PROGRESS
+// - `ON_HOLD` - ON_HOLD
 type TicketRequestStatus struct {
 	typeName         string
 	TicketStatusEnum TicketStatusEnum
@@ -5360,14 +6091,39 @@ type TicketResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TicketResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler TicketResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TicketResponse(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TicketResponse) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The current status of the ticket.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-// * `IN_PROGRESS` - IN_PROGRESS
-// * `ON_HOLD` - ON_HOLD
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+// - `IN_PROGRESS` - IN_PROGRESS
+// - `ON_HOLD` - ON_HOLD
 type TicketStatus struct {
 	typeName         string
 	TicketStatusEnum TicketStatusEnum
@@ -5425,58 +6181,36 @@ func (t *TicketStatus) Accept(visitor TicketStatusVisitor) error {
 	}
 }
 
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-// * `IN_PROGRESS` - IN_PROGRESS
-// * `ON_HOLD` - ON_HOLD
-type TicketStatusEnum uint
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+// - `IN_PROGRESS` - IN_PROGRESS
+// - `ON_HOLD` - ON_HOLD
+type TicketStatusEnum string
 
 const (
-	TicketStatusEnumOpen TicketStatusEnum = iota + 1
-	TicketStatusEnumClosed
-	TicketStatusEnumInProgress
-	TicketStatusEnumOnHold
+	TicketStatusEnumOpen       TicketStatusEnum = "OPEN"
+	TicketStatusEnumClosed     TicketStatusEnum = "CLOSED"
+	TicketStatusEnumInProgress TicketStatusEnum = "IN_PROGRESS"
+	TicketStatusEnumOnHold     TicketStatusEnum = "ON_HOLD"
 )
 
-func (t TicketStatusEnum) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketStatusEnumOpen:
-		return "OPEN"
-	case TicketStatusEnumClosed:
-		return "CLOSED"
-	case TicketStatusEnumInProgress:
-		return "IN_PROGRESS"
-	case TicketStatusEnumOnHold:
-		return "ON_HOLD"
-	}
-}
-
-func (t TicketStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewTicketStatusEnumFromString(s string) (TicketStatusEnum, error) {
+	switch s {
 	case "OPEN":
-		value := TicketStatusEnumOpen
-		*t = value
+		return TicketStatusEnumOpen, nil
 	case "CLOSED":
-		value := TicketStatusEnumClosed
-		*t = value
+		return TicketStatusEnumClosed, nil
 	case "IN_PROGRESS":
-		value := TicketStatusEnumInProgress
-		*t = value
+		return TicketStatusEnumInProgress, nil
 	case "ON_HOLD":
-		value := TicketStatusEnumOnHold
-		*t = value
+		return TicketStatusEnumOnHold, nil
 	}
-	return nil
+	var t TicketStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketStatusEnum) Ptr() *TicketStatusEnum {
+	return &t
 }
 
 type TicketingAttachmentResponse struct {
@@ -5484,2005 +6218,41 @@ type TicketingAttachmentResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type TicketsCollaboratorsListRequestExpand uint
-
-const (
-	TicketsCollaboratorsListRequestExpandRoles TicketsCollaboratorsListRequestExpand = iota + 1
-	TicketsCollaboratorsListRequestExpandTeams
-	TicketsCollaboratorsListRequestExpandTeamsRoles
-)
-
-func (t TicketsCollaboratorsListRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsCollaboratorsListRequestExpandRoles:
-		return "roles"
-	case TicketsCollaboratorsListRequestExpandTeams:
-		return "teams"
-	case TicketsCollaboratorsListRequestExpandTeamsRoles:
-		return "teams,roles"
-	}
-}
-
-func (t TicketsCollaboratorsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsCollaboratorsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (t *TicketingAttachmentResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler TicketingAttachmentResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "roles":
-		value := TicketsCollaboratorsListRequestExpandRoles
-		*t = value
-	case "teams":
-		value := TicketsCollaboratorsListRequestExpandTeams
-		*t = value
-	case "teams,roles":
-		value := TicketsCollaboratorsListRequestExpandTeamsRoles
-		*t = value
-	}
+	*t = TicketingAttachmentResponse(value)
+	t._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-type TicketsListRequestExpand uint
-
-const (
-	TicketsListRequestExpandAccount TicketsListRequestExpand = iota + 1
-	TicketsListRequestExpandAccountContact
-	TicketsListRequestExpandAccountContactCreator
-	TicketsListRequestExpandAccountContactCreatorParentTicket
-	TicketsListRequestExpandAccountContactParentTicket
-	TicketsListRequestExpandAccountCreator
-	TicketsListRequestExpandAccountCreatorParentTicket
-	TicketsListRequestExpandAccountParentTicket
-	TicketsListRequestExpandAssignees
-	TicketsListRequestExpandAssigneesAccount
-	TicketsListRequestExpandAssigneesAccountContact
-	TicketsListRequestExpandAssigneesAccountContactCreator
-	TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket
-	TicketsListRequestExpandAssigneesAccountContactParentTicket
-	TicketsListRequestExpandAssigneesAccountCreator
-	TicketsListRequestExpandAssigneesAccountCreatorParentTicket
-	TicketsListRequestExpandAssigneesAccountParentTicket
-	TicketsListRequestExpandAssigneesCollections
-	TicketsListRequestExpandAssigneesCollectionsAccount
-	TicketsListRequestExpandAssigneesCollectionsAccountContact
-	TicketsListRequestExpandAssigneesCollectionsAccountContactCreator
-	TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
-	TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket
-	TicketsListRequestExpandAssigneesCollectionsAccountCreator
-	TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket
-	TicketsListRequestExpandAssigneesCollectionsAccountParentTicket
-	TicketsListRequestExpandAssigneesCollectionsContact
-	TicketsListRequestExpandAssigneesCollectionsContactCreator
-	TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket
-	TicketsListRequestExpandAssigneesCollectionsContactParentTicket
-	TicketsListRequestExpandAssigneesCollectionsCreator
-	TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket
-	TicketsListRequestExpandAssigneesCollectionsParentTicket
-	TicketsListRequestExpandAssigneesContact
-	TicketsListRequestExpandAssigneesContactCreator
-	TicketsListRequestExpandAssigneesContactCreatorParentTicket
-	TicketsListRequestExpandAssigneesContactParentTicket
-	TicketsListRequestExpandAssigneesCreator
-	TicketsListRequestExpandAssigneesCreatorParentTicket
-	TicketsListRequestExpandAssigneesParentTicket
-	TicketsListRequestExpandAttachments
-	TicketsListRequestExpandAttachmentsAccount
-	TicketsListRequestExpandAttachmentsAccountContact
-	TicketsListRequestExpandAttachmentsAccountContactCreator
-	TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAccountContactParentTicket
-	TicketsListRequestExpandAttachmentsAccountCreator
-	TicketsListRequestExpandAttachmentsAccountCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAccountParentTicket
-	TicketsListRequestExpandAttachmentsAssignees
-	TicketsListRequestExpandAttachmentsAssigneesAccount
-	TicketsListRequestExpandAttachmentsAssigneesAccountContact
-	TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator
-	TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesAccountCreator
-	TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollections
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsContact
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesContact
-	TicketsListRequestExpandAttachmentsAssigneesContactCreator
-	TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesContactParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesCreator
-	TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket
-	TicketsListRequestExpandAttachmentsAssigneesParentTicket
-	TicketsListRequestExpandAttachmentsCollections
-	TicketsListRequestExpandAttachmentsCollectionsAccount
-	TicketsListRequestExpandAttachmentsCollectionsAccountContact
-	TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator
-	TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsAccountCreator
-	TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsContact
-	TicketsListRequestExpandAttachmentsCollectionsContactCreator
-	TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsContactParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsCreator
-	TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket
-	TicketsListRequestExpandAttachmentsCollectionsParentTicket
-	TicketsListRequestExpandAttachmentsContact
-	TicketsListRequestExpandAttachmentsContactCreator
-	TicketsListRequestExpandAttachmentsContactCreatorParentTicket
-	TicketsListRequestExpandAttachmentsContactParentTicket
-	TicketsListRequestExpandAttachmentsCreator
-	TicketsListRequestExpandAttachmentsCreatorParentTicket
-	TicketsListRequestExpandAttachmentsParentTicket
-	TicketsListRequestExpandCollections
-	TicketsListRequestExpandCollectionsAccount
-	TicketsListRequestExpandCollectionsAccountContact
-	TicketsListRequestExpandCollectionsAccountContactCreator
-	TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket
-	TicketsListRequestExpandCollectionsAccountContactParentTicket
-	TicketsListRequestExpandCollectionsAccountCreator
-	TicketsListRequestExpandCollectionsAccountCreatorParentTicket
-	TicketsListRequestExpandCollectionsAccountParentTicket
-	TicketsListRequestExpandCollectionsContact
-	TicketsListRequestExpandCollectionsContactCreator
-	TicketsListRequestExpandCollectionsContactCreatorParentTicket
-	TicketsListRequestExpandCollectionsContactParentTicket
-	TicketsListRequestExpandCollectionsCreator
-	TicketsListRequestExpandCollectionsCreatorParentTicket
-	TicketsListRequestExpandCollectionsParentTicket
-	TicketsListRequestExpandContact
-	TicketsListRequestExpandContactCreator
-	TicketsListRequestExpandContactCreatorParentTicket
-	TicketsListRequestExpandContactParentTicket
-	TicketsListRequestExpandCreator
-	TicketsListRequestExpandCreatorParentTicket
-	TicketsListRequestExpandParentTicket
-)
-
-func (t TicketsListRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsListRequestExpandAccount:
-		return "account"
-	case TicketsListRequestExpandAccountContact:
-		return "account,contact"
-	case TicketsListRequestExpandAccountContactCreator:
-		return "account,contact,creator"
-	case TicketsListRequestExpandAccountContactCreatorParentTicket:
-		return "account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAccountContactParentTicket:
-		return "account,contact,parent_ticket"
-	case TicketsListRequestExpandAccountCreator:
-		return "account,creator"
-	case TicketsListRequestExpandAccountCreatorParentTicket:
-		return "account,creator,parent_ticket"
-	case TicketsListRequestExpandAccountParentTicket:
-		return "account,parent_ticket"
-	case TicketsListRequestExpandAssignees:
-		return "assignees"
-	case TicketsListRequestExpandAssigneesAccount:
-		return "assignees,account"
-	case TicketsListRequestExpandAssigneesAccountContact:
-		return "assignees,account,contact"
-	case TicketsListRequestExpandAssigneesAccountContactCreator:
-		return "assignees,account,contact,creator"
-	case TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket:
-		return "assignees,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesAccountContactParentTicket:
-		return "assignees,account,contact,parent_ticket"
-	case TicketsListRequestExpandAssigneesAccountCreator:
-		return "assignees,account,creator"
-	case TicketsListRequestExpandAssigneesAccountCreatorParentTicket:
-		return "assignees,account,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesAccountParentTicket:
-		return "assignees,account,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollections:
-		return "assignees,collections"
-	case TicketsListRequestExpandAssigneesCollectionsAccount:
-		return "assignees,collections,account"
-	case TicketsListRequestExpandAssigneesCollectionsAccountContact:
-		return "assignees,collections,account,contact"
-	case TicketsListRequestExpandAssigneesCollectionsAccountContactCreator:
-		return "assignees,collections,account,contact,creator"
-	case TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket:
-		return "assignees,collections,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket:
-		return "assignees,collections,account,contact,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsAccountCreator:
-		return "assignees,collections,account,creator"
-	case TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket:
-		return "assignees,collections,account,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsAccountParentTicket:
-		return "assignees,collections,account,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsContact:
-		return "assignees,collections,contact"
-	case TicketsListRequestExpandAssigneesCollectionsContactCreator:
-		return "assignees,collections,contact,creator"
-	case TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket:
-		return "assignees,collections,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsContactParentTicket:
-		return "assignees,collections,contact,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsCreator:
-		return "assignees,collections,creator"
-	case TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket:
-		return "assignees,collections,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesCollectionsParentTicket:
-		return "assignees,collections,parent_ticket"
-	case TicketsListRequestExpandAssigneesContact:
-		return "assignees,contact"
-	case TicketsListRequestExpandAssigneesContactCreator:
-		return "assignees,contact,creator"
-	case TicketsListRequestExpandAssigneesContactCreatorParentTicket:
-		return "assignees,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesContactParentTicket:
-		return "assignees,contact,parent_ticket"
-	case TicketsListRequestExpandAssigneesCreator:
-		return "assignees,creator"
-	case TicketsListRequestExpandAssigneesCreatorParentTicket:
-		return "assignees,creator,parent_ticket"
-	case TicketsListRequestExpandAssigneesParentTicket:
-		return "assignees,parent_ticket"
-	case TicketsListRequestExpandAttachments:
-		return "attachments"
-	case TicketsListRequestExpandAttachmentsAccount:
-		return "attachments,account"
-	case TicketsListRequestExpandAttachmentsAccountContact:
-		return "attachments,account,contact"
-	case TicketsListRequestExpandAttachmentsAccountContactCreator:
-		return "attachments,account,contact,creator"
-	case TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket:
-		return "attachments,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAccountContactParentTicket:
-		return "attachments,account,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAccountCreator:
-		return "attachments,account,creator"
-	case TicketsListRequestExpandAttachmentsAccountCreatorParentTicket:
-		return "attachments,account,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAccountParentTicket:
-		return "attachments,account,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssignees:
-		return "attachments,assignees"
-	case TicketsListRequestExpandAttachmentsAssigneesAccount:
-		return "attachments,assignees,account"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountContact:
-		return "attachments,assignees,account,contact"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator:
-		return "attachments,assignees,account,contact,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket:
-		return "attachments,assignees,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket:
-		return "attachments,assignees,account,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountCreator:
-		return "attachments,assignees,account,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket:
-		return "attachments,assignees,account,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket:
-		return "attachments,assignees,account,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollections:
-		return "attachments,assignees,collections"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount:
-		return "attachments,assignees,collections,account"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact:
-		return "attachments,assignees,collections,account,contact"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator:
-		return "attachments,assignees,collections,account,contact,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket:
-		return "attachments,assignees,collections,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket:
-		return "attachments,assignees,collections,account,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator:
-		return "attachments,assignees,collections,account,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket:
-		return "attachments,assignees,collections,account,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket:
-		return "attachments,assignees,collections,account,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContact:
-		return "attachments,assignees,collections,contact"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator:
-		return "attachments,assignees,collections,contact,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket:
-		return "attachments,assignees,collections,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket:
-		return "attachments,assignees,collections,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator:
-		return "attachments,assignees,collections,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket:
-		return "attachments,assignees,collections,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket:
-		return "attachments,assignees,collections,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesContact:
-		return "attachments,assignees,contact"
-	case TicketsListRequestExpandAttachmentsAssigneesContactCreator:
-		return "attachments,assignees,contact,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket:
-		return "attachments,assignees,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesContactParentTicket:
-		return "attachments,assignees,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesCreator:
-		return "attachments,assignees,creator"
-	case TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket:
-		return "attachments,assignees,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsAssigneesParentTicket:
-		return "attachments,assignees,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollections:
-		return "attachments,collections"
-	case TicketsListRequestExpandAttachmentsCollectionsAccount:
-		return "attachments,collections,account"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountContact:
-		return "attachments,collections,account,contact"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator:
-		return "attachments,collections,account,contact,creator"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket:
-		return "attachments,collections,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket:
-		return "attachments,collections,account,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountCreator:
-		return "attachments,collections,account,creator"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket:
-		return "attachments,collections,account,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket:
-		return "attachments,collections,account,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsContact:
-		return "attachments,collections,contact"
-	case TicketsListRequestExpandAttachmentsCollectionsContactCreator:
-		return "attachments,collections,contact,creator"
-	case TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket:
-		return "attachments,collections,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsContactParentTicket:
-		return "attachments,collections,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsCreator:
-		return "attachments,collections,creator"
-	case TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket:
-		return "attachments,collections,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCollectionsParentTicket:
-		return "attachments,collections,parent_ticket"
-	case TicketsListRequestExpandAttachmentsContact:
-		return "attachments,contact"
-	case TicketsListRequestExpandAttachmentsContactCreator:
-		return "attachments,contact,creator"
-	case TicketsListRequestExpandAttachmentsContactCreatorParentTicket:
-		return "attachments,contact,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsContactParentTicket:
-		return "attachments,contact,parent_ticket"
-	case TicketsListRequestExpandAttachmentsCreator:
-		return "attachments,creator"
-	case TicketsListRequestExpandAttachmentsCreatorParentTicket:
-		return "attachments,creator,parent_ticket"
-	case TicketsListRequestExpandAttachmentsParentTicket:
-		return "attachments,parent_ticket"
-	case TicketsListRequestExpandCollections:
-		return "collections"
-	case TicketsListRequestExpandCollectionsAccount:
-		return "collections,account"
-	case TicketsListRequestExpandCollectionsAccountContact:
-		return "collections,account,contact"
-	case TicketsListRequestExpandCollectionsAccountContactCreator:
-		return "collections,account,contact,creator"
-	case TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket:
-		return "collections,account,contact,creator,parent_ticket"
-	case TicketsListRequestExpandCollectionsAccountContactParentTicket:
-		return "collections,account,contact,parent_ticket"
-	case TicketsListRequestExpandCollectionsAccountCreator:
-		return "collections,account,creator"
-	case TicketsListRequestExpandCollectionsAccountCreatorParentTicket:
-		return "collections,account,creator,parent_ticket"
-	case TicketsListRequestExpandCollectionsAccountParentTicket:
-		return "collections,account,parent_ticket"
-	case TicketsListRequestExpandCollectionsContact:
-		return "collections,contact"
-	case TicketsListRequestExpandCollectionsContactCreator:
-		return "collections,contact,creator"
-	case TicketsListRequestExpandCollectionsContactCreatorParentTicket:
-		return "collections,contact,creator,parent_ticket"
-	case TicketsListRequestExpandCollectionsContactParentTicket:
-		return "collections,contact,parent_ticket"
-	case TicketsListRequestExpandCollectionsCreator:
-		return "collections,creator"
-	case TicketsListRequestExpandCollectionsCreatorParentTicket:
-		return "collections,creator,parent_ticket"
-	case TicketsListRequestExpandCollectionsParentTicket:
-		return "collections,parent_ticket"
-	case TicketsListRequestExpandContact:
-		return "contact"
-	case TicketsListRequestExpandContactCreator:
-		return "contact,creator"
-	case TicketsListRequestExpandContactCreatorParentTicket:
-		return "contact,creator,parent_ticket"
-	case TicketsListRequestExpandContactParentTicket:
-		return "contact,parent_ticket"
-	case TicketsListRequestExpandCreator:
-		return "creator"
-	case TicketsListRequestExpandCreatorParentTicket:
-		return "creator,parent_ticket"
-	case TicketsListRequestExpandParentTicket:
-		return "parent_ticket"
+func (t *TicketingAttachmentResponse) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
 	}
-}
-
-func (t TicketsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
 	}
-	switch raw {
-	case "account":
-		value := TicketsListRequestExpandAccount
-		*t = value
-	case "account,contact":
-		value := TicketsListRequestExpandAccountContact
-		*t = value
-	case "account,contact,creator":
-		value := TicketsListRequestExpandAccountContactCreator
-		*t = value
-	case "account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAccountContactCreatorParentTicket
-		*t = value
-	case "account,contact,parent_ticket":
-		value := TicketsListRequestExpandAccountContactParentTicket
-		*t = value
-	case "account,creator":
-		value := TicketsListRequestExpandAccountCreator
-		*t = value
-	case "account,creator,parent_ticket":
-		value := TicketsListRequestExpandAccountCreatorParentTicket
-		*t = value
-	case "account,parent_ticket":
-		value := TicketsListRequestExpandAccountParentTicket
-		*t = value
-	case "assignees":
-		value := TicketsListRequestExpandAssignees
-		*t = value
-	case "assignees,account":
-		value := TicketsListRequestExpandAssigneesAccount
-		*t = value
-	case "assignees,account,contact":
-		value := TicketsListRequestExpandAssigneesAccountContact
-		*t = value
-	case "assignees,account,contact,creator":
-		value := TicketsListRequestExpandAssigneesAccountContactCreator
-		*t = value
-	case "assignees,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket
-		*t = value
-	case "assignees,account,contact,parent_ticket":
-		value := TicketsListRequestExpandAssigneesAccountContactParentTicket
-		*t = value
-	case "assignees,account,creator":
-		value := TicketsListRequestExpandAssigneesAccountCreator
-		*t = value
-	case "assignees,account,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesAccountCreatorParentTicket
-		*t = value
-	case "assignees,account,parent_ticket":
-		value := TicketsListRequestExpandAssigneesAccountParentTicket
-		*t = value
-	case "assignees,collections":
-		value := TicketsListRequestExpandAssigneesCollections
-		*t = value
-	case "assignees,collections,account":
-		value := TicketsListRequestExpandAssigneesCollectionsAccount
-		*t = value
-	case "assignees,collections,account,contact":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountContact
-		*t = value
-	case "assignees,collections,account,contact,creator":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountContactCreator
-		*t = value
-	case "assignees,collections,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "assignees,collections,account,contact,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket
-		*t = value
-	case "assignees,collections,account,creator":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountCreator
-		*t = value
-	case "assignees,collections,account,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket
-		*t = value
-	case "assignees,collections,account,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsAccountParentTicket
-		*t = value
-	case "assignees,collections,contact":
-		value := TicketsListRequestExpandAssigneesCollectionsContact
-		*t = value
-	case "assignees,collections,contact,creator":
-		value := TicketsListRequestExpandAssigneesCollectionsContactCreator
-		*t = value
-	case "assignees,collections,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket
-		*t = value
-	case "assignees,collections,contact,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsContactParentTicket
-		*t = value
-	case "assignees,collections,creator":
-		value := TicketsListRequestExpandAssigneesCollectionsCreator
-		*t = value
-	case "assignees,collections,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket
-		*t = value
-	case "assignees,collections,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCollectionsParentTicket
-		*t = value
-	case "assignees,contact":
-		value := TicketsListRequestExpandAssigneesContact
-		*t = value
-	case "assignees,contact,creator":
-		value := TicketsListRequestExpandAssigneesContactCreator
-		*t = value
-	case "assignees,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesContactCreatorParentTicket
-		*t = value
-	case "assignees,contact,parent_ticket":
-		value := TicketsListRequestExpandAssigneesContactParentTicket
-		*t = value
-	case "assignees,creator":
-		value := TicketsListRequestExpandAssigneesCreator
-		*t = value
-	case "assignees,creator,parent_ticket":
-		value := TicketsListRequestExpandAssigneesCreatorParentTicket
-		*t = value
-	case "assignees,parent_ticket":
-		value := TicketsListRequestExpandAssigneesParentTicket
-		*t = value
-	case "attachments":
-		value := TicketsListRequestExpandAttachments
-		*t = value
-	case "attachments,account":
-		value := TicketsListRequestExpandAttachmentsAccount
-		*t = value
-	case "attachments,account,contact":
-		value := TicketsListRequestExpandAttachmentsAccountContact
-		*t = value
-	case "attachments,account,contact,creator":
-		value := TicketsListRequestExpandAttachmentsAccountContactCreator
-		*t = value
-	case "attachments,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,account,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAccountContactParentTicket
-		*t = value
-	case "attachments,account,creator":
-		value := TicketsListRequestExpandAttachmentsAccountCreator
-		*t = value
-	case "attachments,account,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAccountCreatorParentTicket
-		*t = value
-	case "attachments,account,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAccountParentTicket
-		*t = value
-	case "attachments,assignees":
-		value := TicketsListRequestExpandAttachmentsAssignees
-		*t = value
-	case "attachments,assignees,account":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccount
-		*t = value
-	case "attachments,assignees,account,contact":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountContact
-		*t = value
-	case "attachments,assignees,account,contact,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator
-		*t = value
-	case "attachments,assignees,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,account,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket
-		*t = value
-	case "attachments,assignees,account,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountCreator
-		*t = value
-	case "attachments,assignees,account,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
-		*t = value
-	case "attachments,assignees,account,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket
-		*t = value
-	case "attachments,assignees,collections":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollections
-		*t = value
-	case "attachments,assignees,collections,account":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount
-		*t = value
-	case "attachments,assignees,collections,account,contact":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact
-		*t = value
-	case "attachments,assignees,collections,account,contact,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
-		*t = value
-	case "attachments,assignees,collections,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,account,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
-		*t = value
-	case "attachments,assignees,collections,account,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator
-		*t = value
-	case "attachments,assignees,collections,account,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,account,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
-		*t = value
-	case "attachments,assignees,collections,contact":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContact
-		*t = value
-	case "attachments,assignees,collections,contact,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator
-		*t = value
-	case "attachments,assignees,collections,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
-		*t = value
-	case "attachments,assignees,collections,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator
-		*t = value
-	case "attachments,assignees,collections,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket
-		*t = value
-	case "attachments,assignees,contact":
-		value := TicketsListRequestExpandAttachmentsAssigneesContact
-		*t = value
-	case "attachments,assignees,contact,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesContactCreator
-		*t = value
-	case "attachments,assignees,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesContactParentTicket
-		*t = value
-	case "attachments,assignees,creator":
-		value := TicketsListRequestExpandAttachmentsAssigneesCreator
-		*t = value
-	case "attachments,assignees,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket
-		*t = value
-	case "attachments,assignees,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsAssigneesParentTicket
-		*t = value
-	case "attachments,collections":
-		value := TicketsListRequestExpandAttachmentsCollections
-		*t = value
-	case "attachments,collections,account":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccount
-		*t = value
-	case "attachments,collections,account,contact":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountContact
-		*t = value
-	case "attachments,collections,account,contact,creator":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator
-		*t = value
-	case "attachments,collections,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,collections,account,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket
-		*t = value
-	case "attachments,collections,account,creator":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountCreator
-		*t = value
-	case "attachments,collections,account,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
-		*t = value
-	case "attachments,collections,account,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket
-		*t = value
-	case "attachments,collections,contact":
-		value := TicketsListRequestExpandAttachmentsCollectionsContact
-		*t = value
-	case "attachments,collections,contact,creator":
-		value := TicketsListRequestExpandAttachmentsCollectionsContactCreator
-		*t = value
-	case "attachments,collections,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket
-		*t = value
-	case "attachments,collections,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsContactParentTicket
-		*t = value
-	case "attachments,collections,creator":
-		value := TicketsListRequestExpandAttachmentsCollectionsCreator
-		*t = value
-	case "attachments,collections,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket
-		*t = value
-	case "attachments,collections,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCollectionsParentTicket
-		*t = value
-	case "attachments,contact":
-		value := TicketsListRequestExpandAttachmentsContact
-		*t = value
-	case "attachments,contact,creator":
-		value := TicketsListRequestExpandAttachmentsContactCreator
-		*t = value
-	case "attachments,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsContactCreatorParentTicket
-		*t = value
-	case "attachments,contact,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsContactParentTicket
-		*t = value
-	case "attachments,creator":
-		value := TicketsListRequestExpandAttachmentsCreator
-		*t = value
-	case "attachments,creator,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsCreatorParentTicket
-		*t = value
-	case "attachments,parent_ticket":
-		value := TicketsListRequestExpandAttachmentsParentTicket
-		*t = value
-	case "collections":
-		value := TicketsListRequestExpandCollections
-		*t = value
-	case "collections,account":
-		value := TicketsListRequestExpandCollectionsAccount
-		*t = value
-	case "collections,account,contact":
-		value := TicketsListRequestExpandCollectionsAccountContact
-		*t = value
-	case "collections,account,contact,creator":
-		value := TicketsListRequestExpandCollectionsAccountContactCreator
-		*t = value
-	case "collections,account,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "collections,account,contact,parent_ticket":
-		value := TicketsListRequestExpandCollectionsAccountContactParentTicket
-		*t = value
-	case "collections,account,creator":
-		value := TicketsListRequestExpandCollectionsAccountCreator
-		*t = value
-	case "collections,account,creator,parent_ticket":
-		value := TicketsListRequestExpandCollectionsAccountCreatorParentTicket
-		*t = value
-	case "collections,account,parent_ticket":
-		value := TicketsListRequestExpandCollectionsAccountParentTicket
-		*t = value
-	case "collections,contact":
-		value := TicketsListRequestExpandCollectionsContact
-		*t = value
-	case "collections,contact,creator":
-		value := TicketsListRequestExpandCollectionsContactCreator
-		*t = value
-	case "collections,contact,creator,parent_ticket":
-		value := TicketsListRequestExpandCollectionsContactCreatorParentTicket
-		*t = value
-	case "collections,contact,parent_ticket":
-		value := TicketsListRequestExpandCollectionsContactParentTicket
-		*t = value
-	case "collections,creator":
-		value := TicketsListRequestExpandCollectionsCreator
-		*t = value
-	case "collections,creator,parent_ticket":
-		value := TicketsListRequestExpandCollectionsCreatorParentTicket
-		*t = value
-	case "collections,parent_ticket":
-		value := TicketsListRequestExpandCollectionsParentTicket
-		*t = value
-	case "contact":
-		value := TicketsListRequestExpandContact
-		*t = value
-	case "contact,creator":
-		value := TicketsListRequestExpandContactCreator
-		*t = value
-	case "contact,creator,parent_ticket":
-		value := TicketsListRequestExpandContactCreatorParentTicket
-		*t = value
-	case "contact,parent_ticket":
-		value := TicketsListRequestExpandContactParentTicket
-		*t = value
-	case "creator":
-		value := TicketsListRequestExpandCreator
-		*t = value
-	case "creator,parent_ticket":
-		value := TicketsListRequestExpandCreatorParentTicket
-		*t = value
-	case "parent_ticket":
-		value := TicketsListRequestExpandParentTicket
-		*t = value
-	}
-	return nil
-}
-
-type TicketsListRequestPriority uint
-
-const (
-	TicketsListRequestPriorityHigh TicketsListRequestPriority = iota + 1
-	TicketsListRequestPriorityLow
-	TicketsListRequestPriorityNormal
-	TicketsListRequestPriorityUrgent
-)
-
-func (t TicketsListRequestPriority) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsListRequestPriorityHigh:
-		return "HIGH"
-	case TicketsListRequestPriorityLow:
-		return "LOW"
-	case TicketsListRequestPriorityNormal:
-		return "NORMAL"
-	case TicketsListRequestPriorityUrgent:
-		return "URGENT"
-	}
-}
-
-func (t TicketsListRequestPriority) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsListRequestPriority) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "HIGH":
-		value := TicketsListRequestPriorityHigh
-		*t = value
-	case "LOW":
-		value := TicketsListRequestPriorityLow
-		*t = value
-	case "NORMAL":
-		value := TicketsListRequestPriorityNormal
-		*t = value
-	case "URGENT":
-		value := TicketsListRequestPriorityUrgent
-		*t = value
-	}
-	return nil
-}
-
-type TicketsListRequestRemoteFields uint
-
-const (
-	TicketsListRequestRemoteFieldsPriority TicketsListRequestRemoteFields = iota + 1
-	TicketsListRequestRemoteFieldsPriorityStatus
-	TicketsListRequestRemoteFieldsPriorityStatusTicketType
-	TicketsListRequestRemoteFieldsPriorityTicketType
-	TicketsListRequestRemoteFieldsStatus
-	TicketsListRequestRemoteFieldsStatusTicketType
-	TicketsListRequestRemoteFieldsTicketType
-)
-
-func (t TicketsListRequestRemoteFields) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsListRequestRemoteFieldsPriority:
-		return "priority"
-	case TicketsListRequestRemoteFieldsPriorityStatus:
-		return "priority,status"
-	case TicketsListRequestRemoteFieldsPriorityStatusTicketType:
-		return "priority,status,ticket_type"
-	case TicketsListRequestRemoteFieldsPriorityTicketType:
-		return "priority,ticket_type"
-	case TicketsListRequestRemoteFieldsStatus:
-		return "status"
-	case TicketsListRequestRemoteFieldsStatusTicketType:
-		return "status,ticket_type"
-	case TicketsListRequestRemoteFieldsTicketType:
-		return "ticket_type"
-	}
-}
-
-func (t TicketsListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "priority":
-		value := TicketsListRequestRemoteFieldsPriority
-		*t = value
-	case "priority,status":
-		value := TicketsListRequestRemoteFieldsPriorityStatus
-		*t = value
-	case "priority,status,ticket_type":
-		value := TicketsListRequestRemoteFieldsPriorityStatusTicketType
-		*t = value
-	case "priority,ticket_type":
-		value := TicketsListRequestRemoteFieldsPriorityTicketType
-		*t = value
-	case "status":
-		value := TicketsListRequestRemoteFieldsStatus
-		*t = value
-	case "status,ticket_type":
-		value := TicketsListRequestRemoteFieldsStatusTicketType
-		*t = value
-	case "ticket_type":
-		value := TicketsListRequestRemoteFieldsTicketType
-		*t = value
-	}
-	return nil
-}
-
-type TicketsListRequestShowEnumOrigins uint
-
-const (
-	TicketsListRequestShowEnumOriginsPriority TicketsListRequestShowEnumOrigins = iota + 1
-	TicketsListRequestShowEnumOriginsPriorityStatus
-	TicketsListRequestShowEnumOriginsPriorityStatusTicketType
-	TicketsListRequestShowEnumOriginsPriorityTicketType
-	TicketsListRequestShowEnumOriginsStatus
-	TicketsListRequestShowEnumOriginsStatusTicketType
-	TicketsListRequestShowEnumOriginsTicketType
-)
-
-func (t TicketsListRequestShowEnumOrigins) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsListRequestShowEnumOriginsPriority:
-		return "priority"
-	case TicketsListRequestShowEnumOriginsPriorityStatus:
-		return "priority,status"
-	case TicketsListRequestShowEnumOriginsPriorityStatusTicketType:
-		return "priority,status,ticket_type"
-	case TicketsListRequestShowEnumOriginsPriorityTicketType:
-		return "priority,ticket_type"
-	case TicketsListRequestShowEnumOriginsStatus:
-		return "status"
-	case TicketsListRequestShowEnumOriginsStatusTicketType:
-		return "status,ticket_type"
-	case TicketsListRequestShowEnumOriginsTicketType:
-		return "ticket_type"
-	}
-}
-
-func (t TicketsListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "priority":
-		value := TicketsListRequestShowEnumOriginsPriority
-		*t = value
-	case "priority,status":
-		value := TicketsListRequestShowEnumOriginsPriorityStatus
-		*t = value
-	case "priority,status,ticket_type":
-		value := TicketsListRequestShowEnumOriginsPriorityStatusTicketType
-		*t = value
-	case "priority,ticket_type":
-		value := TicketsListRequestShowEnumOriginsPriorityTicketType
-		*t = value
-	case "status":
-		value := TicketsListRequestShowEnumOriginsStatus
-		*t = value
-	case "status,ticket_type":
-		value := TicketsListRequestShowEnumOriginsStatusTicketType
-		*t = value
-	case "ticket_type":
-		value := TicketsListRequestShowEnumOriginsTicketType
-		*t = value
-	}
-	return nil
-}
-
-type TicketsListRequestStatus uint
-
-const (
-	TicketsListRequestStatusClosed TicketsListRequestStatus = iota + 1
-	TicketsListRequestStatusInProgress
-	TicketsListRequestStatusOnHold
-	TicketsListRequestStatusOpen
-)
-
-func (t TicketsListRequestStatus) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsListRequestStatusClosed:
-		return "CLOSED"
-	case TicketsListRequestStatusInProgress:
-		return "IN_PROGRESS"
-	case TicketsListRequestStatusOnHold:
-		return "ON_HOLD"
-	case TicketsListRequestStatusOpen:
-		return "OPEN"
-	}
-}
-
-func (t TicketsListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "CLOSED":
-		value := TicketsListRequestStatusClosed
-		*t = value
-	case "IN_PROGRESS":
-		value := TicketsListRequestStatusInProgress
-		*t = value
-	case "ON_HOLD":
-		value := TicketsListRequestStatusOnHold
-		*t = value
-	case "OPEN":
-		value := TicketsListRequestStatusOpen
-		*t = value
-	}
-	return nil
-}
-
-type TicketsRetrieveRequestExpand uint
-
-const (
-	TicketsRetrieveRequestExpandAccount TicketsRetrieveRequestExpand = iota + 1
-	TicketsRetrieveRequestExpandAccountContact
-	TicketsRetrieveRequestExpandAccountContactCreator
-	TicketsRetrieveRequestExpandAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAccountContactParentTicket
-	TicketsRetrieveRequestExpandAccountCreator
-	TicketsRetrieveRequestExpandAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAccountParentTicket
-	TicketsRetrieveRequestExpandAssignees
-	TicketsRetrieveRequestExpandAssigneesAccount
-	TicketsRetrieveRequestExpandAssigneesAccountContact
-	TicketsRetrieveRequestExpandAssigneesAccountContactCreator
-	TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket
-	TicketsRetrieveRequestExpandAssigneesAccountCreator
-	TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesAccountParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollections
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccount
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsContact
-	TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator
-	TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsCreator
-	TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket
-	TicketsRetrieveRequestExpandAssigneesContact
-	TicketsRetrieveRequestExpandAssigneesContactCreator
-	TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesContactParentTicket
-	TicketsRetrieveRequestExpandAssigneesCreator
-	TicketsRetrieveRequestExpandAssigneesCreatorParentTicket
-	TicketsRetrieveRequestExpandAssigneesParentTicket
-	TicketsRetrieveRequestExpandAttachments
-	TicketsRetrieveRequestExpandAttachmentsAccount
-	TicketsRetrieveRequestExpandAttachmentsAccountContact
-	TicketsRetrieveRequestExpandAttachmentsAccountContactCreator
-	TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAccountCreator
-	TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAccountParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssignees
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccount
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollections
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesContact
-	TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCreator
-	TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollections
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccount
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsContact
-	TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator
-	TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsCreator
-	TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket
-	TicketsRetrieveRequestExpandAttachmentsContact
-	TicketsRetrieveRequestExpandAttachmentsContactCreator
-	TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsContactParentTicket
-	TicketsRetrieveRequestExpandAttachmentsCreator
-	TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket
-	TicketsRetrieveRequestExpandAttachmentsParentTicket
-	TicketsRetrieveRequestExpandCollections
-	TicketsRetrieveRequestExpandCollectionsAccount
-	TicketsRetrieveRequestExpandCollectionsAccountContact
-	TicketsRetrieveRequestExpandCollectionsAccountContactCreator
-	TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket
-	TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket
-	TicketsRetrieveRequestExpandCollectionsAccountCreator
-	TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket
-	TicketsRetrieveRequestExpandCollectionsAccountParentTicket
-	TicketsRetrieveRequestExpandCollectionsContact
-	TicketsRetrieveRequestExpandCollectionsContactCreator
-	TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket
-	TicketsRetrieveRequestExpandCollectionsContactParentTicket
-	TicketsRetrieveRequestExpandCollectionsCreator
-	TicketsRetrieveRequestExpandCollectionsCreatorParentTicket
-	TicketsRetrieveRequestExpandCollectionsParentTicket
-	TicketsRetrieveRequestExpandContact
-	TicketsRetrieveRequestExpandContactCreator
-	TicketsRetrieveRequestExpandContactCreatorParentTicket
-	TicketsRetrieveRequestExpandContactParentTicket
-	TicketsRetrieveRequestExpandCreator
-	TicketsRetrieveRequestExpandCreatorParentTicket
-	TicketsRetrieveRequestExpandParentTicket
-)
-
-func (t TicketsRetrieveRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsRetrieveRequestExpandAccount:
-		return "account"
-	case TicketsRetrieveRequestExpandAccountContact:
-		return "account,contact"
-	case TicketsRetrieveRequestExpandAccountContactCreator:
-		return "account,contact,creator"
-	case TicketsRetrieveRequestExpandAccountContactCreatorParentTicket:
-		return "account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAccountContactParentTicket:
-		return "account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAccountCreator:
-		return "account,creator"
-	case TicketsRetrieveRequestExpandAccountCreatorParentTicket:
-		return "account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAccountParentTicket:
-		return "account,parent_ticket"
-	case TicketsRetrieveRequestExpandAssignees:
-		return "assignees"
-	case TicketsRetrieveRequestExpandAssigneesAccount:
-		return "assignees,account"
-	case TicketsRetrieveRequestExpandAssigneesAccountContact:
-		return "assignees,account,contact"
-	case TicketsRetrieveRequestExpandAssigneesAccountContactCreator:
-		return "assignees,account,contact,creator"
-	case TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket:
-		return "assignees,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket:
-		return "assignees,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesAccountCreator:
-		return "assignees,account,creator"
-	case TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket:
-		return "assignees,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesAccountParentTicket:
-		return "assignees,account,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollections:
-		return "assignees,collections"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccount:
-		return "assignees,collections,account"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact:
-		return "assignees,collections,account,contact"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator:
-		return "assignees,collections,account,contact,creator"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket:
-		return "assignees,collections,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket:
-		return "assignees,collections,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator:
-		return "assignees,collections,account,creator"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket:
-		return "assignees,collections,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket:
-		return "assignees,collections,account,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsContact:
-		return "assignees,collections,contact"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator:
-		return "assignees,collections,contact,creator"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket:
-		return "assignees,collections,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket:
-		return "assignees,collections,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsCreator:
-		return "assignees,collections,creator"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket:
-		return "assignees,collections,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket:
-		return "assignees,collections,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesContact:
-		return "assignees,contact"
-	case TicketsRetrieveRequestExpandAssigneesContactCreator:
-		return "assignees,contact,creator"
-	case TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket:
-		return "assignees,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesContactParentTicket:
-		return "assignees,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesCreator:
-		return "assignees,creator"
-	case TicketsRetrieveRequestExpandAssigneesCreatorParentTicket:
-		return "assignees,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAssigneesParentTicket:
-		return "assignees,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachments:
-		return "attachments"
-	case TicketsRetrieveRequestExpandAttachmentsAccount:
-		return "attachments,account"
-	case TicketsRetrieveRequestExpandAttachmentsAccountContact:
-		return "attachments,account,contact"
-	case TicketsRetrieveRequestExpandAttachmentsAccountContactCreator:
-		return "attachments,account,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket:
-		return "attachments,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket:
-		return "attachments,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAccountCreator:
-		return "attachments,account,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket:
-		return "attachments,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAccountParentTicket:
-		return "attachments,account,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssignees:
-		return "attachments,assignees"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccount:
-		return "attachments,assignees,account"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact:
-		return "attachments,assignees,account,contact"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator:
-		return "attachments,assignees,account,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket:
-		return "attachments,assignees,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket:
-		return "attachments,assignees,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator:
-		return "attachments,assignees,account,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket:
-		return "attachments,assignees,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket:
-		return "attachments,assignees,account,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollections:
-		return "attachments,assignees,collections"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount:
-		return "attachments,assignees,collections,account"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact:
-		return "attachments,assignees,collections,account,contact"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator:
-		return "attachments,assignees,collections,account,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket:
-		return "attachments,assignees,collections,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket:
-		return "attachments,assignees,collections,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator:
-		return "attachments,assignees,collections,account,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket:
-		return "attachments,assignees,collections,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket:
-		return "attachments,assignees,collections,account,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact:
-		return "attachments,assignees,collections,contact"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator:
-		return "attachments,assignees,collections,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket:
-		return "attachments,assignees,collections,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket:
-		return "attachments,assignees,collections,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator:
-		return "attachments,assignees,collections,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket:
-		return "attachments,assignees,collections,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket:
-		return "attachments,assignees,collections,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesContact:
-		return "attachments,assignees,contact"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator:
-		return "attachments,assignees,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket:
-		return "attachments,assignees,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket:
-		return "attachments,assignees,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCreator:
-		return "attachments,assignees,creator"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket:
-		return "attachments,assignees,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket:
-		return "attachments,assignees,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollections:
-		return "attachments,collections"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccount:
-		return "attachments,collections,account"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact:
-		return "attachments,collections,account,contact"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator:
-		return "attachments,collections,account,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket:
-		return "attachments,collections,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket:
-		return "attachments,collections,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator:
-		return "attachments,collections,account,creator"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket:
-		return "attachments,collections,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket:
-		return "attachments,collections,account,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsContact:
-		return "attachments,collections,contact"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator:
-		return "attachments,collections,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket:
-		return "attachments,collections,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket:
-		return "attachments,collections,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsCreator:
-		return "attachments,collections,creator"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket:
-		return "attachments,collections,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket:
-		return "attachments,collections,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsContact:
-		return "attachments,contact"
-	case TicketsRetrieveRequestExpandAttachmentsContactCreator:
-		return "attachments,contact,creator"
-	case TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket:
-		return "attachments,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsContactParentTicket:
-		return "attachments,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsCreator:
-		return "attachments,creator"
-	case TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket:
-		return "attachments,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandAttachmentsParentTicket:
-		return "attachments,parent_ticket"
-	case TicketsRetrieveRequestExpandCollections:
-		return "collections"
-	case TicketsRetrieveRequestExpandCollectionsAccount:
-		return "collections,account"
-	case TicketsRetrieveRequestExpandCollectionsAccountContact:
-		return "collections,account,contact"
-	case TicketsRetrieveRequestExpandCollectionsAccountContactCreator:
-		return "collections,account,contact,creator"
-	case TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket:
-		return "collections,account,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket:
-		return "collections,account,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsAccountCreator:
-		return "collections,account,creator"
-	case TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket:
-		return "collections,account,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsAccountParentTicket:
-		return "collections,account,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsContact:
-		return "collections,contact"
-	case TicketsRetrieveRequestExpandCollectionsContactCreator:
-		return "collections,contact,creator"
-	case TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket:
-		return "collections,contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsContactParentTicket:
-		return "collections,contact,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsCreator:
-		return "collections,creator"
-	case TicketsRetrieveRequestExpandCollectionsCreatorParentTicket:
-		return "collections,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandCollectionsParentTicket:
-		return "collections,parent_ticket"
-	case TicketsRetrieveRequestExpandContact:
-		return "contact"
-	case TicketsRetrieveRequestExpandContactCreator:
-		return "contact,creator"
-	case TicketsRetrieveRequestExpandContactCreatorParentTicket:
-		return "contact,creator,parent_ticket"
-	case TicketsRetrieveRequestExpandContactParentTicket:
-		return "contact,parent_ticket"
-	case TicketsRetrieveRequestExpandCreator:
-		return "creator"
-	case TicketsRetrieveRequestExpandCreatorParentTicket:
-		return "creator,parent_ticket"
-	case TicketsRetrieveRequestExpandParentTicket:
-		return "parent_ticket"
-	}
-}
-
-func (t TicketsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := TicketsRetrieveRequestExpandAccount
-		*t = value
-	case "account,contact":
-		value := TicketsRetrieveRequestExpandAccountContact
-		*t = value
-	case "account,contact,creator":
-		value := TicketsRetrieveRequestExpandAccountContactCreator
-		*t = value
-	case "account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAccountContactCreatorParentTicket
-		*t = value
-	case "account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAccountContactParentTicket
-		*t = value
-	case "account,creator":
-		value := TicketsRetrieveRequestExpandAccountCreator
-		*t = value
-	case "account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAccountCreatorParentTicket
-		*t = value
-	case "account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAccountParentTicket
-		*t = value
-	case "assignees":
-		value := TicketsRetrieveRequestExpandAssignees
-		*t = value
-	case "assignees,account":
-		value := TicketsRetrieveRequestExpandAssigneesAccount
-		*t = value
-	case "assignees,account,contact":
-		value := TicketsRetrieveRequestExpandAssigneesAccountContact
-		*t = value
-	case "assignees,account,contact,creator":
-		value := TicketsRetrieveRequestExpandAssigneesAccountContactCreator
-		*t = value
-	case "assignees,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket
-		*t = value
-	case "assignees,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket
-		*t = value
-	case "assignees,account,creator":
-		value := TicketsRetrieveRequestExpandAssigneesAccountCreator
-		*t = value
-	case "assignees,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket
-		*t = value
-	case "assignees,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesAccountParentTicket
-		*t = value
-	case "assignees,collections":
-		value := TicketsRetrieveRequestExpandAssigneesCollections
-		*t = value
-	case "assignees,collections,account":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccount
-		*t = value
-	case "assignees,collections,account,contact":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact
-		*t = value
-	case "assignees,collections,account,contact,creator":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator
-		*t = value
-	case "assignees,collections,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "assignees,collections,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket
-		*t = value
-	case "assignees,collections,account,creator":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator
-		*t = value
-	case "assignees,collections,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket
-		*t = value
-	case "assignees,collections,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket
-		*t = value
-	case "assignees,collections,contact":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsContact
-		*t = value
-	case "assignees,collections,contact,creator":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator
-		*t = value
-	case "assignees,collections,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket
-		*t = value
-	case "assignees,collections,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket
-		*t = value
-	case "assignees,collections,creator":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsCreator
-		*t = value
-	case "assignees,collections,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket
-		*t = value
-	case "assignees,collections,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket
-		*t = value
-	case "assignees,contact":
-		value := TicketsRetrieveRequestExpandAssigneesContact
-		*t = value
-	case "assignees,contact,creator":
-		value := TicketsRetrieveRequestExpandAssigneesContactCreator
-		*t = value
-	case "assignees,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket
-		*t = value
-	case "assignees,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesContactParentTicket
-		*t = value
-	case "assignees,creator":
-		value := TicketsRetrieveRequestExpandAssigneesCreator
-		*t = value
-	case "assignees,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesCreatorParentTicket
-		*t = value
-	case "assignees,parent_ticket":
-		value := TicketsRetrieveRequestExpandAssigneesParentTicket
-		*t = value
-	case "attachments":
-		value := TicketsRetrieveRequestExpandAttachments
-		*t = value
-	case "attachments,account":
-		value := TicketsRetrieveRequestExpandAttachmentsAccount
-		*t = value
-	case "attachments,account,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountContact
-		*t = value
-	case "attachments,account,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountContactCreator
-		*t = value
-	case "attachments,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket
-		*t = value
-	case "attachments,account,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountCreator
-		*t = value
-	case "attachments,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket
-		*t = value
-	case "attachments,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAccountParentTicket
-		*t = value
-	case "attachments,assignees":
-		value := TicketsRetrieveRequestExpandAttachmentsAssignees
-		*t = value
-	case "attachments,assignees,account":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccount
-		*t = value
-	case "attachments,assignees,account,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact
-		*t = value
-	case "attachments,assignees,account,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator
-		*t = value
-	case "attachments,assignees,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket
-		*t = value
-	case "attachments,assignees,account,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator
-		*t = value
-	case "attachments,assignees,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket
-		*t = value
-	case "attachments,assignees,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket
-		*t = value
-	case "attachments,assignees,collections":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollections
-		*t = value
-	case "attachments,assignees,collections,account":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount
-		*t = value
-	case "attachments,assignees,collections,account,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact
-		*t = value
-	case "attachments,assignees,collections,account,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator
-		*t = value
-	case "attachments,assignees,collections,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket
-		*t = value
-	case "attachments,assignees,collections,account,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator
-		*t = value
-	case "attachments,assignees,collections,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket
-		*t = value
-	case "attachments,assignees,collections,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact
-		*t = value
-	case "attachments,assignees,collections,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator
-		*t = value
-	case "attachments,assignees,collections,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket
-		*t = value
-	case "attachments,assignees,collections,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator
-		*t = value
-	case "attachments,assignees,collections,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket
-		*t = value
-	case "attachments,assignees,collections,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket
-		*t = value
-	case "attachments,assignees,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContact
-		*t = value
-	case "attachments,assignees,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator
-		*t = value
-	case "attachments,assignees,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket
-		*t = value
-	case "attachments,assignees,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket
-		*t = value
-	case "attachments,assignees,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCreator
-		*t = value
-	case "attachments,assignees,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket
-		*t = value
-	case "attachments,assignees,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket
-		*t = value
-	case "attachments,collections":
-		value := TicketsRetrieveRequestExpandAttachmentsCollections
-		*t = value
-	case "attachments,collections,account":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccount
-		*t = value
-	case "attachments,collections,account,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact
-		*t = value
-	case "attachments,collections,account,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator
-		*t = value
-	case "attachments,collections,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "attachments,collections,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket
-		*t = value
-	case "attachments,collections,account,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator
-		*t = value
-	case "attachments,collections,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket
-		*t = value
-	case "attachments,collections,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket
-		*t = value
-	case "attachments,collections,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContact
-		*t = value
-	case "attachments,collections,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator
-		*t = value
-	case "attachments,collections,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket
-		*t = value
-	case "attachments,collections,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket
-		*t = value
-	case "attachments,collections,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsCreator
-		*t = value
-	case "attachments,collections,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket
-		*t = value
-	case "attachments,collections,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket
-		*t = value
-	case "attachments,contact":
-		value := TicketsRetrieveRequestExpandAttachmentsContact
-		*t = value
-	case "attachments,contact,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsContactCreator
-		*t = value
-	case "attachments,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket
-		*t = value
-	case "attachments,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsContactParentTicket
-		*t = value
-	case "attachments,creator":
-		value := TicketsRetrieveRequestExpandAttachmentsCreator
-		*t = value
-	case "attachments,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket
-		*t = value
-	case "attachments,parent_ticket":
-		value := TicketsRetrieveRequestExpandAttachmentsParentTicket
-		*t = value
-	case "collections":
-		value := TicketsRetrieveRequestExpandCollections
-		*t = value
-	case "collections,account":
-		value := TicketsRetrieveRequestExpandCollectionsAccount
-		*t = value
-	case "collections,account,contact":
-		value := TicketsRetrieveRequestExpandCollectionsAccountContact
-		*t = value
-	case "collections,account,contact,creator":
-		value := TicketsRetrieveRequestExpandCollectionsAccountContactCreator
-		*t = value
-	case "collections,account,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket
-		*t = value
-	case "collections,account,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket
-		*t = value
-	case "collections,account,creator":
-		value := TicketsRetrieveRequestExpandCollectionsAccountCreator
-		*t = value
-	case "collections,account,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket
-		*t = value
-	case "collections,account,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsAccountParentTicket
-		*t = value
-	case "collections,contact":
-		value := TicketsRetrieveRequestExpandCollectionsContact
-		*t = value
-	case "collections,contact,creator":
-		value := TicketsRetrieveRequestExpandCollectionsContactCreator
-		*t = value
-	case "collections,contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket
-		*t = value
-	case "collections,contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsContactParentTicket
-		*t = value
-	case "collections,creator":
-		value := TicketsRetrieveRequestExpandCollectionsCreator
-		*t = value
-	case "collections,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsCreatorParentTicket
-		*t = value
-	case "collections,parent_ticket":
-		value := TicketsRetrieveRequestExpandCollectionsParentTicket
-		*t = value
-	case "contact":
-		value := TicketsRetrieveRequestExpandContact
-		*t = value
-	case "contact,creator":
-		value := TicketsRetrieveRequestExpandContactCreator
-		*t = value
-	case "contact,creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandContactCreatorParentTicket
-		*t = value
-	case "contact,parent_ticket":
-		value := TicketsRetrieveRequestExpandContactParentTicket
-		*t = value
-	case "creator":
-		value := TicketsRetrieveRequestExpandCreator
-		*t = value
-	case "creator,parent_ticket":
-		value := TicketsRetrieveRequestExpandCreatorParentTicket
-		*t = value
-	case "parent_ticket":
-		value := TicketsRetrieveRequestExpandParentTicket
-		*t = value
-	}
-	return nil
-}
-
-type TicketsRetrieveRequestRemoteFields uint
-
-const (
-	TicketsRetrieveRequestRemoteFieldsPriority TicketsRetrieveRequestRemoteFields = iota + 1
-	TicketsRetrieveRequestRemoteFieldsPriorityStatus
-	TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType
-	TicketsRetrieveRequestRemoteFieldsPriorityTicketType
-	TicketsRetrieveRequestRemoteFieldsStatus
-	TicketsRetrieveRequestRemoteFieldsStatusTicketType
-	TicketsRetrieveRequestRemoteFieldsTicketType
-)
-
-func (t TicketsRetrieveRequestRemoteFields) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsRetrieveRequestRemoteFieldsPriority:
-		return "priority"
-	case TicketsRetrieveRequestRemoteFieldsPriorityStatus:
-		return "priority,status"
-	case TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType:
-		return "priority,status,ticket_type"
-	case TicketsRetrieveRequestRemoteFieldsPriorityTicketType:
-		return "priority,ticket_type"
-	case TicketsRetrieveRequestRemoteFieldsStatus:
-		return "status"
-	case TicketsRetrieveRequestRemoteFieldsStatusTicketType:
-		return "status,ticket_type"
-	case TicketsRetrieveRequestRemoteFieldsTicketType:
-		return "ticket_type"
-	}
-}
-
-func (t TicketsRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "priority":
-		value := TicketsRetrieveRequestRemoteFieldsPriority
-		*t = value
-	case "priority,status":
-		value := TicketsRetrieveRequestRemoteFieldsPriorityStatus
-		*t = value
-	case "priority,status,ticket_type":
-		value := TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType
-		*t = value
-	case "priority,ticket_type":
-		value := TicketsRetrieveRequestRemoteFieldsPriorityTicketType
-		*t = value
-	case "status":
-		value := TicketsRetrieveRequestRemoteFieldsStatus
-		*t = value
-	case "status,ticket_type":
-		value := TicketsRetrieveRequestRemoteFieldsStatusTicketType
-		*t = value
-	case "ticket_type":
-		value := TicketsRetrieveRequestRemoteFieldsTicketType
-		*t = value
-	}
-	return nil
-}
-
-type TicketsRetrieveRequestShowEnumOrigins uint
-
-const (
-	TicketsRetrieveRequestShowEnumOriginsPriority TicketsRetrieveRequestShowEnumOrigins = iota + 1
-	TicketsRetrieveRequestShowEnumOriginsPriorityStatus
-	TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType
-	TicketsRetrieveRequestShowEnumOriginsPriorityTicketType
-	TicketsRetrieveRequestShowEnumOriginsStatus
-	TicketsRetrieveRequestShowEnumOriginsStatusTicketType
-	TicketsRetrieveRequestShowEnumOriginsTicketType
-)
-
-func (t TicketsRetrieveRequestShowEnumOrigins) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TicketsRetrieveRequestShowEnumOriginsPriority:
-		return "priority"
-	case TicketsRetrieveRequestShowEnumOriginsPriorityStatus:
-		return "priority,status"
-	case TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType:
-		return "priority,status,ticket_type"
-	case TicketsRetrieveRequestShowEnumOriginsPriorityTicketType:
-		return "priority,ticket_type"
-	case TicketsRetrieveRequestShowEnumOriginsStatus:
-		return "status"
-	case TicketsRetrieveRequestShowEnumOriginsStatusTicketType:
-		return "status,ticket_type"
-	case TicketsRetrieveRequestShowEnumOriginsTicketType:
-		return "ticket_type"
-	}
-}
-
-func (t TicketsRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TicketsRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "priority":
-		value := TicketsRetrieveRequestShowEnumOriginsPriority
-		*t = value
-	case "priority,status":
-		value := TicketsRetrieveRequestShowEnumOriginsPriorityStatus
-		*t = value
-	case "priority,status,ticket_type":
-		value := TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType
-		*t = value
-	case "priority,ticket_type":
-		value := TicketsRetrieveRequestShowEnumOriginsPriorityTicketType
-		*t = value
-	case "status":
-		value := TicketsRetrieveRequestShowEnumOriginsStatus
-		*t = value
-	case "status,ticket_type":
-		value := TicketsRetrieveRequestShowEnumOriginsStatusTicketType
-		*t = value
-	case "ticket_type":
-		value := TicketsRetrieveRequestShowEnumOriginsTicketType
-		*t = value
-	}
-	return nil
+	return fmt.Sprintf("%#v", t)
 }
 
 // # The User Object
+//
 // ### Description
+//
 // The `User` object is used to represent an employee within a company.
 //
 // ### Usage Example
+//
 // TODO
 type User struct {
 	Id *string `json:"id,omitempty"`
@@ -7502,9 +6272,34 @@ type User struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (u *User) UnmarshalJSON(data []byte) error {
+	type unmarshaler User
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = User(value)
+	u._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *User) String() string {
+	if len(u._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(u._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
 }
 
 type UserRolesItem struct {
@@ -7621,96 +6416,33 @@ func (u *UserTeamsItem) Accept(visitor UserTeamsItemVisitor) error {
 	}
 }
 
-type UsersListRequestExpand uint
-
-const (
-	UsersListRequestExpandRoles UsersListRequestExpand = iota + 1
-	UsersListRequestExpandTeams
-	UsersListRequestExpandTeamsRoles
-)
-
-func (u UsersListRequestExpand) String() string {
-	switch u {
-	default:
-		return strconv.Itoa(int(u))
-	case UsersListRequestExpandRoles:
-		return "roles"
-	case UsersListRequestExpandTeams:
-		return "teams"
-	case UsersListRequestExpandTeamsRoles:
-		return "teams,roles"
-	}
-}
-
-func (u UsersListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", u.String())), nil
-}
-
-func (u *UsersListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "roles":
-		value := UsersListRequestExpandRoles
-		*u = value
-	case "teams":
-		value := UsersListRequestExpandTeams
-		*u = value
-	case "teams,roles":
-		value := UsersListRequestExpandTeamsRoles
-		*u = value
-	}
-	return nil
-}
-
-type UsersRetrieveRequestExpand uint
-
-const (
-	UsersRetrieveRequestExpandRoles UsersRetrieveRequestExpand = iota + 1
-	UsersRetrieveRequestExpandTeams
-	UsersRetrieveRequestExpandTeamsRoles
-)
-
-func (u UsersRetrieveRequestExpand) String() string {
-	switch u {
-	default:
-		return strconv.Itoa(int(u))
-	case UsersRetrieveRequestExpandRoles:
-		return "roles"
-	case UsersRetrieveRequestExpandTeams:
-		return "teams"
-	case UsersRetrieveRequestExpandTeamsRoles:
-		return "teams,roles"
-	}
-}
-
-func (u UsersRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", u.String())), nil
-}
-
-func (u *UsersRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "roles":
-		value := UsersRetrieveRequestExpandRoles
-		*u = value
-	case "teams":
-		value := UsersRetrieveRequestExpandTeams
-		*u = value
-	case "teams,roles":
-		value := UsersRetrieveRequestExpandTeamsRoles
-		*u = value
-	}
-	return nil
-}
-
 type ValidationProblemSource struct {
 	Pointer string `json:"pointer"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *ValidationProblemSource) UnmarshalJSON(data []byte) error {
+	type unmarshaler ValidationProblemSource
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = ValidationProblemSource(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *ValidationProblemSource) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
 }
 
 type WarningValidationProblem struct {
@@ -7718,10 +6450,60 @@ type WarningValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WarningValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler WarningValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WarningValidationProblem(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WarningValidationProblem) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }
 
 type WebhookReceiver struct {
 	Event    string  `json:"event"`
 	IsActive bool    `json:"is_active"`
 	Key      *string `json:"key,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WebhookReceiver) UnmarshalJSON(data []byte) error {
+	type unmarshaler WebhookReceiver
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WebhookReceiver(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WebhookReceiver) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }

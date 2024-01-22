@@ -9,30 +9,26 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	Retrieve(ctx context.Context) (*filestorage.AvailableActions, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of models and actions available for an account.
-func (c *client) Retrieve(ctx context.Context) (*filestorage.AvailableActions, error) {
+func (c *Client) Retrieve(ctx context.Context) (*filestorage.AvailableActions, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -40,18 +36,16 @@ func (c *client) Retrieve(ctx context.Context) (*filestorage.AvailableActions, e
 	endpointURL := baseURL + "/" + "api/filestorage/v1/available-actions"
 
 	var response *filestorage.AvailableActions
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

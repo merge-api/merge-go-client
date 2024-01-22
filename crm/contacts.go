@@ -3,6 +3,7 @@
 package crm
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -73,4 +74,54 @@ type ContactsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type ContactsListRequestExpand string
+
+const (
+	ContactsListRequestExpandAccount      ContactsListRequestExpand = "account"
+	ContactsListRequestExpandAccountOwner ContactsListRequestExpand = "account,owner"
+	ContactsListRequestExpandOwner        ContactsListRequestExpand = "owner"
+)
+
+func NewContactsListRequestExpandFromString(s string) (ContactsListRequestExpand, error) {
+	switch s {
+	case "account":
+		return ContactsListRequestExpandAccount, nil
+	case "account,owner":
+		return ContactsListRequestExpandAccountOwner, nil
+	case "owner":
+		return ContactsListRequestExpandOwner, nil
+	}
+	var t ContactsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ContactsListRequestExpand) Ptr() *ContactsListRequestExpand {
+	return &c
+}
+
+type ContactsRetrieveRequestExpand string
+
+const (
+	ContactsRetrieveRequestExpandAccount      ContactsRetrieveRequestExpand = "account"
+	ContactsRetrieveRequestExpandAccountOwner ContactsRetrieveRequestExpand = "account,owner"
+	ContactsRetrieveRequestExpandOwner        ContactsRetrieveRequestExpand = "owner"
+)
+
+func NewContactsRetrieveRequestExpandFromString(s string) (ContactsRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return ContactsRetrieveRequestExpandAccount, nil
+	case "account,owner":
+		return ContactsRetrieveRequestExpandAccountOwner, nil
+	case "owner":
+		return ContactsRetrieveRequestExpandOwner, nil
+	}
+	var t ContactsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ContactsRetrieveRequestExpand) Ptr() *ContactsRetrieveRequestExpand {
+	return &c
 }

@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -52,4 +53,104 @@ type AccountsRetrieveRequest struct {
 	RemoteFields *AccountsRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *AccountsRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type AccountsListRequestRemoteFields string
+
+const (
+	AccountsListRequestRemoteFieldsClassification       AccountsListRequestRemoteFields = "classification"
+	AccountsListRequestRemoteFieldsClassificationStatus AccountsListRequestRemoteFields = "classification,status"
+	AccountsListRequestRemoteFieldsStatus               AccountsListRequestRemoteFields = "status"
+)
+
+func NewAccountsListRequestRemoteFieldsFromString(s string) (AccountsListRequestRemoteFields, error) {
+	switch s {
+	case "classification":
+		return AccountsListRequestRemoteFieldsClassification, nil
+	case "classification,status":
+		return AccountsListRequestRemoteFieldsClassificationStatus, nil
+	case "status":
+		return AccountsListRequestRemoteFieldsStatus, nil
+	}
+	var t AccountsListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountsListRequestRemoteFields) Ptr() *AccountsListRequestRemoteFields {
+	return &a
+}
+
+type AccountsListRequestShowEnumOrigins string
+
+const (
+	AccountsListRequestShowEnumOriginsClassification       AccountsListRequestShowEnumOrigins = "classification"
+	AccountsListRequestShowEnumOriginsClassificationStatus AccountsListRequestShowEnumOrigins = "classification,status"
+	AccountsListRequestShowEnumOriginsStatus               AccountsListRequestShowEnumOrigins = "status"
+)
+
+func NewAccountsListRequestShowEnumOriginsFromString(s string) (AccountsListRequestShowEnumOrigins, error) {
+	switch s {
+	case "classification":
+		return AccountsListRequestShowEnumOriginsClassification, nil
+	case "classification,status":
+		return AccountsListRequestShowEnumOriginsClassificationStatus, nil
+	case "status":
+		return AccountsListRequestShowEnumOriginsStatus, nil
+	}
+	var t AccountsListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountsListRequestShowEnumOrigins) Ptr() *AccountsListRequestShowEnumOrigins {
+	return &a
+}
+
+type AccountsRetrieveRequestRemoteFields string
+
+const (
+	AccountsRetrieveRequestRemoteFieldsClassification       AccountsRetrieveRequestRemoteFields = "classification"
+	AccountsRetrieveRequestRemoteFieldsClassificationStatus AccountsRetrieveRequestRemoteFields = "classification,status"
+	AccountsRetrieveRequestRemoteFieldsStatus               AccountsRetrieveRequestRemoteFields = "status"
+)
+
+func NewAccountsRetrieveRequestRemoteFieldsFromString(s string) (AccountsRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "classification":
+		return AccountsRetrieveRequestRemoteFieldsClassification, nil
+	case "classification,status":
+		return AccountsRetrieveRequestRemoteFieldsClassificationStatus, nil
+	case "status":
+		return AccountsRetrieveRequestRemoteFieldsStatus, nil
+	}
+	var t AccountsRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountsRetrieveRequestRemoteFields) Ptr() *AccountsRetrieveRequestRemoteFields {
+	return &a
+}
+
+type AccountsRetrieveRequestShowEnumOrigins string
+
+const (
+	AccountsRetrieveRequestShowEnumOriginsClassification       AccountsRetrieveRequestShowEnumOrigins = "classification"
+	AccountsRetrieveRequestShowEnumOriginsClassificationStatus AccountsRetrieveRequestShowEnumOrigins = "classification,status"
+	AccountsRetrieveRequestShowEnumOriginsStatus               AccountsRetrieveRequestShowEnumOrigins = "status"
+)
+
+func NewAccountsRetrieveRequestShowEnumOriginsFromString(s string) (AccountsRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "classification":
+		return AccountsRetrieveRequestShowEnumOriginsClassification, nil
+	case "classification,status":
+		return AccountsRetrieveRequestShowEnumOriginsClassificationStatus, nil
+	case "status":
+		return AccountsRetrieveRequestShowEnumOriginsStatus, nil
+	}
+	var t AccountsRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountsRetrieveRequestShowEnumOrigins) Ptr() *AccountsRetrieveRequestShowEnumOrigins {
+	return &a
 }

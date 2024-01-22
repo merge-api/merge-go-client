@@ -3,6 +3,7 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -46,4 +47,54 @@ type EmployeePayrollRunsRetrieveRequest struct {
 	Expand *EmployeePayrollRunsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type EmployeePayrollRunsListRequestExpand string
+
+const (
+	EmployeePayrollRunsListRequestExpandEmployee           EmployeePayrollRunsListRequestExpand = "employee"
+	EmployeePayrollRunsListRequestExpandEmployeePayrollRun EmployeePayrollRunsListRequestExpand = "employee,payroll_run"
+	EmployeePayrollRunsListRequestExpandPayrollRun         EmployeePayrollRunsListRequestExpand = "payroll_run"
+)
+
+func NewEmployeePayrollRunsListRequestExpandFromString(s string) (EmployeePayrollRunsListRequestExpand, error) {
+	switch s {
+	case "employee":
+		return EmployeePayrollRunsListRequestExpandEmployee, nil
+	case "employee,payroll_run":
+		return EmployeePayrollRunsListRequestExpandEmployeePayrollRun, nil
+	case "payroll_run":
+		return EmployeePayrollRunsListRequestExpandPayrollRun, nil
+	}
+	var t EmployeePayrollRunsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeePayrollRunsListRequestExpand) Ptr() *EmployeePayrollRunsListRequestExpand {
+	return &e
+}
+
+type EmployeePayrollRunsRetrieveRequestExpand string
+
+const (
+	EmployeePayrollRunsRetrieveRequestExpandEmployee           EmployeePayrollRunsRetrieveRequestExpand = "employee"
+	EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun EmployeePayrollRunsRetrieveRequestExpand = "employee,payroll_run"
+	EmployeePayrollRunsRetrieveRequestExpandPayrollRun         EmployeePayrollRunsRetrieveRequestExpand = "payroll_run"
+)
+
+func NewEmployeePayrollRunsRetrieveRequestExpandFromString(s string) (EmployeePayrollRunsRetrieveRequestExpand, error) {
+	switch s {
+	case "employee":
+		return EmployeePayrollRunsRetrieveRequestExpandEmployee, nil
+	case "employee,payroll_run":
+		return EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun, nil
+	case "payroll_run":
+		return EmployeePayrollRunsRetrieveRequestExpandPayrollRun, nil
+	}
+	var t EmployeePayrollRunsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeePayrollRunsRetrieveRequestExpand) Ptr() *EmployeePayrollRunsRetrieveRequestExpand {
+	return &e
 }

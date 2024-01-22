@@ -3,14 +3,15 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
 type BankInfoListRequest struct {
 	// If provided, will only return BankInfo's with this account type. Options: ('SAVINGS', 'CHECKING')
 	//
-	// * `SAVINGS` - SAVINGS
-	// * `CHECKING` - CHECKING
+	// - `SAVINGS` - SAVINGS
+	// - `CHECKING` - CHECKING
 	AccountType *BankInfoListRequestAccountType `json:"-"`
 	// If provided, will only return BankInfo's with this bank name.
 	BankName *string `json:"-"`
@@ -53,4 +54,48 @@ type BankInfoRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type BankInfoListRequestAccountType string
+
+const (
+	BankInfoListRequestAccountTypeChecking BankInfoListRequestAccountType = "CHECKING"
+	BankInfoListRequestAccountTypeSavings  BankInfoListRequestAccountType = "SAVINGS"
+)
+
+func NewBankInfoListRequestAccountTypeFromString(s string) (BankInfoListRequestAccountType, error) {
+	switch s {
+	case "CHECKING":
+		return BankInfoListRequestAccountTypeChecking, nil
+	case "SAVINGS":
+		return BankInfoListRequestAccountTypeSavings, nil
+	}
+	var t BankInfoListRequestAccountType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (b BankInfoListRequestAccountType) Ptr() *BankInfoListRequestAccountType {
+	return &b
+}
+
+type BankInfoListRequestOrderBy string
+
+const (
+	BankInfoListRequestOrderByRemoteCreatedAtDescending BankInfoListRequestOrderBy = "-remote_created_at"
+	BankInfoListRequestOrderByRemoteCreatedAtAscending  BankInfoListRequestOrderBy = "remote_created_at"
+)
+
+func NewBankInfoListRequestOrderByFromString(s string) (BankInfoListRequestOrderBy, error) {
+	switch s {
+	case "-remote_created_at":
+		return BankInfoListRequestOrderByRemoteCreatedAtDescending, nil
+	case "remote_created_at":
+		return BankInfoListRequestOrderByRemoteCreatedAtAscending, nil
+	}
+	var t BankInfoListRequestOrderBy
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (b BankInfoListRequestOrderBy) Ptr() *BankInfoListRequestOrderBy {
+	return &b
 }

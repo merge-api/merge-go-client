@@ -3,6 +3,7 @@
 package crm
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -49,9 +50,9 @@ type OpportunitiesListRequest struct {
 	StageId *string `json:"-"`
 	// If provided, will only return opportunities with this status. Options: ('OPEN', 'WON', 'LOST')
 	//
-	// * `OPEN` - OPEN
-	// * `WON` - WON
-	// * `LOST` - LOST
+	// - `OPEN` - OPEN
+	// - `WON` - WON
+	// - `LOST` - LOST
 	Status *OpportunitiesListRequestStatus `json:"-"`
 }
 
@@ -87,4 +88,103 @@ type OpportunitiesRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type OpportunitiesListRequestExpand string
+
+const (
+	OpportunitiesListRequestExpandAccount           OpportunitiesListRequestExpand = "account"
+	OpportunitiesListRequestExpandOwner             OpportunitiesListRequestExpand = "owner"
+	OpportunitiesListRequestExpandOwnerAccount      OpportunitiesListRequestExpand = "owner,account"
+	OpportunitiesListRequestExpandOwnerStage        OpportunitiesListRequestExpand = "owner,stage"
+	OpportunitiesListRequestExpandOwnerStageAccount OpportunitiesListRequestExpand = "owner,stage,account"
+	OpportunitiesListRequestExpandStage             OpportunitiesListRequestExpand = "stage"
+	OpportunitiesListRequestExpandStageAccount      OpportunitiesListRequestExpand = "stage,account"
+)
+
+func NewOpportunitiesListRequestExpandFromString(s string) (OpportunitiesListRequestExpand, error) {
+	switch s {
+	case "account":
+		return OpportunitiesListRequestExpandAccount, nil
+	case "owner":
+		return OpportunitiesListRequestExpandOwner, nil
+	case "owner,account":
+		return OpportunitiesListRequestExpandOwnerAccount, nil
+	case "owner,stage":
+		return OpportunitiesListRequestExpandOwnerStage, nil
+	case "owner,stage,account":
+		return OpportunitiesListRequestExpandOwnerStageAccount, nil
+	case "stage":
+		return OpportunitiesListRequestExpandStage, nil
+	case "stage,account":
+		return OpportunitiesListRequestExpandStageAccount, nil
+	}
+	var t OpportunitiesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OpportunitiesListRequestExpand) Ptr() *OpportunitiesListRequestExpand {
+	return &o
+}
+
+type OpportunitiesListRequestStatus string
+
+const (
+	OpportunitiesListRequestStatusLost OpportunitiesListRequestStatus = "LOST"
+	OpportunitiesListRequestStatusOpen OpportunitiesListRequestStatus = "OPEN"
+	OpportunitiesListRequestStatusWon  OpportunitiesListRequestStatus = "WON"
+)
+
+func NewOpportunitiesListRequestStatusFromString(s string) (OpportunitiesListRequestStatus, error) {
+	switch s {
+	case "LOST":
+		return OpportunitiesListRequestStatusLost, nil
+	case "OPEN":
+		return OpportunitiesListRequestStatusOpen, nil
+	case "WON":
+		return OpportunitiesListRequestStatusWon, nil
+	}
+	var t OpportunitiesListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OpportunitiesListRequestStatus) Ptr() *OpportunitiesListRequestStatus {
+	return &o
+}
+
+type OpportunitiesRetrieveRequestExpand string
+
+const (
+	OpportunitiesRetrieveRequestExpandAccount           OpportunitiesRetrieveRequestExpand = "account"
+	OpportunitiesRetrieveRequestExpandOwner             OpportunitiesRetrieveRequestExpand = "owner"
+	OpportunitiesRetrieveRequestExpandOwnerAccount      OpportunitiesRetrieveRequestExpand = "owner,account"
+	OpportunitiesRetrieveRequestExpandOwnerStage        OpportunitiesRetrieveRequestExpand = "owner,stage"
+	OpportunitiesRetrieveRequestExpandOwnerStageAccount OpportunitiesRetrieveRequestExpand = "owner,stage,account"
+	OpportunitiesRetrieveRequestExpandStage             OpportunitiesRetrieveRequestExpand = "stage"
+	OpportunitiesRetrieveRequestExpandStageAccount      OpportunitiesRetrieveRequestExpand = "stage,account"
+)
+
+func NewOpportunitiesRetrieveRequestExpandFromString(s string) (OpportunitiesRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return OpportunitiesRetrieveRequestExpandAccount, nil
+	case "owner":
+		return OpportunitiesRetrieveRequestExpandOwner, nil
+	case "owner,account":
+		return OpportunitiesRetrieveRequestExpandOwnerAccount, nil
+	case "owner,stage":
+		return OpportunitiesRetrieveRequestExpandOwnerStage, nil
+	case "owner,stage,account":
+		return OpportunitiesRetrieveRequestExpandOwnerStageAccount, nil
+	case "stage":
+		return OpportunitiesRetrieveRequestExpandStage, nil
+	case "stage,account":
+		return OpportunitiesRetrieveRequestExpandStageAccount, nil
+	}
+	var t OpportunitiesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OpportunitiesRetrieveRequestExpand) Ptr() *OpportunitiesRetrieveRequestExpand {
+	return &o
 }

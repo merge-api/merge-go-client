@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -48,4 +49,78 @@ type ScorecardsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type ScorecardsListRequestExpand string
+
+const (
+	ScorecardsListRequestExpandApplication                     ScorecardsListRequestExpand = "application"
+	ScorecardsListRequestExpandApplicationInterview            ScorecardsListRequestExpand = "application,interview"
+	ScorecardsListRequestExpandApplicationInterviewInterviewer ScorecardsListRequestExpand = "application,interview,interviewer"
+	ScorecardsListRequestExpandApplicationInterviewer          ScorecardsListRequestExpand = "application,interviewer"
+	ScorecardsListRequestExpandInterview                       ScorecardsListRequestExpand = "interview"
+	ScorecardsListRequestExpandInterviewInterviewer            ScorecardsListRequestExpand = "interview,interviewer"
+	ScorecardsListRequestExpandInterviewer                     ScorecardsListRequestExpand = "interviewer"
+)
+
+func NewScorecardsListRequestExpandFromString(s string) (ScorecardsListRequestExpand, error) {
+	switch s {
+	case "application":
+		return ScorecardsListRequestExpandApplication, nil
+	case "application,interview":
+		return ScorecardsListRequestExpandApplicationInterview, nil
+	case "application,interview,interviewer":
+		return ScorecardsListRequestExpandApplicationInterviewInterviewer, nil
+	case "application,interviewer":
+		return ScorecardsListRequestExpandApplicationInterviewer, nil
+	case "interview":
+		return ScorecardsListRequestExpandInterview, nil
+	case "interview,interviewer":
+		return ScorecardsListRequestExpandInterviewInterviewer, nil
+	case "interviewer":
+		return ScorecardsListRequestExpandInterviewer, nil
+	}
+	var t ScorecardsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s ScorecardsListRequestExpand) Ptr() *ScorecardsListRequestExpand {
+	return &s
+}
+
+type ScorecardsRetrieveRequestExpand string
+
+const (
+	ScorecardsRetrieveRequestExpandApplication                     ScorecardsRetrieveRequestExpand = "application"
+	ScorecardsRetrieveRequestExpandApplicationInterview            ScorecardsRetrieveRequestExpand = "application,interview"
+	ScorecardsRetrieveRequestExpandApplicationInterviewInterviewer ScorecardsRetrieveRequestExpand = "application,interview,interviewer"
+	ScorecardsRetrieveRequestExpandApplicationInterviewer          ScorecardsRetrieveRequestExpand = "application,interviewer"
+	ScorecardsRetrieveRequestExpandInterview                       ScorecardsRetrieveRequestExpand = "interview"
+	ScorecardsRetrieveRequestExpandInterviewInterviewer            ScorecardsRetrieveRequestExpand = "interview,interviewer"
+	ScorecardsRetrieveRequestExpandInterviewer                     ScorecardsRetrieveRequestExpand = "interviewer"
+)
+
+func NewScorecardsRetrieveRequestExpandFromString(s string) (ScorecardsRetrieveRequestExpand, error) {
+	switch s {
+	case "application":
+		return ScorecardsRetrieveRequestExpandApplication, nil
+	case "application,interview":
+		return ScorecardsRetrieveRequestExpandApplicationInterview, nil
+	case "application,interview,interviewer":
+		return ScorecardsRetrieveRequestExpandApplicationInterviewInterviewer, nil
+	case "application,interviewer":
+		return ScorecardsRetrieveRequestExpandApplicationInterviewer, nil
+	case "interview":
+		return ScorecardsRetrieveRequestExpandInterview, nil
+	case "interview,interviewer":
+		return ScorecardsRetrieveRequestExpandInterviewInterviewer, nil
+	case "interviewer":
+		return ScorecardsRetrieveRequestExpandInterviewer, nil
+	}
+	var t ScorecardsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s ScorecardsRetrieveRequestExpand) Ptr() *ScorecardsRetrieveRequestExpand {
+	return &s
 }

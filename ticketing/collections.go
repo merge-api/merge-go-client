@@ -3,14 +3,15 @@
 package ticketing
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
 type CollectionsListRequest struct {
 	// If provided, will only return collections of the given type.
 	//
-	// * `LIST` - LIST
-	// * `PROJECT` - PROJECT
+	// - `LIST` - LIST
+	// - `PROJECT` - PROJECT
 	CollectionType *CollectionsListRequestCollectionType `json:"-"`
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-"`
@@ -49,6 +50,53 @@ type CollectionsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type CollectionsListRequestCollectionType string
+
+const (
+	CollectionsListRequestCollectionTypeList    CollectionsListRequestCollectionType = "LIST"
+	CollectionsListRequestCollectionTypeProject CollectionsListRequestCollectionType = "PROJECT"
+)
+
+func NewCollectionsListRequestCollectionTypeFromString(s string) (CollectionsListRequestCollectionType, error) {
+	switch s {
+	case "LIST":
+		return CollectionsListRequestCollectionTypeList, nil
+	case "PROJECT":
+		return CollectionsListRequestCollectionTypeProject, nil
+	}
+	var t CollectionsListRequestCollectionType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CollectionsListRequestCollectionType) Ptr() *CollectionsListRequestCollectionType {
+	return &c
+}
+
+type CollectionsUsersListRequestExpand string
+
+const (
+	CollectionsUsersListRequestExpandRoles      CollectionsUsersListRequestExpand = "roles"
+	CollectionsUsersListRequestExpandTeams      CollectionsUsersListRequestExpand = "teams"
+	CollectionsUsersListRequestExpandTeamsRoles CollectionsUsersListRequestExpand = "teams,roles"
+)
+
+func NewCollectionsUsersListRequestExpandFromString(s string) (CollectionsUsersListRequestExpand, error) {
+	switch s {
+	case "roles":
+		return CollectionsUsersListRequestExpandRoles, nil
+	case "teams":
+		return CollectionsUsersListRequestExpandTeams, nil
+	case "teams,roles":
+		return CollectionsUsersListRequestExpandTeamsRoles, nil
+	}
+	var t CollectionsUsersListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CollectionsUsersListRequestExpand) Ptr() *CollectionsUsersListRequestExpand {
+	return &c
 }
 
 type CollectionsUsersListRequest struct {

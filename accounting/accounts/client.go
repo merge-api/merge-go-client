@@ -12,33 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *accounting.AccountsListRequest) (*accounting.PaginatedAccountList, error)
-	Create(ctx context.Context, request *accounting.AccountEndpointRequest) (*accounting.AccountResponse, error)
-	Retrieve(ctx context.Context, id string, request *accounting.AccountsRetrieveRequest) (*accounting.Account, error)
-	MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Account` objects.
-func (c *client) List(ctx context.Context, request *accounting.AccountsListRequest) (*accounting.PaginatedAccountList, error) {
+func (c *Client) List(ctx context.Context, request *accounting.AccountsListRequest) (*accounting.PaginatedAccountList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -59,7 +52,7 @@ func (c *client) List(ctx context.Context, request *accounting.AccountsListReque
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
@@ -90,24 +83,22 @@ func (c *client) List(ctx context.Context, request *accounting.AccountsListReque
 	}
 
 	var response *accounting.PaginatedAccountList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `Account` object with the given values.
-func (c *client) Create(ctx context.Context, request *accounting.AccountEndpointRequest) (*accounting.AccountResponse, error) {
+func (c *Client) Create(ctx context.Context, request *accounting.AccountEndpointRequest) (*accounting.AccountResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -126,24 +117,23 @@ func (c *client) Create(ctx context.Context, request *accounting.AccountEndpoint
 	}
 
 	var response *accounting.AccountResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `Account` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *accounting.AccountsRetrieveRequest) (*accounting.Account, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.AccountsRetrieveRequest) (*accounting.Account, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -152,7 +142,7 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ac
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
@@ -168,24 +158,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *accounting.Ac
 	}
 
 	var response *accounting.Account
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Account` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -193,18 +181,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	endpointURL := baseURL + "/" + "api/accounting/v1/accounts/meta/post"
 
 	var response *accounting.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

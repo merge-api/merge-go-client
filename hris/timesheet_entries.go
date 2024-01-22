@@ -3,6 +3,7 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -50,4 +51,26 @@ type TimesheetEntriesListRequest struct {
 type TimesheetEntriesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type TimesheetEntriesListRequestOrderBy string
+
+const (
+	TimesheetEntriesListRequestOrderByStartTimeDescending TimesheetEntriesListRequestOrderBy = "-start_time"
+	TimesheetEntriesListRequestOrderByStartTimeAscending  TimesheetEntriesListRequestOrderBy = "start_time"
+)
+
+func NewTimesheetEntriesListRequestOrderByFromString(s string) (TimesheetEntriesListRequestOrderBy, error) {
+	switch s {
+	case "-start_time":
+		return TimesheetEntriesListRequestOrderByStartTimeDescending, nil
+	case "start_time":
+		return TimesheetEntriesListRequestOrderByStartTimeAscending, nil
+	}
+	var t TimesheetEntriesListRequestOrderBy
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimesheetEntriesListRequestOrderBy) Ptr() *TimesheetEntriesListRequestOrderBy {
+	return &t
 }

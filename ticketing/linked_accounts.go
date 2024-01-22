@@ -2,16 +2,20 @@
 
 package ticketing
 
+import (
+	fmt "fmt"
+)
+
 type LinkedAccountsListRequest struct {
 	// Options: ('hris', 'ats', 'accounting', 'ticketing', 'crm', 'mktg', 'filestorage')
 	//
-	// * `hris` - hris
-	// * `ats` - ats
-	// * `accounting` - accounting
-	// * `ticketing` - ticketing
-	// * `crm` - crm
-	// * `mktg` - mktg
-	// * `filestorage` - filestorage
+	// - `hris` - hris
+	// - `ats` - ats
+	// - `accounting` - accounting
+	// - `ticketing` - ticketing
+	// - `crm` - crm
+	// - `mktg` - mktg
+	// - `filestorage` - filestorage
 	Category *LinkedAccountsListRequestCategory `json:"-"`
 	// The pagination cursor value.
 	Cursor *string `json:"-"`
@@ -36,4 +40,41 @@ type LinkedAccountsListRequest struct {
 	PageSize *int `json:"-"`
 	// Filter by status. Options: `COMPLETE`, `INCOMPLETE`, `RELINK_NEEDED`
 	Status *string `json:"-"`
+}
+
+type LinkedAccountsListRequestCategory string
+
+const (
+	LinkedAccountsListRequestCategoryAccounting  LinkedAccountsListRequestCategory = "accounting"
+	LinkedAccountsListRequestCategoryAts         LinkedAccountsListRequestCategory = "ats"
+	LinkedAccountsListRequestCategoryCrm         LinkedAccountsListRequestCategory = "crm"
+	LinkedAccountsListRequestCategoryFilestorage LinkedAccountsListRequestCategory = "filestorage"
+	LinkedAccountsListRequestCategoryHris        LinkedAccountsListRequestCategory = "hris"
+	LinkedAccountsListRequestCategoryMktg        LinkedAccountsListRequestCategory = "mktg"
+	LinkedAccountsListRequestCategoryTicketing   LinkedAccountsListRequestCategory = "ticketing"
+)
+
+func NewLinkedAccountsListRequestCategoryFromString(s string) (LinkedAccountsListRequestCategory, error) {
+	switch s {
+	case "accounting":
+		return LinkedAccountsListRequestCategoryAccounting, nil
+	case "ats":
+		return LinkedAccountsListRequestCategoryAts, nil
+	case "crm":
+		return LinkedAccountsListRequestCategoryCrm, nil
+	case "filestorage":
+		return LinkedAccountsListRequestCategoryFilestorage, nil
+	case "hris":
+		return LinkedAccountsListRequestCategoryHris, nil
+	case "mktg":
+		return LinkedAccountsListRequestCategoryMktg, nil
+	case "ticketing":
+		return LinkedAccountsListRequestCategoryTicketing, nil
+	}
+	var t LinkedAccountsListRequestCategory
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LinkedAccountsListRequestCategory) Ptr() *LinkedAccountsListRequestCategory {
+	return &l
 }

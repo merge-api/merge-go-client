@@ -3,6 +3,7 @@
 package crm
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -71,4 +72,126 @@ type EngagementsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type EngagementsListRequestExpand string
+
+const (
+	EngagementsListRequestExpandAccount                            EngagementsListRequestExpand = "account"
+	EngagementsListRequestExpandAccountEngagementType              EngagementsListRequestExpand = "account,engagement_type"
+	EngagementsListRequestExpandContacts                           EngagementsListRequestExpand = "contacts"
+	EngagementsListRequestExpandContactsAccount                    EngagementsListRequestExpand = "contacts,account"
+	EngagementsListRequestExpandContactsAccountEngagementType      EngagementsListRequestExpand = "contacts,account,engagement_type"
+	EngagementsListRequestExpandContactsEngagementType             EngagementsListRequestExpand = "contacts,engagement_type"
+	EngagementsListRequestExpandContactsOwner                      EngagementsListRequestExpand = "contacts,owner"
+	EngagementsListRequestExpandContactsOwnerAccount               EngagementsListRequestExpand = "contacts,owner,account"
+	EngagementsListRequestExpandContactsOwnerAccountEngagementType EngagementsListRequestExpand = "contacts,owner,account,engagement_type"
+	EngagementsListRequestExpandContactsOwnerEngagementType        EngagementsListRequestExpand = "contacts,owner,engagement_type"
+	EngagementsListRequestExpandEngagementType                     EngagementsListRequestExpand = "engagement_type"
+	EngagementsListRequestExpandOwner                              EngagementsListRequestExpand = "owner"
+	EngagementsListRequestExpandOwnerAccount                       EngagementsListRequestExpand = "owner,account"
+	EngagementsListRequestExpandOwnerAccountEngagementType         EngagementsListRequestExpand = "owner,account,engagement_type"
+	EngagementsListRequestExpandOwnerEngagementType                EngagementsListRequestExpand = "owner,engagement_type"
+)
+
+func NewEngagementsListRequestExpandFromString(s string) (EngagementsListRequestExpand, error) {
+	switch s {
+	case "account":
+		return EngagementsListRequestExpandAccount, nil
+	case "account,engagement_type":
+		return EngagementsListRequestExpandAccountEngagementType, nil
+	case "contacts":
+		return EngagementsListRequestExpandContacts, nil
+	case "contacts,account":
+		return EngagementsListRequestExpandContactsAccount, nil
+	case "contacts,account,engagement_type":
+		return EngagementsListRequestExpandContactsAccountEngagementType, nil
+	case "contacts,engagement_type":
+		return EngagementsListRequestExpandContactsEngagementType, nil
+	case "contacts,owner":
+		return EngagementsListRequestExpandContactsOwner, nil
+	case "contacts,owner,account":
+		return EngagementsListRequestExpandContactsOwnerAccount, nil
+	case "contacts,owner,account,engagement_type":
+		return EngagementsListRequestExpandContactsOwnerAccountEngagementType, nil
+	case "contacts,owner,engagement_type":
+		return EngagementsListRequestExpandContactsOwnerEngagementType, nil
+	case "engagement_type":
+		return EngagementsListRequestExpandEngagementType, nil
+	case "owner":
+		return EngagementsListRequestExpandOwner, nil
+	case "owner,account":
+		return EngagementsListRequestExpandOwnerAccount, nil
+	case "owner,account,engagement_type":
+		return EngagementsListRequestExpandOwnerAccountEngagementType, nil
+	case "owner,engagement_type":
+		return EngagementsListRequestExpandOwnerEngagementType, nil
+	}
+	var t EngagementsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EngagementsListRequestExpand) Ptr() *EngagementsListRequestExpand {
+	return &e
+}
+
+type EngagementsRetrieveRequestExpand string
+
+const (
+	EngagementsRetrieveRequestExpandAccount                            EngagementsRetrieveRequestExpand = "account"
+	EngagementsRetrieveRequestExpandAccountEngagementType              EngagementsRetrieveRequestExpand = "account,engagement_type"
+	EngagementsRetrieveRequestExpandContacts                           EngagementsRetrieveRequestExpand = "contacts"
+	EngagementsRetrieveRequestExpandContactsAccount                    EngagementsRetrieveRequestExpand = "contacts,account"
+	EngagementsRetrieveRequestExpandContactsAccountEngagementType      EngagementsRetrieveRequestExpand = "contacts,account,engagement_type"
+	EngagementsRetrieveRequestExpandContactsEngagementType             EngagementsRetrieveRequestExpand = "contacts,engagement_type"
+	EngagementsRetrieveRequestExpandContactsOwner                      EngagementsRetrieveRequestExpand = "contacts,owner"
+	EngagementsRetrieveRequestExpandContactsOwnerAccount               EngagementsRetrieveRequestExpand = "contacts,owner,account"
+	EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType EngagementsRetrieveRequestExpand = "contacts,owner,account,engagement_type"
+	EngagementsRetrieveRequestExpandContactsOwnerEngagementType        EngagementsRetrieveRequestExpand = "contacts,owner,engagement_type"
+	EngagementsRetrieveRequestExpandEngagementType                     EngagementsRetrieveRequestExpand = "engagement_type"
+	EngagementsRetrieveRequestExpandOwner                              EngagementsRetrieveRequestExpand = "owner"
+	EngagementsRetrieveRequestExpandOwnerAccount                       EngagementsRetrieveRequestExpand = "owner,account"
+	EngagementsRetrieveRequestExpandOwnerAccountEngagementType         EngagementsRetrieveRequestExpand = "owner,account,engagement_type"
+	EngagementsRetrieveRequestExpandOwnerEngagementType                EngagementsRetrieveRequestExpand = "owner,engagement_type"
+)
+
+func NewEngagementsRetrieveRequestExpandFromString(s string) (EngagementsRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return EngagementsRetrieveRequestExpandAccount, nil
+	case "account,engagement_type":
+		return EngagementsRetrieveRequestExpandAccountEngagementType, nil
+	case "contacts":
+		return EngagementsRetrieveRequestExpandContacts, nil
+	case "contacts,account":
+		return EngagementsRetrieveRequestExpandContactsAccount, nil
+	case "contacts,account,engagement_type":
+		return EngagementsRetrieveRequestExpandContactsAccountEngagementType, nil
+	case "contacts,engagement_type":
+		return EngagementsRetrieveRequestExpandContactsEngagementType, nil
+	case "contacts,owner":
+		return EngagementsRetrieveRequestExpandContactsOwner, nil
+	case "contacts,owner,account":
+		return EngagementsRetrieveRequestExpandContactsOwnerAccount, nil
+	case "contacts,owner,account,engagement_type":
+		return EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType, nil
+	case "contacts,owner,engagement_type":
+		return EngagementsRetrieveRequestExpandContactsOwnerEngagementType, nil
+	case "engagement_type":
+		return EngagementsRetrieveRequestExpandEngagementType, nil
+	case "owner":
+		return EngagementsRetrieveRequestExpandOwner, nil
+	case "owner,account":
+		return EngagementsRetrieveRequestExpandOwnerAccount, nil
+	case "owner,account,engagement_type":
+		return EngagementsRetrieveRequestExpandOwnerAccountEngagementType, nil
+	case "owner,engagement_type":
+		return EngagementsRetrieveRequestExpandOwnerEngagementType, nil
+	}
+	var t EngagementsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EngagementsRetrieveRequestExpand) Ptr() *EngagementsRetrieveRequestExpand {
+	return &e
 }

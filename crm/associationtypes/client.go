@@ -12,33 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	CustomObjectClassesAssociationTypesList(ctx context.Context, customObjectClassId string, request *crm.CustomObjectClassesAssociationTypesListRequest) (*crm.PaginatedAssociationTypeList, error)
-	CustomObjectClassesAssociationTypesCreate(ctx context.Context, customObjectClassId string, request *crm.CrmAssociationTypeEndpointRequest) (*crm.CrmAssociationTypeResponse, error)
-	CustomObjectClassesAssociationTypesRetrieve(ctx context.Context, customObjectClassId string, id string, request *crm.CustomObjectClassesAssociationTypesRetrieveRequest) (*crm.AssociationType, error)
-	CustomObjectClassesAssociationTypesMetaPostRetrieve(ctx context.Context, customObjectClassId string) (*crm.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `AssociationType` objects.
-func (c *client) CustomObjectClassesAssociationTypesList(ctx context.Context, customObjectClassId string, request *crm.CustomObjectClassesAssociationTypesListRequest) (*crm.PaginatedAssociationTypeList, error) {
+func (c *Client) CustomObjectClassesAssociationTypesList(ctx context.Context, customObjectClassId string, request *crm.CustomObjectClassesAssociationTypesListRequest) (*crm.PaginatedAssociationTypeList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -56,7 +49,7 @@ func (c *client) CustomObjectClassesAssociationTypesList(ctx context.Context, cu
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
@@ -81,24 +74,22 @@ func (c *client) CustomObjectClassesAssociationTypesList(ctx context.Context, cu
 	}
 
 	var response *crm.PaginatedAssociationTypeList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `AssociationType` object with the given values.
-func (c *client) CustomObjectClassesAssociationTypesCreate(ctx context.Context, customObjectClassId string, request *crm.CrmAssociationTypeEndpointRequest) (*crm.CrmAssociationTypeResponse, error) {
+func (c *Client) CustomObjectClassesAssociationTypesCreate(ctx context.Context, customObjectClassId string, request *crm.CrmAssociationTypeEndpointRequest) (*crm.CrmAssociationTypeResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -117,24 +108,23 @@ func (c *client) CustomObjectClassesAssociationTypesCreate(ctx context.Context, 
 	}
 
 	var response *crm.CrmAssociationTypeResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `AssociationType` object with the given `id`.
-func (c *client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context, customObjectClassId string, id string, request *crm.CustomObjectClassesAssociationTypesRetrieveRequest) (*crm.AssociationType, error) {
+func (c *Client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context, customObjectClassId string, id string, request *crm.CustomObjectClassesAssociationTypesRetrieveRequest) (*crm.AssociationType, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -143,7 +133,7 @@ func (c *client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
@@ -153,24 +143,22 @@ func (c *client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context
 	}
 
 	var response *crm.AssociationType
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `CRMAssociationType` POSTs.
-func (c *client) CustomObjectClassesAssociationTypesMetaPostRetrieve(ctx context.Context, customObjectClassId string) (*crm.MetaResponse, error) {
+func (c *Client) CustomObjectClassesAssociationTypesMetaPostRetrieve(ctx context.Context, customObjectClassId string) (*crm.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -178,18 +166,16 @@ func (c *client) CustomObjectClassesAssociationTypesMetaPostRetrieve(ctx context
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types/meta/post", customObjectClassId)
 
 	var response *crm.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

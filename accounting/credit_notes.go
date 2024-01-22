@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -48,4 +49,898 @@ type CreditNotesRetrieveRequest struct {
 	RemoteFields *CreditNotesRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *CreditNotesRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type CreditNotesListRequestExpand string
+
+const (
+	CreditNotesListRequestExpandAccountingPeriod                                                                 CreditNotesListRequestExpand = "accounting_period"
+	CreditNotesListRequestExpandAppliedPayments                                                                  CreditNotesListRequestExpand = "applied_payments"
+	CreditNotesListRequestExpandAppliedPaymentsAccountingPeriod                                                  CreditNotesListRequestExpand = "applied_payments,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsCompany                                                           CreditNotesListRequestExpand = "applied_payments,company"
+	CreditNotesListRequestExpandAppliedPaymentsCompanyAccountingPeriod                                           CreditNotesListRequestExpand = "applied_payments,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsContact                                                           CreditNotesListRequestExpand = "applied_payments,contact"
+	CreditNotesListRequestExpandAppliedPaymentsContactAccountingPeriod                                           CreditNotesListRequestExpand = "applied_payments,contact,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsContactCompany                                                    CreditNotesListRequestExpand = "applied_payments,contact,company"
+	CreditNotesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod                                    CreditNotesListRequestExpand = "applied_payments,contact,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItems                                                         CreditNotesListRequestExpand = "applied_payments,line_items"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod                                         CreditNotesListRequestExpand = "applied_payments,line_items,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsCompany                                                  CreditNotesListRequestExpand = "applied_payments,line_items,company"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod                                  CreditNotesListRequestExpand = "applied_payments,line_items,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContact                                                  CreditNotesListRequestExpand = "applied_payments,line_items,contact"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod                                  CreditNotesListRequestExpand = "applied_payments,line_items,contact,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompany                                           CreditNotesListRequestExpand = "applied_payments,line_items,contact,company"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod                           CreditNotesListRequestExpand = "applied_payments,line_items,contact,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategories                                       CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod                       CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany                                CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,company"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact                                CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,contact"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany                         CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,contact,company"
+	CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod         CreditNotesListRequestExpand = "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategories                                                CreditNotesListRequestExpand = "applied_payments,tracking_categories"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod                                CreditNotesListRequestExpand = "applied_payments,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompany                                         CreditNotesListRequestExpand = "applied_payments,tracking_categories,company"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                         CreditNotesListRequestExpand = "applied_payments,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContact                                         CreditNotesListRequestExpand = "applied_payments,tracking_categories,contact"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod                         CreditNotesListRequestExpand = "applied_payments,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany                                  CreditNotesListRequestExpand = "applied_payments,tracking_categories,contact,company"
+	CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod                  CreditNotesListRequestExpand = "applied_payments,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandCompany                                                                          CreditNotesListRequestExpand = "company"
+	CreditNotesListRequestExpandCompanyAccountingPeriod                                                          CreditNotesListRequestExpand = "company,accounting_period"
+	CreditNotesListRequestExpandContact                                                                          CreditNotesListRequestExpand = "contact"
+	CreditNotesListRequestExpandContactAccountingPeriod                                                          CreditNotesListRequestExpand = "contact,accounting_period"
+	CreditNotesListRequestExpandContactCompany                                                                   CreditNotesListRequestExpand = "contact,company"
+	CreditNotesListRequestExpandContactCompanyAccountingPeriod                                                   CreditNotesListRequestExpand = "contact,company,accounting_period"
+	CreditNotesListRequestExpandLineItems                                                                        CreditNotesListRequestExpand = "line_items"
+	CreditNotesListRequestExpandLineItemsAccountingPeriod                                                        CreditNotesListRequestExpand = "line_items,accounting_period"
+	CreditNotesListRequestExpandLineItemsCompany                                                                 CreditNotesListRequestExpand = "line_items,company"
+	CreditNotesListRequestExpandLineItemsCompanyAccountingPeriod                                                 CreditNotesListRequestExpand = "line_items,company,accounting_period"
+	CreditNotesListRequestExpandLineItemsContact                                                                 CreditNotesListRequestExpand = "line_items,contact"
+	CreditNotesListRequestExpandLineItemsContactAccountingPeriod                                                 CreditNotesListRequestExpand = "line_items,contact,accounting_period"
+	CreditNotesListRequestExpandLineItemsContactCompany                                                          CreditNotesListRequestExpand = "line_items,contact,company"
+	CreditNotesListRequestExpandLineItemsContactCompanyAccountingPeriod                                          CreditNotesListRequestExpand = "line_items,contact,company,accounting_period"
+	CreditNotesListRequestExpandLineItemsTrackingCategories                                                      CreditNotesListRequestExpand = "line_items,tracking_categories"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesAccountingPeriod                                      CreditNotesListRequestExpand = "line_items,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesCompany                                               CreditNotesListRequestExpand = "line_items,tracking_categories,company"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod                               CreditNotesListRequestExpand = "line_items,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesContact                                               CreditNotesListRequestExpand = "line_items,tracking_categories,contact"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod                               CreditNotesListRequestExpand = "line_items,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesContactCompany                                        CreditNotesListRequestExpand = "line_items,tracking_categories,contact,company"
+	CreditNotesListRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod                        CreditNotesListRequestExpand = "line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandPayments                                                                         CreditNotesListRequestExpand = "payments"
+	CreditNotesListRequestExpandPaymentsAccountingPeriod                                                         CreditNotesListRequestExpand = "payments,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPayments                                                          CreditNotesListRequestExpand = "payments,applied_payments"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod                                          CreditNotesListRequestExpand = "payments,applied_payments,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsCompany                                                   CreditNotesListRequestExpand = "payments,applied_payments,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod                                   CreditNotesListRequestExpand = "payments,applied_payments,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContact                                                   CreditNotesListRequestExpand = "payments,applied_payments,contact"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod                                   CreditNotesListRequestExpand = "payments,applied_payments,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompany                                            CreditNotesListRequestExpand = "payments,applied_payments,contact,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod                            CreditNotesListRequestExpand = "payments,applied_payments,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItems                                                 CreditNotesListRequestExpand = "payments,applied_payments,line_items"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod                                 CreditNotesListRequestExpand = "payments,applied_payments,line_items,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany                                          CreditNotesListRequestExpand = "payments,applied_payments,line_items,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod                          CreditNotesListRequestExpand = "payments,applied_payments,line_items,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContact                                          CreditNotesListRequestExpand = "payments,applied_payments,line_items,contact"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod                          CreditNotesListRequestExpand = "payments,applied_payments,line_items,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany                                   CreditNotesListRequestExpand = "payments,applied_payments,line_items,contact,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod                   CreditNotesListRequestExpand = "payments,applied_payments,line_items,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories                               CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod               CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany                        CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod        CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact                        CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod        CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany                 CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod CreditNotesListRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategories                                        CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod                        CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany                                 CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                 CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact                                 CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,contact"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod                 CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany                          CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,contact,company"
+	CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod          CreditNotesListRequestExpand = "payments,applied_payments,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsCompany                                                                  CreditNotesListRequestExpand = "payments,company"
+	CreditNotesListRequestExpandPaymentsCompanyAccountingPeriod                                                  CreditNotesListRequestExpand = "payments,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsContact                                                                  CreditNotesListRequestExpand = "payments,contact"
+	CreditNotesListRequestExpandPaymentsContactAccountingPeriod                                                  CreditNotesListRequestExpand = "payments,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsContactCompany                                                           CreditNotesListRequestExpand = "payments,contact,company"
+	CreditNotesListRequestExpandPaymentsContactCompanyAccountingPeriod                                           CreditNotesListRequestExpand = "payments,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItems                                                                CreditNotesListRequestExpand = "payments,line_items"
+	CreditNotesListRequestExpandPaymentsLineItemsAccountingPeriod                                                CreditNotesListRequestExpand = "payments,line_items,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsCompany                                                         CreditNotesListRequestExpand = "payments,line_items,company"
+	CreditNotesListRequestExpandPaymentsLineItemsCompanyAccountingPeriod                                         CreditNotesListRequestExpand = "payments,line_items,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsContact                                                         CreditNotesListRequestExpand = "payments,line_items,contact"
+	CreditNotesListRequestExpandPaymentsLineItemsContactAccountingPeriod                                         CreditNotesListRequestExpand = "payments,line_items,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsContactCompany                                                  CreditNotesListRequestExpand = "payments,line_items,contact,company"
+	CreditNotesListRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod                                  CreditNotesListRequestExpand = "payments,line_items,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategories                                              CreditNotesListRequestExpand = "payments,line_items,tracking_categories"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod                              CreditNotesListRequestExpand = "payments,line_items,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesCompany                                       CreditNotesListRequestExpand = "payments,line_items,tracking_categories,company"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                       CreditNotesListRequestExpand = "payments,line_items,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContact                                       CreditNotesListRequestExpand = "payments,line_items,tracking_categories,contact"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                       CreditNotesListRequestExpand = "payments,line_items,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany                                CreditNotesListRequestExpand = "payments,line_items,tracking_categories,contact,company"
+	CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod                CreditNotesListRequestExpand = "payments,line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsTrackingCategories                                                       CreditNotesListRequestExpand = "payments,tracking_categories"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod                                       CreditNotesListRequestExpand = "payments,tracking_categories,accounting_period"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesCompany                                                CreditNotesListRequestExpand = "payments,tracking_categories,company"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod                                CreditNotesListRequestExpand = "payments,tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesContact                                                CreditNotesListRequestExpand = "payments,tracking_categories,contact"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod                                CreditNotesListRequestExpand = "payments,tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesContactCompany                                         CreditNotesListRequestExpand = "payments,tracking_categories,contact,company"
+	CreditNotesListRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod                         CreditNotesListRequestExpand = "payments,tracking_categories,contact,company,accounting_period"
+	CreditNotesListRequestExpandTrackingCategories                                                               CreditNotesListRequestExpand = "tracking_categories"
+	CreditNotesListRequestExpandTrackingCategoriesAccountingPeriod                                               CreditNotesListRequestExpand = "tracking_categories,accounting_period"
+	CreditNotesListRequestExpandTrackingCategoriesCompany                                                        CreditNotesListRequestExpand = "tracking_categories,company"
+	CreditNotesListRequestExpandTrackingCategoriesCompanyAccountingPeriod                                        CreditNotesListRequestExpand = "tracking_categories,company,accounting_period"
+	CreditNotesListRequestExpandTrackingCategoriesContact                                                        CreditNotesListRequestExpand = "tracking_categories,contact"
+	CreditNotesListRequestExpandTrackingCategoriesContactAccountingPeriod                                        CreditNotesListRequestExpand = "tracking_categories,contact,accounting_period"
+	CreditNotesListRequestExpandTrackingCategoriesContactCompany                                                 CreditNotesListRequestExpand = "tracking_categories,contact,company"
+	CreditNotesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                                 CreditNotesListRequestExpand = "tracking_categories,contact,company,accounting_period"
+)
+
+func NewCreditNotesListRequestExpandFromString(s string) (CreditNotesListRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return CreditNotesListRequestExpandAccountingPeriod, nil
+	case "applied_payments":
+		return CreditNotesListRequestExpandAppliedPayments, nil
+	case "applied_payments,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsAccountingPeriod, nil
+	case "applied_payments,company":
+		return CreditNotesListRequestExpandAppliedPaymentsCompany, nil
+	case "applied_payments,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsCompanyAccountingPeriod, nil
+	case "applied_payments,contact":
+		return CreditNotesListRequestExpandAppliedPaymentsContact, nil
+	case "applied_payments,contact,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsContactAccountingPeriod, nil
+	case "applied_payments,contact,company":
+		return CreditNotesListRequestExpandAppliedPaymentsContactCompany, nil
+	case "applied_payments,contact,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItems, nil
+	case "applied_payments,line_items,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "applied_payments,line_items,company":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsCompany, nil
+	case "applied_payments,line_items,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,contact":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsContact, nil
+	case "applied_payments,line_items,contact,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "applied_payments,line_items,contact,company":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompany, nil
+	case "applied_payments,line_items,contact,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategories, nil
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,company":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategories, nil
+	case "applied_payments,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,tracking_categories,company":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompany, nil
+	case "applied_payments,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContact, nil
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "company":
+		return CreditNotesListRequestExpandCompany, nil
+	case "company,accounting_period":
+		return CreditNotesListRequestExpandCompanyAccountingPeriod, nil
+	case "contact":
+		return CreditNotesListRequestExpandContact, nil
+	case "contact,accounting_period":
+		return CreditNotesListRequestExpandContactAccountingPeriod, nil
+	case "contact,company":
+		return CreditNotesListRequestExpandContactCompany, nil
+	case "contact,company,accounting_period":
+		return CreditNotesListRequestExpandContactCompanyAccountingPeriod, nil
+	case "line_items":
+		return CreditNotesListRequestExpandLineItems, nil
+	case "line_items,accounting_period":
+		return CreditNotesListRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,company":
+		return CreditNotesListRequestExpandLineItemsCompany, nil
+	case "line_items,company,accounting_period":
+		return CreditNotesListRequestExpandLineItemsCompanyAccountingPeriod, nil
+	case "line_items,contact":
+		return CreditNotesListRequestExpandLineItemsContact, nil
+	case "line_items,contact,accounting_period":
+		return CreditNotesListRequestExpandLineItemsContactAccountingPeriod, nil
+	case "line_items,contact,company":
+		return CreditNotesListRequestExpandLineItemsContactCompany, nil
+	case "line_items,contact,company,accounting_period":
+		return CreditNotesListRequestExpandLineItemsContactCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return CreditNotesListRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,company":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesCompany, nil
+	case "line_items,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,contact":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesContact, nil
+	case "line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "line_items,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesContactCompany, nil
+	case "line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments":
+		return CreditNotesListRequestExpandPayments, nil
+	case "payments,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAccountingPeriod, nil
+	case "payments,applied_payments":
+		return CreditNotesListRequestExpandPaymentsAppliedPayments, nil
+	case "payments,applied_payments,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsAccountingPeriod, nil
+	case "payments,applied_payments,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsCompany, nil
+	case "payments,applied_payments,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,contact":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsContact, nil
+	case "payments,applied_payments,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod, nil
+	case "payments,applied_payments,contact,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompany, nil
+	case "payments,applied_payments,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItems, nil
+	case "payments,applied_payments,line_items,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "payments,applied_payments,line_items,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompany, nil
+	case "payments,applied_payments,line_items,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContact, nil
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany, nil
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories, nil
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategories, nil
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact, nil
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,company":
+		return CreditNotesListRequestExpandPaymentsCompany, nil
+	case "payments,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsCompanyAccountingPeriod, nil
+	case "payments,contact":
+		return CreditNotesListRequestExpandPaymentsContact, nil
+	case "payments,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsContactAccountingPeriod, nil
+	case "payments,contact,company":
+		return CreditNotesListRequestExpandPaymentsContactCompany, nil
+	case "payments,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,line_items":
+		return CreditNotesListRequestExpandPaymentsLineItems, nil
+	case "payments,line_items,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsAccountingPeriod, nil
+	case "payments,line_items,company":
+		return CreditNotesListRequestExpandPaymentsLineItemsCompany, nil
+	case "payments,line_items,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,line_items,contact":
+		return CreditNotesListRequestExpandPaymentsLineItemsContact, nil
+	case "payments,line_items,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,line_items,contact,company":
+		return CreditNotesListRequestExpandPaymentsLineItemsContactCompany, nil
+	case "payments,line_items,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategories, nil
+	case "payments,line_items,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,company":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,line_items,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,tracking_categories":
+		return CreditNotesListRequestExpandPaymentsTrackingCategories, nil
+	case "payments,tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,tracking_categories,company":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesCompany, nil
+	case "payments,tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,contact":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesContact, nil
+	case "payments,tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,tracking_categories,contact,company":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return CreditNotesListRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return CreditNotesListRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return CreditNotesListRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return CreditNotesListRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return CreditNotesListRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,accounting_period":
+		return CreditNotesListRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories,contact,company":
+		return CreditNotesListRequestExpandTrackingCategoriesContactCompany, nil
+	case "tracking_categories,contact,company,accounting_period":
+		return CreditNotesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	}
+	var t CreditNotesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditNotesListRequestExpand) Ptr() *CreditNotesListRequestExpand {
+	return &c
+}
+
+type CreditNotesListRequestRemoteFields string
+
+const (
+	CreditNotesListRequestRemoteFieldsStatus     CreditNotesListRequestRemoteFields = "status"
+	CreditNotesListRequestRemoteFieldsStatusType CreditNotesListRequestRemoteFields = "status,type"
+	CreditNotesListRequestRemoteFieldsType       CreditNotesListRequestRemoteFields = "type"
+)
+
+func NewCreditNotesListRequestRemoteFieldsFromString(s string) (CreditNotesListRequestRemoteFields, error) {
+	switch s {
+	case "status":
+		return CreditNotesListRequestRemoteFieldsStatus, nil
+	case "status,type":
+		return CreditNotesListRequestRemoteFieldsStatusType, nil
+	case "type":
+		return CreditNotesListRequestRemoteFieldsType, nil
+	}
+	var t CreditNotesListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditNotesListRequestRemoteFields) Ptr() *CreditNotesListRequestRemoteFields {
+	return &c
+}
+
+type CreditNotesListRequestShowEnumOrigins string
+
+const (
+	CreditNotesListRequestShowEnumOriginsStatus     CreditNotesListRequestShowEnumOrigins = "status"
+	CreditNotesListRequestShowEnumOriginsStatusType CreditNotesListRequestShowEnumOrigins = "status,type"
+	CreditNotesListRequestShowEnumOriginsType       CreditNotesListRequestShowEnumOrigins = "type"
+)
+
+func NewCreditNotesListRequestShowEnumOriginsFromString(s string) (CreditNotesListRequestShowEnumOrigins, error) {
+	switch s {
+	case "status":
+		return CreditNotesListRequestShowEnumOriginsStatus, nil
+	case "status,type":
+		return CreditNotesListRequestShowEnumOriginsStatusType, nil
+	case "type":
+		return CreditNotesListRequestShowEnumOriginsType, nil
+	}
+	var t CreditNotesListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditNotesListRequestShowEnumOrigins) Ptr() *CreditNotesListRequestShowEnumOrigins {
+	return &c
+}
+
+type CreditNotesRetrieveRequestExpand string
+
+const (
+	CreditNotesRetrieveRequestExpandAccountingPeriod                                                                 CreditNotesRetrieveRequestExpand = "accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPayments                                                                  CreditNotesRetrieveRequestExpand = "applied_payments"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsAccountingPeriod                                                  CreditNotesRetrieveRequestExpand = "applied_payments,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsCompany                                                           CreditNotesRetrieveRequestExpand = "applied_payments,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod                                           CreditNotesRetrieveRequestExpand = "applied_payments,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContact                                                           CreditNotesRetrieveRequestExpand = "applied_payments,contact"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod                                           CreditNotesRetrieveRequestExpand = "applied_payments,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompany                                                    CreditNotesRetrieveRequestExpand = "applied_payments,contact,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod                                    CreditNotesRetrieveRequestExpand = "applied_payments,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItems                                                         CreditNotesRetrieveRequestExpand = "applied_payments,line_items"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod                                         CreditNotesRetrieveRequestExpand = "applied_payments,line_items,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompany                                                  CreditNotesRetrieveRequestExpand = "applied_payments,line_items,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod                                  CreditNotesRetrieveRequestExpand = "applied_payments,line_items,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContact                                                  CreditNotesRetrieveRequestExpand = "applied_payments,line_items,contact"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod                                  CreditNotesRetrieveRequestExpand = "applied_payments,line_items,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany                                           CreditNotesRetrieveRequestExpand = "applied_payments,line_items,contact,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod                           CreditNotesRetrieveRequestExpand = "applied_payments,line_items,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories                                       CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod                       CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany                                CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact                                CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany                         CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod         CreditNotesRetrieveRequestExpand = "applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategories                                                CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod                                CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany                                         CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                         CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact                                         CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod                         CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany                                  CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod                  CreditNotesRetrieveRequestExpand = "applied_payments,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandCompany                                                                          CreditNotesRetrieveRequestExpand = "company"
+	CreditNotesRetrieveRequestExpandCompanyAccountingPeriod                                                          CreditNotesRetrieveRequestExpand = "company,accounting_period"
+	CreditNotesRetrieveRequestExpandContact                                                                          CreditNotesRetrieveRequestExpand = "contact"
+	CreditNotesRetrieveRequestExpandContactAccountingPeriod                                                          CreditNotesRetrieveRequestExpand = "contact,accounting_period"
+	CreditNotesRetrieveRequestExpandContactCompany                                                                   CreditNotesRetrieveRequestExpand = "contact,company"
+	CreditNotesRetrieveRequestExpandContactCompanyAccountingPeriod                                                   CreditNotesRetrieveRequestExpand = "contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItems                                                                        CreditNotesRetrieveRequestExpand = "line_items"
+	CreditNotesRetrieveRequestExpandLineItemsAccountingPeriod                                                        CreditNotesRetrieveRequestExpand = "line_items,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsCompany                                                                 CreditNotesRetrieveRequestExpand = "line_items,company"
+	CreditNotesRetrieveRequestExpandLineItemsCompanyAccountingPeriod                                                 CreditNotesRetrieveRequestExpand = "line_items,company,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsContact                                                                 CreditNotesRetrieveRequestExpand = "line_items,contact"
+	CreditNotesRetrieveRequestExpandLineItemsContactAccountingPeriod                                                 CreditNotesRetrieveRequestExpand = "line_items,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsContactCompany                                                          CreditNotesRetrieveRequestExpand = "line_items,contact,company"
+	CreditNotesRetrieveRequestExpandLineItemsContactCompanyAccountingPeriod                                          CreditNotesRetrieveRequestExpand = "line_items,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategories                                                      CreditNotesRetrieveRequestExpand = "line_items,tracking_categories"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod                                      CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesCompany                                               CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod                               CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContact                                               CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod                               CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompany                                        CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod                        CreditNotesRetrieveRequestExpand = "line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPayments                                                                         CreditNotesRetrieveRequestExpand = "payments"
+	CreditNotesRetrieveRequestExpandPaymentsAccountingPeriod                                                         CreditNotesRetrieveRequestExpand = "payments,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPayments                                                          CreditNotesRetrieveRequestExpand = "payments,applied_payments"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod                                          CreditNotesRetrieveRequestExpand = "payments,applied_payments,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompany                                                   CreditNotesRetrieveRequestExpand = "payments,applied_payments,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod                                   CreditNotesRetrieveRequestExpand = "payments,applied_payments,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContact                                                   CreditNotesRetrieveRequestExpand = "payments,applied_payments,contact"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod                                   CreditNotesRetrieveRequestExpand = "payments,applied_payments,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany                                            CreditNotesRetrieveRequestExpand = "payments,applied_payments,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod                            CreditNotesRetrieveRequestExpand = "payments,applied_payments,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems                                                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod                                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany                                          CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod                          CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact                                          CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,contact"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod                          CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany                                   CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod                   CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories                               CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod               CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany                        CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod        CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact                        CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod        CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod CreditNotesRetrieveRequestExpand = "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories                                        CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod                        CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany                                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact                                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod                 CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany                          CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod          CreditNotesRetrieveRequestExpand = "payments,applied_payments,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsCompany                                                                  CreditNotesRetrieveRequestExpand = "payments,company"
+	CreditNotesRetrieveRequestExpandPaymentsCompanyAccountingPeriod                                                  CreditNotesRetrieveRequestExpand = "payments,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsContact                                                                  CreditNotesRetrieveRequestExpand = "payments,contact"
+	CreditNotesRetrieveRequestExpandPaymentsContactAccountingPeriod                                                  CreditNotesRetrieveRequestExpand = "payments,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsContactCompany                                                           CreditNotesRetrieveRequestExpand = "payments,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsContactCompanyAccountingPeriod                                           CreditNotesRetrieveRequestExpand = "payments,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItems                                                                CreditNotesRetrieveRequestExpand = "payments,line_items"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsAccountingPeriod                                                CreditNotesRetrieveRequestExpand = "payments,line_items,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsCompany                                                         CreditNotesRetrieveRequestExpand = "payments,line_items,company"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsCompanyAccountingPeriod                                         CreditNotesRetrieveRequestExpand = "payments,line_items,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsContact                                                         CreditNotesRetrieveRequestExpand = "payments,line_items,contact"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsContactAccountingPeriod                                         CreditNotesRetrieveRequestExpand = "payments,line_items,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsContactCompany                                                  CreditNotesRetrieveRequestExpand = "payments,line_items,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod                                  CreditNotesRetrieveRequestExpand = "payments,line_items,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategories                                              CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod                              CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompany                                       CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod                       CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContact                                       CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod                       CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany                                CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod                CreditNotesRetrieveRequestExpand = "payments,line_items,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategories                                                       CreditNotesRetrieveRequestExpand = "payments,tracking_categories"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod                                       CreditNotesRetrieveRequestExpand = "payments,tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesCompany                                                CreditNotesRetrieveRequestExpand = "payments,tracking_categories,company"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod                                CreditNotesRetrieveRequestExpand = "payments,tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContact                                                CreditNotesRetrieveRequestExpand = "payments,tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod                                CreditNotesRetrieveRequestExpand = "payments,tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompany                                         CreditNotesRetrieveRequestExpand = "payments,tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod                         CreditNotesRetrieveRequestExpand = "payments,tracking_categories,contact,company,accounting_period"
+	CreditNotesRetrieveRequestExpandTrackingCategories                                                               CreditNotesRetrieveRequestExpand = "tracking_categories"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesAccountingPeriod                                               CreditNotesRetrieveRequestExpand = "tracking_categories,accounting_period"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesCompany                                                        CreditNotesRetrieveRequestExpand = "tracking_categories,company"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod                                        CreditNotesRetrieveRequestExpand = "tracking_categories,company,accounting_period"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesContact                                                        CreditNotesRetrieveRequestExpand = "tracking_categories,contact"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod                                        CreditNotesRetrieveRequestExpand = "tracking_categories,contact,accounting_period"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesContactCompany                                                 CreditNotesRetrieveRequestExpand = "tracking_categories,contact,company"
+	CreditNotesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                                 CreditNotesRetrieveRequestExpand = "tracking_categories,contact,company,accounting_period"
+)
+
+func NewCreditNotesRetrieveRequestExpandFromString(s string) (CreditNotesRetrieveRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return CreditNotesRetrieveRequestExpandAccountingPeriod, nil
+	case "applied_payments":
+		return CreditNotesRetrieveRequestExpandAppliedPayments, nil
+	case "applied_payments,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsAccountingPeriod, nil
+	case "applied_payments,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsCompany, nil
+	case "applied_payments,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsCompanyAccountingPeriod, nil
+	case "applied_payments,contact":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsContact, nil
+	case "applied_payments,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsContactAccountingPeriod, nil
+	case "applied_payments,contact,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompany, nil
+	case "applied_payments,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItems, nil
+	case "applied_payments,line_items,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "applied_payments,line_items,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompany, nil
+	case "applied_payments,line_items,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,contact":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContact, nil
+	case "applied_payments,line_items,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "applied_payments,line_items,contact,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompany, nil
+	case "applied_payments,line_items,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategories, nil
+	case "applied_payments,line_items,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "applied_payments,line_items,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,line_items,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategories, nil
+	case "applied_payments,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "applied_payments,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompany, nil
+	case "applied_payments,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContact, nil
+	case "applied_payments,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "applied_payments,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "applied_payments,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "company":
+		return CreditNotesRetrieveRequestExpandCompany, nil
+	case "company,accounting_period":
+		return CreditNotesRetrieveRequestExpandCompanyAccountingPeriod, nil
+	case "contact":
+		return CreditNotesRetrieveRequestExpandContact, nil
+	case "contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandContactAccountingPeriod, nil
+	case "contact,company":
+		return CreditNotesRetrieveRequestExpandContactCompany, nil
+	case "contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandContactCompanyAccountingPeriod, nil
+	case "line_items":
+		return CreditNotesRetrieveRequestExpandLineItems, nil
+	case "line_items,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,company":
+		return CreditNotesRetrieveRequestExpandLineItemsCompany, nil
+	case "line_items,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsCompanyAccountingPeriod, nil
+	case "line_items,contact":
+		return CreditNotesRetrieveRequestExpandLineItemsContact, nil
+	case "line_items,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsContactAccountingPeriod, nil
+	case "line_items,contact,company":
+		return CreditNotesRetrieveRequestExpandLineItemsContactCompany, nil
+	case "line_items,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsContactCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesCompany, nil
+	case "line_items,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContact, nil
+	case "line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "line_items,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompany, nil
+	case "line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments":
+		return CreditNotesRetrieveRequestExpandPayments, nil
+	case "payments,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAccountingPeriod, nil
+	case "payments,applied_payments":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPayments, nil
+	case "payments,applied_payments,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsAccountingPeriod, nil
+	case "payments,applied_payments,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompany, nil
+	case "payments,applied_payments,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContact, nil
+	case "payments,applied_payments,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactAccountingPeriod, nil
+	case "payments,applied_payments,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompany, nil
+	case "payments,applied_payments,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItems, nil
+	case "payments,applied_payments,line_items,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsAccountingPeriod, nil
+	case "payments,applied_payments,line_items,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompany, nil
+	case "payments,applied_payments,line_items,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContact, nil
+	case "payments,applied_payments,line_items,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompany, nil
+	case "payments,applied_payments,line_items,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategories, nil
+	case "payments,applied_payments,line_items,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategories, nil
+	case "payments,applied_payments,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompany, nil
+	case "payments,applied_payments,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContact, nil
+	case "payments,applied_payments,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,applied_payments,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,applied_payments,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsAppliedPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,company":
+		return CreditNotesRetrieveRequestExpandPaymentsCompany, nil
+	case "payments,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsCompanyAccountingPeriod, nil
+	case "payments,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsContact, nil
+	case "payments,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsContactAccountingPeriod, nil
+	case "payments,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsContactCompany, nil
+	case "payments,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsContactCompanyAccountingPeriod, nil
+	case "payments,line_items":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItems, nil
+	case "payments,line_items,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsAccountingPeriod, nil
+	case "payments,line_items,company":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsCompany, nil
+	case "payments,line_items,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsCompanyAccountingPeriod, nil
+	case "payments,line_items,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsContact, nil
+	case "payments,line_items,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsContactAccountingPeriod, nil
+	case "payments,line_items,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsContactCompany, nil
+	case "payments,line_items,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsContactCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategories, nil
+	case "payments,line_items,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompany, nil
+	case "payments,line_items,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContact, nil
+	case "payments,line_items,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,line_items,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompany, nil
+	case "payments,line_items,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsLineItemsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "payments,tracking_categories":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategories, nil
+	case "payments,tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesAccountingPeriod, nil
+	case "payments,tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesCompany, nil
+	case "payments,tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "payments,tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContact, nil
+	case "payments,tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContactAccountingPeriod, nil
+	case "payments,tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompany, nil
+	case "payments,tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandPaymentsTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return CreditNotesRetrieveRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,accounting_period":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories,contact,company":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesContactCompany, nil
+	case "tracking_categories,contact,company,accounting_period":
+		return CreditNotesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	}
+	var t CreditNotesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditNotesRetrieveRequestExpand) Ptr() *CreditNotesRetrieveRequestExpand {
+	return &c
+}
+
+type CreditNotesRetrieveRequestRemoteFields string
+
+const (
+	CreditNotesRetrieveRequestRemoteFieldsStatus     CreditNotesRetrieveRequestRemoteFields = "status"
+	CreditNotesRetrieveRequestRemoteFieldsStatusType CreditNotesRetrieveRequestRemoteFields = "status,type"
+	CreditNotesRetrieveRequestRemoteFieldsType       CreditNotesRetrieveRequestRemoteFields = "type"
+)
+
+func NewCreditNotesRetrieveRequestRemoteFieldsFromString(s string) (CreditNotesRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "status":
+		return CreditNotesRetrieveRequestRemoteFieldsStatus, nil
+	case "status,type":
+		return CreditNotesRetrieveRequestRemoteFieldsStatusType, nil
+	case "type":
+		return CreditNotesRetrieveRequestRemoteFieldsType, nil
+	}
+	var t CreditNotesRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditNotesRetrieveRequestRemoteFields) Ptr() *CreditNotesRetrieveRequestRemoteFields {
+	return &c
+}
+
+type CreditNotesRetrieveRequestShowEnumOrigins string
+
+const (
+	CreditNotesRetrieveRequestShowEnumOriginsStatus     CreditNotesRetrieveRequestShowEnumOrigins = "status"
+	CreditNotesRetrieveRequestShowEnumOriginsStatusType CreditNotesRetrieveRequestShowEnumOrigins = "status,type"
+	CreditNotesRetrieveRequestShowEnumOriginsType       CreditNotesRetrieveRequestShowEnumOrigins = "type"
+)
+
+func NewCreditNotesRetrieveRequestShowEnumOriginsFromString(s string) (CreditNotesRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "status":
+		return CreditNotesRetrieveRequestShowEnumOriginsStatus, nil
+	case "status,type":
+		return CreditNotesRetrieveRequestShowEnumOriginsStatusType, nil
+	case "type":
+		return CreditNotesRetrieveRequestShowEnumOriginsType, nil
+	}
+	var t CreditNotesRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditNotesRetrieveRequestShowEnumOrigins) Ptr() *CreditNotesRetrieveRequestShowEnumOrigins {
+	return &c
 }
