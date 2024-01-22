@@ -13,65 +13,33 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	Ats() atsclient.Client
-	Crm() crmclient.Client
-	Filestorage() filestorageclient.Client
-	Hris() hrisclient.Client
-	Ticketing() ticketingclient.Client
-	Accounting() accountingclient.Client
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
+
+	Ats         *atsclient.Client
+	Crm         *crmclient.Client
+	Filestorage *filestorageclient.Client
+	Hris        *hrisclient.Client
+	Ticketing   *ticketingclient.Client
+	Accounting  *accountingclient.Client
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:           options.BaseURL,
-		httpClient:        options.HTTPClient,
-		header:            options.ToHeader(),
-		atsClient:         atsclient.NewClient(opts...),
-		crmClient:         crmclient.NewClient(opts...),
-		filestorageClient: filestorageclient.NewClient(opts...),
-		hrisClient:        hrisclient.NewClient(opts...),
-		ticketingClient:   ticketingclient.NewClient(opts...),
-		accountingClient:  accountingclient.NewClient(opts...),
+	return &Client{
+		baseURL:     options.BaseURL,
+		caller:      core.NewCaller(options.HTTPClient),
+		header:      options.ToHeader(),
+		Ats:         atsclient.NewClient(opts...),
+		Crm:         crmclient.NewClient(opts...),
+		Filestorage: filestorageclient.NewClient(opts...),
+		Hris:        hrisclient.NewClient(opts...),
+		Ticketing:   ticketingclient.NewClient(opts...),
+		Accounting:  accountingclient.NewClient(opts...),
 	}
-}
-
-type client struct {
-	baseURL           string
-	httpClient        core.HTTPClient
-	header            http.Header
-	atsClient         atsclient.Client
-	crmClient         crmclient.Client
-	filestorageClient filestorageclient.Client
-	hrisClient        hrisclient.Client
-	ticketingClient   ticketingclient.Client
-	accountingClient  accountingclient.Client
-}
-
-func (c *client) Ats() atsclient.Client {
-	return c.atsClient
-}
-
-func (c *client) Crm() crmclient.Client {
-	return c.crmClient
-}
-
-func (c *client) Filestorage() filestorageclient.Client {
-	return c.filestorageClient
-}
-
-func (c *client) Hris() hrisclient.Client {
-	return c.hrisClient
-}
-
-func (c *client) Ticketing() ticketingclient.Client {
-	return c.ticketingClient
-}
-
-func (c *client) Accounting() accountingclient.Client {
-	return c.accountingClient
 }

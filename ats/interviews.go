@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -59,4 +60,126 @@ type InterviewsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type InterviewsListRequestExpand string
+
+const (
+	InterviewsListRequestExpandApplication                                       InterviewsListRequestExpand = "application"
+	InterviewsListRequestExpandApplicationJobInterviewStage                      InterviewsListRequestExpand = "application,job_interview_stage"
+	InterviewsListRequestExpandInterviewers                                      InterviewsListRequestExpand = "interviewers"
+	InterviewsListRequestExpandInterviewersApplication                           InterviewsListRequestExpand = "interviewers,application"
+	InterviewsListRequestExpandInterviewersApplicationJobInterviewStage          InterviewsListRequestExpand = "interviewers,application,job_interview_stage"
+	InterviewsListRequestExpandInterviewersJobInterviewStage                     InterviewsListRequestExpand = "interviewers,job_interview_stage"
+	InterviewsListRequestExpandInterviewersOrganizer                             InterviewsListRequestExpand = "interviewers,organizer"
+	InterviewsListRequestExpandInterviewersOrganizerApplication                  InterviewsListRequestExpand = "interviewers,organizer,application"
+	InterviewsListRequestExpandInterviewersOrganizerApplicationJobInterviewStage InterviewsListRequestExpand = "interviewers,organizer,application,job_interview_stage"
+	InterviewsListRequestExpandInterviewersOrganizerJobInterviewStage            InterviewsListRequestExpand = "interviewers,organizer,job_interview_stage"
+	InterviewsListRequestExpandJobInterviewStage                                 InterviewsListRequestExpand = "job_interview_stage"
+	InterviewsListRequestExpandOrganizer                                         InterviewsListRequestExpand = "organizer"
+	InterviewsListRequestExpandOrganizerApplication                              InterviewsListRequestExpand = "organizer,application"
+	InterviewsListRequestExpandOrganizerApplicationJobInterviewStage             InterviewsListRequestExpand = "organizer,application,job_interview_stage"
+	InterviewsListRequestExpandOrganizerJobInterviewStage                        InterviewsListRequestExpand = "organizer,job_interview_stage"
+)
+
+func NewInterviewsListRequestExpandFromString(s string) (InterviewsListRequestExpand, error) {
+	switch s {
+	case "application":
+		return InterviewsListRequestExpandApplication, nil
+	case "application,job_interview_stage":
+		return InterviewsListRequestExpandApplicationJobInterviewStage, nil
+	case "interviewers":
+		return InterviewsListRequestExpandInterviewers, nil
+	case "interviewers,application":
+		return InterviewsListRequestExpandInterviewersApplication, nil
+	case "interviewers,application,job_interview_stage":
+		return InterviewsListRequestExpandInterviewersApplicationJobInterviewStage, nil
+	case "interviewers,job_interview_stage":
+		return InterviewsListRequestExpandInterviewersJobInterviewStage, nil
+	case "interviewers,organizer":
+		return InterviewsListRequestExpandInterviewersOrganizer, nil
+	case "interviewers,organizer,application":
+		return InterviewsListRequestExpandInterviewersOrganizerApplication, nil
+	case "interviewers,organizer,application,job_interview_stage":
+		return InterviewsListRequestExpandInterviewersOrganizerApplicationJobInterviewStage, nil
+	case "interviewers,organizer,job_interview_stage":
+		return InterviewsListRequestExpandInterviewersOrganizerJobInterviewStage, nil
+	case "job_interview_stage":
+		return InterviewsListRequestExpandJobInterviewStage, nil
+	case "organizer":
+		return InterviewsListRequestExpandOrganizer, nil
+	case "organizer,application":
+		return InterviewsListRequestExpandOrganizerApplication, nil
+	case "organizer,application,job_interview_stage":
+		return InterviewsListRequestExpandOrganizerApplicationJobInterviewStage, nil
+	case "organizer,job_interview_stage":
+		return InterviewsListRequestExpandOrganizerJobInterviewStage, nil
+	}
+	var t InterviewsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InterviewsListRequestExpand) Ptr() *InterviewsListRequestExpand {
+	return &i
+}
+
+type InterviewsRetrieveRequestExpand string
+
+const (
+	InterviewsRetrieveRequestExpandApplication                                       InterviewsRetrieveRequestExpand = "application"
+	InterviewsRetrieveRequestExpandApplicationJobInterviewStage                      InterviewsRetrieveRequestExpand = "application,job_interview_stage"
+	InterviewsRetrieveRequestExpandInterviewers                                      InterviewsRetrieveRequestExpand = "interviewers"
+	InterviewsRetrieveRequestExpandInterviewersApplication                           InterviewsRetrieveRequestExpand = "interviewers,application"
+	InterviewsRetrieveRequestExpandInterviewersApplicationJobInterviewStage          InterviewsRetrieveRequestExpand = "interviewers,application,job_interview_stage"
+	InterviewsRetrieveRequestExpandInterviewersJobInterviewStage                     InterviewsRetrieveRequestExpand = "interviewers,job_interview_stage"
+	InterviewsRetrieveRequestExpandInterviewersOrganizer                             InterviewsRetrieveRequestExpand = "interviewers,organizer"
+	InterviewsRetrieveRequestExpandInterviewersOrganizerApplication                  InterviewsRetrieveRequestExpand = "interviewers,organizer,application"
+	InterviewsRetrieveRequestExpandInterviewersOrganizerApplicationJobInterviewStage InterviewsRetrieveRequestExpand = "interviewers,organizer,application,job_interview_stage"
+	InterviewsRetrieveRequestExpandInterviewersOrganizerJobInterviewStage            InterviewsRetrieveRequestExpand = "interviewers,organizer,job_interview_stage"
+	InterviewsRetrieveRequestExpandJobInterviewStage                                 InterviewsRetrieveRequestExpand = "job_interview_stage"
+	InterviewsRetrieveRequestExpandOrganizer                                         InterviewsRetrieveRequestExpand = "organizer"
+	InterviewsRetrieveRequestExpandOrganizerApplication                              InterviewsRetrieveRequestExpand = "organizer,application"
+	InterviewsRetrieveRequestExpandOrganizerApplicationJobInterviewStage             InterviewsRetrieveRequestExpand = "organizer,application,job_interview_stage"
+	InterviewsRetrieveRequestExpandOrganizerJobInterviewStage                        InterviewsRetrieveRequestExpand = "organizer,job_interview_stage"
+)
+
+func NewInterviewsRetrieveRequestExpandFromString(s string) (InterviewsRetrieveRequestExpand, error) {
+	switch s {
+	case "application":
+		return InterviewsRetrieveRequestExpandApplication, nil
+	case "application,job_interview_stage":
+		return InterviewsRetrieveRequestExpandApplicationJobInterviewStage, nil
+	case "interviewers":
+		return InterviewsRetrieveRequestExpandInterviewers, nil
+	case "interviewers,application":
+		return InterviewsRetrieveRequestExpandInterviewersApplication, nil
+	case "interviewers,application,job_interview_stage":
+		return InterviewsRetrieveRequestExpandInterviewersApplicationJobInterviewStage, nil
+	case "interviewers,job_interview_stage":
+		return InterviewsRetrieveRequestExpandInterviewersJobInterviewStage, nil
+	case "interviewers,organizer":
+		return InterviewsRetrieveRequestExpandInterviewersOrganizer, nil
+	case "interviewers,organizer,application":
+		return InterviewsRetrieveRequestExpandInterviewersOrganizerApplication, nil
+	case "interviewers,organizer,application,job_interview_stage":
+		return InterviewsRetrieveRequestExpandInterviewersOrganizerApplicationJobInterviewStage, nil
+	case "interviewers,organizer,job_interview_stage":
+		return InterviewsRetrieveRequestExpandInterviewersOrganizerJobInterviewStage, nil
+	case "job_interview_stage":
+		return InterviewsRetrieveRequestExpandJobInterviewStage, nil
+	case "organizer":
+		return InterviewsRetrieveRequestExpandOrganizer, nil
+	case "organizer,application":
+		return InterviewsRetrieveRequestExpandOrganizerApplication, nil
+	case "organizer,application,job_interview_stage":
+		return InterviewsRetrieveRequestExpandOrganizerApplicationJobInterviewStage, nil
+	case "organizer,job_interview_stage":
+		return InterviewsRetrieveRequestExpandOrganizerJobInterviewStage, nil
+	}
+	var t InterviewsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InterviewsRetrieveRequestExpand) Ptr() *InterviewsRetrieveRequestExpand {
+	return &i
 }

@@ -3,6 +3,7 @@
 package crm
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -67,4 +68,126 @@ type NotesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type NotesListRequestExpand string
+
+const (
+	NotesListRequestExpandAccount                        NotesListRequestExpand = "account"
+	NotesListRequestExpandAccountOpportunity             NotesListRequestExpand = "account,opportunity"
+	NotesListRequestExpandContact                        NotesListRequestExpand = "contact"
+	NotesListRequestExpandContactAccount                 NotesListRequestExpand = "contact,account"
+	NotesListRequestExpandContactAccountOpportunity      NotesListRequestExpand = "contact,account,opportunity"
+	NotesListRequestExpandContactOpportunity             NotesListRequestExpand = "contact,opportunity"
+	NotesListRequestExpandOpportunity                    NotesListRequestExpand = "opportunity"
+	NotesListRequestExpandOwner                          NotesListRequestExpand = "owner"
+	NotesListRequestExpandOwnerAccount                   NotesListRequestExpand = "owner,account"
+	NotesListRequestExpandOwnerAccountOpportunity        NotesListRequestExpand = "owner,account,opportunity"
+	NotesListRequestExpandOwnerContact                   NotesListRequestExpand = "owner,contact"
+	NotesListRequestExpandOwnerContactAccount            NotesListRequestExpand = "owner,contact,account"
+	NotesListRequestExpandOwnerContactAccountOpportunity NotesListRequestExpand = "owner,contact,account,opportunity"
+	NotesListRequestExpandOwnerContactOpportunity        NotesListRequestExpand = "owner,contact,opportunity"
+	NotesListRequestExpandOwnerOpportunity               NotesListRequestExpand = "owner,opportunity"
+)
+
+func NewNotesListRequestExpandFromString(s string) (NotesListRequestExpand, error) {
+	switch s {
+	case "account":
+		return NotesListRequestExpandAccount, nil
+	case "account,opportunity":
+		return NotesListRequestExpandAccountOpportunity, nil
+	case "contact":
+		return NotesListRequestExpandContact, nil
+	case "contact,account":
+		return NotesListRequestExpandContactAccount, nil
+	case "contact,account,opportunity":
+		return NotesListRequestExpandContactAccountOpportunity, nil
+	case "contact,opportunity":
+		return NotesListRequestExpandContactOpportunity, nil
+	case "opportunity":
+		return NotesListRequestExpandOpportunity, nil
+	case "owner":
+		return NotesListRequestExpandOwner, nil
+	case "owner,account":
+		return NotesListRequestExpandOwnerAccount, nil
+	case "owner,account,opportunity":
+		return NotesListRequestExpandOwnerAccountOpportunity, nil
+	case "owner,contact":
+		return NotesListRequestExpandOwnerContact, nil
+	case "owner,contact,account":
+		return NotesListRequestExpandOwnerContactAccount, nil
+	case "owner,contact,account,opportunity":
+		return NotesListRequestExpandOwnerContactAccountOpportunity, nil
+	case "owner,contact,opportunity":
+		return NotesListRequestExpandOwnerContactOpportunity, nil
+	case "owner,opportunity":
+		return NotesListRequestExpandOwnerOpportunity, nil
+	}
+	var t NotesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (n NotesListRequestExpand) Ptr() *NotesListRequestExpand {
+	return &n
+}
+
+type NotesRetrieveRequestExpand string
+
+const (
+	NotesRetrieveRequestExpandAccount                        NotesRetrieveRequestExpand = "account"
+	NotesRetrieveRequestExpandAccountOpportunity             NotesRetrieveRequestExpand = "account,opportunity"
+	NotesRetrieveRequestExpandContact                        NotesRetrieveRequestExpand = "contact"
+	NotesRetrieveRequestExpandContactAccount                 NotesRetrieveRequestExpand = "contact,account"
+	NotesRetrieveRequestExpandContactAccountOpportunity      NotesRetrieveRequestExpand = "contact,account,opportunity"
+	NotesRetrieveRequestExpandContactOpportunity             NotesRetrieveRequestExpand = "contact,opportunity"
+	NotesRetrieveRequestExpandOpportunity                    NotesRetrieveRequestExpand = "opportunity"
+	NotesRetrieveRequestExpandOwner                          NotesRetrieveRequestExpand = "owner"
+	NotesRetrieveRequestExpandOwnerAccount                   NotesRetrieveRequestExpand = "owner,account"
+	NotesRetrieveRequestExpandOwnerAccountOpportunity        NotesRetrieveRequestExpand = "owner,account,opportunity"
+	NotesRetrieveRequestExpandOwnerContact                   NotesRetrieveRequestExpand = "owner,contact"
+	NotesRetrieveRequestExpandOwnerContactAccount            NotesRetrieveRequestExpand = "owner,contact,account"
+	NotesRetrieveRequestExpandOwnerContactAccountOpportunity NotesRetrieveRequestExpand = "owner,contact,account,opportunity"
+	NotesRetrieveRequestExpandOwnerContactOpportunity        NotesRetrieveRequestExpand = "owner,contact,opportunity"
+	NotesRetrieveRequestExpandOwnerOpportunity               NotesRetrieveRequestExpand = "owner,opportunity"
+)
+
+func NewNotesRetrieveRequestExpandFromString(s string) (NotesRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return NotesRetrieveRequestExpandAccount, nil
+	case "account,opportunity":
+		return NotesRetrieveRequestExpandAccountOpportunity, nil
+	case "contact":
+		return NotesRetrieveRequestExpandContact, nil
+	case "contact,account":
+		return NotesRetrieveRequestExpandContactAccount, nil
+	case "contact,account,opportunity":
+		return NotesRetrieveRequestExpandContactAccountOpportunity, nil
+	case "contact,opportunity":
+		return NotesRetrieveRequestExpandContactOpportunity, nil
+	case "opportunity":
+		return NotesRetrieveRequestExpandOpportunity, nil
+	case "owner":
+		return NotesRetrieveRequestExpandOwner, nil
+	case "owner,account":
+		return NotesRetrieveRequestExpandOwnerAccount, nil
+	case "owner,account,opportunity":
+		return NotesRetrieveRequestExpandOwnerAccountOpportunity, nil
+	case "owner,contact":
+		return NotesRetrieveRequestExpandOwnerContact, nil
+	case "owner,contact,account":
+		return NotesRetrieveRequestExpandOwnerContactAccount, nil
+	case "owner,contact,account,opportunity":
+		return NotesRetrieveRequestExpandOwnerContactAccountOpportunity, nil
+	case "owner,contact,opportunity":
+		return NotesRetrieveRequestExpandOwnerContactOpportunity, nil
+	case "owner,opportunity":
+		return NotesRetrieveRequestExpandOwnerOpportunity, nil
+	}
+	var t NotesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (n NotesRetrieveRequestExpand) Ptr() *NotesRetrieveRequestExpand {
+	return &n
 }

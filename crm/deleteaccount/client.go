@@ -8,46 +8,39 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	Delete(ctx context.Context) error
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Delete a linked account.
-func (c *client) Delete(ctx context.Context) error {
+func (c *Client) Delete(ctx context.Context) error {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := baseURL + "/" + "api/crm/v1/delete-account"
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		nil,
-		nil,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:     endpointURL,
+			Method:  http.MethodPost,
+			Headers: c.header,
+		},
 	); err != nil {
 		return err
 	}

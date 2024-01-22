@@ -3,6 +3,7 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -29,12 +30,12 @@ type TimeOffBalancesListRequest struct {
 	PageSize *int `json:"-"`
 	// If provided, will only return TimeOffBalance with this policy type. Options: ('VACATION', 'SICK', 'PERSONAL', 'JURY_DUTY', 'VOLUNTEER', 'BEREAVEMENT')
 	//
-	// * `VACATION` - VACATION
-	// * `SICK` - SICK
-	// * `PERSONAL` - PERSONAL
-	// * `JURY_DUTY` - JURY_DUTY
-	// * `VOLUNTEER` - VOLUNTEER
-	// * `BEREAVEMENT` - BEREAVEMENT
+	// - `VACATION` - VACATION
+	// - `SICK` - SICK
+	// - `PERSONAL` - PERSONAL
+	// - `JURY_DUTY` - JURY_DUTY
+	// - `VOLUNTEER` - VOLUNTEER
+	// - `BEREAVEMENT` - BEREAVEMENT
 	PolicyType *TimeOffBalancesListRequestPolicyType `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-"`
@@ -53,4 +54,38 @@ type TimeOffBalancesRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type TimeOffBalancesListRequestPolicyType string
+
+const (
+	TimeOffBalancesListRequestPolicyTypeBereavement TimeOffBalancesListRequestPolicyType = "BEREAVEMENT"
+	TimeOffBalancesListRequestPolicyTypeJuryDuty    TimeOffBalancesListRequestPolicyType = "JURY_DUTY"
+	TimeOffBalancesListRequestPolicyTypePersonal    TimeOffBalancesListRequestPolicyType = "PERSONAL"
+	TimeOffBalancesListRequestPolicyTypeSick        TimeOffBalancesListRequestPolicyType = "SICK"
+	TimeOffBalancesListRequestPolicyTypeVacation    TimeOffBalancesListRequestPolicyType = "VACATION"
+	TimeOffBalancesListRequestPolicyTypeVolunteer   TimeOffBalancesListRequestPolicyType = "VOLUNTEER"
+)
+
+func NewTimeOffBalancesListRequestPolicyTypeFromString(s string) (TimeOffBalancesListRequestPolicyType, error) {
+	switch s {
+	case "BEREAVEMENT":
+		return TimeOffBalancesListRequestPolicyTypeBereavement, nil
+	case "JURY_DUTY":
+		return TimeOffBalancesListRequestPolicyTypeJuryDuty, nil
+	case "PERSONAL":
+		return TimeOffBalancesListRequestPolicyTypePersonal, nil
+	case "SICK":
+		return TimeOffBalancesListRequestPolicyTypeSick, nil
+	case "VACATION":
+		return TimeOffBalancesListRequestPolicyTypeVacation, nil
+	case "VOLUNTEER":
+		return TimeOffBalancesListRequestPolicyTypeVolunteer, nil
+	}
+	var t TimeOffBalancesListRequestPolicyType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffBalancesListRequestPolicyType) Ptr() *TimeOffBalancesListRequestPolicyType {
+	return &t
 }

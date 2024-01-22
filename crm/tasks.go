@@ -3,6 +3,7 @@
 package crm
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -67,4 +68,78 @@ type TasksRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type TasksListRequestExpand string
+
+const (
+	TasksListRequestExpandAccount                 TasksListRequestExpand = "account"
+	TasksListRequestExpandAccountOpportunity      TasksListRequestExpand = "account,opportunity"
+	TasksListRequestExpandOpportunity             TasksListRequestExpand = "opportunity"
+	TasksListRequestExpandOwner                   TasksListRequestExpand = "owner"
+	TasksListRequestExpandOwnerAccount            TasksListRequestExpand = "owner,account"
+	TasksListRequestExpandOwnerAccountOpportunity TasksListRequestExpand = "owner,account,opportunity"
+	TasksListRequestExpandOwnerOpportunity        TasksListRequestExpand = "owner,opportunity"
+)
+
+func NewTasksListRequestExpandFromString(s string) (TasksListRequestExpand, error) {
+	switch s {
+	case "account":
+		return TasksListRequestExpandAccount, nil
+	case "account,opportunity":
+		return TasksListRequestExpandAccountOpportunity, nil
+	case "opportunity":
+		return TasksListRequestExpandOpportunity, nil
+	case "owner":
+		return TasksListRequestExpandOwner, nil
+	case "owner,account":
+		return TasksListRequestExpandOwnerAccount, nil
+	case "owner,account,opportunity":
+		return TasksListRequestExpandOwnerAccountOpportunity, nil
+	case "owner,opportunity":
+		return TasksListRequestExpandOwnerOpportunity, nil
+	}
+	var t TasksListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TasksListRequestExpand) Ptr() *TasksListRequestExpand {
+	return &t
+}
+
+type TasksRetrieveRequestExpand string
+
+const (
+	TasksRetrieveRequestExpandAccount                 TasksRetrieveRequestExpand = "account"
+	TasksRetrieveRequestExpandAccountOpportunity      TasksRetrieveRequestExpand = "account,opportunity"
+	TasksRetrieveRequestExpandOpportunity             TasksRetrieveRequestExpand = "opportunity"
+	TasksRetrieveRequestExpandOwner                   TasksRetrieveRequestExpand = "owner"
+	TasksRetrieveRequestExpandOwnerAccount            TasksRetrieveRequestExpand = "owner,account"
+	TasksRetrieveRequestExpandOwnerAccountOpportunity TasksRetrieveRequestExpand = "owner,account,opportunity"
+	TasksRetrieveRequestExpandOwnerOpportunity        TasksRetrieveRequestExpand = "owner,opportunity"
+)
+
+func NewTasksRetrieveRequestExpandFromString(s string) (TasksRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return TasksRetrieveRequestExpandAccount, nil
+	case "account,opportunity":
+		return TasksRetrieveRequestExpandAccountOpportunity, nil
+	case "opportunity":
+		return TasksRetrieveRequestExpandOpportunity, nil
+	case "owner":
+		return TasksRetrieveRequestExpandOwner, nil
+	case "owner,account":
+		return TasksRetrieveRequestExpandOwnerAccount, nil
+	case "owner,account,opportunity":
+		return TasksRetrieveRequestExpandOwnerAccountOpportunity, nil
+	case "owner,opportunity":
+		return TasksRetrieveRequestExpandOwnerOpportunity, nil
+	}
+	var t TasksRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TasksRetrieveRequestExpand) Ptr() *TasksRetrieveRequestExpand {
+	return &t
 }

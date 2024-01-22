@@ -3,6 +3,7 @@
 package ticketing
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -36,4 +37,54 @@ type UsersRetrieveRequest struct {
 	Expand *UsersRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type UsersListRequestExpand string
+
+const (
+	UsersListRequestExpandRoles      UsersListRequestExpand = "roles"
+	UsersListRequestExpandTeams      UsersListRequestExpand = "teams"
+	UsersListRequestExpandTeamsRoles UsersListRequestExpand = "teams,roles"
+)
+
+func NewUsersListRequestExpandFromString(s string) (UsersListRequestExpand, error) {
+	switch s {
+	case "roles":
+		return UsersListRequestExpandRoles, nil
+	case "teams":
+		return UsersListRequestExpandTeams, nil
+	case "teams,roles":
+		return UsersListRequestExpandTeamsRoles, nil
+	}
+	var t UsersListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (u UsersListRequestExpand) Ptr() *UsersListRequestExpand {
+	return &u
+}
+
+type UsersRetrieveRequestExpand string
+
+const (
+	UsersRetrieveRequestExpandRoles      UsersRetrieveRequestExpand = "roles"
+	UsersRetrieveRequestExpandTeams      UsersRetrieveRequestExpand = "teams"
+	UsersRetrieveRequestExpandTeamsRoles UsersRetrieveRequestExpand = "teams,roles"
+)
+
+func NewUsersRetrieveRequestExpandFromString(s string) (UsersRetrieveRequestExpand, error) {
+	switch s {
+	case "roles":
+		return UsersRetrieveRequestExpandRoles, nil
+	case "teams":
+		return UsersRetrieveRequestExpandTeams, nil
+	case "teams,roles":
+		return UsersRetrieveRequestExpandTeamsRoles, nil
+	}
+	var t UsersRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (u UsersRetrieveRequestExpand) Ptr() *UsersRetrieveRequestExpand {
+	return &u
 }

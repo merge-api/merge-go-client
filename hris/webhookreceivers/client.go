@@ -9,31 +9,26 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	List(ctx context.Context) ([]*hris.WebhookReceiver, error)
-	Create(ctx context.Context, request *hris.WebhookReceiverRequest) (*hris.WebhookReceiver, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `WebhookReceiver` objects.
-func (c *client) List(ctx context.Context) ([]*hris.WebhookReceiver, error) {
+func (c *Client) List(ctx context.Context) ([]*hris.WebhookReceiver, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -41,24 +36,22 @@ func (c *client) List(ctx context.Context) ([]*hris.WebhookReceiver, error) {
 	endpointURL := baseURL + "/" + "api/hris/v1/webhook-receivers"
 
 	var response []*hris.WebhookReceiver
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates a `WebhookReceiver` object with the given values.
-func (c *client) Create(ctx context.Context, request *hris.WebhookReceiverRequest) (*hris.WebhookReceiver, error) {
+func (c *Client) Create(ctx context.Context, request *hris.WebhookReceiverRequest) (*hris.WebhookReceiver, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -66,18 +59,17 @@ func (c *client) Create(ctx context.Context, request *hris.WebhookReceiverReques
 	endpointURL := baseURL + "/" + "api/hris/v1/webhook-receivers"
 
 	var response *hris.WebhookReceiver
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

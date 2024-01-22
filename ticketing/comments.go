@@ -3,6 +3,7 @@
 package ticketing
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -46,4 +47,78 @@ type CommentsRetrieveRequest struct {
 	Expand *CommentsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type CommentsListRequestExpand string
+
+const (
+	CommentsListRequestExpandContact           CommentsListRequestExpand = "contact"
+	CommentsListRequestExpandContactTicket     CommentsListRequestExpand = "contact,ticket"
+	CommentsListRequestExpandTicket            CommentsListRequestExpand = "ticket"
+	CommentsListRequestExpandUser              CommentsListRequestExpand = "user"
+	CommentsListRequestExpandUserContact       CommentsListRequestExpand = "user,contact"
+	CommentsListRequestExpandUserContactTicket CommentsListRequestExpand = "user,contact,ticket"
+	CommentsListRequestExpandUserTicket        CommentsListRequestExpand = "user,ticket"
+)
+
+func NewCommentsListRequestExpandFromString(s string) (CommentsListRequestExpand, error) {
+	switch s {
+	case "contact":
+		return CommentsListRequestExpandContact, nil
+	case "contact,ticket":
+		return CommentsListRequestExpandContactTicket, nil
+	case "ticket":
+		return CommentsListRequestExpandTicket, nil
+	case "user":
+		return CommentsListRequestExpandUser, nil
+	case "user,contact":
+		return CommentsListRequestExpandUserContact, nil
+	case "user,contact,ticket":
+		return CommentsListRequestExpandUserContactTicket, nil
+	case "user,ticket":
+		return CommentsListRequestExpandUserTicket, nil
+	}
+	var t CommentsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CommentsListRequestExpand) Ptr() *CommentsListRequestExpand {
+	return &c
+}
+
+type CommentsRetrieveRequestExpand string
+
+const (
+	CommentsRetrieveRequestExpandContact           CommentsRetrieveRequestExpand = "contact"
+	CommentsRetrieveRequestExpandContactTicket     CommentsRetrieveRequestExpand = "contact,ticket"
+	CommentsRetrieveRequestExpandTicket            CommentsRetrieveRequestExpand = "ticket"
+	CommentsRetrieveRequestExpandUser              CommentsRetrieveRequestExpand = "user"
+	CommentsRetrieveRequestExpandUserContact       CommentsRetrieveRequestExpand = "user,contact"
+	CommentsRetrieveRequestExpandUserContactTicket CommentsRetrieveRequestExpand = "user,contact,ticket"
+	CommentsRetrieveRequestExpandUserTicket        CommentsRetrieveRequestExpand = "user,ticket"
+)
+
+func NewCommentsRetrieveRequestExpandFromString(s string) (CommentsRetrieveRequestExpand, error) {
+	switch s {
+	case "contact":
+		return CommentsRetrieveRequestExpandContact, nil
+	case "contact,ticket":
+		return CommentsRetrieveRequestExpandContactTicket, nil
+	case "ticket":
+		return CommentsRetrieveRequestExpandTicket, nil
+	case "user":
+		return CommentsRetrieveRequestExpandUser, nil
+	case "user,contact":
+		return CommentsRetrieveRequestExpandUserContact, nil
+	case "user,contact,ticket":
+		return CommentsRetrieveRequestExpandUserContactTicket, nil
+	case "user,ticket":
+		return CommentsRetrieveRequestExpandUserTicket, nil
+	}
+	var t CommentsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CommentsRetrieveRequestExpand) Ptr() *CommentsRetrieveRequestExpand {
+	return &c
 }

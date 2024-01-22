@@ -3,6 +3,7 @@
 package ticketing
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -30,7 +31,29 @@ type IssuesListRequest struct {
 	StartDate *string `json:"-"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
 	Status *IssuesListRequestStatus `json:"-"`
+}
+
+type IssuesListRequestStatus string
+
+const (
+	IssuesListRequestStatusOngoing  IssuesListRequestStatus = "ONGOING"
+	IssuesListRequestStatusResolved IssuesListRequestStatus = "RESOLVED"
+)
+
+func NewIssuesListRequestStatusFromString(s string) (IssuesListRequestStatus, error) {
+	switch s {
+	case "ONGOING":
+		return IssuesListRequestStatusOngoing, nil
+	case "RESOLVED":
+		return IssuesListRequestStatusResolved, nil
+	}
+	var t IssuesListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i IssuesListRequestStatus) Ptr() *IssuesListRequestStatus {
+	return &i
 }

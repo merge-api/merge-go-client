@@ -5,7 +5,7 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	strconv "strconv"
+	core "github.com/merge-api/merge-go-client/core"
 	time "time"
 )
 
@@ -22,13 +22,41 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetails) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetails
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetails(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetails) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The LinkedAccount Object
+//
 // ### Description
+//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
+//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -43,6 +71,31 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetailsAndActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetailsAndActions(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetailsAndActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountDetailsAndActionsIntegration struct {
@@ -54,53 +107,59 @@ type AccountDetailsAndActionsIntegration struct {
 	Slug                     string            `json:"slug"`
 	PassthroughAvailable     bool              `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `COMPLETE` - COMPLETE
-// * `INCOMPLETE` - INCOMPLETE
-// * `RELINK_NEEDED` - RELINK_NEEDED
-type AccountDetailsAndActionsStatusEnum uint
-
-const (
-	AccountDetailsAndActionsStatusEnumComplete AccountDetailsAndActionsStatusEnum = iota + 1
-	AccountDetailsAndActionsStatusEnumIncomplete
-	AccountDetailsAndActionsStatusEnumRelinkNeeded
-)
-
-func (a AccountDetailsAndActionsStatusEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AccountDetailsAndActionsStatusEnumComplete:
-		return "COMPLETE"
-	case AccountDetailsAndActionsStatusEnumIncomplete:
-		return "INCOMPLETE"
-	case AccountDetailsAndActionsStatusEnumRelinkNeeded:
-		return "RELINK_NEEDED"
-	}
-}
-
-func (a AccountDetailsAndActionsStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AccountDetailsAndActionsStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AccountDetailsAndActionsIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActionsIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "COMPLETE":
-		value := AccountDetailsAndActionsStatusEnumComplete
-		*a = value
-	case "INCOMPLETE":
-		value := AccountDetailsAndActionsStatusEnumIncomplete
-		*a = value
-	case "RELINK_NEEDED":
-		value := AccountDetailsAndActionsStatusEnumRelinkNeeded
-		*a = value
-	}
+	*a = AccountDetailsAndActionsIntegration(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountDetailsAndActionsIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `COMPLETE` - COMPLETE
+// - `INCOMPLETE` - INCOMPLETE
+// - `RELINK_NEEDED` - RELINK_NEEDED
+type AccountDetailsAndActionsStatusEnum string
+
+const (
+	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
+	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
+	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+)
+
+func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
+	switch s {
+	case "COMPLETE":
+		return AccountDetailsAndActionsStatusEnumComplete, nil
+	case "INCOMPLETE":
+		return AccountDetailsAndActionsStatusEnumIncomplete, nil
+	case "RELINK_NEEDED":
+		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	}
+	var t AccountDetailsAndActionsStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatusEnum {
+	return &a
 }
 
 type AccountIntegration struct {
@@ -118,58 +177,117 @@ type AccountIntegration struct {
 	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
 	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
-	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
+	ApiEndpointsToDocumentationUrls map[string]interface{} `json:"api_endpoints_to_documentation_urls,omitempty"`
 	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
 	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountIntegration(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountToken struct {
 	AccountToken string              `json:"account_token"`
 	Integration  *AccountIntegration `json:"integration,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `SAVINGS` - SAVINGS
-// * `CHECKING` - CHECKING
-type AccountTypeEnum uint
-
-const (
-	AccountTypeEnumSavings AccountTypeEnum = iota + 1
-	AccountTypeEnumChecking
-)
-
-func (a AccountTypeEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AccountTypeEnumSavings:
-		return "SAVINGS"
-	case AccountTypeEnumChecking:
-		return "CHECKING"
-	}
-}
-
-func (a AccountTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AccountTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AccountToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "SAVINGS":
-		value := AccountTypeEnumSavings
-		*a = value
-	case "CHECKING":
-		value := AccountTypeEnumChecking
-		*a = value
-	}
+	*a = AccountToken(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountToken) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `SAVINGS` - SAVINGS
+// - `CHECKING` - CHECKING
+type AccountTypeEnum string
+
+const (
+	AccountTypeEnumSavings  AccountTypeEnum = "SAVINGS"
+	AccountTypeEnumChecking AccountTypeEnum = "CHECKING"
+)
+
+func NewAccountTypeEnumFromString(s string) (AccountTypeEnum, error) {
+	switch s {
+	case "SAVINGS":
+		return AccountTypeEnumSavings, nil
+	case "CHECKING":
+		return AccountTypeEnumChecking, nil
+	}
+	var t AccountTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountTypeEnum) Ptr() *AccountTypeEnum {
+	return &a
 }
 
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AsyncPassthroughReciept) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncPassthroughReciept
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncPassthroughReciept(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncPassthroughReciept) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AuditLogEvent struct {
@@ -180,83 +298,108 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// * `ADMIN` - ADMIN
-	// * `DEVELOPER` - DEVELOPER
-	// * `MEMBER` - MEMBER
-	// * `API` - API
-	// * `SYSTEM` - SYSTEM
-	// * `MERGE_TEAM` - MERGE_TEAM
+	// - `ADMIN` - ADMIN
+	// - `DEVELOPER` - DEVELOPER
+	// - `MEMBER` - MEMBER
+	// - `API` - API
+	// - `SYSTEM` - SYSTEM
+	// - `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// * `INVITED_USER` - INVITED_USER
-	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// * `CREATED_DESTINATION` - CREATED_DESTINATION
-	// * `DELETED_DESTINATION` - DELETED_DESTINATION
-	// * `CHANGED_SCOPES` - CHANGED_SCOPES
-	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// * `RESET_PASSWORD` - RESET_PASSWORD
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// - `INVITED_USER` - INVITED_USER
+	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// - `CREATED_DESTINATION` - CREATED_DESTINATION
+	// - `DELETED_DESTINATION` - DELETED_DESTINATION
+	// - `CHANGED_SCOPES` - CHANGED_SCOPES
+	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// - `RESET_PASSWORD` - RESET_PASSWORD
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AuditLogEvent) UnmarshalJSON(data []byte) error {
+	type unmarshaler AuditLogEvent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AuditLogEvent(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AuditLogEvent) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // Designates the type of event that occurred.
 //
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -316,12 +459,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -380,22 +523,53 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
+//
 // ### Description
+//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
+//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
 	PassthroughAvailable     bool                `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AvailableActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AvailableActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AvailableActions(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AvailableActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The BankInfo Object
+//
 // ### Description
+//
 // The `BankInfo` object is used to represent the Bank Account information for an Employee.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST BankInfo` endpoint and filter by `ID` to show all bank information.
 type BankInfo struct {
 	Id *string `json:"id,omitempty"`
@@ -411,8 +585,8 @@ type BankInfo struct {
 	BankName *string `json:"bank_name,omitempty"`
 	// The bank account type
 	//
-	// * `SAVINGS` - SAVINGS
-	// * `CHECKING` - CHECKING
+	// - `SAVINGS` - SAVINGS
+	// - `CHECKING` - CHECKING
 	AccountType *BankInfoAccountType `json:"account_type,omitempty"`
 	// When the matching bank object was created in the third party system.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
@@ -420,15 +594,40 @@ type BankInfo struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankInfo) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankInfo
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankInfo(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankInfo) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
 }
 
 // The bank account type
 //
-// * `SAVINGS` - SAVINGS
-// * `CHECKING` - CHECKING
+// - `SAVINGS` - SAVINGS
+// - `CHECKING` - CHECKING
 type BankInfoAccountType struct {
 	typeName        string
 	AccountTypeEnum AccountTypeEnum
@@ -544,87 +743,14 @@ func (b *BankInfoEmployee) Accept(visitor BankInfoEmployeeVisitor) error {
 	}
 }
 
-type BankInfoListRequestAccountType uint
-
-const (
-	BankInfoListRequestAccountTypeChecking BankInfoListRequestAccountType = iota + 1
-	BankInfoListRequestAccountTypeSavings
-)
-
-func (b BankInfoListRequestAccountType) String() string {
-	switch b {
-	default:
-		return strconv.Itoa(int(b))
-	case BankInfoListRequestAccountTypeChecking:
-		return "CHECKING"
-	case BankInfoListRequestAccountTypeSavings:
-		return "SAVINGS"
-	}
-}
-
-func (b BankInfoListRequestAccountType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", b.String())), nil
-}
-
-func (b *BankInfoListRequestAccountType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "CHECKING":
-		value := BankInfoListRequestAccountTypeChecking
-		*b = value
-	case "SAVINGS":
-		value := BankInfoListRequestAccountTypeSavings
-		*b = value
-	}
-	return nil
-}
-
-type BankInfoListRequestOrderBy uint
-
-const (
-	BankInfoListRequestOrderByRemoteCreatedAtDescending BankInfoListRequestOrderBy = iota + 1
-	BankInfoListRequestOrderByRemoteCreatedAtAscending
-)
-
-func (b BankInfoListRequestOrderBy) String() string {
-	switch b {
-	default:
-		return strconv.Itoa(int(b))
-	case BankInfoListRequestOrderByRemoteCreatedAtDescending:
-		return "-remote_created_at"
-	case BankInfoListRequestOrderByRemoteCreatedAtAscending:
-		return "remote_created_at"
-	}
-}
-
-func (b BankInfoListRequestOrderBy) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", b.String())), nil
-}
-
-func (b *BankInfoListRequestOrderBy) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "-remote_created_at":
-		value := BankInfoListRequestOrderByRemoteCreatedAtDescending
-		*b = value
-	case "remote_created_at":
-		value := BankInfoListRequestOrderByRemoteCreatedAtAscending
-		*b = value
-	}
-	return nil
-}
-
 // # The Benefit Object
+//
 // ### Description
+//
 // The `Benefit` object is used to represent a benefit that an employee has enrolled in.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Benefits` endpoint and filter by `ID` to show all benefits.
 type Benefit struct {
 	Id *string `json:"id,omitempty"`
@@ -650,9 +776,34 @@ type Benefit struct {
 	EmployerBenefit *string    `json:"employer_benefit,omitempty"`
 	CreatedAt       *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *Benefit) UnmarshalJSON(data []byte) error {
+	type unmarshaler Benefit
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = Benefit(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *Benefit) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
 }
 
 // The employee on the plan.
@@ -713,228 +864,169 @@ func (b *BenefitEmployee) Accept(visitor BenefitEmployeeVisitor) error {
 	}
 }
 
-// * `MEDICAL` - MEDICAL
-// * `HEALTH_SAVINGS` - HEALTH_SAVINGS
-// * `INSURANCE` - INSURANCE
-// * `RETIREMENT` - RETIREMENT
-// * `OTHER` - OTHER
-type BenefitPlanTypeEnum uint
+// - `MEDICAL` - MEDICAL
+// - `HEALTH_SAVINGS` - HEALTH_SAVINGS
+// - `INSURANCE` - INSURANCE
+// - `RETIREMENT` - RETIREMENT
+// - `OTHER` - OTHER
+type BenefitPlanTypeEnum string
 
 const (
-	BenefitPlanTypeEnumMedical BenefitPlanTypeEnum = iota + 1
-	BenefitPlanTypeEnumHealthSavings
-	BenefitPlanTypeEnumInsurance
-	BenefitPlanTypeEnumRetirement
-	BenefitPlanTypeEnumOther
+	BenefitPlanTypeEnumMedical       BenefitPlanTypeEnum = "MEDICAL"
+	BenefitPlanTypeEnumHealthSavings BenefitPlanTypeEnum = "HEALTH_SAVINGS"
+	BenefitPlanTypeEnumInsurance     BenefitPlanTypeEnum = "INSURANCE"
+	BenefitPlanTypeEnumRetirement    BenefitPlanTypeEnum = "RETIREMENT"
+	BenefitPlanTypeEnumOther         BenefitPlanTypeEnum = "OTHER"
 )
 
-func (b BenefitPlanTypeEnum) String() string {
-	switch b {
-	default:
-		return strconv.Itoa(int(b))
-	case BenefitPlanTypeEnumMedical:
-		return "MEDICAL"
-	case BenefitPlanTypeEnumHealthSavings:
-		return "HEALTH_SAVINGS"
-	case BenefitPlanTypeEnumInsurance:
-		return "INSURANCE"
-	case BenefitPlanTypeEnumRetirement:
-		return "RETIREMENT"
-	case BenefitPlanTypeEnumOther:
-		return "OTHER"
-	}
-}
-
-func (b BenefitPlanTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", b.String())), nil
-}
-
-func (b *BenefitPlanTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewBenefitPlanTypeEnumFromString(s string) (BenefitPlanTypeEnum, error) {
+	switch s {
 	case "MEDICAL":
-		value := BenefitPlanTypeEnumMedical
-		*b = value
+		return BenefitPlanTypeEnumMedical, nil
 	case "HEALTH_SAVINGS":
-		value := BenefitPlanTypeEnumHealthSavings
-		*b = value
+		return BenefitPlanTypeEnumHealthSavings, nil
 	case "INSURANCE":
-		value := BenefitPlanTypeEnumInsurance
-		*b = value
+		return BenefitPlanTypeEnumInsurance, nil
 	case "RETIREMENT":
-		value := BenefitPlanTypeEnumRetirement
-		*b = value
+		return BenefitPlanTypeEnumRetirement, nil
 	case "OTHER":
-		value := BenefitPlanTypeEnumOther
-		*b = value
+		return BenefitPlanTypeEnumOther, nil
 	}
-	return nil
+	var t BenefitPlanTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoriesEnum uint
+func (b BenefitPlanTypeEnum) Ptr() *BenefitPlanTypeEnum {
+	return &b
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoriesEnum string
 
 const (
-	CategoriesEnumHris CategoriesEnum = iota + 1
-	CategoriesEnumAts
-	CategoriesEnumAccounting
-	CategoriesEnumTicketing
-	CategoriesEnumCrm
-	CategoriesEnumMktg
-	CategoriesEnumFilestorage
+	CategoriesEnumHris        CategoriesEnum = "hris"
+	CategoriesEnumAts         CategoriesEnum = "ats"
+	CategoriesEnumAccounting  CategoriesEnum = "accounting"
+	CategoriesEnumTicketing   CategoriesEnum = "ticketing"
+	CategoriesEnumCrm         CategoriesEnum = "crm"
+	CategoriesEnumMktg        CategoriesEnum = "mktg"
+	CategoriesEnumFilestorage CategoriesEnum = "filestorage"
 )
 
-func (c CategoriesEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoriesEnumHris:
-		return "hris"
-	case CategoriesEnumAts:
-		return "ats"
-	case CategoriesEnumAccounting:
-		return "accounting"
-	case CategoriesEnumTicketing:
-		return "ticketing"
-	case CategoriesEnumCrm:
-		return "crm"
-	case CategoriesEnumMktg:
-		return "mktg"
-	case CategoriesEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoriesEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCategoriesEnumFromString(s string) (CategoriesEnum, error) {
+	switch s {
 	case "hris":
-		value := CategoriesEnumHris
-		*c = value
+		return CategoriesEnumHris, nil
 	case "ats":
-		value := CategoriesEnumAts
-		*c = value
+		return CategoriesEnumAts, nil
 	case "accounting":
-		value := CategoriesEnumAccounting
-		*c = value
+		return CategoriesEnumAccounting, nil
 	case "ticketing":
-		value := CategoriesEnumTicketing
-		*c = value
+		return CategoriesEnumTicketing, nil
 	case "crm":
-		value := CategoriesEnumCrm
-		*c = value
+		return CategoriesEnumCrm, nil
 	case "mktg":
-		value := CategoriesEnumMktg
-		*c = value
+		return CategoriesEnumMktg, nil
 	case "filestorage":
-		value := CategoriesEnumFilestorage
-		*c = value
+		return CategoriesEnumFilestorage, nil
 	}
-	return nil
+	var t CategoriesEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoryEnum uint
+func (c CategoriesEnum) Ptr() *CategoriesEnum {
+	return &c
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoryEnum string
 
 const (
-	CategoryEnumHris CategoryEnum = iota + 1
-	CategoryEnumAts
-	CategoryEnumAccounting
-	CategoryEnumTicketing
-	CategoryEnumCrm
-	CategoryEnumMktg
-	CategoryEnumFilestorage
+	CategoryEnumHris        CategoryEnum = "hris"
+	CategoryEnumAts         CategoryEnum = "ats"
+	CategoryEnumAccounting  CategoryEnum = "accounting"
+	CategoryEnumTicketing   CategoryEnum = "ticketing"
+	CategoryEnumCrm         CategoryEnum = "crm"
+	CategoryEnumMktg        CategoryEnum = "mktg"
+	CategoryEnumFilestorage CategoryEnum = "filestorage"
 )
 
-func (c CategoryEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoryEnumHris:
-		return "hris"
-	case CategoryEnumAts:
-		return "ats"
-	case CategoryEnumAccounting:
-		return "accounting"
-	case CategoryEnumTicketing:
-		return "ticketing"
-	case CategoryEnumCrm:
-		return "crm"
-	case CategoryEnumMktg:
-		return "mktg"
-	case CategoryEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoryEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCategoryEnumFromString(s string) (CategoryEnum, error) {
+	switch s {
 	case "hris":
-		value := CategoryEnumHris
-		*c = value
+		return CategoryEnumHris, nil
 	case "ats":
-		value := CategoryEnumAts
-		*c = value
+		return CategoryEnumAts, nil
 	case "accounting":
-		value := CategoryEnumAccounting
-		*c = value
+		return CategoryEnumAccounting, nil
 	case "ticketing":
-		value := CategoryEnumTicketing
-		*c = value
+		return CategoryEnumTicketing, nil
 	case "crm":
-		value := CategoryEnumCrm
-		*c = value
+		return CategoryEnumCrm, nil
 	case "mktg":
-		value := CategoryEnumMktg
-		*c = value
+		return CategoryEnumMktg, nil
 	case "filestorage":
-		value := CategoryEnumFilestorage
-		*c = value
+		return CategoryEnumFilestorage, nil
 	}
-	return nil
+	var t CategoryEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CategoryEnum) Ptr() *CategoryEnum {
+	return &c
 }
 
 type CommonModelScopesBodyRequest struct {
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
 	DisabledFields []string             `json:"disabled_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommonModelScopesBodyRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommonModelScopesBodyRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommonModelScopesBodyRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommonModelScopesBodyRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // # The Company Object
+//
 // ### Description
+//
 // The `Company` object is used to represent a company within the HRIS / Payroll system.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Companies` endpoint and filter by `ID` to show all companies.
 type Company struct {
 	Id *string `json:"id,omitempty"`
@@ -950,9 +1042,34 @@ type Company struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *Company) UnmarshalJSON(data []byte) error {
+	type unmarshaler Company
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = Company(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *Company) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type ConditionSchema struct {
@@ -960,7 +1077,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -968,27 +1085,52 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// * `BOOLEAN` - BOOLEAN
-	// * `DATE` - DATE
-	// * `DATE_TIME` - DATE_TIME
-	// * `INTEGER` - INTEGER
-	// * `FLOAT` - FLOAT
-	// * `STRING` - STRING
-	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// - `BOOLEAN` - BOOLEAN
+	// - `DATE` - DATE
+	// - `DATE_TIME` - DATE_TIME
+	// - `INTEGER` - INTEGER
+	// - `FLOAT` - FLOAT
+	// - `STRING` - STRING
+	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *ConditionSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ConditionSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = ConditionSchema(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *ConditionSchema) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The type of value(s) that can be set for this condition.
 //
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -1046,1855 +1188,1070 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
-type ConditionTypeEnum uint
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+type ConditionTypeEnum string
 
 const (
-	ConditionTypeEnumBoolean ConditionTypeEnum = iota + 1
-	ConditionTypeEnumDate
-	ConditionTypeEnumDateTime
-	ConditionTypeEnumInteger
-	ConditionTypeEnumFloat
-	ConditionTypeEnumString
-	ConditionTypeEnumListOfStrings
+	ConditionTypeEnumBoolean       ConditionTypeEnum = "BOOLEAN"
+	ConditionTypeEnumDate          ConditionTypeEnum = "DATE"
+	ConditionTypeEnumDateTime      ConditionTypeEnum = "DATE_TIME"
+	ConditionTypeEnumInteger       ConditionTypeEnum = "INTEGER"
+	ConditionTypeEnumFloat         ConditionTypeEnum = "FLOAT"
+	ConditionTypeEnumString        ConditionTypeEnum = "STRING"
+	ConditionTypeEnumListOfStrings ConditionTypeEnum = "LIST_OF_STRINGS"
 )
 
-func (c ConditionTypeEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ConditionTypeEnumBoolean:
-		return "BOOLEAN"
-	case ConditionTypeEnumDate:
-		return "DATE"
-	case ConditionTypeEnumDateTime:
-		return "DATE_TIME"
-	case ConditionTypeEnumInteger:
-		return "INTEGER"
-	case ConditionTypeEnumFloat:
-		return "FLOAT"
-	case ConditionTypeEnumString:
-		return "STRING"
-	case ConditionTypeEnumListOfStrings:
-		return "LIST_OF_STRINGS"
-	}
-}
-
-func (c ConditionTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewConditionTypeEnumFromString(s string) (ConditionTypeEnum, error) {
+	switch s {
 	case "BOOLEAN":
-		value := ConditionTypeEnumBoolean
-		*c = value
+		return ConditionTypeEnumBoolean, nil
 	case "DATE":
-		value := ConditionTypeEnumDate
-		*c = value
+		return ConditionTypeEnumDate, nil
 	case "DATE_TIME":
-		value := ConditionTypeEnumDateTime
-		*c = value
+		return ConditionTypeEnumDateTime, nil
 	case "INTEGER":
-		value := ConditionTypeEnumInteger
-		*c = value
+		return ConditionTypeEnumInteger, nil
 	case "FLOAT":
-		value := ConditionTypeEnumFloat
-		*c = value
+		return ConditionTypeEnumFloat, nil
 	case "STRING":
-		value := ConditionTypeEnumString
-		*c = value
+		return ConditionTypeEnumString, nil
 	case "LIST_OF_STRINGS":
-		value := ConditionTypeEnumListOfStrings
-		*c = value
+		return ConditionTypeEnumListOfStrings, nil
 	}
-	return nil
+	var t ConditionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `AF` - Afghanistan
-// * `AX` - Åland Islands
-// * `AL` - Albania
-// * `DZ` - Algeria
-// * `AS` - American Samoa
-// * `AD` - Andorra
-// * `AO` - Angola
-// * `AI` - Anguilla
-// * `AQ` - Antarctica
-// * `AG` - Antigua and Barbuda
-// * `AR` - Argentina
-// * `AM` - Armenia
-// * `AW` - Aruba
-// * `AU` - Australia
-// * `AT` - Austria
-// * `AZ` - Azerbaijan
-// * `BS` - Bahamas
-// * `BH` - Bahrain
-// * `BD` - Bangladesh
-// * `BB` - Barbados
-// * `BY` - Belarus
-// * `BE` - Belgium
-// * `BZ` - Belize
-// * `BJ` - Benin
-// * `BM` - Bermuda
-// * `BT` - Bhutan
-// * `BO` - Bolivia
-// * `BQ` - Bonaire, Sint Eustatius and Saba
-// * `BA` - Bosnia and Herzegovina
-// * `BW` - Botswana
-// * `BV` - Bouvet Island
-// * `BR` - Brazil
-// * `IO` - British Indian Ocean Territory
-// * `BN` - Brunei
-// * `BG` - Bulgaria
-// * `BF` - Burkina Faso
-// * `BI` - Burundi
-// * `CV` - Cabo Verde
-// * `KH` - Cambodia
-// * `CM` - Cameroon
-// * `CA` - Canada
-// * `KY` - Cayman Islands
-// * `CF` - Central African Republic
-// * `TD` - Chad
-// * `CL` - Chile
-// * `CN` - China
-// * `CX` - Christmas Island
-// * `CC` - Cocos (Keeling) Islands
-// * `CO` - Colombia
-// * `KM` - Comoros
-// * `CG` - Congo
-// * `CD` - Congo (the Democratic Republic of the)
-// * `CK` - Cook Islands
-// * `CR` - Costa Rica
-// * `CI` - Côte d'Ivoire
-// * `HR` - Croatia
-// * `CU` - Cuba
-// * `CW` - Curaçao
-// * `CY` - Cyprus
-// * `CZ` - Czechia
-// * `DK` - Denmark
-// * `DJ` - Djibouti
-// * `DM` - Dominica
-// * `DO` - Dominican Republic
-// * `EC` - Ecuador
-// * `EG` - Egypt
-// * `SV` - El Salvador
-// * `GQ` - Equatorial Guinea
-// * `ER` - Eritrea
-// * `EE` - Estonia
-// * `SZ` - Eswatini
-// * `ET` - Ethiopia
-// * `FK` - Falkland Islands (Malvinas)
-// * `FO` - Faroe Islands
-// * `FJ` - Fiji
-// * `FI` - Finland
-// * `FR` - France
-// * `GF` - French Guiana
-// * `PF` - French Polynesia
-// * `TF` - French Southern Territories
-// * `GA` - Gabon
-// * `GM` - Gambia
-// * `GE` - Georgia
-// * `DE` - Germany
-// * `GH` - Ghana
-// * `GI` - Gibraltar
-// * `GR` - Greece
-// * `GL` - Greenland
-// * `GD` - Grenada
-// * `GP` - Guadeloupe
-// * `GU` - Guam
-// * `GT` - Guatemala
-// * `GG` - Guernsey
-// * `GN` - Guinea
-// * `GW` - Guinea-Bissau
-// * `GY` - Guyana
-// * `HT` - Haiti
-// * `HM` - Heard Island and McDonald Islands
-// * `VA` - Holy See
-// * `HN` - Honduras
-// * `HK` - Hong Kong
-// * `HU` - Hungary
-// * `IS` - Iceland
-// * `IN` - India
-// * `ID` - Indonesia
-// * `IR` - Iran
-// * `IQ` - Iraq
-// * `IE` - Ireland
-// * `IM` - Isle of Man
-// * `IL` - Israel
-// * `IT` - Italy
-// * `JM` - Jamaica
-// * `JP` - Japan
-// * `JE` - Jersey
-// * `JO` - Jordan
-// * `KZ` - Kazakhstan
-// * `KE` - Kenya
-// * `KI` - Kiribati
-// * `KW` - Kuwait
-// * `KG` - Kyrgyzstan
-// * `LA` - Laos
-// * `LV` - Latvia
-// * `LB` - Lebanon
-// * `LS` - Lesotho
-// * `LR` - Liberia
-// * `LY` - Libya
-// * `LI` - Liechtenstein
-// * `LT` - Lithuania
-// * `LU` - Luxembourg
-// * `MO` - Macao
-// * `MG` - Madagascar
-// * `MW` - Malawi
-// * `MY` - Malaysia
-// * `MV` - Maldives
-// * `ML` - Mali
-// * `MT` - Malta
-// * `MH` - Marshall Islands
-// * `MQ` - Martinique
-// * `MR` - Mauritania
-// * `MU` - Mauritius
-// * `YT` - Mayotte
-// * `MX` - Mexico
-// * `FM` - Micronesia (Federated States of)
-// * `MD` - Moldova
-// * `MC` - Monaco
-// * `MN` - Mongolia
-// * `ME` - Montenegro
-// * `MS` - Montserrat
-// * `MA` - Morocco
-// * `MZ` - Mozambique
-// * `MM` - Myanmar
-// * `NA` - Namibia
-// * `NR` - Nauru
-// * `NP` - Nepal
-// * `NL` - Netherlands
-// * `NC` - New Caledonia
-// * `NZ` - New Zealand
-// * `NI` - Nicaragua
-// * `NE` - Niger
-// * `NG` - Nigeria
-// * `NU` - Niue
-// * `NF` - Norfolk Island
-// * `KP` - North Korea
-// * `MK` - North Macedonia
-// * `MP` - Northern Mariana Islands
-// * `NO` - Norway
-// * `OM` - Oman
-// * `PK` - Pakistan
-// * `PW` - Palau
-// * `PS` - Palestine, State of
-// * `PA` - Panama
-// * `PG` - Papua New Guinea
-// * `PY` - Paraguay
-// * `PE` - Peru
-// * `PH` - Philippines
-// * `PN` - Pitcairn
-// * `PL` - Poland
-// * `PT` - Portugal
-// * `PR` - Puerto Rico
-// * `QA` - Qatar
-// * `RE` - Réunion
-// * `RO` - Romania
-// * `RU` - Russia
-// * `RW` - Rwanda
-// * `BL` - Saint Barthélemy
-// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-// * `KN` - Saint Kitts and Nevis
-// * `LC` - Saint Lucia
-// * `MF` - Saint Martin (French part)
-// * `PM` - Saint Pierre and Miquelon
-// * `VC` - Saint Vincent and the Grenadines
-// * `WS` - Samoa
-// * `SM` - San Marino
-// * `ST` - Sao Tome and Principe
-// * `SA` - Saudi Arabia
-// * `SN` - Senegal
-// * `RS` - Serbia
-// * `SC` - Seychelles
-// * `SL` - Sierra Leone
-// * `SG` - Singapore
-// * `SX` - Sint Maarten (Dutch part)
-// * `SK` - Slovakia
-// * `SI` - Slovenia
-// * `SB` - Solomon Islands
-// * `SO` - Somalia
-// * `ZA` - South Africa
-// * `GS` - South Georgia and the South Sandwich Islands
-// * `KR` - South Korea
-// * `SS` - South Sudan
-// * `ES` - Spain
-// * `LK` - Sri Lanka
-// * `SD` - Sudan
-// * `SR` - Suriname
-// * `SJ` - Svalbard and Jan Mayen
-// * `SE` - Sweden
-// * `CH` - Switzerland
-// * `SY` - Syria
-// * `TW` - Taiwan
-// * `TJ` - Tajikistan
-// * `TZ` - Tanzania
-// * `TH` - Thailand
-// * `TL` - Timor-Leste
-// * `TG` - Togo
-// * `TK` - Tokelau
-// * `TO` - Tonga
-// * `TT` - Trinidad and Tobago
-// * `TN` - Tunisia
-// * `TR` - Turkey
-// * `TM` - Turkmenistan
-// * `TC` - Turks and Caicos Islands
-// * `TV` - Tuvalu
-// * `UG` - Uganda
-// * `UA` - Ukraine
-// * `AE` - United Arab Emirates
-// * `GB` - United Kingdom
-// * `UM` - United States Minor Outlying Islands
-// * `US` - United States of America
-// * `UY` - Uruguay
-// * `UZ` - Uzbekistan
-// * `VU` - Vanuatu
-// * `VE` - Venezuela
-// * `VN` - Vietnam
-// * `VG` - Virgin Islands (British)
-// * `VI` - Virgin Islands (U.S.)
-// * `WF` - Wallis and Futuna
-// * `EH` - Western Sahara
-// * `YE` - Yemen
-// * `ZM` - Zambia
-// * `ZW` - Zimbabwe
-type CountryEnum uint
+func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
+	return &c
+}
+
+// - `AF` - Afghanistan
+// - `AX` - Åland Islands
+// - `AL` - Albania
+// - `DZ` - Algeria
+// - `AS` - American Samoa
+// - `AD` - Andorra
+// - `AO` - Angola
+// - `AI` - Anguilla
+// - `AQ` - Antarctica
+// - `AG` - Antigua and Barbuda
+// - `AR` - Argentina
+// - `AM` - Armenia
+// - `AW` - Aruba
+// - `AU` - Australia
+// - `AT` - Austria
+// - `AZ` - Azerbaijan
+// - `BS` - Bahamas
+// - `BH` - Bahrain
+// - `BD` - Bangladesh
+// - `BB` - Barbados
+// - `BY` - Belarus
+// - `BE` - Belgium
+// - `BZ` - Belize
+// - `BJ` - Benin
+// - `BM` - Bermuda
+// - `BT` - Bhutan
+// - `BO` - Bolivia
+// - `BQ` - Bonaire, Sint Eustatius and Saba
+// - `BA` - Bosnia and Herzegovina
+// - `BW` - Botswana
+// - `BV` - Bouvet Island
+// - `BR` - Brazil
+// - `IO` - British Indian Ocean Territory
+// - `BN` - Brunei
+// - `BG` - Bulgaria
+// - `BF` - Burkina Faso
+// - `BI` - Burundi
+// - `CV` - Cabo Verde
+// - `KH` - Cambodia
+// - `CM` - Cameroon
+// - `CA` - Canada
+// - `KY` - Cayman Islands
+// - `CF` - Central African Republic
+// - `TD` - Chad
+// - `CL` - Chile
+// - `CN` - China
+// - `CX` - Christmas Island
+// - `CC` - Cocos (Keeling) Islands
+// - `CO` - Colombia
+// - `KM` - Comoros
+// - `CG` - Congo
+// - `CD` - Congo (the Democratic Republic of the)
+// - `CK` - Cook Islands
+// - `CR` - Costa Rica
+// - `CI` - Côte d'Ivoire
+// - `HR` - Croatia
+// - `CU` - Cuba
+// - `CW` - Curaçao
+// - `CY` - Cyprus
+// - `CZ` - Czechia
+// - `DK` - Denmark
+// - `DJ` - Djibouti
+// - `DM` - Dominica
+// - `DO` - Dominican Republic
+// - `EC` - Ecuador
+// - `EG` - Egypt
+// - `SV` - El Salvador
+// - `GQ` - Equatorial Guinea
+// - `ER` - Eritrea
+// - `EE` - Estonia
+// - `SZ` - Eswatini
+// - `ET` - Ethiopia
+// - `FK` - Falkland Islands (Malvinas)
+// - `FO` - Faroe Islands
+// - `FJ` - Fiji
+// - `FI` - Finland
+// - `FR` - France
+// - `GF` - French Guiana
+// - `PF` - French Polynesia
+// - `TF` - French Southern Territories
+// - `GA` - Gabon
+// - `GM` - Gambia
+// - `GE` - Georgia
+// - `DE` - Germany
+// - `GH` - Ghana
+// - `GI` - Gibraltar
+// - `GR` - Greece
+// - `GL` - Greenland
+// - `GD` - Grenada
+// - `GP` - Guadeloupe
+// - `GU` - Guam
+// - `GT` - Guatemala
+// - `GG` - Guernsey
+// - `GN` - Guinea
+// - `GW` - Guinea-Bissau
+// - `GY` - Guyana
+// - `HT` - Haiti
+// - `HM` - Heard Island and McDonald Islands
+// - `VA` - Holy See
+// - `HN` - Honduras
+// - `HK` - Hong Kong
+// - `HU` - Hungary
+// - `IS` - Iceland
+// - `IN` - India
+// - `ID` - Indonesia
+// - `IR` - Iran
+// - `IQ` - Iraq
+// - `IE` - Ireland
+// - `IM` - Isle of Man
+// - `IL` - Israel
+// - `IT` - Italy
+// - `JM` - Jamaica
+// - `JP` - Japan
+// - `JE` - Jersey
+// - `JO` - Jordan
+// - `KZ` - Kazakhstan
+// - `KE` - Kenya
+// - `KI` - Kiribati
+// - `KW` - Kuwait
+// - `KG` - Kyrgyzstan
+// - `LA` - Laos
+// - `LV` - Latvia
+// - `LB` - Lebanon
+// - `LS` - Lesotho
+// - `LR` - Liberia
+// - `LY` - Libya
+// - `LI` - Liechtenstein
+// - `LT` - Lithuania
+// - `LU` - Luxembourg
+// - `MO` - Macao
+// - `MG` - Madagascar
+// - `MW` - Malawi
+// - `MY` - Malaysia
+// - `MV` - Maldives
+// - `ML` - Mali
+// - `MT` - Malta
+// - `MH` - Marshall Islands
+// - `MQ` - Martinique
+// - `MR` - Mauritania
+// - `MU` - Mauritius
+// - `YT` - Mayotte
+// - `MX` - Mexico
+// - `FM` - Micronesia (Federated States of)
+// - `MD` - Moldova
+// - `MC` - Monaco
+// - `MN` - Mongolia
+// - `ME` - Montenegro
+// - `MS` - Montserrat
+// - `MA` - Morocco
+// - `MZ` - Mozambique
+// - `MM` - Myanmar
+// - `NA` - Namibia
+// - `NR` - Nauru
+// - `NP` - Nepal
+// - `NL` - Netherlands
+// - `NC` - New Caledonia
+// - `NZ` - New Zealand
+// - `NI` - Nicaragua
+// - `NE` - Niger
+// - `NG` - Nigeria
+// - `NU` - Niue
+// - `NF` - Norfolk Island
+// - `KP` - North Korea
+// - `MK` - North Macedonia
+// - `MP` - Northern Mariana Islands
+// - `NO` - Norway
+// - `OM` - Oman
+// - `PK` - Pakistan
+// - `PW` - Palau
+// - `PS` - Palestine, State of
+// - `PA` - Panama
+// - `PG` - Papua New Guinea
+// - `PY` - Paraguay
+// - `PE` - Peru
+// - `PH` - Philippines
+// - `PN` - Pitcairn
+// - `PL` - Poland
+// - `PT` - Portugal
+// - `PR` - Puerto Rico
+// - `QA` - Qatar
+// - `RE` - Réunion
+// - `RO` - Romania
+// - `RU` - Russia
+// - `RW` - Rwanda
+// - `BL` - Saint Barthélemy
+// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+// - `KN` - Saint Kitts and Nevis
+// - `LC` - Saint Lucia
+// - `MF` - Saint Martin (French part)
+// - `PM` - Saint Pierre and Miquelon
+// - `VC` - Saint Vincent and the Grenadines
+// - `WS` - Samoa
+// - `SM` - San Marino
+// - `ST` - Sao Tome and Principe
+// - `SA` - Saudi Arabia
+// - `SN` - Senegal
+// - `RS` - Serbia
+// - `SC` - Seychelles
+// - `SL` - Sierra Leone
+// - `SG` - Singapore
+// - `SX` - Sint Maarten (Dutch part)
+// - `SK` - Slovakia
+// - `SI` - Slovenia
+// - `SB` - Solomon Islands
+// - `SO` - Somalia
+// - `ZA` - South Africa
+// - `GS` - South Georgia and the South Sandwich Islands
+// - `KR` - South Korea
+// - `SS` - South Sudan
+// - `ES` - Spain
+// - `LK` - Sri Lanka
+// - `SD` - Sudan
+// - `SR` - Suriname
+// - `SJ` - Svalbard and Jan Mayen
+// - `SE` - Sweden
+// - `CH` - Switzerland
+// - `SY` - Syria
+// - `TW` - Taiwan
+// - `TJ` - Tajikistan
+// - `TZ` - Tanzania
+// - `TH` - Thailand
+// - `TL` - Timor-Leste
+// - `TG` - Togo
+// - `TK` - Tokelau
+// - `TO` - Tonga
+// - `TT` - Trinidad and Tobago
+// - `TN` - Tunisia
+// - `TR` - Turkey
+// - `TM` - Turkmenistan
+// - `TC` - Turks and Caicos Islands
+// - `TV` - Tuvalu
+// - `UG` - Uganda
+// - `UA` - Ukraine
+// - `AE` - United Arab Emirates
+// - `GB` - United Kingdom
+// - `UM` - United States Minor Outlying Islands
+// - `US` - United States of America
+// - `UY` - Uruguay
+// - `UZ` - Uzbekistan
+// - `VU` - Vanuatu
+// - `VE` - Venezuela
+// - `VN` - Vietnam
+// - `VG` - Virgin Islands (British)
+// - `VI` - Virgin Islands (U.S.)
+// - `WF` - Wallis and Futuna
+// - `EH` - Western Sahara
+// - `YE` - Yemen
+// - `ZM` - Zambia
+// - `ZW` - Zimbabwe
+type CountryEnum string
 
 const (
-	CountryEnumAf CountryEnum = iota + 1
-	CountryEnumAx
-	CountryEnumAl
-	CountryEnumDz
-	CountryEnumAs
-	CountryEnumAd
-	CountryEnumAo
-	CountryEnumAi
-	CountryEnumAq
-	CountryEnumAg
-	CountryEnumAr
-	CountryEnumAm
-	CountryEnumAw
-	CountryEnumAu
-	CountryEnumAt
-	CountryEnumAz
-	CountryEnumBs
-	CountryEnumBh
-	CountryEnumBd
-	CountryEnumBb
-	CountryEnumBy
-	CountryEnumBe
-	CountryEnumBz
-	CountryEnumBj
-	CountryEnumBm
-	CountryEnumBt
-	CountryEnumBo
-	CountryEnumBq
-	CountryEnumBa
-	CountryEnumBw
-	CountryEnumBv
-	CountryEnumBr
-	CountryEnumIo
-	CountryEnumBn
-	CountryEnumBg
-	CountryEnumBf
-	CountryEnumBi
-	CountryEnumCv
-	CountryEnumKh
-	CountryEnumCm
-	CountryEnumCa
-	CountryEnumKy
-	CountryEnumCf
-	CountryEnumTd
-	CountryEnumCl
-	CountryEnumCn
-	CountryEnumCx
-	CountryEnumCc
-	CountryEnumCo
-	CountryEnumKm
-	CountryEnumCg
-	CountryEnumCd
-	CountryEnumCk
-	CountryEnumCr
-	CountryEnumCi
-	CountryEnumHr
-	CountryEnumCu
-	CountryEnumCw
-	CountryEnumCy
-	CountryEnumCz
-	CountryEnumDk
-	CountryEnumDj
-	CountryEnumDm
-	CountryEnumDo
-	CountryEnumEc
-	CountryEnumEg
-	CountryEnumSv
-	CountryEnumGq
-	CountryEnumEr
-	CountryEnumEe
-	CountryEnumSz
-	CountryEnumEt
-	CountryEnumFk
-	CountryEnumFo
-	CountryEnumFj
-	CountryEnumFi
-	CountryEnumFr
-	CountryEnumGf
-	CountryEnumPf
-	CountryEnumTf
-	CountryEnumGa
-	CountryEnumGm
-	CountryEnumGe
-	CountryEnumDe
-	CountryEnumGh
-	CountryEnumGi
-	CountryEnumGr
-	CountryEnumGl
-	CountryEnumGd
-	CountryEnumGp
-	CountryEnumGu
-	CountryEnumGt
-	CountryEnumGg
-	CountryEnumGn
-	CountryEnumGw
-	CountryEnumGy
-	CountryEnumHt
-	CountryEnumHm
-	CountryEnumVa
-	CountryEnumHn
-	CountryEnumHk
-	CountryEnumHu
-	CountryEnumIs
-	CountryEnumIn
-	CountryEnumId
-	CountryEnumIr
-	CountryEnumIq
-	CountryEnumIe
-	CountryEnumIm
-	CountryEnumIl
-	CountryEnumIt
-	CountryEnumJm
-	CountryEnumJp
-	CountryEnumJe
-	CountryEnumJo
-	CountryEnumKz
-	CountryEnumKe
-	CountryEnumKi
-	CountryEnumKw
-	CountryEnumKg
-	CountryEnumLa
-	CountryEnumLv
-	CountryEnumLb
-	CountryEnumLs
-	CountryEnumLr
-	CountryEnumLy
-	CountryEnumLi
-	CountryEnumLt
-	CountryEnumLu
-	CountryEnumMo
-	CountryEnumMg
-	CountryEnumMw
-	CountryEnumMy
-	CountryEnumMv
-	CountryEnumMl
-	CountryEnumMt
-	CountryEnumMh
-	CountryEnumMq
-	CountryEnumMr
-	CountryEnumMu
-	CountryEnumYt
-	CountryEnumMx
-	CountryEnumFm
-	CountryEnumMd
-	CountryEnumMc
-	CountryEnumMn
-	CountryEnumMe
-	CountryEnumMs
-	CountryEnumMa
-	CountryEnumMz
-	CountryEnumMm
-	CountryEnumNa
-	CountryEnumNr
-	CountryEnumNp
-	CountryEnumNl
-	CountryEnumNc
-	CountryEnumNz
-	CountryEnumNi
-	CountryEnumNe
-	CountryEnumNg
-	CountryEnumNu
-	CountryEnumNf
-	CountryEnumKp
-	CountryEnumMk
-	CountryEnumMp
-	CountryEnumNo
-	CountryEnumOm
-	CountryEnumPk
-	CountryEnumPw
-	CountryEnumPs
-	CountryEnumPa
-	CountryEnumPg
-	CountryEnumPy
-	CountryEnumPe
-	CountryEnumPh
-	CountryEnumPn
-	CountryEnumPl
-	CountryEnumPt
-	CountryEnumPr
-	CountryEnumQa
-	CountryEnumRe
-	CountryEnumRo
-	CountryEnumRu
-	CountryEnumRw
-	CountryEnumBl
-	CountryEnumSh
-	CountryEnumKn
-	CountryEnumLc
-	CountryEnumMf
-	CountryEnumPm
-	CountryEnumVc
-	CountryEnumWs
-	CountryEnumSm
-	CountryEnumSt
-	CountryEnumSa
-	CountryEnumSn
-	CountryEnumRs
-	CountryEnumSc
-	CountryEnumSl
-	CountryEnumSg
-	CountryEnumSx
-	CountryEnumSk
-	CountryEnumSi
-	CountryEnumSb
-	CountryEnumSo
-	CountryEnumZa
-	CountryEnumGs
-	CountryEnumKr
-	CountryEnumSs
-	CountryEnumEs
-	CountryEnumLk
-	CountryEnumSd
-	CountryEnumSr
-	CountryEnumSj
-	CountryEnumSe
-	CountryEnumCh
-	CountryEnumSy
-	CountryEnumTw
-	CountryEnumTj
-	CountryEnumTz
-	CountryEnumTh
-	CountryEnumTl
-	CountryEnumTg
-	CountryEnumTk
-	CountryEnumTo
-	CountryEnumTt
-	CountryEnumTn
-	CountryEnumTr
-	CountryEnumTm
-	CountryEnumTc
-	CountryEnumTv
-	CountryEnumUg
-	CountryEnumUa
-	CountryEnumAe
-	CountryEnumGb
-	CountryEnumUm
-	CountryEnumUs
-	CountryEnumUy
-	CountryEnumUz
-	CountryEnumVu
-	CountryEnumVe
-	CountryEnumVn
-	CountryEnumVg
-	CountryEnumVi
-	CountryEnumWf
-	CountryEnumEh
-	CountryEnumYe
-	CountryEnumZm
-	CountryEnumZw
+	CountryEnumAf CountryEnum = "AF"
+	CountryEnumAx CountryEnum = "AX"
+	CountryEnumAl CountryEnum = "AL"
+	CountryEnumDz CountryEnum = "DZ"
+	CountryEnumAs CountryEnum = "AS"
+	CountryEnumAd CountryEnum = "AD"
+	CountryEnumAo CountryEnum = "AO"
+	CountryEnumAi CountryEnum = "AI"
+	CountryEnumAq CountryEnum = "AQ"
+	CountryEnumAg CountryEnum = "AG"
+	CountryEnumAr CountryEnum = "AR"
+	CountryEnumAm CountryEnum = "AM"
+	CountryEnumAw CountryEnum = "AW"
+	CountryEnumAu CountryEnum = "AU"
+	CountryEnumAt CountryEnum = "AT"
+	CountryEnumAz CountryEnum = "AZ"
+	CountryEnumBs CountryEnum = "BS"
+	CountryEnumBh CountryEnum = "BH"
+	CountryEnumBd CountryEnum = "BD"
+	CountryEnumBb CountryEnum = "BB"
+	CountryEnumBy CountryEnum = "BY"
+	CountryEnumBe CountryEnum = "BE"
+	CountryEnumBz CountryEnum = "BZ"
+	CountryEnumBj CountryEnum = "BJ"
+	CountryEnumBm CountryEnum = "BM"
+	CountryEnumBt CountryEnum = "BT"
+	CountryEnumBo CountryEnum = "BO"
+	CountryEnumBq CountryEnum = "BQ"
+	CountryEnumBa CountryEnum = "BA"
+	CountryEnumBw CountryEnum = "BW"
+	CountryEnumBv CountryEnum = "BV"
+	CountryEnumBr CountryEnum = "BR"
+	CountryEnumIo CountryEnum = "IO"
+	CountryEnumBn CountryEnum = "BN"
+	CountryEnumBg CountryEnum = "BG"
+	CountryEnumBf CountryEnum = "BF"
+	CountryEnumBi CountryEnum = "BI"
+	CountryEnumCv CountryEnum = "CV"
+	CountryEnumKh CountryEnum = "KH"
+	CountryEnumCm CountryEnum = "CM"
+	CountryEnumCa CountryEnum = "CA"
+	CountryEnumKy CountryEnum = "KY"
+	CountryEnumCf CountryEnum = "CF"
+	CountryEnumTd CountryEnum = "TD"
+	CountryEnumCl CountryEnum = "CL"
+	CountryEnumCn CountryEnum = "CN"
+	CountryEnumCx CountryEnum = "CX"
+	CountryEnumCc CountryEnum = "CC"
+	CountryEnumCo CountryEnum = "CO"
+	CountryEnumKm CountryEnum = "KM"
+	CountryEnumCg CountryEnum = "CG"
+	CountryEnumCd CountryEnum = "CD"
+	CountryEnumCk CountryEnum = "CK"
+	CountryEnumCr CountryEnum = "CR"
+	CountryEnumCi CountryEnum = "CI"
+	CountryEnumHr CountryEnum = "HR"
+	CountryEnumCu CountryEnum = "CU"
+	CountryEnumCw CountryEnum = "CW"
+	CountryEnumCy CountryEnum = "CY"
+	CountryEnumCz CountryEnum = "CZ"
+	CountryEnumDk CountryEnum = "DK"
+	CountryEnumDj CountryEnum = "DJ"
+	CountryEnumDm CountryEnum = "DM"
+	CountryEnumDo CountryEnum = "DO"
+	CountryEnumEc CountryEnum = "EC"
+	CountryEnumEg CountryEnum = "EG"
+	CountryEnumSv CountryEnum = "SV"
+	CountryEnumGq CountryEnum = "GQ"
+	CountryEnumEr CountryEnum = "ER"
+	CountryEnumEe CountryEnum = "EE"
+	CountryEnumSz CountryEnum = "SZ"
+	CountryEnumEt CountryEnum = "ET"
+	CountryEnumFk CountryEnum = "FK"
+	CountryEnumFo CountryEnum = "FO"
+	CountryEnumFj CountryEnum = "FJ"
+	CountryEnumFi CountryEnum = "FI"
+	CountryEnumFr CountryEnum = "FR"
+	CountryEnumGf CountryEnum = "GF"
+	CountryEnumPf CountryEnum = "PF"
+	CountryEnumTf CountryEnum = "TF"
+	CountryEnumGa CountryEnum = "GA"
+	CountryEnumGm CountryEnum = "GM"
+	CountryEnumGe CountryEnum = "GE"
+	CountryEnumDe CountryEnum = "DE"
+	CountryEnumGh CountryEnum = "GH"
+	CountryEnumGi CountryEnum = "GI"
+	CountryEnumGr CountryEnum = "GR"
+	CountryEnumGl CountryEnum = "GL"
+	CountryEnumGd CountryEnum = "GD"
+	CountryEnumGp CountryEnum = "GP"
+	CountryEnumGu CountryEnum = "GU"
+	CountryEnumGt CountryEnum = "GT"
+	CountryEnumGg CountryEnum = "GG"
+	CountryEnumGn CountryEnum = "GN"
+	CountryEnumGw CountryEnum = "GW"
+	CountryEnumGy CountryEnum = "GY"
+	CountryEnumHt CountryEnum = "HT"
+	CountryEnumHm CountryEnum = "HM"
+	CountryEnumVa CountryEnum = "VA"
+	CountryEnumHn CountryEnum = "HN"
+	CountryEnumHk CountryEnum = "HK"
+	CountryEnumHu CountryEnum = "HU"
+	CountryEnumIs CountryEnum = "IS"
+	CountryEnumIn CountryEnum = "IN"
+	CountryEnumId CountryEnum = "ID"
+	CountryEnumIr CountryEnum = "IR"
+	CountryEnumIq CountryEnum = "IQ"
+	CountryEnumIe CountryEnum = "IE"
+	CountryEnumIm CountryEnum = "IM"
+	CountryEnumIl CountryEnum = "IL"
+	CountryEnumIt CountryEnum = "IT"
+	CountryEnumJm CountryEnum = "JM"
+	CountryEnumJp CountryEnum = "JP"
+	CountryEnumJe CountryEnum = "JE"
+	CountryEnumJo CountryEnum = "JO"
+	CountryEnumKz CountryEnum = "KZ"
+	CountryEnumKe CountryEnum = "KE"
+	CountryEnumKi CountryEnum = "KI"
+	CountryEnumKw CountryEnum = "KW"
+	CountryEnumKg CountryEnum = "KG"
+	CountryEnumLa CountryEnum = "LA"
+	CountryEnumLv CountryEnum = "LV"
+	CountryEnumLb CountryEnum = "LB"
+	CountryEnumLs CountryEnum = "LS"
+	CountryEnumLr CountryEnum = "LR"
+	CountryEnumLy CountryEnum = "LY"
+	CountryEnumLi CountryEnum = "LI"
+	CountryEnumLt CountryEnum = "LT"
+	CountryEnumLu CountryEnum = "LU"
+	CountryEnumMo CountryEnum = "MO"
+	CountryEnumMg CountryEnum = "MG"
+	CountryEnumMw CountryEnum = "MW"
+	CountryEnumMy CountryEnum = "MY"
+	CountryEnumMv CountryEnum = "MV"
+	CountryEnumMl CountryEnum = "ML"
+	CountryEnumMt CountryEnum = "MT"
+	CountryEnumMh CountryEnum = "MH"
+	CountryEnumMq CountryEnum = "MQ"
+	CountryEnumMr CountryEnum = "MR"
+	CountryEnumMu CountryEnum = "MU"
+	CountryEnumYt CountryEnum = "YT"
+	CountryEnumMx CountryEnum = "MX"
+	CountryEnumFm CountryEnum = "FM"
+	CountryEnumMd CountryEnum = "MD"
+	CountryEnumMc CountryEnum = "MC"
+	CountryEnumMn CountryEnum = "MN"
+	CountryEnumMe CountryEnum = "ME"
+	CountryEnumMs CountryEnum = "MS"
+	CountryEnumMa CountryEnum = "MA"
+	CountryEnumMz CountryEnum = "MZ"
+	CountryEnumMm CountryEnum = "MM"
+	CountryEnumNa CountryEnum = "NA"
+	CountryEnumNr CountryEnum = "NR"
+	CountryEnumNp CountryEnum = "NP"
+	CountryEnumNl CountryEnum = "NL"
+	CountryEnumNc CountryEnum = "NC"
+	CountryEnumNz CountryEnum = "NZ"
+	CountryEnumNi CountryEnum = "NI"
+	CountryEnumNe CountryEnum = "NE"
+	CountryEnumNg CountryEnum = "NG"
+	CountryEnumNu CountryEnum = "NU"
+	CountryEnumNf CountryEnum = "NF"
+	CountryEnumKp CountryEnum = "KP"
+	CountryEnumMk CountryEnum = "MK"
+	CountryEnumMp CountryEnum = "MP"
+	CountryEnumNo CountryEnum = "NO"
+	CountryEnumOm CountryEnum = "OM"
+	CountryEnumPk CountryEnum = "PK"
+	CountryEnumPw CountryEnum = "PW"
+	CountryEnumPs CountryEnum = "PS"
+	CountryEnumPa CountryEnum = "PA"
+	CountryEnumPg CountryEnum = "PG"
+	CountryEnumPy CountryEnum = "PY"
+	CountryEnumPe CountryEnum = "PE"
+	CountryEnumPh CountryEnum = "PH"
+	CountryEnumPn CountryEnum = "PN"
+	CountryEnumPl CountryEnum = "PL"
+	CountryEnumPt CountryEnum = "PT"
+	CountryEnumPr CountryEnum = "PR"
+	CountryEnumQa CountryEnum = "QA"
+	CountryEnumRe CountryEnum = "RE"
+	CountryEnumRo CountryEnum = "RO"
+	CountryEnumRu CountryEnum = "RU"
+	CountryEnumRw CountryEnum = "RW"
+	CountryEnumBl CountryEnum = "BL"
+	CountryEnumSh CountryEnum = "SH"
+	CountryEnumKn CountryEnum = "KN"
+	CountryEnumLc CountryEnum = "LC"
+	CountryEnumMf CountryEnum = "MF"
+	CountryEnumPm CountryEnum = "PM"
+	CountryEnumVc CountryEnum = "VC"
+	CountryEnumWs CountryEnum = "WS"
+	CountryEnumSm CountryEnum = "SM"
+	CountryEnumSt CountryEnum = "ST"
+	CountryEnumSa CountryEnum = "SA"
+	CountryEnumSn CountryEnum = "SN"
+	CountryEnumRs CountryEnum = "RS"
+	CountryEnumSc CountryEnum = "SC"
+	CountryEnumSl CountryEnum = "SL"
+	CountryEnumSg CountryEnum = "SG"
+	CountryEnumSx CountryEnum = "SX"
+	CountryEnumSk CountryEnum = "SK"
+	CountryEnumSi CountryEnum = "SI"
+	CountryEnumSb CountryEnum = "SB"
+	CountryEnumSo CountryEnum = "SO"
+	CountryEnumZa CountryEnum = "ZA"
+	CountryEnumGs CountryEnum = "GS"
+	CountryEnumKr CountryEnum = "KR"
+	CountryEnumSs CountryEnum = "SS"
+	CountryEnumEs CountryEnum = "ES"
+	CountryEnumLk CountryEnum = "LK"
+	CountryEnumSd CountryEnum = "SD"
+	CountryEnumSr CountryEnum = "SR"
+	CountryEnumSj CountryEnum = "SJ"
+	CountryEnumSe CountryEnum = "SE"
+	CountryEnumCh CountryEnum = "CH"
+	CountryEnumSy CountryEnum = "SY"
+	CountryEnumTw CountryEnum = "TW"
+	CountryEnumTj CountryEnum = "TJ"
+	CountryEnumTz CountryEnum = "TZ"
+	CountryEnumTh CountryEnum = "TH"
+	CountryEnumTl CountryEnum = "TL"
+	CountryEnumTg CountryEnum = "TG"
+	CountryEnumTk CountryEnum = "TK"
+	CountryEnumTo CountryEnum = "TO"
+	CountryEnumTt CountryEnum = "TT"
+	CountryEnumTn CountryEnum = "TN"
+	CountryEnumTr CountryEnum = "TR"
+	CountryEnumTm CountryEnum = "TM"
+	CountryEnumTc CountryEnum = "TC"
+	CountryEnumTv CountryEnum = "TV"
+	CountryEnumUg CountryEnum = "UG"
+	CountryEnumUa CountryEnum = "UA"
+	CountryEnumAe CountryEnum = "AE"
+	CountryEnumGb CountryEnum = "GB"
+	CountryEnumUm CountryEnum = "UM"
+	CountryEnumUs CountryEnum = "US"
+	CountryEnumUy CountryEnum = "UY"
+	CountryEnumUz CountryEnum = "UZ"
+	CountryEnumVu CountryEnum = "VU"
+	CountryEnumVe CountryEnum = "VE"
+	CountryEnumVn CountryEnum = "VN"
+	CountryEnumVg CountryEnum = "VG"
+	CountryEnumVi CountryEnum = "VI"
+	CountryEnumWf CountryEnum = "WF"
+	CountryEnumEh CountryEnum = "EH"
+	CountryEnumYe CountryEnum = "YE"
+	CountryEnumZm CountryEnum = "ZM"
+	CountryEnumZw CountryEnum = "ZW"
 )
 
-func (c CountryEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CountryEnumAf:
-		return "AF"
-	case CountryEnumAx:
-		return "AX"
-	case CountryEnumAl:
-		return "AL"
-	case CountryEnumDz:
-		return "DZ"
-	case CountryEnumAs:
-		return "AS"
-	case CountryEnumAd:
-		return "AD"
-	case CountryEnumAo:
-		return "AO"
-	case CountryEnumAi:
-		return "AI"
-	case CountryEnumAq:
-		return "AQ"
-	case CountryEnumAg:
-		return "AG"
-	case CountryEnumAr:
-		return "AR"
-	case CountryEnumAm:
-		return "AM"
-	case CountryEnumAw:
-		return "AW"
-	case CountryEnumAu:
-		return "AU"
-	case CountryEnumAt:
-		return "AT"
-	case CountryEnumAz:
-		return "AZ"
-	case CountryEnumBs:
-		return "BS"
-	case CountryEnumBh:
-		return "BH"
-	case CountryEnumBd:
-		return "BD"
-	case CountryEnumBb:
-		return "BB"
-	case CountryEnumBy:
-		return "BY"
-	case CountryEnumBe:
-		return "BE"
-	case CountryEnumBz:
-		return "BZ"
-	case CountryEnumBj:
-		return "BJ"
-	case CountryEnumBm:
-		return "BM"
-	case CountryEnumBt:
-		return "BT"
-	case CountryEnumBo:
-		return "BO"
-	case CountryEnumBq:
-		return "BQ"
-	case CountryEnumBa:
-		return "BA"
-	case CountryEnumBw:
-		return "BW"
-	case CountryEnumBv:
-		return "BV"
-	case CountryEnumBr:
-		return "BR"
-	case CountryEnumIo:
-		return "IO"
-	case CountryEnumBn:
-		return "BN"
-	case CountryEnumBg:
-		return "BG"
-	case CountryEnumBf:
-		return "BF"
-	case CountryEnumBi:
-		return "BI"
-	case CountryEnumCv:
-		return "CV"
-	case CountryEnumKh:
-		return "KH"
-	case CountryEnumCm:
-		return "CM"
-	case CountryEnumCa:
-		return "CA"
-	case CountryEnumKy:
-		return "KY"
-	case CountryEnumCf:
-		return "CF"
-	case CountryEnumTd:
-		return "TD"
-	case CountryEnumCl:
-		return "CL"
-	case CountryEnumCn:
-		return "CN"
-	case CountryEnumCx:
-		return "CX"
-	case CountryEnumCc:
-		return "CC"
-	case CountryEnumCo:
-		return "CO"
-	case CountryEnumKm:
-		return "KM"
-	case CountryEnumCg:
-		return "CG"
-	case CountryEnumCd:
-		return "CD"
-	case CountryEnumCk:
-		return "CK"
-	case CountryEnumCr:
-		return "CR"
-	case CountryEnumCi:
-		return "CI"
-	case CountryEnumHr:
-		return "HR"
-	case CountryEnumCu:
-		return "CU"
-	case CountryEnumCw:
-		return "CW"
-	case CountryEnumCy:
-		return "CY"
-	case CountryEnumCz:
-		return "CZ"
-	case CountryEnumDk:
-		return "DK"
-	case CountryEnumDj:
-		return "DJ"
-	case CountryEnumDm:
-		return "DM"
-	case CountryEnumDo:
-		return "DO"
-	case CountryEnumEc:
-		return "EC"
-	case CountryEnumEg:
-		return "EG"
-	case CountryEnumSv:
-		return "SV"
-	case CountryEnumGq:
-		return "GQ"
-	case CountryEnumEr:
-		return "ER"
-	case CountryEnumEe:
-		return "EE"
-	case CountryEnumSz:
-		return "SZ"
-	case CountryEnumEt:
-		return "ET"
-	case CountryEnumFk:
-		return "FK"
-	case CountryEnumFo:
-		return "FO"
-	case CountryEnumFj:
-		return "FJ"
-	case CountryEnumFi:
-		return "FI"
-	case CountryEnumFr:
-		return "FR"
-	case CountryEnumGf:
-		return "GF"
-	case CountryEnumPf:
-		return "PF"
-	case CountryEnumTf:
-		return "TF"
-	case CountryEnumGa:
-		return "GA"
-	case CountryEnumGm:
-		return "GM"
-	case CountryEnumGe:
-		return "GE"
-	case CountryEnumDe:
-		return "DE"
-	case CountryEnumGh:
-		return "GH"
-	case CountryEnumGi:
-		return "GI"
-	case CountryEnumGr:
-		return "GR"
-	case CountryEnumGl:
-		return "GL"
-	case CountryEnumGd:
-		return "GD"
-	case CountryEnumGp:
-		return "GP"
-	case CountryEnumGu:
-		return "GU"
-	case CountryEnumGt:
-		return "GT"
-	case CountryEnumGg:
-		return "GG"
-	case CountryEnumGn:
-		return "GN"
-	case CountryEnumGw:
-		return "GW"
-	case CountryEnumGy:
-		return "GY"
-	case CountryEnumHt:
-		return "HT"
-	case CountryEnumHm:
-		return "HM"
-	case CountryEnumVa:
-		return "VA"
-	case CountryEnumHn:
-		return "HN"
-	case CountryEnumHk:
-		return "HK"
-	case CountryEnumHu:
-		return "HU"
-	case CountryEnumIs:
-		return "IS"
-	case CountryEnumIn:
-		return "IN"
-	case CountryEnumId:
-		return "ID"
-	case CountryEnumIr:
-		return "IR"
-	case CountryEnumIq:
-		return "IQ"
-	case CountryEnumIe:
-		return "IE"
-	case CountryEnumIm:
-		return "IM"
-	case CountryEnumIl:
-		return "IL"
-	case CountryEnumIt:
-		return "IT"
-	case CountryEnumJm:
-		return "JM"
-	case CountryEnumJp:
-		return "JP"
-	case CountryEnumJe:
-		return "JE"
-	case CountryEnumJo:
-		return "JO"
-	case CountryEnumKz:
-		return "KZ"
-	case CountryEnumKe:
-		return "KE"
-	case CountryEnumKi:
-		return "KI"
-	case CountryEnumKw:
-		return "KW"
-	case CountryEnumKg:
-		return "KG"
-	case CountryEnumLa:
-		return "LA"
-	case CountryEnumLv:
-		return "LV"
-	case CountryEnumLb:
-		return "LB"
-	case CountryEnumLs:
-		return "LS"
-	case CountryEnumLr:
-		return "LR"
-	case CountryEnumLy:
-		return "LY"
-	case CountryEnumLi:
-		return "LI"
-	case CountryEnumLt:
-		return "LT"
-	case CountryEnumLu:
-		return "LU"
-	case CountryEnumMo:
-		return "MO"
-	case CountryEnumMg:
-		return "MG"
-	case CountryEnumMw:
-		return "MW"
-	case CountryEnumMy:
-		return "MY"
-	case CountryEnumMv:
-		return "MV"
-	case CountryEnumMl:
-		return "ML"
-	case CountryEnumMt:
-		return "MT"
-	case CountryEnumMh:
-		return "MH"
-	case CountryEnumMq:
-		return "MQ"
-	case CountryEnumMr:
-		return "MR"
-	case CountryEnumMu:
-		return "MU"
-	case CountryEnumYt:
-		return "YT"
-	case CountryEnumMx:
-		return "MX"
-	case CountryEnumFm:
-		return "FM"
-	case CountryEnumMd:
-		return "MD"
-	case CountryEnumMc:
-		return "MC"
-	case CountryEnumMn:
-		return "MN"
-	case CountryEnumMe:
-		return "ME"
-	case CountryEnumMs:
-		return "MS"
-	case CountryEnumMa:
-		return "MA"
-	case CountryEnumMz:
-		return "MZ"
-	case CountryEnumMm:
-		return "MM"
-	case CountryEnumNa:
-		return "NA"
-	case CountryEnumNr:
-		return "NR"
-	case CountryEnumNp:
-		return "NP"
-	case CountryEnumNl:
-		return "NL"
-	case CountryEnumNc:
-		return "NC"
-	case CountryEnumNz:
-		return "NZ"
-	case CountryEnumNi:
-		return "NI"
-	case CountryEnumNe:
-		return "NE"
-	case CountryEnumNg:
-		return "NG"
-	case CountryEnumNu:
-		return "NU"
-	case CountryEnumNf:
-		return "NF"
-	case CountryEnumKp:
-		return "KP"
-	case CountryEnumMk:
-		return "MK"
-	case CountryEnumMp:
-		return "MP"
-	case CountryEnumNo:
-		return "NO"
-	case CountryEnumOm:
-		return "OM"
-	case CountryEnumPk:
-		return "PK"
-	case CountryEnumPw:
-		return "PW"
-	case CountryEnumPs:
-		return "PS"
-	case CountryEnumPa:
-		return "PA"
-	case CountryEnumPg:
-		return "PG"
-	case CountryEnumPy:
-		return "PY"
-	case CountryEnumPe:
-		return "PE"
-	case CountryEnumPh:
-		return "PH"
-	case CountryEnumPn:
-		return "PN"
-	case CountryEnumPl:
-		return "PL"
-	case CountryEnumPt:
-		return "PT"
-	case CountryEnumPr:
-		return "PR"
-	case CountryEnumQa:
-		return "QA"
-	case CountryEnumRe:
-		return "RE"
-	case CountryEnumRo:
-		return "RO"
-	case CountryEnumRu:
-		return "RU"
-	case CountryEnumRw:
-		return "RW"
-	case CountryEnumBl:
-		return "BL"
-	case CountryEnumSh:
-		return "SH"
-	case CountryEnumKn:
-		return "KN"
-	case CountryEnumLc:
-		return "LC"
-	case CountryEnumMf:
-		return "MF"
-	case CountryEnumPm:
-		return "PM"
-	case CountryEnumVc:
-		return "VC"
-	case CountryEnumWs:
-		return "WS"
-	case CountryEnumSm:
-		return "SM"
-	case CountryEnumSt:
-		return "ST"
-	case CountryEnumSa:
-		return "SA"
-	case CountryEnumSn:
-		return "SN"
-	case CountryEnumRs:
-		return "RS"
-	case CountryEnumSc:
-		return "SC"
-	case CountryEnumSl:
-		return "SL"
-	case CountryEnumSg:
-		return "SG"
-	case CountryEnumSx:
-		return "SX"
-	case CountryEnumSk:
-		return "SK"
-	case CountryEnumSi:
-		return "SI"
-	case CountryEnumSb:
-		return "SB"
-	case CountryEnumSo:
-		return "SO"
-	case CountryEnumZa:
-		return "ZA"
-	case CountryEnumGs:
-		return "GS"
-	case CountryEnumKr:
-		return "KR"
-	case CountryEnumSs:
-		return "SS"
-	case CountryEnumEs:
-		return "ES"
-	case CountryEnumLk:
-		return "LK"
-	case CountryEnumSd:
-		return "SD"
-	case CountryEnumSr:
-		return "SR"
-	case CountryEnumSj:
-		return "SJ"
-	case CountryEnumSe:
-		return "SE"
-	case CountryEnumCh:
-		return "CH"
-	case CountryEnumSy:
-		return "SY"
-	case CountryEnumTw:
-		return "TW"
-	case CountryEnumTj:
-		return "TJ"
-	case CountryEnumTz:
-		return "TZ"
-	case CountryEnumTh:
-		return "TH"
-	case CountryEnumTl:
-		return "TL"
-	case CountryEnumTg:
-		return "TG"
-	case CountryEnumTk:
-		return "TK"
-	case CountryEnumTo:
-		return "TO"
-	case CountryEnumTt:
-		return "TT"
-	case CountryEnumTn:
-		return "TN"
-	case CountryEnumTr:
-		return "TR"
-	case CountryEnumTm:
-		return "TM"
-	case CountryEnumTc:
-		return "TC"
-	case CountryEnumTv:
-		return "TV"
-	case CountryEnumUg:
-		return "UG"
-	case CountryEnumUa:
-		return "UA"
-	case CountryEnumAe:
-		return "AE"
-	case CountryEnumGb:
-		return "GB"
-	case CountryEnumUm:
-		return "UM"
-	case CountryEnumUs:
-		return "US"
-	case CountryEnumUy:
-		return "UY"
-	case CountryEnumUz:
-		return "UZ"
-	case CountryEnumVu:
-		return "VU"
-	case CountryEnumVe:
-		return "VE"
-	case CountryEnumVn:
-		return "VN"
-	case CountryEnumVg:
-		return "VG"
-	case CountryEnumVi:
-		return "VI"
-	case CountryEnumWf:
-		return "WF"
-	case CountryEnumEh:
-		return "EH"
-	case CountryEnumYe:
-		return "YE"
-	case CountryEnumZm:
-		return "ZM"
-	case CountryEnumZw:
-		return "ZW"
-	}
-}
-
-func (c CountryEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CountryEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCountryEnumFromString(s string) (CountryEnum, error) {
+	switch s {
 	case "AF":
-		value := CountryEnumAf
-		*c = value
+		return CountryEnumAf, nil
 	case "AX":
-		value := CountryEnumAx
-		*c = value
+		return CountryEnumAx, nil
 	case "AL":
-		value := CountryEnumAl
-		*c = value
+		return CountryEnumAl, nil
 	case "DZ":
-		value := CountryEnumDz
-		*c = value
+		return CountryEnumDz, nil
 	case "AS":
-		value := CountryEnumAs
-		*c = value
+		return CountryEnumAs, nil
 	case "AD":
-		value := CountryEnumAd
-		*c = value
+		return CountryEnumAd, nil
 	case "AO":
-		value := CountryEnumAo
-		*c = value
+		return CountryEnumAo, nil
 	case "AI":
-		value := CountryEnumAi
-		*c = value
+		return CountryEnumAi, nil
 	case "AQ":
-		value := CountryEnumAq
-		*c = value
+		return CountryEnumAq, nil
 	case "AG":
-		value := CountryEnumAg
-		*c = value
+		return CountryEnumAg, nil
 	case "AR":
-		value := CountryEnumAr
-		*c = value
+		return CountryEnumAr, nil
 	case "AM":
-		value := CountryEnumAm
-		*c = value
+		return CountryEnumAm, nil
 	case "AW":
-		value := CountryEnumAw
-		*c = value
+		return CountryEnumAw, nil
 	case "AU":
-		value := CountryEnumAu
-		*c = value
+		return CountryEnumAu, nil
 	case "AT":
-		value := CountryEnumAt
-		*c = value
+		return CountryEnumAt, nil
 	case "AZ":
-		value := CountryEnumAz
-		*c = value
+		return CountryEnumAz, nil
 	case "BS":
-		value := CountryEnumBs
-		*c = value
+		return CountryEnumBs, nil
 	case "BH":
-		value := CountryEnumBh
-		*c = value
+		return CountryEnumBh, nil
 	case "BD":
-		value := CountryEnumBd
-		*c = value
+		return CountryEnumBd, nil
 	case "BB":
-		value := CountryEnumBb
-		*c = value
+		return CountryEnumBb, nil
 	case "BY":
-		value := CountryEnumBy
-		*c = value
+		return CountryEnumBy, nil
 	case "BE":
-		value := CountryEnumBe
-		*c = value
+		return CountryEnumBe, nil
 	case "BZ":
-		value := CountryEnumBz
-		*c = value
+		return CountryEnumBz, nil
 	case "BJ":
-		value := CountryEnumBj
-		*c = value
+		return CountryEnumBj, nil
 	case "BM":
-		value := CountryEnumBm
-		*c = value
+		return CountryEnumBm, nil
 	case "BT":
-		value := CountryEnumBt
-		*c = value
+		return CountryEnumBt, nil
 	case "BO":
-		value := CountryEnumBo
-		*c = value
+		return CountryEnumBo, nil
 	case "BQ":
-		value := CountryEnumBq
-		*c = value
+		return CountryEnumBq, nil
 	case "BA":
-		value := CountryEnumBa
-		*c = value
+		return CountryEnumBa, nil
 	case "BW":
-		value := CountryEnumBw
-		*c = value
+		return CountryEnumBw, nil
 	case "BV":
-		value := CountryEnumBv
-		*c = value
+		return CountryEnumBv, nil
 	case "BR":
-		value := CountryEnumBr
-		*c = value
+		return CountryEnumBr, nil
 	case "IO":
-		value := CountryEnumIo
-		*c = value
+		return CountryEnumIo, nil
 	case "BN":
-		value := CountryEnumBn
-		*c = value
+		return CountryEnumBn, nil
 	case "BG":
-		value := CountryEnumBg
-		*c = value
+		return CountryEnumBg, nil
 	case "BF":
-		value := CountryEnumBf
-		*c = value
+		return CountryEnumBf, nil
 	case "BI":
-		value := CountryEnumBi
-		*c = value
+		return CountryEnumBi, nil
 	case "CV":
-		value := CountryEnumCv
-		*c = value
+		return CountryEnumCv, nil
 	case "KH":
-		value := CountryEnumKh
-		*c = value
+		return CountryEnumKh, nil
 	case "CM":
-		value := CountryEnumCm
-		*c = value
+		return CountryEnumCm, nil
 	case "CA":
-		value := CountryEnumCa
-		*c = value
+		return CountryEnumCa, nil
 	case "KY":
-		value := CountryEnumKy
-		*c = value
+		return CountryEnumKy, nil
 	case "CF":
-		value := CountryEnumCf
-		*c = value
+		return CountryEnumCf, nil
 	case "TD":
-		value := CountryEnumTd
-		*c = value
+		return CountryEnumTd, nil
 	case "CL":
-		value := CountryEnumCl
-		*c = value
+		return CountryEnumCl, nil
 	case "CN":
-		value := CountryEnumCn
-		*c = value
+		return CountryEnumCn, nil
 	case "CX":
-		value := CountryEnumCx
-		*c = value
+		return CountryEnumCx, nil
 	case "CC":
-		value := CountryEnumCc
-		*c = value
+		return CountryEnumCc, nil
 	case "CO":
-		value := CountryEnumCo
-		*c = value
+		return CountryEnumCo, nil
 	case "KM":
-		value := CountryEnumKm
-		*c = value
+		return CountryEnumKm, nil
 	case "CG":
-		value := CountryEnumCg
-		*c = value
+		return CountryEnumCg, nil
 	case "CD":
-		value := CountryEnumCd
-		*c = value
+		return CountryEnumCd, nil
 	case "CK":
-		value := CountryEnumCk
-		*c = value
+		return CountryEnumCk, nil
 	case "CR":
-		value := CountryEnumCr
-		*c = value
+		return CountryEnumCr, nil
 	case "CI":
-		value := CountryEnumCi
-		*c = value
+		return CountryEnumCi, nil
 	case "HR":
-		value := CountryEnumHr
-		*c = value
+		return CountryEnumHr, nil
 	case "CU":
-		value := CountryEnumCu
-		*c = value
+		return CountryEnumCu, nil
 	case "CW":
-		value := CountryEnumCw
-		*c = value
+		return CountryEnumCw, nil
 	case "CY":
-		value := CountryEnumCy
-		*c = value
+		return CountryEnumCy, nil
 	case "CZ":
-		value := CountryEnumCz
-		*c = value
+		return CountryEnumCz, nil
 	case "DK":
-		value := CountryEnumDk
-		*c = value
+		return CountryEnumDk, nil
 	case "DJ":
-		value := CountryEnumDj
-		*c = value
+		return CountryEnumDj, nil
 	case "DM":
-		value := CountryEnumDm
-		*c = value
+		return CountryEnumDm, nil
 	case "DO":
-		value := CountryEnumDo
-		*c = value
+		return CountryEnumDo, nil
 	case "EC":
-		value := CountryEnumEc
-		*c = value
+		return CountryEnumEc, nil
 	case "EG":
-		value := CountryEnumEg
-		*c = value
+		return CountryEnumEg, nil
 	case "SV":
-		value := CountryEnumSv
-		*c = value
+		return CountryEnumSv, nil
 	case "GQ":
-		value := CountryEnumGq
-		*c = value
+		return CountryEnumGq, nil
 	case "ER":
-		value := CountryEnumEr
-		*c = value
+		return CountryEnumEr, nil
 	case "EE":
-		value := CountryEnumEe
-		*c = value
+		return CountryEnumEe, nil
 	case "SZ":
-		value := CountryEnumSz
-		*c = value
+		return CountryEnumSz, nil
 	case "ET":
-		value := CountryEnumEt
-		*c = value
+		return CountryEnumEt, nil
 	case "FK":
-		value := CountryEnumFk
-		*c = value
+		return CountryEnumFk, nil
 	case "FO":
-		value := CountryEnumFo
-		*c = value
+		return CountryEnumFo, nil
 	case "FJ":
-		value := CountryEnumFj
-		*c = value
+		return CountryEnumFj, nil
 	case "FI":
-		value := CountryEnumFi
-		*c = value
+		return CountryEnumFi, nil
 	case "FR":
-		value := CountryEnumFr
-		*c = value
+		return CountryEnumFr, nil
 	case "GF":
-		value := CountryEnumGf
-		*c = value
+		return CountryEnumGf, nil
 	case "PF":
-		value := CountryEnumPf
-		*c = value
+		return CountryEnumPf, nil
 	case "TF":
-		value := CountryEnumTf
-		*c = value
+		return CountryEnumTf, nil
 	case "GA":
-		value := CountryEnumGa
-		*c = value
+		return CountryEnumGa, nil
 	case "GM":
-		value := CountryEnumGm
-		*c = value
+		return CountryEnumGm, nil
 	case "GE":
-		value := CountryEnumGe
-		*c = value
+		return CountryEnumGe, nil
 	case "DE":
-		value := CountryEnumDe
-		*c = value
+		return CountryEnumDe, nil
 	case "GH":
-		value := CountryEnumGh
-		*c = value
+		return CountryEnumGh, nil
 	case "GI":
-		value := CountryEnumGi
-		*c = value
+		return CountryEnumGi, nil
 	case "GR":
-		value := CountryEnumGr
-		*c = value
+		return CountryEnumGr, nil
 	case "GL":
-		value := CountryEnumGl
-		*c = value
+		return CountryEnumGl, nil
 	case "GD":
-		value := CountryEnumGd
-		*c = value
+		return CountryEnumGd, nil
 	case "GP":
-		value := CountryEnumGp
-		*c = value
+		return CountryEnumGp, nil
 	case "GU":
-		value := CountryEnumGu
-		*c = value
+		return CountryEnumGu, nil
 	case "GT":
-		value := CountryEnumGt
-		*c = value
+		return CountryEnumGt, nil
 	case "GG":
-		value := CountryEnumGg
-		*c = value
+		return CountryEnumGg, nil
 	case "GN":
-		value := CountryEnumGn
-		*c = value
+		return CountryEnumGn, nil
 	case "GW":
-		value := CountryEnumGw
-		*c = value
+		return CountryEnumGw, nil
 	case "GY":
-		value := CountryEnumGy
-		*c = value
+		return CountryEnumGy, nil
 	case "HT":
-		value := CountryEnumHt
-		*c = value
+		return CountryEnumHt, nil
 	case "HM":
-		value := CountryEnumHm
-		*c = value
+		return CountryEnumHm, nil
 	case "VA":
-		value := CountryEnumVa
-		*c = value
+		return CountryEnumVa, nil
 	case "HN":
-		value := CountryEnumHn
-		*c = value
+		return CountryEnumHn, nil
 	case "HK":
-		value := CountryEnumHk
-		*c = value
+		return CountryEnumHk, nil
 	case "HU":
-		value := CountryEnumHu
-		*c = value
+		return CountryEnumHu, nil
 	case "IS":
-		value := CountryEnumIs
-		*c = value
+		return CountryEnumIs, nil
 	case "IN":
-		value := CountryEnumIn
-		*c = value
+		return CountryEnumIn, nil
 	case "ID":
-		value := CountryEnumId
-		*c = value
+		return CountryEnumId, nil
 	case "IR":
-		value := CountryEnumIr
-		*c = value
+		return CountryEnumIr, nil
 	case "IQ":
-		value := CountryEnumIq
-		*c = value
+		return CountryEnumIq, nil
 	case "IE":
-		value := CountryEnumIe
-		*c = value
+		return CountryEnumIe, nil
 	case "IM":
-		value := CountryEnumIm
-		*c = value
+		return CountryEnumIm, nil
 	case "IL":
-		value := CountryEnumIl
-		*c = value
+		return CountryEnumIl, nil
 	case "IT":
-		value := CountryEnumIt
-		*c = value
+		return CountryEnumIt, nil
 	case "JM":
-		value := CountryEnumJm
-		*c = value
+		return CountryEnumJm, nil
 	case "JP":
-		value := CountryEnumJp
-		*c = value
+		return CountryEnumJp, nil
 	case "JE":
-		value := CountryEnumJe
-		*c = value
+		return CountryEnumJe, nil
 	case "JO":
-		value := CountryEnumJo
-		*c = value
+		return CountryEnumJo, nil
 	case "KZ":
-		value := CountryEnumKz
-		*c = value
+		return CountryEnumKz, nil
 	case "KE":
-		value := CountryEnumKe
-		*c = value
+		return CountryEnumKe, nil
 	case "KI":
-		value := CountryEnumKi
-		*c = value
+		return CountryEnumKi, nil
 	case "KW":
-		value := CountryEnumKw
-		*c = value
+		return CountryEnumKw, nil
 	case "KG":
-		value := CountryEnumKg
-		*c = value
+		return CountryEnumKg, nil
 	case "LA":
-		value := CountryEnumLa
-		*c = value
+		return CountryEnumLa, nil
 	case "LV":
-		value := CountryEnumLv
-		*c = value
+		return CountryEnumLv, nil
 	case "LB":
-		value := CountryEnumLb
-		*c = value
+		return CountryEnumLb, nil
 	case "LS":
-		value := CountryEnumLs
-		*c = value
+		return CountryEnumLs, nil
 	case "LR":
-		value := CountryEnumLr
-		*c = value
+		return CountryEnumLr, nil
 	case "LY":
-		value := CountryEnumLy
-		*c = value
+		return CountryEnumLy, nil
 	case "LI":
-		value := CountryEnumLi
-		*c = value
+		return CountryEnumLi, nil
 	case "LT":
-		value := CountryEnumLt
-		*c = value
+		return CountryEnumLt, nil
 	case "LU":
-		value := CountryEnumLu
-		*c = value
+		return CountryEnumLu, nil
 	case "MO":
-		value := CountryEnumMo
-		*c = value
+		return CountryEnumMo, nil
 	case "MG":
-		value := CountryEnumMg
-		*c = value
+		return CountryEnumMg, nil
 	case "MW":
-		value := CountryEnumMw
-		*c = value
+		return CountryEnumMw, nil
 	case "MY":
-		value := CountryEnumMy
-		*c = value
+		return CountryEnumMy, nil
 	case "MV":
-		value := CountryEnumMv
-		*c = value
+		return CountryEnumMv, nil
 	case "ML":
-		value := CountryEnumMl
-		*c = value
+		return CountryEnumMl, nil
 	case "MT":
-		value := CountryEnumMt
-		*c = value
+		return CountryEnumMt, nil
 	case "MH":
-		value := CountryEnumMh
-		*c = value
+		return CountryEnumMh, nil
 	case "MQ":
-		value := CountryEnumMq
-		*c = value
+		return CountryEnumMq, nil
 	case "MR":
-		value := CountryEnumMr
-		*c = value
+		return CountryEnumMr, nil
 	case "MU":
-		value := CountryEnumMu
-		*c = value
+		return CountryEnumMu, nil
 	case "YT":
-		value := CountryEnumYt
-		*c = value
+		return CountryEnumYt, nil
 	case "MX":
-		value := CountryEnumMx
-		*c = value
+		return CountryEnumMx, nil
 	case "FM":
-		value := CountryEnumFm
-		*c = value
+		return CountryEnumFm, nil
 	case "MD":
-		value := CountryEnumMd
-		*c = value
+		return CountryEnumMd, nil
 	case "MC":
-		value := CountryEnumMc
-		*c = value
+		return CountryEnumMc, nil
 	case "MN":
-		value := CountryEnumMn
-		*c = value
+		return CountryEnumMn, nil
 	case "ME":
-		value := CountryEnumMe
-		*c = value
+		return CountryEnumMe, nil
 	case "MS":
-		value := CountryEnumMs
-		*c = value
+		return CountryEnumMs, nil
 	case "MA":
-		value := CountryEnumMa
-		*c = value
+		return CountryEnumMa, nil
 	case "MZ":
-		value := CountryEnumMz
-		*c = value
+		return CountryEnumMz, nil
 	case "MM":
-		value := CountryEnumMm
-		*c = value
+		return CountryEnumMm, nil
 	case "NA":
-		value := CountryEnumNa
-		*c = value
+		return CountryEnumNa, nil
 	case "NR":
-		value := CountryEnumNr
-		*c = value
+		return CountryEnumNr, nil
 	case "NP":
-		value := CountryEnumNp
-		*c = value
+		return CountryEnumNp, nil
 	case "NL":
-		value := CountryEnumNl
-		*c = value
+		return CountryEnumNl, nil
 	case "NC":
-		value := CountryEnumNc
-		*c = value
+		return CountryEnumNc, nil
 	case "NZ":
-		value := CountryEnumNz
-		*c = value
+		return CountryEnumNz, nil
 	case "NI":
-		value := CountryEnumNi
-		*c = value
+		return CountryEnumNi, nil
 	case "NE":
-		value := CountryEnumNe
-		*c = value
+		return CountryEnumNe, nil
 	case "NG":
-		value := CountryEnumNg
-		*c = value
+		return CountryEnumNg, nil
 	case "NU":
-		value := CountryEnumNu
-		*c = value
+		return CountryEnumNu, nil
 	case "NF":
-		value := CountryEnumNf
-		*c = value
+		return CountryEnumNf, nil
 	case "KP":
-		value := CountryEnumKp
-		*c = value
+		return CountryEnumKp, nil
 	case "MK":
-		value := CountryEnumMk
-		*c = value
+		return CountryEnumMk, nil
 	case "MP":
-		value := CountryEnumMp
-		*c = value
+		return CountryEnumMp, nil
 	case "NO":
-		value := CountryEnumNo
-		*c = value
+		return CountryEnumNo, nil
 	case "OM":
-		value := CountryEnumOm
-		*c = value
+		return CountryEnumOm, nil
 	case "PK":
-		value := CountryEnumPk
-		*c = value
+		return CountryEnumPk, nil
 	case "PW":
-		value := CountryEnumPw
-		*c = value
+		return CountryEnumPw, nil
 	case "PS":
-		value := CountryEnumPs
-		*c = value
+		return CountryEnumPs, nil
 	case "PA":
-		value := CountryEnumPa
-		*c = value
+		return CountryEnumPa, nil
 	case "PG":
-		value := CountryEnumPg
-		*c = value
+		return CountryEnumPg, nil
 	case "PY":
-		value := CountryEnumPy
-		*c = value
+		return CountryEnumPy, nil
 	case "PE":
-		value := CountryEnumPe
-		*c = value
+		return CountryEnumPe, nil
 	case "PH":
-		value := CountryEnumPh
-		*c = value
+		return CountryEnumPh, nil
 	case "PN":
-		value := CountryEnumPn
-		*c = value
+		return CountryEnumPn, nil
 	case "PL":
-		value := CountryEnumPl
-		*c = value
+		return CountryEnumPl, nil
 	case "PT":
-		value := CountryEnumPt
-		*c = value
+		return CountryEnumPt, nil
 	case "PR":
-		value := CountryEnumPr
-		*c = value
+		return CountryEnumPr, nil
 	case "QA":
-		value := CountryEnumQa
-		*c = value
+		return CountryEnumQa, nil
 	case "RE":
-		value := CountryEnumRe
-		*c = value
+		return CountryEnumRe, nil
 	case "RO":
-		value := CountryEnumRo
-		*c = value
+		return CountryEnumRo, nil
 	case "RU":
-		value := CountryEnumRu
-		*c = value
+		return CountryEnumRu, nil
 	case "RW":
-		value := CountryEnumRw
-		*c = value
+		return CountryEnumRw, nil
 	case "BL":
-		value := CountryEnumBl
-		*c = value
+		return CountryEnumBl, nil
 	case "SH":
-		value := CountryEnumSh
-		*c = value
+		return CountryEnumSh, nil
 	case "KN":
-		value := CountryEnumKn
-		*c = value
+		return CountryEnumKn, nil
 	case "LC":
-		value := CountryEnumLc
-		*c = value
+		return CountryEnumLc, nil
 	case "MF":
-		value := CountryEnumMf
-		*c = value
+		return CountryEnumMf, nil
 	case "PM":
-		value := CountryEnumPm
-		*c = value
+		return CountryEnumPm, nil
 	case "VC":
-		value := CountryEnumVc
-		*c = value
+		return CountryEnumVc, nil
 	case "WS":
-		value := CountryEnumWs
-		*c = value
+		return CountryEnumWs, nil
 	case "SM":
-		value := CountryEnumSm
-		*c = value
+		return CountryEnumSm, nil
 	case "ST":
-		value := CountryEnumSt
-		*c = value
+		return CountryEnumSt, nil
 	case "SA":
-		value := CountryEnumSa
-		*c = value
+		return CountryEnumSa, nil
 	case "SN":
-		value := CountryEnumSn
-		*c = value
+		return CountryEnumSn, nil
 	case "RS":
-		value := CountryEnumRs
-		*c = value
+		return CountryEnumRs, nil
 	case "SC":
-		value := CountryEnumSc
-		*c = value
+		return CountryEnumSc, nil
 	case "SL":
-		value := CountryEnumSl
-		*c = value
+		return CountryEnumSl, nil
 	case "SG":
-		value := CountryEnumSg
-		*c = value
+		return CountryEnumSg, nil
 	case "SX":
-		value := CountryEnumSx
-		*c = value
+		return CountryEnumSx, nil
 	case "SK":
-		value := CountryEnumSk
-		*c = value
+		return CountryEnumSk, nil
 	case "SI":
-		value := CountryEnumSi
-		*c = value
+		return CountryEnumSi, nil
 	case "SB":
-		value := CountryEnumSb
-		*c = value
+		return CountryEnumSb, nil
 	case "SO":
-		value := CountryEnumSo
-		*c = value
+		return CountryEnumSo, nil
 	case "ZA":
-		value := CountryEnumZa
-		*c = value
+		return CountryEnumZa, nil
 	case "GS":
-		value := CountryEnumGs
-		*c = value
+		return CountryEnumGs, nil
 	case "KR":
-		value := CountryEnumKr
-		*c = value
+		return CountryEnumKr, nil
 	case "SS":
-		value := CountryEnumSs
-		*c = value
+		return CountryEnumSs, nil
 	case "ES":
-		value := CountryEnumEs
-		*c = value
+		return CountryEnumEs, nil
 	case "LK":
-		value := CountryEnumLk
-		*c = value
+		return CountryEnumLk, nil
 	case "SD":
-		value := CountryEnumSd
-		*c = value
+		return CountryEnumSd, nil
 	case "SR":
-		value := CountryEnumSr
-		*c = value
+		return CountryEnumSr, nil
 	case "SJ":
-		value := CountryEnumSj
-		*c = value
+		return CountryEnumSj, nil
 	case "SE":
-		value := CountryEnumSe
-		*c = value
+		return CountryEnumSe, nil
 	case "CH":
-		value := CountryEnumCh
-		*c = value
+		return CountryEnumCh, nil
 	case "SY":
-		value := CountryEnumSy
-		*c = value
+		return CountryEnumSy, nil
 	case "TW":
-		value := CountryEnumTw
-		*c = value
+		return CountryEnumTw, nil
 	case "TJ":
-		value := CountryEnumTj
-		*c = value
+		return CountryEnumTj, nil
 	case "TZ":
-		value := CountryEnumTz
-		*c = value
+		return CountryEnumTz, nil
 	case "TH":
-		value := CountryEnumTh
-		*c = value
+		return CountryEnumTh, nil
 	case "TL":
-		value := CountryEnumTl
-		*c = value
+		return CountryEnumTl, nil
 	case "TG":
-		value := CountryEnumTg
-		*c = value
+		return CountryEnumTg, nil
 	case "TK":
-		value := CountryEnumTk
-		*c = value
+		return CountryEnumTk, nil
 	case "TO":
-		value := CountryEnumTo
-		*c = value
+		return CountryEnumTo, nil
 	case "TT":
-		value := CountryEnumTt
-		*c = value
+		return CountryEnumTt, nil
 	case "TN":
-		value := CountryEnumTn
-		*c = value
+		return CountryEnumTn, nil
 	case "TR":
-		value := CountryEnumTr
-		*c = value
+		return CountryEnumTr, nil
 	case "TM":
-		value := CountryEnumTm
-		*c = value
+		return CountryEnumTm, nil
 	case "TC":
-		value := CountryEnumTc
-		*c = value
+		return CountryEnumTc, nil
 	case "TV":
-		value := CountryEnumTv
-		*c = value
+		return CountryEnumTv, nil
 	case "UG":
-		value := CountryEnumUg
-		*c = value
+		return CountryEnumUg, nil
 	case "UA":
-		value := CountryEnumUa
-		*c = value
+		return CountryEnumUa, nil
 	case "AE":
-		value := CountryEnumAe
-		*c = value
+		return CountryEnumAe, nil
 	case "GB":
-		value := CountryEnumGb
-		*c = value
+		return CountryEnumGb, nil
 	case "UM":
-		value := CountryEnumUm
-		*c = value
+		return CountryEnumUm, nil
 	case "US":
-		value := CountryEnumUs
-		*c = value
+		return CountryEnumUs, nil
 	case "UY":
-		value := CountryEnumUy
-		*c = value
+		return CountryEnumUy, nil
 	case "UZ":
-		value := CountryEnumUz
-		*c = value
+		return CountryEnumUz, nil
 	case "VU":
-		value := CountryEnumVu
-		*c = value
+		return CountryEnumVu, nil
 	case "VE":
-		value := CountryEnumVe
-		*c = value
+		return CountryEnumVe, nil
 	case "VN":
-		value := CountryEnumVn
-		*c = value
+		return CountryEnumVn, nil
 	case "VG":
-		value := CountryEnumVg
-		*c = value
+		return CountryEnumVg, nil
 	case "VI":
-		value := CountryEnumVi
-		*c = value
+		return CountryEnumVi, nil
 	case "WF":
-		value := CountryEnumWf
-		*c = value
+		return CountryEnumWf, nil
 	case "EH":
-		value := CountryEnumEh
-		*c = value
+		return CountryEnumEh, nil
 	case "YE":
-		value := CountryEnumYe
-		*c = value
+		return CountryEnumYe, nil
 	case "ZM":
-		value := CountryEnumZm
-		*c = value
+		return CountryEnumZm, nil
 	case "ZW":
-		value := CountryEnumZw
-		*c = value
+		return CountryEnumZw, nil
 	}
-	return nil
+	var t CountryEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CountryEnum) Ptr() *CountryEnum {
+	return &c
 }
 
 // # The DataPassthrough Object
+//
 // ### Description
+//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
+//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -2904,29 +2261,107 @@ type DataPassthroughRequest struct {
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
-	Headers       map[string]any     `json:"headers,omitempty"`
-	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	Headers       map[string]interface{} `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum     `json:"request_format,omitempty"`
 	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
 	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DataPassthroughRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler DataPassthroughRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DataPassthroughRequest(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DataPassthroughRequest) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
 	LogSummary    *DebugModelLogSummary `json:"log_summary,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DebugModeLog) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModeLog
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DebugModeLog(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModeLog) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModelLogSummary struct {
 	Url        string `json:"url"`
 	Method     string `json:"method"`
 	StatusCode int    `json:"status_code"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DebugModelLogSummary) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModelLogSummary
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DebugModelLogSummary(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModelLogSummary) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 // # The Deduction Object
+//
 // ### Description
+//
 // The `Deduction` object is used to represent an array of the wages withheld from total earnings for the purpose of paying taxes.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Deductions` endpoint and filter by `ID` to show all deductions.
 type Deduction struct {
 	Id *string `json:"id,omitempty"`
@@ -2943,16 +2378,44 @@ type Deduction struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *Deduction) UnmarshalJSON(data []byte) error {
+	type unmarshaler Deduction
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = Deduction(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *Deduction) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 // # The Dependent Object
+//
 // ### Description
+//
 // The `Dependent` object is used to represent a dependent (e.g. child, spouse, domestic partner, etc) of an `Employee`
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Dependents` endpoint and filter by `ID` to show all dependents.
 type Dependent struct {
 	Id *string `json:"id,omitempty"`
@@ -2966,9 +2429,9 @@ type Dependent struct {
 	LastName *string `json:"last_name,omitempty"`
 	// The dependent's relationship to the employee.
 	//
-	// * `CHILD` - CHILD
-	// * `SPOUSE` - SPOUSE
-	// * `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
+	// - `CHILD` - CHILD
+	// - `SPOUSE` - SPOUSE
+	// - `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
 	Relationship *DependentRelationship `json:"relationship,omitempty"`
 	// The employee this person is a dependent of.
 	Employee *string `json:"employee,omitempty"`
@@ -2976,11 +2439,11 @@ type Dependent struct {
 	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
 	// The dependent's gender.
 	//
-	// * `MALE` - MALE
-	// * `FEMALE` - FEMALE
-	// * `NON-BINARY` - NON-BINARY
-	// * `OTHER` - OTHER
-	// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+	// - `MALE` - MALE
+	// - `FEMALE` - FEMALE
+	// - `NON-BINARY` - NON-BINARY
+	// - `OTHER` - OTHER
+	// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 	Gender *DependentGender `json:"gender,omitempty"`
 	// The dependent's phone number.
 	PhoneNumber *string `json:"phone_number,omitempty"`
@@ -2994,18 +2457,43 @@ type Dependent struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *Dependent) UnmarshalJSON(data []byte) error {
+	type unmarshaler Dependent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = Dependent(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *Dependent) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 // The dependent's gender.
 //
-// * `MALE` - MALE
-// * `FEMALE` - FEMALE
-// * `NON-BINARY` - NON-BINARY
-// * `OTHER` - OTHER
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+// - `MALE` - MALE
+// - `FEMALE` - FEMALE
+// - `NON-BINARY` - NON-BINARY
+// - `OTHER` - OTHER
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 type DependentGender struct {
 	typeName   string
 	GenderEnum GenderEnum
@@ -3065,9 +2553,9 @@ func (d *DependentGender) Accept(visitor DependentGenderVisitor) error {
 
 // The dependent's relationship to the employee.
 //
-// * `CHILD` - CHILD
-// * `SPOUSE` - SPOUSE
-// * `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
+// - `CHILD` - CHILD
+// - `SPOUSE` - SPOUSE
+// - `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
 type DependentRelationship struct {
 	typeName         string
 	RelationshipEnum RelationshipEnum
@@ -3126,10 +2614,13 @@ func (d *DependentRelationship) Accept(visitor DependentRelationshipVisitor) err
 }
 
 // # The Earning Object
+//
 // ### Description
+//
 // The `Earning` object is used to represent an array of different compensations that an employee receives within specific wage categories.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Earnings` endpoint and filter by `ID` to show all earnings.
 type Earning struct {
 	Id *string `json:"id,omitempty"`
@@ -3140,26 +2631,51 @@ type Earning struct {
 	Amount *float64 `json:"amount,omitempty"`
 	// The type of earning.
 	//
-	// * `SALARY` - SALARY
-	// * `REIMBURSEMENT` - REIMBURSEMENT
-	// * `OVERTIME` - OVERTIME
-	// * `BONUS` - BONUS
+	// - `SALARY` - SALARY
+	// - `REIMBURSEMENT` - REIMBURSEMENT
+	// - `OVERTIME` - OVERTIME
+	// - `BONUS` - BONUS
 	Type *EarningType `json:"type,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *Earning) UnmarshalJSON(data []byte) error {
+	type unmarshaler Earning
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = Earning(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *Earning) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The type of earning.
 //
-// * `SALARY` - SALARY
-// * `REIMBURSEMENT` - REIMBURSEMENT
-// * `OVERTIME` - OVERTIME
-// * `BONUS` - BONUS
+// - `SALARY` - SALARY
+// - `REIMBURSEMENT` - REIMBURSEMENT
+// - `OVERTIME` - OVERTIME
+// - `BONUS` - BONUS
 type EarningType struct {
 	typeName        string
 	EarningTypeEnum EarningTypeEnum
@@ -3217,65 +2733,46 @@ func (e *EarningType) Accept(visitor EarningTypeVisitor) error {
 	}
 }
 
-// * `SALARY` - SALARY
-// * `REIMBURSEMENT` - REIMBURSEMENT
-// * `OVERTIME` - OVERTIME
-// * `BONUS` - BONUS
-type EarningTypeEnum uint
+// - `SALARY` - SALARY
+// - `REIMBURSEMENT` - REIMBURSEMENT
+// - `OVERTIME` - OVERTIME
+// - `BONUS` - BONUS
+type EarningTypeEnum string
 
 const (
-	EarningTypeEnumSalary EarningTypeEnum = iota + 1
-	EarningTypeEnumReimbursement
-	EarningTypeEnumOvertime
-	EarningTypeEnumBonus
+	EarningTypeEnumSalary        EarningTypeEnum = "SALARY"
+	EarningTypeEnumReimbursement EarningTypeEnum = "REIMBURSEMENT"
+	EarningTypeEnumOvertime      EarningTypeEnum = "OVERTIME"
+	EarningTypeEnumBonus         EarningTypeEnum = "BONUS"
 )
 
-func (e EarningTypeEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EarningTypeEnumSalary:
-		return "SALARY"
-	case EarningTypeEnumReimbursement:
-		return "REIMBURSEMENT"
-	case EarningTypeEnumOvertime:
-		return "OVERTIME"
-	case EarningTypeEnumBonus:
-		return "BONUS"
-	}
-}
-
-func (e EarningTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EarningTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEarningTypeEnumFromString(s string) (EarningTypeEnum, error) {
+	switch s {
 	case "SALARY":
-		value := EarningTypeEnumSalary
-		*e = value
+		return EarningTypeEnumSalary, nil
 	case "REIMBURSEMENT":
-		value := EarningTypeEnumReimbursement
-		*e = value
+		return EarningTypeEnumReimbursement, nil
 	case "OVERTIME":
-		value := EarningTypeEnumOvertime
-		*e = value
+		return EarningTypeEnumOvertime, nil
 	case "BONUS":
-		value := EarningTypeEnumBonus
-		*e = value
+		return EarningTypeEnumBonus, nil
 	}
-	return nil
+	var t EarningTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EarningTypeEnum) Ptr() *EarningTypeEnum {
+	return &e
 }
 
 // # The Employee Object
+//
 // ### Description
+//
 // The `Employee` object is used to represent any person who has been employed by a company.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Employee` endpoint and filter by `ID` to show all employees.
 type Employee struct {
 	Id *string `json:"id,omitempty"`
@@ -3318,30 +2815,30 @@ type Employee struct {
 	Ssn *string `json:"ssn,omitempty"`
 	// The employee's gender.
 	//
-	// * `MALE` - MALE
-	// * `FEMALE` - FEMALE
-	// * `NON-BINARY` - NON-BINARY
-	// * `OTHER` - OTHER
-	// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+	// - `MALE` - MALE
+	// - `FEMALE` - FEMALE
+	// - `NON-BINARY` - NON-BINARY
+	// - `OTHER` - OTHER
+	// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 	Gender *EmployeeGender `json:"gender,omitempty"`
 	// The employee's ethnicity.
 	//
-	// * `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
-	// * `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
-	// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-	// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-	// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-	// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-	// * `WHITE` - WHITE
-	// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+	// - `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
+	// - `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
+	// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+	// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+	// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+	// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+	// - `WHITE` - WHITE
+	// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 	Ethnicity *EmployeeEthnicity `json:"ethnicity,omitempty"`
 	// The employee's filing status as related to marital status.
 	//
-	// * `SINGLE` - SINGLE
-	// * `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
-	// * `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
-	// * `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
-	// * `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
+	// - `SINGLE` - SINGLE
+	// - `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
+	// - `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
+	// - `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
+	// - `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
 	MaritalStatus *EmployeeMaritalStatus `json:"marital_status,omitempty"`
 	// The employee's date of birth.
 	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
@@ -3353,22 +2850,47 @@ type Employee struct {
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// The employment status of the employee.
 	//
-	// * `ACTIVE` - ACTIVE
-	// * `PENDING` - PENDING
-	// * `INACTIVE` - INACTIVE
+	// - `ACTIVE` - ACTIVE
+	// - `PENDING` - PENDING
+	// - `INACTIVE` - INACTIVE
 	EmploymentStatus *EmployeeEmploymentStatus `json:"employment_status,omitempty"`
 	// The employee's termination date.
 	TerminationDate *time.Time `json:"termination_date,omitempty"`
 	// The URL of the employee's avatar image.
 	Avatar *string `json:"avatar,omitempty"`
 	// Custom fields configured for a given model.
-	CustomFields     map[string]any `json:"custom_fields,omitempty"`
-	RemoteWasDeleted *bool          `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time     `json:"created_at,omitempty"`
+	CustomFields     map[string]interface{} `json:"custom_fields,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	CreatedAt        *time.Time             `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *Employee) UnmarshalJSON(data []byte) error {
+	type unmarshaler Employee
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = Employee(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *Employee) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The ID of the employee's company.
@@ -3431,9 +2953,9 @@ func (e *EmployeeCompany) Accept(visitor EmployeeCompanyVisitor) error {
 
 // The employment status of the employee.
 //
-// * `ACTIVE` - ACTIVE
-// * `PENDING` - PENDING
-// * `INACTIVE` - INACTIVE
+// - `ACTIVE` - ACTIVE
+// - `PENDING` - PENDING
+// - `INACTIVE` - INACTIVE
 type EmployeeEmploymentStatus struct {
 	typeName             string
 	EmploymentStatusEnum EmploymentStatusEnum
@@ -3550,14 +3072,14 @@ func (e *EmployeeEmploymentsItem) Accept(visitor EmployeeEmploymentsItemVisitor)
 
 // The employee's ethnicity.
 //
-// * `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
-// * `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
-// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-// * `WHITE` - WHITE
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+// - `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
+// - `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
+// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+// - `WHITE` - WHITE
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 type EmployeeEthnicity struct {
 	typeName      string
 	EthnicityEnum EthnicityEnum
@@ -3617,11 +3139,11 @@ func (e *EmployeeEthnicity) Accept(visitor EmployeeEthnicityVisitor) error {
 
 // The employee's gender.
 //
-// * `MALE` - MALE
-// * `FEMALE` - FEMALE
-// * `NON-BINARY` - NON-BINARY
-// * `OTHER` - OTHER
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+// - `MALE` - MALE
+// - `FEMALE` - FEMALE
+// - `NON-BINARY` - NON-BINARY
+// - `OTHER` - OTHER
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 type EmployeeGender struct {
 	typeName   string
 	GenderEnum GenderEnum
@@ -3854,11 +3376,11 @@ func (e *EmployeeManager) Accept(visitor EmployeeManagerVisitor) error {
 
 // The employee's filing status as related to marital status.
 //
-// * `SINGLE` - SINGLE
-// * `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
-// * `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
-// * `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
-// * `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
+// - `SINGLE` - SINGLE
+// - `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
+// - `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
+// - `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
+// - `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
 type EmployeeMaritalStatus struct {
 	typeName          string
 	MaritalStatusEnum MaritalStatusEnum
@@ -3975,10 +3497,13 @@ func (e *EmployeePayGroup) Accept(visitor EmployeePayGroupVisitor) error {
 }
 
 // # The EmployeePayrollRun Object
+//
 // ### Description
+//
 // The `EmployeePayrollRun` object is used to represent an employee's pay statement for a specific payroll run.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST EmployeePayrollRun` endpoint and filter by `ID` to show all employee payroll runs.
 type EmployeePayrollRun struct {
 	Id *string `json:"id,omitempty"`
@@ -4005,9 +3530,34 @@ type EmployeePayrollRun struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EmployeePayrollRun) UnmarshalJSON(data []byte) error {
+	type unmarshaler EmployeePayrollRun
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EmployeePayrollRun(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EmployeePayrollRun) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The employee whose payroll is being run.
@@ -4126,99 +3676,14 @@ func (e *EmployeePayrollRunPayrollRun) Accept(visitor EmployeePayrollRunPayrollR
 	}
 }
 
-type EmployeePayrollRunsListRequestExpand uint
-
-const (
-	EmployeePayrollRunsListRequestExpandEmployee EmployeePayrollRunsListRequestExpand = iota + 1
-	EmployeePayrollRunsListRequestExpandEmployeePayrollRun
-	EmployeePayrollRunsListRequestExpandPayrollRun
-)
-
-func (e EmployeePayrollRunsListRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeePayrollRunsListRequestExpandEmployee:
-		return "employee"
-	case EmployeePayrollRunsListRequestExpandEmployeePayrollRun:
-		return "employee,payroll_run"
-	case EmployeePayrollRunsListRequestExpandPayrollRun:
-		return "payroll_run"
-	}
-}
-
-func (e EmployeePayrollRunsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeePayrollRunsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employee":
-		value := EmployeePayrollRunsListRequestExpandEmployee
-		*e = value
-	case "employee,payroll_run":
-		value := EmployeePayrollRunsListRequestExpandEmployeePayrollRun
-		*e = value
-	case "payroll_run":
-		value := EmployeePayrollRunsListRequestExpandPayrollRun
-		*e = value
-	}
-	return nil
-}
-
-type EmployeePayrollRunsRetrieveRequestExpand uint
-
-const (
-	EmployeePayrollRunsRetrieveRequestExpandEmployee EmployeePayrollRunsRetrieveRequestExpand = iota + 1
-	EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun
-	EmployeePayrollRunsRetrieveRequestExpandPayrollRun
-)
-
-func (e EmployeePayrollRunsRetrieveRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeePayrollRunsRetrieveRequestExpandEmployee:
-		return "employee"
-	case EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun:
-		return "employee,payroll_run"
-	case EmployeePayrollRunsRetrieveRequestExpandPayrollRun:
-		return "payroll_run"
-	}
-}
-
-func (e EmployeePayrollRunsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeePayrollRunsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employee":
-		value := EmployeePayrollRunsRetrieveRequestExpandEmployee
-		*e = value
-	case "employee,payroll_run":
-		value := EmployeePayrollRunsRetrieveRequestExpandEmployeePayrollRun
-		*e = value
-	case "payroll_run":
-		value := EmployeePayrollRunsRetrieveRequestExpandPayrollRun
-		*e = value
-	}
-	return nil
-}
-
 // # The Employee Object
+//
 // ### Description
+//
 // The `Employee` object is used to represent any person who has been employed by a company.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Employee` endpoint and filter by `ID` to show all employees.
 type EmployeeRequest struct {
 	// The employee's number that appears in the third-party integration's UI.
@@ -4258,30 +3723,30 @@ type EmployeeRequest struct {
 	Ssn *string `json:"ssn,omitempty"`
 	// The employee's gender.
 	//
-	// * `MALE` - MALE
-	// * `FEMALE` - FEMALE
-	// * `NON-BINARY` - NON-BINARY
-	// * `OTHER` - OTHER
-	// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+	// - `MALE` - MALE
+	// - `FEMALE` - FEMALE
+	// - `NON-BINARY` - NON-BINARY
+	// - `OTHER` - OTHER
+	// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 	Gender *EmployeeRequestGender `json:"gender,omitempty"`
 	// The employee's ethnicity.
 	//
-	// * `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
-	// * `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
-	// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-	// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-	// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-	// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-	// * `WHITE` - WHITE
-	// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+	// - `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
+	// - `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
+	// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+	// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+	// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+	// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+	// - `WHITE` - WHITE
+	// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 	Ethnicity *EmployeeRequestEthnicity `json:"ethnicity,omitempty"`
 	// The employee's filing status as related to marital status.
 	//
-	// * `SINGLE` - SINGLE
-	// * `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
-	// * `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
-	// * `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
-	// * `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
+	// - `SINGLE` - SINGLE
+	// - `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
+	// - `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
+	// - `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
+	// - `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
 	MaritalStatus *EmployeeRequestMaritalStatus `json:"marital_status,omitempty"`
 	// The employee's date of birth.
 	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
@@ -4291,16 +3756,41 @@ type EmployeeRequest struct {
 	StartDate *time.Time `json:"start_date,omitempty"`
 	// The employment status of the employee.
 	//
-	// * `ACTIVE` - ACTIVE
-	// * `PENDING` - PENDING
-	// * `INACTIVE` - INACTIVE
+	// - `ACTIVE` - ACTIVE
+	// - `PENDING` - PENDING
+	// - `INACTIVE` - INACTIVE
 	EmploymentStatus *EmployeeRequestEmploymentStatus `json:"employment_status,omitempty"`
 	// The employee's termination date.
 	TerminationDate *time.Time `json:"termination_date,omitempty"`
 	// The URL of the employee's avatar image.
-	Avatar              *string        `json:"avatar,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	Avatar              *string                `json:"avatar,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EmployeeRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler EmployeeRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EmployeeRequest(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EmployeeRequest) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The ID of the employee's company.
@@ -4363,9 +3853,9 @@ func (e *EmployeeRequestCompany) Accept(visitor EmployeeRequestCompanyVisitor) e
 
 // The employment status of the employee.
 //
-// * `ACTIVE` - ACTIVE
-// * `PENDING` - PENDING
-// * `INACTIVE` - INACTIVE
+// - `ACTIVE` - ACTIVE
+// - `PENDING` - PENDING
+// - `INACTIVE` - INACTIVE
 type EmployeeRequestEmploymentStatus struct {
 	typeName             string
 	EmploymentStatusEnum EmploymentStatusEnum
@@ -4482,14 +3972,14 @@ func (e *EmployeeRequestEmploymentsItem) Accept(visitor EmployeeRequestEmploymen
 
 // The employee's ethnicity.
 //
-// * `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
-// * `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
-// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-// * `WHITE` - WHITE
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+// - `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
+// - `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
+// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+// - `WHITE` - WHITE
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 type EmployeeRequestEthnicity struct {
 	typeName      string
 	EthnicityEnum EthnicityEnum
@@ -4549,11 +4039,11 @@ func (e *EmployeeRequestEthnicity) Accept(visitor EmployeeRequestEthnicityVisito
 
 // The employee's gender.
 //
-// * `MALE` - MALE
-// * `FEMALE` - FEMALE
-// * `NON-BINARY` - NON-BINARY
-// * `OTHER` - OTHER
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+// - `MALE` - MALE
+// - `FEMALE` - FEMALE
+// - `NON-BINARY` - NON-BINARY
+// - `OTHER` - OTHER
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
 type EmployeeRequestGender struct {
 	typeName   string
 	GenderEnum GenderEnum
@@ -4786,11 +4276,11 @@ func (e *EmployeeRequestManager) Accept(visitor EmployeeRequestManagerVisitor) e
 
 // The employee's filing status as related to marital status.
 //
-// * `SINGLE` - SINGLE
-// * `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
-// * `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
-// * `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
-// * `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
+// - `SINGLE` - SINGLE
+// - `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
+// - `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
+// - `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
+// - `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
 type EmployeeRequestMaritalStatus struct {
 	typeName          string
 	MaritalStatusEnum MaritalStatusEnum
@@ -5027,6 +4517,31 @@ type EmployeeResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EmployeeResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler EmployeeResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EmployeeResponse(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EmployeeResponse) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The employee's team.
@@ -5145,3631 +4660,14 @@ func (e *EmployeeWorkLocation) Accept(visitor EmployeeWorkLocationVisitor) error
 	}
 }
 
-type EmployeesListRequestEmploymentStatus uint
-
-const (
-	EmployeesListRequestEmploymentStatusActive EmployeesListRequestEmploymentStatus = iota + 1
-	EmployeesListRequestEmploymentStatusInactive
-	EmployeesListRequestEmploymentStatusPending
-)
-
-func (e EmployeesListRequestEmploymentStatus) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesListRequestEmploymentStatusActive:
-		return "ACTIVE"
-	case EmployeesListRequestEmploymentStatusInactive:
-		return "INACTIVE"
-	case EmployeesListRequestEmploymentStatusPending:
-		return "PENDING"
-	}
-}
-
-func (e EmployeesListRequestEmploymentStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesListRequestEmploymentStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ACTIVE":
-		value := EmployeesListRequestEmploymentStatusActive
-		*e = value
-	case "INACTIVE":
-		value := EmployeesListRequestEmploymentStatusInactive
-		*e = value
-	case "PENDING":
-		value := EmployeesListRequestEmploymentStatusPending
-		*e = value
-	}
-	return nil
-}
-
-type EmployeesListRequestExpand uint
-
-const (
-	EmployeesListRequestExpandCompany EmployeesListRequestExpand = iota + 1
-	EmployeesListRequestExpandCompanyPayGroup
-	EmployeesListRequestExpandEmployments
-	EmployeesListRequestExpandEmploymentsCompany
-	EmployeesListRequestExpandEmploymentsCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroups
-	EmployeesListRequestExpandEmploymentsGroupsCompany
-	EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocation
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsManager
-	EmployeesListRequestExpandEmploymentsGroupsManagerCompany
-	EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsManagerTeam
-	EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsTeam
-	EmployeesListRequestExpandEmploymentsGroupsTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocation
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocation
-	EmployeesListRequestExpandEmploymentsHomeLocationCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationManager
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationTeam
-	EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
-	EmployeesListRequestExpandEmploymentsManager
-	EmployeesListRequestExpandEmploymentsManagerCompany
-	EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsManagerPayGroup
-	EmployeesListRequestExpandEmploymentsManagerTeam
-	EmployeesListRequestExpandEmploymentsManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsPayGroup
-	EmployeesListRequestExpandEmploymentsTeam
-	EmployeesListRequestExpandEmploymentsTeamCompany
-	EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsTeamPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocation
-	EmployeesListRequestExpandEmploymentsWorkLocationCompany
-	EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationManager
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationTeam
-	EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany
-	EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup
-	EmployeesListRequestExpandGroups
-	EmployeesListRequestExpandGroupsCompany
-	EmployeesListRequestExpandGroupsCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocation
-	EmployeesListRequestExpandGroupsHomeLocationCompany
-	EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationManager
-	EmployeesListRequestExpandGroupsHomeLocationManagerCompany
-	EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationManagerTeam
-	EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany
-	EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationTeam
-	EmployeesListRequestExpandGroupsHomeLocationTeamCompany
-	EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocation
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
-	EmployeesListRequestExpandGroupsManager
-	EmployeesListRequestExpandGroupsManagerCompany
-	EmployeesListRequestExpandGroupsManagerCompanyPayGroup
-	EmployeesListRequestExpandGroupsManagerPayGroup
-	EmployeesListRequestExpandGroupsManagerTeam
-	EmployeesListRequestExpandGroupsManagerTeamCompany
-	EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsManagerTeamPayGroup
-	EmployeesListRequestExpandGroupsPayGroup
-	EmployeesListRequestExpandGroupsTeam
-	EmployeesListRequestExpandGroupsTeamCompany
-	EmployeesListRequestExpandGroupsTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsTeamPayGroup
-	EmployeesListRequestExpandGroupsWorkLocation
-	EmployeesListRequestExpandGroupsWorkLocationCompany
-	EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationManager
-	EmployeesListRequestExpandGroupsWorkLocationManagerCompany
-	EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationManagerTeam
-	EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationTeam
-	EmployeesListRequestExpandGroupsWorkLocationTeamCompany
-	EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup
-	EmployeesListRequestExpandHomeLocation
-	EmployeesListRequestExpandHomeLocationCompany
-	EmployeesListRequestExpandHomeLocationCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationManager
-	EmployeesListRequestExpandHomeLocationManagerCompany
-	EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationManagerPayGroup
-	EmployeesListRequestExpandHomeLocationManagerTeam
-	EmployeesListRequestExpandHomeLocationManagerTeamCompany
-	EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationManagerTeamPayGroup
-	EmployeesListRequestExpandHomeLocationPayGroup
-	EmployeesListRequestExpandHomeLocationTeam
-	EmployeesListRequestExpandHomeLocationTeamCompany
-	EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationTeamPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocation
-	EmployeesListRequestExpandHomeLocationWorkLocationCompany
-	EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationManager
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationTeam
-	EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany
-	EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup
-	EmployeesListRequestExpandManager
-	EmployeesListRequestExpandManagerCompany
-	EmployeesListRequestExpandManagerCompanyPayGroup
-	EmployeesListRequestExpandManagerPayGroup
-	EmployeesListRequestExpandManagerTeam
-	EmployeesListRequestExpandManagerTeamCompany
-	EmployeesListRequestExpandManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandManagerTeamPayGroup
-	EmployeesListRequestExpandPayGroup
-	EmployeesListRequestExpandTeam
-	EmployeesListRequestExpandTeamCompany
-	EmployeesListRequestExpandTeamCompanyPayGroup
-	EmployeesListRequestExpandTeamPayGroup
-	EmployeesListRequestExpandWorkLocation
-	EmployeesListRequestExpandWorkLocationCompany
-	EmployeesListRequestExpandWorkLocationCompanyPayGroup
-	EmployeesListRequestExpandWorkLocationManager
-	EmployeesListRequestExpandWorkLocationManagerCompany
-	EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup
-	EmployeesListRequestExpandWorkLocationManagerPayGroup
-	EmployeesListRequestExpandWorkLocationManagerTeam
-	EmployeesListRequestExpandWorkLocationManagerTeamCompany
-	EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup
-	EmployeesListRequestExpandWorkLocationManagerTeamPayGroup
-	EmployeesListRequestExpandWorkLocationPayGroup
-	EmployeesListRequestExpandWorkLocationTeam
-	EmployeesListRequestExpandWorkLocationTeamCompany
-	EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup
-	EmployeesListRequestExpandWorkLocationTeamPayGroup
-)
-
-func (e EmployeesListRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesListRequestExpandCompany:
-		return "company"
-	case EmployeesListRequestExpandCompanyPayGroup:
-		return "company,pay_group"
-	case EmployeesListRequestExpandEmployments:
-		return "employments"
-	case EmployeesListRequestExpandEmploymentsCompany:
-		return "employments,company"
-	case EmployeesListRequestExpandEmploymentsCompanyPayGroup:
-		return "employments,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroups:
-		return "employments,groups"
-	case EmployeesListRequestExpandEmploymentsGroupsCompany:
-		return "employments,groups,company"
-	case EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup:
-		return "employments,groups,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocation:
-		return "employments,groups,home_location"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany:
-		return "employments,groups,home_location,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup:
-		return "employments,groups,home_location,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager:
-		return "employments,groups,home_location,manager"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany:
-		return "employments,groups,home_location,manager,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup:
-		return "employments,groups,home_location,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup:
-		return "employments,groups,home_location,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam:
-		return "employments,groups,home_location,manager,team"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany:
-		return "employments,groups,home_location,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup:
-		return "employments,groups,home_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup:
-		return "employments,groups,home_location,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup:
-		return "employments,groups,home_location,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam:
-		return "employments,groups,home_location,team"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany:
-		return "employments,groups,home_location,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup:
-		return "employments,groups,home_location,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup:
-		return "employments,groups,home_location,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation:
-		return "employments,groups,home_location,work_location"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany:
-		return "employments,groups,home_location,work_location,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup:
-		return "employments,groups,home_location,work_location,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager:
-		return "employments,groups,home_location,work_location,manager"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany:
-		return "employments,groups,home_location,work_location,manager,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "employments,groups,home_location,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup:
-		return "employments,groups,home_location,work_location,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam:
-		return "employments,groups,home_location,work_location,manager,team"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany:
-		return "employments,groups,home_location,work_location,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,groups,home_location,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup:
-		return "employments,groups,home_location,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup:
-		return "employments,groups,home_location,work_location,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam:
-		return "employments,groups,home_location,work_location,team"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany:
-		return "employments,groups,home_location,work_location,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "employments,groups,home_location,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup:
-		return "employments,groups,home_location,work_location,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsManager:
-		return "employments,groups,manager"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerCompany:
-		return "employments,groups,manager,company"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup:
-		return "employments,groups,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup:
-		return "employments,groups,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerTeam:
-		return "employments,groups,manager,team"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany:
-		return "employments,groups,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup:
-		return "employments,groups,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup:
-		return "employments,groups,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsPayGroup:
-		return "employments,groups,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsTeam:
-		return "employments,groups,team"
-	case EmployeesListRequestExpandEmploymentsGroupsTeamCompany:
-		return "employments,groups,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup:
-		return "employments,groups,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup:
-		return "employments,groups,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocation:
-		return "employments,groups,work_location"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany:
-		return "employments,groups,work_location,company"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup:
-		return "employments,groups,work_location,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager:
-		return "employments,groups,work_location,manager"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany:
-		return "employments,groups,work_location,manager,company"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup:
-		return "employments,groups,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup:
-		return "employments,groups,work_location,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam:
-		return "employments,groups,work_location,manager,team"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany:
-		return "employments,groups,work_location,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,groups,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup:
-		return "employments,groups,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup:
-		return "employments,groups,work_location,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam:
-		return "employments,groups,work_location,team"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany:
-		return "employments,groups,work_location,team,company"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup:
-		return "employments,groups,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup:
-		return "employments,groups,work_location,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocation:
-		return "employments,home_location"
-	case EmployeesListRequestExpandEmploymentsHomeLocationCompany:
-		return "employments,home_location,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup:
-		return "employments,home_location,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManager:
-		return "employments,home_location,manager"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany:
-		return "employments,home_location,manager,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup:
-		return "employments,home_location,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup:
-		return "employments,home_location,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam:
-		return "employments,home_location,manager,team"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany:
-		return "employments,home_location,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup:
-		return "employments,home_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup:
-		return "employments,home_location,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationPayGroup:
-		return "employments,home_location,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationTeam:
-		return "employments,home_location,team"
-	case EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany:
-		return "employments,home_location,team,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup:
-		return "employments,home_location,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup:
-		return "employments,home_location,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation:
-		return "employments,home_location,work_location"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany:
-		return "employments,home_location,work_location,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup:
-		return "employments,home_location,work_location,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager:
-		return "employments,home_location,work_location,manager"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany:
-		return "employments,home_location,work_location,manager,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "employments,home_location,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup:
-		return "employments,home_location,work_location,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam:
-		return "employments,home_location,work_location,manager,team"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany:
-		return "employments,home_location,work_location,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,home_location,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup:
-		return "employments,home_location,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup:
-		return "employments,home_location,work_location,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam:
-		return "employments,home_location,work_location,team"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany:
-		return "employments,home_location,work_location,team,company"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "employments,home_location,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup:
-		return "employments,home_location,work_location,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsManager:
-		return "employments,manager"
-	case EmployeesListRequestExpandEmploymentsManagerCompany:
-		return "employments,manager,company"
-	case EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup:
-		return "employments,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsManagerPayGroup:
-		return "employments,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsManagerTeam:
-		return "employments,manager,team"
-	case EmployeesListRequestExpandEmploymentsManagerTeamCompany:
-		return "employments,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup:
-		return "employments,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsManagerTeamPayGroup:
-		return "employments,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsPayGroup:
-		return "employments,pay_group"
-	case EmployeesListRequestExpandEmploymentsTeam:
-		return "employments,team"
-	case EmployeesListRequestExpandEmploymentsTeamCompany:
-		return "employments,team,company"
-	case EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup:
-		return "employments,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsTeamPayGroup:
-		return "employments,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocation:
-		return "employments,work_location"
-	case EmployeesListRequestExpandEmploymentsWorkLocationCompany:
-		return "employments,work_location,company"
-	case EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup:
-		return "employments,work_location,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManager:
-		return "employments,work_location,manager"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany:
-		return "employments,work_location,manager,company"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup:
-		return "employments,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup:
-		return "employments,work_location,manager,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam:
-		return "employments,work_location,manager,team"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany:
-		return "employments,work_location,manager,team,company"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup:
-		return "employments,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationPayGroup:
-		return "employments,work_location,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationTeam:
-		return "employments,work_location,team"
-	case EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany:
-		return "employments,work_location,team,company"
-	case EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup:
-		return "employments,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup:
-		return "employments,work_location,team,pay_group"
-	case EmployeesListRequestExpandGroups:
-		return "groups"
-	case EmployeesListRequestExpandGroupsCompany:
-		return "groups,company"
-	case EmployeesListRequestExpandGroupsCompanyPayGroup:
-		return "groups,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocation:
-		return "groups,home_location"
-	case EmployeesListRequestExpandGroupsHomeLocationCompany:
-		return "groups,home_location,company"
-	case EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup:
-		return "groups,home_location,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationManager:
-		return "groups,home_location,manager"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerCompany:
-		return "groups,home_location,manager,company"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup:
-		return "groups,home_location,manager,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup:
-		return "groups,home_location,manager,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerTeam:
-		return "groups,home_location,manager,team"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany:
-		return "groups,home_location,manager,team,company"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup:
-		return "groups,home_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup:
-		return "groups,home_location,manager,team,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationPayGroup:
-		return "groups,home_location,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationTeam:
-		return "groups,home_location,team"
-	case EmployeesListRequestExpandGroupsHomeLocationTeamCompany:
-		return "groups,home_location,team,company"
-	case EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup:
-		return "groups,home_location,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup:
-		return "groups,home_location,team,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocation:
-		return "groups,home_location,work_location"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany:
-		return "groups,home_location,work_location,company"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup:
-		return "groups,home_location,work_location,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager:
-		return "groups,home_location,work_location,manager"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany:
-		return "groups,home_location,work_location,manager,company"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "groups,home_location,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup:
-		return "groups,home_location,work_location,manager,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam:
-		return "groups,home_location,work_location,manager,team"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany:
-		return "groups,home_location,work_location,manager,team,company"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "groups,home_location,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup:
-		return "groups,home_location,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup:
-		return "groups,home_location,work_location,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam:
-		return "groups,home_location,work_location,team"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany:
-		return "groups,home_location,work_location,team,company"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "groups,home_location,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup:
-		return "groups,home_location,work_location,team,pay_group"
-	case EmployeesListRequestExpandGroupsManager:
-		return "groups,manager"
-	case EmployeesListRequestExpandGroupsManagerCompany:
-		return "groups,manager,company"
-	case EmployeesListRequestExpandGroupsManagerCompanyPayGroup:
-		return "groups,manager,company,pay_group"
-	case EmployeesListRequestExpandGroupsManagerPayGroup:
-		return "groups,manager,pay_group"
-	case EmployeesListRequestExpandGroupsManagerTeam:
-		return "groups,manager,team"
-	case EmployeesListRequestExpandGroupsManagerTeamCompany:
-		return "groups,manager,team,company"
-	case EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup:
-		return "groups,manager,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsManagerTeamPayGroup:
-		return "groups,manager,team,pay_group"
-	case EmployeesListRequestExpandGroupsPayGroup:
-		return "groups,pay_group"
-	case EmployeesListRequestExpandGroupsTeam:
-		return "groups,team"
-	case EmployeesListRequestExpandGroupsTeamCompany:
-		return "groups,team,company"
-	case EmployeesListRequestExpandGroupsTeamCompanyPayGroup:
-		return "groups,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsTeamPayGroup:
-		return "groups,team,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocation:
-		return "groups,work_location"
-	case EmployeesListRequestExpandGroupsWorkLocationCompany:
-		return "groups,work_location,company"
-	case EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup:
-		return "groups,work_location,company,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationManager:
-		return "groups,work_location,manager"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerCompany:
-		return "groups,work_location,manager,company"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup:
-		return "groups,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup:
-		return "groups,work_location,manager,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerTeam:
-		return "groups,work_location,manager,team"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany:
-		return "groups,work_location,manager,team,company"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup:
-		return "groups,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup:
-		return "groups,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationPayGroup:
-		return "groups,work_location,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationTeam:
-		return "groups,work_location,team"
-	case EmployeesListRequestExpandGroupsWorkLocationTeamCompany:
-		return "groups,work_location,team,company"
-	case EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup:
-		return "groups,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup:
-		return "groups,work_location,team,pay_group"
-	case EmployeesListRequestExpandHomeLocation:
-		return "home_location"
-	case EmployeesListRequestExpandHomeLocationCompany:
-		return "home_location,company"
-	case EmployeesListRequestExpandHomeLocationCompanyPayGroup:
-		return "home_location,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationManager:
-		return "home_location,manager"
-	case EmployeesListRequestExpandHomeLocationManagerCompany:
-		return "home_location,manager,company"
-	case EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup:
-		return "home_location,manager,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationManagerPayGroup:
-		return "home_location,manager,pay_group"
-	case EmployeesListRequestExpandHomeLocationManagerTeam:
-		return "home_location,manager,team"
-	case EmployeesListRequestExpandHomeLocationManagerTeamCompany:
-		return "home_location,manager,team,company"
-	case EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup:
-		return "home_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationManagerTeamPayGroup:
-		return "home_location,manager,team,pay_group"
-	case EmployeesListRequestExpandHomeLocationPayGroup:
-		return "home_location,pay_group"
-	case EmployeesListRequestExpandHomeLocationTeam:
-		return "home_location,team"
-	case EmployeesListRequestExpandHomeLocationTeamCompany:
-		return "home_location,team,company"
-	case EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup:
-		return "home_location,team,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationTeamPayGroup:
-		return "home_location,team,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocation:
-		return "home_location,work_location"
-	case EmployeesListRequestExpandHomeLocationWorkLocationCompany:
-		return "home_location,work_location,company"
-	case EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup:
-		return "home_location,work_location,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManager:
-		return "home_location,work_location,manager"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany:
-		return "home_location,work_location,manager,company"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "home_location,work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup:
-		return "home_location,work_location,manager,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam:
-		return "home_location,work_location,manager,team"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany:
-		return "home_location,work_location,manager,team,company"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "home_location,work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup:
-		return "home_location,work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationPayGroup:
-		return "home_location,work_location,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationTeam:
-		return "home_location,work_location,team"
-	case EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany:
-		return "home_location,work_location,team,company"
-	case EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "home_location,work_location,team,company,pay_group"
-	case EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup:
-		return "home_location,work_location,team,pay_group"
-	case EmployeesListRequestExpandManager:
-		return "manager"
-	case EmployeesListRequestExpandManagerCompany:
-		return "manager,company"
-	case EmployeesListRequestExpandManagerCompanyPayGroup:
-		return "manager,company,pay_group"
-	case EmployeesListRequestExpandManagerPayGroup:
-		return "manager,pay_group"
-	case EmployeesListRequestExpandManagerTeam:
-		return "manager,team"
-	case EmployeesListRequestExpandManagerTeamCompany:
-		return "manager,team,company"
-	case EmployeesListRequestExpandManagerTeamCompanyPayGroup:
-		return "manager,team,company,pay_group"
-	case EmployeesListRequestExpandManagerTeamPayGroup:
-		return "manager,team,pay_group"
-	case EmployeesListRequestExpandPayGroup:
-		return "pay_group"
-	case EmployeesListRequestExpandTeam:
-		return "team"
-	case EmployeesListRequestExpandTeamCompany:
-		return "team,company"
-	case EmployeesListRequestExpandTeamCompanyPayGroup:
-		return "team,company,pay_group"
-	case EmployeesListRequestExpandTeamPayGroup:
-		return "team,pay_group"
-	case EmployeesListRequestExpandWorkLocation:
-		return "work_location"
-	case EmployeesListRequestExpandWorkLocationCompany:
-		return "work_location,company"
-	case EmployeesListRequestExpandWorkLocationCompanyPayGroup:
-		return "work_location,company,pay_group"
-	case EmployeesListRequestExpandWorkLocationManager:
-		return "work_location,manager"
-	case EmployeesListRequestExpandWorkLocationManagerCompany:
-		return "work_location,manager,company"
-	case EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup:
-		return "work_location,manager,company,pay_group"
-	case EmployeesListRequestExpandWorkLocationManagerPayGroup:
-		return "work_location,manager,pay_group"
-	case EmployeesListRequestExpandWorkLocationManagerTeam:
-		return "work_location,manager,team"
-	case EmployeesListRequestExpandWorkLocationManagerTeamCompany:
-		return "work_location,manager,team,company"
-	case EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup:
-		return "work_location,manager,team,company,pay_group"
-	case EmployeesListRequestExpandWorkLocationManagerTeamPayGroup:
-		return "work_location,manager,team,pay_group"
-	case EmployeesListRequestExpandWorkLocationPayGroup:
-		return "work_location,pay_group"
-	case EmployeesListRequestExpandWorkLocationTeam:
-		return "work_location,team"
-	case EmployeesListRequestExpandWorkLocationTeamCompany:
-		return "work_location,team,company"
-	case EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup:
-		return "work_location,team,company,pay_group"
-	case EmployeesListRequestExpandWorkLocationTeamPayGroup:
-		return "work_location,team,pay_group"
-	}
-}
-
-func (e EmployeesListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "company":
-		value := EmployeesListRequestExpandCompany
-		*e = value
-	case "company,pay_group":
-		value := EmployeesListRequestExpandCompanyPayGroup
-		*e = value
-	case "employments":
-		value := EmployeesListRequestExpandEmployments
-		*e = value
-	case "employments,company":
-		value := EmployeesListRequestExpandEmploymentsCompany
-		*e = value
-	case "employments,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsCompanyPayGroup
-		*e = value
-	case "employments,groups":
-		value := EmployeesListRequestExpandEmploymentsGroups
-		*e = value
-	case "employments,groups,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsCompany
-		*e = value
-	case "employments,groups,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocation
-		*e = value
-	case "employments,groups,home_location,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany
-		*e = value
-	case "employments,groups,home_location,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,manager":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager
-		*e = value
-	case "employments,groups,home_location,manager,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany
-		*e = value
-	case "employments,groups,home_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
-		*e = value
-	case "employments,groups,home_location,manager,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam
-		*e = value
-	case "employments,groups,home_location,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
-		*e = value
-	case "employments,groups,home_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
-		*e = value
-	case "employments,groups,home_location,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup
-		*e = value
-	case "employments,groups,home_location,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam
-		*e = value
-	case "employments,groups,home_location,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany
-		*e = value
-	case "employments,groups,home_location,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation
-		*e = value
-	case "employments,groups,home_location,work_location,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
-		*e = value
-	case "employments,groups,home_location,work_location,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
-		*e = value
-	case "employments,groups,home_location,work_location,manager,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "employments,groups,home_location,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
-		*e = value
-	case "employments,groups,home_location,work_location,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "employments,groups,home_location,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "employments,groups,manager":
-		value := EmployeesListRequestExpandEmploymentsGroupsManager
-		*e = value
-	case "employments,groups,manager,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerCompany
-		*e = value
-	case "employments,groups,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup
-		*e = value
-	case "employments,groups,manager,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeam
-		*e = value
-	case "employments,groups,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany
-		*e = value
-	case "employments,groups,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup
-		*e = value
-	case "employments,groups,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsPayGroup
-		*e = value
-	case "employments,groups,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsTeam
-		*e = value
-	case "employments,groups,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsTeamCompany
-		*e = value
-	case "employments,groups,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup
-		*e = value
-	case "employments,groups,work_location":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocation
-		*e = value
-	case "employments,groups,work_location,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany
-		*e = value
-	case "employments,groups,work_location,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,manager":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager
-		*e = value
-	case "employments,groups,work_location,manager,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany
-		*e = value
-	case "employments,groups,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
-		*e = value
-	case "employments,groups,work_location,manager,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam
-		*e = value
-	case "employments,groups,work_location,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,groups,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,groups,work_location,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup
-		*e = value
-	case "employments,groups,work_location,team":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam
-		*e = value
-	case "employments,groups,work_location,team,company":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany
-		*e = value
-	case "employments,groups,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
-		*e = value
-	case "employments,home_location":
-		value := EmployeesListRequestExpandEmploymentsHomeLocation
-		*e = value
-	case "employments,home_location,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationCompany
-		*e = value
-	case "employments,home_location,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup
-		*e = value
-	case "employments,home_location,manager":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManager
-		*e = value
-	case "employments,home_location,manager,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany
-		*e = value
-	case "employments,home_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,home_location,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup
-		*e = value
-	case "employments,home_location,manager,team":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam
-		*e = value
-	case "employments,home_location,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany
-		*e = value
-	case "employments,home_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
-		*e = value
-	case "employments,home_location,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationPayGroup
-		*e = value
-	case "employments,home_location,team":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationTeam
-		*e = value
-	case "employments,home_location,team,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany
-		*e = value
-	case "employments,home_location,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup
-		*e = value
-	case "employments,home_location,work_location":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation
-		*e = value
-	case "employments,home_location,work_location,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany
-		*e = value
-	case "employments,home_location,work_location,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager
-		*e = value
-	case "employments,home_location,work_location,manager,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "employments,home_location,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager,team":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "employments,home_location,work_location,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,home_location,work_location,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
-		*e = value
-	case "employments,home_location,work_location,team":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam
-		*e = value
-	case "employments,home_location,work_location,team,company":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "employments,home_location,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "employments,manager":
-		value := EmployeesListRequestExpandEmploymentsManager
-		*e = value
-	case "employments,manager,company":
-		value := EmployeesListRequestExpandEmploymentsManagerCompany
-		*e = value
-	case "employments,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup
-		*e = value
-	case "employments,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsManagerPayGroup
-		*e = value
-	case "employments,manager,team":
-		value := EmployeesListRequestExpandEmploymentsManagerTeam
-		*e = value
-	case "employments,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsManagerTeamCompany
-		*e = value
-	case "employments,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsManagerTeamPayGroup
-		*e = value
-	case "employments,pay_group":
-		value := EmployeesListRequestExpandEmploymentsPayGroup
-		*e = value
-	case "employments,team":
-		value := EmployeesListRequestExpandEmploymentsTeam
-		*e = value
-	case "employments,team,company":
-		value := EmployeesListRequestExpandEmploymentsTeamCompany
-		*e = value
-	case "employments,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup
-		*e = value
-	case "employments,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsTeamPayGroup
-		*e = value
-	case "employments,work_location":
-		value := EmployeesListRequestExpandEmploymentsWorkLocation
-		*e = value
-	case "employments,work_location,company":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationCompany
-		*e = value
-	case "employments,work_location,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,work_location,manager":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManager
-		*e = value
-	case "employments,work_location,manager,company":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany
-		*e = value
-	case "employments,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup
-		*e = value
-	case "employments,work_location,manager,team":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam
-		*e = value
-	case "employments,work_location,manager,team,company":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,work_location,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationPayGroup
-		*e = value
-	case "employments,work_location,team":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationTeam
-		*e = value
-	case "employments,work_location,team,company":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany
-		*e = value
-	case "employments,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,work_location,team,pay_group":
-		value := EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup
-		*e = value
-	case "groups":
-		value := EmployeesListRequestExpandGroups
-		*e = value
-	case "groups,company":
-		value := EmployeesListRequestExpandGroupsCompany
-		*e = value
-	case "groups,company,pay_group":
-		value := EmployeesListRequestExpandGroupsCompanyPayGroup
-		*e = value
-	case "groups,home_location":
-		value := EmployeesListRequestExpandGroupsHomeLocation
-		*e = value
-	case "groups,home_location,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationCompany
-		*e = value
-	case "groups,home_location,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup
-		*e = value
-	case "groups,home_location,manager":
-		value := EmployeesListRequestExpandGroupsHomeLocationManager
-		*e = value
-	case "groups,home_location,manager,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerCompany
-		*e = value
-	case "groups,home_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "groups,home_location,manager,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup
-		*e = value
-	case "groups,home_location,manager,team":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeam
-		*e = value
-	case "groups,home_location,manager,team,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany
-		*e = value
-	case "groups,home_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup
-		*e = value
-	case "groups,home_location,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationPayGroup
-		*e = value
-	case "groups,home_location,team":
-		value := EmployeesListRequestExpandGroupsHomeLocationTeam
-		*e = value
-	case "groups,home_location,team,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationTeamCompany
-		*e = value
-	case "groups,home_location,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,team,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup
-		*e = value
-	case "groups,home_location,work_location":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocation
-		*e = value
-	case "groups,home_location,work_location,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany
-		*e = value
-	case "groups,home_location,work_location,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager
-		*e = value
-	case "groups,home_location,work_location,manager,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "groups,home_location,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager,team":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "groups,home_location,work_location,manager,team,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "groups,home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "groups,home_location,work_location,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup
-		*e = value
-	case "groups,home_location,work_location,team":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam
-		*e = value
-	case "groups,home_location,work_location,team,company":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "groups,home_location,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,team,pay_group":
-		value := EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "groups,manager":
-		value := EmployeesListRequestExpandGroupsManager
-		*e = value
-	case "groups,manager,company":
-		value := EmployeesListRequestExpandGroupsManagerCompany
-		*e = value
-	case "groups,manager,company,pay_group":
-		value := EmployeesListRequestExpandGroupsManagerCompanyPayGroup
-		*e = value
-	case "groups,manager,pay_group":
-		value := EmployeesListRequestExpandGroupsManagerPayGroup
-		*e = value
-	case "groups,manager,team":
-		value := EmployeesListRequestExpandGroupsManagerTeam
-		*e = value
-	case "groups,manager,team,company":
-		value := EmployeesListRequestExpandGroupsManagerTeamCompany
-		*e = value
-	case "groups,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,manager,team,pay_group":
-		value := EmployeesListRequestExpandGroupsManagerTeamPayGroup
-		*e = value
-	case "groups,pay_group":
-		value := EmployeesListRequestExpandGroupsPayGroup
-		*e = value
-	case "groups,team":
-		value := EmployeesListRequestExpandGroupsTeam
-		*e = value
-	case "groups,team,company":
-		value := EmployeesListRequestExpandGroupsTeamCompany
-		*e = value
-	case "groups,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsTeamCompanyPayGroup
-		*e = value
-	case "groups,team,pay_group":
-		value := EmployeesListRequestExpandGroupsTeamPayGroup
-		*e = value
-	case "groups,work_location":
-		value := EmployeesListRequestExpandGroupsWorkLocation
-		*e = value
-	case "groups,work_location,company":
-		value := EmployeesListRequestExpandGroupsWorkLocationCompany
-		*e = value
-	case "groups,work_location,company,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup
-		*e = value
-	case "groups,work_location,manager":
-		value := EmployeesListRequestExpandGroupsWorkLocationManager
-		*e = value
-	case "groups,work_location,manager,company":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerCompany
-		*e = value
-	case "groups,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "groups,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup
-		*e = value
-	case "groups,work_location,manager,team":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeam
-		*e = value
-	case "groups,work_location,manager,team,company":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany
-		*e = value
-	case "groups,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup
-		*e = value
-	case "groups,work_location,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationPayGroup
-		*e = value
-	case "groups,work_location,team":
-		value := EmployeesListRequestExpandGroupsWorkLocationTeam
-		*e = value
-	case "groups,work_location,team,company":
-		value := EmployeesListRequestExpandGroupsWorkLocationTeamCompany
-		*e = value
-	case "groups,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "groups,work_location,team,pay_group":
-		value := EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup
-		*e = value
-	case "home_location":
-		value := EmployeesListRequestExpandHomeLocation
-		*e = value
-	case "home_location,company":
-		value := EmployeesListRequestExpandHomeLocationCompany
-		*e = value
-	case "home_location,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationCompanyPayGroup
-		*e = value
-	case "home_location,manager":
-		value := EmployeesListRequestExpandHomeLocationManager
-		*e = value
-	case "home_location,manager,company":
-		value := EmployeesListRequestExpandHomeLocationManagerCompany
-		*e = value
-	case "home_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "home_location,manager,pay_group":
-		value := EmployeesListRequestExpandHomeLocationManagerPayGroup
-		*e = value
-	case "home_location,manager,team":
-		value := EmployeesListRequestExpandHomeLocationManagerTeam
-		*e = value
-	case "home_location,manager,team,company":
-		value := EmployeesListRequestExpandHomeLocationManagerTeamCompany
-		*e = value
-	case "home_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "home_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandHomeLocationManagerTeamPayGroup
-		*e = value
-	case "home_location,pay_group":
-		value := EmployeesListRequestExpandHomeLocationPayGroup
-		*e = value
-	case "home_location,team":
-		value := EmployeesListRequestExpandHomeLocationTeam
-		*e = value
-	case "home_location,team,company":
-		value := EmployeesListRequestExpandHomeLocationTeamCompany
-		*e = value
-	case "home_location,team,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "home_location,team,pay_group":
-		value := EmployeesListRequestExpandHomeLocationTeamPayGroup
-		*e = value
-	case "home_location,work_location":
-		value := EmployeesListRequestExpandHomeLocationWorkLocation
-		*e = value
-	case "home_location,work_location,company":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationCompany
-		*e = value
-	case "home_location,work_location,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "home_location,work_location,manager":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManager
-		*e = value
-	case "home_location,work_location,manager,company":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "home_location,work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "home_location,work_location,manager,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "home_location,work_location,manager,team":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "home_location,work_location,manager,team,company":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "home_location,work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "home_location,work_location,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationPayGroup
-		*e = value
-	case "home_location,work_location,team":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationTeam
-		*e = value
-	case "home_location,work_location,team,company":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "home_location,work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "home_location,work_location,team,pay_group":
-		value := EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "manager":
-		value := EmployeesListRequestExpandManager
-		*e = value
-	case "manager,company":
-		value := EmployeesListRequestExpandManagerCompany
-		*e = value
-	case "manager,company,pay_group":
-		value := EmployeesListRequestExpandManagerCompanyPayGroup
-		*e = value
-	case "manager,pay_group":
-		value := EmployeesListRequestExpandManagerPayGroup
-		*e = value
-	case "manager,team":
-		value := EmployeesListRequestExpandManagerTeam
-		*e = value
-	case "manager,team,company":
-		value := EmployeesListRequestExpandManagerTeamCompany
-		*e = value
-	case "manager,team,company,pay_group":
-		value := EmployeesListRequestExpandManagerTeamCompanyPayGroup
-		*e = value
-	case "manager,team,pay_group":
-		value := EmployeesListRequestExpandManagerTeamPayGroup
-		*e = value
-	case "pay_group":
-		value := EmployeesListRequestExpandPayGroup
-		*e = value
-	case "team":
-		value := EmployeesListRequestExpandTeam
-		*e = value
-	case "team,company":
-		value := EmployeesListRequestExpandTeamCompany
-		*e = value
-	case "team,company,pay_group":
-		value := EmployeesListRequestExpandTeamCompanyPayGroup
-		*e = value
-	case "team,pay_group":
-		value := EmployeesListRequestExpandTeamPayGroup
-		*e = value
-	case "work_location":
-		value := EmployeesListRequestExpandWorkLocation
-		*e = value
-	case "work_location,company":
-		value := EmployeesListRequestExpandWorkLocationCompany
-		*e = value
-	case "work_location,company,pay_group":
-		value := EmployeesListRequestExpandWorkLocationCompanyPayGroup
-		*e = value
-	case "work_location,manager":
-		value := EmployeesListRequestExpandWorkLocationManager
-		*e = value
-	case "work_location,manager,company":
-		value := EmployeesListRequestExpandWorkLocationManagerCompany
-		*e = value
-	case "work_location,manager,company,pay_group":
-		value := EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "work_location,manager,pay_group":
-		value := EmployeesListRequestExpandWorkLocationManagerPayGroup
-		*e = value
-	case "work_location,manager,team":
-		value := EmployeesListRequestExpandWorkLocationManagerTeam
-		*e = value
-	case "work_location,manager,team,company":
-		value := EmployeesListRequestExpandWorkLocationManagerTeamCompany
-		*e = value
-	case "work_location,manager,team,company,pay_group":
-		value := EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "work_location,manager,team,pay_group":
-		value := EmployeesListRequestExpandWorkLocationManagerTeamPayGroup
-		*e = value
-	case "work_location,pay_group":
-		value := EmployeesListRequestExpandWorkLocationPayGroup
-		*e = value
-	case "work_location,team":
-		value := EmployeesListRequestExpandWorkLocationTeam
-		*e = value
-	case "work_location,team,company":
-		value := EmployeesListRequestExpandWorkLocationTeamCompany
-		*e = value
-	case "work_location,team,company,pay_group":
-		value := EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "work_location,team,pay_group":
-		value := EmployeesListRequestExpandWorkLocationTeamPayGroup
-		*e = value
-	}
-	return nil
-}
-
-type EmployeesListRequestRemoteFields uint
-
-const (
-	EmployeesListRequestRemoteFieldsEmploymentStatus EmployeesListRequestRemoteFields = iota + 1
-	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity
-	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender
-	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
-	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
-	EmployeesListRequestRemoteFieldsEmploymentStatusGender
-	EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
-	EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus
-	EmployeesListRequestRemoteFieldsEthnicity
-	EmployeesListRequestRemoteFieldsEthnicityGender
-	EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus
-	EmployeesListRequestRemoteFieldsEthnicityMaritalStatus
-	EmployeesListRequestRemoteFieldsGender
-	EmployeesListRequestRemoteFieldsGenderMaritalStatus
-	EmployeesListRequestRemoteFieldsMaritalStatus
-)
-
-func (e EmployeesListRequestRemoteFields) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesListRequestRemoteFieldsEmploymentStatus:
-		return "employment_status"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity:
-		return "employment_status,ethnicity"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender:
-		return "employment_status,ethnicity,gender"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus:
-		return "employment_status,ethnicity,gender,marital_status"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus:
-		return "employment_status,ethnicity,marital_status"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusGender:
-		return "employment_status,gender"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus:
-		return "employment_status,gender,marital_status"
-	case EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus:
-		return "employment_status,marital_status"
-	case EmployeesListRequestRemoteFieldsEthnicity:
-		return "ethnicity"
-	case EmployeesListRequestRemoteFieldsEthnicityGender:
-		return "ethnicity,gender"
-	case EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus:
-		return "ethnicity,gender,marital_status"
-	case EmployeesListRequestRemoteFieldsEthnicityMaritalStatus:
-		return "ethnicity,marital_status"
-	case EmployeesListRequestRemoteFieldsGender:
-		return "gender"
-	case EmployeesListRequestRemoteFieldsGenderMaritalStatus:
-		return "gender,marital_status"
-	case EmployeesListRequestRemoteFieldsMaritalStatus:
-		return "marital_status"
-	}
-}
-
-func (e EmployeesListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_status":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatus
-		*e = value
-	case "employment_status,ethnicity":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity
-		*e = value
-	case "employment_status,ethnicity,gender":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender
-		*e = value
-	case "employment_status,ethnicity,gender,marital_status":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
-		*e = value
-	case "employment_status,ethnicity,marital_status":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
-		*e = value
-	case "employment_status,gender":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusGender
-		*e = value
-	case "employment_status,gender,marital_status":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
-		*e = value
-	case "employment_status,marital_status":
-		value := EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus
-		*e = value
-	case "ethnicity":
-		value := EmployeesListRequestRemoteFieldsEthnicity
-		*e = value
-	case "ethnicity,gender":
-		value := EmployeesListRequestRemoteFieldsEthnicityGender
-		*e = value
-	case "ethnicity,gender,marital_status":
-		value := EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus
-		*e = value
-	case "ethnicity,marital_status":
-		value := EmployeesListRequestRemoteFieldsEthnicityMaritalStatus
-		*e = value
-	case "gender":
-		value := EmployeesListRequestRemoteFieldsGender
-		*e = value
-	case "gender,marital_status":
-		value := EmployeesListRequestRemoteFieldsGenderMaritalStatus
-		*e = value
-	case "marital_status":
-		value := EmployeesListRequestRemoteFieldsMaritalStatus
-		*e = value
-	}
-	return nil
-}
-
-type EmployeesListRequestShowEnumOrigins uint
-
-const (
-	EmployeesListRequestShowEnumOriginsEmploymentStatus EmployeesListRequestShowEnumOrigins = iota + 1
-	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity
-	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender
-	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
-	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
-	EmployeesListRequestShowEnumOriginsEmploymentStatusGender
-	EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
-	EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus
-	EmployeesListRequestShowEnumOriginsEthnicity
-	EmployeesListRequestShowEnumOriginsEthnicityGender
-	EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus
-	EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus
-	EmployeesListRequestShowEnumOriginsGender
-	EmployeesListRequestShowEnumOriginsGenderMaritalStatus
-	EmployeesListRequestShowEnumOriginsMaritalStatus
-)
-
-func (e EmployeesListRequestShowEnumOrigins) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesListRequestShowEnumOriginsEmploymentStatus:
-		return "employment_status"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity:
-		return "employment_status,ethnicity"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender:
-		return "employment_status,ethnicity,gender"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus:
-		return "employment_status,ethnicity,gender,marital_status"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus:
-		return "employment_status,ethnicity,marital_status"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusGender:
-		return "employment_status,gender"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus:
-		return "employment_status,gender,marital_status"
-	case EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus:
-		return "employment_status,marital_status"
-	case EmployeesListRequestShowEnumOriginsEthnicity:
-		return "ethnicity"
-	case EmployeesListRequestShowEnumOriginsEthnicityGender:
-		return "ethnicity,gender"
-	case EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus:
-		return "ethnicity,gender,marital_status"
-	case EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus:
-		return "ethnicity,marital_status"
-	case EmployeesListRequestShowEnumOriginsGender:
-		return "gender"
-	case EmployeesListRequestShowEnumOriginsGenderMaritalStatus:
-		return "gender,marital_status"
-	case EmployeesListRequestShowEnumOriginsMaritalStatus:
-		return "marital_status"
-	}
-}
-
-func (e EmployeesListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_status":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatus
-		*e = value
-	case "employment_status,ethnicity":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity
-		*e = value
-	case "employment_status,ethnicity,gender":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender
-		*e = value
-	case "employment_status,ethnicity,gender,marital_status":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
-		*e = value
-	case "employment_status,ethnicity,marital_status":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
-		*e = value
-	case "employment_status,gender":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusGender
-		*e = value
-	case "employment_status,gender,marital_status":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
-		*e = value
-	case "employment_status,marital_status":
-		value := EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus
-		*e = value
-	case "ethnicity":
-		value := EmployeesListRequestShowEnumOriginsEthnicity
-		*e = value
-	case "ethnicity,gender":
-		value := EmployeesListRequestShowEnumOriginsEthnicityGender
-		*e = value
-	case "ethnicity,gender,marital_status":
-		value := EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus
-		*e = value
-	case "ethnicity,marital_status":
-		value := EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus
-		*e = value
-	case "gender":
-		value := EmployeesListRequestShowEnumOriginsGender
-		*e = value
-	case "gender,marital_status":
-		value := EmployeesListRequestShowEnumOriginsGenderMaritalStatus
-		*e = value
-	case "marital_status":
-		value := EmployeesListRequestShowEnumOriginsMaritalStatus
-		*e = value
-	}
-	return nil
-}
-
-type EmployeesRetrieveRequestExpand uint
-
-const (
-	EmployeesRetrieveRequestExpandCompany EmployeesRetrieveRequestExpand = iota + 1
-	EmployeesRetrieveRequestExpandCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmployments
-	EmployeesRetrieveRequestExpandEmploymentsCompany
-	EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroups
-	EmployeesRetrieveRequestExpandEmploymentsGroupsCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManager
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocation
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsManager
-	EmployeesRetrieveRequestExpandEmploymentsManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsTeam
-	EmployeesRetrieveRequestExpandEmploymentsTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocation
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandGroups
-	EmployeesRetrieveRequestExpandGroupsCompany
-	EmployeesRetrieveRequestExpandGroupsCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocation
-	EmployeesRetrieveRequestExpandGroupsHomeLocationCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManager
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationTeam
-	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsManager
-	EmployeesRetrieveRequestExpandGroupsManagerCompany
-	EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsManagerPayGroup
-	EmployeesRetrieveRequestExpandGroupsManagerTeam
-	EmployeesRetrieveRequestExpandGroupsManagerTeamCompany
-	EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsPayGroup
-	EmployeesRetrieveRequestExpandGroupsTeam
-	EmployeesRetrieveRequestExpandGroupsTeamCompany
-	EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocation
-	EmployeesRetrieveRequestExpandGroupsWorkLocationCompany
-	EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManager
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationTeam
-	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandHomeLocation
-	EmployeesRetrieveRequestExpandHomeLocationCompany
-	EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationManager
-	EmployeesRetrieveRequestExpandHomeLocationManagerCompany
-	EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationManagerTeam
-	EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationTeam
-	EmployeesRetrieveRequestExpandHomeLocationTeamCompany
-	EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocation
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup
-	EmployeesRetrieveRequestExpandManager
-	EmployeesRetrieveRequestExpandManagerCompany
-	EmployeesRetrieveRequestExpandManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandManagerPayGroup
-	EmployeesRetrieveRequestExpandManagerTeam
-	EmployeesRetrieveRequestExpandManagerTeamCompany
-	EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandPayGroup
-	EmployeesRetrieveRequestExpandTeam
-	EmployeesRetrieveRequestExpandTeamCompany
-	EmployeesRetrieveRequestExpandTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandTeamPayGroup
-	EmployeesRetrieveRequestExpandWorkLocation
-	EmployeesRetrieveRequestExpandWorkLocationCompany
-	EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationManager
-	EmployeesRetrieveRequestExpandWorkLocationManagerCompany
-	EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationManagerTeam
-	EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany
-	EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationTeam
-	EmployeesRetrieveRequestExpandWorkLocationTeamCompany
-	EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup
-	EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup
-)
-
-func (e EmployeesRetrieveRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesRetrieveRequestExpandCompany:
-		return "company"
-	case EmployeesRetrieveRequestExpandCompanyPayGroup:
-		return "company,pay_group"
-	case EmployeesRetrieveRequestExpandEmployments:
-		return "employments"
-	case EmployeesRetrieveRequestExpandEmploymentsCompany:
-		return "employments,company"
-	case EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup:
-		return "employments,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroups:
-		return "employments,groups"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsCompany:
-		return "employments,groups,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup:
-		return "employments,groups,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation:
-		return "employments,groups,home_location"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany:
-		return "employments,groups,home_location,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup:
-		return "employments,groups,home_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager:
-		return "employments,groups,home_location,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany:
-		return "employments,groups,home_location,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup:
-		return "employments,groups,home_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup:
-		return "employments,groups,home_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam:
-		return "employments,groups,home_location,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany:
-		return "employments,groups,home_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup:
-		return "employments,groups,home_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup:
-		return "employments,groups,home_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup:
-		return "employments,groups,home_location,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam:
-		return "employments,groups,home_location,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany:
-		return "employments,groups,home_location,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup:
-		return "employments,groups,home_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup:
-		return "employments,groups,home_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation:
-		return "employments,groups,home_location,work_location"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany:
-		return "employments,groups,home_location,work_location,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup:
-		return "employments,groups,home_location,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager:
-		return "employments,groups,home_location,work_location,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany:
-		return "employments,groups,home_location,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "employments,groups,home_location,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup:
-		return "employments,groups,home_location,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam:
-		return "employments,groups,home_location,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany:
-		return "employments,groups,home_location,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,groups,home_location,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup:
-		return "employments,groups,home_location,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup:
-		return "employments,groups,home_location,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam:
-		return "employments,groups,home_location,work_location,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany:
-		return "employments,groups,home_location,work_location,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "employments,groups,home_location,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup:
-		return "employments,groups,home_location,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManager:
-		return "employments,groups,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany:
-		return "employments,groups,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup:
-		return "employments,groups,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup:
-		return "employments,groups,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam:
-		return "employments,groups,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany:
-		return "employments,groups,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup:
-		return "employments,groups,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup:
-		return "employments,groups,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup:
-		return "employments,groups,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeam:
-		return "employments,groups,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany:
-		return "employments,groups,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup:
-		return "employments,groups,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup:
-		return "employments,groups,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation:
-		return "employments,groups,work_location"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany:
-		return "employments,groups,work_location,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup:
-		return "employments,groups,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager:
-		return "employments,groups,work_location,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany:
-		return "employments,groups,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup:
-		return "employments,groups,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup:
-		return "employments,groups,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam:
-		return "employments,groups,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany:
-		return "employments,groups,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,groups,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup:
-		return "employments,groups,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup:
-		return "employments,groups,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam:
-		return "employments,groups,work_location,team"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany:
-		return "employments,groups,work_location,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup:
-		return "employments,groups,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup:
-		return "employments,groups,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocation:
-		return "employments,home_location"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany:
-		return "employments,home_location,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup:
-		return "employments,home_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager:
-		return "employments,home_location,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany:
-		return "employments,home_location,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup:
-		return "employments,home_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup:
-		return "employments,home_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam:
-		return "employments,home_location,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany:
-		return "employments,home_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup:
-		return "employments,home_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup:
-		return "employments,home_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup:
-		return "employments,home_location,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam:
-		return "employments,home_location,team"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany:
-		return "employments,home_location,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup:
-		return "employments,home_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup:
-		return "employments,home_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation:
-		return "employments,home_location,work_location"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany:
-		return "employments,home_location,work_location,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup:
-		return "employments,home_location,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager:
-		return "employments,home_location,work_location,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany:
-		return "employments,home_location,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "employments,home_location,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup:
-		return "employments,home_location,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam:
-		return "employments,home_location,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany:
-		return "employments,home_location,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,home_location,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup:
-		return "employments,home_location,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup:
-		return "employments,home_location,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam:
-		return "employments,home_location,work_location,team"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany:
-		return "employments,home_location,work_location,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "employments,home_location,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup:
-		return "employments,home_location,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsManager:
-		return "employments,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerCompany:
-		return "employments,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup:
-		return "employments,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup:
-		return "employments,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerTeam:
-		return "employments,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany:
-		return "employments,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup:
-		return "employments,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup:
-		return "employments,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsPayGroup:
-		return "employments,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsTeam:
-		return "employments,team"
-	case EmployeesRetrieveRequestExpandEmploymentsTeamCompany:
-		return "employments,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup:
-		return "employments,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup:
-		return "employments,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocation:
-		return "employments,work_location"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany:
-		return "employments,work_location,company"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup:
-		return "employments,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager:
-		return "employments,work_location,manager"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany:
-		return "employments,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup:
-		return "employments,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup:
-		return "employments,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam:
-		return "employments,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany:
-		return "employments,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup:
-		return "employments,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup:
-		return "employments,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup:
-		return "employments,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam:
-		return "employments,work_location,team"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany:
-		return "employments,work_location,team,company"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup:
-		return "employments,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup:
-		return "employments,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroups:
-		return "groups"
-	case EmployeesRetrieveRequestExpandGroupsCompany:
-		return "groups,company"
-	case EmployeesRetrieveRequestExpandGroupsCompanyPayGroup:
-		return "groups,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocation:
-		return "groups,home_location"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationCompany:
-		return "groups,home_location,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup:
-		return "groups,home_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManager:
-		return "groups,home_location,manager"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany:
-		return "groups,home_location,manager,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup:
-		return "groups,home_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup:
-		return "groups,home_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam:
-		return "groups,home_location,manager,team"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany:
-		return "groups,home_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup:
-		return "groups,home_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup:
-		return "groups,home_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup:
-		return "groups,home_location,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeam:
-		return "groups,home_location,team"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany:
-		return "groups,home_location,team,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup:
-		return "groups,home_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup:
-		return "groups,home_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation:
-		return "groups,home_location,work_location"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany:
-		return "groups,home_location,work_location,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup:
-		return "groups,home_location,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager:
-		return "groups,home_location,work_location,manager"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany:
-		return "groups,home_location,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "groups,home_location,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup:
-		return "groups,home_location,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam:
-		return "groups,home_location,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany:
-		return "groups,home_location,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "groups,home_location,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup:
-		return "groups,home_location,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup:
-		return "groups,home_location,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam:
-		return "groups,home_location,work_location,team"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany:
-		return "groups,home_location,work_location,team,company"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "groups,home_location,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup:
-		return "groups,home_location,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsManager:
-		return "groups,manager"
-	case EmployeesRetrieveRequestExpandGroupsManagerCompany:
-		return "groups,manager,company"
-	case EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup:
-		return "groups,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsManagerPayGroup:
-		return "groups,manager,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsManagerTeam:
-		return "groups,manager,team"
-	case EmployeesRetrieveRequestExpandGroupsManagerTeamCompany:
-		return "groups,manager,team,company"
-	case EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup:
-		return "groups,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup:
-		return "groups,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsPayGroup:
-		return "groups,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsTeam:
-		return "groups,team"
-	case EmployeesRetrieveRequestExpandGroupsTeamCompany:
-		return "groups,team,company"
-	case EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup:
-		return "groups,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsTeamPayGroup:
-		return "groups,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocation:
-		return "groups,work_location"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationCompany:
-		return "groups,work_location,company"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup:
-		return "groups,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManager:
-		return "groups,work_location,manager"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany:
-		return "groups,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup:
-		return "groups,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup:
-		return "groups,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam:
-		return "groups,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany:
-		return "groups,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup:
-		return "groups,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup:
-		return "groups,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup:
-		return "groups,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeam:
-		return "groups,work_location,team"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany:
-		return "groups,work_location,team,company"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup:
-		return "groups,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup:
-		return "groups,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocation:
-		return "home_location"
-	case EmployeesRetrieveRequestExpandHomeLocationCompany:
-		return "home_location,company"
-	case EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup:
-		return "home_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationManager:
-		return "home_location,manager"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerCompany:
-		return "home_location,manager,company"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup:
-		return "home_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup:
-		return "home_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerTeam:
-		return "home_location,manager,team"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany:
-		return "home_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup:
-		return "home_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup:
-		return "home_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationPayGroup:
-		return "home_location,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationTeam:
-		return "home_location,team"
-	case EmployeesRetrieveRequestExpandHomeLocationTeamCompany:
-		return "home_location,team,company"
-	case EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup:
-		return "home_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup:
-		return "home_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocation:
-		return "home_location,work_location"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany:
-		return "home_location,work_location,company"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup:
-		return "home_location,work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager:
-		return "home_location,work_location,manager"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany:
-		return "home_location,work_location,manager,company"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup:
-		return "home_location,work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup:
-		return "home_location,work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam:
-		return "home_location,work_location,manager,team"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany:
-		return "home_location,work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup:
-		return "home_location,work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup:
-		return "home_location,work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup:
-		return "home_location,work_location,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam:
-		return "home_location,work_location,team"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany:
-		return "home_location,work_location,team,company"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup:
-		return "home_location,work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup:
-		return "home_location,work_location,team,pay_group"
-	case EmployeesRetrieveRequestExpandManager:
-		return "manager"
-	case EmployeesRetrieveRequestExpandManagerCompany:
-		return "manager,company"
-	case EmployeesRetrieveRequestExpandManagerCompanyPayGroup:
-		return "manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandManagerPayGroup:
-		return "manager,pay_group"
-	case EmployeesRetrieveRequestExpandManagerTeam:
-		return "manager,team"
-	case EmployeesRetrieveRequestExpandManagerTeamCompany:
-		return "manager,team,company"
-	case EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup:
-		return "manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandManagerTeamPayGroup:
-		return "manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandPayGroup:
-		return "pay_group"
-	case EmployeesRetrieveRequestExpandTeam:
-		return "team"
-	case EmployeesRetrieveRequestExpandTeamCompany:
-		return "team,company"
-	case EmployeesRetrieveRequestExpandTeamCompanyPayGroup:
-		return "team,company,pay_group"
-	case EmployeesRetrieveRequestExpandTeamPayGroup:
-		return "team,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocation:
-		return "work_location"
-	case EmployeesRetrieveRequestExpandWorkLocationCompany:
-		return "work_location,company"
-	case EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup:
-		return "work_location,company,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationManager:
-		return "work_location,manager"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerCompany:
-		return "work_location,manager,company"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup:
-		return "work_location,manager,company,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup:
-		return "work_location,manager,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerTeam:
-		return "work_location,manager,team"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany:
-		return "work_location,manager,team,company"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup:
-		return "work_location,manager,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup:
-		return "work_location,manager,team,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationPayGroup:
-		return "work_location,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationTeam:
-		return "work_location,team"
-	case EmployeesRetrieveRequestExpandWorkLocationTeamCompany:
-		return "work_location,team,company"
-	case EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup:
-		return "work_location,team,company,pay_group"
-	case EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup:
-		return "work_location,team,pay_group"
-	}
-}
-
-func (e EmployeesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "company":
-		value := EmployeesRetrieveRequestExpandCompany
-		*e = value
-	case "company,pay_group":
-		value := EmployeesRetrieveRequestExpandCompanyPayGroup
-		*e = value
-	case "employments":
-		value := EmployeesRetrieveRequestExpandEmployments
-		*e = value
-	case "employments,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsCompany
-		*e = value
-	case "employments,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup
-		*e = value
-	case "employments,groups":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroups
-		*e = value
-	case "employments,groups,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsCompany
-		*e = value
-	case "employments,groups,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation
-		*e = value
-	case "employments,groups,home_location,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany
-		*e = value
-	case "employments,groups,home_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager
-		*e = value
-	case "employments,groups,home_location,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany
-		*e = value
-	case "employments,groups,home_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup
-		*e = value
-	case "employments,groups,home_location,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam
-		*e = value
-	case "employments,groups,home_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany
-		*e = value
-	case "employments,groups,home_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup
-		*e = value
-	case "employments,groups,home_location,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup
-		*e = value
-	case "employments,groups,home_location,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam
-		*e = value
-	case "employments,groups,home_location,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany
-		*e = value
-	case "employments,groups,home_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation
-		*e = value
-	case "employments,groups,home_location,work_location,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany
-		*e = value
-	case "employments,groups,home_location,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager
-		*e = value
-	case "employments,groups,home_location,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "employments,groups,home_location,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam
-		*e = value
-	case "employments,groups,home_location,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "employments,groups,home_location,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,home_location,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "employments,groups,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManager
-		*e = value
-	case "employments,groups,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany
-		*e = value
-	case "employments,groups,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup
-		*e = value
-	case "employments,groups,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam
-		*e = value
-	case "employments,groups,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany
-		*e = value
-	case "employments,groups,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup
-		*e = value
-	case "employments,groups,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup
-		*e = value
-	case "employments,groups,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeam
-		*e = value
-	case "employments,groups,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany
-		*e = value
-	case "employments,groups,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup
-		*e = value
-	case "employments,groups,work_location":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation
-		*e = value
-	case "employments,groups,work_location,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany
-		*e = value
-	case "employments,groups,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager
-		*e = value
-	case "employments,groups,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany
-		*e = value
-	case "employments,groups,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup
-		*e = value
-	case "employments,groups,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam
-		*e = value
-	case "employments,groups,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,groups,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,groups,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup
-		*e = value
-	case "employments,groups,work_location,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam
-		*e = value
-	case "employments,groups,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany
-		*e = value
-	case "employments,groups,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,groups,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup
-		*e = value
-	case "employments,home_location":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocation
-		*e = value
-	case "employments,home_location,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany
-		*e = value
-	case "employments,home_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup
-		*e = value
-	case "employments,home_location,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager
-		*e = value
-	case "employments,home_location,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany
-		*e = value
-	case "employments,home_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,home_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup
-		*e = value
-	case "employments,home_location,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam
-		*e = value
-	case "employments,home_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany
-		*e = value
-	case "employments,home_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup
-		*e = value
-	case "employments,home_location,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup
-		*e = value
-	case "employments,home_location,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam
-		*e = value
-	case "employments,home_location,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany
-		*e = value
-	case "employments,home_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup
-		*e = value
-	case "employments,home_location,work_location":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation
-		*e = value
-	case "employments,home_location,work_location,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany
-		*e = value
-	case "employments,home_location,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager
-		*e = value
-	case "employments,home_location,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "employments,home_location,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "employments,home_location,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,home_location,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup
-		*e = value
-	case "employments,home_location,work_location,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam
-		*e = value
-	case "employments,home_location,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "employments,home_location,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,home_location,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "employments,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsManager
-		*e = value
-	case "employments,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerCompany
-		*e = value
-	case "employments,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup
-		*e = value
-	case "employments,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup
-		*e = value
-	case "employments,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeam
-		*e = value
-	case "employments,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany
-		*e = value
-	case "employments,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup
-		*e = value
-	case "employments,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsPayGroup
-		*e = value
-	case "employments,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsTeam
-		*e = value
-	case "employments,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsTeamCompany
-		*e = value
-	case "employments,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup
-		*e = value
-	case "employments,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup
-		*e = value
-	case "employments,work_location":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocation
-		*e = value
-	case "employments,work_location,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany
-		*e = value
-	case "employments,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup
-		*e = value
-	case "employments,work_location,manager":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager
-		*e = value
-	case "employments,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany
-		*e = value
-	case "employments,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "employments,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup
-		*e = value
-	case "employments,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam
-		*e = value
-	case "employments,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany
-		*e = value
-	case "employments,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "employments,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup
-		*e = value
-	case "employments,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup
-		*e = value
-	case "employments,work_location,team":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam
-		*e = value
-	case "employments,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany
-		*e = value
-	case "employments,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "employments,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup
-		*e = value
-	case "groups":
-		value := EmployeesRetrieveRequestExpandGroups
-		*e = value
-	case "groups,company":
-		value := EmployeesRetrieveRequestExpandGroupsCompany
-		*e = value
-	case "groups,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsCompanyPayGroup
-		*e = value
-	case "groups,home_location":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocation
-		*e = value
-	case "groups,home_location,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationCompany
-		*e = value
-	case "groups,home_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup
-		*e = value
-	case "groups,home_location,manager":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManager
-		*e = value
-	case "groups,home_location,manager,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany
-		*e = value
-	case "groups,home_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "groups,home_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup
-		*e = value
-	case "groups,home_location,manager,team":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam
-		*e = value
-	case "groups,home_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany
-		*e = value
-	case "groups,home_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup
-		*e = value
-	case "groups,home_location,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup
-		*e = value
-	case "groups,home_location,team":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeam
-		*e = value
-	case "groups,home_location,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany
-		*e = value
-	case "groups,home_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup
-		*e = value
-	case "groups,home_location,work_location":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation
-		*e = value
-	case "groups,home_location,work_location,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany
-		*e = value
-	case "groups,home_location,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager
-		*e = value
-	case "groups,home_location,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "groups,home_location,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "groups,home_location,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "groups,home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "groups,home_location,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup
-		*e = value
-	case "groups,home_location,work_location,team":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam
-		*e = value
-	case "groups,home_location,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "groups,home_location,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "groups,home_location,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "groups,manager":
-		value := EmployeesRetrieveRequestExpandGroupsManager
-		*e = value
-	case "groups,manager,company":
-		value := EmployeesRetrieveRequestExpandGroupsManagerCompany
-		*e = value
-	case "groups,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup
-		*e = value
-	case "groups,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsManagerPayGroup
-		*e = value
-	case "groups,manager,team":
-		value := EmployeesRetrieveRequestExpandGroupsManagerTeam
-		*e = value
-	case "groups,manager,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsManagerTeamCompany
-		*e = value
-	case "groups,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup
-		*e = value
-	case "groups,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsPayGroup
-		*e = value
-	case "groups,team":
-		value := EmployeesRetrieveRequestExpandGroupsTeam
-		*e = value
-	case "groups,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsTeamCompany
-		*e = value
-	case "groups,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup
-		*e = value
-	case "groups,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsTeamPayGroup
-		*e = value
-	case "groups,work_location":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocation
-		*e = value
-	case "groups,work_location,company":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationCompany
-		*e = value
-	case "groups,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup
-		*e = value
-	case "groups,work_location,manager":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManager
-		*e = value
-	case "groups,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany
-		*e = value
-	case "groups,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "groups,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup
-		*e = value
-	case "groups,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam
-		*e = value
-	case "groups,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany
-		*e = value
-	case "groups,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "groups,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup
-		*e = value
-	case "groups,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup
-		*e = value
-	case "groups,work_location,team":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeam
-		*e = value
-	case "groups,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany
-		*e = value
-	case "groups,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "groups,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup
-		*e = value
-	case "home_location":
-		value := EmployeesRetrieveRequestExpandHomeLocation
-		*e = value
-	case "home_location,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationCompany
-		*e = value
-	case "home_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup
-		*e = value
-	case "home_location,manager":
-		value := EmployeesRetrieveRequestExpandHomeLocationManager
-		*e = value
-	case "home_location,manager,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerCompany
-		*e = value
-	case "home_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup
-		*e = value
-	case "home_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup
-		*e = value
-	case "home_location,manager,team":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeam
-		*e = value
-	case "home_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany
-		*e = value
-	case "home_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "home_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup
-		*e = value
-	case "home_location,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationPayGroup
-		*e = value
-	case "home_location,team":
-		value := EmployeesRetrieveRequestExpandHomeLocationTeam
-		*e = value
-	case "home_location,team,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationTeamCompany
-		*e = value
-	case "home_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup
-		*e = value
-	case "home_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup
-		*e = value
-	case "home_location,work_location":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocation
-		*e = value
-	case "home_location,work_location,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany
-		*e = value
-	case "home_location,work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup
-		*e = value
-	case "home_location,work_location,manager":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager
-		*e = value
-	case "home_location,work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany
-		*e = value
-	case "home_location,work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "home_location,work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup
-		*e = value
-	case "home_location,work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam
-		*e = value
-	case "home_location,work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany
-		*e = value
-	case "home_location,work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "home_location,work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup
-		*e = value
-	case "home_location,work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup
-		*e = value
-	case "home_location,work_location,team":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam
-		*e = value
-	case "home_location,work_location,team,company":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany
-		*e = value
-	case "home_location,work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "home_location,work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup
-		*e = value
-	case "manager":
-		value := EmployeesRetrieveRequestExpandManager
-		*e = value
-	case "manager,company":
-		value := EmployeesRetrieveRequestExpandManagerCompany
-		*e = value
-	case "manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandManagerCompanyPayGroup
-		*e = value
-	case "manager,pay_group":
-		value := EmployeesRetrieveRequestExpandManagerPayGroup
-		*e = value
-	case "manager,team":
-		value := EmployeesRetrieveRequestExpandManagerTeam
-		*e = value
-	case "manager,team,company":
-		value := EmployeesRetrieveRequestExpandManagerTeamCompany
-		*e = value
-	case "manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup
-		*e = value
-	case "manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandManagerTeamPayGroup
-		*e = value
-	case "pay_group":
-		value := EmployeesRetrieveRequestExpandPayGroup
-		*e = value
-	case "team":
-		value := EmployeesRetrieveRequestExpandTeam
-		*e = value
-	case "team,company":
-		value := EmployeesRetrieveRequestExpandTeamCompany
-		*e = value
-	case "team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandTeamCompanyPayGroup
-		*e = value
-	case "team,pay_group":
-		value := EmployeesRetrieveRequestExpandTeamPayGroup
-		*e = value
-	case "work_location":
-		value := EmployeesRetrieveRequestExpandWorkLocation
-		*e = value
-	case "work_location,company":
-		value := EmployeesRetrieveRequestExpandWorkLocationCompany
-		*e = value
-	case "work_location,company,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup
-		*e = value
-	case "work_location,manager":
-		value := EmployeesRetrieveRequestExpandWorkLocationManager
-		*e = value
-	case "work_location,manager,company":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerCompany
-		*e = value
-	case "work_location,manager,company,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup
-		*e = value
-	case "work_location,manager,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup
-		*e = value
-	case "work_location,manager,team":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeam
-		*e = value
-	case "work_location,manager,team,company":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany
-		*e = value
-	case "work_location,manager,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup
-		*e = value
-	case "work_location,manager,team,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup
-		*e = value
-	case "work_location,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationPayGroup
-		*e = value
-	case "work_location,team":
-		value := EmployeesRetrieveRequestExpandWorkLocationTeam
-		*e = value
-	case "work_location,team,company":
-		value := EmployeesRetrieveRequestExpandWorkLocationTeamCompany
-		*e = value
-	case "work_location,team,company,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup
-		*e = value
-	case "work_location,team,pay_group":
-		value := EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup
-		*e = value
-	}
-	return nil
-}
-
-type EmployeesRetrieveRequestRemoteFields uint
-
-const (
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatus EmployeesRetrieveRequestRemoteFields = iota + 1
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsEthnicity
-	EmployeesRetrieveRequestRemoteFieldsEthnicityGender
-	EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsGender
-	EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus
-	EmployeesRetrieveRequestRemoteFieldsMaritalStatus
-)
-
-func (e EmployeesRetrieveRequestRemoteFields) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatus:
-		return "employment_status"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity:
-		return "employment_status,ethnicity"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender:
-		return "employment_status,ethnicity,gender"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus:
-		return "employment_status,ethnicity,gender,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus:
-		return "employment_status,ethnicity,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender:
-		return "employment_status,gender"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus:
-		return "employment_status,gender,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus:
-		return "employment_status,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsEthnicity:
-		return "ethnicity"
-	case EmployeesRetrieveRequestRemoteFieldsEthnicityGender:
-		return "ethnicity,gender"
-	case EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus:
-		return "ethnicity,gender,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus:
-		return "ethnicity,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsGender:
-		return "gender"
-	case EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus:
-		return "gender,marital_status"
-	case EmployeesRetrieveRequestRemoteFieldsMaritalStatus:
-		return "marital_status"
-	}
-}
-
-func (e EmployeesRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatus
-		*e = value
-	case "employment_status,ethnicity":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity
-		*e = value
-	case "employment_status,ethnicity,gender":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender
-		*e = value
-	case "employment_status,ethnicity,gender,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus
-		*e = value
-	case "employment_status,ethnicity,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus
-		*e = value
-	case "employment_status,gender":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender
-		*e = value
-	case "employment_status,gender,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus
-		*e = value
-	case "employment_status,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus
-		*e = value
-	case "ethnicity":
-		value := EmployeesRetrieveRequestRemoteFieldsEthnicity
-		*e = value
-	case "ethnicity,gender":
-		value := EmployeesRetrieveRequestRemoteFieldsEthnicityGender
-		*e = value
-	case "ethnicity,gender,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus
-		*e = value
-	case "ethnicity,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus
-		*e = value
-	case "gender":
-		value := EmployeesRetrieveRequestRemoteFieldsGender
-		*e = value
-	case "gender,marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus
-		*e = value
-	case "marital_status":
-		value := EmployeesRetrieveRequestRemoteFieldsMaritalStatus
-		*e = value
-	}
-	return nil
-}
-
-type EmployeesRetrieveRequestShowEnumOrigins uint
-
-const (
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus EmployeesRetrieveRequestShowEnumOrigins = iota + 1
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsEthnicity
-	EmployeesRetrieveRequestShowEnumOriginsEthnicityGender
-	EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsGender
-	EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus
-	EmployeesRetrieveRequestShowEnumOriginsMaritalStatus
-)
-
-func (e EmployeesRetrieveRequestShowEnumOrigins) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus:
-		return "employment_status"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity:
-		return "employment_status,ethnicity"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender:
-		return "employment_status,ethnicity,gender"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus:
-		return "employment_status,ethnicity,gender,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus:
-		return "employment_status,ethnicity,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender:
-		return "employment_status,gender"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus:
-		return "employment_status,gender,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus:
-		return "employment_status,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsEthnicity:
-		return "ethnicity"
-	case EmployeesRetrieveRequestShowEnumOriginsEthnicityGender:
-		return "ethnicity,gender"
-	case EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus:
-		return "ethnicity,gender,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus:
-		return "ethnicity,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsGender:
-		return "gender"
-	case EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus:
-		return "gender,marital_status"
-	case EmployeesRetrieveRequestShowEnumOriginsMaritalStatus:
-		return "marital_status"
-	}
-}
-
-func (e EmployeesRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmployeesRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus
-		*e = value
-	case "employment_status,ethnicity":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity
-		*e = value
-	case "employment_status,ethnicity,gender":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender
-		*e = value
-	case "employment_status,ethnicity,gender,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus
-		*e = value
-	case "employment_status,ethnicity,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus
-		*e = value
-	case "employment_status,gender":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender
-		*e = value
-	case "employment_status,gender,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus
-		*e = value
-	case "employment_status,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus
-		*e = value
-	case "ethnicity":
-		value := EmployeesRetrieveRequestShowEnumOriginsEthnicity
-		*e = value
-	case "ethnicity,gender":
-		value := EmployeesRetrieveRequestShowEnumOriginsEthnicityGender
-		*e = value
-	case "ethnicity,gender,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus
-		*e = value
-	case "ethnicity,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus
-		*e = value
-	case "gender":
-		value := EmployeesRetrieveRequestShowEnumOriginsGender
-		*e = value
-	case "gender,marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus
-		*e = value
-	case "marital_status":
-		value := EmployeesRetrieveRequestShowEnumOriginsMaritalStatus
-		*e = value
-	}
-	return nil
-}
-
 // # The EmployerBenefit Object
+//
 // ### Description
+//
 // The `Employer Benefit` object is used to represent a benefit plan offered by a company.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST EmployerBenefits` endpoint and filter by `ID` to show all EmployerBenefits.
 type EmployerBenefit struct {
 	Id *string `json:"id,omitempty"`
@@ -8777,11 +4675,11 @@ type EmployerBenefit struct {
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The type of benefit plan.
 	//
-	// * `MEDICAL` - MEDICAL
-	// * `HEALTH_SAVINGS` - HEALTH_SAVINGS
-	// * `INSURANCE` - INSURANCE
-	// * `RETIREMENT` - RETIREMENT
-	// * `OTHER` - OTHER
+	// - `MEDICAL` - MEDICAL
+	// - `HEALTH_SAVINGS` - HEALTH_SAVINGS
+	// - `INSURANCE` - INSURANCE
+	// - `RETIREMENT` - RETIREMENT
+	// - `OTHER` - OTHER
 	BenefitPlanType *EmployerBenefitBenefitPlanType `json:"benefit_plan_type,omitempty"`
 	// The employer benefit's name - typically the carrier or network name.
 	Name *string `json:"name,omitempty"`
@@ -8793,18 +4691,43 @@ type EmployerBenefit struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time       `json:"modified_at,omitempty"`
-	FieldMappings map[string]any   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]any `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EmployerBenefit) UnmarshalJSON(data []byte) error {
+	type unmarshaler EmployerBenefit
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EmployerBenefit(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EmployerBenefit) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The type of benefit plan.
 //
-// * `MEDICAL` - MEDICAL
-// * `HEALTH_SAVINGS` - HEALTH_SAVINGS
-// * `INSURANCE` - INSURANCE
-// * `RETIREMENT` - RETIREMENT
-// * `OTHER` - OTHER
+// - `MEDICAL` - MEDICAL
+// - `HEALTH_SAVINGS` - HEALTH_SAVINGS
+// - `INSURANCE` - INSURANCE
+// - `RETIREMENT` - RETIREMENT
+// - `OTHER` - OTHER
 type EmployerBenefitBenefitPlanType struct {
 	typeName            string
 	BenefitPlanTypeEnum BenefitPlanTypeEnum
@@ -8863,12 +4786,15 @@ func (e *EmployerBenefitBenefitPlanType) Accept(visitor EmployerBenefitBenefitPl
 }
 
 // # The Employment Object
+//
 // ### Description
+//
 // The `Employment` object is used to represent a job position at a company.
 //
 // Please note: When there is a change in pay or title, integrations with historical data will create new Employment objects while integrations without historical data will update existing ones.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Employments` endpoint and filter by `ID` to show all employees.
 type Employment struct {
 	Id *string `json:"id,omitempty"`
@@ -8882,363 +4808,388 @@ type Employment struct {
 	PayRate *float64 `json:"pay_rate,omitempty"`
 	// The time period this pay rate encompasses.
 	//
-	// * `HOUR` - HOUR
-	// * `DAY` - DAY
-	// * `WEEK` - WEEK
-	// * `EVERY_TWO_WEEKS` - EVERY_TWO_WEEKS
-	// * `SEMIMONTHLY` - SEMIMONTHLY
-	// * `MONTH` - MONTH
-	// * `QUARTER` - QUARTER
-	// * `EVERY_SIX_MONTHS` - EVERY_SIX_MONTHS
-	// * `YEAR` - YEAR
+	// - `HOUR` - HOUR
+	// - `DAY` - DAY
+	// - `WEEK` - WEEK
+	// - `EVERY_TWO_WEEKS` - EVERY_TWO_WEEKS
+	// - `SEMIMONTHLY` - SEMIMONTHLY
+	// - `MONTH` - MONTH
+	// - `QUARTER` - QUARTER
+	// - `EVERY_SIX_MONTHS` - EVERY_SIX_MONTHS
+	// - `YEAR` - YEAR
 	PayPeriod *EmploymentPayPeriod `json:"pay_period,omitempty"`
 	// The position's pay frequency.
 	//
-	// * `WEEKLY` - WEEKLY
-	// * `BIWEEKLY` - BIWEEKLY
-	// * `MONTHLY` - MONTHLY
-	// * `QUARTERLY` - QUARTERLY
-	// * `SEMIANNUALLY` - SEMIANNUALLY
-	// * `ANNUALLY` - ANNUALLY
-	// * `THIRTEEN-MONTHLY` - THIRTEEN-MONTHLY
-	// * `PRO_RATA` - PRO_RATA
-	// * `SEMIMONTHLY` - SEMIMONTHLY
+	// - `WEEKLY` - WEEKLY
+	// - `BIWEEKLY` - BIWEEKLY
+	// - `MONTHLY` - MONTHLY
+	// - `QUARTERLY` - QUARTERLY
+	// - `SEMIANNUALLY` - SEMIANNUALLY
+	// - `ANNUALLY` - ANNUALLY
+	// - `THIRTEEN-MONTHLY` - THIRTEEN-MONTHLY
+	// - `PRO_RATA` - PRO_RATA
+	// - `SEMIMONTHLY` - SEMIMONTHLY
 	PayFrequency *EmploymentPayFrequency `json:"pay_frequency,omitempty"`
 	// The position's currency code.
 	//
-	// * `XUA` - ADB Unit of Account
-	// * `AFN` - Afghan Afghani
-	// * `AFA` - Afghan Afghani (1927–2002)
-	// * `ALL` - Albanian Lek
-	// * `ALK` - Albanian Lek (1946–1965)
-	// * `DZD` - Algerian Dinar
-	// * `ADP` - Andorran Peseta
-	// * `AOA` - Angolan Kwanza
-	// * `AOK` - Angolan Kwanza (1977–1991)
-	// * `AON` - Angolan New Kwanza (1990–2000)
-	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
-	// * `ARA` - Argentine Austral
-	// * `ARS` - Argentine Peso
-	// * `ARM` - Argentine Peso (1881–1970)
-	// * `ARP` - Argentine Peso (1983–1985)
-	// * `ARL` - Argentine Peso Ley (1970–1983)
-	// * `AMD` - Armenian Dram
-	// * `AWG` - Aruban Florin
-	// * `AUD` - Australian Dollar
-	// * `ATS` - Austrian Schilling
-	// * `AZN` - Azerbaijani Manat
-	// * `AZM` - Azerbaijani Manat (1993–2006)
-	// * `BSD` - Bahamian Dollar
-	// * `BHD` - Bahraini Dinar
-	// * `BDT` - Bangladeshi Taka
-	// * `BBD` - Barbadian Dollar
-	// * `BYN` - Belarusian Ruble
-	// * `BYB` - Belarusian Ruble (1994–1999)
-	// * `BYR` - Belarusian Ruble (2000–2016)
-	// * `BEF` - Belgian Franc
-	// * `BEC` - Belgian Franc (convertible)
-	// * `BEL` - Belgian Franc (financial)
-	// * `BZD` - Belize Dollar
-	// * `BMD` - Bermudan Dollar
-	// * `BTN` - Bhutanese Ngultrum
-	// * `BOB` - Bolivian Boliviano
-	// * `BOL` - Bolivian Boliviano (1863–1963)
-	// * `BOV` - Bolivian Mvdol
-	// * `BOP` - Bolivian Peso
-	// * `BAM` - Bosnia-Herzegovina Convertible Mark
-	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
-	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
-	// * `BWP` - Botswanan Pula
-	// * `BRC` - Brazilian Cruzado (1986–1989)
-	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
-	// * `BRE` - Brazilian Cruzeiro (1990–1993)
-	// * `BRR` - Brazilian Cruzeiro (1993–1994)
-	// * `BRN` - Brazilian New Cruzado (1989–1990)
-	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
-	// * `BRL` - Brazilian Real
-	// * `GBP` - British Pound
-	// * `BND` - Brunei Dollar
-	// * `BGL` - Bulgarian Hard Lev
-	// * `BGN` - Bulgarian Lev
-	// * `BGO` - Bulgarian Lev (1879–1952)
-	// * `BGM` - Bulgarian Socialist Lev
-	// * `BUK` - Burmese Kyat
-	// * `BIF` - Burundian Franc
-	// * `XPF` - CFP Franc
-	// * `KHR` - Cambodian Riel
-	// * `CAD` - Canadian Dollar
-	// * `CVE` - Cape Verdean Escudo
-	// * `KYD` - Cayman Islands Dollar
-	// * `XAF` - Central African CFA Franc
-	// * `CLE` - Chilean Escudo
-	// * `CLP` - Chilean Peso
-	// * `CLF` - Chilean Unit of Account (UF)
-	// * `CNX` - Chinese People’s Bank Dollar
-	// * `CNY` - Chinese Yuan
-	// * `CNH` - Chinese Yuan (offshore)
-	// * `COP` - Colombian Peso
-	// * `COU` - Colombian Real Value Unit
-	// * `KMF` - Comorian Franc
-	// * `CDF` - Congolese Franc
-	// * `CRC` - Costa Rican Colón
-	// * `HRD` - Croatian Dinar
-	// * `HRK` - Croatian Kuna
-	// * `CUC` - Cuban Convertible Peso
-	// * `CUP` - Cuban Peso
-	// * `CYP` - Cypriot Pound
-	// * `CZK` - Czech Koruna
-	// * `CSK` - Czechoslovak Hard Koruna
-	// * `DKK` - Danish Krone
-	// * `DJF` - Djiboutian Franc
-	// * `DOP` - Dominican Peso
-	// * `NLG` - Dutch Guilder
-	// * `XCD` - East Caribbean Dollar
-	// * `DDM` - East German Mark
-	// * `ECS` - Ecuadorian Sucre
-	// * `ECV` - Ecuadorian Unit of Constant Value
-	// * `EGP` - Egyptian Pound
-	// * `GQE` - Equatorial Guinean Ekwele
-	// * `ERN` - Eritrean Nakfa
-	// * `EEK` - Estonian Kroon
-	// * `ETB` - Ethiopian Birr
-	// * `EUR` - Euro
-	// * `XBA` - European Composite Unit
-	// * `XEU` - European Currency Unit
-	// * `XBB` - European Monetary Unit
-	// * `XBC` - European Unit of Account (XBC)
-	// * `XBD` - European Unit of Account (XBD)
-	// * `FKP` - Falkland Islands Pound
-	// * `FJD` - Fijian Dollar
-	// * `FIM` - Finnish Markka
-	// * `FRF` - French Franc
-	// * `XFO` - French Gold Franc
-	// * `XFU` - French UIC-Franc
-	// * `GMD` - Gambian Dalasi
-	// * `GEK` - Georgian Kupon Larit
-	// * `GEL` - Georgian Lari
-	// * `DEM` - German Mark
-	// * `GHS` - Ghanaian Cedi
-	// * `GHC` - Ghanaian Cedi (1979–2007)
-	// * `GIP` - Gibraltar Pound
-	// * `XAU` - Gold
-	// * `GRD` - Greek Drachma
-	// * `GTQ` - Guatemalan Quetzal
-	// * `GWP` - Guinea-Bissau Peso
-	// * `GNF` - Guinean Franc
-	// * `GNS` - Guinean Syli
-	// * `GYD` - Guyanaese Dollar
-	// * `HTG` - Haitian Gourde
-	// * `HNL` - Honduran Lempira
-	// * `HKD` - Hong Kong Dollar
-	// * `HUF` - Hungarian Forint
-	// * `IMP` - IMP
-	// * `ISK` - Icelandic Króna
-	// * `ISJ` - Icelandic Króna (1918–1981)
-	// * `INR` - Indian Rupee
-	// * `IDR` - Indonesian Rupiah
-	// * `IRR` - Iranian Rial
-	// * `IQD` - Iraqi Dinar
-	// * `IEP` - Irish Pound
-	// * `ILS` - Israeli New Shekel
-	// * `ILP` - Israeli Pound
-	// * `ILR` - Israeli Shekel (1980–1985)
-	// * `ITL` - Italian Lira
-	// * `JMD` - Jamaican Dollar
-	// * `JPY` - Japanese Yen
-	// * `JOD` - Jordanian Dinar
-	// * `KZT` - Kazakhstani Tenge
-	// * `KES` - Kenyan Shilling
-	// * `KWD` - Kuwaiti Dinar
-	// * `KGS` - Kyrgystani Som
-	// * `LAK` - Laotian Kip
-	// * `LVL` - Latvian Lats
-	// * `LVR` - Latvian Ruble
-	// * `LBP` - Lebanese Pound
-	// * `LSL` - Lesotho Loti
-	// * `LRD` - Liberian Dollar
-	// * `LYD` - Libyan Dinar
-	// * `LTL` - Lithuanian Litas
-	// * `LTT` - Lithuanian Talonas
-	// * `LUL` - Luxembourg Financial Franc
-	// * `LUC` - Luxembourgian Convertible Franc
-	// * `LUF` - Luxembourgian Franc
-	// * `MOP` - Macanese Pataca
-	// * `MKD` - Macedonian Denar
-	// * `MKN` - Macedonian Denar (1992–1993)
-	// * `MGA` - Malagasy Ariary
-	// * `MGF` - Malagasy Franc
-	// * `MWK` - Malawian Kwacha
-	// * `MYR` - Malaysian Ringgit
-	// * `MVR` - Maldivian Rufiyaa
-	// * `MVP` - Maldivian Rupee (1947–1981)
-	// * `MLF` - Malian Franc
-	// * `MTL` - Maltese Lira
-	// * `MTP` - Maltese Pound
-	// * `MRU` - Mauritanian Ouguiya
-	// * `MRO` - Mauritanian Ouguiya (1973–2017)
-	// * `MUR` - Mauritian Rupee
-	// * `MXV` - Mexican Investment Unit
-	// * `MXN` - Mexican Peso
-	// * `MXP` - Mexican Silver Peso (1861–1992)
-	// * `MDC` - Moldovan Cupon
-	// * `MDL` - Moldovan Leu
-	// * `MCF` - Monegasque Franc
-	// * `MNT` - Mongolian Tugrik
-	// * `MAD` - Moroccan Dirham
-	// * `MAF` - Moroccan Franc
-	// * `MZE` - Mozambican Escudo
-	// * `MZN` - Mozambican Metical
-	// * `MZM` - Mozambican Metical (1980–2006)
-	// * `MMK` - Myanmar Kyat
-	// * `NAD` - Namibian Dollar
-	// * `NPR` - Nepalese Rupee
-	// * `ANG` - Netherlands Antillean Guilder
-	// * `TWD` - New Taiwan Dollar
-	// * `NZD` - New Zealand Dollar
-	// * `NIO` - Nicaraguan Córdoba
-	// * `NIC` - Nicaraguan Córdoba (1988–1991)
-	// * `NGN` - Nigerian Naira
-	// * `KPW` - North Korean Won
-	// * `NOK` - Norwegian Krone
-	// * `OMR` - Omani Rial
-	// * `PKR` - Pakistani Rupee
-	// * `XPD` - Palladium
-	// * `PAB` - Panamanian Balboa
-	// * `PGK` - Papua New Guinean Kina
-	// * `PYG` - Paraguayan Guarani
-	// * `PEI` - Peruvian Inti
-	// * `PEN` - Peruvian Sol
-	// * `PES` - Peruvian Sol (1863–1965)
-	// * `PHP` - Philippine Peso
-	// * `XPT` - Platinum
-	// * `PLN` - Polish Zloty
-	// * `PLZ` - Polish Zloty (1950–1995)
-	// * `PTE` - Portuguese Escudo
-	// * `GWE` - Portuguese Guinea Escudo
-	// * `QAR` - Qatari Rial
-	// * `XRE` - RINET Funds
-	// * `RHD` - Rhodesian Dollar
-	// * `RON` - Romanian Leu
-	// * `ROL` - Romanian Leu (1952–2006)
-	// * `RUB` - Russian Ruble
-	// * `RUR` - Russian Ruble (1991–1998)
-	// * `RWF` - Rwandan Franc
-	// * `SVC` - Salvadoran Colón
-	// * `WST` - Samoan Tala
-	// * `SAR` - Saudi Riyal
-	// * `RSD` - Serbian Dinar
-	// * `CSD` - Serbian Dinar (2002–2006)
-	// * `SCR` - Seychellois Rupee
-	// * `SLL` - Sierra Leonean Leone
-	// * `XAG` - Silver
-	// * `SGD` - Singapore Dollar
-	// * `SKK` - Slovak Koruna
-	// * `SIT` - Slovenian Tolar
-	// * `SBD` - Solomon Islands Dollar
-	// * `SOS` - Somali Shilling
-	// * `ZAR` - South African Rand
-	// * `ZAL` - South African Rand (financial)
-	// * `KRH` - South Korean Hwan (1953–1962)
-	// * `KRW` - South Korean Won
-	// * `KRO` - South Korean Won (1945–1953)
-	// * `SSP` - South Sudanese Pound
-	// * `SUR` - Soviet Rouble
-	// * `ESP` - Spanish Peseta
-	// * `ESA` - Spanish Peseta (A account)
-	// * `ESB` - Spanish Peseta (convertible account)
-	// * `XDR` - Special Drawing Rights
-	// * `LKR` - Sri Lankan Rupee
-	// * `SHP` - St. Helena Pound
-	// * `XSU` - Sucre
-	// * `SDD` - Sudanese Dinar (1992–2007)
-	// * `SDG` - Sudanese Pound
-	// * `SDP` - Sudanese Pound (1957–1998)
-	// * `SRD` - Surinamese Dollar
-	// * `SRG` - Surinamese Guilder
-	// * `SZL` - Swazi Lilangeni
-	// * `SEK` - Swedish Krona
-	// * `CHF` - Swiss Franc
-	// * `SYP` - Syrian Pound
-	// * `STN` - São Tomé & Príncipe Dobra
-	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
-	// * `TVD` - TVD
-	// * `TJR` - Tajikistani Ruble
-	// * `TJS` - Tajikistani Somoni
-	// * `TZS` - Tanzanian Shilling
-	// * `XTS` - Testing Currency Code
-	// * `THB` - Thai Baht
-	// * `XXX` - The codes assigned for transactions where no currency is involved
-	// * `TPE` - Timorese Escudo
-	// * `TOP` - Tongan Paʻanga
-	// * `TTD` - Trinidad & Tobago Dollar
-	// * `TND` - Tunisian Dinar
-	// * `TRY` - Turkish Lira
-	// * `TRL` - Turkish Lira (1922–2005)
-	// * `TMT` - Turkmenistani Manat
-	// * `TMM` - Turkmenistani Manat (1993–2009)
-	// * `USD` - US Dollar
-	// * `USN` - US Dollar (Next day)
-	// * `USS` - US Dollar (Same day)
-	// * `UGX` - Ugandan Shilling
-	// * `UGS` - Ugandan Shilling (1966–1987)
-	// * `UAH` - Ukrainian Hryvnia
-	// * `UAK` - Ukrainian Karbovanets
-	// * `AED` - United Arab Emirates Dirham
-	// * `UYW` - Uruguayan Nominal Wage Index Unit
-	// * `UYU` - Uruguayan Peso
-	// * `UYP` - Uruguayan Peso (1975–1993)
-	// * `UYI` - Uruguayan Peso (Indexed Units)
-	// * `UZS` - Uzbekistani Som
-	// * `VUV` - Vanuatu Vatu
-	// * `VES` - Venezuelan Bolívar
-	// * `VEB` - Venezuelan Bolívar (1871–2008)
-	// * `VEF` - Venezuelan Bolívar (2008–2018)
-	// * `VND` - Vietnamese Dong
-	// * `VNN` - Vietnamese Dong (1978–1985)
-	// * `CHE` - WIR Euro
-	// * `CHW` - WIR Franc
-	// * `XOF` - West African CFA Franc
-	// * `YDD` - Yemeni Dinar
-	// * `YER` - Yemeni Rial
-	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
-	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
-	// * `YUM` - Yugoslavian New Dinar (1994–2002)
-	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
-	// * `ZWN` - ZWN
-	// * `ZRN` - Zairean New Zaire (1993–1998)
-	// * `ZRZ` - Zairean Zaire (1971–1993)
-	// * `ZMW` - Zambian Kwacha
-	// * `ZMK` - Zambian Kwacha (1968–2012)
-	// * `ZWD` - Zimbabwean Dollar (1980–2008)
-	// * `ZWR` - Zimbabwean Dollar (2008)
-	// * `ZWL` - Zimbabwean Dollar (2009)
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
 	PayCurrency *EmploymentPayCurrency `json:"pay_currency,omitempty"`
 	// The employment's pay group
 	PayGroup *EmploymentPayGroup `json:"pay_group,omitempty"`
 	// The position's FLSA status.
 	//
-	// * `EXEMPT` - EXEMPT
-	// * `SALARIED_NONEXEMPT` - SALARIED_NONEXEMPT
-	// * `NONEXEMPT` - NONEXEMPT
-	// * `OWNER` - OWNER
+	// - `EXEMPT` - EXEMPT
+	// - `SALARIED_NONEXEMPT` - SALARIED_NONEXEMPT
+	// - `NONEXEMPT` - NONEXEMPT
+	// - `OWNER` - OWNER
 	FlsaStatus *EmploymentFlsaStatus `json:"flsa_status,omitempty"`
 	// The position's effective date.
 	EffectiveDate *time.Time `json:"effective_date,omitempty"`
 	// The position's type of employment.
 	//
-	// * `FULL_TIME` - FULL_TIME
-	// * `PART_TIME` - PART_TIME
-	// * `INTERN` - INTERN
-	// * `CONTRACTOR` - CONTRACTOR
-	// * `FREELANCE` - FREELANCE
+	// - `FULL_TIME` - FULL_TIME
+	// - `PART_TIME` - PART_TIME
+	// - `INTERN` - INTERN
+	// - `CONTRACTOR` - CONTRACTOR
+	// - `FREELANCE` - FREELANCE
 	EmploymentType *EmploymentEmploymentType `json:"employment_type,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *Employment) UnmarshalJSON(data []byte) error {
+	type unmarshaler Employment
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = Employment(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *Employment) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The employee holding this position.
@@ -9301,11 +5252,11 @@ func (e *EmploymentEmployee) Accept(visitor EmploymentEmployeeVisitor) error {
 
 // The position's type of employment.
 //
-// * `FULL_TIME` - FULL_TIME
-// * `PART_TIME` - PART_TIME
-// * `INTERN` - INTERN
-// * `CONTRACTOR` - CONTRACTOR
-// * `FREELANCE` - FREELANCE
+// - `FULL_TIME` - FULL_TIME
+// - `PART_TIME` - PART_TIME
+// - `INTERN` - INTERN
+// - `CONTRACTOR` - CONTRACTOR
+// - `FREELANCE` - FREELANCE
 type EmploymentEmploymentType struct {
 	typeName           string
 	EmploymentTypeEnum EmploymentTypeEnum
@@ -9365,10 +5316,10 @@ func (e *EmploymentEmploymentType) Accept(visitor EmploymentEmploymentTypeVisito
 
 // The position's FLSA status.
 //
-// * `EXEMPT` - EXEMPT
-// * `SALARIED_NONEXEMPT` - SALARIED_NONEXEMPT
-// * `NONEXEMPT` - NONEXEMPT
-// * `OWNER` - OWNER
+// - `EXEMPT` - EXEMPT
+// - `SALARIED_NONEXEMPT` - SALARIED_NONEXEMPT
+// - `NONEXEMPT` - NONEXEMPT
+// - `OWNER` - OWNER
 type EmploymentFlsaStatus struct {
 	typeName       string
 	FlsaStatusEnum FlsaStatusEnum
@@ -9428,312 +5379,312 @@ func (e *EmploymentFlsaStatus) Accept(visitor EmploymentFlsaStatusVisitor) error
 
 // The position's currency code.
 //
-// * `XUA` - ADB Unit of Account
-// * `AFN` - Afghan Afghani
-// * `AFA` - Afghan Afghani (1927–2002)
-// * `ALL` - Albanian Lek
-// * `ALK` - Albanian Lek (1946–1965)
-// * `DZD` - Algerian Dinar
-// * `ADP` - Andorran Peseta
-// * `AOA` - Angolan Kwanza
-// * `AOK` - Angolan Kwanza (1977–1991)
-// * `AON` - Angolan New Kwanza (1990–2000)
-// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
-// * `ARA` - Argentine Austral
-// * `ARS` - Argentine Peso
-// * `ARM` - Argentine Peso (1881–1970)
-// * `ARP` - Argentine Peso (1983–1985)
-// * `ARL` - Argentine Peso Ley (1970–1983)
-// * `AMD` - Armenian Dram
-// * `AWG` - Aruban Florin
-// * `AUD` - Australian Dollar
-// * `ATS` - Austrian Schilling
-// * `AZN` - Azerbaijani Manat
-// * `AZM` - Azerbaijani Manat (1993–2006)
-// * `BSD` - Bahamian Dollar
-// * `BHD` - Bahraini Dinar
-// * `BDT` - Bangladeshi Taka
-// * `BBD` - Barbadian Dollar
-// * `BYN` - Belarusian Ruble
-// * `BYB` - Belarusian Ruble (1994–1999)
-// * `BYR` - Belarusian Ruble (2000–2016)
-// * `BEF` - Belgian Franc
-// * `BEC` - Belgian Franc (convertible)
-// * `BEL` - Belgian Franc (financial)
-// * `BZD` - Belize Dollar
-// * `BMD` - Bermudan Dollar
-// * `BTN` - Bhutanese Ngultrum
-// * `BOB` - Bolivian Boliviano
-// * `BOL` - Bolivian Boliviano (1863–1963)
-// * `BOV` - Bolivian Mvdol
-// * `BOP` - Bolivian Peso
-// * `BAM` - Bosnia-Herzegovina Convertible Mark
-// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
-// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
-// * `BWP` - Botswanan Pula
-// * `BRC` - Brazilian Cruzado (1986–1989)
-// * `BRZ` - Brazilian Cruzeiro (1942–1967)
-// * `BRE` - Brazilian Cruzeiro (1990–1993)
-// * `BRR` - Brazilian Cruzeiro (1993–1994)
-// * `BRN` - Brazilian New Cruzado (1989–1990)
-// * `BRB` - Brazilian New Cruzeiro (1967–1986)
-// * `BRL` - Brazilian Real
-// * `GBP` - British Pound
-// * `BND` - Brunei Dollar
-// * `BGL` - Bulgarian Hard Lev
-// * `BGN` - Bulgarian Lev
-// * `BGO` - Bulgarian Lev (1879–1952)
-// * `BGM` - Bulgarian Socialist Lev
-// * `BUK` - Burmese Kyat
-// * `BIF` - Burundian Franc
-// * `XPF` - CFP Franc
-// * `KHR` - Cambodian Riel
-// * `CAD` - Canadian Dollar
-// * `CVE` - Cape Verdean Escudo
-// * `KYD` - Cayman Islands Dollar
-// * `XAF` - Central African CFA Franc
-// * `CLE` - Chilean Escudo
-// * `CLP` - Chilean Peso
-// * `CLF` - Chilean Unit of Account (UF)
-// * `CNX` - Chinese People’s Bank Dollar
-// * `CNY` - Chinese Yuan
-// * `CNH` - Chinese Yuan (offshore)
-// * `COP` - Colombian Peso
-// * `COU` - Colombian Real Value Unit
-// * `KMF` - Comorian Franc
-// * `CDF` - Congolese Franc
-// * `CRC` - Costa Rican Colón
-// * `HRD` - Croatian Dinar
-// * `HRK` - Croatian Kuna
-// * `CUC` - Cuban Convertible Peso
-// * `CUP` - Cuban Peso
-// * `CYP` - Cypriot Pound
-// * `CZK` - Czech Koruna
-// * `CSK` - Czechoslovak Hard Koruna
-// * `DKK` - Danish Krone
-// * `DJF` - Djiboutian Franc
-// * `DOP` - Dominican Peso
-// * `NLG` - Dutch Guilder
-// * `XCD` - East Caribbean Dollar
-// * `DDM` - East German Mark
-// * `ECS` - Ecuadorian Sucre
-// * `ECV` - Ecuadorian Unit of Constant Value
-// * `EGP` - Egyptian Pound
-// * `GQE` - Equatorial Guinean Ekwele
-// * `ERN` - Eritrean Nakfa
-// * `EEK` - Estonian Kroon
-// * `ETB` - Ethiopian Birr
-// * `EUR` - Euro
-// * `XBA` - European Composite Unit
-// * `XEU` - European Currency Unit
-// * `XBB` - European Monetary Unit
-// * `XBC` - European Unit of Account (XBC)
-// * `XBD` - European Unit of Account (XBD)
-// * `FKP` - Falkland Islands Pound
-// * `FJD` - Fijian Dollar
-// * `FIM` - Finnish Markka
-// * `FRF` - French Franc
-// * `XFO` - French Gold Franc
-// * `XFU` - French UIC-Franc
-// * `GMD` - Gambian Dalasi
-// * `GEK` - Georgian Kupon Larit
-// * `GEL` - Georgian Lari
-// * `DEM` - German Mark
-// * `GHS` - Ghanaian Cedi
-// * `GHC` - Ghanaian Cedi (1979–2007)
-// * `GIP` - Gibraltar Pound
-// * `XAU` - Gold
-// * `GRD` - Greek Drachma
-// * `GTQ` - Guatemalan Quetzal
-// * `GWP` - Guinea-Bissau Peso
-// * `GNF` - Guinean Franc
-// * `GNS` - Guinean Syli
-// * `GYD` - Guyanaese Dollar
-// * `HTG` - Haitian Gourde
-// * `HNL` - Honduran Lempira
-// * `HKD` - Hong Kong Dollar
-// * `HUF` - Hungarian Forint
-// * `IMP` - IMP
-// * `ISK` - Icelandic Króna
-// * `ISJ` - Icelandic Króna (1918–1981)
-// * `INR` - Indian Rupee
-// * `IDR` - Indonesian Rupiah
-// * `IRR` - Iranian Rial
-// * `IQD` - Iraqi Dinar
-// * `IEP` - Irish Pound
-// * `ILS` - Israeli New Shekel
-// * `ILP` - Israeli Pound
-// * `ILR` - Israeli Shekel (1980–1985)
-// * `ITL` - Italian Lira
-// * `JMD` - Jamaican Dollar
-// * `JPY` - Japanese Yen
-// * `JOD` - Jordanian Dinar
-// * `KZT` - Kazakhstani Tenge
-// * `KES` - Kenyan Shilling
-// * `KWD` - Kuwaiti Dinar
-// * `KGS` - Kyrgystani Som
-// * `LAK` - Laotian Kip
-// * `LVL` - Latvian Lats
-// * `LVR` - Latvian Ruble
-// * `LBP` - Lebanese Pound
-// * `LSL` - Lesotho Loti
-// * `LRD` - Liberian Dollar
-// * `LYD` - Libyan Dinar
-// * `LTL` - Lithuanian Litas
-// * `LTT` - Lithuanian Talonas
-// * `LUL` - Luxembourg Financial Franc
-// * `LUC` - Luxembourgian Convertible Franc
-// * `LUF` - Luxembourgian Franc
-// * `MOP` - Macanese Pataca
-// * `MKD` - Macedonian Denar
-// * `MKN` - Macedonian Denar (1992–1993)
-// * `MGA` - Malagasy Ariary
-// * `MGF` - Malagasy Franc
-// * `MWK` - Malawian Kwacha
-// * `MYR` - Malaysian Ringgit
-// * `MVR` - Maldivian Rufiyaa
-// * `MVP` - Maldivian Rupee (1947–1981)
-// * `MLF` - Malian Franc
-// * `MTL` - Maltese Lira
-// * `MTP` - Maltese Pound
-// * `MRU` - Mauritanian Ouguiya
-// * `MRO` - Mauritanian Ouguiya (1973–2017)
-// * `MUR` - Mauritian Rupee
-// * `MXV` - Mexican Investment Unit
-// * `MXN` - Mexican Peso
-// * `MXP` - Mexican Silver Peso (1861–1992)
-// * `MDC` - Moldovan Cupon
-// * `MDL` - Moldovan Leu
-// * `MCF` - Monegasque Franc
-// * `MNT` - Mongolian Tugrik
-// * `MAD` - Moroccan Dirham
-// * `MAF` - Moroccan Franc
-// * `MZE` - Mozambican Escudo
-// * `MZN` - Mozambican Metical
-// * `MZM` - Mozambican Metical (1980–2006)
-// * `MMK` - Myanmar Kyat
-// * `NAD` - Namibian Dollar
-// * `NPR` - Nepalese Rupee
-// * `ANG` - Netherlands Antillean Guilder
-// * `TWD` - New Taiwan Dollar
-// * `NZD` - New Zealand Dollar
-// * `NIO` - Nicaraguan Córdoba
-// * `NIC` - Nicaraguan Córdoba (1988–1991)
-// * `NGN` - Nigerian Naira
-// * `KPW` - North Korean Won
-// * `NOK` - Norwegian Krone
-// * `OMR` - Omani Rial
-// * `PKR` - Pakistani Rupee
-// * `XPD` - Palladium
-// * `PAB` - Panamanian Balboa
-// * `PGK` - Papua New Guinean Kina
-// * `PYG` - Paraguayan Guarani
-// * `PEI` - Peruvian Inti
-// * `PEN` - Peruvian Sol
-// * `PES` - Peruvian Sol (1863–1965)
-// * `PHP` - Philippine Peso
-// * `XPT` - Platinum
-// * `PLN` - Polish Zloty
-// * `PLZ` - Polish Zloty (1950–1995)
-// * `PTE` - Portuguese Escudo
-// * `GWE` - Portuguese Guinea Escudo
-// * `QAR` - Qatari Rial
-// * `XRE` - RINET Funds
-// * `RHD` - Rhodesian Dollar
-// * `RON` - Romanian Leu
-// * `ROL` - Romanian Leu (1952–2006)
-// * `RUB` - Russian Ruble
-// * `RUR` - Russian Ruble (1991–1998)
-// * `RWF` - Rwandan Franc
-// * `SVC` - Salvadoran Colón
-// * `WST` - Samoan Tala
-// * `SAR` - Saudi Riyal
-// * `RSD` - Serbian Dinar
-// * `CSD` - Serbian Dinar (2002–2006)
-// * `SCR` - Seychellois Rupee
-// * `SLL` - Sierra Leonean Leone
-// * `XAG` - Silver
-// * `SGD` - Singapore Dollar
-// * `SKK` - Slovak Koruna
-// * `SIT` - Slovenian Tolar
-// * `SBD` - Solomon Islands Dollar
-// * `SOS` - Somali Shilling
-// * `ZAR` - South African Rand
-// * `ZAL` - South African Rand (financial)
-// * `KRH` - South Korean Hwan (1953–1962)
-// * `KRW` - South Korean Won
-// * `KRO` - South Korean Won (1945–1953)
-// * `SSP` - South Sudanese Pound
-// * `SUR` - Soviet Rouble
-// * `ESP` - Spanish Peseta
-// * `ESA` - Spanish Peseta (A account)
-// * `ESB` - Spanish Peseta (convertible account)
-// * `XDR` - Special Drawing Rights
-// * `LKR` - Sri Lankan Rupee
-// * `SHP` - St. Helena Pound
-// * `XSU` - Sucre
-// * `SDD` - Sudanese Dinar (1992–2007)
-// * `SDG` - Sudanese Pound
-// * `SDP` - Sudanese Pound (1957–1998)
-// * `SRD` - Surinamese Dollar
-// * `SRG` - Surinamese Guilder
-// * `SZL` - Swazi Lilangeni
-// * `SEK` - Swedish Krona
-// * `CHF` - Swiss Franc
-// * `SYP` - Syrian Pound
-// * `STN` - São Tomé & Príncipe Dobra
-// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
-// * `TVD` - TVD
-// * `TJR` - Tajikistani Ruble
-// * `TJS` - Tajikistani Somoni
-// * `TZS` - Tanzanian Shilling
-// * `XTS` - Testing Currency Code
-// * `THB` - Thai Baht
-// * `XXX` - The codes assigned for transactions where no currency is involved
-// * `TPE` - Timorese Escudo
-// * `TOP` - Tongan Paʻanga
-// * `TTD` - Trinidad & Tobago Dollar
-// * `TND` - Tunisian Dinar
-// * `TRY` - Turkish Lira
-// * `TRL` - Turkish Lira (1922–2005)
-// * `TMT` - Turkmenistani Manat
-// * `TMM` - Turkmenistani Manat (1993–2009)
-// * `USD` - US Dollar
-// * `USN` - US Dollar (Next day)
-// * `USS` - US Dollar (Same day)
-// * `UGX` - Ugandan Shilling
-// * `UGS` - Ugandan Shilling (1966–1987)
-// * `UAH` - Ukrainian Hryvnia
-// * `UAK` - Ukrainian Karbovanets
-// * `AED` - United Arab Emirates Dirham
-// * `UYW` - Uruguayan Nominal Wage Index Unit
-// * `UYU` - Uruguayan Peso
-// * `UYP` - Uruguayan Peso (1975–1993)
-// * `UYI` - Uruguayan Peso (Indexed Units)
-// * `UZS` - Uzbekistani Som
-// * `VUV` - Vanuatu Vatu
-// * `VES` - Venezuelan Bolívar
-// * `VEB` - Venezuelan Bolívar (1871–2008)
-// * `VEF` - Venezuelan Bolívar (2008–2018)
-// * `VND` - Vietnamese Dong
-// * `VNN` - Vietnamese Dong (1978–1985)
-// * `CHE` - WIR Euro
-// * `CHW` - WIR Franc
-// * `XOF` - West African CFA Franc
-// * `YDD` - Yemeni Dinar
-// * `YER` - Yemeni Rial
-// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
-// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
-// * `YUM` - Yugoslavian New Dinar (1994–2002)
-// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
-// * `ZWN` - ZWN
-// * `ZRN` - Zairean New Zaire (1993–1998)
-// * `ZRZ` - Zairean Zaire (1971–1993)
-// * `ZMW` - Zambian Kwacha
-// * `ZMK` - Zambian Kwacha (1968–2012)
-// * `ZWD` - Zimbabwean Dollar (1980–2008)
-// * `ZWR` - Zimbabwean Dollar (2008)
-// * `ZWL` - Zimbabwean Dollar (2009)
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
 type EmploymentPayCurrency struct {
 	typeName        string
 	PayCurrencyEnum PayCurrencyEnum
@@ -9793,15 +5744,15 @@ func (e *EmploymentPayCurrency) Accept(visitor EmploymentPayCurrencyVisitor) err
 
 // The position's pay frequency.
 //
-// * `WEEKLY` - WEEKLY
-// * `BIWEEKLY` - BIWEEKLY
-// * `MONTHLY` - MONTHLY
-// * `QUARTERLY` - QUARTERLY
-// * `SEMIANNUALLY` - SEMIANNUALLY
-// * `ANNUALLY` - ANNUALLY
-// * `THIRTEEN-MONTHLY` - THIRTEEN-MONTHLY
-// * `PRO_RATA` - PRO_RATA
-// * `SEMIMONTHLY` - SEMIMONTHLY
+// - `WEEKLY` - WEEKLY
+// - `BIWEEKLY` - BIWEEKLY
+// - `MONTHLY` - MONTHLY
+// - `QUARTERLY` - QUARTERLY
+// - `SEMIANNUALLY` - SEMIANNUALLY
+// - `ANNUALLY` - ANNUALLY
+// - `THIRTEEN-MONTHLY` - THIRTEEN-MONTHLY
+// - `PRO_RATA` - PRO_RATA
+// - `SEMIMONTHLY` - SEMIMONTHLY
 type EmploymentPayFrequency struct {
 	typeName         string
 	PayFrequencyEnum PayFrequencyEnum
@@ -9919,15 +5870,15 @@ func (e *EmploymentPayGroup) Accept(visitor EmploymentPayGroupVisitor) error {
 
 // The time period this pay rate encompasses.
 //
-// * `HOUR` - HOUR
-// * `DAY` - DAY
-// * `WEEK` - WEEK
-// * `EVERY_TWO_WEEKS` - EVERY_TWO_WEEKS
-// * `SEMIMONTHLY` - SEMIMONTHLY
-// * `MONTH` - MONTH
-// * `QUARTER` - QUARTER
-// * `EVERY_SIX_MONTHS` - EVERY_SIX_MONTHS
-// * `YEAR` - YEAR
+// - `HOUR` - HOUR
+// - `DAY` - DAY
+// - `WEEK` - WEEK
+// - `EVERY_TWO_WEEKS` - EVERY_TWO_WEEKS
+// - `SEMIMONTHLY` - SEMIMONTHLY
+// - `MONTH` - MONTH
+// - `QUARTER` - QUARTER
+// - `EVERY_SIX_MONTHS` - EVERY_SIX_MONTHS
+// - `YEAR` - YEAR
 type EmploymentPayPeriod struct {
 	typeName      string
 	PayPeriodEnum PayPeriodEnum
@@ -9985,789 +5936,120 @@ func (e *EmploymentPayPeriod) Accept(visitor EmploymentPayPeriodVisitor) error {
 	}
 }
 
-// * `ACTIVE` - ACTIVE
-// * `PENDING` - PENDING
-// * `INACTIVE` - INACTIVE
-type EmploymentStatusEnum uint
+// - `ACTIVE` - ACTIVE
+// - `PENDING` - PENDING
+// - `INACTIVE` - INACTIVE
+type EmploymentStatusEnum string
 
 const (
-	EmploymentStatusEnumActive EmploymentStatusEnum = iota + 1
-	EmploymentStatusEnumPending
-	EmploymentStatusEnumInactive
+	EmploymentStatusEnumActive   EmploymentStatusEnum = "ACTIVE"
+	EmploymentStatusEnumPending  EmploymentStatusEnum = "PENDING"
+	EmploymentStatusEnumInactive EmploymentStatusEnum = "INACTIVE"
 )
 
-func (e EmploymentStatusEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentStatusEnumActive:
-		return "ACTIVE"
-	case EmploymentStatusEnumPending:
-		return "PENDING"
-	case EmploymentStatusEnumInactive:
-		return "INACTIVE"
-	}
-}
-
-func (e EmploymentStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEmploymentStatusEnumFromString(s string) (EmploymentStatusEnum, error) {
+	switch s {
 	case "ACTIVE":
-		value := EmploymentStatusEnumActive
-		*e = value
+		return EmploymentStatusEnumActive, nil
 	case "PENDING":
-		value := EmploymentStatusEnumPending
-		*e = value
+		return EmploymentStatusEnumPending, nil
 	case "INACTIVE":
-		value := EmploymentStatusEnumInactive
-		*e = value
+		return EmploymentStatusEnumInactive, nil
 	}
-	return nil
+	var t EmploymentStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `FULL_TIME` - FULL_TIME
-// * `PART_TIME` - PART_TIME
-// * `INTERN` - INTERN
-// * `CONTRACTOR` - CONTRACTOR
-// * `FREELANCE` - FREELANCE
-type EmploymentTypeEnum uint
+func (e EmploymentStatusEnum) Ptr() *EmploymentStatusEnum {
+	return &e
+}
+
+// - `FULL_TIME` - FULL_TIME
+// - `PART_TIME` - PART_TIME
+// - `INTERN` - INTERN
+// - `CONTRACTOR` - CONTRACTOR
+// - `FREELANCE` - FREELANCE
+type EmploymentTypeEnum string
 
 const (
-	EmploymentTypeEnumFullTime EmploymentTypeEnum = iota + 1
-	EmploymentTypeEnumPartTime
-	EmploymentTypeEnumIntern
-	EmploymentTypeEnumContractor
-	EmploymentTypeEnumFreelance
+	EmploymentTypeEnumFullTime   EmploymentTypeEnum = "FULL_TIME"
+	EmploymentTypeEnumPartTime   EmploymentTypeEnum = "PART_TIME"
+	EmploymentTypeEnumIntern     EmploymentTypeEnum = "INTERN"
+	EmploymentTypeEnumContractor EmploymentTypeEnum = "CONTRACTOR"
+	EmploymentTypeEnumFreelance  EmploymentTypeEnum = "FREELANCE"
 )
 
-func (e EmploymentTypeEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentTypeEnumFullTime:
-		return "FULL_TIME"
-	case EmploymentTypeEnumPartTime:
-		return "PART_TIME"
-	case EmploymentTypeEnumIntern:
-		return "INTERN"
-	case EmploymentTypeEnumContractor:
-		return "CONTRACTOR"
-	case EmploymentTypeEnumFreelance:
-		return "FREELANCE"
-	}
-}
-
-func (e EmploymentTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEmploymentTypeEnumFromString(s string) (EmploymentTypeEnum, error) {
+	switch s {
 	case "FULL_TIME":
-		value := EmploymentTypeEnumFullTime
-		*e = value
+		return EmploymentTypeEnumFullTime, nil
 	case "PART_TIME":
-		value := EmploymentTypeEnumPartTime
-		*e = value
+		return EmploymentTypeEnumPartTime, nil
 	case "INTERN":
-		value := EmploymentTypeEnumIntern
-		*e = value
+		return EmploymentTypeEnumIntern, nil
 	case "CONTRACTOR":
-		value := EmploymentTypeEnumContractor
-		*e = value
+		return EmploymentTypeEnumContractor, nil
 	case "FREELANCE":
-		value := EmploymentTypeEnumFreelance
-		*e = value
+		return EmploymentTypeEnumFreelance, nil
 	}
-	return nil
+	var t EmploymentTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type EmploymentsListRequestExpand uint
+func (e EmploymentTypeEnum) Ptr() *EmploymentTypeEnum {
+	return &e
+}
+
+// - `READ` - READ
+// - `WRITE` - WRITE
+type EnabledActionsEnum string
 
 const (
-	EmploymentsListRequestExpandEmployee EmploymentsListRequestExpand = iota + 1
-	EmploymentsListRequestExpandEmployeePayGroup
-	EmploymentsListRequestExpandPayGroup
+	EnabledActionsEnumRead  EnabledActionsEnum = "READ"
+	EnabledActionsEnumWrite EnabledActionsEnum = "WRITE"
 )
 
-func (e EmploymentsListRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsListRequestExpandEmployee:
-		return "employee"
-	case EmploymentsListRequestExpandEmployeePayGroup:
-		return "employee,pay_group"
-	case EmploymentsListRequestExpandPayGroup:
-		return "pay_group"
-	}
-}
-
-func (e EmploymentsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employee":
-		value := EmploymentsListRequestExpandEmployee
-		*e = value
-	case "employee,pay_group":
-		value := EmploymentsListRequestExpandEmployeePayGroup
-		*e = value
-	case "pay_group":
-		value := EmploymentsListRequestExpandPayGroup
-		*e = value
-	}
-	return nil
-}
-
-type EmploymentsListRequestOrderBy uint
-
-const (
-	EmploymentsListRequestOrderByEffectiveDateDescending EmploymentsListRequestOrderBy = iota + 1
-	EmploymentsListRequestOrderByEffectiveDateAscending
-)
-
-func (e EmploymentsListRequestOrderBy) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsListRequestOrderByEffectiveDateDescending:
-		return "-effective_date"
-	case EmploymentsListRequestOrderByEffectiveDateAscending:
-		return "effective_date"
-	}
-}
-
-func (e EmploymentsListRequestOrderBy) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsListRequestOrderBy) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "-effective_date":
-		value := EmploymentsListRequestOrderByEffectiveDateDescending
-		*e = value
-	case "effective_date":
-		value := EmploymentsListRequestOrderByEffectiveDateAscending
-		*e = value
-	}
-	return nil
-}
-
-type EmploymentsListRequestRemoteFields uint
-
-const (
-	EmploymentsListRequestRemoteFieldsEmploymentType EmploymentsListRequestRemoteFields = iota + 1
-	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatus
-	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
-	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-	EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
-	EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequency
-	EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
-	EmploymentsListRequestRemoteFieldsEmploymentTypePayPeriod
-	EmploymentsListRequestRemoteFieldsFlsaStatus
-	EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequency
-	EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
-	EmploymentsListRequestRemoteFieldsFlsaStatusPayPeriod
-	EmploymentsListRequestRemoteFieldsPayFrequency
-	EmploymentsListRequestRemoteFieldsPayFrequencyPayPeriod
-	EmploymentsListRequestRemoteFieldsPayPeriod
-)
-
-func (e EmploymentsListRequestRemoteFields) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsListRequestRemoteFieldsEmploymentType:
-		return "employment_type"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatus:
-		return "employment_type,flsa_status"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency:
-		return "employment_type,flsa_status,pay_frequency"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
-		return "employment_type,flsa_status,pay_frequency,pay_period"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod:
-		return "employment_type,flsa_status,pay_period"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequency:
-		return "employment_type,pay_frequency"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod:
-		return "employment_type,pay_frequency,pay_period"
-	case EmploymentsListRequestRemoteFieldsEmploymentTypePayPeriod:
-		return "employment_type,pay_period"
-	case EmploymentsListRequestRemoteFieldsFlsaStatus:
-		return "flsa_status"
-	case EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequency:
-		return "flsa_status,pay_frequency"
-	case EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod:
-		return "flsa_status,pay_frequency,pay_period"
-	case EmploymentsListRequestRemoteFieldsFlsaStatusPayPeriod:
-		return "flsa_status,pay_period"
-	case EmploymentsListRequestRemoteFieldsPayFrequency:
-		return "pay_frequency"
-	case EmploymentsListRequestRemoteFieldsPayFrequencyPayPeriod:
-		return "pay_frequency,pay_period"
-	case EmploymentsListRequestRemoteFieldsPayPeriod:
-		return "pay_period"
-	}
-}
-
-func (e EmploymentsListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_type":
-		value := EmploymentsListRequestRemoteFieldsEmploymentType
-		*e = value
-	case "employment_type,flsa_status":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatus
-		*e = value
-	case "employment_type,flsa_status,pay_frequency":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
-		*e = value
-	case "employment_type,flsa_status,pay_frequency,pay_period":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "employment_type,flsa_status,pay_period":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
-		*e = value
-	case "employment_type,pay_frequency":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequency
-		*e = value
-	case "employment_type,pay_frequency,pay_period":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
-		*e = value
-	case "employment_type,pay_period":
-		value := EmploymentsListRequestRemoteFieldsEmploymentTypePayPeriod
-		*e = value
-	case "flsa_status":
-		value := EmploymentsListRequestRemoteFieldsFlsaStatus
-		*e = value
-	case "flsa_status,pay_frequency":
-		value := EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequency
-		*e = value
-	case "flsa_status,pay_frequency,pay_period":
-		value := EmploymentsListRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "flsa_status,pay_period":
-		value := EmploymentsListRequestRemoteFieldsFlsaStatusPayPeriod
-		*e = value
-	case "pay_frequency":
-		value := EmploymentsListRequestRemoteFieldsPayFrequency
-		*e = value
-	case "pay_frequency,pay_period":
-		value := EmploymentsListRequestRemoteFieldsPayFrequencyPayPeriod
-		*e = value
-	case "pay_period":
-		value := EmploymentsListRequestRemoteFieldsPayPeriod
-		*e = value
-	}
-	return nil
-}
-
-type EmploymentsListRequestShowEnumOrigins uint
-
-const (
-	EmploymentsListRequestShowEnumOriginsEmploymentType EmploymentsListRequestShowEnumOrigins = iota + 1
-	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatus
-	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
-	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-	EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
-	EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequency
-	EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
-	EmploymentsListRequestShowEnumOriginsEmploymentTypePayPeriod
-	EmploymentsListRequestShowEnumOriginsFlsaStatus
-	EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequency
-	EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
-	EmploymentsListRequestShowEnumOriginsFlsaStatusPayPeriod
-	EmploymentsListRequestShowEnumOriginsPayFrequency
-	EmploymentsListRequestShowEnumOriginsPayFrequencyPayPeriod
-	EmploymentsListRequestShowEnumOriginsPayPeriod
-)
-
-func (e EmploymentsListRequestShowEnumOrigins) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsListRequestShowEnumOriginsEmploymentType:
-		return "employment_type"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatus:
-		return "employment_type,flsa_status"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency:
-		return "employment_type,flsa_status,pay_frequency"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
-		return "employment_type,flsa_status,pay_frequency,pay_period"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod:
-		return "employment_type,flsa_status,pay_period"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequency:
-		return "employment_type,pay_frequency"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod:
-		return "employment_type,pay_frequency,pay_period"
-	case EmploymentsListRequestShowEnumOriginsEmploymentTypePayPeriod:
-		return "employment_type,pay_period"
-	case EmploymentsListRequestShowEnumOriginsFlsaStatus:
-		return "flsa_status"
-	case EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequency:
-		return "flsa_status,pay_frequency"
-	case EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod:
-		return "flsa_status,pay_frequency,pay_period"
-	case EmploymentsListRequestShowEnumOriginsFlsaStatusPayPeriod:
-		return "flsa_status,pay_period"
-	case EmploymentsListRequestShowEnumOriginsPayFrequency:
-		return "pay_frequency"
-	case EmploymentsListRequestShowEnumOriginsPayFrequencyPayPeriod:
-		return "pay_frequency,pay_period"
-	case EmploymentsListRequestShowEnumOriginsPayPeriod:
-		return "pay_period"
-	}
-}
-
-func (e EmploymentsListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_type":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentType
-		*e = value
-	case "employment_type,flsa_status":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatus
-		*e = value
-	case "employment_type,flsa_status,pay_frequency":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
-		*e = value
-	case "employment_type,flsa_status,pay_frequency,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "employment_type,flsa_status,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
-		*e = value
-	case "employment_type,pay_frequency":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequency
-		*e = value
-	case "employment_type,pay_frequency,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
-		*e = value
-	case "employment_type,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsEmploymentTypePayPeriod
-		*e = value
-	case "flsa_status":
-		value := EmploymentsListRequestShowEnumOriginsFlsaStatus
-		*e = value
-	case "flsa_status,pay_frequency":
-		value := EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequency
-		*e = value
-	case "flsa_status,pay_frequency,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "flsa_status,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsFlsaStatusPayPeriod
-		*e = value
-	case "pay_frequency":
-		value := EmploymentsListRequestShowEnumOriginsPayFrequency
-		*e = value
-	case "pay_frequency,pay_period":
-		value := EmploymentsListRequestShowEnumOriginsPayFrequencyPayPeriod
-		*e = value
-	case "pay_period":
-		value := EmploymentsListRequestShowEnumOriginsPayPeriod
-		*e = value
-	}
-	return nil
-}
-
-type EmploymentsRetrieveRequestExpand uint
-
-const (
-	EmploymentsRetrieveRequestExpandEmployee EmploymentsRetrieveRequestExpand = iota + 1
-	EmploymentsRetrieveRequestExpandEmployeePayGroup
-	EmploymentsRetrieveRequestExpandPayGroup
-)
-
-func (e EmploymentsRetrieveRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsRetrieveRequestExpandEmployee:
-		return "employee"
-	case EmploymentsRetrieveRequestExpandEmployeePayGroup:
-		return "employee,pay_group"
-	case EmploymentsRetrieveRequestExpandPayGroup:
-		return "pay_group"
-	}
-}
-
-func (e EmploymentsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employee":
-		value := EmploymentsRetrieveRequestExpandEmployee
-		*e = value
-	case "employee,pay_group":
-		value := EmploymentsRetrieveRequestExpandEmployeePayGroup
-		*e = value
-	case "pay_group":
-		value := EmploymentsRetrieveRequestExpandPayGroup
-		*e = value
-	}
-	return nil
-}
-
-type EmploymentsRetrieveRequestRemoteFields uint
-
-const (
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentType EmploymentsRetrieveRequestRemoteFields = iota + 1
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatus
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequency
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsFlsaStatus
-	EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequency
-	EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsPayFrequency
-	EmploymentsRetrieveRequestRemoteFieldsPayFrequencyPayPeriod
-	EmploymentsRetrieveRequestRemoteFieldsPayPeriod
-)
-
-func (e EmploymentsRetrieveRequestRemoteFields) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentType:
-		return "employment_type"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatus:
-		return "employment_type,flsa_status"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency:
-		return "employment_type,flsa_status,pay_frequency"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
-		return "employment_type,flsa_status,pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod:
-		return "employment_type,flsa_status,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequency:
-		return "employment_type,pay_frequency"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod:
-		return "employment_type,pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayPeriod:
-		return "employment_type,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatus:
-		return "flsa_status"
-	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequency:
-		return "flsa_status,pay_frequency"
-	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod:
-		return "flsa_status,pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayPeriod:
-		return "flsa_status,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsPayFrequency:
-		return "pay_frequency"
-	case EmploymentsRetrieveRequestRemoteFieldsPayFrequencyPayPeriod:
-		return "pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestRemoteFieldsPayPeriod:
-		return "pay_period"
-	}
-}
-
-func (e EmploymentsRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_type":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentType
-		*e = value
-	case "employment_type,flsa_status":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatus
-		*e = value
-	case "employment_type,flsa_status,pay_frequency":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequency
-		*e = value
-	case "employment_type,flsa_status,pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "employment_type,flsa_status,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypeFlsaStatusPayPeriod
-		*e = value
-	case "employment_type,pay_frequency":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequency
-		*e = value
-	case "employment_type,pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayFrequencyPayPeriod
-		*e = value
-	case "employment_type,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsEmploymentTypePayPeriod
-		*e = value
-	case "flsa_status":
-		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatus
-		*e = value
-	case "flsa_status,pay_frequency":
-		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequency
-		*e = value
-	case "flsa_status,pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "flsa_status,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsFlsaStatusPayPeriod
-		*e = value
-	case "pay_frequency":
-		value := EmploymentsRetrieveRequestRemoteFieldsPayFrequency
-		*e = value
-	case "pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsPayFrequencyPayPeriod
-		*e = value
-	case "pay_period":
-		value := EmploymentsRetrieveRequestRemoteFieldsPayPeriod
-		*e = value
-	}
-	return nil
-}
-
-type EmploymentsRetrieveRequestShowEnumOrigins uint
-
-const (
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentType EmploymentsRetrieveRequestShowEnumOrigins = iota + 1
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatus
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequency
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatus
-	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequency
-	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsPayFrequency
-	EmploymentsRetrieveRequestShowEnumOriginsPayFrequencyPayPeriod
-	EmploymentsRetrieveRequestShowEnumOriginsPayPeriod
-)
-
-func (e EmploymentsRetrieveRequestShowEnumOrigins) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentType:
-		return "employment_type"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatus:
-		return "employment_type,flsa_status"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency:
-		return "employment_type,flsa_status,pay_frequency"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod:
-		return "employment_type,flsa_status,pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod:
-		return "employment_type,flsa_status,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequency:
-		return "employment_type,pay_frequency"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod:
-		return "employment_type,pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayPeriod:
-		return "employment_type,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatus:
-		return "flsa_status"
-	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequency:
-		return "flsa_status,pay_frequency"
-	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod:
-		return "flsa_status,pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayPeriod:
-		return "flsa_status,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsPayFrequency:
-		return "pay_frequency"
-	case EmploymentsRetrieveRequestShowEnumOriginsPayFrequencyPayPeriod:
-		return "pay_frequency,pay_period"
-	case EmploymentsRetrieveRequestShowEnumOriginsPayPeriod:
-		return "pay_period"
-	}
-}
-
-func (e EmploymentsRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EmploymentsRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "employment_type":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentType
-		*e = value
-	case "employment_type,flsa_status":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatus
-		*e = value
-	case "employment_type,flsa_status,pay_frequency":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequency
-		*e = value
-	case "employment_type,flsa_status,pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "employment_type,flsa_status,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypeFlsaStatusPayPeriod
-		*e = value
-	case "employment_type,pay_frequency":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequency
-		*e = value
-	case "employment_type,pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayFrequencyPayPeriod
-		*e = value
-	case "employment_type,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsEmploymentTypePayPeriod
-		*e = value
-	case "flsa_status":
-		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatus
-		*e = value
-	case "flsa_status,pay_frequency":
-		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequency
-		*e = value
-	case "flsa_status,pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayFrequencyPayPeriod
-		*e = value
-	case "flsa_status,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsFlsaStatusPayPeriod
-		*e = value
-	case "pay_frequency":
-		value := EmploymentsRetrieveRequestShowEnumOriginsPayFrequency
-		*e = value
-	case "pay_frequency,pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsPayFrequencyPayPeriod
-		*e = value
-	case "pay_period":
-		value := EmploymentsRetrieveRequestShowEnumOriginsPayPeriod
-		*e = value
-	}
-	return nil
-}
-
-// * `READ` - READ
-// * `WRITE` - WRITE
-type EnabledActionsEnum uint
-
-const (
-	EnabledActionsEnumRead EnabledActionsEnum = iota + 1
-	EnabledActionsEnumWrite
-)
-
-func (e EnabledActionsEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EnabledActionsEnumRead:
-		return "READ"
-	case EnabledActionsEnumWrite:
-		return "WRITE"
-	}
-}
-
-func (e EnabledActionsEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEnabledActionsEnumFromString(s string) (EnabledActionsEnum, error) {
+	switch s {
 	case "READ":
-		value := EnabledActionsEnumRead
-		*e = value
+		return EnabledActionsEnumRead, nil
 	case "WRITE":
-		value := EnabledActionsEnumWrite
-		*e = value
+		return EnabledActionsEnumWrite, nil
 	}
-	return nil
+	var t EnabledActionsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
-type EncodingEnum uint
+func (e EnabledActionsEnum) Ptr() *EnabledActionsEnum {
+	return &e
+}
+
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
+type EncodingEnum string
 
 const (
-	EncodingEnumRaw EncodingEnum = iota + 1
-	EncodingEnumBase64
-	EncodingEnumGzipBase64
+	EncodingEnumRaw        EncodingEnum = "RAW"
+	EncodingEnumBase64     EncodingEnum = "BASE64"
+	EncodingEnumGzipBase64 EncodingEnum = "GZIP_BASE64"
 )
 
-func (e EncodingEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EncodingEnumRaw:
-		return "RAW"
-	case EncodingEnumBase64:
-		return "BASE64"
-	case EncodingEnumGzipBase64:
-		return "GZIP_BASE64"
-	}
-}
-
-func (e EncodingEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EncodingEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEncodingEnumFromString(s string) (EncodingEnum, error) {
+	switch s {
 	case "RAW":
-		value := EncodingEnumRaw
-		*e = value
+		return EncodingEnumRaw, nil
 	case "BASE64":
-		value := EncodingEnumBase64
-		*e = value
+		return EncodingEnumBase64, nil
 	case "GZIP_BASE64":
-		value := EncodingEnumGzipBase64
-		*e = value
+		return EncodingEnumGzipBase64, nil
 	}
-	return nil
+	var t EncodingEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EncodingEnum) Ptr() *EncodingEnum {
+	return &e
 }
 
 type ErrorValidationProblem struct {
@@ -10775,446 +6057,293 @@ type ErrorValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
-// * `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
-// * `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
-// * `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
-// * `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
-// * `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
-// * `WHITE` - WHITE
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
-type EthnicityEnum uint
-
-const (
-	EthnicityEnumAmericanIndianOrAlaskaNative EthnicityEnum = iota + 1
-	EthnicityEnumAsianOrIndianSubcontinent
-	EthnicityEnumBlackOrAfricanAmerican
-	EthnicityEnumHispanicOrLatino
-	EthnicityEnumNativeHawaiianOrOtherPacificIslander
-	EthnicityEnumTwoOrMoreRaces
-	EthnicityEnumWhite
-	EthnicityEnumPreferNotToDisclose
-)
-
-func (e EthnicityEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EthnicityEnumAmericanIndianOrAlaskaNative:
-		return "AMERICAN_INDIAN_OR_ALASKA_NATIVE"
-	case EthnicityEnumAsianOrIndianSubcontinent:
-		return "ASIAN_OR_INDIAN_SUBCONTINENT"
-	case EthnicityEnumBlackOrAfricanAmerican:
-		return "BLACK_OR_AFRICAN_AMERICAN"
-	case EthnicityEnumHispanicOrLatino:
-		return "HISPANIC_OR_LATINO"
-	case EthnicityEnumNativeHawaiianOrOtherPacificIslander:
-		return "NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER"
-	case EthnicityEnumTwoOrMoreRaces:
-		return "TWO_OR_MORE_RACES"
-	case EthnicityEnumWhite:
-		return "WHITE"
-	case EthnicityEnumPreferNotToDisclose:
-		return "PREFER_NOT_TO_DISCLOSE"
-	}
-}
-
-func (e EthnicityEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EthnicityEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (e *ErrorValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler ErrorValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*e = ErrorValidationProblem(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *ErrorValidationProblem) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+// - `AMERICAN_INDIAN_OR_ALASKA_NATIVE` - AMERICAN_INDIAN_OR_ALASKA_NATIVE
+// - `ASIAN_OR_INDIAN_SUBCONTINENT` - ASIAN_OR_INDIAN_SUBCONTINENT
+// - `BLACK_OR_AFRICAN_AMERICAN` - BLACK_OR_AFRICAN_AMERICAN
+// - `HISPANIC_OR_LATINO` - HISPANIC_OR_LATINO
+// - `NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER` - NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER
+// - `TWO_OR_MORE_RACES` - TWO_OR_MORE_RACES
+// - `WHITE` - WHITE
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+type EthnicityEnum string
+
+const (
+	EthnicityEnumAmericanIndianOrAlaskaNative         EthnicityEnum = "AMERICAN_INDIAN_OR_ALASKA_NATIVE"
+	EthnicityEnumAsianOrIndianSubcontinent            EthnicityEnum = "ASIAN_OR_INDIAN_SUBCONTINENT"
+	EthnicityEnumBlackOrAfricanAmerican               EthnicityEnum = "BLACK_OR_AFRICAN_AMERICAN"
+	EthnicityEnumHispanicOrLatino                     EthnicityEnum = "HISPANIC_OR_LATINO"
+	EthnicityEnumNativeHawaiianOrOtherPacificIslander EthnicityEnum = "NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER"
+	EthnicityEnumTwoOrMoreRaces                       EthnicityEnum = "TWO_OR_MORE_RACES"
+	EthnicityEnumWhite                                EthnicityEnum = "WHITE"
+	EthnicityEnumPreferNotToDisclose                  EthnicityEnum = "PREFER_NOT_TO_DISCLOSE"
+)
+
+func NewEthnicityEnumFromString(s string) (EthnicityEnum, error) {
+	switch s {
 	case "AMERICAN_INDIAN_OR_ALASKA_NATIVE":
-		value := EthnicityEnumAmericanIndianOrAlaskaNative
-		*e = value
+		return EthnicityEnumAmericanIndianOrAlaskaNative, nil
 	case "ASIAN_OR_INDIAN_SUBCONTINENT":
-		value := EthnicityEnumAsianOrIndianSubcontinent
-		*e = value
+		return EthnicityEnumAsianOrIndianSubcontinent, nil
 	case "BLACK_OR_AFRICAN_AMERICAN":
-		value := EthnicityEnumBlackOrAfricanAmerican
-		*e = value
+		return EthnicityEnumBlackOrAfricanAmerican, nil
 	case "HISPANIC_OR_LATINO":
-		value := EthnicityEnumHispanicOrLatino
-		*e = value
+		return EthnicityEnumHispanicOrLatino, nil
 	case "NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER":
-		value := EthnicityEnumNativeHawaiianOrOtherPacificIslander
-		*e = value
+		return EthnicityEnumNativeHawaiianOrOtherPacificIslander, nil
 	case "TWO_OR_MORE_RACES":
-		value := EthnicityEnumTwoOrMoreRaces
-		*e = value
+		return EthnicityEnumTwoOrMoreRaces, nil
 	case "WHITE":
-		value := EthnicityEnumWhite
-		*e = value
+		return EthnicityEnumWhite, nil
 	case "PREFER_NOT_TO_DISCLOSE":
-		value := EthnicityEnumPreferNotToDisclose
-		*e = value
+		return EthnicityEnumPreferNotToDisclose, nil
 	}
-	return nil
+	var t EthnicityEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
-type EventTypeEnum uint
+func (e EthnicityEnum) Ptr() *EthnicityEnum {
+	return &e
+}
+
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+type EventTypeEnum string
 
 const (
-	EventTypeEnumCreatedRemoteProductionApiKey EventTypeEnum = iota + 1
-	EventTypeEnumDeletedRemoteProductionApiKey
-	EventTypeEnumCreatedTestApiKey
-	EventTypeEnumDeletedTestApiKey
-	EventTypeEnumRegeneratedProductionApiKey
-	EventTypeEnumInvitedUser
-	EventTypeEnumTwoFactorAuthEnabled
-	EventTypeEnumTwoFactorAuthDisabled
-	EventTypeEnumDeletedLinkedAccount
-	EventTypeEnumCreatedDestination
-	EventTypeEnumDeletedDestination
-	EventTypeEnumChangedScopes
-	EventTypeEnumChangedPersonalInformation
-	EventTypeEnumChangedOrganizationSettings
-	EventTypeEnumEnabledIntegration
-	EventTypeEnumDisabledIntegration
-	EventTypeEnumEnabledCategory
-	EventTypeEnumDisabledCategory
-	EventTypeEnumChangedPassword
-	EventTypeEnumResetPassword
-	EventTypeEnumEnabledRedactUnmappedDataForOrganization
-	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumDisabledRedactUnmappedDataForOrganization
-	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumCreatedIntegrationWideFieldMapping
-	EventTypeEnumCreatedLinkedAccountFieldMapping
-	EventTypeEnumChangedIntegrationWideFieldMapping
-	EventTypeEnumChangedLinkedAccountFieldMapping
-	EventTypeEnumDeletedIntegrationWideFieldMapping
-	EventTypeEnumDeletedLinkedAccountFieldMapping
+	EventTypeEnumCreatedRemoteProductionApiKey              EventTypeEnum = "CREATED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumDeletedRemoteProductionApiKey              EventTypeEnum = "DELETED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumCreatedTestApiKey                          EventTypeEnum = "CREATED_TEST_API_KEY"
+	EventTypeEnumDeletedTestApiKey                          EventTypeEnum = "DELETED_TEST_API_KEY"
+	EventTypeEnumRegeneratedProductionApiKey                EventTypeEnum = "REGENERATED_PRODUCTION_API_KEY"
+	EventTypeEnumInvitedUser                                EventTypeEnum = "INVITED_USER"
+	EventTypeEnumTwoFactorAuthEnabled                       EventTypeEnum = "TWO_FACTOR_AUTH_ENABLED"
+	EventTypeEnumTwoFactorAuthDisabled                      EventTypeEnum = "TWO_FACTOR_AUTH_DISABLED"
+	EventTypeEnumDeletedLinkedAccount                       EventTypeEnum = "DELETED_LINKED_ACCOUNT"
+	EventTypeEnumCreatedDestination                         EventTypeEnum = "CREATED_DESTINATION"
+	EventTypeEnumDeletedDestination                         EventTypeEnum = "DELETED_DESTINATION"
+	EventTypeEnumChangedScopes                              EventTypeEnum = "CHANGED_SCOPES"
+	EventTypeEnumChangedPersonalInformation                 EventTypeEnum = "CHANGED_PERSONAL_INFORMATION"
+	EventTypeEnumChangedOrganizationSettings                EventTypeEnum = "CHANGED_ORGANIZATION_SETTINGS"
+	EventTypeEnumEnabledIntegration                         EventTypeEnum = "ENABLED_INTEGRATION"
+	EventTypeEnumDisabledIntegration                        EventTypeEnum = "DISABLED_INTEGRATION"
+	EventTypeEnumEnabledCategory                            EventTypeEnum = "ENABLED_CATEGORY"
+	EventTypeEnumDisabledCategory                           EventTypeEnum = "DISABLED_CATEGORY"
+	EventTypeEnumChangedPassword                            EventTypeEnum = "CHANGED_PASSWORD"
+	EventTypeEnumResetPassword                              EventTypeEnum = "RESET_PASSWORD"
+	EventTypeEnumEnabledRedactUnmappedDataForOrganization   EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount  EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumDisabledRedactUnmappedDataForOrganization  EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumCreatedIntegrationWideFieldMapping         EventTypeEnum = "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountFieldMapping           EventTypeEnum = "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumChangedIntegrationWideFieldMapping         EventTypeEnum = "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
 )
 
-func (e EventTypeEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EventTypeEnumCreatedRemoteProductionApiKey:
-		return "CREATED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumDeletedRemoteProductionApiKey:
-		return "DELETED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumCreatedTestApiKey:
-		return "CREATED_TEST_API_KEY"
-	case EventTypeEnumDeletedTestApiKey:
-		return "DELETED_TEST_API_KEY"
-	case EventTypeEnumRegeneratedProductionApiKey:
-		return "REGENERATED_PRODUCTION_API_KEY"
-	case EventTypeEnumInvitedUser:
-		return "INVITED_USER"
-	case EventTypeEnumTwoFactorAuthEnabled:
-		return "TWO_FACTOR_AUTH_ENABLED"
-	case EventTypeEnumTwoFactorAuthDisabled:
-		return "TWO_FACTOR_AUTH_DISABLED"
-	case EventTypeEnumDeletedLinkedAccount:
-		return "DELETED_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedDestination:
-		return "CREATED_DESTINATION"
-	case EventTypeEnumDeletedDestination:
-		return "DELETED_DESTINATION"
-	case EventTypeEnumChangedScopes:
-		return "CHANGED_SCOPES"
-	case EventTypeEnumChangedPersonalInformation:
-		return "CHANGED_PERSONAL_INFORMATION"
-	case EventTypeEnumChangedOrganizationSettings:
-		return "CHANGED_ORGANIZATION_SETTINGS"
-	case EventTypeEnumEnabledIntegration:
-		return "ENABLED_INTEGRATION"
-	case EventTypeEnumDisabledIntegration:
-		return "DISABLED_INTEGRATION"
-	case EventTypeEnumEnabledCategory:
-		return "ENABLED_CATEGORY"
-	case EventTypeEnumDisabledCategory:
-		return "DISABLED_CATEGORY"
-	case EventTypeEnumChangedPassword:
-		return "CHANGED_PASSWORD"
-	case EventTypeEnumResetPassword:
-		return "RESET_PASSWORD"
-	case EventTypeEnumEnabledRedactUnmappedDataForOrganization:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumDisabledRedactUnmappedDataForOrganization:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedIntegrationWideFieldMapping:
-		return "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumCreatedLinkedAccountFieldMapping:
-		return "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumChangedIntegrationWideFieldMapping:
-		return "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumChangedLinkedAccountFieldMapping:
-		return "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumDeletedIntegrationWideFieldMapping:
-		return "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumDeletedLinkedAccountFieldMapping:
-		return "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
-	}
-}
-
-func (e EventTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
+	switch s {
 	case "CREATED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumCreatedRemoteProductionApiKey
-		*e = value
+		return EventTypeEnumCreatedRemoteProductionApiKey, nil
 	case "DELETED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumDeletedRemoteProductionApiKey
-		*e = value
+		return EventTypeEnumDeletedRemoteProductionApiKey, nil
 	case "CREATED_TEST_API_KEY":
-		value := EventTypeEnumCreatedTestApiKey
-		*e = value
+		return EventTypeEnumCreatedTestApiKey, nil
 	case "DELETED_TEST_API_KEY":
-		value := EventTypeEnumDeletedTestApiKey
-		*e = value
+		return EventTypeEnumDeletedTestApiKey, nil
 	case "REGENERATED_PRODUCTION_API_KEY":
-		value := EventTypeEnumRegeneratedProductionApiKey
-		*e = value
+		return EventTypeEnumRegeneratedProductionApiKey, nil
 	case "INVITED_USER":
-		value := EventTypeEnumInvitedUser
-		*e = value
+		return EventTypeEnumInvitedUser, nil
 	case "TWO_FACTOR_AUTH_ENABLED":
-		value := EventTypeEnumTwoFactorAuthEnabled
-		*e = value
+		return EventTypeEnumTwoFactorAuthEnabled, nil
 	case "TWO_FACTOR_AUTH_DISABLED":
-		value := EventTypeEnumTwoFactorAuthDisabled
-		*e = value
+		return EventTypeEnumTwoFactorAuthDisabled, nil
 	case "DELETED_LINKED_ACCOUNT":
-		value := EventTypeEnumDeletedLinkedAccount
-		*e = value
+		return EventTypeEnumDeletedLinkedAccount, nil
 	case "CREATED_DESTINATION":
-		value := EventTypeEnumCreatedDestination
-		*e = value
+		return EventTypeEnumCreatedDestination, nil
 	case "DELETED_DESTINATION":
-		value := EventTypeEnumDeletedDestination
-		*e = value
+		return EventTypeEnumDeletedDestination, nil
 	case "CHANGED_SCOPES":
-		value := EventTypeEnumChangedScopes
-		*e = value
+		return EventTypeEnumChangedScopes, nil
 	case "CHANGED_PERSONAL_INFORMATION":
-		value := EventTypeEnumChangedPersonalInformation
-		*e = value
+		return EventTypeEnumChangedPersonalInformation, nil
 	case "CHANGED_ORGANIZATION_SETTINGS":
-		value := EventTypeEnumChangedOrganizationSettings
-		*e = value
+		return EventTypeEnumChangedOrganizationSettings, nil
 	case "ENABLED_INTEGRATION":
-		value := EventTypeEnumEnabledIntegration
-		*e = value
+		return EventTypeEnumEnabledIntegration, nil
 	case "DISABLED_INTEGRATION":
-		value := EventTypeEnumDisabledIntegration
-		*e = value
+		return EventTypeEnumDisabledIntegration, nil
 	case "ENABLED_CATEGORY":
-		value := EventTypeEnumEnabledCategory
-		*e = value
+		return EventTypeEnumEnabledCategory, nil
 	case "DISABLED_CATEGORY":
-		value := EventTypeEnumDisabledCategory
-		*e = value
+		return EventTypeEnumDisabledCategory, nil
 	case "CHANGED_PASSWORD":
-		value := EventTypeEnumChangedPassword
-		*e = value
+		return EventTypeEnumChangedPassword, nil
 	case "RESET_PASSWORD":
-		value := EventTypeEnumResetPassword
-		*e = value
+		return EventTypeEnumResetPassword, nil
 	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumEnabledRedactUnmappedDataForOrganization
-		*e = value
+		return EventTypeEnumEnabledRedactUnmappedDataForOrganization, nil
 	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-		*e = value
+		return EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount, nil
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumDisabledRedactUnmappedDataForOrganization
-		*e = value
+		return EventTypeEnumDisabledRedactUnmappedDataForOrganization, nil
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-		*e = value
+		return EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount, nil
 	case "CREATED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumCreatedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumCreatedIntegrationWideFieldMapping, nil
 	case "CREATED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumCreatedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumCreatedLinkedAccountFieldMapping, nil
 	case "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumChangedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumChangedIntegrationWideFieldMapping, nil
 	case "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumChangedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumChangedLinkedAccountFieldMapping, nil
 	case "DELETED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumDeletedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumDeletedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
 	}
-	return nil
+	var t EventTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `EXEMPT` - EXEMPT
-// * `SALARIED_NONEXEMPT` - SALARIED_NONEXEMPT
-// * `NONEXEMPT` - NONEXEMPT
-// * `OWNER` - OWNER
-type FlsaStatusEnum uint
+func (e EventTypeEnum) Ptr() *EventTypeEnum {
+	return &e
+}
+
+// - `EXEMPT` - EXEMPT
+// - `SALARIED_NONEXEMPT` - SALARIED_NONEXEMPT
+// - `NONEXEMPT` - NONEXEMPT
+// - `OWNER` - OWNER
+type FlsaStatusEnum string
 
 const (
-	FlsaStatusEnumExempt FlsaStatusEnum = iota + 1
-	FlsaStatusEnumSalariedNonexempt
-	FlsaStatusEnumNonexempt
-	FlsaStatusEnumOwner
+	FlsaStatusEnumExempt            FlsaStatusEnum = "EXEMPT"
+	FlsaStatusEnumSalariedNonexempt FlsaStatusEnum = "SALARIED_NONEXEMPT"
+	FlsaStatusEnumNonexempt         FlsaStatusEnum = "NONEXEMPT"
+	FlsaStatusEnumOwner             FlsaStatusEnum = "OWNER"
 )
 
-func (f FlsaStatusEnum) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FlsaStatusEnumExempt:
-		return "EXEMPT"
-	case FlsaStatusEnumSalariedNonexempt:
-		return "SALARIED_NONEXEMPT"
-	case FlsaStatusEnumNonexempt:
-		return "NONEXEMPT"
-	case FlsaStatusEnumOwner:
-		return "OWNER"
-	}
-}
-
-func (f FlsaStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FlsaStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewFlsaStatusEnumFromString(s string) (FlsaStatusEnum, error) {
+	switch s {
 	case "EXEMPT":
-		value := FlsaStatusEnumExempt
-		*f = value
+		return FlsaStatusEnumExempt, nil
 	case "SALARIED_NONEXEMPT":
-		value := FlsaStatusEnumSalariedNonexempt
-		*f = value
+		return FlsaStatusEnumSalariedNonexempt, nil
 	case "NONEXEMPT":
-		value := FlsaStatusEnumNonexempt
-		*f = value
+		return FlsaStatusEnumNonexempt, nil
 	case "OWNER":
-		value := FlsaStatusEnumOwner
-		*f = value
+		return FlsaStatusEnumOwner, nil
 	}
-	return nil
+	var t FlsaStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `MALE` - MALE
-// * `FEMALE` - FEMALE
-// * `NON-BINARY` - NON-BINARY
-// * `OTHER` - OTHER
-// * `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
-type GenderEnum uint
+func (f FlsaStatusEnum) Ptr() *FlsaStatusEnum {
+	return &f
+}
+
+// - `MALE` - MALE
+// - `FEMALE` - FEMALE
+// - `NON-BINARY` - NON-BINARY
+// - `OTHER` - OTHER
+// - `PREFER_NOT_TO_DISCLOSE` - PREFER_NOT_TO_DISCLOSE
+type GenderEnum string
 
 const (
-	GenderEnumMale GenderEnum = iota + 1
-	GenderEnumFemale
-	GenderEnumNonBinary
-	GenderEnumOther
-	GenderEnumPreferNotToDisclose
+	GenderEnumMale                GenderEnum = "MALE"
+	GenderEnumFemale              GenderEnum = "FEMALE"
+	GenderEnumNonBinary           GenderEnum = "NON-BINARY"
+	GenderEnumOther               GenderEnum = "OTHER"
+	GenderEnumPreferNotToDisclose GenderEnum = "PREFER_NOT_TO_DISCLOSE"
 )
 
-func (g GenderEnum) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GenderEnumMale:
-		return "MALE"
-	case GenderEnumFemale:
-		return "FEMALE"
-	case GenderEnumNonBinary:
-		return "NON-BINARY"
-	case GenderEnumOther:
-		return "OTHER"
-	case GenderEnumPreferNotToDisclose:
-		return "PREFER_NOT_TO_DISCLOSE"
-	}
-}
-
-func (g GenderEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
-}
-
-func (g *GenderEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewGenderEnumFromString(s string) (GenderEnum, error) {
+	switch s {
 	case "MALE":
-		value := GenderEnumMale
-		*g = value
+		return GenderEnumMale, nil
 	case "FEMALE":
-		value := GenderEnumFemale
-		*g = value
+		return GenderEnumFemale, nil
 	case "NON-BINARY":
-		value := GenderEnumNonBinary
-		*g = value
+		return GenderEnumNonBinary, nil
 	case "OTHER":
-		value := GenderEnumOther
-		*g = value
+		return GenderEnumOther, nil
 	case "PREFER_NOT_TO_DISCLOSE":
-		value := GenderEnumPreferNotToDisclose
-		*g = value
+		return GenderEnumPreferNotToDisclose, nil
 	}
-	return nil
+	var t GenderEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GenderEnum) Ptr() *GenderEnum {
+	return &g
 }
 
 // # The Group Object
+//
 // ### Description
+//
 // The `Group` object is used to represent any subset of employees, such as `PayGroup` or `Team`. Employees can be in multiple Groups.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Employee` endpoint and expand groups to view an employee's groups.
 type Group struct {
 	Id *string `json:"id,omitempty"`
@@ -11226,28 +6355,53 @@ type Group struct {
 	Name *string `json:"name,omitempty"`
 	// The group type
 	//
-	// * `TEAM` - TEAM
-	// * `DEPARTMENT` - DEPARTMENT
-	// * `COST_CENTER` - COST_CENTER
-	// * `BUSINESS_UNIT` - BUSINESS_UNIT
-	// * `GROUP` - GROUP
+	// - `TEAM` - TEAM
+	// - `DEPARTMENT` - DEPARTMENT
+	// - `COST_CENTER` - COST_CENTER
+	// - `BUSINESS_UNIT` - BUSINESS_UNIT
+	// - `GROUP` - GROUP
 	Type *GroupType `json:"type,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (g *Group) UnmarshalJSON(data []byte) error {
+	type unmarshaler Group
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = Group(value)
+	g._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *Group) String() string {
+	if len(g._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(g._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 // The group type
 //
-// * `TEAM` - TEAM
-// * `DEPARTMENT` - DEPARTMENT
-// * `COST_CENTER` - COST_CENTER
-// * `BUSINESS_UNIT` - BUSINESS_UNIT
-// * `GROUP` - GROUP
+// - `TEAM` - TEAM
+// - `DEPARTMENT` - DEPARTMENT
+// - `COST_CENTER` - COST_CENTER
+// - `BUSINESS_UNIT` - BUSINESS_UNIT
+// - `GROUP` - GROUP
 type GroupType struct {
 	typeName      string
 	GroupTypeEnum GroupTypeEnum
@@ -11305,143 +6459,86 @@ func (g *GroupType) Accept(visitor GroupTypeVisitor) error {
 	}
 }
 
-// * `TEAM` - TEAM
-// * `DEPARTMENT` - DEPARTMENT
-// * `COST_CENTER` - COST_CENTER
-// * `BUSINESS_UNIT` - BUSINESS_UNIT
-// * `GROUP` - GROUP
-type GroupTypeEnum uint
+// - `TEAM` - TEAM
+// - `DEPARTMENT` - DEPARTMENT
+// - `COST_CENTER` - COST_CENTER
+// - `BUSINESS_UNIT` - BUSINESS_UNIT
+// - `GROUP` - GROUP
+type GroupTypeEnum string
 
 const (
-	GroupTypeEnumTeam GroupTypeEnum = iota + 1
-	GroupTypeEnumDepartment
-	GroupTypeEnumCostCenter
-	GroupTypeEnumBusinessUnit
-	GroupTypeEnumGroup
+	GroupTypeEnumTeam         GroupTypeEnum = "TEAM"
+	GroupTypeEnumDepartment   GroupTypeEnum = "DEPARTMENT"
+	GroupTypeEnumCostCenter   GroupTypeEnum = "COST_CENTER"
+	GroupTypeEnumBusinessUnit GroupTypeEnum = "BUSINESS_UNIT"
+	GroupTypeEnumGroup        GroupTypeEnum = "GROUP"
 )
 
-func (g GroupTypeEnum) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GroupTypeEnumTeam:
-		return "TEAM"
-	case GroupTypeEnumDepartment:
-		return "DEPARTMENT"
-	case GroupTypeEnumCostCenter:
-		return "COST_CENTER"
-	case GroupTypeEnumBusinessUnit:
-		return "BUSINESS_UNIT"
-	case GroupTypeEnumGroup:
-		return "GROUP"
-	}
-}
-
-func (g GroupTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
-}
-
-func (g *GroupTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewGroupTypeEnumFromString(s string) (GroupTypeEnum, error) {
+	switch s {
 	case "TEAM":
-		value := GroupTypeEnumTeam
-		*g = value
+		return GroupTypeEnumTeam, nil
 	case "DEPARTMENT":
-		value := GroupTypeEnumDepartment
-		*g = value
+		return GroupTypeEnumDepartment, nil
 	case "COST_CENTER":
-		value := GroupTypeEnumCostCenter
-		*g = value
+		return GroupTypeEnumCostCenter, nil
 	case "BUSINESS_UNIT":
-		value := GroupTypeEnumBusinessUnit
-		*g = value
+		return GroupTypeEnumBusinessUnit, nil
 	case "GROUP":
-		value := GroupTypeEnumGroup
-		*g = value
+		return GroupTypeEnumGroup, nil
 	}
-	return nil
+	var t GroupTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type IgnoreCommonModelRequestReason struct {
-	typeName   string
-	ReasonEnum ReasonEnum
-	String     string
-}
-
-func NewIgnoreCommonModelRequestReasonFromReasonEnum(value ReasonEnum) *IgnoreCommonModelRequestReason {
-	return &IgnoreCommonModelRequestReason{typeName: "reasonEnum", ReasonEnum: value}
-}
-
-func NewIgnoreCommonModelRequestReasonFromString(value string) *IgnoreCommonModelRequestReason {
-	return &IgnoreCommonModelRequestReason{typeName: "string", String: value}
-}
-
-func (i *IgnoreCommonModelRequestReason) UnmarshalJSON(data []byte) error {
-	var valueReasonEnum ReasonEnum
-	if err := json.Unmarshal(data, &valueReasonEnum); err == nil {
-		i.typeName = "reasonEnum"
-		i.ReasonEnum = valueReasonEnum
-		return nil
-	}
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		i.typeName = "string"
-		i.String = valueString
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
-}
-
-func (i IgnoreCommonModelRequestReason) MarshalJSON() ([]byte, error) {
-	switch i.typeName {
-	default:
-		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "reasonEnum":
-		return json.Marshal(i.ReasonEnum)
-	case "string":
-		return json.Marshal(i.String)
-	}
-}
-
-type IgnoreCommonModelRequestReasonVisitor interface {
-	VisitReasonEnum(ReasonEnum) error
-	VisitString(string) error
-}
-
-func (i *IgnoreCommonModelRequestReason) Accept(visitor IgnoreCommonModelRequestReasonVisitor) error {
-	switch i.typeName {
-	default:
-		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "reasonEnum":
-		return visitor.VisitReasonEnum(i.ReasonEnum)
-	case "string":
-		return visitor.VisitString(i.String)
-	}
+func (g GroupTypeEnum) Ptr() *GroupTypeEnum {
+	return &g
 }
 
 type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
-	Status            *IssueStatus   `json:"status,omitempty"`
-	ErrorDescription  string         `json:"error_description"`
-	EndUser           map[string]any `json:"end_user,omitempty"`
-	FirstIncidentTime *time.Time     `json:"first_incident_time,omitempty"`
-	LastIncidentTime  *time.Time     `json:"last_incident_time,omitempty"`
-	IsMuted           *bool          `json:"is_muted,omitempty"`
-	ErrorDetails      []string       `json:"error_details,omitempty"`
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
+	Status            *IssueStatus           `json:"status,omitempty"`
+	ErrorDescription  string                 `json:"error_description"`
+	EndUser           map[string]interface{} `json:"end_user,omitempty"`
+	FirstIncidentTime *time.Time             `json:"first_incident_time,omitempty"`
+	LastIncidentTime  *time.Time             `json:"last_incident_time,omitempty"`
+	IsMuted           *bool                  `json:"is_muted,omitempty"`
+	ErrorDetails      []string               `json:"error_details,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *Issue) UnmarshalJSON(data []byte) error {
+	type unmarshaler Issue
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = Issue(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *Issue) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -11499,88 +6596,59 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
-type IssueStatusEnum uint
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
+type IssueStatusEnum string
 
 const (
-	IssueStatusEnumOngoing IssueStatusEnum = iota + 1
-	IssueStatusEnumResolved
+	IssueStatusEnumOngoing  IssueStatusEnum = "ONGOING"
+	IssueStatusEnumResolved IssueStatusEnum = "RESOLVED"
 )
 
-func (i IssueStatusEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssueStatusEnumOngoing:
-		return "ONGOING"
-	case IssueStatusEnumResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssueStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewIssueStatusEnumFromString(s string) (IssueStatusEnum, error) {
+	switch s {
 	case "ONGOING":
-		value := IssueStatusEnumOngoing
-		*i = value
+		return IssueStatusEnumOngoing, nil
 	case "RESOLVED":
-		value := IssueStatusEnumResolved
-		*i = value
+		return IssueStatusEnumResolved, nil
 	}
-	return nil
+	var t IssueStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type IssuesListRequestStatus uint
-
-const (
-	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
-	IssuesListRequestStatusResolved
-)
-
-func (i IssuesListRequestStatus) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssuesListRequestStatusOngoing:
-		return "ONGOING"
-	case IssuesListRequestStatusResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ONGOING":
-		value := IssuesListRequestStatusOngoing
-		*i = value
-	case "RESOLVED":
-		value := IssuesListRequestStatusResolved
-		*i = value
-	}
-	return nil
+func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
+	return &i
 }
 
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
 	MagicLinkUrl    *string `json:"magic_link_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkToken(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkToken) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountCondition struct {
@@ -11588,111 +6656,171 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    *any   `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountCondition) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountCondition
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountCondition(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountCondition) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountConditionRequest struct {
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    any    `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountConditionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountConditionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountConditionRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountConditionRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfiguration struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountCondition `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfiguration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfiguration(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfigurationRequest struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountConditionRequest `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfigurationRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfigurationRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountStatus struct {
 	LinkedAccountStatus string `json:"linked_account_status"`
 	CanMakeRequest      bool   `json:"can_make_request"`
+
+	_rawJSON json.RawMessage
 }
 
-type LinkedAccountsListRequestCategory uint
-
-const (
-	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
-	LinkedAccountsListRequestCategoryAts
-	LinkedAccountsListRequestCategoryCrm
-	LinkedAccountsListRequestCategoryFilestorage
-	LinkedAccountsListRequestCategoryHris
-	LinkedAccountsListRequestCategoryMktg
-	LinkedAccountsListRequestCategoryTicketing
-)
-
-func (l LinkedAccountsListRequestCategory) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LinkedAccountsListRequestCategoryAccounting:
-		return "accounting"
-	case LinkedAccountsListRequestCategoryAts:
-		return "ats"
-	case LinkedAccountsListRequestCategoryCrm:
-		return "crm"
-	case LinkedAccountsListRequestCategoryFilestorage:
-		return "filestorage"
-	case LinkedAccountsListRequestCategoryHris:
-		return "hris"
-	case LinkedAccountsListRequestCategoryMktg:
-		return "mktg"
-	case LinkedAccountsListRequestCategoryTicketing:
-		return "ticketing"
-	}
-}
-
-func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (l *LinkedAccountStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "accounting":
-		value := LinkedAccountsListRequestCategoryAccounting
-		*l = value
-	case "ats":
-		value := LinkedAccountsListRequestCategoryAts
-		*l = value
-	case "crm":
-		value := LinkedAccountsListRequestCategoryCrm
-		*l = value
-	case "filestorage":
-		value := LinkedAccountsListRequestCategoryFilestorage
-		*l = value
-	case "hris":
-		value := LinkedAccountsListRequestCategoryHris
-		*l = value
-	case "mktg":
-		value := LinkedAccountsListRequestCategoryMktg
-		*l = value
-	case "ticketing":
-		value := LinkedAccountsListRequestCategoryTicketing
-		*l = value
-	}
+	*l = LinkedAccountStatus(value)
+	l._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (l *LinkedAccountStatus) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
+}
+
 // # The Location Object
+//
 // ### Description
+//
 // The `Location` object is used to represent an address that can be associated with an employee.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Locations` endpoint and filter by `ID` to show all office locations.
 type Location struct {
 	Id *string `json:"id,omitempty"`
@@ -11714,521 +6842,546 @@ type Location struct {
 	ZipCode *string `json:"zip_code,omitempty"`
 	// The location's country.
 	//
-	// * `AF` - Afghanistan
-	// * `AX` - Åland Islands
-	// * `AL` - Albania
-	// * `DZ` - Algeria
-	// * `AS` - American Samoa
-	// * `AD` - Andorra
-	// * `AO` - Angola
-	// * `AI` - Anguilla
-	// * `AQ` - Antarctica
-	// * `AG` - Antigua and Barbuda
-	// * `AR` - Argentina
-	// * `AM` - Armenia
-	// * `AW` - Aruba
-	// * `AU` - Australia
-	// * `AT` - Austria
-	// * `AZ` - Azerbaijan
-	// * `BS` - Bahamas
-	// * `BH` - Bahrain
-	// * `BD` - Bangladesh
-	// * `BB` - Barbados
-	// * `BY` - Belarus
-	// * `BE` - Belgium
-	// * `BZ` - Belize
-	// * `BJ` - Benin
-	// * `BM` - Bermuda
-	// * `BT` - Bhutan
-	// * `BO` - Bolivia
-	// * `BQ` - Bonaire, Sint Eustatius and Saba
-	// * `BA` - Bosnia and Herzegovina
-	// * `BW` - Botswana
-	// * `BV` - Bouvet Island
-	// * `BR` - Brazil
-	// * `IO` - British Indian Ocean Territory
-	// * `BN` - Brunei
-	// * `BG` - Bulgaria
-	// * `BF` - Burkina Faso
-	// * `BI` - Burundi
-	// * `CV` - Cabo Verde
-	// * `KH` - Cambodia
-	// * `CM` - Cameroon
-	// * `CA` - Canada
-	// * `KY` - Cayman Islands
-	// * `CF` - Central African Republic
-	// * `TD` - Chad
-	// * `CL` - Chile
-	// * `CN` - China
-	// * `CX` - Christmas Island
-	// * `CC` - Cocos (Keeling) Islands
-	// * `CO` - Colombia
-	// * `KM` - Comoros
-	// * `CG` - Congo
-	// * `CD` - Congo (the Democratic Republic of the)
-	// * `CK` - Cook Islands
-	// * `CR` - Costa Rica
-	// * `CI` - Côte d'Ivoire
-	// * `HR` - Croatia
-	// * `CU` - Cuba
-	// * `CW` - Curaçao
-	// * `CY` - Cyprus
-	// * `CZ` - Czechia
-	// * `DK` - Denmark
-	// * `DJ` - Djibouti
-	// * `DM` - Dominica
-	// * `DO` - Dominican Republic
-	// * `EC` - Ecuador
-	// * `EG` - Egypt
-	// * `SV` - El Salvador
-	// * `GQ` - Equatorial Guinea
-	// * `ER` - Eritrea
-	// * `EE` - Estonia
-	// * `SZ` - Eswatini
-	// * `ET` - Ethiopia
-	// * `FK` - Falkland Islands (Malvinas)
-	// * `FO` - Faroe Islands
-	// * `FJ` - Fiji
-	// * `FI` - Finland
-	// * `FR` - France
-	// * `GF` - French Guiana
-	// * `PF` - French Polynesia
-	// * `TF` - French Southern Territories
-	// * `GA` - Gabon
-	// * `GM` - Gambia
-	// * `GE` - Georgia
-	// * `DE` - Germany
-	// * `GH` - Ghana
-	// * `GI` - Gibraltar
-	// * `GR` - Greece
-	// * `GL` - Greenland
-	// * `GD` - Grenada
-	// * `GP` - Guadeloupe
-	// * `GU` - Guam
-	// * `GT` - Guatemala
-	// * `GG` - Guernsey
-	// * `GN` - Guinea
-	// * `GW` - Guinea-Bissau
-	// * `GY` - Guyana
-	// * `HT` - Haiti
-	// * `HM` - Heard Island and McDonald Islands
-	// * `VA` - Holy See
-	// * `HN` - Honduras
-	// * `HK` - Hong Kong
-	// * `HU` - Hungary
-	// * `IS` - Iceland
-	// * `IN` - India
-	// * `ID` - Indonesia
-	// * `IR` - Iran
-	// * `IQ` - Iraq
-	// * `IE` - Ireland
-	// * `IM` - Isle of Man
-	// * `IL` - Israel
-	// * `IT` - Italy
-	// * `JM` - Jamaica
-	// * `JP` - Japan
-	// * `JE` - Jersey
-	// * `JO` - Jordan
-	// * `KZ` - Kazakhstan
-	// * `KE` - Kenya
-	// * `KI` - Kiribati
-	// * `KW` - Kuwait
-	// * `KG` - Kyrgyzstan
-	// * `LA` - Laos
-	// * `LV` - Latvia
-	// * `LB` - Lebanon
-	// * `LS` - Lesotho
-	// * `LR` - Liberia
-	// * `LY` - Libya
-	// * `LI` - Liechtenstein
-	// * `LT` - Lithuania
-	// * `LU` - Luxembourg
-	// * `MO` - Macao
-	// * `MG` - Madagascar
-	// * `MW` - Malawi
-	// * `MY` - Malaysia
-	// * `MV` - Maldives
-	// * `ML` - Mali
-	// * `MT` - Malta
-	// * `MH` - Marshall Islands
-	// * `MQ` - Martinique
-	// * `MR` - Mauritania
-	// * `MU` - Mauritius
-	// * `YT` - Mayotte
-	// * `MX` - Mexico
-	// * `FM` - Micronesia (Federated States of)
-	// * `MD` - Moldova
-	// * `MC` - Monaco
-	// * `MN` - Mongolia
-	// * `ME` - Montenegro
-	// * `MS` - Montserrat
-	// * `MA` - Morocco
-	// * `MZ` - Mozambique
-	// * `MM` - Myanmar
-	// * `NA` - Namibia
-	// * `NR` - Nauru
-	// * `NP` - Nepal
-	// * `NL` - Netherlands
-	// * `NC` - New Caledonia
-	// * `NZ` - New Zealand
-	// * `NI` - Nicaragua
-	// * `NE` - Niger
-	// * `NG` - Nigeria
-	// * `NU` - Niue
-	// * `NF` - Norfolk Island
-	// * `KP` - North Korea
-	// * `MK` - North Macedonia
-	// * `MP` - Northern Mariana Islands
-	// * `NO` - Norway
-	// * `OM` - Oman
-	// * `PK` - Pakistan
-	// * `PW` - Palau
-	// * `PS` - Palestine, State of
-	// * `PA` - Panama
-	// * `PG` - Papua New Guinea
-	// * `PY` - Paraguay
-	// * `PE` - Peru
-	// * `PH` - Philippines
-	// * `PN` - Pitcairn
-	// * `PL` - Poland
-	// * `PT` - Portugal
-	// * `PR` - Puerto Rico
-	// * `QA` - Qatar
-	// * `RE` - Réunion
-	// * `RO` - Romania
-	// * `RU` - Russia
-	// * `RW` - Rwanda
-	// * `BL` - Saint Barthélemy
-	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-	// * `KN` - Saint Kitts and Nevis
-	// * `LC` - Saint Lucia
-	// * `MF` - Saint Martin (French part)
-	// * `PM` - Saint Pierre and Miquelon
-	// * `VC` - Saint Vincent and the Grenadines
-	// * `WS` - Samoa
-	// * `SM` - San Marino
-	// * `ST` - Sao Tome and Principe
-	// * `SA` - Saudi Arabia
-	// * `SN` - Senegal
-	// * `RS` - Serbia
-	// * `SC` - Seychelles
-	// * `SL` - Sierra Leone
-	// * `SG` - Singapore
-	// * `SX` - Sint Maarten (Dutch part)
-	// * `SK` - Slovakia
-	// * `SI` - Slovenia
-	// * `SB` - Solomon Islands
-	// * `SO` - Somalia
-	// * `ZA` - South Africa
-	// * `GS` - South Georgia and the South Sandwich Islands
-	// * `KR` - South Korea
-	// * `SS` - South Sudan
-	// * `ES` - Spain
-	// * `LK` - Sri Lanka
-	// * `SD` - Sudan
-	// * `SR` - Suriname
-	// * `SJ` - Svalbard and Jan Mayen
-	// * `SE` - Sweden
-	// * `CH` - Switzerland
-	// * `SY` - Syria
-	// * `TW` - Taiwan
-	// * `TJ` - Tajikistan
-	// * `TZ` - Tanzania
-	// * `TH` - Thailand
-	// * `TL` - Timor-Leste
-	// * `TG` - Togo
-	// * `TK` - Tokelau
-	// * `TO` - Tonga
-	// * `TT` - Trinidad and Tobago
-	// * `TN` - Tunisia
-	// * `TR` - Turkey
-	// * `TM` - Turkmenistan
-	// * `TC` - Turks and Caicos Islands
-	// * `TV` - Tuvalu
-	// * `UG` - Uganda
-	// * `UA` - Ukraine
-	// * `AE` - United Arab Emirates
-	// * `GB` - United Kingdom
-	// * `UM` - United States Minor Outlying Islands
-	// * `US` - United States of America
-	// * `UY` - Uruguay
-	// * `UZ` - Uzbekistan
-	// * `VU` - Vanuatu
-	// * `VE` - Venezuela
-	// * `VN` - Vietnam
-	// * `VG` - Virgin Islands (British)
-	// * `VI` - Virgin Islands (U.S.)
-	// * `WF` - Wallis and Futuna
-	// * `EH` - Western Sahara
-	// * `YE` - Yemen
-	// * `ZM` - Zambia
-	// * `ZW` - Zimbabwe
+	// - `AF` - Afghanistan
+	// - `AX` - Åland Islands
+	// - `AL` - Albania
+	// - `DZ` - Algeria
+	// - `AS` - American Samoa
+	// - `AD` - Andorra
+	// - `AO` - Angola
+	// - `AI` - Anguilla
+	// - `AQ` - Antarctica
+	// - `AG` - Antigua and Barbuda
+	// - `AR` - Argentina
+	// - `AM` - Armenia
+	// - `AW` - Aruba
+	// - `AU` - Australia
+	// - `AT` - Austria
+	// - `AZ` - Azerbaijan
+	// - `BS` - Bahamas
+	// - `BH` - Bahrain
+	// - `BD` - Bangladesh
+	// - `BB` - Barbados
+	// - `BY` - Belarus
+	// - `BE` - Belgium
+	// - `BZ` - Belize
+	// - `BJ` - Benin
+	// - `BM` - Bermuda
+	// - `BT` - Bhutan
+	// - `BO` - Bolivia
+	// - `BQ` - Bonaire, Sint Eustatius and Saba
+	// - `BA` - Bosnia and Herzegovina
+	// - `BW` - Botswana
+	// - `BV` - Bouvet Island
+	// - `BR` - Brazil
+	// - `IO` - British Indian Ocean Territory
+	// - `BN` - Brunei
+	// - `BG` - Bulgaria
+	// - `BF` - Burkina Faso
+	// - `BI` - Burundi
+	// - `CV` - Cabo Verde
+	// - `KH` - Cambodia
+	// - `CM` - Cameroon
+	// - `CA` - Canada
+	// - `KY` - Cayman Islands
+	// - `CF` - Central African Republic
+	// - `TD` - Chad
+	// - `CL` - Chile
+	// - `CN` - China
+	// - `CX` - Christmas Island
+	// - `CC` - Cocos (Keeling) Islands
+	// - `CO` - Colombia
+	// - `KM` - Comoros
+	// - `CG` - Congo
+	// - `CD` - Congo (the Democratic Republic of the)
+	// - `CK` - Cook Islands
+	// - `CR` - Costa Rica
+	// - `CI` - Côte d'Ivoire
+	// - `HR` - Croatia
+	// - `CU` - Cuba
+	// - `CW` - Curaçao
+	// - `CY` - Cyprus
+	// - `CZ` - Czechia
+	// - `DK` - Denmark
+	// - `DJ` - Djibouti
+	// - `DM` - Dominica
+	// - `DO` - Dominican Republic
+	// - `EC` - Ecuador
+	// - `EG` - Egypt
+	// - `SV` - El Salvador
+	// - `GQ` - Equatorial Guinea
+	// - `ER` - Eritrea
+	// - `EE` - Estonia
+	// - `SZ` - Eswatini
+	// - `ET` - Ethiopia
+	// - `FK` - Falkland Islands (Malvinas)
+	// - `FO` - Faroe Islands
+	// - `FJ` - Fiji
+	// - `FI` - Finland
+	// - `FR` - France
+	// - `GF` - French Guiana
+	// - `PF` - French Polynesia
+	// - `TF` - French Southern Territories
+	// - `GA` - Gabon
+	// - `GM` - Gambia
+	// - `GE` - Georgia
+	// - `DE` - Germany
+	// - `GH` - Ghana
+	// - `GI` - Gibraltar
+	// - `GR` - Greece
+	// - `GL` - Greenland
+	// - `GD` - Grenada
+	// - `GP` - Guadeloupe
+	// - `GU` - Guam
+	// - `GT` - Guatemala
+	// - `GG` - Guernsey
+	// - `GN` - Guinea
+	// - `GW` - Guinea-Bissau
+	// - `GY` - Guyana
+	// - `HT` - Haiti
+	// - `HM` - Heard Island and McDonald Islands
+	// - `VA` - Holy See
+	// - `HN` - Honduras
+	// - `HK` - Hong Kong
+	// - `HU` - Hungary
+	// - `IS` - Iceland
+	// - `IN` - India
+	// - `ID` - Indonesia
+	// - `IR` - Iran
+	// - `IQ` - Iraq
+	// - `IE` - Ireland
+	// - `IM` - Isle of Man
+	// - `IL` - Israel
+	// - `IT` - Italy
+	// - `JM` - Jamaica
+	// - `JP` - Japan
+	// - `JE` - Jersey
+	// - `JO` - Jordan
+	// - `KZ` - Kazakhstan
+	// - `KE` - Kenya
+	// - `KI` - Kiribati
+	// - `KW` - Kuwait
+	// - `KG` - Kyrgyzstan
+	// - `LA` - Laos
+	// - `LV` - Latvia
+	// - `LB` - Lebanon
+	// - `LS` - Lesotho
+	// - `LR` - Liberia
+	// - `LY` - Libya
+	// - `LI` - Liechtenstein
+	// - `LT` - Lithuania
+	// - `LU` - Luxembourg
+	// - `MO` - Macao
+	// - `MG` - Madagascar
+	// - `MW` - Malawi
+	// - `MY` - Malaysia
+	// - `MV` - Maldives
+	// - `ML` - Mali
+	// - `MT` - Malta
+	// - `MH` - Marshall Islands
+	// - `MQ` - Martinique
+	// - `MR` - Mauritania
+	// - `MU` - Mauritius
+	// - `YT` - Mayotte
+	// - `MX` - Mexico
+	// - `FM` - Micronesia (Federated States of)
+	// - `MD` - Moldova
+	// - `MC` - Monaco
+	// - `MN` - Mongolia
+	// - `ME` - Montenegro
+	// - `MS` - Montserrat
+	// - `MA` - Morocco
+	// - `MZ` - Mozambique
+	// - `MM` - Myanmar
+	// - `NA` - Namibia
+	// - `NR` - Nauru
+	// - `NP` - Nepal
+	// - `NL` - Netherlands
+	// - `NC` - New Caledonia
+	// - `NZ` - New Zealand
+	// - `NI` - Nicaragua
+	// - `NE` - Niger
+	// - `NG` - Nigeria
+	// - `NU` - Niue
+	// - `NF` - Norfolk Island
+	// - `KP` - North Korea
+	// - `MK` - North Macedonia
+	// - `MP` - Northern Mariana Islands
+	// - `NO` - Norway
+	// - `OM` - Oman
+	// - `PK` - Pakistan
+	// - `PW` - Palau
+	// - `PS` - Palestine, State of
+	// - `PA` - Panama
+	// - `PG` - Papua New Guinea
+	// - `PY` - Paraguay
+	// - `PE` - Peru
+	// - `PH` - Philippines
+	// - `PN` - Pitcairn
+	// - `PL` - Poland
+	// - `PT` - Portugal
+	// - `PR` - Puerto Rico
+	// - `QA` - Qatar
+	// - `RE` - Réunion
+	// - `RO` - Romania
+	// - `RU` - Russia
+	// - `RW` - Rwanda
+	// - `BL` - Saint Barthélemy
+	// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+	// - `KN` - Saint Kitts and Nevis
+	// - `LC` - Saint Lucia
+	// - `MF` - Saint Martin (French part)
+	// - `PM` - Saint Pierre and Miquelon
+	// - `VC` - Saint Vincent and the Grenadines
+	// - `WS` - Samoa
+	// - `SM` - San Marino
+	// - `ST` - Sao Tome and Principe
+	// - `SA` - Saudi Arabia
+	// - `SN` - Senegal
+	// - `RS` - Serbia
+	// - `SC` - Seychelles
+	// - `SL` - Sierra Leone
+	// - `SG` - Singapore
+	// - `SX` - Sint Maarten (Dutch part)
+	// - `SK` - Slovakia
+	// - `SI` - Slovenia
+	// - `SB` - Solomon Islands
+	// - `SO` - Somalia
+	// - `ZA` - South Africa
+	// - `GS` - South Georgia and the South Sandwich Islands
+	// - `KR` - South Korea
+	// - `SS` - South Sudan
+	// - `ES` - Spain
+	// - `LK` - Sri Lanka
+	// - `SD` - Sudan
+	// - `SR` - Suriname
+	// - `SJ` - Svalbard and Jan Mayen
+	// - `SE` - Sweden
+	// - `CH` - Switzerland
+	// - `SY` - Syria
+	// - `TW` - Taiwan
+	// - `TJ` - Tajikistan
+	// - `TZ` - Tanzania
+	// - `TH` - Thailand
+	// - `TL` - Timor-Leste
+	// - `TG` - Togo
+	// - `TK` - Tokelau
+	// - `TO` - Tonga
+	// - `TT` - Trinidad and Tobago
+	// - `TN` - Tunisia
+	// - `TR` - Turkey
+	// - `TM` - Turkmenistan
+	// - `TC` - Turks and Caicos Islands
+	// - `TV` - Tuvalu
+	// - `UG` - Uganda
+	// - `UA` - Ukraine
+	// - `AE` - United Arab Emirates
+	// - `GB` - United Kingdom
+	// - `UM` - United States Minor Outlying Islands
+	// - `US` - United States of America
+	// - `UY` - Uruguay
+	// - `UZ` - Uzbekistan
+	// - `VU` - Vanuatu
+	// - `VE` - Venezuela
+	// - `VN` - Vietnam
+	// - `VG` - Virgin Islands (British)
+	// - `VI` - Virgin Islands (U.S.)
+	// - `WF` - Wallis and Futuna
+	// - `EH` - Western Sahara
+	// - `YE` - Yemen
+	// - `ZM` - Zambia
+	// - `ZW` - Zimbabwe
 	Country *LocationCountry `json:"country,omitempty"`
 	// The location's type. Can be either WORK or HOME
 	//
-	// * `HOME` - HOME
-	// * `WORK` - WORK
+	// - `HOME` - HOME
+	// - `WORK` - WORK
 	LocationType *LocationLocationType `json:"location_type,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *Location) UnmarshalJSON(data []byte) error {
+	type unmarshaler Location
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = Location(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *Location) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 // The location's country.
 //
-// * `AF` - Afghanistan
-// * `AX` - Åland Islands
-// * `AL` - Albania
-// * `DZ` - Algeria
-// * `AS` - American Samoa
-// * `AD` - Andorra
-// * `AO` - Angola
-// * `AI` - Anguilla
-// * `AQ` - Antarctica
-// * `AG` - Antigua and Barbuda
-// * `AR` - Argentina
-// * `AM` - Armenia
-// * `AW` - Aruba
-// * `AU` - Australia
-// * `AT` - Austria
-// * `AZ` - Azerbaijan
-// * `BS` - Bahamas
-// * `BH` - Bahrain
-// * `BD` - Bangladesh
-// * `BB` - Barbados
-// * `BY` - Belarus
-// * `BE` - Belgium
-// * `BZ` - Belize
-// * `BJ` - Benin
-// * `BM` - Bermuda
-// * `BT` - Bhutan
-// * `BO` - Bolivia
-// * `BQ` - Bonaire, Sint Eustatius and Saba
-// * `BA` - Bosnia and Herzegovina
-// * `BW` - Botswana
-// * `BV` - Bouvet Island
-// * `BR` - Brazil
-// * `IO` - British Indian Ocean Territory
-// * `BN` - Brunei
-// * `BG` - Bulgaria
-// * `BF` - Burkina Faso
-// * `BI` - Burundi
-// * `CV` - Cabo Verde
-// * `KH` - Cambodia
-// * `CM` - Cameroon
-// * `CA` - Canada
-// * `KY` - Cayman Islands
-// * `CF` - Central African Republic
-// * `TD` - Chad
-// * `CL` - Chile
-// * `CN` - China
-// * `CX` - Christmas Island
-// * `CC` - Cocos (Keeling) Islands
-// * `CO` - Colombia
-// * `KM` - Comoros
-// * `CG` - Congo
-// * `CD` - Congo (the Democratic Republic of the)
-// * `CK` - Cook Islands
-// * `CR` - Costa Rica
-// * `CI` - Côte d'Ivoire
-// * `HR` - Croatia
-// * `CU` - Cuba
-// * `CW` - Curaçao
-// * `CY` - Cyprus
-// * `CZ` - Czechia
-// * `DK` - Denmark
-// * `DJ` - Djibouti
-// * `DM` - Dominica
-// * `DO` - Dominican Republic
-// * `EC` - Ecuador
-// * `EG` - Egypt
-// * `SV` - El Salvador
-// * `GQ` - Equatorial Guinea
-// * `ER` - Eritrea
-// * `EE` - Estonia
-// * `SZ` - Eswatini
-// * `ET` - Ethiopia
-// * `FK` - Falkland Islands (Malvinas)
-// * `FO` - Faroe Islands
-// * `FJ` - Fiji
-// * `FI` - Finland
-// * `FR` - France
-// * `GF` - French Guiana
-// * `PF` - French Polynesia
-// * `TF` - French Southern Territories
-// * `GA` - Gabon
-// * `GM` - Gambia
-// * `GE` - Georgia
-// * `DE` - Germany
-// * `GH` - Ghana
-// * `GI` - Gibraltar
-// * `GR` - Greece
-// * `GL` - Greenland
-// * `GD` - Grenada
-// * `GP` - Guadeloupe
-// * `GU` - Guam
-// * `GT` - Guatemala
-// * `GG` - Guernsey
-// * `GN` - Guinea
-// * `GW` - Guinea-Bissau
-// * `GY` - Guyana
-// * `HT` - Haiti
-// * `HM` - Heard Island and McDonald Islands
-// * `VA` - Holy See
-// * `HN` - Honduras
-// * `HK` - Hong Kong
-// * `HU` - Hungary
-// * `IS` - Iceland
-// * `IN` - India
-// * `ID` - Indonesia
-// * `IR` - Iran
-// * `IQ` - Iraq
-// * `IE` - Ireland
-// * `IM` - Isle of Man
-// * `IL` - Israel
-// * `IT` - Italy
-// * `JM` - Jamaica
-// * `JP` - Japan
-// * `JE` - Jersey
-// * `JO` - Jordan
-// * `KZ` - Kazakhstan
-// * `KE` - Kenya
-// * `KI` - Kiribati
-// * `KW` - Kuwait
-// * `KG` - Kyrgyzstan
-// * `LA` - Laos
-// * `LV` - Latvia
-// * `LB` - Lebanon
-// * `LS` - Lesotho
-// * `LR` - Liberia
-// * `LY` - Libya
-// * `LI` - Liechtenstein
-// * `LT` - Lithuania
-// * `LU` - Luxembourg
-// * `MO` - Macao
-// * `MG` - Madagascar
-// * `MW` - Malawi
-// * `MY` - Malaysia
-// * `MV` - Maldives
-// * `ML` - Mali
-// * `MT` - Malta
-// * `MH` - Marshall Islands
-// * `MQ` - Martinique
-// * `MR` - Mauritania
-// * `MU` - Mauritius
-// * `YT` - Mayotte
-// * `MX` - Mexico
-// * `FM` - Micronesia (Federated States of)
-// * `MD` - Moldova
-// * `MC` - Monaco
-// * `MN` - Mongolia
-// * `ME` - Montenegro
-// * `MS` - Montserrat
-// * `MA` - Morocco
-// * `MZ` - Mozambique
-// * `MM` - Myanmar
-// * `NA` - Namibia
-// * `NR` - Nauru
-// * `NP` - Nepal
-// * `NL` - Netherlands
-// * `NC` - New Caledonia
-// * `NZ` - New Zealand
-// * `NI` - Nicaragua
-// * `NE` - Niger
-// * `NG` - Nigeria
-// * `NU` - Niue
-// * `NF` - Norfolk Island
-// * `KP` - North Korea
-// * `MK` - North Macedonia
-// * `MP` - Northern Mariana Islands
-// * `NO` - Norway
-// * `OM` - Oman
-// * `PK` - Pakistan
-// * `PW` - Palau
-// * `PS` - Palestine, State of
-// * `PA` - Panama
-// * `PG` - Papua New Guinea
-// * `PY` - Paraguay
-// * `PE` - Peru
-// * `PH` - Philippines
-// * `PN` - Pitcairn
-// * `PL` - Poland
-// * `PT` - Portugal
-// * `PR` - Puerto Rico
-// * `QA` - Qatar
-// * `RE` - Réunion
-// * `RO` - Romania
-// * `RU` - Russia
-// * `RW` - Rwanda
-// * `BL` - Saint Barthélemy
-// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-// * `KN` - Saint Kitts and Nevis
-// * `LC` - Saint Lucia
-// * `MF` - Saint Martin (French part)
-// * `PM` - Saint Pierre and Miquelon
-// * `VC` - Saint Vincent and the Grenadines
-// * `WS` - Samoa
-// * `SM` - San Marino
-// * `ST` - Sao Tome and Principe
-// * `SA` - Saudi Arabia
-// * `SN` - Senegal
-// * `RS` - Serbia
-// * `SC` - Seychelles
-// * `SL` - Sierra Leone
-// * `SG` - Singapore
-// * `SX` - Sint Maarten (Dutch part)
-// * `SK` - Slovakia
-// * `SI` - Slovenia
-// * `SB` - Solomon Islands
-// * `SO` - Somalia
-// * `ZA` - South Africa
-// * `GS` - South Georgia and the South Sandwich Islands
-// * `KR` - South Korea
-// * `SS` - South Sudan
-// * `ES` - Spain
-// * `LK` - Sri Lanka
-// * `SD` - Sudan
-// * `SR` - Suriname
-// * `SJ` - Svalbard and Jan Mayen
-// * `SE` - Sweden
-// * `CH` - Switzerland
-// * `SY` - Syria
-// * `TW` - Taiwan
-// * `TJ` - Tajikistan
-// * `TZ` - Tanzania
-// * `TH` - Thailand
-// * `TL` - Timor-Leste
-// * `TG` - Togo
-// * `TK` - Tokelau
-// * `TO` - Tonga
-// * `TT` - Trinidad and Tobago
-// * `TN` - Tunisia
-// * `TR` - Turkey
-// * `TM` - Turkmenistan
-// * `TC` - Turks and Caicos Islands
-// * `TV` - Tuvalu
-// * `UG` - Uganda
-// * `UA` - Ukraine
-// * `AE` - United Arab Emirates
-// * `GB` - United Kingdom
-// * `UM` - United States Minor Outlying Islands
-// * `US` - United States of America
-// * `UY` - Uruguay
-// * `UZ` - Uzbekistan
-// * `VU` - Vanuatu
-// * `VE` - Venezuela
-// * `VN` - Vietnam
-// * `VG` - Virgin Islands (British)
-// * `VI` - Virgin Islands (U.S.)
-// * `WF` - Wallis and Futuna
-// * `EH` - Western Sahara
-// * `YE` - Yemen
-// * `ZM` - Zambia
-// * `ZW` - Zimbabwe
+// - `AF` - Afghanistan
+// - `AX` - Åland Islands
+// - `AL` - Albania
+// - `DZ` - Algeria
+// - `AS` - American Samoa
+// - `AD` - Andorra
+// - `AO` - Angola
+// - `AI` - Anguilla
+// - `AQ` - Antarctica
+// - `AG` - Antigua and Barbuda
+// - `AR` - Argentina
+// - `AM` - Armenia
+// - `AW` - Aruba
+// - `AU` - Australia
+// - `AT` - Austria
+// - `AZ` - Azerbaijan
+// - `BS` - Bahamas
+// - `BH` - Bahrain
+// - `BD` - Bangladesh
+// - `BB` - Barbados
+// - `BY` - Belarus
+// - `BE` - Belgium
+// - `BZ` - Belize
+// - `BJ` - Benin
+// - `BM` - Bermuda
+// - `BT` - Bhutan
+// - `BO` - Bolivia
+// - `BQ` - Bonaire, Sint Eustatius and Saba
+// - `BA` - Bosnia and Herzegovina
+// - `BW` - Botswana
+// - `BV` - Bouvet Island
+// - `BR` - Brazil
+// - `IO` - British Indian Ocean Territory
+// - `BN` - Brunei
+// - `BG` - Bulgaria
+// - `BF` - Burkina Faso
+// - `BI` - Burundi
+// - `CV` - Cabo Verde
+// - `KH` - Cambodia
+// - `CM` - Cameroon
+// - `CA` - Canada
+// - `KY` - Cayman Islands
+// - `CF` - Central African Republic
+// - `TD` - Chad
+// - `CL` - Chile
+// - `CN` - China
+// - `CX` - Christmas Island
+// - `CC` - Cocos (Keeling) Islands
+// - `CO` - Colombia
+// - `KM` - Comoros
+// - `CG` - Congo
+// - `CD` - Congo (the Democratic Republic of the)
+// - `CK` - Cook Islands
+// - `CR` - Costa Rica
+// - `CI` - Côte d'Ivoire
+// - `HR` - Croatia
+// - `CU` - Cuba
+// - `CW` - Curaçao
+// - `CY` - Cyprus
+// - `CZ` - Czechia
+// - `DK` - Denmark
+// - `DJ` - Djibouti
+// - `DM` - Dominica
+// - `DO` - Dominican Republic
+// - `EC` - Ecuador
+// - `EG` - Egypt
+// - `SV` - El Salvador
+// - `GQ` - Equatorial Guinea
+// - `ER` - Eritrea
+// - `EE` - Estonia
+// - `SZ` - Eswatini
+// - `ET` - Ethiopia
+// - `FK` - Falkland Islands (Malvinas)
+// - `FO` - Faroe Islands
+// - `FJ` - Fiji
+// - `FI` - Finland
+// - `FR` - France
+// - `GF` - French Guiana
+// - `PF` - French Polynesia
+// - `TF` - French Southern Territories
+// - `GA` - Gabon
+// - `GM` - Gambia
+// - `GE` - Georgia
+// - `DE` - Germany
+// - `GH` - Ghana
+// - `GI` - Gibraltar
+// - `GR` - Greece
+// - `GL` - Greenland
+// - `GD` - Grenada
+// - `GP` - Guadeloupe
+// - `GU` - Guam
+// - `GT` - Guatemala
+// - `GG` - Guernsey
+// - `GN` - Guinea
+// - `GW` - Guinea-Bissau
+// - `GY` - Guyana
+// - `HT` - Haiti
+// - `HM` - Heard Island and McDonald Islands
+// - `VA` - Holy See
+// - `HN` - Honduras
+// - `HK` - Hong Kong
+// - `HU` - Hungary
+// - `IS` - Iceland
+// - `IN` - India
+// - `ID` - Indonesia
+// - `IR` - Iran
+// - `IQ` - Iraq
+// - `IE` - Ireland
+// - `IM` - Isle of Man
+// - `IL` - Israel
+// - `IT` - Italy
+// - `JM` - Jamaica
+// - `JP` - Japan
+// - `JE` - Jersey
+// - `JO` - Jordan
+// - `KZ` - Kazakhstan
+// - `KE` - Kenya
+// - `KI` - Kiribati
+// - `KW` - Kuwait
+// - `KG` - Kyrgyzstan
+// - `LA` - Laos
+// - `LV` - Latvia
+// - `LB` - Lebanon
+// - `LS` - Lesotho
+// - `LR` - Liberia
+// - `LY` - Libya
+// - `LI` - Liechtenstein
+// - `LT` - Lithuania
+// - `LU` - Luxembourg
+// - `MO` - Macao
+// - `MG` - Madagascar
+// - `MW` - Malawi
+// - `MY` - Malaysia
+// - `MV` - Maldives
+// - `ML` - Mali
+// - `MT` - Malta
+// - `MH` - Marshall Islands
+// - `MQ` - Martinique
+// - `MR` - Mauritania
+// - `MU` - Mauritius
+// - `YT` - Mayotte
+// - `MX` - Mexico
+// - `FM` - Micronesia (Federated States of)
+// - `MD` - Moldova
+// - `MC` - Monaco
+// - `MN` - Mongolia
+// - `ME` - Montenegro
+// - `MS` - Montserrat
+// - `MA` - Morocco
+// - `MZ` - Mozambique
+// - `MM` - Myanmar
+// - `NA` - Namibia
+// - `NR` - Nauru
+// - `NP` - Nepal
+// - `NL` - Netherlands
+// - `NC` - New Caledonia
+// - `NZ` - New Zealand
+// - `NI` - Nicaragua
+// - `NE` - Niger
+// - `NG` - Nigeria
+// - `NU` - Niue
+// - `NF` - Norfolk Island
+// - `KP` - North Korea
+// - `MK` - North Macedonia
+// - `MP` - Northern Mariana Islands
+// - `NO` - Norway
+// - `OM` - Oman
+// - `PK` - Pakistan
+// - `PW` - Palau
+// - `PS` - Palestine, State of
+// - `PA` - Panama
+// - `PG` - Papua New Guinea
+// - `PY` - Paraguay
+// - `PE` - Peru
+// - `PH` - Philippines
+// - `PN` - Pitcairn
+// - `PL` - Poland
+// - `PT` - Portugal
+// - `PR` - Puerto Rico
+// - `QA` - Qatar
+// - `RE` - Réunion
+// - `RO` - Romania
+// - `RU` - Russia
+// - `RW` - Rwanda
+// - `BL` - Saint Barthélemy
+// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+// - `KN` - Saint Kitts and Nevis
+// - `LC` - Saint Lucia
+// - `MF` - Saint Martin (French part)
+// - `PM` - Saint Pierre and Miquelon
+// - `VC` - Saint Vincent and the Grenadines
+// - `WS` - Samoa
+// - `SM` - San Marino
+// - `ST` - Sao Tome and Principe
+// - `SA` - Saudi Arabia
+// - `SN` - Senegal
+// - `RS` - Serbia
+// - `SC` - Seychelles
+// - `SL` - Sierra Leone
+// - `SG` - Singapore
+// - `SX` - Sint Maarten (Dutch part)
+// - `SK` - Slovakia
+// - `SI` - Slovenia
+// - `SB` - Solomon Islands
+// - `SO` - Somalia
+// - `ZA` - South Africa
+// - `GS` - South Georgia and the South Sandwich Islands
+// - `KR` - South Korea
+// - `SS` - South Sudan
+// - `ES` - Spain
+// - `LK` - Sri Lanka
+// - `SD` - Sudan
+// - `SR` - Suriname
+// - `SJ` - Svalbard and Jan Mayen
+// - `SE` - Sweden
+// - `CH` - Switzerland
+// - `SY` - Syria
+// - `TW` - Taiwan
+// - `TJ` - Tajikistan
+// - `TZ` - Tanzania
+// - `TH` - Thailand
+// - `TL` - Timor-Leste
+// - `TG` - Togo
+// - `TK` - Tokelau
+// - `TO` - Tonga
+// - `TT` - Trinidad and Tobago
+// - `TN` - Tunisia
+// - `TR` - Turkey
+// - `TM` - Turkmenistan
+// - `TC` - Turks and Caicos Islands
+// - `TV` - Tuvalu
+// - `UG` - Uganda
+// - `UA` - Ukraine
+// - `AE` - United Arab Emirates
+// - `GB` - United Kingdom
+// - `UM` - United States Minor Outlying Islands
+// - `US` - United States of America
+// - `UY` - Uruguay
+// - `UZ` - Uzbekistan
+// - `VU` - Vanuatu
+// - `VE` - Venezuela
+// - `VN` - Vietnam
+// - `VG` - Virgin Islands (British)
+// - `VI` - Virgin Islands (U.S.)
+// - `WF` - Wallis and Futuna
+// - `EH` - Western Sahara
+// - `YE` - Yemen
+// - `ZM` - Zambia
+// - `ZW` - Zimbabwe
 type LocationCountry struct {
 	typeName    string
 	CountryEnum CountryEnum
@@ -12288,8 +7441,8 @@ func (l *LocationCountry) Accept(visitor LocationCountryVisitor) error {
 
 // The location's type. Can be either WORK or HOME
 //
-// * `HOME` - HOME
-// * `WORK` - WORK
+// - `HOME` - HOME
+// - `WORK` - WORK
 type LocationLocationType struct {
 	typeName         string
 	LocationTypeEnum LocationTypeEnum
@@ -12347,246 +7500,192 @@ func (l *LocationLocationType) Accept(visitor LocationLocationTypeVisitor) error
 	}
 }
 
-// * `HOME` - HOME
-// * `WORK` - WORK
-type LocationTypeEnum uint
+// - `HOME` - HOME
+// - `WORK` - WORK
+type LocationTypeEnum string
 
 const (
-	LocationTypeEnumHome LocationTypeEnum = iota + 1
-	LocationTypeEnumWork
+	LocationTypeEnumHome LocationTypeEnum = "HOME"
+	LocationTypeEnumWork LocationTypeEnum = "WORK"
 )
 
-func (l LocationTypeEnum) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LocationTypeEnumHome:
-		return "HOME"
-	case LocationTypeEnumWork:
-		return "WORK"
-	}
-}
-
-func (l LocationTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LocationTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewLocationTypeEnumFromString(s string) (LocationTypeEnum, error) {
+	switch s {
 	case "HOME":
-		value := LocationTypeEnumHome
-		*l = value
+		return LocationTypeEnumHome, nil
 	case "WORK":
-		value := LocationTypeEnumWork
-		*l = value
+		return LocationTypeEnumWork, nil
 	}
-	return nil
+	var t LocationTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type LocationsListRequestLocationType uint
+func (l LocationTypeEnum) Ptr() *LocationTypeEnum {
+	return &l
+}
+
+// - `SINGLE` - SINGLE
+// - `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
+// - `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
+// - `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
+// - `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
+type MaritalStatusEnum string
 
 const (
-	LocationsListRequestLocationTypeHome LocationsListRequestLocationType = iota + 1
-	LocationsListRequestLocationTypeWork
+	MaritalStatusEnumSingle                                     MaritalStatusEnum = "SINGLE"
+	MaritalStatusEnumMarriedFilingJointly                       MaritalStatusEnum = "MARRIED_FILING_JOINTLY"
+	MaritalStatusEnumMarriedFilingSeparately                    MaritalStatusEnum = "MARRIED_FILING_SEPARATELY"
+	MaritalStatusEnumHeadOfHousehold                            MaritalStatusEnum = "HEAD_OF_HOUSEHOLD"
+	MaritalStatusEnumQualifyingWidowOrWidowerWithDependentChild MaritalStatusEnum = "QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD"
 )
 
-func (l LocationsListRequestLocationType) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LocationsListRequestLocationTypeHome:
-		return "HOME"
-	case LocationsListRequestLocationTypeWork:
-		return "WORK"
-	}
-}
-
-func (l LocationsListRequestLocationType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LocationsListRequestLocationType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "HOME":
-		value := LocationsListRequestLocationTypeHome
-		*l = value
-	case "WORK":
-		value := LocationsListRequestLocationTypeWork
-		*l = value
-	}
-	return nil
-}
-
-// * `SINGLE` - SINGLE
-// * `MARRIED_FILING_JOINTLY` - MARRIED_FILING_JOINTLY
-// * `MARRIED_FILING_SEPARATELY` - MARRIED_FILING_SEPARATELY
-// * `HEAD_OF_HOUSEHOLD` - HEAD_OF_HOUSEHOLD
-// * `QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD` - QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD
-type MaritalStatusEnum uint
-
-const (
-	MaritalStatusEnumSingle MaritalStatusEnum = iota + 1
-	MaritalStatusEnumMarriedFilingJointly
-	MaritalStatusEnumMarriedFilingSeparately
-	MaritalStatusEnumHeadOfHousehold
-	MaritalStatusEnumQualifyingWidowOrWidowerWithDependentChild
-)
-
-func (m MaritalStatusEnum) String() string {
-	switch m {
-	default:
-		return strconv.Itoa(int(m))
-	case MaritalStatusEnumSingle:
-		return "SINGLE"
-	case MaritalStatusEnumMarriedFilingJointly:
-		return "MARRIED_FILING_JOINTLY"
-	case MaritalStatusEnumMarriedFilingSeparately:
-		return "MARRIED_FILING_SEPARATELY"
-	case MaritalStatusEnumHeadOfHousehold:
-		return "HEAD_OF_HOUSEHOLD"
-	case MaritalStatusEnumQualifyingWidowOrWidowerWithDependentChild:
-		return "QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD"
-	}
-}
-
-func (m MaritalStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", m.String())), nil
-}
-
-func (m *MaritalStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewMaritalStatusEnumFromString(s string) (MaritalStatusEnum, error) {
+	switch s {
 	case "SINGLE":
-		value := MaritalStatusEnumSingle
-		*m = value
+		return MaritalStatusEnumSingle, nil
 	case "MARRIED_FILING_JOINTLY":
-		value := MaritalStatusEnumMarriedFilingJointly
-		*m = value
+		return MaritalStatusEnumMarriedFilingJointly, nil
 	case "MARRIED_FILING_SEPARATELY":
-		value := MaritalStatusEnumMarriedFilingSeparately
-		*m = value
+		return MaritalStatusEnumMarriedFilingSeparately, nil
 	case "HEAD_OF_HOUSEHOLD":
-		value := MaritalStatusEnumHeadOfHousehold
-		*m = value
+		return MaritalStatusEnumHeadOfHousehold, nil
 	case "QUALIFYING_WIDOW_OR_WIDOWER_WITH_DEPENDENT_CHILD":
-		value := MaritalStatusEnumQualifyingWidowOrWidowerWithDependentChild
-		*m = value
+		return MaritalStatusEnumQualifyingWidowOrWidowerWithDependentChild, nil
 	}
-	return nil
+	var t MaritalStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (m MaritalStatusEnum) Ptr() *MaritalStatusEnum {
+	return &m
 }
 
 type MetaResponse struct {
-	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
-	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
-	Status                         *LinkedAccountStatus `json:"status,omitempty"`
-	HasConditionalParams           bool                 `json:"has_conditional_params"`
-	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
+	RequestSchema                  map[string]interface{} `json:"request_schema,omitempty"`
+	RemoteFieldClasses             map[string]interface{} `json:"remote_field_classes,omitempty"`
+	Status                         *LinkedAccountStatus   `json:"status,omitempty"`
+	HasConditionalParams           bool                   `json:"has_conditional_params"`
+	HasRequiredLinkedAccountParams bool                   `json:"has_required_linked_account_params"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `GET` - GET
-// * `OPTIONS` - OPTIONS
-// * `HEAD` - HEAD
-// * `POST` - POST
-// * `PUT` - PUT
-// * `PATCH` - PATCH
-// * `DELETE` - DELETE
-type MethodEnum uint
-
-const (
-	MethodEnumGet MethodEnum = iota + 1
-	MethodEnumOptions
-	MethodEnumHead
-	MethodEnumPost
-	MethodEnumPut
-	MethodEnumPatch
-	MethodEnumDelete
-)
-
-func (m MethodEnum) String() string {
-	switch m {
-	default:
-		return strconv.Itoa(int(m))
-	case MethodEnumGet:
-		return "GET"
-	case MethodEnumOptions:
-		return "OPTIONS"
-	case MethodEnumHead:
-		return "HEAD"
-	case MethodEnumPost:
-		return "POST"
-	case MethodEnumPut:
-		return "PUT"
-	case MethodEnumPatch:
-		return "PATCH"
-	case MethodEnumDelete:
-		return "DELETE"
-	}
-}
-
-func (m MethodEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", m.String())), nil
-}
-
-func (m *MethodEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (m *MetaResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler MetaResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "GET":
-		value := MethodEnumGet
-		*m = value
-	case "OPTIONS":
-		value := MethodEnumOptions
-		*m = value
-	case "HEAD":
-		value := MethodEnumHead
-		*m = value
-	case "POST":
-		value := MethodEnumPost
-		*m = value
-	case "PUT":
-		value := MethodEnumPut
-		*m = value
-	case "PATCH":
-		value := MethodEnumPatch
-		*m = value
-	case "DELETE":
-		value := MethodEnumDelete
-		*m = value
-	}
+	*m = MetaResponse(value)
+	m._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (m *MetaResponse) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
+}
+
+// - `GET` - GET
+// - `OPTIONS` - OPTIONS
+// - `HEAD` - HEAD
+// - `POST` - POST
+// - `PUT` - PUT
+// - `PATCH` - PATCH
+// - `DELETE` - DELETE
+type MethodEnum string
+
+const (
+	MethodEnumGet     MethodEnum = "GET"
+	MethodEnumOptions MethodEnum = "OPTIONS"
+	MethodEnumHead    MethodEnum = "HEAD"
+	MethodEnumPost    MethodEnum = "POST"
+	MethodEnumPut     MethodEnum = "PUT"
+	MethodEnumPatch   MethodEnum = "PATCH"
+	MethodEnumDelete  MethodEnum = "DELETE"
+)
+
+func NewMethodEnumFromString(s string) (MethodEnum, error) {
+	switch s {
+	case "GET":
+		return MethodEnumGet, nil
+	case "OPTIONS":
+		return MethodEnumOptions, nil
+	case "HEAD":
+		return MethodEnumHead, nil
+	case "POST":
+		return MethodEnumPost, nil
+	case "PUT":
+		return MethodEnumPut, nil
+	case "PATCH":
+		return MethodEnumPatch, nil
+	case "DELETE":
+		return MethodEnumDelete, nil
+	}
+	var t MethodEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (m MethodEnum) Ptr() *MethodEnum {
+	return &m
+}
+
 // # The ModelOperation Object
+//
 // ### Description
+//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
+//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
 	AvailableOperations    []string `json:"available_operations,omitempty"`
 	RequiredPostParameters []string `json:"required_post_parameters,omitempty"`
 	SupportedFields        []string `json:"supported_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *ModelOperation) UnmarshalJSON(data []byte) error {
+	type unmarshaler ModelOperation
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = ModelOperation(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *ModelOperation) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // # The MultipartFormField Object
+//
 // ### Description
+//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
+//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -12595,21 +7694,46 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// * `RAW` - RAW
-	// * `BASE64` - BASE64
-	// * `GZIP_BASE64` - GZIP_BASE64
+	// - `RAW` - RAW
+	// - `BASE64` - BASE64
+	// - `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
 	// The MIME type of the file, if the field is for a file.
 	ContentType *string `json:"content_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *MultipartFormFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler MultipartFormFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = MultipartFormFieldRequest(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *MultipartFormFieldRequest) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -12672,2396 +7796,1984 @@ type OperatorSchema struct {
 	Operator *string `json:"operator,omitempty"`
 	// Whether the operator can be repeated multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *OperatorSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler OperatorSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = OperatorSchema(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *OperatorSchema) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 type PaginatedAccountDetailsAndActionsList struct {
 	Next     *string                     `json:"next,omitempty"`
 	Previous *string                     `json:"previous,omitempty"`
 	Results  []*AccountDetailsAndActions `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAccountDetailsAndActionsList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAccountDetailsAndActionsList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAuditLogEventList struct {
 	Next     *string          `json:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty"`
 	Results  []*AuditLogEvent `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAuditLogEventList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAuditLogEventList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAuditLogEventList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAuditLogEventList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedBankInfoList struct {
 	Next     *string     `json:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty"`
 	Results  []*BankInfo `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedBankInfoList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedBankInfoList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedBankInfoList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedBankInfoList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedBenefitList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Benefit `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedBenefitList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedBenefitList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedBenefitList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedBenefitList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedCompanyList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Company `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedCompanyList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedCompanyList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedCompanyList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedCompanyList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedConditionSchemaList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
 	Results  []*ConditionSchema `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedConditionSchemaList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedConditionSchemaList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedConditionSchemaList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedConditionSchemaList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedDependentList struct {
 	Next     *string      `json:"next,omitempty"`
 	Previous *string      `json:"previous,omitempty"`
 	Results  []*Dependent `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedDependentList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedDependentList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedDependentList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedDependentList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedEmployeeList struct {
 	Next     *string     `json:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty"`
 	Results  []*Employee `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEmployeeList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEmployeeList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEmployeeList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEmployeeList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedEmployeePayrollRunList struct {
 	Next     *string               `json:"next,omitempty"`
 	Previous *string               `json:"previous,omitempty"`
 	Results  []*EmployeePayrollRun `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEmployeePayrollRunList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEmployeePayrollRunList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEmployeePayrollRunList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEmployeePayrollRunList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedEmployerBenefitList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
 	Results  []*EmployerBenefit `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEmployerBenefitList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEmployerBenefitList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEmployerBenefitList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEmployerBenefitList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedEmploymentList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*Employment `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEmploymentList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEmploymentList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEmploymentList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEmploymentList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedGroupList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Group `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedGroupList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedGroupList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedGroupList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedGroupList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedIssueList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Issue `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedIssueList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedIssueList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedIssueList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedIssueList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedLocationList struct {
 	Next     *string     `json:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty"`
 	Results  []*Location `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedLocationList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedLocationList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedLocationList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedLocationList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedPayGroupList struct {
 	Next     *string     `json:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty"`
 	Results  []*PayGroup `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedPayGroupList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedPayGroupList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedPayGroupList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedPayGroupList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedPayrollRunList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*PayrollRun `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedPayrollRunList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedPayrollRunList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedPayrollRunList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedPayrollRunList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedSyncStatusList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*SyncStatus `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedSyncStatusList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedSyncStatusList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedSyncStatusList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedSyncStatusList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTeamList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Team `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTeamList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTeamList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTeamList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTeamList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTimeOffBalanceList struct {
 	Next     *string           `json:"next,omitempty"`
 	Previous *string           `json:"previous,omitempty"`
 	Results  []*TimeOffBalance `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTimeOffBalanceList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTimeOffBalanceList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTimeOffBalanceList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTimeOffBalanceList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTimeOffList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*TimeOff `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTimeOffList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTimeOffList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTimeOffList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTimeOffList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTimesheetEntryList struct {
 	Next     *string           `json:"next,omitempty"`
 	Previous *string           `json:"previous,omitempty"`
 	Results  []*TimesheetEntry `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `XUA` - ADB Unit of Account
-// * `AFN` - Afghan Afghani
-// * `AFA` - Afghan Afghani (1927–2002)
-// * `ALL` - Albanian Lek
-// * `ALK` - Albanian Lek (1946–1965)
-// * `DZD` - Algerian Dinar
-// * `ADP` - Andorran Peseta
-// * `AOA` - Angolan Kwanza
-// * `AOK` - Angolan Kwanza (1977–1991)
-// * `AON` - Angolan New Kwanza (1990–2000)
-// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
-// * `ARA` - Argentine Austral
-// * `ARS` - Argentine Peso
-// * `ARM` - Argentine Peso (1881–1970)
-// * `ARP` - Argentine Peso (1983–1985)
-// * `ARL` - Argentine Peso Ley (1970–1983)
-// * `AMD` - Armenian Dram
-// * `AWG` - Aruban Florin
-// * `AUD` - Australian Dollar
-// * `ATS` - Austrian Schilling
-// * `AZN` - Azerbaijani Manat
-// * `AZM` - Azerbaijani Manat (1993–2006)
-// * `BSD` - Bahamian Dollar
-// * `BHD` - Bahraini Dinar
-// * `BDT` - Bangladeshi Taka
-// * `BBD` - Barbadian Dollar
-// * `BYN` - Belarusian Ruble
-// * `BYB` - Belarusian Ruble (1994–1999)
-// * `BYR` - Belarusian Ruble (2000–2016)
-// * `BEF` - Belgian Franc
-// * `BEC` - Belgian Franc (convertible)
-// * `BEL` - Belgian Franc (financial)
-// * `BZD` - Belize Dollar
-// * `BMD` - Bermudan Dollar
-// * `BTN` - Bhutanese Ngultrum
-// * `BOB` - Bolivian Boliviano
-// * `BOL` - Bolivian Boliviano (1863–1963)
-// * `BOV` - Bolivian Mvdol
-// * `BOP` - Bolivian Peso
-// * `BAM` - Bosnia-Herzegovina Convertible Mark
-// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
-// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
-// * `BWP` - Botswanan Pula
-// * `BRC` - Brazilian Cruzado (1986–1989)
-// * `BRZ` - Brazilian Cruzeiro (1942–1967)
-// * `BRE` - Brazilian Cruzeiro (1990–1993)
-// * `BRR` - Brazilian Cruzeiro (1993–1994)
-// * `BRN` - Brazilian New Cruzado (1989–1990)
-// * `BRB` - Brazilian New Cruzeiro (1967–1986)
-// * `BRL` - Brazilian Real
-// * `GBP` - British Pound
-// * `BND` - Brunei Dollar
-// * `BGL` - Bulgarian Hard Lev
-// * `BGN` - Bulgarian Lev
-// * `BGO` - Bulgarian Lev (1879–1952)
-// * `BGM` - Bulgarian Socialist Lev
-// * `BUK` - Burmese Kyat
-// * `BIF` - Burundian Franc
-// * `XPF` - CFP Franc
-// * `KHR` - Cambodian Riel
-// * `CAD` - Canadian Dollar
-// * `CVE` - Cape Verdean Escudo
-// * `KYD` - Cayman Islands Dollar
-// * `XAF` - Central African CFA Franc
-// * `CLE` - Chilean Escudo
-// * `CLP` - Chilean Peso
-// * `CLF` - Chilean Unit of Account (UF)
-// * `CNX` - Chinese People’s Bank Dollar
-// * `CNY` - Chinese Yuan
-// * `CNH` - Chinese Yuan (offshore)
-// * `COP` - Colombian Peso
-// * `COU` - Colombian Real Value Unit
-// * `KMF` - Comorian Franc
-// * `CDF` - Congolese Franc
-// * `CRC` - Costa Rican Colón
-// * `HRD` - Croatian Dinar
-// * `HRK` - Croatian Kuna
-// * `CUC` - Cuban Convertible Peso
-// * `CUP` - Cuban Peso
-// * `CYP` - Cypriot Pound
-// * `CZK` - Czech Koruna
-// * `CSK` - Czechoslovak Hard Koruna
-// * `DKK` - Danish Krone
-// * `DJF` - Djiboutian Franc
-// * `DOP` - Dominican Peso
-// * `NLG` - Dutch Guilder
-// * `XCD` - East Caribbean Dollar
-// * `DDM` - East German Mark
-// * `ECS` - Ecuadorian Sucre
-// * `ECV` - Ecuadorian Unit of Constant Value
-// * `EGP` - Egyptian Pound
-// * `GQE` - Equatorial Guinean Ekwele
-// * `ERN` - Eritrean Nakfa
-// * `EEK` - Estonian Kroon
-// * `ETB` - Ethiopian Birr
-// * `EUR` - Euro
-// * `XBA` - European Composite Unit
-// * `XEU` - European Currency Unit
-// * `XBB` - European Monetary Unit
-// * `XBC` - European Unit of Account (XBC)
-// * `XBD` - European Unit of Account (XBD)
-// * `FKP` - Falkland Islands Pound
-// * `FJD` - Fijian Dollar
-// * `FIM` - Finnish Markka
-// * `FRF` - French Franc
-// * `XFO` - French Gold Franc
-// * `XFU` - French UIC-Franc
-// * `GMD` - Gambian Dalasi
-// * `GEK` - Georgian Kupon Larit
-// * `GEL` - Georgian Lari
-// * `DEM` - German Mark
-// * `GHS` - Ghanaian Cedi
-// * `GHC` - Ghanaian Cedi (1979–2007)
-// * `GIP` - Gibraltar Pound
-// * `XAU` - Gold
-// * `GRD` - Greek Drachma
-// * `GTQ` - Guatemalan Quetzal
-// * `GWP` - Guinea-Bissau Peso
-// * `GNF` - Guinean Franc
-// * `GNS` - Guinean Syli
-// * `GYD` - Guyanaese Dollar
-// * `HTG` - Haitian Gourde
-// * `HNL` - Honduran Lempira
-// * `HKD` - Hong Kong Dollar
-// * `HUF` - Hungarian Forint
-// * `IMP` - IMP
-// * `ISK` - Icelandic Króna
-// * `ISJ` - Icelandic Króna (1918–1981)
-// * `INR` - Indian Rupee
-// * `IDR` - Indonesian Rupiah
-// * `IRR` - Iranian Rial
-// * `IQD` - Iraqi Dinar
-// * `IEP` - Irish Pound
-// * `ILS` - Israeli New Shekel
-// * `ILP` - Israeli Pound
-// * `ILR` - Israeli Shekel (1980–1985)
-// * `ITL` - Italian Lira
-// * `JMD` - Jamaican Dollar
-// * `JPY` - Japanese Yen
-// * `JOD` - Jordanian Dinar
-// * `KZT` - Kazakhstani Tenge
-// * `KES` - Kenyan Shilling
-// * `KWD` - Kuwaiti Dinar
-// * `KGS` - Kyrgystani Som
-// * `LAK` - Laotian Kip
-// * `LVL` - Latvian Lats
-// * `LVR` - Latvian Ruble
-// * `LBP` - Lebanese Pound
-// * `LSL` - Lesotho Loti
-// * `LRD` - Liberian Dollar
-// * `LYD` - Libyan Dinar
-// * `LTL` - Lithuanian Litas
-// * `LTT` - Lithuanian Talonas
-// * `LUL` - Luxembourg Financial Franc
-// * `LUC` - Luxembourgian Convertible Franc
-// * `LUF` - Luxembourgian Franc
-// * `MOP` - Macanese Pataca
-// * `MKD` - Macedonian Denar
-// * `MKN` - Macedonian Denar (1992–1993)
-// * `MGA` - Malagasy Ariary
-// * `MGF` - Malagasy Franc
-// * `MWK` - Malawian Kwacha
-// * `MYR` - Malaysian Ringgit
-// * `MVR` - Maldivian Rufiyaa
-// * `MVP` - Maldivian Rupee (1947–1981)
-// * `MLF` - Malian Franc
-// * `MTL` - Maltese Lira
-// * `MTP` - Maltese Pound
-// * `MRU` - Mauritanian Ouguiya
-// * `MRO` - Mauritanian Ouguiya (1973–2017)
-// * `MUR` - Mauritian Rupee
-// * `MXV` - Mexican Investment Unit
-// * `MXN` - Mexican Peso
-// * `MXP` - Mexican Silver Peso (1861–1992)
-// * `MDC` - Moldovan Cupon
-// * `MDL` - Moldovan Leu
-// * `MCF` - Monegasque Franc
-// * `MNT` - Mongolian Tugrik
-// * `MAD` - Moroccan Dirham
-// * `MAF` - Moroccan Franc
-// * `MZE` - Mozambican Escudo
-// * `MZN` - Mozambican Metical
-// * `MZM` - Mozambican Metical (1980–2006)
-// * `MMK` - Myanmar Kyat
-// * `NAD` - Namibian Dollar
-// * `NPR` - Nepalese Rupee
-// * `ANG` - Netherlands Antillean Guilder
-// * `TWD` - New Taiwan Dollar
-// * `NZD` - New Zealand Dollar
-// * `NIO` - Nicaraguan Córdoba
-// * `NIC` - Nicaraguan Córdoba (1988–1991)
-// * `NGN` - Nigerian Naira
-// * `KPW` - North Korean Won
-// * `NOK` - Norwegian Krone
-// * `OMR` - Omani Rial
-// * `PKR` - Pakistani Rupee
-// * `XPD` - Palladium
-// * `PAB` - Panamanian Balboa
-// * `PGK` - Papua New Guinean Kina
-// * `PYG` - Paraguayan Guarani
-// * `PEI` - Peruvian Inti
-// * `PEN` - Peruvian Sol
-// * `PES` - Peruvian Sol (1863–1965)
-// * `PHP` - Philippine Peso
-// * `XPT` - Platinum
-// * `PLN` - Polish Zloty
-// * `PLZ` - Polish Zloty (1950–1995)
-// * `PTE` - Portuguese Escudo
-// * `GWE` - Portuguese Guinea Escudo
-// * `QAR` - Qatari Rial
-// * `XRE` - RINET Funds
-// * `RHD` - Rhodesian Dollar
-// * `RON` - Romanian Leu
-// * `ROL` - Romanian Leu (1952–2006)
-// * `RUB` - Russian Ruble
-// * `RUR` - Russian Ruble (1991–1998)
-// * `RWF` - Rwandan Franc
-// * `SVC` - Salvadoran Colón
-// * `WST` - Samoan Tala
-// * `SAR` - Saudi Riyal
-// * `RSD` - Serbian Dinar
-// * `CSD` - Serbian Dinar (2002–2006)
-// * `SCR` - Seychellois Rupee
-// * `SLL` - Sierra Leonean Leone
-// * `XAG` - Silver
-// * `SGD` - Singapore Dollar
-// * `SKK` - Slovak Koruna
-// * `SIT` - Slovenian Tolar
-// * `SBD` - Solomon Islands Dollar
-// * `SOS` - Somali Shilling
-// * `ZAR` - South African Rand
-// * `ZAL` - South African Rand (financial)
-// * `KRH` - South Korean Hwan (1953–1962)
-// * `KRW` - South Korean Won
-// * `KRO` - South Korean Won (1945–1953)
-// * `SSP` - South Sudanese Pound
-// * `SUR` - Soviet Rouble
-// * `ESP` - Spanish Peseta
-// * `ESA` - Spanish Peseta (A account)
-// * `ESB` - Spanish Peseta (convertible account)
-// * `XDR` - Special Drawing Rights
-// * `LKR` - Sri Lankan Rupee
-// * `SHP` - St. Helena Pound
-// * `XSU` - Sucre
-// * `SDD` - Sudanese Dinar (1992–2007)
-// * `SDG` - Sudanese Pound
-// * `SDP` - Sudanese Pound (1957–1998)
-// * `SRD` - Surinamese Dollar
-// * `SRG` - Surinamese Guilder
-// * `SZL` - Swazi Lilangeni
-// * `SEK` - Swedish Krona
-// * `CHF` - Swiss Franc
-// * `SYP` - Syrian Pound
-// * `STN` - São Tomé & Príncipe Dobra
-// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
-// * `TVD` - TVD
-// * `TJR` - Tajikistani Ruble
-// * `TJS` - Tajikistani Somoni
-// * `TZS` - Tanzanian Shilling
-// * `XTS` - Testing Currency Code
-// * `THB` - Thai Baht
-// * `XXX` - The codes assigned for transactions where no currency is involved
-// * `TPE` - Timorese Escudo
-// * `TOP` - Tongan Paʻanga
-// * `TTD` - Trinidad & Tobago Dollar
-// * `TND` - Tunisian Dinar
-// * `TRY` - Turkish Lira
-// * `TRL` - Turkish Lira (1922–2005)
-// * `TMT` - Turkmenistani Manat
-// * `TMM` - Turkmenistani Manat (1993–2009)
-// * `USD` - US Dollar
-// * `USN` - US Dollar (Next day)
-// * `USS` - US Dollar (Same day)
-// * `UGX` - Ugandan Shilling
-// * `UGS` - Ugandan Shilling (1966–1987)
-// * `UAH` - Ukrainian Hryvnia
-// * `UAK` - Ukrainian Karbovanets
-// * `AED` - United Arab Emirates Dirham
-// * `UYW` - Uruguayan Nominal Wage Index Unit
-// * `UYU` - Uruguayan Peso
-// * `UYP` - Uruguayan Peso (1975–1993)
-// * `UYI` - Uruguayan Peso (Indexed Units)
-// * `UZS` - Uzbekistani Som
-// * `VUV` - Vanuatu Vatu
-// * `VES` - Venezuelan Bolívar
-// * `VEB` - Venezuelan Bolívar (1871–2008)
-// * `VEF` - Venezuelan Bolívar (2008–2018)
-// * `VND` - Vietnamese Dong
-// * `VNN` - Vietnamese Dong (1978–1985)
-// * `CHE` - WIR Euro
-// * `CHW` - WIR Franc
-// * `XOF` - West African CFA Franc
-// * `YDD` - Yemeni Dinar
-// * `YER` - Yemeni Rial
-// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
-// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
-// * `YUM` - Yugoslavian New Dinar (1994–2002)
-// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
-// * `ZWN` - ZWN
-// * `ZRN` - Zairean New Zaire (1993–1998)
-// * `ZRZ` - Zairean Zaire (1971–1993)
-// * `ZMW` - Zambian Kwacha
-// * `ZMK` - Zambian Kwacha (1968–2012)
-// * `ZWD` - Zimbabwean Dollar (1980–2008)
-// * `ZWR` - Zimbabwean Dollar (2008)
-// * `ZWL` - Zimbabwean Dollar (2009)
-type PayCurrencyEnum uint
-
-const (
-	PayCurrencyEnumXua PayCurrencyEnum = iota + 1
-	PayCurrencyEnumAfn
-	PayCurrencyEnumAfa
-	PayCurrencyEnumAll
-	PayCurrencyEnumAlk
-	PayCurrencyEnumDzd
-	PayCurrencyEnumAdp
-	PayCurrencyEnumAoa
-	PayCurrencyEnumAok
-	PayCurrencyEnumAon
-	PayCurrencyEnumAor
-	PayCurrencyEnumAra
-	PayCurrencyEnumArs
-	PayCurrencyEnumArm
-	PayCurrencyEnumArp
-	PayCurrencyEnumArl
-	PayCurrencyEnumAmd
-	PayCurrencyEnumAwg
-	PayCurrencyEnumAud
-	PayCurrencyEnumAts
-	PayCurrencyEnumAzn
-	PayCurrencyEnumAzm
-	PayCurrencyEnumBsd
-	PayCurrencyEnumBhd
-	PayCurrencyEnumBdt
-	PayCurrencyEnumBbd
-	PayCurrencyEnumByn
-	PayCurrencyEnumByb
-	PayCurrencyEnumByr
-	PayCurrencyEnumBef
-	PayCurrencyEnumBec
-	PayCurrencyEnumBel
-	PayCurrencyEnumBzd
-	PayCurrencyEnumBmd
-	PayCurrencyEnumBtn
-	PayCurrencyEnumBob
-	PayCurrencyEnumBol
-	PayCurrencyEnumBov
-	PayCurrencyEnumBop
-	PayCurrencyEnumBam
-	PayCurrencyEnumBad
-	PayCurrencyEnumBan
-	PayCurrencyEnumBwp
-	PayCurrencyEnumBrc
-	PayCurrencyEnumBrz
-	PayCurrencyEnumBre
-	PayCurrencyEnumBrr
-	PayCurrencyEnumBrn
-	PayCurrencyEnumBrb
-	PayCurrencyEnumBrl
-	PayCurrencyEnumGbp
-	PayCurrencyEnumBnd
-	PayCurrencyEnumBgl
-	PayCurrencyEnumBgn
-	PayCurrencyEnumBgo
-	PayCurrencyEnumBgm
-	PayCurrencyEnumBuk
-	PayCurrencyEnumBif
-	PayCurrencyEnumXpf
-	PayCurrencyEnumKhr
-	PayCurrencyEnumCad
-	PayCurrencyEnumCve
-	PayCurrencyEnumKyd
-	PayCurrencyEnumXaf
-	PayCurrencyEnumCle
-	PayCurrencyEnumClp
-	PayCurrencyEnumClf
-	PayCurrencyEnumCnx
-	PayCurrencyEnumCny
-	PayCurrencyEnumCnh
-	PayCurrencyEnumCop
-	PayCurrencyEnumCou
-	PayCurrencyEnumKmf
-	PayCurrencyEnumCdf
-	PayCurrencyEnumCrc
-	PayCurrencyEnumHrd
-	PayCurrencyEnumHrk
-	PayCurrencyEnumCuc
-	PayCurrencyEnumCup
-	PayCurrencyEnumCyp
-	PayCurrencyEnumCzk
-	PayCurrencyEnumCsk
-	PayCurrencyEnumDkk
-	PayCurrencyEnumDjf
-	PayCurrencyEnumDop
-	PayCurrencyEnumNlg
-	PayCurrencyEnumXcd
-	PayCurrencyEnumDdm
-	PayCurrencyEnumEcs
-	PayCurrencyEnumEcv
-	PayCurrencyEnumEgp
-	PayCurrencyEnumGqe
-	PayCurrencyEnumErn
-	PayCurrencyEnumEek
-	PayCurrencyEnumEtb
-	PayCurrencyEnumEur
-	PayCurrencyEnumXba
-	PayCurrencyEnumXeu
-	PayCurrencyEnumXbb
-	PayCurrencyEnumXbc
-	PayCurrencyEnumXbd
-	PayCurrencyEnumFkp
-	PayCurrencyEnumFjd
-	PayCurrencyEnumFim
-	PayCurrencyEnumFrf
-	PayCurrencyEnumXfo
-	PayCurrencyEnumXfu
-	PayCurrencyEnumGmd
-	PayCurrencyEnumGek
-	PayCurrencyEnumGel
-	PayCurrencyEnumDem
-	PayCurrencyEnumGhs
-	PayCurrencyEnumGhc
-	PayCurrencyEnumGip
-	PayCurrencyEnumXau
-	PayCurrencyEnumGrd
-	PayCurrencyEnumGtq
-	PayCurrencyEnumGwp
-	PayCurrencyEnumGnf
-	PayCurrencyEnumGns
-	PayCurrencyEnumGyd
-	PayCurrencyEnumHtg
-	PayCurrencyEnumHnl
-	PayCurrencyEnumHkd
-	PayCurrencyEnumHuf
-	PayCurrencyEnumImp
-	PayCurrencyEnumIsk
-	PayCurrencyEnumIsj
-	PayCurrencyEnumInr
-	PayCurrencyEnumIdr
-	PayCurrencyEnumIrr
-	PayCurrencyEnumIqd
-	PayCurrencyEnumIep
-	PayCurrencyEnumIls
-	PayCurrencyEnumIlp
-	PayCurrencyEnumIlr
-	PayCurrencyEnumItl
-	PayCurrencyEnumJmd
-	PayCurrencyEnumJpy
-	PayCurrencyEnumJod
-	PayCurrencyEnumKzt
-	PayCurrencyEnumKes
-	PayCurrencyEnumKwd
-	PayCurrencyEnumKgs
-	PayCurrencyEnumLak
-	PayCurrencyEnumLvl
-	PayCurrencyEnumLvr
-	PayCurrencyEnumLbp
-	PayCurrencyEnumLsl
-	PayCurrencyEnumLrd
-	PayCurrencyEnumLyd
-	PayCurrencyEnumLtl
-	PayCurrencyEnumLtt
-	PayCurrencyEnumLul
-	PayCurrencyEnumLuc
-	PayCurrencyEnumLuf
-	PayCurrencyEnumMop
-	PayCurrencyEnumMkd
-	PayCurrencyEnumMkn
-	PayCurrencyEnumMga
-	PayCurrencyEnumMgf
-	PayCurrencyEnumMwk
-	PayCurrencyEnumMyr
-	PayCurrencyEnumMvr
-	PayCurrencyEnumMvp
-	PayCurrencyEnumMlf
-	PayCurrencyEnumMtl
-	PayCurrencyEnumMtp
-	PayCurrencyEnumMru
-	PayCurrencyEnumMro
-	PayCurrencyEnumMur
-	PayCurrencyEnumMxv
-	PayCurrencyEnumMxn
-	PayCurrencyEnumMxp
-	PayCurrencyEnumMdc
-	PayCurrencyEnumMdl
-	PayCurrencyEnumMcf
-	PayCurrencyEnumMnt
-	PayCurrencyEnumMad
-	PayCurrencyEnumMaf
-	PayCurrencyEnumMze
-	PayCurrencyEnumMzn
-	PayCurrencyEnumMzm
-	PayCurrencyEnumMmk
-	PayCurrencyEnumNad
-	PayCurrencyEnumNpr
-	PayCurrencyEnumAng
-	PayCurrencyEnumTwd
-	PayCurrencyEnumNzd
-	PayCurrencyEnumNio
-	PayCurrencyEnumNic
-	PayCurrencyEnumNgn
-	PayCurrencyEnumKpw
-	PayCurrencyEnumNok
-	PayCurrencyEnumOmr
-	PayCurrencyEnumPkr
-	PayCurrencyEnumXpd
-	PayCurrencyEnumPab
-	PayCurrencyEnumPgk
-	PayCurrencyEnumPyg
-	PayCurrencyEnumPei
-	PayCurrencyEnumPen
-	PayCurrencyEnumPes
-	PayCurrencyEnumPhp
-	PayCurrencyEnumXpt
-	PayCurrencyEnumPln
-	PayCurrencyEnumPlz
-	PayCurrencyEnumPte
-	PayCurrencyEnumGwe
-	PayCurrencyEnumQar
-	PayCurrencyEnumXre
-	PayCurrencyEnumRhd
-	PayCurrencyEnumRon
-	PayCurrencyEnumRol
-	PayCurrencyEnumRub
-	PayCurrencyEnumRur
-	PayCurrencyEnumRwf
-	PayCurrencyEnumSvc
-	PayCurrencyEnumWst
-	PayCurrencyEnumSar
-	PayCurrencyEnumRsd
-	PayCurrencyEnumCsd
-	PayCurrencyEnumScr
-	PayCurrencyEnumSll
-	PayCurrencyEnumXag
-	PayCurrencyEnumSgd
-	PayCurrencyEnumSkk
-	PayCurrencyEnumSit
-	PayCurrencyEnumSbd
-	PayCurrencyEnumSos
-	PayCurrencyEnumZar
-	PayCurrencyEnumZal
-	PayCurrencyEnumKrh
-	PayCurrencyEnumKrw
-	PayCurrencyEnumKro
-	PayCurrencyEnumSsp
-	PayCurrencyEnumSur
-	PayCurrencyEnumEsp
-	PayCurrencyEnumEsa
-	PayCurrencyEnumEsb
-	PayCurrencyEnumXdr
-	PayCurrencyEnumLkr
-	PayCurrencyEnumShp
-	PayCurrencyEnumXsu
-	PayCurrencyEnumSdd
-	PayCurrencyEnumSdg
-	PayCurrencyEnumSdp
-	PayCurrencyEnumSrd
-	PayCurrencyEnumSrg
-	PayCurrencyEnumSzl
-	PayCurrencyEnumSek
-	PayCurrencyEnumChf
-	PayCurrencyEnumSyp
-	PayCurrencyEnumStn
-	PayCurrencyEnumStd
-	PayCurrencyEnumTvd
-	PayCurrencyEnumTjr
-	PayCurrencyEnumTjs
-	PayCurrencyEnumTzs
-	PayCurrencyEnumXts
-	PayCurrencyEnumThb
-	PayCurrencyEnumXxx
-	PayCurrencyEnumTpe
-	PayCurrencyEnumTop
-	PayCurrencyEnumTtd
-	PayCurrencyEnumTnd
-	PayCurrencyEnumTry
-	PayCurrencyEnumTrl
-	PayCurrencyEnumTmt
-	PayCurrencyEnumTmm
-	PayCurrencyEnumUsd
-	PayCurrencyEnumUsn
-	PayCurrencyEnumUss
-	PayCurrencyEnumUgx
-	PayCurrencyEnumUgs
-	PayCurrencyEnumUah
-	PayCurrencyEnumUak
-	PayCurrencyEnumAed
-	PayCurrencyEnumUyw
-	PayCurrencyEnumUyu
-	PayCurrencyEnumUyp
-	PayCurrencyEnumUyi
-	PayCurrencyEnumUzs
-	PayCurrencyEnumVuv
-	PayCurrencyEnumVes
-	PayCurrencyEnumVeb
-	PayCurrencyEnumVef
-	PayCurrencyEnumVnd
-	PayCurrencyEnumVnn
-	PayCurrencyEnumChe
-	PayCurrencyEnumChw
-	PayCurrencyEnumXof
-	PayCurrencyEnumYdd
-	PayCurrencyEnumYer
-	PayCurrencyEnumYun
-	PayCurrencyEnumYud
-	PayCurrencyEnumYum
-	PayCurrencyEnumYur
-	PayCurrencyEnumZwn
-	PayCurrencyEnumZrn
-	PayCurrencyEnumZrz
-	PayCurrencyEnumZmw
-	PayCurrencyEnumZmk
-	PayCurrencyEnumZwd
-	PayCurrencyEnumZwr
-	PayCurrencyEnumZwl
-)
-
-func (p PayCurrencyEnum) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayCurrencyEnumXua:
-		return "XUA"
-	case PayCurrencyEnumAfn:
-		return "AFN"
-	case PayCurrencyEnumAfa:
-		return "AFA"
-	case PayCurrencyEnumAll:
-		return "ALL"
-	case PayCurrencyEnumAlk:
-		return "ALK"
-	case PayCurrencyEnumDzd:
-		return "DZD"
-	case PayCurrencyEnumAdp:
-		return "ADP"
-	case PayCurrencyEnumAoa:
-		return "AOA"
-	case PayCurrencyEnumAok:
-		return "AOK"
-	case PayCurrencyEnumAon:
-		return "AON"
-	case PayCurrencyEnumAor:
-		return "AOR"
-	case PayCurrencyEnumAra:
-		return "ARA"
-	case PayCurrencyEnumArs:
-		return "ARS"
-	case PayCurrencyEnumArm:
-		return "ARM"
-	case PayCurrencyEnumArp:
-		return "ARP"
-	case PayCurrencyEnumArl:
-		return "ARL"
-	case PayCurrencyEnumAmd:
-		return "AMD"
-	case PayCurrencyEnumAwg:
-		return "AWG"
-	case PayCurrencyEnumAud:
-		return "AUD"
-	case PayCurrencyEnumAts:
-		return "ATS"
-	case PayCurrencyEnumAzn:
-		return "AZN"
-	case PayCurrencyEnumAzm:
-		return "AZM"
-	case PayCurrencyEnumBsd:
-		return "BSD"
-	case PayCurrencyEnumBhd:
-		return "BHD"
-	case PayCurrencyEnumBdt:
-		return "BDT"
-	case PayCurrencyEnumBbd:
-		return "BBD"
-	case PayCurrencyEnumByn:
-		return "BYN"
-	case PayCurrencyEnumByb:
-		return "BYB"
-	case PayCurrencyEnumByr:
-		return "BYR"
-	case PayCurrencyEnumBef:
-		return "BEF"
-	case PayCurrencyEnumBec:
-		return "BEC"
-	case PayCurrencyEnumBel:
-		return "BEL"
-	case PayCurrencyEnumBzd:
-		return "BZD"
-	case PayCurrencyEnumBmd:
-		return "BMD"
-	case PayCurrencyEnumBtn:
-		return "BTN"
-	case PayCurrencyEnumBob:
-		return "BOB"
-	case PayCurrencyEnumBol:
-		return "BOL"
-	case PayCurrencyEnumBov:
-		return "BOV"
-	case PayCurrencyEnumBop:
-		return "BOP"
-	case PayCurrencyEnumBam:
-		return "BAM"
-	case PayCurrencyEnumBad:
-		return "BAD"
-	case PayCurrencyEnumBan:
-		return "BAN"
-	case PayCurrencyEnumBwp:
-		return "BWP"
-	case PayCurrencyEnumBrc:
-		return "BRC"
-	case PayCurrencyEnumBrz:
-		return "BRZ"
-	case PayCurrencyEnumBre:
-		return "BRE"
-	case PayCurrencyEnumBrr:
-		return "BRR"
-	case PayCurrencyEnumBrn:
-		return "BRN"
-	case PayCurrencyEnumBrb:
-		return "BRB"
-	case PayCurrencyEnumBrl:
-		return "BRL"
-	case PayCurrencyEnumGbp:
-		return "GBP"
-	case PayCurrencyEnumBnd:
-		return "BND"
-	case PayCurrencyEnumBgl:
-		return "BGL"
-	case PayCurrencyEnumBgn:
-		return "BGN"
-	case PayCurrencyEnumBgo:
-		return "BGO"
-	case PayCurrencyEnumBgm:
-		return "BGM"
-	case PayCurrencyEnumBuk:
-		return "BUK"
-	case PayCurrencyEnumBif:
-		return "BIF"
-	case PayCurrencyEnumXpf:
-		return "XPF"
-	case PayCurrencyEnumKhr:
-		return "KHR"
-	case PayCurrencyEnumCad:
-		return "CAD"
-	case PayCurrencyEnumCve:
-		return "CVE"
-	case PayCurrencyEnumKyd:
-		return "KYD"
-	case PayCurrencyEnumXaf:
-		return "XAF"
-	case PayCurrencyEnumCle:
-		return "CLE"
-	case PayCurrencyEnumClp:
-		return "CLP"
-	case PayCurrencyEnumClf:
-		return "CLF"
-	case PayCurrencyEnumCnx:
-		return "CNX"
-	case PayCurrencyEnumCny:
-		return "CNY"
-	case PayCurrencyEnumCnh:
-		return "CNH"
-	case PayCurrencyEnumCop:
-		return "COP"
-	case PayCurrencyEnumCou:
-		return "COU"
-	case PayCurrencyEnumKmf:
-		return "KMF"
-	case PayCurrencyEnumCdf:
-		return "CDF"
-	case PayCurrencyEnumCrc:
-		return "CRC"
-	case PayCurrencyEnumHrd:
-		return "HRD"
-	case PayCurrencyEnumHrk:
-		return "HRK"
-	case PayCurrencyEnumCuc:
-		return "CUC"
-	case PayCurrencyEnumCup:
-		return "CUP"
-	case PayCurrencyEnumCyp:
-		return "CYP"
-	case PayCurrencyEnumCzk:
-		return "CZK"
-	case PayCurrencyEnumCsk:
-		return "CSK"
-	case PayCurrencyEnumDkk:
-		return "DKK"
-	case PayCurrencyEnumDjf:
-		return "DJF"
-	case PayCurrencyEnumDop:
-		return "DOP"
-	case PayCurrencyEnumNlg:
-		return "NLG"
-	case PayCurrencyEnumXcd:
-		return "XCD"
-	case PayCurrencyEnumDdm:
-		return "DDM"
-	case PayCurrencyEnumEcs:
-		return "ECS"
-	case PayCurrencyEnumEcv:
-		return "ECV"
-	case PayCurrencyEnumEgp:
-		return "EGP"
-	case PayCurrencyEnumGqe:
-		return "GQE"
-	case PayCurrencyEnumErn:
-		return "ERN"
-	case PayCurrencyEnumEek:
-		return "EEK"
-	case PayCurrencyEnumEtb:
-		return "ETB"
-	case PayCurrencyEnumEur:
-		return "EUR"
-	case PayCurrencyEnumXba:
-		return "XBA"
-	case PayCurrencyEnumXeu:
-		return "XEU"
-	case PayCurrencyEnumXbb:
-		return "XBB"
-	case PayCurrencyEnumXbc:
-		return "XBC"
-	case PayCurrencyEnumXbd:
-		return "XBD"
-	case PayCurrencyEnumFkp:
-		return "FKP"
-	case PayCurrencyEnumFjd:
-		return "FJD"
-	case PayCurrencyEnumFim:
-		return "FIM"
-	case PayCurrencyEnumFrf:
-		return "FRF"
-	case PayCurrencyEnumXfo:
-		return "XFO"
-	case PayCurrencyEnumXfu:
-		return "XFU"
-	case PayCurrencyEnumGmd:
-		return "GMD"
-	case PayCurrencyEnumGek:
-		return "GEK"
-	case PayCurrencyEnumGel:
-		return "GEL"
-	case PayCurrencyEnumDem:
-		return "DEM"
-	case PayCurrencyEnumGhs:
-		return "GHS"
-	case PayCurrencyEnumGhc:
-		return "GHC"
-	case PayCurrencyEnumGip:
-		return "GIP"
-	case PayCurrencyEnumXau:
-		return "XAU"
-	case PayCurrencyEnumGrd:
-		return "GRD"
-	case PayCurrencyEnumGtq:
-		return "GTQ"
-	case PayCurrencyEnumGwp:
-		return "GWP"
-	case PayCurrencyEnumGnf:
-		return "GNF"
-	case PayCurrencyEnumGns:
-		return "GNS"
-	case PayCurrencyEnumGyd:
-		return "GYD"
-	case PayCurrencyEnumHtg:
-		return "HTG"
-	case PayCurrencyEnumHnl:
-		return "HNL"
-	case PayCurrencyEnumHkd:
-		return "HKD"
-	case PayCurrencyEnumHuf:
-		return "HUF"
-	case PayCurrencyEnumImp:
-		return "IMP"
-	case PayCurrencyEnumIsk:
-		return "ISK"
-	case PayCurrencyEnumIsj:
-		return "ISJ"
-	case PayCurrencyEnumInr:
-		return "INR"
-	case PayCurrencyEnumIdr:
-		return "IDR"
-	case PayCurrencyEnumIrr:
-		return "IRR"
-	case PayCurrencyEnumIqd:
-		return "IQD"
-	case PayCurrencyEnumIep:
-		return "IEP"
-	case PayCurrencyEnumIls:
-		return "ILS"
-	case PayCurrencyEnumIlp:
-		return "ILP"
-	case PayCurrencyEnumIlr:
-		return "ILR"
-	case PayCurrencyEnumItl:
-		return "ITL"
-	case PayCurrencyEnumJmd:
-		return "JMD"
-	case PayCurrencyEnumJpy:
-		return "JPY"
-	case PayCurrencyEnumJod:
-		return "JOD"
-	case PayCurrencyEnumKzt:
-		return "KZT"
-	case PayCurrencyEnumKes:
-		return "KES"
-	case PayCurrencyEnumKwd:
-		return "KWD"
-	case PayCurrencyEnumKgs:
-		return "KGS"
-	case PayCurrencyEnumLak:
-		return "LAK"
-	case PayCurrencyEnumLvl:
-		return "LVL"
-	case PayCurrencyEnumLvr:
-		return "LVR"
-	case PayCurrencyEnumLbp:
-		return "LBP"
-	case PayCurrencyEnumLsl:
-		return "LSL"
-	case PayCurrencyEnumLrd:
-		return "LRD"
-	case PayCurrencyEnumLyd:
-		return "LYD"
-	case PayCurrencyEnumLtl:
-		return "LTL"
-	case PayCurrencyEnumLtt:
-		return "LTT"
-	case PayCurrencyEnumLul:
-		return "LUL"
-	case PayCurrencyEnumLuc:
-		return "LUC"
-	case PayCurrencyEnumLuf:
-		return "LUF"
-	case PayCurrencyEnumMop:
-		return "MOP"
-	case PayCurrencyEnumMkd:
-		return "MKD"
-	case PayCurrencyEnumMkn:
-		return "MKN"
-	case PayCurrencyEnumMga:
-		return "MGA"
-	case PayCurrencyEnumMgf:
-		return "MGF"
-	case PayCurrencyEnumMwk:
-		return "MWK"
-	case PayCurrencyEnumMyr:
-		return "MYR"
-	case PayCurrencyEnumMvr:
-		return "MVR"
-	case PayCurrencyEnumMvp:
-		return "MVP"
-	case PayCurrencyEnumMlf:
-		return "MLF"
-	case PayCurrencyEnumMtl:
-		return "MTL"
-	case PayCurrencyEnumMtp:
-		return "MTP"
-	case PayCurrencyEnumMru:
-		return "MRU"
-	case PayCurrencyEnumMro:
-		return "MRO"
-	case PayCurrencyEnumMur:
-		return "MUR"
-	case PayCurrencyEnumMxv:
-		return "MXV"
-	case PayCurrencyEnumMxn:
-		return "MXN"
-	case PayCurrencyEnumMxp:
-		return "MXP"
-	case PayCurrencyEnumMdc:
-		return "MDC"
-	case PayCurrencyEnumMdl:
-		return "MDL"
-	case PayCurrencyEnumMcf:
-		return "MCF"
-	case PayCurrencyEnumMnt:
-		return "MNT"
-	case PayCurrencyEnumMad:
-		return "MAD"
-	case PayCurrencyEnumMaf:
-		return "MAF"
-	case PayCurrencyEnumMze:
-		return "MZE"
-	case PayCurrencyEnumMzn:
-		return "MZN"
-	case PayCurrencyEnumMzm:
-		return "MZM"
-	case PayCurrencyEnumMmk:
-		return "MMK"
-	case PayCurrencyEnumNad:
-		return "NAD"
-	case PayCurrencyEnumNpr:
-		return "NPR"
-	case PayCurrencyEnumAng:
-		return "ANG"
-	case PayCurrencyEnumTwd:
-		return "TWD"
-	case PayCurrencyEnumNzd:
-		return "NZD"
-	case PayCurrencyEnumNio:
-		return "NIO"
-	case PayCurrencyEnumNic:
-		return "NIC"
-	case PayCurrencyEnumNgn:
-		return "NGN"
-	case PayCurrencyEnumKpw:
-		return "KPW"
-	case PayCurrencyEnumNok:
-		return "NOK"
-	case PayCurrencyEnumOmr:
-		return "OMR"
-	case PayCurrencyEnumPkr:
-		return "PKR"
-	case PayCurrencyEnumXpd:
-		return "XPD"
-	case PayCurrencyEnumPab:
-		return "PAB"
-	case PayCurrencyEnumPgk:
-		return "PGK"
-	case PayCurrencyEnumPyg:
-		return "PYG"
-	case PayCurrencyEnumPei:
-		return "PEI"
-	case PayCurrencyEnumPen:
-		return "PEN"
-	case PayCurrencyEnumPes:
-		return "PES"
-	case PayCurrencyEnumPhp:
-		return "PHP"
-	case PayCurrencyEnumXpt:
-		return "XPT"
-	case PayCurrencyEnumPln:
-		return "PLN"
-	case PayCurrencyEnumPlz:
-		return "PLZ"
-	case PayCurrencyEnumPte:
-		return "PTE"
-	case PayCurrencyEnumGwe:
-		return "GWE"
-	case PayCurrencyEnumQar:
-		return "QAR"
-	case PayCurrencyEnumXre:
-		return "XRE"
-	case PayCurrencyEnumRhd:
-		return "RHD"
-	case PayCurrencyEnumRon:
-		return "RON"
-	case PayCurrencyEnumRol:
-		return "ROL"
-	case PayCurrencyEnumRub:
-		return "RUB"
-	case PayCurrencyEnumRur:
-		return "RUR"
-	case PayCurrencyEnumRwf:
-		return "RWF"
-	case PayCurrencyEnumSvc:
-		return "SVC"
-	case PayCurrencyEnumWst:
-		return "WST"
-	case PayCurrencyEnumSar:
-		return "SAR"
-	case PayCurrencyEnumRsd:
-		return "RSD"
-	case PayCurrencyEnumCsd:
-		return "CSD"
-	case PayCurrencyEnumScr:
-		return "SCR"
-	case PayCurrencyEnumSll:
-		return "SLL"
-	case PayCurrencyEnumXag:
-		return "XAG"
-	case PayCurrencyEnumSgd:
-		return "SGD"
-	case PayCurrencyEnumSkk:
-		return "SKK"
-	case PayCurrencyEnumSit:
-		return "SIT"
-	case PayCurrencyEnumSbd:
-		return "SBD"
-	case PayCurrencyEnumSos:
-		return "SOS"
-	case PayCurrencyEnumZar:
-		return "ZAR"
-	case PayCurrencyEnumZal:
-		return "ZAL"
-	case PayCurrencyEnumKrh:
-		return "KRH"
-	case PayCurrencyEnumKrw:
-		return "KRW"
-	case PayCurrencyEnumKro:
-		return "KRO"
-	case PayCurrencyEnumSsp:
-		return "SSP"
-	case PayCurrencyEnumSur:
-		return "SUR"
-	case PayCurrencyEnumEsp:
-		return "ESP"
-	case PayCurrencyEnumEsa:
-		return "ESA"
-	case PayCurrencyEnumEsb:
-		return "ESB"
-	case PayCurrencyEnumXdr:
-		return "XDR"
-	case PayCurrencyEnumLkr:
-		return "LKR"
-	case PayCurrencyEnumShp:
-		return "SHP"
-	case PayCurrencyEnumXsu:
-		return "XSU"
-	case PayCurrencyEnumSdd:
-		return "SDD"
-	case PayCurrencyEnumSdg:
-		return "SDG"
-	case PayCurrencyEnumSdp:
-		return "SDP"
-	case PayCurrencyEnumSrd:
-		return "SRD"
-	case PayCurrencyEnumSrg:
-		return "SRG"
-	case PayCurrencyEnumSzl:
-		return "SZL"
-	case PayCurrencyEnumSek:
-		return "SEK"
-	case PayCurrencyEnumChf:
-		return "CHF"
-	case PayCurrencyEnumSyp:
-		return "SYP"
-	case PayCurrencyEnumStn:
-		return "STN"
-	case PayCurrencyEnumStd:
-		return "STD"
-	case PayCurrencyEnumTvd:
-		return "TVD"
-	case PayCurrencyEnumTjr:
-		return "TJR"
-	case PayCurrencyEnumTjs:
-		return "TJS"
-	case PayCurrencyEnumTzs:
-		return "TZS"
-	case PayCurrencyEnumXts:
-		return "XTS"
-	case PayCurrencyEnumThb:
-		return "THB"
-	case PayCurrencyEnumXxx:
-		return "XXX"
-	case PayCurrencyEnumTpe:
-		return "TPE"
-	case PayCurrencyEnumTop:
-		return "TOP"
-	case PayCurrencyEnumTtd:
-		return "TTD"
-	case PayCurrencyEnumTnd:
-		return "TND"
-	case PayCurrencyEnumTry:
-		return "TRY"
-	case PayCurrencyEnumTrl:
-		return "TRL"
-	case PayCurrencyEnumTmt:
-		return "TMT"
-	case PayCurrencyEnumTmm:
-		return "TMM"
-	case PayCurrencyEnumUsd:
-		return "USD"
-	case PayCurrencyEnumUsn:
-		return "USN"
-	case PayCurrencyEnumUss:
-		return "USS"
-	case PayCurrencyEnumUgx:
-		return "UGX"
-	case PayCurrencyEnumUgs:
-		return "UGS"
-	case PayCurrencyEnumUah:
-		return "UAH"
-	case PayCurrencyEnumUak:
-		return "UAK"
-	case PayCurrencyEnumAed:
-		return "AED"
-	case PayCurrencyEnumUyw:
-		return "UYW"
-	case PayCurrencyEnumUyu:
-		return "UYU"
-	case PayCurrencyEnumUyp:
-		return "UYP"
-	case PayCurrencyEnumUyi:
-		return "UYI"
-	case PayCurrencyEnumUzs:
-		return "UZS"
-	case PayCurrencyEnumVuv:
-		return "VUV"
-	case PayCurrencyEnumVes:
-		return "VES"
-	case PayCurrencyEnumVeb:
-		return "VEB"
-	case PayCurrencyEnumVef:
-		return "VEF"
-	case PayCurrencyEnumVnd:
-		return "VND"
-	case PayCurrencyEnumVnn:
-		return "VNN"
-	case PayCurrencyEnumChe:
-		return "CHE"
-	case PayCurrencyEnumChw:
-		return "CHW"
-	case PayCurrencyEnumXof:
-		return "XOF"
-	case PayCurrencyEnumYdd:
-		return "YDD"
-	case PayCurrencyEnumYer:
-		return "YER"
-	case PayCurrencyEnumYun:
-		return "YUN"
-	case PayCurrencyEnumYud:
-		return "YUD"
-	case PayCurrencyEnumYum:
-		return "YUM"
-	case PayCurrencyEnumYur:
-		return "YUR"
-	case PayCurrencyEnumZwn:
-		return "ZWN"
-	case PayCurrencyEnumZrn:
-		return "ZRN"
-	case PayCurrencyEnumZrz:
-		return "ZRZ"
-	case PayCurrencyEnumZmw:
-		return "ZMW"
-	case PayCurrencyEnumZmk:
-		return "ZMK"
-	case PayCurrencyEnumZwd:
-		return "ZWD"
-	case PayCurrencyEnumZwr:
-		return "ZWR"
-	case PayCurrencyEnumZwl:
-		return "ZWL"
-	}
-}
-
-func (p PayCurrencyEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayCurrencyEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (p *PaginatedTimesheetEntryList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTimesheetEntryList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*p = PaginatedTimesheetEntryList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTimesheetEntryList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type PayCurrencyEnum string
+
+const (
+	PayCurrencyEnumXua PayCurrencyEnum = "XUA"
+	PayCurrencyEnumAfn PayCurrencyEnum = "AFN"
+	PayCurrencyEnumAfa PayCurrencyEnum = "AFA"
+	PayCurrencyEnumAll PayCurrencyEnum = "ALL"
+	PayCurrencyEnumAlk PayCurrencyEnum = "ALK"
+	PayCurrencyEnumDzd PayCurrencyEnum = "DZD"
+	PayCurrencyEnumAdp PayCurrencyEnum = "ADP"
+	PayCurrencyEnumAoa PayCurrencyEnum = "AOA"
+	PayCurrencyEnumAok PayCurrencyEnum = "AOK"
+	PayCurrencyEnumAon PayCurrencyEnum = "AON"
+	PayCurrencyEnumAor PayCurrencyEnum = "AOR"
+	PayCurrencyEnumAra PayCurrencyEnum = "ARA"
+	PayCurrencyEnumArs PayCurrencyEnum = "ARS"
+	PayCurrencyEnumArm PayCurrencyEnum = "ARM"
+	PayCurrencyEnumArp PayCurrencyEnum = "ARP"
+	PayCurrencyEnumArl PayCurrencyEnum = "ARL"
+	PayCurrencyEnumAmd PayCurrencyEnum = "AMD"
+	PayCurrencyEnumAwg PayCurrencyEnum = "AWG"
+	PayCurrencyEnumAud PayCurrencyEnum = "AUD"
+	PayCurrencyEnumAts PayCurrencyEnum = "ATS"
+	PayCurrencyEnumAzn PayCurrencyEnum = "AZN"
+	PayCurrencyEnumAzm PayCurrencyEnum = "AZM"
+	PayCurrencyEnumBsd PayCurrencyEnum = "BSD"
+	PayCurrencyEnumBhd PayCurrencyEnum = "BHD"
+	PayCurrencyEnumBdt PayCurrencyEnum = "BDT"
+	PayCurrencyEnumBbd PayCurrencyEnum = "BBD"
+	PayCurrencyEnumByn PayCurrencyEnum = "BYN"
+	PayCurrencyEnumByb PayCurrencyEnum = "BYB"
+	PayCurrencyEnumByr PayCurrencyEnum = "BYR"
+	PayCurrencyEnumBef PayCurrencyEnum = "BEF"
+	PayCurrencyEnumBec PayCurrencyEnum = "BEC"
+	PayCurrencyEnumBel PayCurrencyEnum = "BEL"
+	PayCurrencyEnumBzd PayCurrencyEnum = "BZD"
+	PayCurrencyEnumBmd PayCurrencyEnum = "BMD"
+	PayCurrencyEnumBtn PayCurrencyEnum = "BTN"
+	PayCurrencyEnumBob PayCurrencyEnum = "BOB"
+	PayCurrencyEnumBol PayCurrencyEnum = "BOL"
+	PayCurrencyEnumBov PayCurrencyEnum = "BOV"
+	PayCurrencyEnumBop PayCurrencyEnum = "BOP"
+	PayCurrencyEnumBam PayCurrencyEnum = "BAM"
+	PayCurrencyEnumBad PayCurrencyEnum = "BAD"
+	PayCurrencyEnumBan PayCurrencyEnum = "BAN"
+	PayCurrencyEnumBwp PayCurrencyEnum = "BWP"
+	PayCurrencyEnumBrc PayCurrencyEnum = "BRC"
+	PayCurrencyEnumBrz PayCurrencyEnum = "BRZ"
+	PayCurrencyEnumBre PayCurrencyEnum = "BRE"
+	PayCurrencyEnumBrr PayCurrencyEnum = "BRR"
+	PayCurrencyEnumBrn PayCurrencyEnum = "BRN"
+	PayCurrencyEnumBrb PayCurrencyEnum = "BRB"
+	PayCurrencyEnumBrl PayCurrencyEnum = "BRL"
+	PayCurrencyEnumGbp PayCurrencyEnum = "GBP"
+	PayCurrencyEnumBnd PayCurrencyEnum = "BND"
+	PayCurrencyEnumBgl PayCurrencyEnum = "BGL"
+	PayCurrencyEnumBgn PayCurrencyEnum = "BGN"
+	PayCurrencyEnumBgo PayCurrencyEnum = "BGO"
+	PayCurrencyEnumBgm PayCurrencyEnum = "BGM"
+	PayCurrencyEnumBuk PayCurrencyEnum = "BUK"
+	PayCurrencyEnumBif PayCurrencyEnum = "BIF"
+	PayCurrencyEnumXpf PayCurrencyEnum = "XPF"
+	PayCurrencyEnumKhr PayCurrencyEnum = "KHR"
+	PayCurrencyEnumCad PayCurrencyEnum = "CAD"
+	PayCurrencyEnumCve PayCurrencyEnum = "CVE"
+	PayCurrencyEnumKyd PayCurrencyEnum = "KYD"
+	PayCurrencyEnumXaf PayCurrencyEnum = "XAF"
+	PayCurrencyEnumCle PayCurrencyEnum = "CLE"
+	PayCurrencyEnumClp PayCurrencyEnum = "CLP"
+	PayCurrencyEnumClf PayCurrencyEnum = "CLF"
+	PayCurrencyEnumCnx PayCurrencyEnum = "CNX"
+	PayCurrencyEnumCny PayCurrencyEnum = "CNY"
+	PayCurrencyEnumCnh PayCurrencyEnum = "CNH"
+	PayCurrencyEnumCop PayCurrencyEnum = "COP"
+	PayCurrencyEnumCou PayCurrencyEnum = "COU"
+	PayCurrencyEnumKmf PayCurrencyEnum = "KMF"
+	PayCurrencyEnumCdf PayCurrencyEnum = "CDF"
+	PayCurrencyEnumCrc PayCurrencyEnum = "CRC"
+	PayCurrencyEnumHrd PayCurrencyEnum = "HRD"
+	PayCurrencyEnumHrk PayCurrencyEnum = "HRK"
+	PayCurrencyEnumCuc PayCurrencyEnum = "CUC"
+	PayCurrencyEnumCup PayCurrencyEnum = "CUP"
+	PayCurrencyEnumCyp PayCurrencyEnum = "CYP"
+	PayCurrencyEnumCzk PayCurrencyEnum = "CZK"
+	PayCurrencyEnumCsk PayCurrencyEnum = "CSK"
+	PayCurrencyEnumDkk PayCurrencyEnum = "DKK"
+	PayCurrencyEnumDjf PayCurrencyEnum = "DJF"
+	PayCurrencyEnumDop PayCurrencyEnum = "DOP"
+	PayCurrencyEnumNlg PayCurrencyEnum = "NLG"
+	PayCurrencyEnumXcd PayCurrencyEnum = "XCD"
+	PayCurrencyEnumDdm PayCurrencyEnum = "DDM"
+	PayCurrencyEnumEcs PayCurrencyEnum = "ECS"
+	PayCurrencyEnumEcv PayCurrencyEnum = "ECV"
+	PayCurrencyEnumEgp PayCurrencyEnum = "EGP"
+	PayCurrencyEnumGqe PayCurrencyEnum = "GQE"
+	PayCurrencyEnumErn PayCurrencyEnum = "ERN"
+	PayCurrencyEnumEek PayCurrencyEnum = "EEK"
+	PayCurrencyEnumEtb PayCurrencyEnum = "ETB"
+	PayCurrencyEnumEur PayCurrencyEnum = "EUR"
+	PayCurrencyEnumXba PayCurrencyEnum = "XBA"
+	PayCurrencyEnumXeu PayCurrencyEnum = "XEU"
+	PayCurrencyEnumXbb PayCurrencyEnum = "XBB"
+	PayCurrencyEnumXbc PayCurrencyEnum = "XBC"
+	PayCurrencyEnumXbd PayCurrencyEnum = "XBD"
+	PayCurrencyEnumFkp PayCurrencyEnum = "FKP"
+	PayCurrencyEnumFjd PayCurrencyEnum = "FJD"
+	PayCurrencyEnumFim PayCurrencyEnum = "FIM"
+	PayCurrencyEnumFrf PayCurrencyEnum = "FRF"
+	PayCurrencyEnumXfo PayCurrencyEnum = "XFO"
+	PayCurrencyEnumXfu PayCurrencyEnum = "XFU"
+	PayCurrencyEnumGmd PayCurrencyEnum = "GMD"
+	PayCurrencyEnumGek PayCurrencyEnum = "GEK"
+	PayCurrencyEnumGel PayCurrencyEnum = "GEL"
+	PayCurrencyEnumDem PayCurrencyEnum = "DEM"
+	PayCurrencyEnumGhs PayCurrencyEnum = "GHS"
+	PayCurrencyEnumGhc PayCurrencyEnum = "GHC"
+	PayCurrencyEnumGip PayCurrencyEnum = "GIP"
+	PayCurrencyEnumXau PayCurrencyEnum = "XAU"
+	PayCurrencyEnumGrd PayCurrencyEnum = "GRD"
+	PayCurrencyEnumGtq PayCurrencyEnum = "GTQ"
+	PayCurrencyEnumGwp PayCurrencyEnum = "GWP"
+	PayCurrencyEnumGnf PayCurrencyEnum = "GNF"
+	PayCurrencyEnumGns PayCurrencyEnum = "GNS"
+	PayCurrencyEnumGyd PayCurrencyEnum = "GYD"
+	PayCurrencyEnumHtg PayCurrencyEnum = "HTG"
+	PayCurrencyEnumHnl PayCurrencyEnum = "HNL"
+	PayCurrencyEnumHkd PayCurrencyEnum = "HKD"
+	PayCurrencyEnumHuf PayCurrencyEnum = "HUF"
+	PayCurrencyEnumImp PayCurrencyEnum = "IMP"
+	PayCurrencyEnumIsk PayCurrencyEnum = "ISK"
+	PayCurrencyEnumIsj PayCurrencyEnum = "ISJ"
+	PayCurrencyEnumInr PayCurrencyEnum = "INR"
+	PayCurrencyEnumIdr PayCurrencyEnum = "IDR"
+	PayCurrencyEnumIrr PayCurrencyEnum = "IRR"
+	PayCurrencyEnumIqd PayCurrencyEnum = "IQD"
+	PayCurrencyEnumIep PayCurrencyEnum = "IEP"
+	PayCurrencyEnumIls PayCurrencyEnum = "ILS"
+	PayCurrencyEnumIlp PayCurrencyEnum = "ILP"
+	PayCurrencyEnumIlr PayCurrencyEnum = "ILR"
+	PayCurrencyEnumItl PayCurrencyEnum = "ITL"
+	PayCurrencyEnumJmd PayCurrencyEnum = "JMD"
+	PayCurrencyEnumJpy PayCurrencyEnum = "JPY"
+	PayCurrencyEnumJod PayCurrencyEnum = "JOD"
+	PayCurrencyEnumKzt PayCurrencyEnum = "KZT"
+	PayCurrencyEnumKes PayCurrencyEnum = "KES"
+	PayCurrencyEnumKwd PayCurrencyEnum = "KWD"
+	PayCurrencyEnumKgs PayCurrencyEnum = "KGS"
+	PayCurrencyEnumLak PayCurrencyEnum = "LAK"
+	PayCurrencyEnumLvl PayCurrencyEnum = "LVL"
+	PayCurrencyEnumLvr PayCurrencyEnum = "LVR"
+	PayCurrencyEnumLbp PayCurrencyEnum = "LBP"
+	PayCurrencyEnumLsl PayCurrencyEnum = "LSL"
+	PayCurrencyEnumLrd PayCurrencyEnum = "LRD"
+	PayCurrencyEnumLyd PayCurrencyEnum = "LYD"
+	PayCurrencyEnumLtl PayCurrencyEnum = "LTL"
+	PayCurrencyEnumLtt PayCurrencyEnum = "LTT"
+	PayCurrencyEnumLul PayCurrencyEnum = "LUL"
+	PayCurrencyEnumLuc PayCurrencyEnum = "LUC"
+	PayCurrencyEnumLuf PayCurrencyEnum = "LUF"
+	PayCurrencyEnumMop PayCurrencyEnum = "MOP"
+	PayCurrencyEnumMkd PayCurrencyEnum = "MKD"
+	PayCurrencyEnumMkn PayCurrencyEnum = "MKN"
+	PayCurrencyEnumMga PayCurrencyEnum = "MGA"
+	PayCurrencyEnumMgf PayCurrencyEnum = "MGF"
+	PayCurrencyEnumMwk PayCurrencyEnum = "MWK"
+	PayCurrencyEnumMyr PayCurrencyEnum = "MYR"
+	PayCurrencyEnumMvr PayCurrencyEnum = "MVR"
+	PayCurrencyEnumMvp PayCurrencyEnum = "MVP"
+	PayCurrencyEnumMlf PayCurrencyEnum = "MLF"
+	PayCurrencyEnumMtl PayCurrencyEnum = "MTL"
+	PayCurrencyEnumMtp PayCurrencyEnum = "MTP"
+	PayCurrencyEnumMru PayCurrencyEnum = "MRU"
+	PayCurrencyEnumMro PayCurrencyEnum = "MRO"
+	PayCurrencyEnumMur PayCurrencyEnum = "MUR"
+	PayCurrencyEnumMxv PayCurrencyEnum = "MXV"
+	PayCurrencyEnumMxn PayCurrencyEnum = "MXN"
+	PayCurrencyEnumMxp PayCurrencyEnum = "MXP"
+	PayCurrencyEnumMdc PayCurrencyEnum = "MDC"
+	PayCurrencyEnumMdl PayCurrencyEnum = "MDL"
+	PayCurrencyEnumMcf PayCurrencyEnum = "MCF"
+	PayCurrencyEnumMnt PayCurrencyEnum = "MNT"
+	PayCurrencyEnumMad PayCurrencyEnum = "MAD"
+	PayCurrencyEnumMaf PayCurrencyEnum = "MAF"
+	PayCurrencyEnumMze PayCurrencyEnum = "MZE"
+	PayCurrencyEnumMzn PayCurrencyEnum = "MZN"
+	PayCurrencyEnumMzm PayCurrencyEnum = "MZM"
+	PayCurrencyEnumMmk PayCurrencyEnum = "MMK"
+	PayCurrencyEnumNad PayCurrencyEnum = "NAD"
+	PayCurrencyEnumNpr PayCurrencyEnum = "NPR"
+	PayCurrencyEnumAng PayCurrencyEnum = "ANG"
+	PayCurrencyEnumTwd PayCurrencyEnum = "TWD"
+	PayCurrencyEnumNzd PayCurrencyEnum = "NZD"
+	PayCurrencyEnumNio PayCurrencyEnum = "NIO"
+	PayCurrencyEnumNic PayCurrencyEnum = "NIC"
+	PayCurrencyEnumNgn PayCurrencyEnum = "NGN"
+	PayCurrencyEnumKpw PayCurrencyEnum = "KPW"
+	PayCurrencyEnumNok PayCurrencyEnum = "NOK"
+	PayCurrencyEnumOmr PayCurrencyEnum = "OMR"
+	PayCurrencyEnumPkr PayCurrencyEnum = "PKR"
+	PayCurrencyEnumXpd PayCurrencyEnum = "XPD"
+	PayCurrencyEnumPab PayCurrencyEnum = "PAB"
+	PayCurrencyEnumPgk PayCurrencyEnum = "PGK"
+	PayCurrencyEnumPyg PayCurrencyEnum = "PYG"
+	PayCurrencyEnumPei PayCurrencyEnum = "PEI"
+	PayCurrencyEnumPen PayCurrencyEnum = "PEN"
+	PayCurrencyEnumPes PayCurrencyEnum = "PES"
+	PayCurrencyEnumPhp PayCurrencyEnum = "PHP"
+	PayCurrencyEnumXpt PayCurrencyEnum = "XPT"
+	PayCurrencyEnumPln PayCurrencyEnum = "PLN"
+	PayCurrencyEnumPlz PayCurrencyEnum = "PLZ"
+	PayCurrencyEnumPte PayCurrencyEnum = "PTE"
+	PayCurrencyEnumGwe PayCurrencyEnum = "GWE"
+	PayCurrencyEnumQar PayCurrencyEnum = "QAR"
+	PayCurrencyEnumXre PayCurrencyEnum = "XRE"
+	PayCurrencyEnumRhd PayCurrencyEnum = "RHD"
+	PayCurrencyEnumRon PayCurrencyEnum = "RON"
+	PayCurrencyEnumRol PayCurrencyEnum = "ROL"
+	PayCurrencyEnumRub PayCurrencyEnum = "RUB"
+	PayCurrencyEnumRur PayCurrencyEnum = "RUR"
+	PayCurrencyEnumRwf PayCurrencyEnum = "RWF"
+	PayCurrencyEnumSvc PayCurrencyEnum = "SVC"
+	PayCurrencyEnumWst PayCurrencyEnum = "WST"
+	PayCurrencyEnumSar PayCurrencyEnum = "SAR"
+	PayCurrencyEnumRsd PayCurrencyEnum = "RSD"
+	PayCurrencyEnumCsd PayCurrencyEnum = "CSD"
+	PayCurrencyEnumScr PayCurrencyEnum = "SCR"
+	PayCurrencyEnumSll PayCurrencyEnum = "SLL"
+	PayCurrencyEnumXag PayCurrencyEnum = "XAG"
+	PayCurrencyEnumSgd PayCurrencyEnum = "SGD"
+	PayCurrencyEnumSkk PayCurrencyEnum = "SKK"
+	PayCurrencyEnumSit PayCurrencyEnum = "SIT"
+	PayCurrencyEnumSbd PayCurrencyEnum = "SBD"
+	PayCurrencyEnumSos PayCurrencyEnum = "SOS"
+	PayCurrencyEnumZar PayCurrencyEnum = "ZAR"
+	PayCurrencyEnumZal PayCurrencyEnum = "ZAL"
+	PayCurrencyEnumKrh PayCurrencyEnum = "KRH"
+	PayCurrencyEnumKrw PayCurrencyEnum = "KRW"
+	PayCurrencyEnumKro PayCurrencyEnum = "KRO"
+	PayCurrencyEnumSsp PayCurrencyEnum = "SSP"
+	PayCurrencyEnumSur PayCurrencyEnum = "SUR"
+	PayCurrencyEnumEsp PayCurrencyEnum = "ESP"
+	PayCurrencyEnumEsa PayCurrencyEnum = "ESA"
+	PayCurrencyEnumEsb PayCurrencyEnum = "ESB"
+	PayCurrencyEnumXdr PayCurrencyEnum = "XDR"
+	PayCurrencyEnumLkr PayCurrencyEnum = "LKR"
+	PayCurrencyEnumShp PayCurrencyEnum = "SHP"
+	PayCurrencyEnumXsu PayCurrencyEnum = "XSU"
+	PayCurrencyEnumSdd PayCurrencyEnum = "SDD"
+	PayCurrencyEnumSdg PayCurrencyEnum = "SDG"
+	PayCurrencyEnumSdp PayCurrencyEnum = "SDP"
+	PayCurrencyEnumSrd PayCurrencyEnum = "SRD"
+	PayCurrencyEnumSrg PayCurrencyEnum = "SRG"
+	PayCurrencyEnumSzl PayCurrencyEnum = "SZL"
+	PayCurrencyEnumSek PayCurrencyEnum = "SEK"
+	PayCurrencyEnumChf PayCurrencyEnum = "CHF"
+	PayCurrencyEnumSyp PayCurrencyEnum = "SYP"
+	PayCurrencyEnumStn PayCurrencyEnum = "STN"
+	PayCurrencyEnumStd PayCurrencyEnum = "STD"
+	PayCurrencyEnumTvd PayCurrencyEnum = "TVD"
+	PayCurrencyEnumTjr PayCurrencyEnum = "TJR"
+	PayCurrencyEnumTjs PayCurrencyEnum = "TJS"
+	PayCurrencyEnumTzs PayCurrencyEnum = "TZS"
+	PayCurrencyEnumXts PayCurrencyEnum = "XTS"
+	PayCurrencyEnumThb PayCurrencyEnum = "THB"
+	PayCurrencyEnumXxx PayCurrencyEnum = "XXX"
+	PayCurrencyEnumTpe PayCurrencyEnum = "TPE"
+	PayCurrencyEnumTop PayCurrencyEnum = "TOP"
+	PayCurrencyEnumTtd PayCurrencyEnum = "TTD"
+	PayCurrencyEnumTnd PayCurrencyEnum = "TND"
+	PayCurrencyEnumTry PayCurrencyEnum = "TRY"
+	PayCurrencyEnumTrl PayCurrencyEnum = "TRL"
+	PayCurrencyEnumTmt PayCurrencyEnum = "TMT"
+	PayCurrencyEnumTmm PayCurrencyEnum = "TMM"
+	PayCurrencyEnumUsd PayCurrencyEnum = "USD"
+	PayCurrencyEnumUsn PayCurrencyEnum = "USN"
+	PayCurrencyEnumUss PayCurrencyEnum = "USS"
+	PayCurrencyEnumUgx PayCurrencyEnum = "UGX"
+	PayCurrencyEnumUgs PayCurrencyEnum = "UGS"
+	PayCurrencyEnumUah PayCurrencyEnum = "UAH"
+	PayCurrencyEnumUak PayCurrencyEnum = "UAK"
+	PayCurrencyEnumAed PayCurrencyEnum = "AED"
+	PayCurrencyEnumUyw PayCurrencyEnum = "UYW"
+	PayCurrencyEnumUyu PayCurrencyEnum = "UYU"
+	PayCurrencyEnumUyp PayCurrencyEnum = "UYP"
+	PayCurrencyEnumUyi PayCurrencyEnum = "UYI"
+	PayCurrencyEnumUzs PayCurrencyEnum = "UZS"
+	PayCurrencyEnumVuv PayCurrencyEnum = "VUV"
+	PayCurrencyEnumVes PayCurrencyEnum = "VES"
+	PayCurrencyEnumVeb PayCurrencyEnum = "VEB"
+	PayCurrencyEnumVef PayCurrencyEnum = "VEF"
+	PayCurrencyEnumVnd PayCurrencyEnum = "VND"
+	PayCurrencyEnumVnn PayCurrencyEnum = "VNN"
+	PayCurrencyEnumChe PayCurrencyEnum = "CHE"
+	PayCurrencyEnumChw PayCurrencyEnum = "CHW"
+	PayCurrencyEnumXof PayCurrencyEnum = "XOF"
+	PayCurrencyEnumYdd PayCurrencyEnum = "YDD"
+	PayCurrencyEnumYer PayCurrencyEnum = "YER"
+	PayCurrencyEnumYun PayCurrencyEnum = "YUN"
+	PayCurrencyEnumYud PayCurrencyEnum = "YUD"
+	PayCurrencyEnumYum PayCurrencyEnum = "YUM"
+	PayCurrencyEnumYur PayCurrencyEnum = "YUR"
+	PayCurrencyEnumZwn PayCurrencyEnum = "ZWN"
+	PayCurrencyEnumZrn PayCurrencyEnum = "ZRN"
+	PayCurrencyEnumZrz PayCurrencyEnum = "ZRZ"
+	PayCurrencyEnumZmw PayCurrencyEnum = "ZMW"
+	PayCurrencyEnumZmk PayCurrencyEnum = "ZMK"
+	PayCurrencyEnumZwd PayCurrencyEnum = "ZWD"
+	PayCurrencyEnumZwr PayCurrencyEnum = "ZWR"
+	PayCurrencyEnumZwl PayCurrencyEnum = "ZWL"
+)
+
+func NewPayCurrencyEnumFromString(s string) (PayCurrencyEnum, error) {
+	switch s {
 	case "XUA":
-		value := PayCurrencyEnumXua
-		*p = value
+		return PayCurrencyEnumXua, nil
 	case "AFN":
-		value := PayCurrencyEnumAfn
-		*p = value
+		return PayCurrencyEnumAfn, nil
 	case "AFA":
-		value := PayCurrencyEnumAfa
-		*p = value
+		return PayCurrencyEnumAfa, nil
 	case "ALL":
-		value := PayCurrencyEnumAll
-		*p = value
+		return PayCurrencyEnumAll, nil
 	case "ALK":
-		value := PayCurrencyEnumAlk
-		*p = value
+		return PayCurrencyEnumAlk, nil
 	case "DZD":
-		value := PayCurrencyEnumDzd
-		*p = value
+		return PayCurrencyEnumDzd, nil
 	case "ADP":
-		value := PayCurrencyEnumAdp
-		*p = value
+		return PayCurrencyEnumAdp, nil
 	case "AOA":
-		value := PayCurrencyEnumAoa
-		*p = value
+		return PayCurrencyEnumAoa, nil
 	case "AOK":
-		value := PayCurrencyEnumAok
-		*p = value
+		return PayCurrencyEnumAok, nil
 	case "AON":
-		value := PayCurrencyEnumAon
-		*p = value
+		return PayCurrencyEnumAon, nil
 	case "AOR":
-		value := PayCurrencyEnumAor
-		*p = value
+		return PayCurrencyEnumAor, nil
 	case "ARA":
-		value := PayCurrencyEnumAra
-		*p = value
+		return PayCurrencyEnumAra, nil
 	case "ARS":
-		value := PayCurrencyEnumArs
-		*p = value
+		return PayCurrencyEnumArs, nil
 	case "ARM":
-		value := PayCurrencyEnumArm
-		*p = value
+		return PayCurrencyEnumArm, nil
 	case "ARP":
-		value := PayCurrencyEnumArp
-		*p = value
+		return PayCurrencyEnumArp, nil
 	case "ARL":
-		value := PayCurrencyEnumArl
-		*p = value
+		return PayCurrencyEnumArl, nil
 	case "AMD":
-		value := PayCurrencyEnumAmd
-		*p = value
+		return PayCurrencyEnumAmd, nil
 	case "AWG":
-		value := PayCurrencyEnumAwg
-		*p = value
+		return PayCurrencyEnumAwg, nil
 	case "AUD":
-		value := PayCurrencyEnumAud
-		*p = value
+		return PayCurrencyEnumAud, nil
 	case "ATS":
-		value := PayCurrencyEnumAts
-		*p = value
+		return PayCurrencyEnumAts, nil
 	case "AZN":
-		value := PayCurrencyEnumAzn
-		*p = value
+		return PayCurrencyEnumAzn, nil
 	case "AZM":
-		value := PayCurrencyEnumAzm
-		*p = value
+		return PayCurrencyEnumAzm, nil
 	case "BSD":
-		value := PayCurrencyEnumBsd
-		*p = value
+		return PayCurrencyEnumBsd, nil
 	case "BHD":
-		value := PayCurrencyEnumBhd
-		*p = value
+		return PayCurrencyEnumBhd, nil
 	case "BDT":
-		value := PayCurrencyEnumBdt
-		*p = value
+		return PayCurrencyEnumBdt, nil
 	case "BBD":
-		value := PayCurrencyEnumBbd
-		*p = value
+		return PayCurrencyEnumBbd, nil
 	case "BYN":
-		value := PayCurrencyEnumByn
-		*p = value
+		return PayCurrencyEnumByn, nil
 	case "BYB":
-		value := PayCurrencyEnumByb
-		*p = value
+		return PayCurrencyEnumByb, nil
 	case "BYR":
-		value := PayCurrencyEnumByr
-		*p = value
+		return PayCurrencyEnumByr, nil
 	case "BEF":
-		value := PayCurrencyEnumBef
-		*p = value
+		return PayCurrencyEnumBef, nil
 	case "BEC":
-		value := PayCurrencyEnumBec
-		*p = value
+		return PayCurrencyEnumBec, nil
 	case "BEL":
-		value := PayCurrencyEnumBel
-		*p = value
+		return PayCurrencyEnumBel, nil
 	case "BZD":
-		value := PayCurrencyEnumBzd
-		*p = value
+		return PayCurrencyEnumBzd, nil
 	case "BMD":
-		value := PayCurrencyEnumBmd
-		*p = value
+		return PayCurrencyEnumBmd, nil
 	case "BTN":
-		value := PayCurrencyEnumBtn
-		*p = value
+		return PayCurrencyEnumBtn, nil
 	case "BOB":
-		value := PayCurrencyEnumBob
-		*p = value
+		return PayCurrencyEnumBob, nil
 	case "BOL":
-		value := PayCurrencyEnumBol
-		*p = value
+		return PayCurrencyEnumBol, nil
 	case "BOV":
-		value := PayCurrencyEnumBov
-		*p = value
+		return PayCurrencyEnumBov, nil
 	case "BOP":
-		value := PayCurrencyEnumBop
-		*p = value
+		return PayCurrencyEnumBop, nil
 	case "BAM":
-		value := PayCurrencyEnumBam
-		*p = value
+		return PayCurrencyEnumBam, nil
 	case "BAD":
-		value := PayCurrencyEnumBad
-		*p = value
+		return PayCurrencyEnumBad, nil
 	case "BAN":
-		value := PayCurrencyEnumBan
-		*p = value
+		return PayCurrencyEnumBan, nil
 	case "BWP":
-		value := PayCurrencyEnumBwp
-		*p = value
+		return PayCurrencyEnumBwp, nil
 	case "BRC":
-		value := PayCurrencyEnumBrc
-		*p = value
+		return PayCurrencyEnumBrc, nil
 	case "BRZ":
-		value := PayCurrencyEnumBrz
-		*p = value
+		return PayCurrencyEnumBrz, nil
 	case "BRE":
-		value := PayCurrencyEnumBre
-		*p = value
+		return PayCurrencyEnumBre, nil
 	case "BRR":
-		value := PayCurrencyEnumBrr
-		*p = value
+		return PayCurrencyEnumBrr, nil
 	case "BRN":
-		value := PayCurrencyEnumBrn
-		*p = value
+		return PayCurrencyEnumBrn, nil
 	case "BRB":
-		value := PayCurrencyEnumBrb
-		*p = value
+		return PayCurrencyEnumBrb, nil
 	case "BRL":
-		value := PayCurrencyEnumBrl
-		*p = value
+		return PayCurrencyEnumBrl, nil
 	case "GBP":
-		value := PayCurrencyEnumGbp
-		*p = value
+		return PayCurrencyEnumGbp, nil
 	case "BND":
-		value := PayCurrencyEnumBnd
-		*p = value
+		return PayCurrencyEnumBnd, nil
 	case "BGL":
-		value := PayCurrencyEnumBgl
-		*p = value
+		return PayCurrencyEnumBgl, nil
 	case "BGN":
-		value := PayCurrencyEnumBgn
-		*p = value
+		return PayCurrencyEnumBgn, nil
 	case "BGO":
-		value := PayCurrencyEnumBgo
-		*p = value
+		return PayCurrencyEnumBgo, nil
 	case "BGM":
-		value := PayCurrencyEnumBgm
-		*p = value
+		return PayCurrencyEnumBgm, nil
 	case "BUK":
-		value := PayCurrencyEnumBuk
-		*p = value
+		return PayCurrencyEnumBuk, nil
 	case "BIF":
-		value := PayCurrencyEnumBif
-		*p = value
+		return PayCurrencyEnumBif, nil
 	case "XPF":
-		value := PayCurrencyEnumXpf
-		*p = value
+		return PayCurrencyEnumXpf, nil
 	case "KHR":
-		value := PayCurrencyEnumKhr
-		*p = value
+		return PayCurrencyEnumKhr, nil
 	case "CAD":
-		value := PayCurrencyEnumCad
-		*p = value
+		return PayCurrencyEnumCad, nil
 	case "CVE":
-		value := PayCurrencyEnumCve
-		*p = value
+		return PayCurrencyEnumCve, nil
 	case "KYD":
-		value := PayCurrencyEnumKyd
-		*p = value
+		return PayCurrencyEnumKyd, nil
 	case "XAF":
-		value := PayCurrencyEnumXaf
-		*p = value
+		return PayCurrencyEnumXaf, nil
 	case "CLE":
-		value := PayCurrencyEnumCle
-		*p = value
+		return PayCurrencyEnumCle, nil
 	case "CLP":
-		value := PayCurrencyEnumClp
-		*p = value
+		return PayCurrencyEnumClp, nil
 	case "CLF":
-		value := PayCurrencyEnumClf
-		*p = value
+		return PayCurrencyEnumClf, nil
 	case "CNX":
-		value := PayCurrencyEnumCnx
-		*p = value
+		return PayCurrencyEnumCnx, nil
 	case "CNY":
-		value := PayCurrencyEnumCny
-		*p = value
+		return PayCurrencyEnumCny, nil
 	case "CNH":
-		value := PayCurrencyEnumCnh
-		*p = value
+		return PayCurrencyEnumCnh, nil
 	case "COP":
-		value := PayCurrencyEnumCop
-		*p = value
+		return PayCurrencyEnumCop, nil
 	case "COU":
-		value := PayCurrencyEnumCou
-		*p = value
+		return PayCurrencyEnumCou, nil
 	case "KMF":
-		value := PayCurrencyEnumKmf
-		*p = value
+		return PayCurrencyEnumKmf, nil
 	case "CDF":
-		value := PayCurrencyEnumCdf
-		*p = value
+		return PayCurrencyEnumCdf, nil
 	case "CRC":
-		value := PayCurrencyEnumCrc
-		*p = value
+		return PayCurrencyEnumCrc, nil
 	case "HRD":
-		value := PayCurrencyEnumHrd
-		*p = value
+		return PayCurrencyEnumHrd, nil
 	case "HRK":
-		value := PayCurrencyEnumHrk
-		*p = value
+		return PayCurrencyEnumHrk, nil
 	case "CUC":
-		value := PayCurrencyEnumCuc
-		*p = value
+		return PayCurrencyEnumCuc, nil
 	case "CUP":
-		value := PayCurrencyEnumCup
-		*p = value
+		return PayCurrencyEnumCup, nil
 	case "CYP":
-		value := PayCurrencyEnumCyp
-		*p = value
+		return PayCurrencyEnumCyp, nil
 	case "CZK":
-		value := PayCurrencyEnumCzk
-		*p = value
+		return PayCurrencyEnumCzk, nil
 	case "CSK":
-		value := PayCurrencyEnumCsk
-		*p = value
+		return PayCurrencyEnumCsk, nil
 	case "DKK":
-		value := PayCurrencyEnumDkk
-		*p = value
+		return PayCurrencyEnumDkk, nil
 	case "DJF":
-		value := PayCurrencyEnumDjf
-		*p = value
+		return PayCurrencyEnumDjf, nil
 	case "DOP":
-		value := PayCurrencyEnumDop
-		*p = value
+		return PayCurrencyEnumDop, nil
 	case "NLG":
-		value := PayCurrencyEnumNlg
-		*p = value
+		return PayCurrencyEnumNlg, nil
 	case "XCD":
-		value := PayCurrencyEnumXcd
-		*p = value
+		return PayCurrencyEnumXcd, nil
 	case "DDM":
-		value := PayCurrencyEnumDdm
-		*p = value
+		return PayCurrencyEnumDdm, nil
 	case "ECS":
-		value := PayCurrencyEnumEcs
-		*p = value
+		return PayCurrencyEnumEcs, nil
 	case "ECV":
-		value := PayCurrencyEnumEcv
-		*p = value
+		return PayCurrencyEnumEcv, nil
 	case "EGP":
-		value := PayCurrencyEnumEgp
-		*p = value
+		return PayCurrencyEnumEgp, nil
 	case "GQE":
-		value := PayCurrencyEnumGqe
-		*p = value
+		return PayCurrencyEnumGqe, nil
 	case "ERN":
-		value := PayCurrencyEnumErn
-		*p = value
+		return PayCurrencyEnumErn, nil
 	case "EEK":
-		value := PayCurrencyEnumEek
-		*p = value
+		return PayCurrencyEnumEek, nil
 	case "ETB":
-		value := PayCurrencyEnumEtb
-		*p = value
+		return PayCurrencyEnumEtb, nil
 	case "EUR":
-		value := PayCurrencyEnumEur
-		*p = value
+		return PayCurrencyEnumEur, nil
 	case "XBA":
-		value := PayCurrencyEnumXba
-		*p = value
+		return PayCurrencyEnumXba, nil
 	case "XEU":
-		value := PayCurrencyEnumXeu
-		*p = value
+		return PayCurrencyEnumXeu, nil
 	case "XBB":
-		value := PayCurrencyEnumXbb
-		*p = value
+		return PayCurrencyEnumXbb, nil
 	case "XBC":
-		value := PayCurrencyEnumXbc
-		*p = value
+		return PayCurrencyEnumXbc, nil
 	case "XBD":
-		value := PayCurrencyEnumXbd
-		*p = value
+		return PayCurrencyEnumXbd, nil
 	case "FKP":
-		value := PayCurrencyEnumFkp
-		*p = value
+		return PayCurrencyEnumFkp, nil
 	case "FJD":
-		value := PayCurrencyEnumFjd
-		*p = value
+		return PayCurrencyEnumFjd, nil
 	case "FIM":
-		value := PayCurrencyEnumFim
-		*p = value
+		return PayCurrencyEnumFim, nil
 	case "FRF":
-		value := PayCurrencyEnumFrf
-		*p = value
+		return PayCurrencyEnumFrf, nil
 	case "XFO":
-		value := PayCurrencyEnumXfo
-		*p = value
+		return PayCurrencyEnumXfo, nil
 	case "XFU":
-		value := PayCurrencyEnumXfu
-		*p = value
+		return PayCurrencyEnumXfu, nil
 	case "GMD":
-		value := PayCurrencyEnumGmd
-		*p = value
+		return PayCurrencyEnumGmd, nil
 	case "GEK":
-		value := PayCurrencyEnumGek
-		*p = value
+		return PayCurrencyEnumGek, nil
 	case "GEL":
-		value := PayCurrencyEnumGel
-		*p = value
+		return PayCurrencyEnumGel, nil
 	case "DEM":
-		value := PayCurrencyEnumDem
-		*p = value
+		return PayCurrencyEnumDem, nil
 	case "GHS":
-		value := PayCurrencyEnumGhs
-		*p = value
+		return PayCurrencyEnumGhs, nil
 	case "GHC":
-		value := PayCurrencyEnumGhc
-		*p = value
+		return PayCurrencyEnumGhc, nil
 	case "GIP":
-		value := PayCurrencyEnumGip
-		*p = value
+		return PayCurrencyEnumGip, nil
 	case "XAU":
-		value := PayCurrencyEnumXau
-		*p = value
+		return PayCurrencyEnumXau, nil
 	case "GRD":
-		value := PayCurrencyEnumGrd
-		*p = value
+		return PayCurrencyEnumGrd, nil
 	case "GTQ":
-		value := PayCurrencyEnumGtq
-		*p = value
+		return PayCurrencyEnumGtq, nil
 	case "GWP":
-		value := PayCurrencyEnumGwp
-		*p = value
+		return PayCurrencyEnumGwp, nil
 	case "GNF":
-		value := PayCurrencyEnumGnf
-		*p = value
+		return PayCurrencyEnumGnf, nil
 	case "GNS":
-		value := PayCurrencyEnumGns
-		*p = value
+		return PayCurrencyEnumGns, nil
 	case "GYD":
-		value := PayCurrencyEnumGyd
-		*p = value
+		return PayCurrencyEnumGyd, nil
 	case "HTG":
-		value := PayCurrencyEnumHtg
-		*p = value
+		return PayCurrencyEnumHtg, nil
 	case "HNL":
-		value := PayCurrencyEnumHnl
-		*p = value
+		return PayCurrencyEnumHnl, nil
 	case "HKD":
-		value := PayCurrencyEnumHkd
-		*p = value
+		return PayCurrencyEnumHkd, nil
 	case "HUF":
-		value := PayCurrencyEnumHuf
-		*p = value
+		return PayCurrencyEnumHuf, nil
 	case "IMP":
-		value := PayCurrencyEnumImp
-		*p = value
+		return PayCurrencyEnumImp, nil
 	case "ISK":
-		value := PayCurrencyEnumIsk
-		*p = value
+		return PayCurrencyEnumIsk, nil
 	case "ISJ":
-		value := PayCurrencyEnumIsj
-		*p = value
+		return PayCurrencyEnumIsj, nil
 	case "INR":
-		value := PayCurrencyEnumInr
-		*p = value
+		return PayCurrencyEnumInr, nil
 	case "IDR":
-		value := PayCurrencyEnumIdr
-		*p = value
+		return PayCurrencyEnumIdr, nil
 	case "IRR":
-		value := PayCurrencyEnumIrr
-		*p = value
+		return PayCurrencyEnumIrr, nil
 	case "IQD":
-		value := PayCurrencyEnumIqd
-		*p = value
+		return PayCurrencyEnumIqd, nil
 	case "IEP":
-		value := PayCurrencyEnumIep
-		*p = value
+		return PayCurrencyEnumIep, nil
 	case "ILS":
-		value := PayCurrencyEnumIls
-		*p = value
+		return PayCurrencyEnumIls, nil
 	case "ILP":
-		value := PayCurrencyEnumIlp
-		*p = value
+		return PayCurrencyEnumIlp, nil
 	case "ILR":
-		value := PayCurrencyEnumIlr
-		*p = value
+		return PayCurrencyEnumIlr, nil
 	case "ITL":
-		value := PayCurrencyEnumItl
-		*p = value
+		return PayCurrencyEnumItl, nil
 	case "JMD":
-		value := PayCurrencyEnumJmd
-		*p = value
+		return PayCurrencyEnumJmd, nil
 	case "JPY":
-		value := PayCurrencyEnumJpy
-		*p = value
+		return PayCurrencyEnumJpy, nil
 	case "JOD":
-		value := PayCurrencyEnumJod
-		*p = value
+		return PayCurrencyEnumJod, nil
 	case "KZT":
-		value := PayCurrencyEnumKzt
-		*p = value
+		return PayCurrencyEnumKzt, nil
 	case "KES":
-		value := PayCurrencyEnumKes
-		*p = value
+		return PayCurrencyEnumKes, nil
 	case "KWD":
-		value := PayCurrencyEnumKwd
-		*p = value
+		return PayCurrencyEnumKwd, nil
 	case "KGS":
-		value := PayCurrencyEnumKgs
-		*p = value
+		return PayCurrencyEnumKgs, nil
 	case "LAK":
-		value := PayCurrencyEnumLak
-		*p = value
+		return PayCurrencyEnumLak, nil
 	case "LVL":
-		value := PayCurrencyEnumLvl
-		*p = value
+		return PayCurrencyEnumLvl, nil
 	case "LVR":
-		value := PayCurrencyEnumLvr
-		*p = value
+		return PayCurrencyEnumLvr, nil
 	case "LBP":
-		value := PayCurrencyEnumLbp
-		*p = value
+		return PayCurrencyEnumLbp, nil
 	case "LSL":
-		value := PayCurrencyEnumLsl
-		*p = value
+		return PayCurrencyEnumLsl, nil
 	case "LRD":
-		value := PayCurrencyEnumLrd
-		*p = value
+		return PayCurrencyEnumLrd, nil
 	case "LYD":
-		value := PayCurrencyEnumLyd
-		*p = value
+		return PayCurrencyEnumLyd, nil
 	case "LTL":
-		value := PayCurrencyEnumLtl
-		*p = value
+		return PayCurrencyEnumLtl, nil
 	case "LTT":
-		value := PayCurrencyEnumLtt
-		*p = value
+		return PayCurrencyEnumLtt, nil
 	case "LUL":
-		value := PayCurrencyEnumLul
-		*p = value
+		return PayCurrencyEnumLul, nil
 	case "LUC":
-		value := PayCurrencyEnumLuc
-		*p = value
+		return PayCurrencyEnumLuc, nil
 	case "LUF":
-		value := PayCurrencyEnumLuf
-		*p = value
+		return PayCurrencyEnumLuf, nil
 	case "MOP":
-		value := PayCurrencyEnumMop
-		*p = value
+		return PayCurrencyEnumMop, nil
 	case "MKD":
-		value := PayCurrencyEnumMkd
-		*p = value
+		return PayCurrencyEnumMkd, nil
 	case "MKN":
-		value := PayCurrencyEnumMkn
-		*p = value
+		return PayCurrencyEnumMkn, nil
 	case "MGA":
-		value := PayCurrencyEnumMga
-		*p = value
+		return PayCurrencyEnumMga, nil
 	case "MGF":
-		value := PayCurrencyEnumMgf
-		*p = value
+		return PayCurrencyEnumMgf, nil
 	case "MWK":
-		value := PayCurrencyEnumMwk
-		*p = value
+		return PayCurrencyEnumMwk, nil
 	case "MYR":
-		value := PayCurrencyEnumMyr
-		*p = value
+		return PayCurrencyEnumMyr, nil
 	case "MVR":
-		value := PayCurrencyEnumMvr
-		*p = value
+		return PayCurrencyEnumMvr, nil
 	case "MVP":
-		value := PayCurrencyEnumMvp
-		*p = value
+		return PayCurrencyEnumMvp, nil
 	case "MLF":
-		value := PayCurrencyEnumMlf
-		*p = value
+		return PayCurrencyEnumMlf, nil
 	case "MTL":
-		value := PayCurrencyEnumMtl
-		*p = value
+		return PayCurrencyEnumMtl, nil
 	case "MTP":
-		value := PayCurrencyEnumMtp
-		*p = value
+		return PayCurrencyEnumMtp, nil
 	case "MRU":
-		value := PayCurrencyEnumMru
-		*p = value
+		return PayCurrencyEnumMru, nil
 	case "MRO":
-		value := PayCurrencyEnumMro
-		*p = value
+		return PayCurrencyEnumMro, nil
 	case "MUR":
-		value := PayCurrencyEnumMur
-		*p = value
+		return PayCurrencyEnumMur, nil
 	case "MXV":
-		value := PayCurrencyEnumMxv
-		*p = value
+		return PayCurrencyEnumMxv, nil
 	case "MXN":
-		value := PayCurrencyEnumMxn
-		*p = value
+		return PayCurrencyEnumMxn, nil
 	case "MXP":
-		value := PayCurrencyEnumMxp
-		*p = value
+		return PayCurrencyEnumMxp, nil
 	case "MDC":
-		value := PayCurrencyEnumMdc
-		*p = value
+		return PayCurrencyEnumMdc, nil
 	case "MDL":
-		value := PayCurrencyEnumMdl
-		*p = value
+		return PayCurrencyEnumMdl, nil
 	case "MCF":
-		value := PayCurrencyEnumMcf
-		*p = value
+		return PayCurrencyEnumMcf, nil
 	case "MNT":
-		value := PayCurrencyEnumMnt
-		*p = value
+		return PayCurrencyEnumMnt, nil
 	case "MAD":
-		value := PayCurrencyEnumMad
-		*p = value
+		return PayCurrencyEnumMad, nil
 	case "MAF":
-		value := PayCurrencyEnumMaf
-		*p = value
+		return PayCurrencyEnumMaf, nil
 	case "MZE":
-		value := PayCurrencyEnumMze
-		*p = value
+		return PayCurrencyEnumMze, nil
 	case "MZN":
-		value := PayCurrencyEnumMzn
-		*p = value
+		return PayCurrencyEnumMzn, nil
 	case "MZM":
-		value := PayCurrencyEnumMzm
-		*p = value
+		return PayCurrencyEnumMzm, nil
 	case "MMK":
-		value := PayCurrencyEnumMmk
-		*p = value
+		return PayCurrencyEnumMmk, nil
 	case "NAD":
-		value := PayCurrencyEnumNad
-		*p = value
+		return PayCurrencyEnumNad, nil
 	case "NPR":
-		value := PayCurrencyEnumNpr
-		*p = value
+		return PayCurrencyEnumNpr, nil
 	case "ANG":
-		value := PayCurrencyEnumAng
-		*p = value
+		return PayCurrencyEnumAng, nil
 	case "TWD":
-		value := PayCurrencyEnumTwd
-		*p = value
+		return PayCurrencyEnumTwd, nil
 	case "NZD":
-		value := PayCurrencyEnumNzd
-		*p = value
+		return PayCurrencyEnumNzd, nil
 	case "NIO":
-		value := PayCurrencyEnumNio
-		*p = value
+		return PayCurrencyEnumNio, nil
 	case "NIC":
-		value := PayCurrencyEnumNic
-		*p = value
+		return PayCurrencyEnumNic, nil
 	case "NGN":
-		value := PayCurrencyEnumNgn
-		*p = value
+		return PayCurrencyEnumNgn, nil
 	case "KPW":
-		value := PayCurrencyEnumKpw
-		*p = value
+		return PayCurrencyEnumKpw, nil
 	case "NOK":
-		value := PayCurrencyEnumNok
-		*p = value
+		return PayCurrencyEnumNok, nil
 	case "OMR":
-		value := PayCurrencyEnumOmr
-		*p = value
+		return PayCurrencyEnumOmr, nil
 	case "PKR":
-		value := PayCurrencyEnumPkr
-		*p = value
+		return PayCurrencyEnumPkr, nil
 	case "XPD":
-		value := PayCurrencyEnumXpd
-		*p = value
+		return PayCurrencyEnumXpd, nil
 	case "PAB":
-		value := PayCurrencyEnumPab
-		*p = value
+		return PayCurrencyEnumPab, nil
 	case "PGK":
-		value := PayCurrencyEnumPgk
-		*p = value
+		return PayCurrencyEnumPgk, nil
 	case "PYG":
-		value := PayCurrencyEnumPyg
-		*p = value
+		return PayCurrencyEnumPyg, nil
 	case "PEI":
-		value := PayCurrencyEnumPei
-		*p = value
+		return PayCurrencyEnumPei, nil
 	case "PEN":
-		value := PayCurrencyEnumPen
-		*p = value
+		return PayCurrencyEnumPen, nil
 	case "PES":
-		value := PayCurrencyEnumPes
-		*p = value
+		return PayCurrencyEnumPes, nil
 	case "PHP":
-		value := PayCurrencyEnumPhp
-		*p = value
+		return PayCurrencyEnumPhp, nil
 	case "XPT":
-		value := PayCurrencyEnumXpt
-		*p = value
+		return PayCurrencyEnumXpt, nil
 	case "PLN":
-		value := PayCurrencyEnumPln
-		*p = value
+		return PayCurrencyEnumPln, nil
 	case "PLZ":
-		value := PayCurrencyEnumPlz
-		*p = value
+		return PayCurrencyEnumPlz, nil
 	case "PTE":
-		value := PayCurrencyEnumPte
-		*p = value
+		return PayCurrencyEnumPte, nil
 	case "GWE":
-		value := PayCurrencyEnumGwe
-		*p = value
+		return PayCurrencyEnumGwe, nil
 	case "QAR":
-		value := PayCurrencyEnumQar
-		*p = value
+		return PayCurrencyEnumQar, nil
 	case "XRE":
-		value := PayCurrencyEnumXre
-		*p = value
+		return PayCurrencyEnumXre, nil
 	case "RHD":
-		value := PayCurrencyEnumRhd
-		*p = value
+		return PayCurrencyEnumRhd, nil
 	case "RON":
-		value := PayCurrencyEnumRon
-		*p = value
+		return PayCurrencyEnumRon, nil
 	case "ROL":
-		value := PayCurrencyEnumRol
-		*p = value
+		return PayCurrencyEnumRol, nil
 	case "RUB":
-		value := PayCurrencyEnumRub
-		*p = value
+		return PayCurrencyEnumRub, nil
 	case "RUR":
-		value := PayCurrencyEnumRur
-		*p = value
+		return PayCurrencyEnumRur, nil
 	case "RWF":
-		value := PayCurrencyEnumRwf
-		*p = value
+		return PayCurrencyEnumRwf, nil
 	case "SVC":
-		value := PayCurrencyEnumSvc
-		*p = value
+		return PayCurrencyEnumSvc, nil
 	case "WST":
-		value := PayCurrencyEnumWst
-		*p = value
+		return PayCurrencyEnumWst, nil
 	case "SAR":
-		value := PayCurrencyEnumSar
-		*p = value
+		return PayCurrencyEnumSar, nil
 	case "RSD":
-		value := PayCurrencyEnumRsd
-		*p = value
+		return PayCurrencyEnumRsd, nil
 	case "CSD":
-		value := PayCurrencyEnumCsd
-		*p = value
+		return PayCurrencyEnumCsd, nil
 	case "SCR":
-		value := PayCurrencyEnumScr
-		*p = value
+		return PayCurrencyEnumScr, nil
 	case "SLL":
-		value := PayCurrencyEnumSll
-		*p = value
+		return PayCurrencyEnumSll, nil
 	case "XAG":
-		value := PayCurrencyEnumXag
-		*p = value
+		return PayCurrencyEnumXag, nil
 	case "SGD":
-		value := PayCurrencyEnumSgd
-		*p = value
+		return PayCurrencyEnumSgd, nil
 	case "SKK":
-		value := PayCurrencyEnumSkk
-		*p = value
+		return PayCurrencyEnumSkk, nil
 	case "SIT":
-		value := PayCurrencyEnumSit
-		*p = value
+		return PayCurrencyEnumSit, nil
 	case "SBD":
-		value := PayCurrencyEnumSbd
-		*p = value
+		return PayCurrencyEnumSbd, nil
 	case "SOS":
-		value := PayCurrencyEnumSos
-		*p = value
+		return PayCurrencyEnumSos, nil
 	case "ZAR":
-		value := PayCurrencyEnumZar
-		*p = value
+		return PayCurrencyEnumZar, nil
 	case "ZAL":
-		value := PayCurrencyEnumZal
-		*p = value
+		return PayCurrencyEnumZal, nil
 	case "KRH":
-		value := PayCurrencyEnumKrh
-		*p = value
+		return PayCurrencyEnumKrh, nil
 	case "KRW":
-		value := PayCurrencyEnumKrw
-		*p = value
+		return PayCurrencyEnumKrw, nil
 	case "KRO":
-		value := PayCurrencyEnumKro
-		*p = value
+		return PayCurrencyEnumKro, nil
 	case "SSP":
-		value := PayCurrencyEnumSsp
-		*p = value
+		return PayCurrencyEnumSsp, nil
 	case "SUR":
-		value := PayCurrencyEnumSur
-		*p = value
+		return PayCurrencyEnumSur, nil
 	case "ESP":
-		value := PayCurrencyEnumEsp
-		*p = value
+		return PayCurrencyEnumEsp, nil
 	case "ESA":
-		value := PayCurrencyEnumEsa
-		*p = value
+		return PayCurrencyEnumEsa, nil
 	case "ESB":
-		value := PayCurrencyEnumEsb
-		*p = value
+		return PayCurrencyEnumEsb, nil
 	case "XDR":
-		value := PayCurrencyEnumXdr
-		*p = value
+		return PayCurrencyEnumXdr, nil
 	case "LKR":
-		value := PayCurrencyEnumLkr
-		*p = value
+		return PayCurrencyEnumLkr, nil
 	case "SHP":
-		value := PayCurrencyEnumShp
-		*p = value
+		return PayCurrencyEnumShp, nil
 	case "XSU":
-		value := PayCurrencyEnumXsu
-		*p = value
+		return PayCurrencyEnumXsu, nil
 	case "SDD":
-		value := PayCurrencyEnumSdd
-		*p = value
+		return PayCurrencyEnumSdd, nil
 	case "SDG":
-		value := PayCurrencyEnumSdg
-		*p = value
+		return PayCurrencyEnumSdg, nil
 	case "SDP":
-		value := PayCurrencyEnumSdp
-		*p = value
+		return PayCurrencyEnumSdp, nil
 	case "SRD":
-		value := PayCurrencyEnumSrd
-		*p = value
+		return PayCurrencyEnumSrd, nil
 	case "SRG":
-		value := PayCurrencyEnumSrg
-		*p = value
+		return PayCurrencyEnumSrg, nil
 	case "SZL":
-		value := PayCurrencyEnumSzl
-		*p = value
+		return PayCurrencyEnumSzl, nil
 	case "SEK":
-		value := PayCurrencyEnumSek
-		*p = value
+		return PayCurrencyEnumSek, nil
 	case "CHF":
-		value := PayCurrencyEnumChf
-		*p = value
+		return PayCurrencyEnumChf, nil
 	case "SYP":
-		value := PayCurrencyEnumSyp
-		*p = value
+		return PayCurrencyEnumSyp, nil
 	case "STN":
-		value := PayCurrencyEnumStn
-		*p = value
+		return PayCurrencyEnumStn, nil
 	case "STD":
-		value := PayCurrencyEnumStd
-		*p = value
+		return PayCurrencyEnumStd, nil
 	case "TVD":
-		value := PayCurrencyEnumTvd
-		*p = value
+		return PayCurrencyEnumTvd, nil
 	case "TJR":
-		value := PayCurrencyEnumTjr
-		*p = value
+		return PayCurrencyEnumTjr, nil
 	case "TJS":
-		value := PayCurrencyEnumTjs
-		*p = value
+		return PayCurrencyEnumTjs, nil
 	case "TZS":
-		value := PayCurrencyEnumTzs
-		*p = value
+		return PayCurrencyEnumTzs, nil
 	case "XTS":
-		value := PayCurrencyEnumXts
-		*p = value
+		return PayCurrencyEnumXts, nil
 	case "THB":
-		value := PayCurrencyEnumThb
-		*p = value
+		return PayCurrencyEnumThb, nil
 	case "XXX":
-		value := PayCurrencyEnumXxx
-		*p = value
+		return PayCurrencyEnumXxx, nil
 	case "TPE":
-		value := PayCurrencyEnumTpe
-		*p = value
+		return PayCurrencyEnumTpe, nil
 	case "TOP":
-		value := PayCurrencyEnumTop
-		*p = value
+		return PayCurrencyEnumTop, nil
 	case "TTD":
-		value := PayCurrencyEnumTtd
-		*p = value
+		return PayCurrencyEnumTtd, nil
 	case "TND":
-		value := PayCurrencyEnumTnd
-		*p = value
+		return PayCurrencyEnumTnd, nil
 	case "TRY":
-		value := PayCurrencyEnumTry
-		*p = value
+		return PayCurrencyEnumTry, nil
 	case "TRL":
-		value := PayCurrencyEnumTrl
-		*p = value
+		return PayCurrencyEnumTrl, nil
 	case "TMT":
-		value := PayCurrencyEnumTmt
-		*p = value
+		return PayCurrencyEnumTmt, nil
 	case "TMM":
-		value := PayCurrencyEnumTmm
-		*p = value
+		return PayCurrencyEnumTmm, nil
 	case "USD":
-		value := PayCurrencyEnumUsd
-		*p = value
+		return PayCurrencyEnumUsd, nil
 	case "USN":
-		value := PayCurrencyEnumUsn
-		*p = value
+		return PayCurrencyEnumUsn, nil
 	case "USS":
-		value := PayCurrencyEnumUss
-		*p = value
+		return PayCurrencyEnumUss, nil
 	case "UGX":
-		value := PayCurrencyEnumUgx
-		*p = value
+		return PayCurrencyEnumUgx, nil
 	case "UGS":
-		value := PayCurrencyEnumUgs
-		*p = value
+		return PayCurrencyEnumUgs, nil
 	case "UAH":
-		value := PayCurrencyEnumUah
-		*p = value
+		return PayCurrencyEnumUah, nil
 	case "UAK":
-		value := PayCurrencyEnumUak
-		*p = value
+		return PayCurrencyEnumUak, nil
 	case "AED":
-		value := PayCurrencyEnumAed
-		*p = value
+		return PayCurrencyEnumAed, nil
 	case "UYW":
-		value := PayCurrencyEnumUyw
-		*p = value
+		return PayCurrencyEnumUyw, nil
 	case "UYU":
-		value := PayCurrencyEnumUyu
-		*p = value
+		return PayCurrencyEnumUyu, nil
 	case "UYP":
-		value := PayCurrencyEnumUyp
-		*p = value
+		return PayCurrencyEnumUyp, nil
 	case "UYI":
-		value := PayCurrencyEnumUyi
-		*p = value
+		return PayCurrencyEnumUyi, nil
 	case "UZS":
-		value := PayCurrencyEnumUzs
-		*p = value
+		return PayCurrencyEnumUzs, nil
 	case "VUV":
-		value := PayCurrencyEnumVuv
-		*p = value
+		return PayCurrencyEnumVuv, nil
 	case "VES":
-		value := PayCurrencyEnumVes
-		*p = value
+		return PayCurrencyEnumVes, nil
 	case "VEB":
-		value := PayCurrencyEnumVeb
-		*p = value
+		return PayCurrencyEnumVeb, nil
 	case "VEF":
-		value := PayCurrencyEnumVef
-		*p = value
+		return PayCurrencyEnumVef, nil
 	case "VND":
-		value := PayCurrencyEnumVnd
-		*p = value
+		return PayCurrencyEnumVnd, nil
 	case "VNN":
-		value := PayCurrencyEnumVnn
-		*p = value
+		return PayCurrencyEnumVnn, nil
 	case "CHE":
-		value := PayCurrencyEnumChe
-		*p = value
+		return PayCurrencyEnumChe, nil
 	case "CHW":
-		value := PayCurrencyEnumChw
-		*p = value
+		return PayCurrencyEnumChw, nil
 	case "XOF":
-		value := PayCurrencyEnumXof
-		*p = value
+		return PayCurrencyEnumXof, nil
 	case "YDD":
-		value := PayCurrencyEnumYdd
-		*p = value
+		return PayCurrencyEnumYdd, nil
 	case "YER":
-		value := PayCurrencyEnumYer
-		*p = value
+		return PayCurrencyEnumYer, nil
 	case "YUN":
-		value := PayCurrencyEnumYun
-		*p = value
+		return PayCurrencyEnumYun, nil
 	case "YUD":
-		value := PayCurrencyEnumYud
-		*p = value
+		return PayCurrencyEnumYud, nil
 	case "YUM":
-		value := PayCurrencyEnumYum
-		*p = value
+		return PayCurrencyEnumYum, nil
 	case "YUR":
-		value := PayCurrencyEnumYur
-		*p = value
+		return PayCurrencyEnumYur, nil
 	case "ZWN":
-		value := PayCurrencyEnumZwn
-		*p = value
+		return PayCurrencyEnumZwn, nil
 	case "ZRN":
-		value := PayCurrencyEnumZrn
-		*p = value
+		return PayCurrencyEnumZrn, nil
 	case "ZRZ":
-		value := PayCurrencyEnumZrz
-		*p = value
+		return PayCurrencyEnumZrz, nil
 	case "ZMW":
-		value := PayCurrencyEnumZmw
-		*p = value
+		return PayCurrencyEnumZmw, nil
 	case "ZMK":
-		value := PayCurrencyEnumZmk
-		*p = value
+		return PayCurrencyEnumZmk, nil
 	case "ZWD":
-		value := PayCurrencyEnumZwd
-		*p = value
+		return PayCurrencyEnumZwd, nil
 	case "ZWR":
-		value := PayCurrencyEnumZwr
-		*p = value
+		return PayCurrencyEnumZwr, nil
 	case "ZWL":
-		value := PayCurrencyEnumZwl
-		*p = value
+		return PayCurrencyEnumZwl, nil
 	}
-	return nil
+	var t PayCurrencyEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `WEEKLY` - WEEKLY
-// * `BIWEEKLY` - BIWEEKLY
-// * `MONTHLY` - MONTHLY
-// * `QUARTERLY` - QUARTERLY
-// * `SEMIANNUALLY` - SEMIANNUALLY
-// * `ANNUALLY` - ANNUALLY
-// * `THIRTEEN-MONTHLY` - THIRTEEN-MONTHLY
-// * `PRO_RATA` - PRO_RATA
-// * `SEMIMONTHLY` - SEMIMONTHLY
-type PayFrequencyEnum uint
+func (p PayCurrencyEnum) Ptr() *PayCurrencyEnum {
+	return &p
+}
+
+// - `WEEKLY` - WEEKLY
+// - `BIWEEKLY` - BIWEEKLY
+// - `MONTHLY` - MONTHLY
+// - `QUARTERLY` - QUARTERLY
+// - `SEMIANNUALLY` - SEMIANNUALLY
+// - `ANNUALLY` - ANNUALLY
+// - `THIRTEEN-MONTHLY` - THIRTEEN-MONTHLY
+// - `PRO_RATA` - PRO_RATA
+// - `SEMIMONTHLY` - SEMIMONTHLY
+type PayFrequencyEnum string
 
 const (
-	PayFrequencyEnumWeekly PayFrequencyEnum = iota + 1
-	PayFrequencyEnumBiweekly
-	PayFrequencyEnumMonthly
-	PayFrequencyEnumQuarterly
-	PayFrequencyEnumSemiannually
-	PayFrequencyEnumAnnually
-	PayFrequencyEnumThirteenMonthly
-	PayFrequencyEnumProRata
-	PayFrequencyEnumSemimonthly
+	PayFrequencyEnumWeekly          PayFrequencyEnum = "WEEKLY"
+	PayFrequencyEnumBiweekly        PayFrequencyEnum = "BIWEEKLY"
+	PayFrequencyEnumMonthly         PayFrequencyEnum = "MONTHLY"
+	PayFrequencyEnumQuarterly       PayFrequencyEnum = "QUARTERLY"
+	PayFrequencyEnumSemiannually    PayFrequencyEnum = "SEMIANNUALLY"
+	PayFrequencyEnumAnnually        PayFrequencyEnum = "ANNUALLY"
+	PayFrequencyEnumThirteenMonthly PayFrequencyEnum = "THIRTEEN-MONTHLY"
+	PayFrequencyEnumProRata         PayFrequencyEnum = "PRO_RATA"
+	PayFrequencyEnumSemimonthly     PayFrequencyEnum = "SEMIMONTHLY"
 )
 
-func (p PayFrequencyEnum) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayFrequencyEnumWeekly:
-		return "WEEKLY"
-	case PayFrequencyEnumBiweekly:
-		return "BIWEEKLY"
-	case PayFrequencyEnumMonthly:
-		return "MONTHLY"
-	case PayFrequencyEnumQuarterly:
-		return "QUARTERLY"
-	case PayFrequencyEnumSemiannually:
-		return "SEMIANNUALLY"
-	case PayFrequencyEnumAnnually:
-		return "ANNUALLY"
-	case PayFrequencyEnumThirteenMonthly:
-		return "THIRTEEN-MONTHLY"
-	case PayFrequencyEnumProRata:
-		return "PRO_RATA"
-	case PayFrequencyEnumSemimonthly:
-		return "SEMIMONTHLY"
-	}
-}
-
-func (p PayFrequencyEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayFrequencyEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewPayFrequencyEnumFromString(s string) (PayFrequencyEnum, error) {
+	switch s {
 	case "WEEKLY":
-		value := PayFrequencyEnumWeekly
-		*p = value
+		return PayFrequencyEnumWeekly, nil
 	case "BIWEEKLY":
-		value := PayFrequencyEnumBiweekly
-		*p = value
+		return PayFrequencyEnumBiweekly, nil
 	case "MONTHLY":
-		value := PayFrequencyEnumMonthly
-		*p = value
+		return PayFrequencyEnumMonthly, nil
 	case "QUARTERLY":
-		value := PayFrequencyEnumQuarterly
-		*p = value
+		return PayFrequencyEnumQuarterly, nil
 	case "SEMIANNUALLY":
-		value := PayFrequencyEnumSemiannually
-		*p = value
+		return PayFrequencyEnumSemiannually, nil
 	case "ANNUALLY":
-		value := PayFrequencyEnumAnnually
-		*p = value
+		return PayFrequencyEnumAnnually, nil
 	case "THIRTEEN-MONTHLY":
-		value := PayFrequencyEnumThirteenMonthly
-		*p = value
+		return PayFrequencyEnumThirteenMonthly, nil
 	case "PRO_RATA":
-		value := PayFrequencyEnumProRata
-		*p = value
+		return PayFrequencyEnumProRata, nil
 	case "SEMIMONTHLY":
-		value := PayFrequencyEnumSemimonthly
-		*p = value
+		return PayFrequencyEnumSemimonthly, nil
 	}
-	return nil
+	var t PayFrequencyEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayFrequencyEnum) Ptr() *PayFrequencyEnum {
+	return &p
 }
 
 // # The PayGroup Object
+//
 // ### Description
+//
 // The `PayGroup` object is used to represent a subset of employees that are put together for payroll processing purposes.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST PayGroup` endpoint and filter by `ID` to show all pay group information.
 type PayGroup struct {
 	Id *string `json:"id,omitempty"`
@@ -15073,105 +9785,96 @@ type PayGroup struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `HOUR` - HOUR
-// * `DAY` - DAY
-// * `WEEK` - WEEK
-// * `EVERY_TWO_WEEKS` - EVERY_TWO_WEEKS
-// * `SEMIMONTHLY` - SEMIMONTHLY
-// * `MONTH` - MONTH
-// * `QUARTER` - QUARTER
-// * `EVERY_SIX_MONTHS` - EVERY_SIX_MONTHS
-// * `YEAR` - YEAR
-type PayPeriodEnum uint
-
-const (
-	PayPeriodEnumHour PayPeriodEnum = iota + 1
-	PayPeriodEnumDay
-	PayPeriodEnumWeek
-	PayPeriodEnumEveryTwoWeeks
-	PayPeriodEnumSemimonthly
-	PayPeriodEnumMonth
-	PayPeriodEnumQuarter
-	PayPeriodEnumEverySixMonths
-	PayPeriodEnumYear
-)
-
-func (p PayPeriodEnum) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayPeriodEnumHour:
-		return "HOUR"
-	case PayPeriodEnumDay:
-		return "DAY"
-	case PayPeriodEnumWeek:
-		return "WEEK"
-	case PayPeriodEnumEveryTwoWeeks:
-		return "EVERY_TWO_WEEKS"
-	case PayPeriodEnumSemimonthly:
-		return "SEMIMONTHLY"
-	case PayPeriodEnumMonth:
-		return "MONTH"
-	case PayPeriodEnumQuarter:
-		return "QUARTER"
-	case PayPeriodEnumEverySixMonths:
-		return "EVERY_SIX_MONTHS"
-	case PayPeriodEnumYear:
-		return "YEAR"
-	}
-}
-
-func (p PayPeriodEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayPeriodEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (p *PayGroup) UnmarshalJSON(data []byte) error {
+	type unmarshaler PayGroup
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "HOUR":
-		value := PayPeriodEnumHour
-		*p = value
-	case "DAY":
-		value := PayPeriodEnumDay
-		*p = value
-	case "WEEK":
-		value := PayPeriodEnumWeek
-		*p = value
-	case "EVERY_TWO_WEEKS":
-		value := PayPeriodEnumEveryTwoWeeks
-		*p = value
-	case "SEMIMONTHLY":
-		value := PayPeriodEnumSemimonthly
-		*p = value
-	case "MONTH":
-		value := PayPeriodEnumMonth
-		*p = value
-	case "QUARTER":
-		value := PayPeriodEnumQuarter
-		*p = value
-	case "EVERY_SIX_MONTHS":
-		value := PayPeriodEnumEverySixMonths
-		*p = value
-	case "YEAR":
-		value := PayPeriodEnumYear
-		*p = value
-	}
+	*p = PayGroup(value)
+	p._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (p *PayGroup) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// - `HOUR` - HOUR
+// - `DAY` - DAY
+// - `WEEK` - WEEK
+// - `EVERY_TWO_WEEKS` - EVERY_TWO_WEEKS
+// - `SEMIMONTHLY` - SEMIMONTHLY
+// - `MONTH` - MONTH
+// - `QUARTER` - QUARTER
+// - `EVERY_SIX_MONTHS` - EVERY_SIX_MONTHS
+// - `YEAR` - YEAR
+type PayPeriodEnum string
+
+const (
+	PayPeriodEnumHour           PayPeriodEnum = "HOUR"
+	PayPeriodEnumDay            PayPeriodEnum = "DAY"
+	PayPeriodEnumWeek           PayPeriodEnum = "WEEK"
+	PayPeriodEnumEveryTwoWeeks  PayPeriodEnum = "EVERY_TWO_WEEKS"
+	PayPeriodEnumSemimonthly    PayPeriodEnum = "SEMIMONTHLY"
+	PayPeriodEnumMonth          PayPeriodEnum = "MONTH"
+	PayPeriodEnumQuarter        PayPeriodEnum = "QUARTER"
+	PayPeriodEnumEverySixMonths PayPeriodEnum = "EVERY_SIX_MONTHS"
+	PayPeriodEnumYear           PayPeriodEnum = "YEAR"
+)
+
+func NewPayPeriodEnumFromString(s string) (PayPeriodEnum, error) {
+	switch s {
+	case "HOUR":
+		return PayPeriodEnumHour, nil
+	case "DAY":
+		return PayPeriodEnumDay, nil
+	case "WEEK":
+		return PayPeriodEnumWeek, nil
+	case "EVERY_TWO_WEEKS":
+		return PayPeriodEnumEveryTwoWeeks, nil
+	case "SEMIMONTHLY":
+		return PayPeriodEnumSemimonthly, nil
+	case "MONTH":
+		return PayPeriodEnumMonth, nil
+	case "QUARTER":
+		return PayPeriodEnumQuarter, nil
+	case "EVERY_SIX_MONTHS":
+		return PayPeriodEnumEverySixMonths, nil
+	case "YEAR":
+		return PayPeriodEnumYear, nil
+	}
+	var t PayPeriodEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PayPeriodEnum) Ptr() *PayPeriodEnum {
+	return &p
+}
+
 // # The PayrollRun Object
+//
 // ### Description
+//
 // The `PayrollRun` object is used to represent a group of pay statements for a specific pay schedule.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST PayrollRuns` endpoint and filter by `ID` to show all payroll runs.
 type PayrollRun struct {
 	Id *string `json:"id,omitempty"`
@@ -15179,19 +9882,19 @@ type PayrollRun struct {
 	RemoteId *string `json:"remote_id,omitempty"`
 	// The state of the payroll run
 	//
-	// * `PAID` - PAID
-	// * `DRAFT` - DRAFT
-	// * `APPROVED` - APPROVED
-	// * `FAILED` - FAILED
-	// * `CLOSED` - CLOSED
+	// - `PAID` - PAID
+	// - `DRAFT` - DRAFT
+	// - `APPROVED` - APPROVED
+	// - `FAILED` - FAILED
+	// - `CLOSED` - CLOSED
 	RunState *PayrollRunRunState `json:"run_state,omitempty"`
 	// The type of the payroll run
 	//
-	// * `REGULAR` - REGULAR
-	// * `OFF_CYCLE` - OFF_CYCLE
-	// * `CORRECTION` - CORRECTION
-	// * `TERMINATION` - TERMINATION
-	// * `SIGN_ON_BONUS` - SIGN_ON_BONUS
+	// - `REGULAR` - REGULAR
+	// - `OFF_CYCLE` - OFF_CYCLE
+	// - `CORRECTION` - CORRECTION
+	// - `TERMINATION` - TERMINATION
+	// - `SIGN_ON_BONUS` - SIGN_ON_BONUS
 	RunType *PayrollRunRunType `json:"run_type,omitempty"`
 	// The day and time the payroll run started.
 	StartDate *time.Time `json:"start_date,omitempty"`
@@ -15203,18 +9906,43 @@ type PayrollRun struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PayrollRun) UnmarshalJSON(data []byte) error {
+	type unmarshaler PayrollRun
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PayrollRun(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PayrollRun) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The state of the payroll run
 //
-// * `PAID` - PAID
-// * `DRAFT` - DRAFT
-// * `APPROVED` - APPROVED
-// * `FAILED` - FAILED
-// * `CLOSED` - CLOSED
+// - `PAID` - PAID
+// - `DRAFT` - DRAFT
+// - `APPROVED` - APPROVED
+// - `FAILED` - FAILED
+// - `CLOSED` - CLOSED
 type PayrollRunRunState struct {
 	typeName     string
 	RunStateEnum RunStateEnum
@@ -15274,11 +10002,11 @@ func (p *PayrollRunRunState) Accept(visitor PayrollRunRunStateVisitor) error {
 
 // The type of the payroll run
 //
-// * `REGULAR` - REGULAR
-// * `OFF_CYCLE` - OFF_CYCLE
-// * `CORRECTION` - CORRECTION
-// * `TERMINATION` - TERMINATION
-// * `SIGN_ON_BONUS` - SIGN_ON_BONUS
+// - `REGULAR` - REGULAR
+// - `OFF_CYCLE` - OFF_CYCLE
+// - `CORRECTION` - CORRECTION
+// - `TERMINATION` - TERMINATION
+// - `SIGN_ON_BONUS` - SIGN_ON_BONUS
 type PayrollRunRunType struct {
 	typeName    string
 	RunTypeEnum RunTypeEnum
@@ -15336,430 +10064,213 @@ func (p *PayrollRunRunType) Accept(visitor PayrollRunRunTypeVisitor) error {
 	}
 }
 
-type PayrollRunsListRequestRemoteFields uint
+// - `VACATION` - VACATION
+// - `SICK` - SICK
+// - `PERSONAL` - PERSONAL
+// - `JURY_DUTY` - JURY_DUTY
+// - `VOLUNTEER` - VOLUNTEER
+// - `BEREAVEMENT` - BEREAVEMENT
+type PolicyTypeEnum string
 
 const (
-	PayrollRunsListRequestRemoteFieldsRunState PayrollRunsListRequestRemoteFields = iota + 1
-	PayrollRunsListRequestRemoteFieldsRunStateRunType
-	PayrollRunsListRequestRemoteFieldsRunType
+	PolicyTypeEnumVacation    PolicyTypeEnum = "VACATION"
+	PolicyTypeEnumSick        PolicyTypeEnum = "SICK"
+	PolicyTypeEnumPersonal    PolicyTypeEnum = "PERSONAL"
+	PolicyTypeEnumJuryDuty    PolicyTypeEnum = "JURY_DUTY"
+	PolicyTypeEnumVolunteer   PolicyTypeEnum = "VOLUNTEER"
+	PolicyTypeEnumBereavement PolicyTypeEnum = "BEREAVEMENT"
 )
 
-func (p PayrollRunsListRequestRemoteFields) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayrollRunsListRequestRemoteFieldsRunState:
-		return "run_state"
-	case PayrollRunsListRequestRemoteFieldsRunStateRunType:
-		return "run_state,run_type"
-	case PayrollRunsListRequestRemoteFieldsRunType:
-		return "run_type"
-	}
-}
-
-func (p PayrollRunsListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayrollRunsListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "run_state":
-		value := PayrollRunsListRequestRemoteFieldsRunState
-		*p = value
-	case "run_state,run_type":
-		value := PayrollRunsListRequestRemoteFieldsRunStateRunType
-		*p = value
-	case "run_type":
-		value := PayrollRunsListRequestRemoteFieldsRunType
-		*p = value
-	}
-	return nil
-}
-
-type PayrollRunsListRequestRunType uint
-
-const (
-	PayrollRunsListRequestRunTypeCorrection PayrollRunsListRequestRunType = iota + 1
-	PayrollRunsListRequestRunTypeOffCycle
-	PayrollRunsListRequestRunTypeRegular
-	PayrollRunsListRequestRunTypeSignOnBonus
-	PayrollRunsListRequestRunTypeTermination
-)
-
-func (p PayrollRunsListRequestRunType) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayrollRunsListRequestRunTypeCorrection:
-		return "CORRECTION"
-	case PayrollRunsListRequestRunTypeOffCycle:
-		return "OFF_CYCLE"
-	case PayrollRunsListRequestRunTypeRegular:
-		return "REGULAR"
-	case PayrollRunsListRequestRunTypeSignOnBonus:
-		return "SIGN_ON_BONUS"
-	case PayrollRunsListRequestRunTypeTermination:
-		return "TERMINATION"
-	}
-}
-
-func (p PayrollRunsListRequestRunType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayrollRunsListRequestRunType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "CORRECTION":
-		value := PayrollRunsListRequestRunTypeCorrection
-		*p = value
-	case "OFF_CYCLE":
-		value := PayrollRunsListRequestRunTypeOffCycle
-		*p = value
-	case "REGULAR":
-		value := PayrollRunsListRequestRunTypeRegular
-		*p = value
-	case "SIGN_ON_BONUS":
-		value := PayrollRunsListRequestRunTypeSignOnBonus
-		*p = value
-	case "TERMINATION":
-		value := PayrollRunsListRequestRunTypeTermination
-		*p = value
-	}
-	return nil
-}
-
-type PayrollRunsListRequestShowEnumOrigins uint
-
-const (
-	PayrollRunsListRequestShowEnumOriginsRunState PayrollRunsListRequestShowEnumOrigins = iota + 1
-	PayrollRunsListRequestShowEnumOriginsRunStateRunType
-	PayrollRunsListRequestShowEnumOriginsRunType
-)
-
-func (p PayrollRunsListRequestShowEnumOrigins) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayrollRunsListRequestShowEnumOriginsRunState:
-		return "run_state"
-	case PayrollRunsListRequestShowEnumOriginsRunStateRunType:
-		return "run_state,run_type"
-	case PayrollRunsListRequestShowEnumOriginsRunType:
-		return "run_type"
-	}
-}
-
-func (p PayrollRunsListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayrollRunsListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "run_state":
-		value := PayrollRunsListRequestShowEnumOriginsRunState
-		*p = value
-	case "run_state,run_type":
-		value := PayrollRunsListRequestShowEnumOriginsRunStateRunType
-		*p = value
-	case "run_type":
-		value := PayrollRunsListRequestShowEnumOriginsRunType
-		*p = value
-	}
-	return nil
-}
-
-type PayrollRunsRetrieveRequestRemoteFields uint
-
-const (
-	PayrollRunsRetrieveRequestRemoteFieldsRunState PayrollRunsRetrieveRequestRemoteFields = iota + 1
-	PayrollRunsRetrieveRequestRemoteFieldsRunStateRunType
-	PayrollRunsRetrieveRequestRemoteFieldsRunType
-)
-
-func (p PayrollRunsRetrieveRequestRemoteFields) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayrollRunsRetrieveRequestRemoteFieldsRunState:
-		return "run_state"
-	case PayrollRunsRetrieveRequestRemoteFieldsRunStateRunType:
-		return "run_state,run_type"
-	case PayrollRunsRetrieveRequestRemoteFieldsRunType:
-		return "run_type"
-	}
-}
-
-func (p PayrollRunsRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayrollRunsRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "run_state":
-		value := PayrollRunsRetrieveRequestRemoteFieldsRunState
-		*p = value
-	case "run_state,run_type":
-		value := PayrollRunsRetrieveRequestRemoteFieldsRunStateRunType
-		*p = value
-	case "run_type":
-		value := PayrollRunsRetrieveRequestRemoteFieldsRunType
-		*p = value
-	}
-	return nil
-}
-
-type PayrollRunsRetrieveRequestShowEnumOrigins uint
-
-const (
-	PayrollRunsRetrieveRequestShowEnumOriginsRunState PayrollRunsRetrieveRequestShowEnumOrigins = iota + 1
-	PayrollRunsRetrieveRequestShowEnumOriginsRunStateRunType
-	PayrollRunsRetrieveRequestShowEnumOriginsRunType
-)
-
-func (p PayrollRunsRetrieveRequestShowEnumOrigins) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PayrollRunsRetrieveRequestShowEnumOriginsRunState:
-		return "run_state"
-	case PayrollRunsRetrieveRequestShowEnumOriginsRunStateRunType:
-		return "run_state,run_type"
-	case PayrollRunsRetrieveRequestShowEnumOriginsRunType:
-		return "run_type"
-	}
-}
-
-func (p PayrollRunsRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PayrollRunsRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "run_state":
-		value := PayrollRunsRetrieveRequestShowEnumOriginsRunState
-		*p = value
-	case "run_state,run_type":
-		value := PayrollRunsRetrieveRequestShowEnumOriginsRunStateRunType
-		*p = value
-	case "run_type":
-		value := PayrollRunsRetrieveRequestShowEnumOriginsRunType
-		*p = value
-	}
-	return nil
-}
-
-// * `VACATION` - VACATION
-// * `SICK` - SICK
-// * `PERSONAL` - PERSONAL
-// * `JURY_DUTY` - JURY_DUTY
-// * `VOLUNTEER` - VOLUNTEER
-// * `BEREAVEMENT` - BEREAVEMENT
-type PolicyTypeEnum uint
-
-const (
-	PolicyTypeEnumVacation PolicyTypeEnum = iota + 1
-	PolicyTypeEnumSick
-	PolicyTypeEnumPersonal
-	PolicyTypeEnumJuryDuty
-	PolicyTypeEnumVolunteer
-	PolicyTypeEnumBereavement
-)
-
-func (p PolicyTypeEnum) String() string {
-	switch p {
-	default:
-		return strconv.Itoa(int(p))
-	case PolicyTypeEnumVacation:
-		return "VACATION"
-	case PolicyTypeEnumSick:
-		return "SICK"
-	case PolicyTypeEnumPersonal:
-		return "PERSONAL"
-	case PolicyTypeEnumJuryDuty:
-		return "JURY_DUTY"
-	case PolicyTypeEnumVolunteer:
-		return "VOLUNTEER"
-	case PolicyTypeEnumBereavement:
-		return "BEREAVEMENT"
-	}
-}
-
-func (p PolicyTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", p.String())), nil
-}
-
-func (p *PolicyTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewPolicyTypeEnumFromString(s string) (PolicyTypeEnum, error) {
+	switch s {
 	case "VACATION":
-		value := PolicyTypeEnumVacation
-		*p = value
+		return PolicyTypeEnumVacation, nil
 	case "SICK":
-		value := PolicyTypeEnumSick
-		*p = value
+		return PolicyTypeEnumSick, nil
 	case "PERSONAL":
-		value := PolicyTypeEnumPersonal
-		*p = value
+		return PolicyTypeEnumPersonal, nil
 	case "JURY_DUTY":
-		value := PolicyTypeEnumJuryDuty
-		*p = value
+		return PolicyTypeEnumJuryDuty, nil
 	case "VOLUNTEER":
-		value := PolicyTypeEnumVolunteer
-		*p = value
+		return PolicyTypeEnumVolunteer, nil
 	case "BEREAVEMENT":
-		value := PolicyTypeEnumBereavement
-		*p = value
+		return PolicyTypeEnumBereavement, nil
 	}
-	return nil
+	var t PolicyTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
-// * `GDPR` - GDPR
-// * `OTHER` - OTHER
-type ReasonEnum uint
+func (p PolicyTypeEnum) Ptr() *PolicyTypeEnum {
+	return &p
+}
+
+// - `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
+// - `GDPR` - GDPR
+// - `OTHER` - OTHER
+type ReasonEnum string
 
 const (
-	ReasonEnumGeneralCustomerRequest ReasonEnum = iota + 1
-	ReasonEnumGdpr
-	ReasonEnumOther
+	ReasonEnumGeneralCustomerRequest ReasonEnum = "GENERAL_CUSTOMER_REQUEST"
+	ReasonEnumGdpr                   ReasonEnum = "GDPR"
+	ReasonEnumOther                  ReasonEnum = "OTHER"
 )
 
-func (r ReasonEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case ReasonEnumGeneralCustomerRequest:
-		return "GENERAL_CUSTOMER_REQUEST"
-	case ReasonEnumGdpr:
-		return "GDPR"
-	case ReasonEnumOther:
-		return "OTHER"
-	}
-}
-
-func (r ReasonEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *ReasonEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewReasonEnumFromString(s string) (ReasonEnum, error) {
+	switch s {
 	case "GENERAL_CUSTOMER_REQUEST":
-		value := ReasonEnumGeneralCustomerRequest
-		*r = value
+		return ReasonEnumGeneralCustomerRequest, nil
 	case "GDPR":
-		value := ReasonEnumGdpr
-		*r = value
+		return ReasonEnumGdpr, nil
 	case "OTHER":
-		value := ReasonEnumOther
-		*r = value
+		return ReasonEnumOther, nil
 	}
-	return nil
+	var t ReasonEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `CHILD` - CHILD
-// * `SPOUSE` - SPOUSE
-// * `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
-type RelationshipEnum uint
+func (r ReasonEnum) Ptr() *ReasonEnum {
+	return &r
+}
+
+// - `CHILD` - CHILD
+// - `SPOUSE` - SPOUSE
+// - `DOMESTIC_PARTNER` - DOMESTIC_PARTNER
+type RelationshipEnum string
 
 const (
-	RelationshipEnumChild RelationshipEnum = iota + 1
-	RelationshipEnumSpouse
-	RelationshipEnumDomesticPartner
+	RelationshipEnumChild           RelationshipEnum = "CHILD"
+	RelationshipEnumSpouse          RelationshipEnum = "SPOUSE"
+	RelationshipEnumDomesticPartner RelationshipEnum = "DOMESTIC_PARTNER"
 )
 
-func (r RelationshipEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RelationshipEnumChild:
-		return "CHILD"
-	case RelationshipEnumSpouse:
-		return "SPOUSE"
-	case RelationshipEnumDomesticPartner:
-		return "DOMESTIC_PARTNER"
-	}
-}
-
-func (r RelationshipEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RelationshipEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewRelationshipEnumFromString(s string) (RelationshipEnum, error) {
+	switch s {
 	case "CHILD":
-		value := RelationshipEnumChild
-		*r = value
+		return RelationshipEnumChild, nil
 	case "SPOUSE":
-		value := RelationshipEnumSpouse
-		*r = value
+		return RelationshipEnumSpouse, nil
 	case "DOMESTIC_PARTNER":
-		value := RelationshipEnumDomesticPartner
-		*r = value
+		return RelationshipEnumDomesticPartner, nil
 	}
-	return nil
+	var t RelationshipEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RelationshipEnum) Ptr() *RelationshipEnum {
+	return &r
 }
 
 type RemoteData struct {
-	Path string `json:"path"`
-	Data *any   `json:"data,omitempty"`
+	Path string      `json:"path"`
+	Data interface{} `json:"data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteData) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteData
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteData(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteData) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 // # The RemoteKey Object
+//
 // ### Description
+//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
+//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
 	Key  string `json:"key"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteKey) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteKey
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteKey(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteKey) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 // # The RemoteResponse Object
+//
 // ### Description
+//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
+//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
 	Method          string                      `json:"method"`
 	Path            string                      `json:"path"`
 	Status          int                         `json:"status"`
-	Response        any                         `json:"response,omitempty"`
-	ResponseHeaders map[string]any              `json:"response_headers,omitempty"`
+	Response        interface{}                 `json:"response,omitempty"`
+	ResponseHeaders map[string]interface{}      `json:"response_headers,omitempty"`
 	ResponseType    *RemoteResponseResponseType `json:"response_type,omitempty"`
-	Headers         map[string]any              `json:"headers,omitempty"`
+	Headers         map[string]interface{}      `json:"headers,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteResponse(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteResponse) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteResponseResponseType struct {
@@ -15819,396 +10330,242 @@ func (r *RemoteResponseResponseType) Accept(visitor RemoteResponseResponseTypeVi
 	}
 }
 
-// * `JSON` - JSON
-// * `XML` - XML
-// * `MULTIPART` - MULTIPART
-type RequestFormatEnum uint
+// - `JSON` - JSON
+// - `XML` - XML
+// - `MULTIPART` - MULTIPART
+type RequestFormatEnum string
 
 const (
-	RequestFormatEnumJson RequestFormatEnum = iota + 1
-	RequestFormatEnumXml
-	RequestFormatEnumMultipart
+	RequestFormatEnumJson      RequestFormatEnum = "JSON"
+	RequestFormatEnumXml       RequestFormatEnum = "XML"
+	RequestFormatEnumMultipart RequestFormatEnum = "MULTIPART"
 )
 
-func (r RequestFormatEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RequestFormatEnumJson:
-		return "JSON"
-	case RequestFormatEnumXml:
-		return "XML"
-	case RequestFormatEnumMultipart:
-		return "MULTIPART"
-	}
-}
-
-func (r RequestFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "JSON":
-		value := RequestFormatEnumJson
-		*r = value
-	case "XML":
-		value := RequestFormatEnumXml
-		*r = value
-	case "MULTIPART":
-		value := RequestFormatEnumMultipart
-		*r = value
-	}
-	return nil
-}
-
-// * `VACATION` - VACATION
-// * `SICK` - SICK
-// * `PERSONAL` - PERSONAL
-// * `JURY_DUTY` - JURY_DUTY
-// * `VOLUNTEER` - VOLUNTEER
-// * `BEREAVEMENT` - BEREAVEMENT
-type RequestTypeEnum uint
-
-const (
-	RequestTypeEnumVacation RequestTypeEnum = iota + 1
-	RequestTypeEnumSick
-	RequestTypeEnumPersonal
-	RequestTypeEnumJuryDuty
-	RequestTypeEnumVolunteer
-	RequestTypeEnumBereavement
-)
-
-func (r RequestTypeEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RequestTypeEnumVacation:
-		return "VACATION"
-	case RequestTypeEnumSick:
-		return "SICK"
-	case RequestTypeEnumPersonal:
-		return "PERSONAL"
-	case RequestTypeEnumJuryDuty:
-		return "JURY_DUTY"
-	case RequestTypeEnumVolunteer:
-		return "VOLUNTEER"
-	case RequestTypeEnumBereavement:
-		return "BEREAVEMENT"
-	}
-}
-
-func (r RequestTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RequestTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "VACATION":
-		value := RequestTypeEnumVacation
-		*r = value
-	case "SICK":
-		value := RequestTypeEnumSick
-		*r = value
-	case "PERSONAL":
-		value := RequestTypeEnumPersonal
-		*r = value
-	case "JURY_DUTY":
-		value := RequestTypeEnumJuryDuty
-		*r = value
-	case "VOLUNTEER":
-		value := RequestTypeEnumVolunteer
-		*r = value
-	case "BEREAVEMENT":
-		value := RequestTypeEnumBereavement
-		*r = value
-	}
-	return nil
-}
-
-// * `JSON` - JSON
-// * `BASE64_GZIP` - BASE64_GZIP
-type ResponseTypeEnum uint
-
-const (
-	ResponseTypeEnumJson ResponseTypeEnum = iota + 1
-	ResponseTypeEnumBase64Gzip
-)
-
-func (r ResponseTypeEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case ResponseTypeEnumJson:
-		return "JSON"
-	case ResponseTypeEnumBase64Gzip:
-		return "BASE64_GZIP"
-	}
-}
-
-func (r ResponseTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "JSON":
-		value := ResponseTypeEnumJson
-		*r = value
-	case "BASE64_GZIP":
-		value := ResponseTypeEnumBase64Gzip
-		*r = value
-	}
-	return nil
-}
-
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
-type RoleEnum uint
-
-const (
-	RoleEnumAdmin RoleEnum = iota + 1
-	RoleEnumDeveloper
-	RoleEnumMember
-	RoleEnumApi
-	RoleEnumSystem
-	RoleEnumMergeTeam
-)
-
-func (r RoleEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RoleEnumAdmin:
-		return "ADMIN"
-	case RoleEnumDeveloper:
-		return "DEVELOPER"
-	case RoleEnumMember:
-		return "MEMBER"
-	case RoleEnumApi:
-		return "API"
-	case RoleEnumSystem:
-		return "SYSTEM"
-	case RoleEnumMergeTeam:
-		return "MERGE_TEAM"
-	}
-}
-
-func (r RoleEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RoleEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ADMIN":
-		value := RoleEnumAdmin
-		*r = value
-	case "DEVELOPER":
-		value := RoleEnumDeveloper
-		*r = value
-	case "MEMBER":
-		value := RoleEnumMember
-		*r = value
-	case "API":
-		value := RoleEnumApi
-		*r = value
-	case "SYSTEM":
-		value := RoleEnumSystem
-		*r = value
-	case "MERGE_TEAM":
-		value := RoleEnumMergeTeam
-		*r = value
-	}
-	return nil
-}
-
-// * `PAID` - PAID
-// * `DRAFT` - DRAFT
-// * `APPROVED` - APPROVED
-// * `FAILED` - FAILED
-// * `CLOSED` - CLOSED
-type RunStateEnum uint
-
-const (
-	RunStateEnumPaid RunStateEnum = iota + 1
-	RunStateEnumDraft
-	RunStateEnumApproved
-	RunStateEnumFailed
-	RunStateEnumClosed
-)
-
-func (r RunStateEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RunStateEnumPaid:
-		return "PAID"
-	case RunStateEnumDraft:
-		return "DRAFT"
-	case RunStateEnumApproved:
-		return "APPROVED"
-	case RunStateEnumFailed:
-		return "FAILED"
-	case RunStateEnumClosed:
-		return "CLOSED"
-	}
-}
-
-func (r RunStateEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RunStateEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "PAID":
-		value := RunStateEnumPaid
-		*r = value
-	case "DRAFT":
-		value := RunStateEnumDraft
-		*r = value
-	case "APPROVED":
-		value := RunStateEnumApproved
-		*r = value
-	case "FAILED":
-		value := RunStateEnumFailed
-		*r = value
-	case "CLOSED":
-		value := RunStateEnumClosed
-		*r = value
-	}
-	return nil
-}
-
-// * `REGULAR` - REGULAR
-// * `OFF_CYCLE` - OFF_CYCLE
-// * `CORRECTION` - CORRECTION
-// * `TERMINATION` - TERMINATION
-// * `SIGN_ON_BONUS` - SIGN_ON_BONUS
-type RunTypeEnum uint
-
-const (
-	RunTypeEnumRegular RunTypeEnum = iota + 1
-	RunTypeEnumOffCycle
-	RunTypeEnumCorrection
-	RunTypeEnumTermination
-	RunTypeEnumSignOnBonus
-)
-
-func (r RunTypeEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RunTypeEnumRegular:
-		return "REGULAR"
-	case RunTypeEnumOffCycle:
-		return "OFF_CYCLE"
-	case RunTypeEnumCorrection:
-		return "CORRECTION"
-	case RunTypeEnumTermination:
-		return "TERMINATION"
-	case RunTypeEnumSignOnBonus:
-		return "SIGN_ON_BONUS"
-	}
-}
-
-func (r RunTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RunTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "REGULAR":
-		value := RunTypeEnumRegular
-		*r = value
-	case "OFF_CYCLE":
-		value := RunTypeEnumOffCycle
-		*r = value
-	case "CORRECTION":
-		value := RunTypeEnumCorrection
-		*r = value
-	case "TERMINATION":
-		value := RunTypeEnumTermination
-		*r = value
-	case "SIGN_ON_BONUS":
-		value := RunTypeEnumSignOnBonus
-		*r = value
-	}
-	return nil
-}
-
-// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// * `IN_LAST_SYNC` - IN_LAST_SYNC
-type SelectiveSyncConfigurationsUsageEnum uint
-
-const (
-	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = iota + 1
-	SelectiveSyncConfigurationsUsageEnumInLastSync
-)
-
-func (s SelectiveSyncConfigurationsUsageEnum) String() string {
+func NewRequestFormatEnumFromString(s string) (RequestFormatEnum, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SelectiveSyncConfigurationsUsageEnumInNextSync:
-		return "IN_NEXT_SYNC"
-	case SelectiveSyncConfigurationsUsageEnumInLastSync:
-		return "IN_LAST_SYNC"
+	case "JSON":
+		return RequestFormatEnumJson, nil
+	case "XML":
+		return RequestFormatEnumXml, nil
+	case "MULTIPART":
+		return RequestFormatEnumMultipart, nil
 	}
+	var t RequestFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-func (s SelectiveSyncConfigurationsUsageEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
+func (r RequestFormatEnum) Ptr() *RequestFormatEnum {
+	return &r
 }
 
-func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+// - `VACATION` - VACATION
+// - `SICK` - SICK
+// - `PERSONAL` - PERSONAL
+// - `JURY_DUTY` - JURY_DUTY
+// - `VOLUNTEER` - VOLUNTEER
+// - `BEREAVEMENT` - BEREAVEMENT
+type RequestTypeEnum string
+
+const (
+	RequestTypeEnumVacation    RequestTypeEnum = "VACATION"
+	RequestTypeEnumSick        RequestTypeEnum = "SICK"
+	RequestTypeEnumPersonal    RequestTypeEnum = "PERSONAL"
+	RequestTypeEnumJuryDuty    RequestTypeEnum = "JURY_DUTY"
+	RequestTypeEnumVolunteer   RequestTypeEnum = "VOLUNTEER"
+	RequestTypeEnumBereavement RequestTypeEnum = "BEREAVEMENT"
+)
+
+func NewRequestTypeEnumFromString(s string) (RequestTypeEnum, error) {
+	switch s {
+	case "VACATION":
+		return RequestTypeEnumVacation, nil
+	case "SICK":
+		return RequestTypeEnumSick, nil
+	case "PERSONAL":
+		return RequestTypeEnumPersonal, nil
+	case "JURY_DUTY":
+		return RequestTypeEnumJuryDuty, nil
+	case "VOLUNTEER":
+		return RequestTypeEnumVolunteer, nil
+	case "BEREAVEMENT":
+		return RequestTypeEnumBereavement, nil
 	}
-	switch raw {
+	var t RequestTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RequestTypeEnum) Ptr() *RequestTypeEnum {
+	return &r
+}
+
+// - `JSON` - JSON
+// - `BASE64_GZIP` - BASE64_GZIP
+type ResponseTypeEnum string
+
+const (
+	ResponseTypeEnumJson       ResponseTypeEnum = "JSON"
+	ResponseTypeEnumBase64Gzip ResponseTypeEnum = "BASE64_GZIP"
+)
+
+func NewResponseTypeEnumFromString(s string) (ResponseTypeEnum, error) {
+	switch s {
+	case "JSON":
+		return ResponseTypeEnumJson, nil
+	case "BASE64_GZIP":
+		return ResponseTypeEnumBase64Gzip, nil
+	}
+	var t ResponseTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r ResponseTypeEnum) Ptr() *ResponseTypeEnum {
+	return &r
+}
+
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
+type RoleEnum string
+
+const (
+	RoleEnumAdmin     RoleEnum = "ADMIN"
+	RoleEnumDeveloper RoleEnum = "DEVELOPER"
+	RoleEnumMember    RoleEnum = "MEMBER"
+	RoleEnumApi       RoleEnum = "API"
+	RoleEnumSystem    RoleEnum = "SYSTEM"
+	RoleEnumMergeTeam RoleEnum = "MERGE_TEAM"
+)
+
+func NewRoleEnumFromString(s string) (RoleEnum, error) {
+	switch s {
+	case "ADMIN":
+		return RoleEnumAdmin, nil
+	case "DEVELOPER":
+		return RoleEnumDeveloper, nil
+	case "MEMBER":
+		return RoleEnumMember, nil
+	case "API":
+		return RoleEnumApi, nil
+	case "SYSTEM":
+		return RoleEnumSystem, nil
+	case "MERGE_TEAM":
+		return RoleEnumMergeTeam, nil
+	}
+	var t RoleEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RoleEnum) Ptr() *RoleEnum {
+	return &r
+}
+
+// - `PAID` - PAID
+// - `DRAFT` - DRAFT
+// - `APPROVED` - APPROVED
+// - `FAILED` - FAILED
+// - `CLOSED` - CLOSED
+type RunStateEnum string
+
+const (
+	RunStateEnumPaid     RunStateEnum = "PAID"
+	RunStateEnumDraft    RunStateEnum = "DRAFT"
+	RunStateEnumApproved RunStateEnum = "APPROVED"
+	RunStateEnumFailed   RunStateEnum = "FAILED"
+	RunStateEnumClosed   RunStateEnum = "CLOSED"
+)
+
+func NewRunStateEnumFromString(s string) (RunStateEnum, error) {
+	switch s {
+	case "PAID":
+		return RunStateEnumPaid, nil
+	case "DRAFT":
+		return RunStateEnumDraft, nil
+	case "APPROVED":
+		return RunStateEnumApproved, nil
+	case "FAILED":
+		return RunStateEnumFailed, nil
+	case "CLOSED":
+		return RunStateEnumClosed, nil
+	}
+	var t RunStateEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RunStateEnum) Ptr() *RunStateEnum {
+	return &r
+}
+
+// - `REGULAR` - REGULAR
+// - `OFF_CYCLE` - OFF_CYCLE
+// - `CORRECTION` - CORRECTION
+// - `TERMINATION` - TERMINATION
+// - `SIGN_ON_BONUS` - SIGN_ON_BONUS
+type RunTypeEnum string
+
+const (
+	RunTypeEnumRegular     RunTypeEnum = "REGULAR"
+	RunTypeEnumOffCycle    RunTypeEnum = "OFF_CYCLE"
+	RunTypeEnumCorrection  RunTypeEnum = "CORRECTION"
+	RunTypeEnumTermination RunTypeEnum = "TERMINATION"
+	RunTypeEnumSignOnBonus RunTypeEnum = "SIGN_ON_BONUS"
+)
+
+func NewRunTypeEnumFromString(s string) (RunTypeEnum, error) {
+	switch s {
+	case "REGULAR":
+		return RunTypeEnumRegular, nil
+	case "OFF_CYCLE":
+		return RunTypeEnumOffCycle, nil
+	case "CORRECTION":
+		return RunTypeEnumCorrection, nil
+	case "TERMINATION":
+		return RunTypeEnumTermination, nil
+	case "SIGN_ON_BONUS":
+		return RunTypeEnumSignOnBonus, nil
+	}
+	var t RunTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RunTypeEnum) Ptr() *RunTypeEnum {
+	return &r
+}
+
+// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// - `IN_LAST_SYNC` - IN_LAST_SYNC
+type SelectiveSyncConfigurationsUsageEnum string
+
+const (
+	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = "IN_NEXT_SYNC"
+	SelectiveSyncConfigurationsUsageEnumInLastSync SelectiveSyncConfigurationsUsageEnum = "IN_LAST_SYNC"
+)
+
+func NewSelectiveSyncConfigurationsUsageEnumFromString(s string) (SelectiveSyncConfigurationsUsageEnum, error) {
+	switch s {
 	case "IN_NEXT_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInNextSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInNextSync, nil
 	case "IN_LAST_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInLastSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInLastSync, nil
 	}
-	return nil
+	var t SelectiveSyncConfigurationsUsageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SelectiveSyncConfigurationsUsageEnum) Ptr() *SelectiveSyncConfigurationsUsageEnum {
+	return &s
 }
 
 // # The SyncStatus Object
+//
 // ### Description
-// The `SyncStatus` object is used to represent the syncing state of an account
+//
+// # The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
+//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -16218,81 +10575,81 @@ type SyncStatus struct {
 	Status                           SyncStatusStatusEnum                  `json:"status,omitempty"`
 	IsInitialSync                    bool                                  `json:"is_initial_sync"`
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `SYNCING` - SYNCING
-// * `DONE` - DONE
-// * `FAILED` - FAILED
-// * `DISABLED` - DISABLED
-// * `PAUSED` - PAUSED
-// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
-type SyncStatusStatusEnum uint
-
-const (
-	SyncStatusStatusEnumSyncing SyncStatusStatusEnum = iota + 1
-	SyncStatusStatusEnumDone
-	SyncStatusStatusEnumFailed
-	SyncStatusStatusEnumDisabled
-	SyncStatusStatusEnumPaused
-	SyncStatusStatusEnumPartiallySynced
-)
-
-func (s SyncStatusStatusEnum) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SyncStatusStatusEnumSyncing:
-		return "SYNCING"
-	case SyncStatusStatusEnumDone:
-		return "DONE"
-	case SyncStatusStatusEnumFailed:
-		return "FAILED"
-	case SyncStatusStatusEnumDisabled:
-		return "DISABLED"
-	case SyncStatusStatusEnumPaused:
-		return "PAUSED"
-	case SyncStatusStatusEnumPartiallySynced:
-		return "PARTIALLY_SYNCED"
-	}
-}
-
-func (s SyncStatusStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (s *SyncStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler SyncStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "SYNCING":
-		value := SyncStatusStatusEnumSyncing
-		*s = value
-	case "DONE":
-		value := SyncStatusStatusEnumDone
-		*s = value
-	case "FAILED":
-		value := SyncStatusStatusEnumFailed
-		*s = value
-	case "DISABLED":
-		value := SyncStatusStatusEnumDisabled
-		*s = value
-	case "PAUSED":
-		value := SyncStatusStatusEnumPaused
-		*s = value
-	case "PARTIALLY_SYNCED":
-		value := SyncStatusStatusEnumPartiallySynced
-		*s = value
-	}
+	*s = SyncStatus(value)
+	s._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (s *SyncStatus) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// - `SYNCING` - SYNCING
+// - `DONE` - DONE
+// - `FAILED` - FAILED
+// - `DISABLED` - DISABLED
+// - `PAUSED` - PAUSED
+// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+type SyncStatusStatusEnum string
+
+const (
+	SyncStatusStatusEnumSyncing         SyncStatusStatusEnum = "SYNCING"
+	SyncStatusStatusEnumDone            SyncStatusStatusEnum = "DONE"
+	SyncStatusStatusEnumFailed          SyncStatusStatusEnum = "FAILED"
+	SyncStatusStatusEnumDisabled        SyncStatusStatusEnum = "DISABLED"
+	SyncStatusStatusEnumPaused          SyncStatusStatusEnum = "PAUSED"
+	SyncStatusStatusEnumPartiallySynced SyncStatusStatusEnum = "PARTIALLY_SYNCED"
+)
+
+func NewSyncStatusStatusEnumFromString(s string) (SyncStatusStatusEnum, error) {
+	switch s {
+	case "SYNCING":
+		return SyncStatusStatusEnumSyncing, nil
+	case "DONE":
+		return SyncStatusStatusEnumDone, nil
+	case "FAILED":
+		return SyncStatusStatusEnumFailed, nil
+	case "DISABLED":
+		return SyncStatusStatusEnumDisabled, nil
+	case "PAUSED":
+		return SyncStatusStatusEnumPaused, nil
+	case "PARTIALLY_SYNCED":
+		return SyncStatusStatusEnumPartiallySynced, nil
+	}
+	var t SyncStatusStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
+	return &s
+}
+
 // # The Tax Object
+//
 // ### Description
+//
 // The `Tax` object is used to represent an array of the tax deductions for a given employee's payroll run.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST Taxes` endpoint and filter by `ID` to show all taxes.
 type Tax struct {
 	Id *string `json:"id,omitempty"`
@@ -16309,16 +10666,44 @@ type Tax struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *Tax) UnmarshalJSON(data []byte) error {
+	type unmarshaler Tax
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = Tax(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *Tax) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // # The Team Object
+//
 // ### Description
+//
 // The `Team` object is used to represent a subdivision of the company, usually a department. Each employee will be grouped into one specific Team.
 //
 // ### Usage Example
+//
 // If you're building a way to filter by `Team`, you'd hit the `GET Teams` endpoint to fetch the `Teams`, and then use the `ID` of the team your user selects to filter the `GET Employees` endpoint.
 type Team struct {
 	Id *string `json:"id,omitempty"`
@@ -16332,9 +10717,34 @@ type Team struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *Team) UnmarshalJSON(data []byte) error {
+	type unmarshaler Team
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = Team(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *Team) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The team's parent team.
@@ -16396,10 +10806,13 @@ func (t *TeamParentTeam) Accept(visitor TeamParentTeamVisitor) error {
 }
 
 // # The TimeOff Object
+//
 // ### Description
+//
 // The `TimeOff` object is used to represent all employees' Time Off entries.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST TimeOffs` endpoint and filter by `ID` to show all time off requests.
 type TimeOff struct {
 	Id *string `json:"id,omitempty"`
@@ -16411,29 +10824,29 @@ type TimeOff struct {
 	Approver *TimeOffApprover `json:"approver,omitempty"`
 	// The status of this time off request.
 	//
-	// * `REQUESTED` - REQUESTED
-	// * `APPROVED` - APPROVED
-	// * `DECLINED` - DECLINED
-	// * `CANCELLED` - CANCELLED
-	// * `DELETED` - DELETED
+	// - `REQUESTED` - REQUESTED
+	// - `APPROVED` - APPROVED
+	// - `DECLINED` - DECLINED
+	// - `CANCELLED` - CANCELLED
+	// - `DELETED` - DELETED
 	Status *TimeOffStatus `json:"status,omitempty"`
 	// The employee note for this time off request.
 	EmployeeNote *string `json:"employee_note,omitempty"`
 	// The measurement that the third-party integration uses to count time requested.
 	//
-	// * `HOURS` - HOURS
-	// * `DAYS` - DAYS
+	// - `HOURS` - HOURS
+	// - `DAYS` - DAYS
 	Units *TimeOffUnits `json:"units,omitempty"`
 	// The time off quantity measured by the prescribed “units”.
 	Amount *float64 `json:"amount,omitempty"`
 	// The type of time off request.
 	//
-	// * `VACATION` - VACATION
-	// * `SICK` - SICK
-	// * `PERSONAL` - PERSONAL
-	// * `JURY_DUTY` - JURY_DUTY
-	// * `VOLUNTEER` - VOLUNTEER
-	// * `BEREAVEMENT` - BEREAVEMENT
+	// - `VACATION` - VACATION
+	// - `SICK` - SICK
+	// - `PERSONAL` - PERSONAL
+	// - `JURY_DUTY` - JURY_DUTY
+	// - `VOLUNTEER` - VOLUNTEER
+	// - `BEREAVEMENT` - BEREAVEMENT
 	RequestType *TimeOffRequestType `json:"request_type,omitempty"`
 	// The day and time of the start of the time requested off.
 	StartTime *time.Time `json:"start_time,omitempty"`
@@ -16442,9 +10855,34 @@ type TimeOff struct {
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TimeOff) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimeOff
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TimeOff(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TimeOff) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The Merge ID of the employee with the ability to approve the time off request.
@@ -16506,10 +10944,13 @@ func (t *TimeOffApprover) Accept(visitor TimeOffApproverVisitor) error {
 }
 
 // # The TimeOffBalance Object
+//
 // ### Description
+//
 // The `TimeOffBalance` object is used to represent current balances for an employee's Time Off plan.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST TimeOffBalances` endpoint and filter by `ID` to show all time off balances.
 type TimeOffBalance struct {
 	Id *string `json:"id,omitempty"`
@@ -16523,20 +10964,45 @@ type TimeOffBalance struct {
 	Used *float64 `json:"used,omitempty"`
 	// The policy type of this time off balance.
 	//
-	// * `VACATION` - VACATION
-	// * `SICK` - SICK
-	// * `PERSONAL` - PERSONAL
-	// * `JURY_DUTY` - JURY_DUTY
-	// * `VOLUNTEER` - VOLUNTEER
-	// * `BEREAVEMENT` - BEREAVEMENT
+	// - `VACATION` - VACATION
+	// - `SICK` - SICK
+	// - `PERSONAL` - PERSONAL
+	// - `JURY_DUTY` - JURY_DUTY
+	// - `VOLUNTEER` - VOLUNTEER
+	// - `BEREAVEMENT` - BEREAVEMENT
 	PolicyType *TimeOffBalancePolicyType `json:"policy_type,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TimeOffBalance) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimeOffBalance
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TimeOffBalance(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TimeOffBalance) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The employee the balance belongs to.
@@ -16599,12 +11065,12 @@ func (t *TimeOffBalanceEmployee) Accept(visitor TimeOffBalanceEmployeeVisitor) e
 
 // The policy type of this time off balance.
 //
-// * `VACATION` - VACATION
-// * `SICK` - SICK
-// * `PERSONAL` - PERSONAL
-// * `JURY_DUTY` - JURY_DUTY
-// * `VOLUNTEER` - VOLUNTEER
-// * `BEREAVEMENT` - BEREAVEMENT
+// - `VACATION` - VACATION
+// - `SICK` - SICK
+// - `PERSONAL` - PERSONAL
+// - `JURY_DUTY` - JURY_DUTY
+// - `VOLUNTEER` - VOLUNTEER
+// - `BEREAVEMENT` - BEREAVEMENT
 type TimeOffBalancePolicyType struct {
 	typeName       string
 	PolicyTypeEnum PolicyTypeEnum
@@ -16660,68 +11126,6 @@ func (t *TimeOffBalancePolicyType) Accept(visitor TimeOffBalancePolicyTypeVisito
 	case "string":
 		return visitor.VisitString(t.String)
 	}
-}
-
-type TimeOffBalancesListRequestPolicyType uint
-
-const (
-	TimeOffBalancesListRequestPolicyTypeBereavement TimeOffBalancesListRequestPolicyType = iota + 1
-	TimeOffBalancesListRequestPolicyTypeJuryDuty
-	TimeOffBalancesListRequestPolicyTypePersonal
-	TimeOffBalancesListRequestPolicyTypeSick
-	TimeOffBalancesListRequestPolicyTypeVacation
-	TimeOffBalancesListRequestPolicyTypeVolunteer
-)
-
-func (t TimeOffBalancesListRequestPolicyType) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffBalancesListRequestPolicyTypeBereavement:
-		return "BEREAVEMENT"
-	case TimeOffBalancesListRequestPolicyTypeJuryDuty:
-		return "JURY_DUTY"
-	case TimeOffBalancesListRequestPolicyTypePersonal:
-		return "PERSONAL"
-	case TimeOffBalancesListRequestPolicyTypeSick:
-		return "SICK"
-	case TimeOffBalancesListRequestPolicyTypeVacation:
-		return "VACATION"
-	case TimeOffBalancesListRequestPolicyTypeVolunteer:
-		return "VOLUNTEER"
-	}
-}
-
-func (t TimeOffBalancesListRequestPolicyType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffBalancesListRequestPolicyType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "BEREAVEMENT":
-		value := TimeOffBalancesListRequestPolicyTypeBereavement
-		*t = value
-	case "JURY_DUTY":
-		value := TimeOffBalancesListRequestPolicyTypeJuryDuty
-		*t = value
-	case "PERSONAL":
-		value := TimeOffBalancesListRequestPolicyTypePersonal
-		*t = value
-	case "SICK":
-		value := TimeOffBalancesListRequestPolicyTypeSick
-		*t = value
-	case "VACATION":
-		value := TimeOffBalancesListRequestPolicyTypeVacation
-		*t = value
-	case "VOLUNTEER":
-		value := TimeOffBalancesListRequestPolicyTypeVolunteer
-		*t = value
-	}
-	return nil
 }
 
 // The employee requesting time off.
@@ -16782,309 +11186,14 @@ func (t *TimeOffEmployee) Accept(visitor TimeOffEmployeeVisitor) error {
 	}
 }
 
-type TimeOffListRequestExpand uint
-
-const (
-	TimeOffListRequestExpandApprover TimeOffListRequestExpand = iota + 1
-	TimeOffListRequestExpandEmployee
-	TimeOffListRequestExpandEmployeeApprover
-)
-
-func (t TimeOffListRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffListRequestExpandApprover:
-		return "approver"
-	case TimeOffListRequestExpandEmployee:
-		return "employee"
-	case TimeOffListRequestExpandEmployeeApprover:
-		return "employee,approver"
-	}
-}
-
-func (t TimeOffListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "approver":
-		value := TimeOffListRequestExpandApprover
-		*t = value
-	case "employee":
-		value := TimeOffListRequestExpandEmployee
-		*t = value
-	case "employee,approver":
-		value := TimeOffListRequestExpandEmployeeApprover
-		*t = value
-	}
-	return nil
-}
-
-type TimeOffListRequestRemoteFields uint
-
-const (
-	TimeOffListRequestRemoteFieldsRequestType TimeOffListRequestRemoteFields = iota + 1
-	TimeOffListRequestRemoteFieldsRequestTypeStatus
-	TimeOffListRequestRemoteFieldsRequestTypeStatusUnits
-	TimeOffListRequestRemoteFieldsRequestTypeUnits
-	TimeOffListRequestRemoteFieldsStatus
-	TimeOffListRequestRemoteFieldsStatusUnits
-	TimeOffListRequestRemoteFieldsUnits
-)
-
-func (t TimeOffListRequestRemoteFields) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffListRequestRemoteFieldsRequestType:
-		return "request_type"
-	case TimeOffListRequestRemoteFieldsRequestTypeStatus:
-		return "request_type,status"
-	case TimeOffListRequestRemoteFieldsRequestTypeStatusUnits:
-		return "request_type,status,units"
-	case TimeOffListRequestRemoteFieldsRequestTypeUnits:
-		return "request_type,units"
-	case TimeOffListRequestRemoteFieldsStatus:
-		return "status"
-	case TimeOffListRequestRemoteFieldsStatusUnits:
-		return "status,units"
-	case TimeOffListRequestRemoteFieldsUnits:
-		return "units"
-	}
-}
-
-func (t TimeOffListRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffListRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "request_type":
-		value := TimeOffListRequestRemoteFieldsRequestType
-		*t = value
-	case "request_type,status":
-		value := TimeOffListRequestRemoteFieldsRequestTypeStatus
-		*t = value
-	case "request_type,status,units":
-		value := TimeOffListRequestRemoteFieldsRequestTypeStatusUnits
-		*t = value
-	case "request_type,units":
-		value := TimeOffListRequestRemoteFieldsRequestTypeUnits
-		*t = value
-	case "status":
-		value := TimeOffListRequestRemoteFieldsStatus
-		*t = value
-	case "status,units":
-		value := TimeOffListRequestRemoteFieldsStatusUnits
-		*t = value
-	case "units":
-		value := TimeOffListRequestRemoteFieldsUnits
-		*t = value
-	}
-	return nil
-}
-
-type TimeOffListRequestRequestType uint
-
-const (
-	TimeOffListRequestRequestTypeBereavement TimeOffListRequestRequestType = iota + 1
-	TimeOffListRequestRequestTypeJuryDuty
-	TimeOffListRequestRequestTypePersonal
-	TimeOffListRequestRequestTypeSick
-	TimeOffListRequestRequestTypeVacation
-	TimeOffListRequestRequestTypeVolunteer
-)
-
-func (t TimeOffListRequestRequestType) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffListRequestRequestTypeBereavement:
-		return "BEREAVEMENT"
-	case TimeOffListRequestRequestTypeJuryDuty:
-		return "JURY_DUTY"
-	case TimeOffListRequestRequestTypePersonal:
-		return "PERSONAL"
-	case TimeOffListRequestRequestTypeSick:
-		return "SICK"
-	case TimeOffListRequestRequestTypeVacation:
-		return "VACATION"
-	case TimeOffListRequestRequestTypeVolunteer:
-		return "VOLUNTEER"
-	}
-}
-
-func (t TimeOffListRequestRequestType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffListRequestRequestType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "BEREAVEMENT":
-		value := TimeOffListRequestRequestTypeBereavement
-		*t = value
-	case "JURY_DUTY":
-		value := TimeOffListRequestRequestTypeJuryDuty
-		*t = value
-	case "PERSONAL":
-		value := TimeOffListRequestRequestTypePersonal
-		*t = value
-	case "SICK":
-		value := TimeOffListRequestRequestTypeSick
-		*t = value
-	case "VACATION":
-		value := TimeOffListRequestRequestTypeVacation
-		*t = value
-	case "VOLUNTEER":
-		value := TimeOffListRequestRequestTypeVolunteer
-		*t = value
-	}
-	return nil
-}
-
-type TimeOffListRequestShowEnumOrigins uint
-
-const (
-	TimeOffListRequestShowEnumOriginsRequestType TimeOffListRequestShowEnumOrigins = iota + 1
-	TimeOffListRequestShowEnumOriginsRequestTypeStatus
-	TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits
-	TimeOffListRequestShowEnumOriginsRequestTypeUnits
-	TimeOffListRequestShowEnumOriginsStatus
-	TimeOffListRequestShowEnumOriginsStatusUnits
-	TimeOffListRequestShowEnumOriginsUnits
-)
-
-func (t TimeOffListRequestShowEnumOrigins) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffListRequestShowEnumOriginsRequestType:
-		return "request_type"
-	case TimeOffListRequestShowEnumOriginsRequestTypeStatus:
-		return "request_type,status"
-	case TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits:
-		return "request_type,status,units"
-	case TimeOffListRequestShowEnumOriginsRequestTypeUnits:
-		return "request_type,units"
-	case TimeOffListRequestShowEnumOriginsStatus:
-		return "status"
-	case TimeOffListRequestShowEnumOriginsStatusUnits:
-		return "status,units"
-	case TimeOffListRequestShowEnumOriginsUnits:
-		return "units"
-	}
-}
-
-func (t TimeOffListRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffListRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "request_type":
-		value := TimeOffListRequestShowEnumOriginsRequestType
-		*t = value
-	case "request_type,status":
-		value := TimeOffListRequestShowEnumOriginsRequestTypeStatus
-		*t = value
-	case "request_type,status,units":
-		value := TimeOffListRequestShowEnumOriginsRequestTypeStatusUnits
-		*t = value
-	case "request_type,units":
-		value := TimeOffListRequestShowEnumOriginsRequestTypeUnits
-		*t = value
-	case "status":
-		value := TimeOffListRequestShowEnumOriginsStatus
-		*t = value
-	case "status,units":
-		value := TimeOffListRequestShowEnumOriginsStatusUnits
-		*t = value
-	case "units":
-		value := TimeOffListRequestShowEnumOriginsUnits
-		*t = value
-	}
-	return nil
-}
-
-type TimeOffListRequestStatus uint
-
-const (
-	TimeOffListRequestStatusApproved TimeOffListRequestStatus = iota + 1
-	TimeOffListRequestStatusCancelled
-	TimeOffListRequestStatusDeclined
-	TimeOffListRequestStatusDeleted
-	TimeOffListRequestStatusRequested
-)
-
-func (t TimeOffListRequestStatus) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffListRequestStatusApproved:
-		return "APPROVED"
-	case TimeOffListRequestStatusCancelled:
-		return "CANCELLED"
-	case TimeOffListRequestStatusDeclined:
-		return "DECLINED"
-	case TimeOffListRequestStatusDeleted:
-		return "DELETED"
-	case TimeOffListRequestStatusRequested:
-		return "REQUESTED"
-	}
-}
-
-func (t TimeOffListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "APPROVED":
-		value := TimeOffListRequestStatusApproved
-		*t = value
-	case "CANCELLED":
-		value := TimeOffListRequestStatusCancelled
-		*t = value
-	case "DECLINED":
-		value := TimeOffListRequestStatusDeclined
-		*t = value
-	case "DELETED":
-		value := TimeOffListRequestStatusDeleted
-		*t = value
-	case "REQUESTED":
-		value := TimeOffListRequestStatusRequested
-		*t = value
-	}
-	return nil
-}
-
 // # The TimeOff Object
+//
 // ### Description
+//
 // The `TimeOff` object is used to represent all employees' Time Off entries.
 //
 // ### Usage Example
+//
 // Fetch from the `LIST TimeOffs` endpoint and filter by `ID` to show all time off requests.
 type TimeOffRequest struct {
 	// The employee requesting time off.
@@ -17093,36 +11202,61 @@ type TimeOffRequest struct {
 	Approver *TimeOffRequestApprover `json:"approver,omitempty"`
 	// The status of this time off request.
 	//
-	// * `REQUESTED` - REQUESTED
-	// * `APPROVED` - APPROVED
-	// * `DECLINED` - DECLINED
-	// * `CANCELLED` - CANCELLED
-	// * `DELETED` - DELETED
+	// - `REQUESTED` - REQUESTED
+	// - `APPROVED` - APPROVED
+	// - `DECLINED` - DECLINED
+	// - `CANCELLED` - CANCELLED
+	// - `DELETED` - DELETED
 	Status *TimeOffRequestStatus `json:"status,omitempty"`
 	// The employee note for this time off request.
 	EmployeeNote *string `json:"employee_note,omitempty"`
 	// The measurement that the third-party integration uses to count time requested.
 	//
-	// * `HOURS` - HOURS
-	// * `DAYS` - DAYS
+	// - `HOURS` - HOURS
+	// - `DAYS` - DAYS
 	Units *TimeOffRequestUnits `json:"units,omitempty"`
 	// The time off quantity measured by the prescribed “units”.
 	Amount *float64 `json:"amount,omitempty"`
 	// The type of time off request.
 	//
-	// * `VACATION` - VACATION
-	// * `SICK` - SICK
-	// * `PERSONAL` - PERSONAL
-	// * `JURY_DUTY` - JURY_DUTY
-	// * `VOLUNTEER` - VOLUNTEER
-	// * `BEREAVEMENT` - BEREAVEMENT
+	// - `VACATION` - VACATION
+	// - `SICK` - SICK
+	// - `PERSONAL` - PERSONAL
+	// - `JURY_DUTY` - JURY_DUTY
+	// - `VOLUNTEER` - VOLUNTEER
+	// - `BEREAVEMENT` - BEREAVEMENT
 	RequestType *TimeOffRequestRequestType `json:"request_type,omitempty"`
 	// The day and time of the start of the time requested off.
 	StartTime *time.Time `json:"start_time,omitempty"`
 	// The day and time of the end of the time requested off.
-	EndTime             *time.Time     `json:"end_time,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	EndTime             *time.Time             `json:"end_time,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TimeOffRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimeOffRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TimeOffRequest(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TimeOffRequest) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The Merge ID of the employee with the ability to approve the time off request.
@@ -17243,12 +11377,12 @@ func (t *TimeOffRequestEmployee) Accept(visitor TimeOffRequestEmployeeVisitor) e
 
 // The type of time off request.
 //
-// * `VACATION` - VACATION
-// * `SICK` - SICK
-// * `PERSONAL` - PERSONAL
-// * `JURY_DUTY` - JURY_DUTY
-// * `VOLUNTEER` - VOLUNTEER
-// * `BEREAVEMENT` - BEREAVEMENT
+// - `VACATION` - VACATION
+// - `SICK` - SICK
+// - `PERSONAL` - PERSONAL
+// - `JURY_DUTY` - JURY_DUTY
+// - `VOLUNTEER` - VOLUNTEER
+// - `BEREAVEMENT` - BEREAVEMENT
 type TimeOffRequestRequestType struct {
 	typeName        string
 	RequestTypeEnum RequestTypeEnum
@@ -17308,11 +11442,11 @@ func (t *TimeOffRequestRequestType) Accept(visitor TimeOffRequestRequestTypeVisi
 
 // The status of this time off request.
 //
-// * `REQUESTED` - REQUESTED
-// * `APPROVED` - APPROVED
-// * `DECLINED` - DECLINED
-// * `CANCELLED` - CANCELLED
-// * `DELETED` - DELETED
+// - `REQUESTED` - REQUESTED
+// - `APPROVED` - APPROVED
+// - `DECLINED` - DECLINED
+// - `CANCELLED` - CANCELLED
+// - `DELETED` - DELETED
 type TimeOffRequestStatus struct {
 	typeName          string
 	TimeOffStatusEnum TimeOffStatusEnum
@@ -17372,12 +11506,12 @@ func (t *TimeOffRequestStatus) Accept(visitor TimeOffRequestStatusVisitor) error
 
 // The type of time off request.
 //
-// * `VACATION` - VACATION
-// * `SICK` - SICK
-// * `PERSONAL` - PERSONAL
-// * `JURY_DUTY` - JURY_DUTY
-// * `VOLUNTEER` - VOLUNTEER
-// * `BEREAVEMENT` - BEREAVEMENT
+// - `VACATION` - VACATION
+// - `SICK` - SICK
+// - `PERSONAL` - PERSONAL
+// - `JURY_DUTY` - JURY_DUTY
+// - `VOLUNTEER` - VOLUNTEER
+// - `BEREAVEMENT` - BEREAVEMENT
 type TimeOffRequestType struct {
 	typeName        string
 	RequestTypeEnum RequestTypeEnum
@@ -17437,8 +11571,8 @@ func (t *TimeOffRequestType) Accept(visitor TimeOffRequestTypeVisitor) error {
 
 // The measurement that the third-party integration uses to count time requested.
 //
-// * `HOURS` - HOURS
-// * `DAYS` - DAYS
+// - `HOURS` - HOURS
+// - `DAYS` - DAYS
 type TimeOffRequestUnits struct {
 	typeName  string
 	UnitsEnum UnitsEnum
@@ -17501,195 +11635,40 @@ type TimeOffResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type TimeOffRetrieveRequestExpand uint
-
-const (
-	TimeOffRetrieveRequestExpandApprover TimeOffRetrieveRequestExpand = iota + 1
-	TimeOffRetrieveRequestExpandEmployee
-	TimeOffRetrieveRequestExpandEmployeeApprover
-)
-
-func (t TimeOffRetrieveRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffRetrieveRequestExpandApprover:
-		return "approver"
-	case TimeOffRetrieveRequestExpandEmployee:
-		return "employee"
-	case TimeOffRetrieveRequestExpandEmployeeApprover:
-		return "employee,approver"
-	}
-}
-
-func (t TimeOffRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (t *TimeOffResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimeOffResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "approver":
-		value := TimeOffRetrieveRequestExpandApprover
-		*t = value
-	case "employee":
-		value := TimeOffRetrieveRequestExpandEmployee
-		*t = value
-	case "employee,approver":
-		value := TimeOffRetrieveRequestExpandEmployeeApprover
-		*t = value
-	}
+	*t = TimeOffResponse(value)
+	t._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-type TimeOffRetrieveRequestRemoteFields uint
-
-const (
-	TimeOffRetrieveRequestRemoteFieldsRequestType TimeOffRetrieveRequestRemoteFields = iota + 1
-	TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus
-	TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits
-	TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits
-	TimeOffRetrieveRequestRemoteFieldsStatus
-	TimeOffRetrieveRequestRemoteFieldsStatusUnits
-	TimeOffRetrieveRequestRemoteFieldsUnits
-)
-
-func (t TimeOffRetrieveRequestRemoteFields) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffRetrieveRequestRemoteFieldsRequestType:
-		return "request_type"
-	case TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus:
-		return "request_type,status"
-	case TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits:
-		return "request_type,status,units"
-	case TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits:
-		return "request_type,units"
-	case TimeOffRetrieveRequestRemoteFieldsStatus:
-		return "status"
-	case TimeOffRetrieveRequestRemoteFieldsStatusUnits:
-		return "status,units"
-	case TimeOffRetrieveRequestRemoteFieldsUnits:
-		return "units"
+func (t *TimeOffResponse) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
 	}
-}
-
-func (t TimeOffRetrieveRequestRemoteFields) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffRetrieveRequestRemoteFields) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
 	}
-	switch raw {
-	case "request_type":
-		value := TimeOffRetrieveRequestRemoteFieldsRequestType
-		*t = value
-	case "request_type,status":
-		value := TimeOffRetrieveRequestRemoteFieldsRequestTypeStatus
-		*t = value
-	case "request_type,status,units":
-		value := TimeOffRetrieveRequestRemoteFieldsRequestTypeStatusUnits
-		*t = value
-	case "request_type,units":
-		value := TimeOffRetrieveRequestRemoteFieldsRequestTypeUnits
-		*t = value
-	case "status":
-		value := TimeOffRetrieveRequestRemoteFieldsStatus
-		*t = value
-	case "status,units":
-		value := TimeOffRetrieveRequestRemoteFieldsStatusUnits
-		*t = value
-	case "units":
-		value := TimeOffRetrieveRequestRemoteFieldsUnits
-		*t = value
-	}
-	return nil
-}
-
-type TimeOffRetrieveRequestShowEnumOrigins uint
-
-const (
-	TimeOffRetrieveRequestShowEnumOriginsRequestType TimeOffRetrieveRequestShowEnumOrigins = iota + 1
-	TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus
-	TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits
-	TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits
-	TimeOffRetrieveRequestShowEnumOriginsStatus
-	TimeOffRetrieveRequestShowEnumOriginsStatusUnits
-	TimeOffRetrieveRequestShowEnumOriginsUnits
-)
-
-func (t TimeOffRetrieveRequestShowEnumOrigins) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffRetrieveRequestShowEnumOriginsRequestType:
-		return "request_type"
-	case TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus:
-		return "request_type,status"
-	case TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits:
-		return "request_type,status,units"
-	case TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits:
-		return "request_type,units"
-	case TimeOffRetrieveRequestShowEnumOriginsStatus:
-		return "status"
-	case TimeOffRetrieveRequestShowEnumOriginsStatusUnits:
-		return "status,units"
-	case TimeOffRetrieveRequestShowEnumOriginsUnits:
-		return "units"
-	}
-}
-
-func (t TimeOffRetrieveRequestShowEnumOrigins) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffRetrieveRequestShowEnumOrigins) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "request_type":
-		value := TimeOffRetrieveRequestShowEnumOriginsRequestType
-		*t = value
-	case "request_type,status":
-		value := TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatus
-		*t = value
-	case "request_type,status,units":
-		value := TimeOffRetrieveRequestShowEnumOriginsRequestTypeStatusUnits
-		*t = value
-	case "request_type,units":
-		value := TimeOffRetrieveRequestShowEnumOriginsRequestTypeUnits
-		*t = value
-	case "status":
-		value := TimeOffRetrieveRequestShowEnumOriginsStatus
-		*t = value
-	case "status,units":
-		value := TimeOffRetrieveRequestShowEnumOriginsStatusUnits
-		*t = value
-	case "units":
-		value := TimeOffRetrieveRequestShowEnumOriginsUnits
-		*t = value
-	}
-	return nil
+	return fmt.Sprintf("%#v", t)
 }
 
 // The status of this time off request.
 //
-// * `REQUESTED` - REQUESTED
-// * `APPROVED` - APPROVED
-// * `DECLINED` - DECLINED
-// * `CANCELLED` - CANCELLED
-// * `DELETED` - DELETED
+// - `REQUESTED` - REQUESTED
+// - `APPROVED` - APPROVED
+// - `DECLINED` - DECLINED
+// - `CANCELLED` - CANCELLED
+// - `DELETED` - DELETED
 type TimeOffStatus struct {
 	typeName          string
 	TimeOffStatusEnum TimeOffStatusEnum
@@ -17747,71 +11726,46 @@ func (t *TimeOffStatus) Accept(visitor TimeOffStatusVisitor) error {
 	}
 }
 
-// * `REQUESTED` - REQUESTED
-// * `APPROVED` - APPROVED
-// * `DECLINED` - DECLINED
-// * `CANCELLED` - CANCELLED
-// * `DELETED` - DELETED
-type TimeOffStatusEnum uint
+// - `REQUESTED` - REQUESTED
+// - `APPROVED` - APPROVED
+// - `DECLINED` - DECLINED
+// - `CANCELLED` - CANCELLED
+// - `DELETED` - DELETED
+type TimeOffStatusEnum string
 
 const (
-	TimeOffStatusEnumRequested TimeOffStatusEnum = iota + 1
-	TimeOffStatusEnumApproved
-	TimeOffStatusEnumDeclined
-	TimeOffStatusEnumCancelled
-	TimeOffStatusEnumDeleted
+	TimeOffStatusEnumRequested TimeOffStatusEnum = "REQUESTED"
+	TimeOffStatusEnumApproved  TimeOffStatusEnum = "APPROVED"
+	TimeOffStatusEnumDeclined  TimeOffStatusEnum = "DECLINED"
+	TimeOffStatusEnumCancelled TimeOffStatusEnum = "CANCELLED"
+	TimeOffStatusEnumDeleted   TimeOffStatusEnum = "DELETED"
 )
 
-func (t TimeOffStatusEnum) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimeOffStatusEnumRequested:
-		return "REQUESTED"
-	case TimeOffStatusEnumApproved:
-		return "APPROVED"
-	case TimeOffStatusEnumDeclined:
-		return "DECLINED"
-	case TimeOffStatusEnumCancelled:
-		return "CANCELLED"
-	case TimeOffStatusEnumDeleted:
-		return "DELETED"
-	}
-}
-
-func (t TimeOffStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimeOffStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewTimeOffStatusEnumFromString(s string) (TimeOffStatusEnum, error) {
+	switch s {
 	case "REQUESTED":
-		value := TimeOffStatusEnumRequested
-		*t = value
+		return TimeOffStatusEnumRequested, nil
 	case "APPROVED":
-		value := TimeOffStatusEnumApproved
-		*t = value
+		return TimeOffStatusEnumApproved, nil
 	case "DECLINED":
-		value := TimeOffStatusEnumDeclined
-		*t = value
+		return TimeOffStatusEnumDeclined, nil
 	case "CANCELLED":
-		value := TimeOffStatusEnumCancelled
-		*t = value
+		return TimeOffStatusEnumCancelled, nil
 	case "DELETED":
-		value := TimeOffStatusEnumDeleted
-		*t = value
+		return TimeOffStatusEnumDeleted, nil
 	}
-	return nil
+	var t TimeOffStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TimeOffStatusEnum) Ptr() *TimeOffStatusEnum {
+	return &t
 }
 
 // The measurement that the third-party integration uses to count time requested.
 //
-// * `HOURS` - HOURS
-// * `DAYS` - DAYS
+// - `HOURS` - HOURS
+// - `DAYS` - DAYS
 type TimeOffUnits struct {
 	typeName  string
 	UnitsEnum UnitsEnum
@@ -17869,49 +11823,14 @@ func (t *TimeOffUnits) Accept(visitor TimeOffUnitsVisitor) error {
 	}
 }
 
-type TimesheetEntriesListRequestOrderBy uint
-
-const (
-	TimesheetEntriesListRequestOrderByStartTimeDescending TimesheetEntriesListRequestOrderBy = iota + 1
-	TimesheetEntriesListRequestOrderByStartTimeAscending
-)
-
-func (t TimesheetEntriesListRequestOrderBy) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TimesheetEntriesListRequestOrderByStartTimeDescending:
-		return "-start_time"
-	case TimesheetEntriesListRequestOrderByStartTimeAscending:
-		return "start_time"
-	}
-}
-
-func (t TimesheetEntriesListRequestOrderBy) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TimesheetEntriesListRequestOrderBy) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "-start_time":
-		value := TimesheetEntriesListRequestOrderByStartTimeDescending
-		*t = value
-	case "start_time":
-		value := TimesheetEntriesListRequestOrderByStartTimeAscending
-		*t = value
-	}
-	return nil
-}
-
 // # The Timesheet Entry Object
+//
 // ### Description
+//
 // The `Timesheet Entry` object is used to track coverage for hours worked by an 'Employee'.
 //
 // ### Usage Example
+//
 // GET and POST Timesheet Entries
 type TimesheetEntry struct {
 	Id *string `json:"id,omitempty"`
@@ -17928,13 +11847,41 @@ type TimesheetEntry struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TimesheetEntry) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimesheetEntry
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TimesheetEntry(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TimesheetEntry) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // # The Timesheet Entry Object
+//
 // ### Description
+//
 // The `Timesheet Entry` object is used to track coverage for hours worked by an 'Employee'.
 //
 // ### Usage Example
+//
 // GET and POST Timesheet Entries
 type TimesheetEntryRequest struct {
 	// The employee the timesheet entry is for.
@@ -17944,9 +11891,34 @@ type TimesheetEntryRequest struct {
 	// The time at which the employee started work.
 	StartTime *time.Time `json:"start_time,omitempty"`
 	// The time at which the employee ended work.
-	EndTime             *time.Time     `json:"end_time,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	EndTime             *time.Time             `json:"end_time,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TimesheetEntryRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimesheetEntryRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TimesheetEntryRequest(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TimesheetEntryRequest) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 type TimesheetEntryResponse struct {
@@ -17954,50 +11926,84 @@ type TimesheetEntryResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `HOURS` - HOURS
-// * `DAYS` - DAYS
-type UnitsEnum uint
-
-const (
-	UnitsEnumHours UnitsEnum = iota + 1
-	UnitsEnumDays
-)
-
-func (u UnitsEnum) String() string {
-	switch u {
-	default:
-		return strconv.Itoa(int(u))
-	case UnitsEnumHours:
-		return "HOURS"
-	case UnitsEnumDays:
-		return "DAYS"
-	}
-}
-
-func (u UnitsEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", u.String())), nil
-}
-
-func (u *UnitsEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (t *TimesheetEntryResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler TimesheetEntryResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "HOURS":
-		value := UnitsEnumHours
-		*u = value
-	case "DAYS":
-		value := UnitsEnumDays
-		*u = value
-	}
+	*t = TimesheetEntryResponse(value)
+	t._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (t *TimesheetEntryResponse) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
+}
+
+// - `HOURS` - HOURS
+// - `DAYS` - DAYS
+type UnitsEnum string
+
+const (
+	UnitsEnumHours UnitsEnum = "HOURS"
+	UnitsEnumDays  UnitsEnum = "DAYS"
+)
+
+func NewUnitsEnumFromString(s string) (UnitsEnum, error) {
+	switch s {
+	case "HOURS":
+		return UnitsEnumHours, nil
+	case "DAYS":
+		return UnitsEnumDays, nil
+	}
+	var t UnitsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (u UnitsEnum) Ptr() *UnitsEnum {
+	return &u
 }
 
 type ValidationProblemSource struct {
 	Pointer string `json:"pointer"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *ValidationProblemSource) UnmarshalJSON(data []byte) error {
+	type unmarshaler ValidationProblemSource
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = ValidationProblemSource(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *ValidationProblemSource) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
 }
 
 type WarningValidationProblem struct {
@@ -18005,10 +12011,60 @@ type WarningValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WarningValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler WarningValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WarningValidationProblem(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WarningValidationProblem) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }
 
 type WebhookReceiver struct {
 	Event    string  `json:"event"`
 	IsActive bool    `json:"is_active"`
 	Key      *string `json:"key,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WebhookReceiver) UnmarshalJSON(data []byte) error {
+	type unmarshaler WebhookReceiver
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WebhookReceiver(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WebhookReceiver) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }

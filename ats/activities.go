@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -53,4 +54,104 @@ type ActivitiesRetrieveRequest struct {
 	RemoteFields *ActivitiesRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *ActivitiesRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type ActivitiesListRequestRemoteFields string
+
+const (
+	ActivitiesListRequestRemoteFieldsActivityType           ActivitiesListRequestRemoteFields = "activity_type"
+	ActivitiesListRequestRemoteFieldsActivityTypeVisibility ActivitiesListRequestRemoteFields = "activity_type,visibility"
+	ActivitiesListRequestRemoteFieldsVisibility             ActivitiesListRequestRemoteFields = "visibility"
+)
+
+func NewActivitiesListRequestRemoteFieldsFromString(s string) (ActivitiesListRequestRemoteFields, error) {
+	switch s {
+	case "activity_type":
+		return ActivitiesListRequestRemoteFieldsActivityType, nil
+	case "activity_type,visibility":
+		return ActivitiesListRequestRemoteFieldsActivityTypeVisibility, nil
+	case "visibility":
+		return ActivitiesListRequestRemoteFieldsVisibility, nil
+	}
+	var t ActivitiesListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a ActivitiesListRequestRemoteFields) Ptr() *ActivitiesListRequestRemoteFields {
+	return &a
+}
+
+type ActivitiesListRequestShowEnumOrigins string
+
+const (
+	ActivitiesListRequestShowEnumOriginsActivityType           ActivitiesListRequestShowEnumOrigins = "activity_type"
+	ActivitiesListRequestShowEnumOriginsActivityTypeVisibility ActivitiesListRequestShowEnumOrigins = "activity_type,visibility"
+	ActivitiesListRequestShowEnumOriginsVisibility             ActivitiesListRequestShowEnumOrigins = "visibility"
+)
+
+func NewActivitiesListRequestShowEnumOriginsFromString(s string) (ActivitiesListRequestShowEnumOrigins, error) {
+	switch s {
+	case "activity_type":
+		return ActivitiesListRequestShowEnumOriginsActivityType, nil
+	case "activity_type,visibility":
+		return ActivitiesListRequestShowEnumOriginsActivityTypeVisibility, nil
+	case "visibility":
+		return ActivitiesListRequestShowEnumOriginsVisibility, nil
+	}
+	var t ActivitiesListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a ActivitiesListRequestShowEnumOrigins) Ptr() *ActivitiesListRequestShowEnumOrigins {
+	return &a
+}
+
+type ActivitiesRetrieveRequestRemoteFields string
+
+const (
+	ActivitiesRetrieveRequestRemoteFieldsActivityType           ActivitiesRetrieveRequestRemoteFields = "activity_type"
+	ActivitiesRetrieveRequestRemoteFieldsActivityTypeVisibility ActivitiesRetrieveRequestRemoteFields = "activity_type,visibility"
+	ActivitiesRetrieveRequestRemoteFieldsVisibility             ActivitiesRetrieveRequestRemoteFields = "visibility"
+)
+
+func NewActivitiesRetrieveRequestRemoteFieldsFromString(s string) (ActivitiesRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "activity_type":
+		return ActivitiesRetrieveRequestRemoteFieldsActivityType, nil
+	case "activity_type,visibility":
+		return ActivitiesRetrieveRequestRemoteFieldsActivityTypeVisibility, nil
+	case "visibility":
+		return ActivitiesRetrieveRequestRemoteFieldsVisibility, nil
+	}
+	var t ActivitiesRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a ActivitiesRetrieveRequestRemoteFields) Ptr() *ActivitiesRetrieveRequestRemoteFields {
+	return &a
+}
+
+type ActivitiesRetrieveRequestShowEnumOrigins string
+
+const (
+	ActivitiesRetrieveRequestShowEnumOriginsActivityType           ActivitiesRetrieveRequestShowEnumOrigins = "activity_type"
+	ActivitiesRetrieveRequestShowEnumOriginsActivityTypeVisibility ActivitiesRetrieveRequestShowEnumOrigins = "activity_type,visibility"
+	ActivitiesRetrieveRequestShowEnumOriginsVisibility             ActivitiesRetrieveRequestShowEnumOrigins = "visibility"
+)
+
+func NewActivitiesRetrieveRequestShowEnumOriginsFromString(s string) (ActivitiesRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "activity_type":
+		return ActivitiesRetrieveRequestShowEnumOriginsActivityType, nil
+	case "activity_type,visibility":
+		return ActivitiesRetrieveRequestShowEnumOriginsActivityTypeVisibility, nil
+	case "visibility":
+		return ActivitiesRetrieveRequestShowEnumOriginsVisibility, nil
+	}
+	var t ActivitiesRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a ActivitiesRetrieveRequestShowEnumOrigins) Ptr() *ActivitiesRetrieveRequestShowEnumOrigins {
+	return &a
 }

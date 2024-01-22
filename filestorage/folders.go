@@ -3,6 +3,7 @@
 package filestorage
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -48,4 +49,78 @@ type FoldersRetrieveRequest struct {
 	Expand *FoldersRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type FoldersListRequestExpand string
+
+const (
+	FoldersListRequestExpandDrive                        FoldersListRequestExpand = "drive"
+	FoldersListRequestExpandParentFolder                 FoldersListRequestExpand = "parent_folder"
+	FoldersListRequestExpandParentFolderDrive            FoldersListRequestExpand = "parent_folder,drive"
+	FoldersListRequestExpandPermissions                  FoldersListRequestExpand = "permissions"
+	FoldersListRequestExpandPermissionsDrive             FoldersListRequestExpand = "permissions,drive"
+	FoldersListRequestExpandPermissionsParentFolder      FoldersListRequestExpand = "permissions,parent_folder"
+	FoldersListRequestExpandPermissionsParentFolderDrive FoldersListRequestExpand = "permissions,parent_folder,drive"
+)
+
+func NewFoldersListRequestExpandFromString(s string) (FoldersListRequestExpand, error) {
+	switch s {
+	case "drive":
+		return FoldersListRequestExpandDrive, nil
+	case "parent_folder":
+		return FoldersListRequestExpandParentFolder, nil
+	case "parent_folder,drive":
+		return FoldersListRequestExpandParentFolderDrive, nil
+	case "permissions":
+		return FoldersListRequestExpandPermissions, nil
+	case "permissions,drive":
+		return FoldersListRequestExpandPermissionsDrive, nil
+	case "permissions,parent_folder":
+		return FoldersListRequestExpandPermissionsParentFolder, nil
+	case "permissions,parent_folder,drive":
+		return FoldersListRequestExpandPermissionsParentFolderDrive, nil
+	}
+	var t FoldersListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FoldersListRequestExpand) Ptr() *FoldersListRequestExpand {
+	return &f
+}
+
+type FoldersRetrieveRequestExpand string
+
+const (
+	FoldersRetrieveRequestExpandDrive                        FoldersRetrieveRequestExpand = "drive"
+	FoldersRetrieveRequestExpandParentFolder                 FoldersRetrieveRequestExpand = "parent_folder"
+	FoldersRetrieveRequestExpandParentFolderDrive            FoldersRetrieveRequestExpand = "parent_folder,drive"
+	FoldersRetrieveRequestExpandPermissions                  FoldersRetrieveRequestExpand = "permissions"
+	FoldersRetrieveRequestExpandPermissionsDrive             FoldersRetrieveRequestExpand = "permissions,drive"
+	FoldersRetrieveRequestExpandPermissionsParentFolder      FoldersRetrieveRequestExpand = "permissions,parent_folder"
+	FoldersRetrieveRequestExpandPermissionsParentFolderDrive FoldersRetrieveRequestExpand = "permissions,parent_folder,drive"
+)
+
+func NewFoldersRetrieveRequestExpandFromString(s string) (FoldersRetrieveRequestExpand, error) {
+	switch s {
+	case "drive":
+		return FoldersRetrieveRequestExpandDrive, nil
+	case "parent_folder":
+		return FoldersRetrieveRequestExpandParentFolder, nil
+	case "parent_folder,drive":
+		return FoldersRetrieveRequestExpandParentFolderDrive, nil
+	case "permissions":
+		return FoldersRetrieveRequestExpandPermissions, nil
+	case "permissions,drive":
+		return FoldersRetrieveRequestExpandPermissionsDrive, nil
+	case "permissions,parent_folder":
+		return FoldersRetrieveRequestExpandPermissionsParentFolder, nil
+	case "permissions,parent_folder,drive":
+		return FoldersRetrieveRequestExpandPermissionsParentFolderDrive, nil
+	}
+	var t FoldersRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FoldersRetrieveRequestExpand) Ptr() *FoldersRetrieveRequestExpand {
+	return &f
 }

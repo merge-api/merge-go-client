@@ -12,37 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *ticketing.TicketsListRequest) (*ticketing.PaginatedTicketList, error)
-	Create(ctx context.Context, request *ticketing.TicketEndpointRequest) (*ticketing.TicketResponse, error)
-	Retrieve(ctx context.Context, id string, request *ticketing.TicketsRetrieveRequest) (*ticketing.Ticket, error)
-	PartialUpdate(ctx context.Context, id string, request *ticketing.PatchedTicketEndpointRequest) (*ticketing.TicketResponse, error)
-	CollaboratorsList(ctx context.Context, parentId string, request *ticketing.TicketsCollaboratorsListRequest) (*ticketing.PaginatedUserList, error)
-	MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.MetaResponse, error)
-	MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error)
-	RemoteFieldClassesList(ctx context.Context, request *ticketing.TicketsRemoteFieldClassesListRequest) (*ticketing.PaginatedRemoteFieldClassList, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Ticket` objects.
-func (c *client) List(ctx context.Context, request *ticketing.TicketsListRequest) (*ticketing.PaginatedTicketList, error) {
+func (c *Client) List(ctx context.Context, request *ticketing.TicketsListRequest) (*ticketing.PaginatedTicketList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -148,24 +137,22 @@ func (c *client) List(ctx context.Context, request *ticketing.TicketsListRequest
 	}
 
 	var response *ticketing.PaginatedTicketList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates a `Ticket` object with the given values.
-func (c *client) Create(ctx context.Context, request *ticketing.TicketEndpointRequest) (*ticketing.TicketResponse, error) {
+func (c *Client) Create(ctx context.Context, request *ticketing.TicketEndpointRequest) (*ticketing.TicketResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -184,24 +171,23 @@ func (c *client) Create(ctx context.Context, request *ticketing.TicketEndpointRe
 	}
 
 	var response *ticketing.TicketResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `Ticket` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.TicketsRetrieveRequest) (*ticketing.Ticket, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.TicketsRetrieveRequest) (*ticketing.Ticket, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -229,24 +215,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Tic
 	}
 
 	var response *ticketing.Ticket
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Updates a `Ticket` object with the given `id`.
-func (c *client) PartialUpdate(ctx context.Context, id string, request *ticketing.PatchedTicketEndpointRequest) (*ticketing.TicketResponse, error) {
+func (c *Client) PartialUpdate(ctx context.Context, id string, request *ticketing.PatchedTicketEndpointRequest) (*ticketing.TicketResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -265,24 +249,23 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *ticketin
 	}
 
 	var response *ticketing.TicketResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPatch,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPatch,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a list of `User` objects.
-func (c *client) CollaboratorsList(ctx context.Context, parentId string, request *ticketing.TicketsCollaboratorsListRequest) (*ticketing.PaginatedUserList, error) {
+func (c *Client) CollaboratorsList(ctx context.Context, parentId string, request *ticketing.TicketsCollaboratorsListRequest) (*ticketing.PaginatedUserList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -310,24 +293,22 @@ func (c *client) CollaboratorsList(ctx context.Context, parentId string, request
 	}
 
 	var response *ticketing.PaginatedUserList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Ticket` PATCHs.
-func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.MetaResponse, error) {
+func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -335,24 +316,22 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.M
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/meta/patch/%v", id)
 
 	var response *ticketing.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Ticket` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -360,24 +339,22 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse,
 	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets/meta/post"
 
 	var response *ticketing.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
-func (c *client) RemoteFieldClassesList(ctx context.Context, request *ticketing.TicketsRemoteFieldClassesListRequest) (*ticketing.PaginatedRemoteFieldClassList, error) {
+func (c *Client) RemoteFieldClassesList(ctx context.Context, request *ticketing.TicketsRemoteFieldClassesListRequest) (*ticketing.PaginatedRemoteFieldClassList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -402,18 +379,16 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *ticketing.
 	}
 
 	var response *ticketing.PaginatedRemoteFieldClassList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

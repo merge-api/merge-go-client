@@ -38,240 +38,83 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	AccountDetails() accountdetails.Client
-	AccountToken() accounttoken.Client
-	Activities() activities.Client
-	Applications() applications.Client
-	AsyncPassthrough() asyncpassthrough.Client
-	Attachments() attachments.Client
-	AuditTrail() audittrail.Client
-	AvailableActions() availableactions.Client
-	Candidates() candidates.Client
-	DeleteAccount() deleteaccount.Client
-	Departments() departments.Client
-	Eeocs() eeocs.Client
-	GenerateKey() generatekey.Client
-	Interviews() interviews.Client
-	Issues() issues.Client
-	JobInterviewStages() jobinterviewstages.Client
-	Jobs() jobs.Client
-	LinkToken() linktoken.Client
-	LinkedAccounts() linkedaccounts.Client
-	Offers() offers.Client
-	Offices() offices.Client
-	Passthrough() passthrough.Client
-	RegenerateKey() regeneratekey.Client
-	RejectReasons() rejectreasons.Client
-	Scorecards() scorecards.Client
-	SelectiveSync() selectivesync.Client
-	SyncStatus() syncstatus.Client
-	ForceResync() forceresync.Client
-	Tags() tags.Client
-	Users() users.Client
-	WebhookReceivers() webhookreceivers.Client
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
+
+	AccountDetails     *accountdetails.Client
+	AccountToken       *accounttoken.Client
+	Activities         *activities.Client
+	Applications       *applications.Client
+	AsyncPassthrough   *asyncpassthrough.Client
+	Attachments        *attachments.Client
+	AuditTrail         *audittrail.Client
+	AvailableActions   *availableactions.Client
+	Candidates         *candidates.Client
+	DeleteAccount      *deleteaccount.Client
+	Departments        *departments.Client
+	Eeocs              *eeocs.Client
+	GenerateKey        *generatekey.Client
+	Interviews         *interviews.Client
+	Issues             *issues.Client
+	JobInterviewStages *jobinterviewstages.Client
+	Jobs               *jobs.Client
+	LinkToken          *linktoken.Client
+	LinkedAccounts     *linkedaccounts.Client
+	Offers             *offers.Client
+	Offices            *offices.Client
+	Passthrough        *passthrough.Client
+	RegenerateKey      *regeneratekey.Client
+	RejectReasons      *rejectreasons.Client
+	Scorecards         *scorecards.Client
+	SelectiveSync      *selectivesync.Client
+	SyncStatus         *syncstatus.Client
+	ForceResync        *forceresync.Client
+	Tags               *tags.Client
+	Users              *users.Client
+	WebhookReceivers   *webhookreceivers.Client
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:                  options.BaseURL,
-		httpClient:               options.HTTPClient,
-		header:                   options.ToHeader(),
-		accountDetailsClient:     accountdetails.NewClient(opts...),
-		accountTokenClient:       accounttoken.NewClient(opts...),
-		activitiesClient:         activities.NewClient(opts...),
-		applicationsClient:       applications.NewClient(opts...),
-		asyncPassthroughClient:   asyncpassthrough.NewClient(opts...),
-		attachmentsClient:        attachments.NewClient(opts...),
-		auditTrailClient:         audittrail.NewClient(opts...),
-		availableActionsClient:   availableactions.NewClient(opts...),
-		candidatesClient:         candidates.NewClient(opts...),
-		deleteAccountClient:      deleteaccount.NewClient(opts...),
-		departmentsClient:        departments.NewClient(opts...),
-		eeocsClient:              eeocs.NewClient(opts...),
-		generateKeyClient:        generatekey.NewClient(opts...),
-		interviewsClient:         interviews.NewClient(opts...),
-		issuesClient:             issues.NewClient(opts...),
-		jobInterviewStagesClient: jobinterviewstages.NewClient(opts...),
-		jobsClient:               jobs.NewClient(opts...),
-		linkTokenClient:          linktoken.NewClient(opts...),
-		linkedAccountsClient:     linkedaccounts.NewClient(opts...),
-		offersClient:             offers.NewClient(opts...),
-		officesClient:            offices.NewClient(opts...),
-		passthroughClient:        passthrough.NewClient(opts...),
-		regenerateKeyClient:      regeneratekey.NewClient(opts...),
-		rejectReasonsClient:      rejectreasons.NewClient(opts...),
-		scorecardsClient:         scorecards.NewClient(opts...),
-		selectiveSyncClient:      selectivesync.NewClient(opts...),
-		syncStatusClient:         syncstatus.NewClient(opts...),
-		forceResyncClient:        forceresync.NewClient(opts...),
-		tagsClient:               tags.NewClient(opts...),
-		usersClient:              users.NewClient(opts...),
-		webhookReceiversClient:   webhookreceivers.NewClient(opts...),
+	return &Client{
+		baseURL:            options.BaseURL,
+		caller:             core.NewCaller(options.HTTPClient),
+		header:             options.ToHeader(),
+		AccountDetails:     accountdetails.NewClient(opts...),
+		AccountToken:       accounttoken.NewClient(opts...),
+		Activities:         activities.NewClient(opts...),
+		Applications:       applications.NewClient(opts...),
+		AsyncPassthrough:   asyncpassthrough.NewClient(opts...),
+		Attachments:        attachments.NewClient(opts...),
+		AuditTrail:         audittrail.NewClient(opts...),
+		AvailableActions:   availableactions.NewClient(opts...),
+		Candidates:         candidates.NewClient(opts...),
+		DeleteAccount:      deleteaccount.NewClient(opts...),
+		Departments:        departments.NewClient(opts...),
+		Eeocs:              eeocs.NewClient(opts...),
+		GenerateKey:        generatekey.NewClient(opts...),
+		Interviews:         interviews.NewClient(opts...),
+		Issues:             issues.NewClient(opts...),
+		JobInterviewStages: jobinterviewstages.NewClient(opts...),
+		Jobs:               jobs.NewClient(opts...),
+		LinkToken:          linktoken.NewClient(opts...),
+		LinkedAccounts:     linkedaccounts.NewClient(opts...),
+		Offers:             offers.NewClient(opts...),
+		Offices:            offices.NewClient(opts...),
+		Passthrough:        passthrough.NewClient(opts...),
+		RegenerateKey:      regeneratekey.NewClient(opts...),
+		RejectReasons:      rejectreasons.NewClient(opts...),
+		Scorecards:         scorecards.NewClient(opts...),
+		SelectiveSync:      selectivesync.NewClient(opts...),
+		SyncStatus:         syncstatus.NewClient(opts...),
+		ForceResync:        forceresync.NewClient(opts...),
+		Tags:               tags.NewClient(opts...),
+		Users:              users.NewClient(opts...),
+		WebhookReceivers:   webhookreceivers.NewClient(opts...),
 	}
-}
-
-type client struct {
-	baseURL                  string
-	httpClient               core.HTTPClient
-	header                   http.Header
-	accountDetailsClient     accountdetails.Client
-	accountTokenClient       accounttoken.Client
-	activitiesClient         activities.Client
-	applicationsClient       applications.Client
-	asyncPassthroughClient   asyncpassthrough.Client
-	attachmentsClient        attachments.Client
-	auditTrailClient         audittrail.Client
-	availableActionsClient   availableactions.Client
-	candidatesClient         candidates.Client
-	deleteAccountClient      deleteaccount.Client
-	departmentsClient        departments.Client
-	eeocsClient              eeocs.Client
-	generateKeyClient        generatekey.Client
-	interviewsClient         interviews.Client
-	issuesClient             issues.Client
-	jobInterviewStagesClient jobinterviewstages.Client
-	jobsClient               jobs.Client
-	linkTokenClient          linktoken.Client
-	linkedAccountsClient     linkedaccounts.Client
-	offersClient             offers.Client
-	officesClient            offices.Client
-	passthroughClient        passthrough.Client
-	regenerateKeyClient      regeneratekey.Client
-	rejectReasonsClient      rejectreasons.Client
-	scorecardsClient         scorecards.Client
-	selectiveSyncClient      selectivesync.Client
-	syncStatusClient         syncstatus.Client
-	forceResyncClient        forceresync.Client
-	tagsClient               tags.Client
-	usersClient              users.Client
-	webhookReceiversClient   webhookreceivers.Client
-}
-
-func (c *client) AccountDetails() accountdetails.Client {
-	return c.accountDetailsClient
-}
-
-func (c *client) AccountToken() accounttoken.Client {
-	return c.accountTokenClient
-}
-
-func (c *client) Activities() activities.Client {
-	return c.activitiesClient
-}
-
-func (c *client) Applications() applications.Client {
-	return c.applicationsClient
-}
-
-func (c *client) AsyncPassthrough() asyncpassthrough.Client {
-	return c.asyncPassthroughClient
-}
-
-func (c *client) Attachments() attachments.Client {
-	return c.attachmentsClient
-}
-
-func (c *client) AuditTrail() audittrail.Client {
-	return c.auditTrailClient
-}
-
-func (c *client) AvailableActions() availableactions.Client {
-	return c.availableActionsClient
-}
-
-func (c *client) Candidates() candidates.Client {
-	return c.candidatesClient
-}
-
-func (c *client) DeleteAccount() deleteaccount.Client {
-	return c.deleteAccountClient
-}
-
-func (c *client) Departments() departments.Client {
-	return c.departmentsClient
-}
-
-func (c *client) Eeocs() eeocs.Client {
-	return c.eeocsClient
-}
-
-func (c *client) GenerateKey() generatekey.Client {
-	return c.generateKeyClient
-}
-
-func (c *client) Interviews() interviews.Client {
-	return c.interviewsClient
-}
-
-func (c *client) Issues() issues.Client {
-	return c.issuesClient
-}
-
-func (c *client) JobInterviewStages() jobinterviewstages.Client {
-	return c.jobInterviewStagesClient
-}
-
-func (c *client) Jobs() jobs.Client {
-	return c.jobsClient
-}
-
-func (c *client) LinkToken() linktoken.Client {
-	return c.linkTokenClient
-}
-
-func (c *client) LinkedAccounts() linkedaccounts.Client {
-	return c.linkedAccountsClient
-}
-
-func (c *client) Offers() offers.Client {
-	return c.offersClient
-}
-
-func (c *client) Offices() offices.Client {
-	return c.officesClient
-}
-
-func (c *client) Passthrough() passthrough.Client {
-	return c.passthroughClient
-}
-
-func (c *client) RegenerateKey() regeneratekey.Client {
-	return c.regenerateKeyClient
-}
-
-func (c *client) RejectReasons() rejectreasons.Client {
-	return c.rejectReasonsClient
-}
-
-func (c *client) Scorecards() scorecards.Client {
-	return c.scorecardsClient
-}
-
-func (c *client) SelectiveSync() selectivesync.Client {
-	return c.selectiveSyncClient
-}
-
-func (c *client) SyncStatus() syncstatus.Client {
-	return c.syncStatusClient
-}
-
-func (c *client) ForceResync() forceresync.Client {
-	return c.forceResyncClient
-}
-
-func (c *client) Tags() tags.Client {
-	return c.tagsClient
-}
-
-func (c *client) Users() users.Client {
-	return c.usersClient
-}
-
-func (c *client) WebhookReceivers() webhookreceivers.Client {
-	return c.webhookReceiversClient
 }

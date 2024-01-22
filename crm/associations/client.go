@@ -12,31 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	CustomObjectClassesCustomObjectsAssociationsList(ctx context.Context, customObjectClassId string, objectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsListRequest) (*crm.PaginatedAssociationList, error)
-	CustomObjectClassesCustomObjectsAssociationsUpdate(ctx context.Context, associationTypeId string, sourceClassId string, sourceObjectId string, targetClassId string, targetObjectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsUpdateRequest) (*crm.Association, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Association` objects.
-func (c *client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Context, customObjectClassId string, objectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsListRequest) (*crm.PaginatedAssociationList, error) {
+func (c *Client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Context, customObjectClassId string, objectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsListRequest) (*crm.PaginatedAssociationList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -57,7 +52,7 @@ func (c *client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Co
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
@@ -82,24 +77,22 @@ func (c *client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Co
 	}
 
 	var response *crm.PaginatedAssociationList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an Association between `source_object_id` and `target_object_id` of type `association_type_id`.
-func (c *client) CustomObjectClassesCustomObjectsAssociationsUpdate(ctx context.Context, associationTypeId string, sourceClassId string, sourceObjectId string, targetClassId string, targetObjectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsUpdateRequest) (*crm.Association, error) {
+func (c *Client) CustomObjectClassesCustomObjectsAssociationsUpdate(ctx context.Context, associationTypeId string, sourceClassId string, sourceObjectId string, targetClassId string, targetObjectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsUpdateRequest) (*crm.Association, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -118,18 +111,16 @@ func (c *client) CustomObjectClassesCustomObjectsAssociationsUpdate(ctx context.
 	}
 
 	var response *crm.Association
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPut,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPut,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

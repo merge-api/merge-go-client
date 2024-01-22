@@ -44,282 +44,95 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	AccountDetails() accountdetails.Client
-	AccountToken() accounttoken.Client
-	AccountingPeriods() accountingperiods.Client
-	Accounts() accounts.Client
-	Addresses() addresses.Client
-	AsyncPassthrough() asyncpassthrough.Client
-	Attachments() attachments.Client
-	AuditTrail() audittrail.Client
-	AvailableActions() availableactions.Client
-	BalanceSheets() balancesheets.Client
-	CashFlowStatements() cashflowstatements.Client
-	CompanyInfo() companyinfo.Client
-	Contacts() contacts.Client
-	CreditNotes() creditnotes.Client
-	DeleteAccount() deleteaccount.Client
-	Expenses() expenses.Client
-	GenerateKey() generatekey.Client
-	IncomeStatements() incomestatements.Client
-	Invoices() invoices.Client
-	Issues() issues.Client
-	Items() items.Client
-	JournalEntries() journalentries.Client
-	LinkToken() linktoken.Client
-	LinkedAccounts() linkedaccounts.Client
-	Passthrough() passthrough.Client
-	Payments() payments.Client
-	PhoneNumbers() phonenumbers.Client
-	PurchaseOrders() purchaseorders.Client
-	RegenerateKey() regeneratekey.Client
-	SelectiveSync() selectivesync.Client
-	SyncStatus() syncstatus.Client
-	ForceResync() forceresync.Client
-	TaxRates() taxrates.Client
-	TrackingCategories() trackingcategories.Client
-	Transactions() transactions.Client
-	VendorCredits() vendorcredits.Client
-	WebhookReceivers() webhookreceivers.Client
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
+
+	AccountDetails     *accountdetails.Client
+	AccountToken       *accounttoken.Client
+	AccountingPeriods  *accountingperiods.Client
+	Accounts           *accounts.Client
+	Addresses          *addresses.Client
+	AsyncPassthrough   *asyncpassthrough.Client
+	Attachments        *attachments.Client
+	AuditTrail         *audittrail.Client
+	AvailableActions   *availableactions.Client
+	BalanceSheets      *balancesheets.Client
+	CashFlowStatements *cashflowstatements.Client
+	CompanyInfo        *companyinfo.Client
+	Contacts           *contacts.Client
+	CreditNotes        *creditnotes.Client
+	DeleteAccount      *deleteaccount.Client
+	Expenses           *expenses.Client
+	GenerateKey        *generatekey.Client
+	IncomeStatements   *incomestatements.Client
+	Invoices           *invoices.Client
+	Issues             *issues.Client
+	Items              *items.Client
+	JournalEntries     *journalentries.Client
+	LinkToken          *linktoken.Client
+	LinkedAccounts     *linkedaccounts.Client
+	Passthrough        *passthrough.Client
+	Payments           *payments.Client
+	PhoneNumbers       *phonenumbers.Client
+	PurchaseOrders     *purchaseorders.Client
+	RegenerateKey      *regeneratekey.Client
+	SelectiveSync      *selectivesync.Client
+	SyncStatus         *syncstatus.Client
+	ForceResync        *forceresync.Client
+	TaxRates           *taxrates.Client
+	TrackingCategories *trackingcategories.Client
+	Transactions       *transactions.Client
+	VendorCredits      *vendorcredits.Client
+	WebhookReceivers   *webhookreceivers.Client
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:                  options.BaseURL,
-		httpClient:               options.HTTPClient,
-		header:                   options.ToHeader(),
-		accountDetailsClient:     accountdetails.NewClient(opts...),
-		accountTokenClient:       accounttoken.NewClient(opts...),
-		accountingPeriodsClient:  accountingperiods.NewClient(opts...),
-		accountsClient:           accounts.NewClient(opts...),
-		addressesClient:          addresses.NewClient(opts...),
-		asyncPassthroughClient:   asyncpassthrough.NewClient(opts...),
-		attachmentsClient:        attachments.NewClient(opts...),
-		auditTrailClient:         audittrail.NewClient(opts...),
-		availableActionsClient:   availableactions.NewClient(opts...),
-		balanceSheetsClient:      balancesheets.NewClient(opts...),
-		cashFlowStatementsClient: cashflowstatements.NewClient(opts...),
-		companyInfoClient:        companyinfo.NewClient(opts...),
-		contactsClient:           contacts.NewClient(opts...),
-		creditNotesClient:        creditnotes.NewClient(opts...),
-		deleteAccountClient:      deleteaccount.NewClient(opts...),
-		expensesClient:           expenses.NewClient(opts...),
-		generateKeyClient:        generatekey.NewClient(opts...),
-		incomeStatementsClient:   incomestatements.NewClient(opts...),
-		invoicesClient:           invoices.NewClient(opts...),
-		issuesClient:             issues.NewClient(opts...),
-		itemsClient:              items.NewClient(opts...),
-		journalEntriesClient:     journalentries.NewClient(opts...),
-		linkTokenClient:          linktoken.NewClient(opts...),
-		linkedAccountsClient:     linkedaccounts.NewClient(opts...),
-		passthroughClient:        passthrough.NewClient(opts...),
-		paymentsClient:           payments.NewClient(opts...),
-		phoneNumbersClient:       phonenumbers.NewClient(opts...),
-		purchaseOrdersClient:     purchaseorders.NewClient(opts...),
-		regenerateKeyClient:      regeneratekey.NewClient(opts...),
-		selectiveSyncClient:      selectivesync.NewClient(opts...),
-		syncStatusClient:         syncstatus.NewClient(opts...),
-		forceResyncClient:        forceresync.NewClient(opts...),
-		taxRatesClient:           taxrates.NewClient(opts...),
-		trackingCategoriesClient: trackingcategories.NewClient(opts...),
-		transactionsClient:       transactions.NewClient(opts...),
-		vendorCreditsClient:      vendorcredits.NewClient(opts...),
-		webhookReceiversClient:   webhookreceivers.NewClient(opts...),
+	return &Client{
+		baseURL:            options.BaseURL,
+		caller:             core.NewCaller(options.HTTPClient),
+		header:             options.ToHeader(),
+		AccountDetails:     accountdetails.NewClient(opts...),
+		AccountToken:       accounttoken.NewClient(opts...),
+		AccountingPeriods:  accountingperiods.NewClient(opts...),
+		Accounts:           accounts.NewClient(opts...),
+		Addresses:          addresses.NewClient(opts...),
+		AsyncPassthrough:   asyncpassthrough.NewClient(opts...),
+		Attachments:        attachments.NewClient(opts...),
+		AuditTrail:         audittrail.NewClient(opts...),
+		AvailableActions:   availableactions.NewClient(opts...),
+		BalanceSheets:      balancesheets.NewClient(opts...),
+		CashFlowStatements: cashflowstatements.NewClient(opts...),
+		CompanyInfo:        companyinfo.NewClient(opts...),
+		Contacts:           contacts.NewClient(opts...),
+		CreditNotes:        creditnotes.NewClient(opts...),
+		DeleteAccount:      deleteaccount.NewClient(opts...),
+		Expenses:           expenses.NewClient(opts...),
+		GenerateKey:        generatekey.NewClient(opts...),
+		IncomeStatements:   incomestatements.NewClient(opts...),
+		Invoices:           invoices.NewClient(opts...),
+		Issues:             issues.NewClient(opts...),
+		Items:              items.NewClient(opts...),
+		JournalEntries:     journalentries.NewClient(opts...),
+		LinkToken:          linktoken.NewClient(opts...),
+		LinkedAccounts:     linkedaccounts.NewClient(opts...),
+		Passthrough:        passthrough.NewClient(opts...),
+		Payments:           payments.NewClient(opts...),
+		PhoneNumbers:       phonenumbers.NewClient(opts...),
+		PurchaseOrders:     purchaseorders.NewClient(opts...),
+		RegenerateKey:      regeneratekey.NewClient(opts...),
+		SelectiveSync:      selectivesync.NewClient(opts...),
+		SyncStatus:         syncstatus.NewClient(opts...),
+		ForceResync:        forceresync.NewClient(opts...),
+		TaxRates:           taxrates.NewClient(opts...),
+		TrackingCategories: trackingcategories.NewClient(opts...),
+		Transactions:       transactions.NewClient(opts...),
+		VendorCredits:      vendorcredits.NewClient(opts...),
+		WebhookReceivers:   webhookreceivers.NewClient(opts...),
 	}
-}
-
-type client struct {
-	baseURL                  string
-	httpClient               core.HTTPClient
-	header                   http.Header
-	accountDetailsClient     accountdetails.Client
-	accountTokenClient       accounttoken.Client
-	accountingPeriodsClient  accountingperiods.Client
-	accountsClient           accounts.Client
-	addressesClient          addresses.Client
-	asyncPassthroughClient   asyncpassthrough.Client
-	attachmentsClient        attachments.Client
-	auditTrailClient         audittrail.Client
-	availableActionsClient   availableactions.Client
-	balanceSheetsClient      balancesheets.Client
-	cashFlowStatementsClient cashflowstatements.Client
-	companyInfoClient        companyinfo.Client
-	contactsClient           contacts.Client
-	creditNotesClient        creditnotes.Client
-	deleteAccountClient      deleteaccount.Client
-	expensesClient           expenses.Client
-	generateKeyClient        generatekey.Client
-	incomeStatementsClient   incomestatements.Client
-	invoicesClient           invoices.Client
-	issuesClient             issues.Client
-	itemsClient              items.Client
-	journalEntriesClient     journalentries.Client
-	linkTokenClient          linktoken.Client
-	linkedAccountsClient     linkedaccounts.Client
-	passthroughClient        passthrough.Client
-	paymentsClient           payments.Client
-	phoneNumbersClient       phonenumbers.Client
-	purchaseOrdersClient     purchaseorders.Client
-	regenerateKeyClient      regeneratekey.Client
-	selectiveSyncClient      selectivesync.Client
-	syncStatusClient         syncstatus.Client
-	forceResyncClient        forceresync.Client
-	taxRatesClient           taxrates.Client
-	trackingCategoriesClient trackingcategories.Client
-	transactionsClient       transactions.Client
-	vendorCreditsClient      vendorcredits.Client
-	webhookReceiversClient   webhookreceivers.Client
-}
-
-func (c *client) AccountDetails() accountdetails.Client {
-	return c.accountDetailsClient
-}
-
-func (c *client) AccountToken() accounttoken.Client {
-	return c.accountTokenClient
-}
-
-func (c *client) AccountingPeriods() accountingperiods.Client {
-	return c.accountingPeriodsClient
-}
-
-func (c *client) Accounts() accounts.Client {
-	return c.accountsClient
-}
-
-func (c *client) Addresses() addresses.Client {
-	return c.addressesClient
-}
-
-func (c *client) AsyncPassthrough() asyncpassthrough.Client {
-	return c.asyncPassthroughClient
-}
-
-func (c *client) Attachments() attachments.Client {
-	return c.attachmentsClient
-}
-
-func (c *client) AuditTrail() audittrail.Client {
-	return c.auditTrailClient
-}
-
-func (c *client) AvailableActions() availableactions.Client {
-	return c.availableActionsClient
-}
-
-func (c *client) BalanceSheets() balancesheets.Client {
-	return c.balanceSheetsClient
-}
-
-func (c *client) CashFlowStatements() cashflowstatements.Client {
-	return c.cashFlowStatementsClient
-}
-
-func (c *client) CompanyInfo() companyinfo.Client {
-	return c.companyInfoClient
-}
-
-func (c *client) Contacts() contacts.Client {
-	return c.contactsClient
-}
-
-func (c *client) CreditNotes() creditnotes.Client {
-	return c.creditNotesClient
-}
-
-func (c *client) DeleteAccount() deleteaccount.Client {
-	return c.deleteAccountClient
-}
-
-func (c *client) Expenses() expenses.Client {
-	return c.expensesClient
-}
-
-func (c *client) GenerateKey() generatekey.Client {
-	return c.generateKeyClient
-}
-
-func (c *client) IncomeStatements() incomestatements.Client {
-	return c.incomeStatementsClient
-}
-
-func (c *client) Invoices() invoices.Client {
-	return c.invoicesClient
-}
-
-func (c *client) Issues() issues.Client {
-	return c.issuesClient
-}
-
-func (c *client) Items() items.Client {
-	return c.itemsClient
-}
-
-func (c *client) JournalEntries() journalentries.Client {
-	return c.journalEntriesClient
-}
-
-func (c *client) LinkToken() linktoken.Client {
-	return c.linkTokenClient
-}
-
-func (c *client) LinkedAccounts() linkedaccounts.Client {
-	return c.linkedAccountsClient
-}
-
-func (c *client) Passthrough() passthrough.Client {
-	return c.passthroughClient
-}
-
-func (c *client) Payments() payments.Client {
-	return c.paymentsClient
-}
-
-func (c *client) PhoneNumbers() phonenumbers.Client {
-	return c.phoneNumbersClient
-}
-
-func (c *client) PurchaseOrders() purchaseorders.Client {
-	return c.purchaseOrdersClient
-}
-
-func (c *client) RegenerateKey() regeneratekey.Client {
-	return c.regenerateKeyClient
-}
-
-func (c *client) SelectiveSync() selectivesync.Client {
-	return c.selectiveSyncClient
-}
-
-func (c *client) SyncStatus() syncstatus.Client {
-	return c.syncStatusClient
-}
-
-func (c *client) ForceResync() forceresync.Client {
-	return c.forceResyncClient
-}
-
-func (c *client) TaxRates() taxrates.Client {
-	return c.taxRatesClient
-}
-
-func (c *client) TrackingCategories() trackingcategories.Client {
-	return c.trackingCategoriesClient
-}
-
-func (c *client) Transactions() transactions.Client {
-	return c.transactionsClient
-}
-
-func (c *client) VendorCredits() vendorcredits.Client {
-	return c.vendorCreditsClient
-}
-
-func (c *client) WebhookReceivers() webhookreceivers.Client {
-	return c.webhookReceiversClient
 }

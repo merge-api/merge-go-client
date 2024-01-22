@@ -11,32 +11,26 @@ import (
 	url "net/url"
 )
 
-type Client interface {
-	ConfigurationsList(ctx context.Context) ([]*accounting.LinkedAccountSelectiveSyncConfiguration, error)
-	ConfigurationsUpdate(ctx context.Context, request *accounting.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*accounting.LinkedAccountSelectiveSyncConfiguration, error)
-	MetaList(ctx context.Context, request *accounting.SelectiveSyncMetaListRequest) (*accounting.PaginatedConditionSchemaList, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Get a linked account's selective syncs.
-func (c *client) ConfigurationsList(ctx context.Context) ([]*accounting.LinkedAccountSelectiveSyncConfiguration, error) {
+func (c *Client) ConfigurationsList(ctx context.Context) ([]*accounting.LinkedAccountSelectiveSyncConfiguration, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -44,24 +38,22 @@ func (c *client) ConfigurationsList(ctx context.Context) ([]*accounting.LinkedAc
 	endpointURL := baseURL + "/" + "api/accounting/v1/selective-sync/configurations"
 
 	var response []*accounting.LinkedAccountSelectiveSyncConfiguration
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Replace a linked account's selective syncs.
-func (c *client) ConfigurationsUpdate(ctx context.Context, request *accounting.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*accounting.LinkedAccountSelectiveSyncConfiguration, error) {
+func (c *Client) ConfigurationsUpdate(ctx context.Context, request *accounting.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*accounting.LinkedAccountSelectiveSyncConfiguration, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -69,24 +61,23 @@ func (c *client) ConfigurationsUpdate(ctx context.Context, request *accounting.L
 	endpointURL := baseURL + "/" + "api/accounting/v1/selective-sync/configurations"
 
 	var response []*accounting.LinkedAccountSelectiveSyncConfiguration
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPut,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPut,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Get metadata for the conditions available to a linked account.
-func (c *client) MetaList(ctx context.Context, request *accounting.SelectiveSyncMetaListRequest) (*accounting.PaginatedConditionSchemaList, error) {
+func (c *Client) MetaList(ctx context.Context, request *accounting.SelectiveSyncMetaListRequest) (*accounting.PaginatedConditionSchemaList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -108,18 +99,16 @@ func (c *client) MetaList(ctx context.Context, request *accounting.SelectiveSync
 	}
 
 	var response *accounting.PaginatedConditionSchemaList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

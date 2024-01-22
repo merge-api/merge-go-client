@@ -3,6 +3,7 @@
 package ats
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -37,11 +38,11 @@ type JobsListRequest struct {
 	ShowEnumOrigins *string `json:"-"`
 	// If provided, will only return jobs with this status. Options: ('OPEN', 'CLOSED', 'DRAFT', 'ARCHIVED', 'PENDING')
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	// * `DRAFT` - DRAFT
-	// * `ARCHIVED` - ARCHIVED
-	// * `PENDING` - PENDING
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	// - `DRAFT` - DRAFT
+	// - `ARCHIVED` - ARCHIVED
+	// - `PENDING` - PENDING
 	Status *JobsListRequestStatus `json:"-"`
 }
 
@@ -67,4 +68,182 @@ type JobsScreeningQuestionsListRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
+}
+
+type JobsListRequestExpand string
+
+const (
+	JobsListRequestExpandDepartments                                JobsListRequestExpand = "departments"
+	JobsListRequestExpandDepartmentsHiringManagers                  JobsListRequestExpand = "departments,hiring_managers"
+	JobsListRequestExpandDepartmentsHiringManagersRecruiters        JobsListRequestExpand = "departments,hiring_managers,recruiters"
+	JobsListRequestExpandDepartmentsOffices                         JobsListRequestExpand = "departments,offices"
+	JobsListRequestExpandDepartmentsOfficesHiringManagers           JobsListRequestExpand = "departments,offices,hiring_managers"
+	JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters JobsListRequestExpand = "departments,offices,hiring_managers,recruiters"
+	JobsListRequestExpandDepartmentsOfficesRecruiters               JobsListRequestExpand = "departments,offices,recruiters"
+	JobsListRequestExpandDepartmentsRecruiters                      JobsListRequestExpand = "departments,recruiters"
+	JobsListRequestExpandHiringManagers                             JobsListRequestExpand = "hiring_managers"
+	JobsListRequestExpandHiringManagersRecruiters                   JobsListRequestExpand = "hiring_managers,recruiters"
+	JobsListRequestExpandOffices                                    JobsListRequestExpand = "offices"
+	JobsListRequestExpandOfficesHiringManagers                      JobsListRequestExpand = "offices,hiring_managers"
+	JobsListRequestExpandOfficesHiringManagersRecruiters            JobsListRequestExpand = "offices,hiring_managers,recruiters"
+	JobsListRequestExpandOfficesRecruiters                          JobsListRequestExpand = "offices,recruiters"
+	JobsListRequestExpandRecruiters                                 JobsListRequestExpand = "recruiters"
+)
+
+func NewJobsListRequestExpandFromString(s string) (JobsListRequestExpand, error) {
+	switch s {
+	case "departments":
+		return JobsListRequestExpandDepartments, nil
+	case "departments,hiring_managers":
+		return JobsListRequestExpandDepartmentsHiringManagers, nil
+	case "departments,hiring_managers,recruiters":
+		return JobsListRequestExpandDepartmentsHiringManagersRecruiters, nil
+	case "departments,offices":
+		return JobsListRequestExpandDepartmentsOffices, nil
+	case "departments,offices,hiring_managers":
+		return JobsListRequestExpandDepartmentsOfficesHiringManagers, nil
+	case "departments,offices,hiring_managers,recruiters":
+		return JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters, nil
+	case "departments,offices,recruiters":
+		return JobsListRequestExpandDepartmentsOfficesRecruiters, nil
+	case "departments,recruiters":
+		return JobsListRequestExpandDepartmentsRecruiters, nil
+	case "hiring_managers":
+		return JobsListRequestExpandHiringManagers, nil
+	case "hiring_managers,recruiters":
+		return JobsListRequestExpandHiringManagersRecruiters, nil
+	case "offices":
+		return JobsListRequestExpandOffices, nil
+	case "offices,hiring_managers":
+		return JobsListRequestExpandOfficesHiringManagers, nil
+	case "offices,hiring_managers,recruiters":
+		return JobsListRequestExpandOfficesHiringManagersRecruiters, nil
+	case "offices,recruiters":
+		return JobsListRequestExpandOfficesRecruiters, nil
+	case "recruiters":
+		return JobsListRequestExpandRecruiters, nil
+	}
+	var t JobsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (j JobsListRequestExpand) Ptr() *JobsListRequestExpand {
+	return &j
+}
+
+type JobsListRequestStatus string
+
+const (
+	JobsListRequestStatusArchived JobsListRequestStatus = "ARCHIVED"
+	JobsListRequestStatusClosed   JobsListRequestStatus = "CLOSED"
+	JobsListRequestStatusDraft    JobsListRequestStatus = "DRAFT"
+	JobsListRequestStatusOpen     JobsListRequestStatus = "OPEN"
+	JobsListRequestStatusPending  JobsListRequestStatus = "PENDING"
+)
+
+func NewJobsListRequestStatusFromString(s string) (JobsListRequestStatus, error) {
+	switch s {
+	case "ARCHIVED":
+		return JobsListRequestStatusArchived, nil
+	case "CLOSED":
+		return JobsListRequestStatusClosed, nil
+	case "DRAFT":
+		return JobsListRequestStatusDraft, nil
+	case "OPEN":
+		return JobsListRequestStatusOpen, nil
+	case "PENDING":
+		return JobsListRequestStatusPending, nil
+	}
+	var t JobsListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (j JobsListRequestStatus) Ptr() *JobsListRequestStatus {
+	return &j
+}
+
+type JobsRetrieveRequestExpand string
+
+const (
+	JobsRetrieveRequestExpandDepartments                                JobsRetrieveRequestExpand = "departments"
+	JobsRetrieveRequestExpandDepartmentsHiringManagers                  JobsRetrieveRequestExpand = "departments,hiring_managers"
+	JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters        JobsRetrieveRequestExpand = "departments,hiring_managers,recruiters"
+	JobsRetrieveRequestExpandDepartmentsOffices                         JobsRetrieveRequestExpand = "departments,offices"
+	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers           JobsRetrieveRequestExpand = "departments,offices,hiring_managers"
+	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters JobsRetrieveRequestExpand = "departments,offices,hiring_managers,recruiters"
+	JobsRetrieveRequestExpandDepartmentsOfficesRecruiters               JobsRetrieveRequestExpand = "departments,offices,recruiters"
+	JobsRetrieveRequestExpandDepartmentsRecruiters                      JobsRetrieveRequestExpand = "departments,recruiters"
+	JobsRetrieveRequestExpandHiringManagers                             JobsRetrieveRequestExpand = "hiring_managers"
+	JobsRetrieveRequestExpandHiringManagersRecruiters                   JobsRetrieveRequestExpand = "hiring_managers,recruiters"
+	JobsRetrieveRequestExpandOffices                                    JobsRetrieveRequestExpand = "offices"
+	JobsRetrieveRequestExpandOfficesHiringManagers                      JobsRetrieveRequestExpand = "offices,hiring_managers"
+	JobsRetrieveRequestExpandOfficesHiringManagersRecruiters            JobsRetrieveRequestExpand = "offices,hiring_managers,recruiters"
+	JobsRetrieveRequestExpandOfficesRecruiters                          JobsRetrieveRequestExpand = "offices,recruiters"
+	JobsRetrieveRequestExpandRecruiters                                 JobsRetrieveRequestExpand = "recruiters"
+)
+
+func NewJobsRetrieveRequestExpandFromString(s string) (JobsRetrieveRequestExpand, error) {
+	switch s {
+	case "departments":
+		return JobsRetrieveRequestExpandDepartments, nil
+	case "departments,hiring_managers":
+		return JobsRetrieveRequestExpandDepartmentsHiringManagers, nil
+	case "departments,hiring_managers,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters, nil
+	case "departments,offices":
+		return JobsRetrieveRequestExpandDepartmentsOffices, nil
+	case "departments,offices,hiring_managers":
+		return JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers, nil
+	case "departments,offices,hiring_managers,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters, nil
+	case "departments,offices,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsOfficesRecruiters, nil
+	case "departments,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsRecruiters, nil
+	case "hiring_managers":
+		return JobsRetrieveRequestExpandHiringManagers, nil
+	case "hiring_managers,recruiters":
+		return JobsRetrieveRequestExpandHiringManagersRecruiters, nil
+	case "offices":
+		return JobsRetrieveRequestExpandOffices, nil
+	case "offices,hiring_managers":
+		return JobsRetrieveRequestExpandOfficesHiringManagers, nil
+	case "offices,hiring_managers,recruiters":
+		return JobsRetrieveRequestExpandOfficesHiringManagersRecruiters, nil
+	case "offices,recruiters":
+		return JobsRetrieveRequestExpandOfficesRecruiters, nil
+	case "recruiters":
+		return JobsRetrieveRequestExpandRecruiters, nil
+	}
+	var t JobsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (j JobsRetrieveRequestExpand) Ptr() *JobsRetrieveRequestExpand {
+	return &j
+}
+
+type JobsScreeningQuestionsListRequestExpand string
+
+const (
+	JobsScreeningQuestionsListRequestExpandJob        JobsScreeningQuestionsListRequestExpand = "job"
+	JobsScreeningQuestionsListRequestExpandOptions    JobsScreeningQuestionsListRequestExpand = "options"
+	JobsScreeningQuestionsListRequestExpandOptionsJob JobsScreeningQuestionsListRequestExpand = "options,job"
+)
+
+func NewJobsScreeningQuestionsListRequestExpandFromString(s string) (JobsScreeningQuestionsListRequestExpand, error) {
+	switch s {
+	case "job":
+		return JobsScreeningQuestionsListRequestExpandJob, nil
+	case "options":
+		return JobsScreeningQuestionsListRequestExpandOptions, nil
+	case "options,job":
+		return JobsScreeningQuestionsListRequestExpandOptionsJob, nil
+	}
+	var t JobsScreeningQuestionsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (j JobsScreeningQuestionsListRequestExpand) Ptr() *JobsScreeningQuestionsListRequestExpand {
+	return &j
 }

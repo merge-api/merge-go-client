@@ -12,32 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *ticketing.ProjectsListRequest) (*ticketing.PaginatedProjectList, error)
-	Retrieve(ctx context.Context, id string, request *ticketing.ProjectsRetrieveRequest) (*ticketing.Project, error)
-	UsersList(ctx context.Context, parentId string, request *ticketing.ProjectsUsersListRequest) (*ticketing.PaginatedUserList, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Project` objects.
-func (c *client) List(ctx context.Context, request *ticketing.ProjectsListRequest) (*ticketing.PaginatedProjectList, error) {
+func (c *Client) List(ctx context.Context, request *ticketing.ProjectsListRequest) (*ticketing.PaginatedProjectList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -77,24 +71,22 @@ func (c *client) List(ctx context.Context, request *ticketing.ProjectsListReques
 	}
 
 	var response *ticketing.PaginatedProjectList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `Project` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.ProjectsRetrieveRequest) (*ticketing.Project, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.ProjectsRetrieveRequest) (*ticketing.Project, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -110,24 +102,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *ticketing.Pro
 	}
 
 	var response *ticketing.Project
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a list of `User` objects.
-func (c *client) UsersList(ctx context.Context, parentId string, request *ticketing.ProjectsUsersListRequest) (*ticketing.PaginatedUserList, error) {
+func (c *Client) UsersList(ctx context.Context, parentId string, request *ticketing.ProjectsUsersListRequest) (*ticketing.PaginatedUserList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -155,18 +145,16 @@ func (c *client) UsersList(ctx context.Context, parentId string, request *ticket
 	}
 
 	var response *ticketing.PaginatedUserList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

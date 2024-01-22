@@ -3,6 +3,7 @@
 package ticketing
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -68,10 +69,10 @@ type TicketsListRequest struct {
 	ParentTicketId *string `json:"-"`
 	// If provided, will only return tickets of this priority.
 	//
-	// * `URGENT` - URGENT
-	// * `HIGH` - HIGH
-	// * `NORMAL` - NORMAL
-	// * `LOW` - LOW
+	// - `URGENT` - URGENT
+	// - `HIGH` - HIGH
+	// - `NORMAL` - NORMAL
+	// - `LOW` - LOW
 	Priority *TicketsListRequestPriority `json:"-"`
 	// If provided, will only return tickets for this project.
 	ProjectId *string `json:"-"`
@@ -91,10 +92,10 @@ type TicketsListRequest struct {
 	ShowEnumOrigins *TicketsListRequestShowEnumOrigins `json:"-"`
 	// If provided, will only return tickets of this status.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	// * `IN_PROGRESS` - IN_PROGRESS
-	// * `ON_HOLD` - ON_HOLD
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	// - `IN_PROGRESS` - IN_PROGRESS
+	// - `ON_HOLD` - ON_HOLD
 	Status *TicketsListRequestStatus `json:"-"`
 	// If provided, will only return tickets matching the tags; multiple tags can be separated by commas.
 	Tags *string `json:"-"`
@@ -132,4 +133,1027 @@ type TicketsRetrieveRequest struct {
 	RemoteFields *TicketsRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *TicketsRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type TicketsCollaboratorsListRequestExpand string
+
+const (
+	TicketsCollaboratorsListRequestExpandRoles      TicketsCollaboratorsListRequestExpand = "roles"
+	TicketsCollaboratorsListRequestExpandTeams      TicketsCollaboratorsListRequestExpand = "teams"
+	TicketsCollaboratorsListRequestExpandTeamsRoles TicketsCollaboratorsListRequestExpand = "teams,roles"
+)
+
+func NewTicketsCollaboratorsListRequestExpandFromString(s string) (TicketsCollaboratorsListRequestExpand, error) {
+	switch s {
+	case "roles":
+		return TicketsCollaboratorsListRequestExpandRoles, nil
+	case "teams":
+		return TicketsCollaboratorsListRequestExpandTeams, nil
+	case "teams,roles":
+		return TicketsCollaboratorsListRequestExpandTeamsRoles, nil
+	}
+	var t TicketsCollaboratorsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsCollaboratorsListRequestExpand) Ptr() *TicketsCollaboratorsListRequestExpand {
+	return &t
+}
+
+type TicketsListRequestExpand string
+
+const (
+	TicketsListRequestExpandAccount                                                          TicketsListRequestExpand = "account"
+	TicketsListRequestExpandAccountContact                                                   TicketsListRequestExpand = "account,contact"
+	TicketsListRequestExpandAccountContactCreator                                            TicketsListRequestExpand = "account,contact,creator"
+	TicketsListRequestExpandAccountContactCreatorParentTicket                                TicketsListRequestExpand = "account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAccountContactParentTicket                                       TicketsListRequestExpand = "account,contact,parent_ticket"
+	TicketsListRequestExpandAccountCreator                                                   TicketsListRequestExpand = "account,creator"
+	TicketsListRequestExpandAccountCreatorParentTicket                                       TicketsListRequestExpand = "account,creator,parent_ticket"
+	TicketsListRequestExpandAccountParentTicket                                              TicketsListRequestExpand = "account,parent_ticket"
+	TicketsListRequestExpandAssignees                                                        TicketsListRequestExpand = "assignees"
+	TicketsListRequestExpandAssigneesAccount                                                 TicketsListRequestExpand = "assignees,account"
+	TicketsListRequestExpandAssigneesAccountContact                                          TicketsListRequestExpand = "assignees,account,contact"
+	TicketsListRequestExpandAssigneesAccountContactCreator                                   TicketsListRequestExpand = "assignees,account,contact,creator"
+	TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket                       TicketsListRequestExpand = "assignees,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesAccountContactParentTicket                              TicketsListRequestExpand = "assignees,account,contact,parent_ticket"
+	TicketsListRequestExpandAssigneesAccountCreator                                          TicketsListRequestExpand = "assignees,account,creator"
+	TicketsListRequestExpandAssigneesAccountCreatorParentTicket                              TicketsListRequestExpand = "assignees,account,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesAccountParentTicket                                     TicketsListRequestExpand = "assignees,account,parent_ticket"
+	TicketsListRequestExpandAssigneesCollections                                             TicketsListRequestExpand = "assignees,collections"
+	TicketsListRequestExpandAssigneesCollectionsAccount                                      TicketsListRequestExpand = "assignees,collections,account"
+	TicketsListRequestExpandAssigneesCollectionsAccountContact                               TicketsListRequestExpand = "assignees,collections,account,contact"
+	TicketsListRequestExpandAssigneesCollectionsAccountContactCreator                        TicketsListRequestExpand = "assignees,collections,account,contact,creator"
+	TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket            TicketsListRequestExpand = "assignees,collections,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket                   TicketsListRequestExpand = "assignees,collections,account,contact,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsAccountCreator                               TicketsListRequestExpand = "assignees,collections,account,creator"
+	TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket                   TicketsListRequestExpand = "assignees,collections,account,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsAccountParentTicket                          TicketsListRequestExpand = "assignees,collections,account,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsContact                                      TicketsListRequestExpand = "assignees,collections,contact"
+	TicketsListRequestExpandAssigneesCollectionsContactCreator                               TicketsListRequestExpand = "assignees,collections,contact,creator"
+	TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket                   TicketsListRequestExpand = "assignees,collections,contact,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsContactParentTicket                          TicketsListRequestExpand = "assignees,collections,contact,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsCreator                                      TicketsListRequestExpand = "assignees,collections,creator"
+	TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket                          TicketsListRequestExpand = "assignees,collections,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesCollectionsParentTicket                                 TicketsListRequestExpand = "assignees,collections,parent_ticket"
+	TicketsListRequestExpandAssigneesContact                                                 TicketsListRequestExpand = "assignees,contact"
+	TicketsListRequestExpandAssigneesContactCreator                                          TicketsListRequestExpand = "assignees,contact,creator"
+	TicketsListRequestExpandAssigneesContactCreatorParentTicket                              TicketsListRequestExpand = "assignees,contact,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesContactParentTicket                                     TicketsListRequestExpand = "assignees,contact,parent_ticket"
+	TicketsListRequestExpandAssigneesCreator                                                 TicketsListRequestExpand = "assignees,creator"
+	TicketsListRequestExpandAssigneesCreatorParentTicket                                     TicketsListRequestExpand = "assignees,creator,parent_ticket"
+	TicketsListRequestExpandAssigneesParentTicket                                            TicketsListRequestExpand = "assignees,parent_ticket"
+	TicketsListRequestExpandAttachments                                                      TicketsListRequestExpand = "attachments"
+	TicketsListRequestExpandAttachmentsAccount                                               TicketsListRequestExpand = "attachments,account"
+	TicketsListRequestExpandAttachmentsAccountContact                                        TicketsListRequestExpand = "attachments,account,contact"
+	TicketsListRequestExpandAttachmentsAccountContactCreator                                 TicketsListRequestExpand = "attachments,account,contact,creator"
+	TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket                     TicketsListRequestExpand = "attachments,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAccountContactParentTicket                            TicketsListRequestExpand = "attachments,account,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsAccountCreator                                        TicketsListRequestExpand = "attachments,account,creator"
+	TicketsListRequestExpandAttachmentsAccountCreatorParentTicket                            TicketsListRequestExpand = "attachments,account,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAccountParentTicket                                   TicketsListRequestExpand = "attachments,account,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssignees                                             TicketsListRequestExpand = "attachments,assignees"
+	TicketsListRequestExpandAttachmentsAssigneesAccount                                      TicketsListRequestExpand = "attachments,assignees,account"
+	TicketsListRequestExpandAttachmentsAssigneesAccountContact                               TicketsListRequestExpand = "attachments,assignees,account,contact"
+	TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator                        TicketsListRequestExpand = "attachments,assignees,account,contact,creator"
+	TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket            TicketsListRequestExpand = "attachments,assignees,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket                   TicketsListRequestExpand = "attachments,assignees,account,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesAccountCreator                               TicketsListRequestExpand = "attachments,assignees,account,creator"
+	TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket                   TicketsListRequestExpand = "attachments,assignees,account,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket                          TicketsListRequestExpand = "attachments,assignees,account,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollections                                  TicketsListRequestExpand = "attachments,assignees,collections"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount                           TicketsListRequestExpand = "attachments,assignees,collections,account"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact                    TicketsListRequestExpand = "attachments,assignees,collections,account,contact"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator             TicketsListRequestExpand = "attachments,assignees,collections,account,contact,creator"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket TicketsListRequestExpand = "attachments,assignees,collections,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket        TicketsListRequestExpand = "attachments,assignees,collections,account,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator                    TicketsListRequestExpand = "attachments,assignees,collections,account,creator"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket        TicketsListRequestExpand = "attachments,assignees,collections,account,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket               TicketsListRequestExpand = "attachments,assignees,collections,account,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContact                           TicketsListRequestExpand = "attachments,assignees,collections,contact"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator                    TicketsListRequestExpand = "attachments,assignees,collections,contact,creator"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket        TicketsListRequestExpand = "attachments,assignees,collections,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket               TicketsListRequestExpand = "attachments,assignees,collections,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator                           TicketsListRequestExpand = "attachments,assignees,collections,creator"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket               TicketsListRequestExpand = "attachments,assignees,collections,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket                      TicketsListRequestExpand = "attachments,assignees,collections,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesContact                                      TicketsListRequestExpand = "attachments,assignees,contact"
+	TicketsListRequestExpandAttachmentsAssigneesContactCreator                               TicketsListRequestExpand = "attachments,assignees,contact,creator"
+	TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket                   TicketsListRequestExpand = "attachments,assignees,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesContactParentTicket                          TicketsListRequestExpand = "attachments,assignees,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesCreator                                      TicketsListRequestExpand = "attachments,assignees,creator"
+	TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket                          TicketsListRequestExpand = "attachments,assignees,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsAssigneesParentTicket                                 TicketsListRequestExpand = "attachments,assignees,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollections                                           TicketsListRequestExpand = "attachments,collections"
+	TicketsListRequestExpandAttachmentsCollectionsAccount                                    TicketsListRequestExpand = "attachments,collections,account"
+	TicketsListRequestExpandAttachmentsCollectionsAccountContact                             TicketsListRequestExpand = "attachments,collections,account,contact"
+	TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator                      TicketsListRequestExpand = "attachments,collections,account,contact,creator"
+	TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket          TicketsListRequestExpand = "attachments,collections,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket                 TicketsListRequestExpand = "attachments,collections,account,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsAccountCreator                             TicketsListRequestExpand = "attachments,collections,account,creator"
+	TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket                 TicketsListRequestExpand = "attachments,collections,account,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket                        TicketsListRequestExpand = "attachments,collections,account,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsContact                                    TicketsListRequestExpand = "attachments,collections,contact"
+	TicketsListRequestExpandAttachmentsCollectionsContactCreator                             TicketsListRequestExpand = "attachments,collections,contact,creator"
+	TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket                 TicketsListRequestExpand = "attachments,collections,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsContactParentTicket                        TicketsListRequestExpand = "attachments,collections,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsCreator                                    TicketsListRequestExpand = "attachments,collections,creator"
+	TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket                        TicketsListRequestExpand = "attachments,collections,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsCollectionsParentTicket                               TicketsListRequestExpand = "attachments,collections,parent_ticket"
+	TicketsListRequestExpandAttachmentsContact                                               TicketsListRequestExpand = "attachments,contact"
+	TicketsListRequestExpandAttachmentsContactCreator                                        TicketsListRequestExpand = "attachments,contact,creator"
+	TicketsListRequestExpandAttachmentsContactCreatorParentTicket                            TicketsListRequestExpand = "attachments,contact,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsContactParentTicket                                   TicketsListRequestExpand = "attachments,contact,parent_ticket"
+	TicketsListRequestExpandAttachmentsCreator                                               TicketsListRequestExpand = "attachments,creator"
+	TicketsListRequestExpandAttachmentsCreatorParentTicket                                   TicketsListRequestExpand = "attachments,creator,parent_ticket"
+	TicketsListRequestExpandAttachmentsParentTicket                                          TicketsListRequestExpand = "attachments,parent_ticket"
+	TicketsListRequestExpandCollections                                                      TicketsListRequestExpand = "collections"
+	TicketsListRequestExpandCollectionsAccount                                               TicketsListRequestExpand = "collections,account"
+	TicketsListRequestExpandCollectionsAccountContact                                        TicketsListRequestExpand = "collections,account,contact"
+	TicketsListRequestExpandCollectionsAccountContactCreator                                 TicketsListRequestExpand = "collections,account,contact,creator"
+	TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket                     TicketsListRequestExpand = "collections,account,contact,creator,parent_ticket"
+	TicketsListRequestExpandCollectionsAccountContactParentTicket                            TicketsListRequestExpand = "collections,account,contact,parent_ticket"
+	TicketsListRequestExpandCollectionsAccountCreator                                        TicketsListRequestExpand = "collections,account,creator"
+	TicketsListRequestExpandCollectionsAccountCreatorParentTicket                            TicketsListRequestExpand = "collections,account,creator,parent_ticket"
+	TicketsListRequestExpandCollectionsAccountParentTicket                                   TicketsListRequestExpand = "collections,account,parent_ticket"
+	TicketsListRequestExpandCollectionsContact                                               TicketsListRequestExpand = "collections,contact"
+	TicketsListRequestExpandCollectionsContactCreator                                        TicketsListRequestExpand = "collections,contact,creator"
+	TicketsListRequestExpandCollectionsContactCreatorParentTicket                            TicketsListRequestExpand = "collections,contact,creator,parent_ticket"
+	TicketsListRequestExpandCollectionsContactParentTicket                                   TicketsListRequestExpand = "collections,contact,parent_ticket"
+	TicketsListRequestExpandCollectionsCreator                                               TicketsListRequestExpand = "collections,creator"
+	TicketsListRequestExpandCollectionsCreatorParentTicket                                   TicketsListRequestExpand = "collections,creator,parent_ticket"
+	TicketsListRequestExpandCollectionsParentTicket                                          TicketsListRequestExpand = "collections,parent_ticket"
+	TicketsListRequestExpandContact                                                          TicketsListRequestExpand = "contact"
+	TicketsListRequestExpandContactCreator                                                   TicketsListRequestExpand = "contact,creator"
+	TicketsListRequestExpandContactCreatorParentTicket                                       TicketsListRequestExpand = "contact,creator,parent_ticket"
+	TicketsListRequestExpandContactParentTicket                                              TicketsListRequestExpand = "contact,parent_ticket"
+	TicketsListRequestExpandCreator                                                          TicketsListRequestExpand = "creator"
+	TicketsListRequestExpandCreatorParentTicket                                              TicketsListRequestExpand = "creator,parent_ticket"
+	TicketsListRequestExpandParentTicket                                                     TicketsListRequestExpand = "parent_ticket"
+)
+
+func NewTicketsListRequestExpandFromString(s string) (TicketsListRequestExpand, error) {
+	switch s {
+	case "account":
+		return TicketsListRequestExpandAccount, nil
+	case "account,contact":
+		return TicketsListRequestExpandAccountContact, nil
+	case "account,contact,creator":
+		return TicketsListRequestExpandAccountContactCreator, nil
+	case "account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAccountContactCreatorParentTicket, nil
+	case "account,contact,parent_ticket":
+		return TicketsListRequestExpandAccountContactParentTicket, nil
+	case "account,creator":
+		return TicketsListRequestExpandAccountCreator, nil
+	case "account,creator,parent_ticket":
+		return TicketsListRequestExpandAccountCreatorParentTicket, nil
+	case "account,parent_ticket":
+		return TicketsListRequestExpandAccountParentTicket, nil
+	case "assignees":
+		return TicketsListRequestExpandAssignees, nil
+	case "assignees,account":
+		return TicketsListRequestExpandAssigneesAccount, nil
+	case "assignees,account,contact":
+		return TicketsListRequestExpandAssigneesAccountContact, nil
+	case "assignees,account,contact,creator":
+		return TicketsListRequestExpandAssigneesAccountContactCreator, nil
+	case "assignees,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesAccountContactCreatorParentTicket, nil
+	case "assignees,account,contact,parent_ticket":
+		return TicketsListRequestExpandAssigneesAccountContactParentTicket, nil
+	case "assignees,account,creator":
+		return TicketsListRequestExpandAssigneesAccountCreator, nil
+	case "assignees,account,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesAccountCreatorParentTicket, nil
+	case "assignees,account,parent_ticket":
+		return TicketsListRequestExpandAssigneesAccountParentTicket, nil
+	case "assignees,collections":
+		return TicketsListRequestExpandAssigneesCollections, nil
+	case "assignees,collections,account":
+		return TicketsListRequestExpandAssigneesCollectionsAccount, nil
+	case "assignees,collections,account,contact":
+		return TicketsListRequestExpandAssigneesCollectionsAccountContact, nil
+	case "assignees,collections,account,contact,creator":
+		return TicketsListRequestExpandAssigneesCollectionsAccountContactCreator, nil
+	case "assignees,collections,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket, nil
+	case "assignees,collections,account,contact,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsAccountContactParentTicket, nil
+	case "assignees,collections,account,creator":
+		return TicketsListRequestExpandAssigneesCollectionsAccountCreator, nil
+	case "assignees,collections,account,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsAccountCreatorParentTicket, nil
+	case "assignees,collections,account,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsAccountParentTicket, nil
+	case "assignees,collections,contact":
+		return TicketsListRequestExpandAssigneesCollectionsContact, nil
+	case "assignees,collections,contact,creator":
+		return TicketsListRequestExpandAssigneesCollectionsContactCreator, nil
+	case "assignees,collections,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsContactCreatorParentTicket, nil
+	case "assignees,collections,contact,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsContactParentTicket, nil
+	case "assignees,collections,creator":
+		return TicketsListRequestExpandAssigneesCollectionsCreator, nil
+	case "assignees,collections,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsCreatorParentTicket, nil
+	case "assignees,collections,parent_ticket":
+		return TicketsListRequestExpandAssigneesCollectionsParentTicket, nil
+	case "assignees,contact":
+		return TicketsListRequestExpandAssigneesContact, nil
+	case "assignees,contact,creator":
+		return TicketsListRequestExpandAssigneesContactCreator, nil
+	case "assignees,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesContactCreatorParentTicket, nil
+	case "assignees,contact,parent_ticket":
+		return TicketsListRequestExpandAssigneesContactParentTicket, nil
+	case "assignees,creator":
+		return TicketsListRequestExpandAssigneesCreator, nil
+	case "assignees,creator,parent_ticket":
+		return TicketsListRequestExpandAssigneesCreatorParentTicket, nil
+	case "assignees,parent_ticket":
+		return TicketsListRequestExpandAssigneesParentTicket, nil
+	case "attachments":
+		return TicketsListRequestExpandAttachments, nil
+	case "attachments,account":
+		return TicketsListRequestExpandAttachmentsAccount, nil
+	case "attachments,account,contact":
+		return TicketsListRequestExpandAttachmentsAccountContact, nil
+	case "attachments,account,contact,creator":
+		return TicketsListRequestExpandAttachmentsAccountContactCreator, nil
+	case "attachments,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAccountContactCreatorParentTicket, nil
+	case "attachments,account,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAccountContactParentTicket, nil
+	case "attachments,account,creator":
+		return TicketsListRequestExpandAttachmentsAccountCreator, nil
+	case "attachments,account,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAccountCreatorParentTicket, nil
+	case "attachments,account,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAccountParentTicket, nil
+	case "attachments,assignees":
+		return TicketsListRequestExpandAttachmentsAssignees, nil
+	case "attachments,assignees,account":
+		return TicketsListRequestExpandAttachmentsAssigneesAccount, nil
+	case "attachments,assignees,account,contact":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountContact, nil
+	case "attachments,assignees,account,contact,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountContactCreator, nil
+	case "attachments,assignees,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket, nil
+	case "attachments,assignees,account,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountContactParentTicket, nil
+	case "attachments,assignees,account,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountCreator, nil
+	case "attachments,assignees,account,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountCreatorParentTicket, nil
+	case "attachments,assignees,account,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesAccountParentTicket, nil
+	case "attachments,assignees,collections":
+		return TicketsListRequestExpandAttachmentsAssigneesCollections, nil
+	case "attachments,assignees,collections,account":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccount, nil
+	case "attachments,assignees,collections,account,contact":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContact, nil
+	case "attachments,assignees,collections,account,contact,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator, nil
+	case "attachments,assignees,collections,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket, nil
+	case "attachments,assignees,collections,account,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket, nil
+	case "attachments,assignees,collections,account,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreator, nil
+	case "attachments,assignees,collections,account,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket, nil
+	case "attachments,assignees,collections,account,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket, nil
+	case "attachments,assignees,collections,contact":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsContact, nil
+	case "attachments,assignees,collections,contact,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreator, nil
+	case "attachments,assignees,collections,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket, nil
+	case "attachments,assignees,collections,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsContactParentTicket, nil
+	case "attachments,assignees,collections,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsCreator, nil
+	case "attachments,assignees,collections,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket, nil
+	case "attachments,assignees,collections,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCollectionsParentTicket, nil
+	case "attachments,assignees,contact":
+		return TicketsListRequestExpandAttachmentsAssigneesContact, nil
+	case "attachments,assignees,contact,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesContactCreator, nil
+	case "attachments,assignees,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesContactCreatorParentTicket, nil
+	case "attachments,assignees,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesContactParentTicket, nil
+	case "attachments,assignees,creator":
+		return TicketsListRequestExpandAttachmentsAssigneesCreator, nil
+	case "attachments,assignees,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesCreatorParentTicket, nil
+	case "attachments,assignees,parent_ticket":
+		return TicketsListRequestExpandAttachmentsAssigneesParentTicket, nil
+	case "attachments,collections":
+		return TicketsListRequestExpandAttachmentsCollections, nil
+	case "attachments,collections,account":
+		return TicketsListRequestExpandAttachmentsCollectionsAccount, nil
+	case "attachments,collections,account,contact":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountContact, nil
+	case "attachments,collections,account,contact,creator":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountContactCreator, nil
+	case "attachments,collections,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket, nil
+	case "attachments,collections,account,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountContactParentTicket, nil
+	case "attachments,collections,account,creator":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountCreator, nil
+	case "attachments,collections,account,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountCreatorParentTicket, nil
+	case "attachments,collections,account,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsAccountParentTicket, nil
+	case "attachments,collections,contact":
+		return TicketsListRequestExpandAttachmentsCollectionsContact, nil
+	case "attachments,collections,contact,creator":
+		return TicketsListRequestExpandAttachmentsCollectionsContactCreator, nil
+	case "attachments,collections,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsContactCreatorParentTicket, nil
+	case "attachments,collections,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsContactParentTicket, nil
+	case "attachments,collections,creator":
+		return TicketsListRequestExpandAttachmentsCollectionsCreator, nil
+	case "attachments,collections,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsCreatorParentTicket, nil
+	case "attachments,collections,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCollectionsParentTicket, nil
+	case "attachments,contact":
+		return TicketsListRequestExpandAttachmentsContact, nil
+	case "attachments,contact,creator":
+		return TicketsListRequestExpandAttachmentsContactCreator, nil
+	case "attachments,contact,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsContactCreatorParentTicket, nil
+	case "attachments,contact,parent_ticket":
+		return TicketsListRequestExpandAttachmentsContactParentTicket, nil
+	case "attachments,creator":
+		return TicketsListRequestExpandAttachmentsCreator, nil
+	case "attachments,creator,parent_ticket":
+		return TicketsListRequestExpandAttachmentsCreatorParentTicket, nil
+	case "attachments,parent_ticket":
+		return TicketsListRequestExpandAttachmentsParentTicket, nil
+	case "collections":
+		return TicketsListRequestExpandCollections, nil
+	case "collections,account":
+		return TicketsListRequestExpandCollectionsAccount, nil
+	case "collections,account,contact":
+		return TicketsListRequestExpandCollectionsAccountContact, nil
+	case "collections,account,contact,creator":
+		return TicketsListRequestExpandCollectionsAccountContactCreator, nil
+	case "collections,account,contact,creator,parent_ticket":
+		return TicketsListRequestExpandCollectionsAccountContactCreatorParentTicket, nil
+	case "collections,account,contact,parent_ticket":
+		return TicketsListRequestExpandCollectionsAccountContactParentTicket, nil
+	case "collections,account,creator":
+		return TicketsListRequestExpandCollectionsAccountCreator, nil
+	case "collections,account,creator,parent_ticket":
+		return TicketsListRequestExpandCollectionsAccountCreatorParentTicket, nil
+	case "collections,account,parent_ticket":
+		return TicketsListRequestExpandCollectionsAccountParentTicket, nil
+	case "collections,contact":
+		return TicketsListRequestExpandCollectionsContact, nil
+	case "collections,contact,creator":
+		return TicketsListRequestExpandCollectionsContactCreator, nil
+	case "collections,contact,creator,parent_ticket":
+		return TicketsListRequestExpandCollectionsContactCreatorParentTicket, nil
+	case "collections,contact,parent_ticket":
+		return TicketsListRequestExpandCollectionsContactParentTicket, nil
+	case "collections,creator":
+		return TicketsListRequestExpandCollectionsCreator, nil
+	case "collections,creator,parent_ticket":
+		return TicketsListRequestExpandCollectionsCreatorParentTicket, nil
+	case "collections,parent_ticket":
+		return TicketsListRequestExpandCollectionsParentTicket, nil
+	case "contact":
+		return TicketsListRequestExpandContact, nil
+	case "contact,creator":
+		return TicketsListRequestExpandContactCreator, nil
+	case "contact,creator,parent_ticket":
+		return TicketsListRequestExpandContactCreatorParentTicket, nil
+	case "contact,parent_ticket":
+		return TicketsListRequestExpandContactParentTicket, nil
+	case "creator":
+		return TicketsListRequestExpandCreator, nil
+	case "creator,parent_ticket":
+		return TicketsListRequestExpandCreatorParentTicket, nil
+	case "parent_ticket":
+		return TicketsListRequestExpandParentTicket, nil
+	}
+	var t TicketsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsListRequestExpand) Ptr() *TicketsListRequestExpand {
+	return &t
+}
+
+type TicketsListRequestPriority string
+
+const (
+	TicketsListRequestPriorityHigh   TicketsListRequestPriority = "HIGH"
+	TicketsListRequestPriorityLow    TicketsListRequestPriority = "LOW"
+	TicketsListRequestPriorityNormal TicketsListRequestPriority = "NORMAL"
+	TicketsListRequestPriorityUrgent TicketsListRequestPriority = "URGENT"
+)
+
+func NewTicketsListRequestPriorityFromString(s string) (TicketsListRequestPriority, error) {
+	switch s {
+	case "HIGH":
+		return TicketsListRequestPriorityHigh, nil
+	case "LOW":
+		return TicketsListRequestPriorityLow, nil
+	case "NORMAL":
+		return TicketsListRequestPriorityNormal, nil
+	case "URGENT":
+		return TicketsListRequestPriorityUrgent, nil
+	}
+	var t TicketsListRequestPriority
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsListRequestPriority) Ptr() *TicketsListRequestPriority {
+	return &t
+}
+
+type TicketsListRequestRemoteFields string
+
+const (
+	TicketsListRequestRemoteFieldsPriority                 TicketsListRequestRemoteFields = "priority"
+	TicketsListRequestRemoteFieldsPriorityStatus           TicketsListRequestRemoteFields = "priority,status"
+	TicketsListRequestRemoteFieldsPriorityStatusTicketType TicketsListRequestRemoteFields = "priority,status,ticket_type"
+	TicketsListRequestRemoteFieldsPriorityTicketType       TicketsListRequestRemoteFields = "priority,ticket_type"
+	TicketsListRequestRemoteFieldsStatus                   TicketsListRequestRemoteFields = "status"
+	TicketsListRequestRemoteFieldsStatusTicketType         TicketsListRequestRemoteFields = "status,ticket_type"
+	TicketsListRequestRemoteFieldsTicketType               TicketsListRequestRemoteFields = "ticket_type"
+)
+
+func NewTicketsListRequestRemoteFieldsFromString(s string) (TicketsListRequestRemoteFields, error) {
+	switch s {
+	case "priority":
+		return TicketsListRequestRemoteFieldsPriority, nil
+	case "priority,status":
+		return TicketsListRequestRemoteFieldsPriorityStatus, nil
+	case "priority,status,ticket_type":
+		return TicketsListRequestRemoteFieldsPriorityStatusTicketType, nil
+	case "priority,ticket_type":
+		return TicketsListRequestRemoteFieldsPriorityTicketType, nil
+	case "status":
+		return TicketsListRequestRemoteFieldsStatus, nil
+	case "status,ticket_type":
+		return TicketsListRequestRemoteFieldsStatusTicketType, nil
+	case "ticket_type":
+		return TicketsListRequestRemoteFieldsTicketType, nil
+	}
+	var t TicketsListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsListRequestRemoteFields) Ptr() *TicketsListRequestRemoteFields {
+	return &t
+}
+
+type TicketsListRequestShowEnumOrigins string
+
+const (
+	TicketsListRequestShowEnumOriginsPriority                 TicketsListRequestShowEnumOrigins = "priority"
+	TicketsListRequestShowEnumOriginsPriorityStatus           TicketsListRequestShowEnumOrigins = "priority,status"
+	TicketsListRequestShowEnumOriginsPriorityStatusTicketType TicketsListRequestShowEnumOrigins = "priority,status,ticket_type"
+	TicketsListRequestShowEnumOriginsPriorityTicketType       TicketsListRequestShowEnumOrigins = "priority,ticket_type"
+	TicketsListRequestShowEnumOriginsStatus                   TicketsListRequestShowEnumOrigins = "status"
+	TicketsListRequestShowEnumOriginsStatusTicketType         TicketsListRequestShowEnumOrigins = "status,ticket_type"
+	TicketsListRequestShowEnumOriginsTicketType               TicketsListRequestShowEnumOrigins = "ticket_type"
+)
+
+func NewTicketsListRequestShowEnumOriginsFromString(s string) (TicketsListRequestShowEnumOrigins, error) {
+	switch s {
+	case "priority":
+		return TicketsListRequestShowEnumOriginsPriority, nil
+	case "priority,status":
+		return TicketsListRequestShowEnumOriginsPriorityStatus, nil
+	case "priority,status,ticket_type":
+		return TicketsListRequestShowEnumOriginsPriorityStatusTicketType, nil
+	case "priority,ticket_type":
+		return TicketsListRequestShowEnumOriginsPriorityTicketType, nil
+	case "status":
+		return TicketsListRequestShowEnumOriginsStatus, nil
+	case "status,ticket_type":
+		return TicketsListRequestShowEnumOriginsStatusTicketType, nil
+	case "ticket_type":
+		return TicketsListRequestShowEnumOriginsTicketType, nil
+	}
+	var t TicketsListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsListRequestShowEnumOrigins) Ptr() *TicketsListRequestShowEnumOrigins {
+	return &t
+}
+
+type TicketsListRequestStatus string
+
+const (
+	TicketsListRequestStatusClosed     TicketsListRequestStatus = "CLOSED"
+	TicketsListRequestStatusInProgress TicketsListRequestStatus = "IN_PROGRESS"
+	TicketsListRequestStatusOnHold     TicketsListRequestStatus = "ON_HOLD"
+	TicketsListRequestStatusOpen       TicketsListRequestStatus = "OPEN"
+)
+
+func NewTicketsListRequestStatusFromString(s string) (TicketsListRequestStatus, error) {
+	switch s {
+	case "CLOSED":
+		return TicketsListRequestStatusClosed, nil
+	case "IN_PROGRESS":
+		return TicketsListRequestStatusInProgress, nil
+	case "ON_HOLD":
+		return TicketsListRequestStatusOnHold, nil
+	case "OPEN":
+		return TicketsListRequestStatusOpen, nil
+	}
+	var t TicketsListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsListRequestStatus) Ptr() *TicketsListRequestStatus {
+	return &t
+}
+
+type TicketsRetrieveRequestExpand string
+
+const (
+	TicketsRetrieveRequestExpandAccount                                                          TicketsRetrieveRequestExpand = "account"
+	TicketsRetrieveRequestExpandAccountContact                                                   TicketsRetrieveRequestExpand = "account,contact"
+	TicketsRetrieveRequestExpandAccountContactCreator                                            TicketsRetrieveRequestExpand = "account,contact,creator"
+	TicketsRetrieveRequestExpandAccountContactCreatorParentTicket                                TicketsRetrieveRequestExpand = "account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAccountContactParentTicket                                       TicketsRetrieveRequestExpand = "account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAccountCreator                                                   TicketsRetrieveRequestExpand = "account,creator"
+	TicketsRetrieveRequestExpandAccountCreatorParentTicket                                       TicketsRetrieveRequestExpand = "account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAccountParentTicket                                              TicketsRetrieveRequestExpand = "account,parent_ticket"
+	TicketsRetrieveRequestExpandAssignees                                                        TicketsRetrieveRequestExpand = "assignees"
+	TicketsRetrieveRequestExpandAssigneesAccount                                                 TicketsRetrieveRequestExpand = "assignees,account"
+	TicketsRetrieveRequestExpandAssigneesAccountContact                                          TicketsRetrieveRequestExpand = "assignees,account,contact"
+	TicketsRetrieveRequestExpandAssigneesAccountContactCreator                                   TicketsRetrieveRequestExpand = "assignees,account,contact,creator"
+	TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket                       TicketsRetrieveRequestExpand = "assignees,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket                              TicketsRetrieveRequestExpand = "assignees,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesAccountCreator                                          TicketsRetrieveRequestExpand = "assignees,account,creator"
+	TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket                              TicketsRetrieveRequestExpand = "assignees,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesAccountParentTicket                                     TicketsRetrieveRequestExpand = "assignees,account,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollections                                             TicketsRetrieveRequestExpand = "assignees,collections"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccount                                      TicketsRetrieveRequestExpand = "assignees,collections,account"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact                               TicketsRetrieveRequestExpand = "assignees,collections,account,contact"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator                        TicketsRetrieveRequestExpand = "assignees,collections,account,contact,creator"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket            TicketsRetrieveRequestExpand = "assignees,collections,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket                   TicketsRetrieveRequestExpand = "assignees,collections,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator                               TicketsRetrieveRequestExpand = "assignees,collections,account,creator"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket                   TicketsRetrieveRequestExpand = "assignees,collections,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket                          TicketsRetrieveRequestExpand = "assignees,collections,account,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsContact                                      TicketsRetrieveRequestExpand = "assignees,collections,contact"
+	TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator                               TicketsRetrieveRequestExpand = "assignees,collections,contact,creator"
+	TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket                   TicketsRetrieveRequestExpand = "assignees,collections,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket                          TicketsRetrieveRequestExpand = "assignees,collections,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsCreator                                      TicketsRetrieveRequestExpand = "assignees,collections,creator"
+	TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket                          TicketsRetrieveRequestExpand = "assignees,collections,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket                                 TicketsRetrieveRequestExpand = "assignees,collections,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesContact                                                 TicketsRetrieveRequestExpand = "assignees,contact"
+	TicketsRetrieveRequestExpandAssigneesContactCreator                                          TicketsRetrieveRequestExpand = "assignees,contact,creator"
+	TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket                              TicketsRetrieveRequestExpand = "assignees,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesContactParentTicket                                     TicketsRetrieveRequestExpand = "assignees,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesCreator                                                 TicketsRetrieveRequestExpand = "assignees,creator"
+	TicketsRetrieveRequestExpandAssigneesCreatorParentTicket                                     TicketsRetrieveRequestExpand = "assignees,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAssigneesParentTicket                                            TicketsRetrieveRequestExpand = "assignees,parent_ticket"
+	TicketsRetrieveRequestExpandAttachments                                                      TicketsRetrieveRequestExpand = "attachments"
+	TicketsRetrieveRequestExpandAttachmentsAccount                                               TicketsRetrieveRequestExpand = "attachments,account"
+	TicketsRetrieveRequestExpandAttachmentsAccountContact                                        TicketsRetrieveRequestExpand = "attachments,account,contact"
+	TicketsRetrieveRequestExpandAttachmentsAccountContactCreator                                 TicketsRetrieveRequestExpand = "attachments,account,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket                     TicketsRetrieveRequestExpand = "attachments,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket                            TicketsRetrieveRequestExpand = "attachments,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAccountCreator                                        TicketsRetrieveRequestExpand = "attachments,account,creator"
+	TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket                            TicketsRetrieveRequestExpand = "attachments,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAccountParentTicket                                   TicketsRetrieveRequestExpand = "attachments,account,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssignees                                             TicketsRetrieveRequestExpand = "attachments,assignees"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccount                                      TicketsRetrieveRequestExpand = "attachments,assignees,account"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact                               TicketsRetrieveRequestExpand = "attachments,assignees,account,contact"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator                        TicketsRetrieveRequestExpand = "attachments,assignees,account,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket            TicketsRetrieveRequestExpand = "attachments,assignees,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket                   TicketsRetrieveRequestExpand = "attachments,assignees,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator                               TicketsRetrieveRequestExpand = "attachments,assignees,account,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket                   TicketsRetrieveRequestExpand = "attachments,assignees,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket                          TicketsRetrieveRequestExpand = "attachments,assignees,account,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollections                                  TicketsRetrieveRequestExpand = "attachments,assignees,collections"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount                           TicketsRetrieveRequestExpand = "attachments,assignees,collections,account"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact                    TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,contact"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator             TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket        TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator                    TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket        TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket               TicketsRetrieveRequestExpand = "attachments,assignees,collections,account,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact                           TicketsRetrieveRequestExpand = "attachments,assignees,collections,contact"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator                    TicketsRetrieveRequestExpand = "attachments,assignees,collections,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket        TicketsRetrieveRequestExpand = "attachments,assignees,collections,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket               TicketsRetrieveRequestExpand = "attachments,assignees,collections,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator                           TicketsRetrieveRequestExpand = "attachments,assignees,collections,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket               TicketsRetrieveRequestExpand = "attachments,assignees,collections,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket                      TicketsRetrieveRequestExpand = "attachments,assignees,collections,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContact                                      TicketsRetrieveRequestExpand = "attachments,assignees,contact"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator                               TicketsRetrieveRequestExpand = "attachments,assignees,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket                   TicketsRetrieveRequestExpand = "attachments,assignees,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket                          TicketsRetrieveRequestExpand = "attachments,assignees,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCreator                                      TicketsRetrieveRequestExpand = "attachments,assignees,creator"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket                          TicketsRetrieveRequestExpand = "attachments,assignees,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket                                 TicketsRetrieveRequestExpand = "attachments,assignees,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollections                                           TicketsRetrieveRequestExpand = "attachments,collections"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccount                                    TicketsRetrieveRequestExpand = "attachments,collections,account"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact                             TicketsRetrieveRequestExpand = "attachments,collections,account,contact"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator                      TicketsRetrieveRequestExpand = "attachments,collections,account,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket          TicketsRetrieveRequestExpand = "attachments,collections,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket                 TicketsRetrieveRequestExpand = "attachments,collections,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator                             TicketsRetrieveRequestExpand = "attachments,collections,account,creator"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket                 TicketsRetrieveRequestExpand = "attachments,collections,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket                        TicketsRetrieveRequestExpand = "attachments,collections,account,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContact                                    TicketsRetrieveRequestExpand = "attachments,collections,contact"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator                             TicketsRetrieveRequestExpand = "attachments,collections,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket                 TicketsRetrieveRequestExpand = "attachments,collections,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket                        TicketsRetrieveRequestExpand = "attachments,collections,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsCreator                                    TicketsRetrieveRequestExpand = "attachments,collections,creator"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket                        TicketsRetrieveRequestExpand = "attachments,collections,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket                               TicketsRetrieveRequestExpand = "attachments,collections,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsContact                                               TicketsRetrieveRequestExpand = "attachments,contact"
+	TicketsRetrieveRequestExpandAttachmentsContactCreator                                        TicketsRetrieveRequestExpand = "attachments,contact,creator"
+	TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket                            TicketsRetrieveRequestExpand = "attachments,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsContactParentTicket                                   TicketsRetrieveRequestExpand = "attachments,contact,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsCreator                                               TicketsRetrieveRequestExpand = "attachments,creator"
+	TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket                                   TicketsRetrieveRequestExpand = "attachments,creator,parent_ticket"
+	TicketsRetrieveRequestExpandAttachmentsParentTicket                                          TicketsRetrieveRequestExpand = "attachments,parent_ticket"
+	TicketsRetrieveRequestExpandCollections                                                      TicketsRetrieveRequestExpand = "collections"
+	TicketsRetrieveRequestExpandCollectionsAccount                                               TicketsRetrieveRequestExpand = "collections,account"
+	TicketsRetrieveRequestExpandCollectionsAccountContact                                        TicketsRetrieveRequestExpand = "collections,account,contact"
+	TicketsRetrieveRequestExpandCollectionsAccountContactCreator                                 TicketsRetrieveRequestExpand = "collections,account,contact,creator"
+	TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket                     TicketsRetrieveRequestExpand = "collections,account,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket                            TicketsRetrieveRequestExpand = "collections,account,contact,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsAccountCreator                                        TicketsRetrieveRequestExpand = "collections,account,creator"
+	TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket                            TicketsRetrieveRequestExpand = "collections,account,creator,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsAccountParentTicket                                   TicketsRetrieveRequestExpand = "collections,account,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsContact                                               TicketsRetrieveRequestExpand = "collections,contact"
+	TicketsRetrieveRequestExpandCollectionsContactCreator                                        TicketsRetrieveRequestExpand = "collections,contact,creator"
+	TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket                            TicketsRetrieveRequestExpand = "collections,contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsContactParentTicket                                   TicketsRetrieveRequestExpand = "collections,contact,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsCreator                                               TicketsRetrieveRequestExpand = "collections,creator"
+	TicketsRetrieveRequestExpandCollectionsCreatorParentTicket                                   TicketsRetrieveRequestExpand = "collections,creator,parent_ticket"
+	TicketsRetrieveRequestExpandCollectionsParentTicket                                          TicketsRetrieveRequestExpand = "collections,parent_ticket"
+	TicketsRetrieveRequestExpandContact                                                          TicketsRetrieveRequestExpand = "contact"
+	TicketsRetrieveRequestExpandContactCreator                                                   TicketsRetrieveRequestExpand = "contact,creator"
+	TicketsRetrieveRequestExpandContactCreatorParentTicket                                       TicketsRetrieveRequestExpand = "contact,creator,parent_ticket"
+	TicketsRetrieveRequestExpandContactParentTicket                                              TicketsRetrieveRequestExpand = "contact,parent_ticket"
+	TicketsRetrieveRequestExpandCreator                                                          TicketsRetrieveRequestExpand = "creator"
+	TicketsRetrieveRequestExpandCreatorParentTicket                                              TicketsRetrieveRequestExpand = "creator,parent_ticket"
+	TicketsRetrieveRequestExpandParentTicket                                                     TicketsRetrieveRequestExpand = "parent_ticket"
+)
+
+func NewTicketsRetrieveRequestExpandFromString(s string) (TicketsRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return TicketsRetrieveRequestExpandAccount, nil
+	case "account,contact":
+		return TicketsRetrieveRequestExpandAccountContact, nil
+	case "account,contact,creator":
+		return TicketsRetrieveRequestExpandAccountContactCreator, nil
+	case "account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAccountContactCreatorParentTicket, nil
+	case "account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAccountContactParentTicket, nil
+	case "account,creator":
+		return TicketsRetrieveRequestExpandAccountCreator, nil
+	case "account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAccountCreatorParentTicket, nil
+	case "account,parent_ticket":
+		return TicketsRetrieveRequestExpandAccountParentTicket, nil
+	case "assignees":
+		return TicketsRetrieveRequestExpandAssignees, nil
+	case "assignees,account":
+		return TicketsRetrieveRequestExpandAssigneesAccount, nil
+	case "assignees,account,contact":
+		return TicketsRetrieveRequestExpandAssigneesAccountContact, nil
+	case "assignees,account,contact,creator":
+		return TicketsRetrieveRequestExpandAssigneesAccountContactCreator, nil
+	case "assignees,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesAccountContactCreatorParentTicket, nil
+	case "assignees,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesAccountContactParentTicket, nil
+	case "assignees,account,creator":
+		return TicketsRetrieveRequestExpandAssigneesAccountCreator, nil
+	case "assignees,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesAccountCreatorParentTicket, nil
+	case "assignees,account,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesAccountParentTicket, nil
+	case "assignees,collections":
+		return TicketsRetrieveRequestExpandAssigneesCollections, nil
+	case "assignees,collections,account":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccount, nil
+	case "assignees,collections,account,contact":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountContact, nil
+	case "assignees,collections,account,contact,creator":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreator, nil
+	case "assignees,collections,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactCreatorParentTicket, nil
+	case "assignees,collections,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountContactParentTicket, nil
+	case "assignees,collections,account,creator":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreator, nil
+	case "assignees,collections,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountCreatorParentTicket, nil
+	case "assignees,collections,account,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsAccountParentTicket, nil
+	case "assignees,collections,contact":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsContact, nil
+	case "assignees,collections,contact,creator":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsContactCreator, nil
+	case "assignees,collections,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsContactCreatorParentTicket, nil
+	case "assignees,collections,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsContactParentTicket, nil
+	case "assignees,collections,creator":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsCreator, nil
+	case "assignees,collections,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsCreatorParentTicket, nil
+	case "assignees,collections,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCollectionsParentTicket, nil
+	case "assignees,contact":
+		return TicketsRetrieveRequestExpandAssigneesContact, nil
+	case "assignees,contact,creator":
+		return TicketsRetrieveRequestExpandAssigneesContactCreator, nil
+	case "assignees,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesContactCreatorParentTicket, nil
+	case "assignees,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesContactParentTicket, nil
+	case "assignees,creator":
+		return TicketsRetrieveRequestExpandAssigneesCreator, nil
+	case "assignees,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesCreatorParentTicket, nil
+	case "assignees,parent_ticket":
+		return TicketsRetrieveRequestExpandAssigneesParentTicket, nil
+	case "attachments":
+		return TicketsRetrieveRequestExpandAttachments, nil
+	case "attachments,account":
+		return TicketsRetrieveRequestExpandAttachmentsAccount, nil
+	case "attachments,account,contact":
+		return TicketsRetrieveRequestExpandAttachmentsAccountContact, nil
+	case "attachments,account,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAccountContactCreator, nil
+	case "attachments,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAccountContactCreatorParentTicket, nil
+	case "attachments,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAccountContactParentTicket, nil
+	case "attachments,account,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAccountCreator, nil
+	case "attachments,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAccountCreatorParentTicket, nil
+	case "attachments,account,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAccountParentTicket, nil
+	case "attachments,assignees":
+		return TicketsRetrieveRequestExpandAttachmentsAssignees, nil
+	case "attachments,assignees,account":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccount, nil
+	case "attachments,assignees,account,contact":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContact, nil
+	case "attachments,assignees,account,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreator, nil
+	case "attachments,assignees,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactCreatorParentTicket, nil
+	case "attachments,assignees,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountContactParentTicket, nil
+	case "attachments,assignees,account,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreator, nil
+	case "attachments,assignees,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountCreatorParentTicket, nil
+	case "attachments,assignees,account,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesAccountParentTicket, nil
+	case "attachments,assignees,collections":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollections, nil
+	case "attachments,assignees,collections,account":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccount, nil
+	case "attachments,assignees,collections,account,contact":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContact, nil
+	case "attachments,assignees,collections,account,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreator, nil
+	case "attachments,assignees,collections,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactCreatorParentTicket, nil
+	case "attachments,assignees,collections,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountContactParentTicket, nil
+	case "attachments,assignees,collections,account,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreator, nil
+	case "attachments,assignees,collections,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountCreatorParentTicket, nil
+	case "attachments,assignees,collections,account,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsAccountParentTicket, nil
+	case "attachments,assignees,collections,contact":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContact, nil
+	case "attachments,assignees,collections,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreator, nil
+	case "attachments,assignees,collections,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactCreatorParentTicket, nil
+	case "attachments,assignees,collections,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsContactParentTicket, nil
+	case "attachments,assignees,collections,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreator, nil
+	case "attachments,assignees,collections,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsCreatorParentTicket, nil
+	case "attachments,assignees,collections,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCollectionsParentTicket, nil
+	case "attachments,assignees,contact":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesContact, nil
+	case "attachments,assignees,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreator, nil
+	case "attachments,assignees,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesContactCreatorParentTicket, nil
+	case "attachments,assignees,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesContactParentTicket, nil
+	case "attachments,assignees,creator":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCreator, nil
+	case "attachments,assignees,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesCreatorParentTicket, nil
+	case "attachments,assignees,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsAssigneesParentTicket, nil
+	case "attachments,collections":
+		return TicketsRetrieveRequestExpandAttachmentsCollections, nil
+	case "attachments,collections,account":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccount, nil
+	case "attachments,collections,account,contact":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContact, nil
+	case "attachments,collections,account,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreator, nil
+	case "attachments,collections,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactCreatorParentTicket, nil
+	case "attachments,collections,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountContactParentTicket, nil
+	case "attachments,collections,account,creator":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreator, nil
+	case "attachments,collections,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountCreatorParentTicket, nil
+	case "attachments,collections,account,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsAccountParentTicket, nil
+	case "attachments,collections,contact":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsContact, nil
+	case "attachments,collections,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreator, nil
+	case "attachments,collections,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsContactCreatorParentTicket, nil
+	case "attachments,collections,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsContactParentTicket, nil
+	case "attachments,collections,creator":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsCreator, nil
+	case "attachments,collections,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsCreatorParentTicket, nil
+	case "attachments,collections,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCollectionsParentTicket, nil
+	case "attachments,contact":
+		return TicketsRetrieveRequestExpandAttachmentsContact, nil
+	case "attachments,contact,creator":
+		return TicketsRetrieveRequestExpandAttachmentsContactCreator, nil
+	case "attachments,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsContactCreatorParentTicket, nil
+	case "attachments,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsContactParentTicket, nil
+	case "attachments,creator":
+		return TicketsRetrieveRequestExpandAttachmentsCreator, nil
+	case "attachments,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsCreatorParentTicket, nil
+	case "attachments,parent_ticket":
+		return TicketsRetrieveRequestExpandAttachmentsParentTicket, nil
+	case "collections":
+		return TicketsRetrieveRequestExpandCollections, nil
+	case "collections,account":
+		return TicketsRetrieveRequestExpandCollectionsAccount, nil
+	case "collections,account,contact":
+		return TicketsRetrieveRequestExpandCollectionsAccountContact, nil
+	case "collections,account,contact,creator":
+		return TicketsRetrieveRequestExpandCollectionsAccountContactCreator, nil
+	case "collections,account,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsAccountContactCreatorParentTicket, nil
+	case "collections,account,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsAccountContactParentTicket, nil
+	case "collections,account,creator":
+		return TicketsRetrieveRequestExpandCollectionsAccountCreator, nil
+	case "collections,account,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsAccountCreatorParentTicket, nil
+	case "collections,account,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsAccountParentTicket, nil
+	case "collections,contact":
+		return TicketsRetrieveRequestExpandCollectionsContact, nil
+	case "collections,contact,creator":
+		return TicketsRetrieveRequestExpandCollectionsContactCreator, nil
+	case "collections,contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsContactCreatorParentTicket, nil
+	case "collections,contact,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsContactParentTicket, nil
+	case "collections,creator":
+		return TicketsRetrieveRequestExpandCollectionsCreator, nil
+	case "collections,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsCreatorParentTicket, nil
+	case "collections,parent_ticket":
+		return TicketsRetrieveRequestExpandCollectionsParentTicket, nil
+	case "contact":
+		return TicketsRetrieveRequestExpandContact, nil
+	case "contact,creator":
+		return TicketsRetrieveRequestExpandContactCreator, nil
+	case "contact,creator,parent_ticket":
+		return TicketsRetrieveRequestExpandContactCreatorParentTicket, nil
+	case "contact,parent_ticket":
+		return TicketsRetrieveRequestExpandContactParentTicket, nil
+	case "creator":
+		return TicketsRetrieveRequestExpandCreator, nil
+	case "creator,parent_ticket":
+		return TicketsRetrieveRequestExpandCreatorParentTicket, nil
+	case "parent_ticket":
+		return TicketsRetrieveRequestExpandParentTicket, nil
+	}
+	var t TicketsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsRetrieveRequestExpand) Ptr() *TicketsRetrieveRequestExpand {
+	return &t
+}
+
+type TicketsRetrieveRequestRemoteFields string
+
+const (
+	TicketsRetrieveRequestRemoteFieldsPriority                 TicketsRetrieveRequestRemoteFields = "priority"
+	TicketsRetrieveRequestRemoteFieldsPriorityStatus           TicketsRetrieveRequestRemoteFields = "priority,status"
+	TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType TicketsRetrieveRequestRemoteFields = "priority,status,ticket_type"
+	TicketsRetrieveRequestRemoteFieldsPriorityTicketType       TicketsRetrieveRequestRemoteFields = "priority,ticket_type"
+	TicketsRetrieveRequestRemoteFieldsStatus                   TicketsRetrieveRequestRemoteFields = "status"
+	TicketsRetrieveRequestRemoteFieldsStatusTicketType         TicketsRetrieveRequestRemoteFields = "status,ticket_type"
+	TicketsRetrieveRequestRemoteFieldsTicketType               TicketsRetrieveRequestRemoteFields = "ticket_type"
+)
+
+func NewTicketsRetrieveRequestRemoteFieldsFromString(s string) (TicketsRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "priority":
+		return TicketsRetrieveRequestRemoteFieldsPriority, nil
+	case "priority,status":
+		return TicketsRetrieveRequestRemoteFieldsPriorityStatus, nil
+	case "priority,status,ticket_type":
+		return TicketsRetrieveRequestRemoteFieldsPriorityStatusTicketType, nil
+	case "priority,ticket_type":
+		return TicketsRetrieveRequestRemoteFieldsPriorityTicketType, nil
+	case "status":
+		return TicketsRetrieveRequestRemoteFieldsStatus, nil
+	case "status,ticket_type":
+		return TicketsRetrieveRequestRemoteFieldsStatusTicketType, nil
+	case "ticket_type":
+		return TicketsRetrieveRequestRemoteFieldsTicketType, nil
+	}
+	var t TicketsRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsRetrieveRequestRemoteFields) Ptr() *TicketsRetrieveRequestRemoteFields {
+	return &t
+}
+
+type TicketsRetrieveRequestShowEnumOrigins string
+
+const (
+	TicketsRetrieveRequestShowEnumOriginsPriority                 TicketsRetrieveRequestShowEnumOrigins = "priority"
+	TicketsRetrieveRequestShowEnumOriginsPriorityStatus           TicketsRetrieveRequestShowEnumOrigins = "priority,status"
+	TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType TicketsRetrieveRequestShowEnumOrigins = "priority,status,ticket_type"
+	TicketsRetrieveRequestShowEnumOriginsPriorityTicketType       TicketsRetrieveRequestShowEnumOrigins = "priority,ticket_type"
+	TicketsRetrieveRequestShowEnumOriginsStatus                   TicketsRetrieveRequestShowEnumOrigins = "status"
+	TicketsRetrieveRequestShowEnumOriginsStatusTicketType         TicketsRetrieveRequestShowEnumOrigins = "status,ticket_type"
+	TicketsRetrieveRequestShowEnumOriginsTicketType               TicketsRetrieveRequestShowEnumOrigins = "ticket_type"
+)
+
+func NewTicketsRetrieveRequestShowEnumOriginsFromString(s string) (TicketsRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "priority":
+		return TicketsRetrieveRequestShowEnumOriginsPriority, nil
+	case "priority,status":
+		return TicketsRetrieveRequestShowEnumOriginsPriorityStatus, nil
+	case "priority,status,ticket_type":
+		return TicketsRetrieveRequestShowEnumOriginsPriorityStatusTicketType, nil
+	case "priority,ticket_type":
+		return TicketsRetrieveRequestShowEnumOriginsPriorityTicketType, nil
+	case "status":
+		return TicketsRetrieveRequestShowEnumOriginsStatus, nil
+	case "status,ticket_type":
+		return TicketsRetrieveRequestShowEnumOriginsStatusTicketType, nil
+	case "ticket_type":
+		return TicketsRetrieveRequestShowEnumOriginsTicketType, nil
+	}
+	var t TicketsRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsRetrieveRequestShowEnumOrigins) Ptr() *TicketsRetrieveRequestShowEnumOrigins {
+	return &t
 }

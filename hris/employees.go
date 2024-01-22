@@ -3,6 +3,8 @@
 package hris
 
 import (
+	json "encoding/json"
+	fmt "fmt"
 	time "time"
 )
 
@@ -32,9 +34,9 @@ type EmployeesListRequest struct {
 	DisplayFullName *string `json:"-"`
 	// If provided, will only return employees with this employment status.
 	//
-	// * `ACTIVE` - ACTIVE
-	// * `PENDING` - PENDING
-	// * `INACTIVE` - INACTIVE
+	// - `ACTIVE` - ACTIVE
+	// - `PENDING` - PENDING
+	// - `INACTIVE` - INACTIVE
 	EmploymentStatus *EmployeesListRequestEmploymentStatus `json:"-"`
 	// If provided, will only return employees that have an employment of the specified employment_type.
 	EmploymentType *string `json:"-"`
@@ -101,4 +103,1892 @@ type EmployeesRetrieveRequest struct {
 	RemoteFields *EmployeesRetrieveRequestRemoteFields `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *EmployeesRetrieveRequestShowEnumOrigins `json:"-"`
+}
+
+type EmployeesListRequestEmploymentStatus string
+
+const (
+	EmployeesListRequestEmploymentStatusActive   EmployeesListRequestEmploymentStatus = "ACTIVE"
+	EmployeesListRequestEmploymentStatusInactive EmployeesListRequestEmploymentStatus = "INACTIVE"
+	EmployeesListRequestEmploymentStatusPending  EmployeesListRequestEmploymentStatus = "PENDING"
+)
+
+func NewEmployeesListRequestEmploymentStatusFromString(s string) (EmployeesListRequestEmploymentStatus, error) {
+	switch s {
+	case "ACTIVE":
+		return EmployeesListRequestEmploymentStatusActive, nil
+	case "INACTIVE":
+		return EmployeesListRequestEmploymentStatusInactive, nil
+	case "PENDING":
+		return EmployeesListRequestEmploymentStatusPending, nil
+	}
+	var t EmployeesListRequestEmploymentStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesListRequestEmploymentStatus) Ptr() *EmployeesListRequestEmploymentStatus {
+	return &e
+}
+
+type EmployeesListRequestExpand string
+
+const (
+	EmployeesListRequestExpandCompany                                                             EmployeesListRequestExpand = "company"
+	EmployeesListRequestExpandCompanyPayGroup                                                     EmployeesListRequestExpand = "company,pay_group"
+	EmployeesListRequestExpandEmployments                                                         EmployeesListRequestExpand = "employments"
+	EmployeesListRequestExpandEmploymentsCompany                                                  EmployeesListRequestExpand = "employments,company"
+	EmployeesListRequestExpandEmploymentsCompanyPayGroup                                          EmployeesListRequestExpand = "employments,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroups                                                   EmployeesListRequestExpand = "employments,groups"
+	EmployeesListRequestExpandEmploymentsGroupsCompany                                            EmployeesListRequestExpand = "employments,groups,company"
+	EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup                                    EmployeesListRequestExpand = "employments,groups,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocation                                       EmployeesListRequestExpand = "employments,groups,home_location"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany                                EmployeesListRequestExpand = "employments,groups,home_location,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup                        EmployeesListRequestExpand = "employments,groups,home_location,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager                                EmployeesListRequestExpand = "employments,groups,home_location,manager"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany                         EmployeesListRequestExpand = "employments,groups,home_location,manager,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup                 EmployeesListRequestExpand = "employments,groups,home_location,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup                        EmployeesListRequestExpand = "employments,groups,home_location,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam                            EmployeesListRequestExpand = "employments,groups,home_location,manager,team"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany                     EmployeesListRequestExpand = "employments,groups,home_location,manager,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup             EmployeesListRequestExpand = "employments,groups,home_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup                    EmployeesListRequestExpand = "employments,groups,home_location,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup                               EmployeesListRequestExpand = "employments,groups,home_location,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam                                   EmployeesListRequestExpand = "employments,groups,home_location,team"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany                            EmployeesListRequestExpand = "employments,groups,home_location,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup                    EmployeesListRequestExpand = "employments,groups,home_location,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup                           EmployeesListRequestExpand = "employments,groups,home_location,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation                           EmployeesListRequestExpand = "employments,groups,home_location,work_location"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany                    EmployeesListRequestExpand = "employments,groups,home_location,work_location,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup            EmployeesListRequestExpand = "employments,groups,home_location,work_location,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager                    EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany             EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup     EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup            EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam                EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,team"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany         EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup        EmployeesListRequestExpand = "employments,groups,home_location,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup                   EmployeesListRequestExpand = "employments,groups,home_location,work_location,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam                       EmployeesListRequestExpand = "employments,groups,home_location,work_location,team"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany                EmployeesListRequestExpand = "employments,groups,home_location,work_location,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup        EmployeesListRequestExpand = "employments,groups,home_location,work_location,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup               EmployeesListRequestExpand = "employments,groups,home_location,work_location,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsManager                                            EmployeesListRequestExpand = "employments,groups,manager"
+	EmployeesListRequestExpandEmploymentsGroupsManagerCompany                                     EmployeesListRequestExpand = "employments,groups,manager,company"
+	EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup                             EmployeesListRequestExpand = "employments,groups,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup                                    EmployeesListRequestExpand = "employments,groups,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeam                                        EmployeesListRequestExpand = "employments,groups,manager,team"
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany                                 EmployeesListRequestExpand = "employments,groups,manager,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup                         EmployeesListRequestExpand = "employments,groups,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup                                EmployeesListRequestExpand = "employments,groups,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsPayGroup                                           EmployeesListRequestExpand = "employments,groups,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsTeam                                               EmployeesListRequestExpand = "employments,groups,team"
+	EmployeesListRequestExpandEmploymentsGroupsTeamCompany                                        EmployeesListRequestExpand = "employments,groups,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup                                EmployeesListRequestExpand = "employments,groups,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup                                       EmployeesListRequestExpand = "employments,groups,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocation                                       EmployeesListRequestExpand = "employments,groups,work_location"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany                                EmployeesListRequestExpand = "employments,groups,work_location,company"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup                        EmployeesListRequestExpand = "employments,groups,work_location,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager                                EmployeesListRequestExpand = "employments,groups,work_location,manager"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany                         EmployeesListRequestExpand = "employments,groups,work_location,manager,company"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup                 EmployeesListRequestExpand = "employments,groups,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup                        EmployeesListRequestExpand = "employments,groups,work_location,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam                            EmployeesListRequestExpand = "employments,groups,work_location,manager,team"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany                     EmployeesListRequestExpand = "employments,groups,work_location,manager,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup             EmployeesListRequestExpand = "employments,groups,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup                    EmployeesListRequestExpand = "employments,groups,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup                               EmployeesListRequestExpand = "employments,groups,work_location,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam                                   EmployeesListRequestExpand = "employments,groups,work_location,team"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany                            EmployeesListRequestExpand = "employments,groups,work_location,team,company"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup                    EmployeesListRequestExpand = "employments,groups,work_location,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup                           EmployeesListRequestExpand = "employments,groups,work_location,team,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocation                                             EmployeesListRequestExpand = "employments,home_location"
+	EmployeesListRequestExpandEmploymentsHomeLocationCompany                                      EmployeesListRequestExpand = "employments,home_location,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup                              EmployeesListRequestExpand = "employments,home_location,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationManager                                      EmployeesListRequestExpand = "employments,home_location,manager"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany                               EmployeesListRequestExpand = "employments,home_location,manager,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup                       EmployeesListRequestExpand = "employments,home_location,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup                              EmployeesListRequestExpand = "employments,home_location,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam                                  EmployeesListRequestExpand = "employments,home_location,manager,team"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany                           EmployeesListRequestExpand = "employments,home_location,manager,team,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup                   EmployeesListRequestExpand = "employments,home_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup                          EmployeesListRequestExpand = "employments,home_location,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationPayGroup                                     EmployeesListRequestExpand = "employments,home_location,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationTeam                                         EmployeesListRequestExpand = "employments,home_location,team"
+	EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany                                  EmployeesListRequestExpand = "employments,home_location,team,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup                          EmployeesListRequestExpand = "employments,home_location,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup                                 EmployeesListRequestExpand = "employments,home_location,team,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation                                 EmployeesListRequestExpand = "employments,home_location,work_location"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany                          EmployeesListRequestExpand = "employments,home_location,work_location,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup                  EmployeesListRequestExpand = "employments,home_location,work_location,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager                          EmployeesListRequestExpand = "employments,home_location,work_location,manager"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany                   EmployeesListRequestExpand = "employments,home_location,work_location,manager,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup           EmployeesListRequestExpand = "employments,home_location,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup                  EmployeesListRequestExpand = "employments,home_location,work_location,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam                      EmployeesListRequestExpand = "employments,home_location,work_location,manager,team"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany               EmployeesListRequestExpand = "employments,home_location,work_location,manager,team,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup       EmployeesListRequestExpand = "employments,home_location,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup              EmployeesListRequestExpand = "employments,home_location,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup                         EmployeesListRequestExpand = "employments,home_location,work_location,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam                             EmployeesListRequestExpand = "employments,home_location,work_location,team"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany                      EmployeesListRequestExpand = "employments,home_location,work_location,team,company"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup              EmployeesListRequestExpand = "employments,home_location,work_location,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup                     EmployeesListRequestExpand = "employments,home_location,work_location,team,pay_group"
+	EmployeesListRequestExpandEmploymentsManager                                                  EmployeesListRequestExpand = "employments,manager"
+	EmployeesListRequestExpandEmploymentsManagerCompany                                           EmployeesListRequestExpand = "employments,manager,company"
+	EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup                                   EmployeesListRequestExpand = "employments,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsManagerPayGroup                                          EmployeesListRequestExpand = "employments,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsManagerTeam                                              EmployeesListRequestExpand = "employments,manager,team"
+	EmployeesListRequestExpandEmploymentsManagerTeamCompany                                       EmployeesListRequestExpand = "employments,manager,team,company"
+	EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup                               EmployeesListRequestExpand = "employments,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsManagerTeamPayGroup                                      EmployeesListRequestExpand = "employments,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsPayGroup                                                 EmployeesListRequestExpand = "employments,pay_group"
+	EmployeesListRequestExpandEmploymentsTeam                                                     EmployeesListRequestExpand = "employments,team"
+	EmployeesListRequestExpandEmploymentsTeamCompany                                              EmployeesListRequestExpand = "employments,team,company"
+	EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup                                      EmployeesListRequestExpand = "employments,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsTeamPayGroup                                             EmployeesListRequestExpand = "employments,team,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocation                                             EmployeesListRequestExpand = "employments,work_location"
+	EmployeesListRequestExpandEmploymentsWorkLocationCompany                                      EmployeesListRequestExpand = "employments,work_location,company"
+	EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup                              EmployeesListRequestExpand = "employments,work_location,company,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationManager                                      EmployeesListRequestExpand = "employments,work_location,manager"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany                               EmployeesListRequestExpand = "employments,work_location,manager,company"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup                       EmployeesListRequestExpand = "employments,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup                              EmployeesListRequestExpand = "employments,work_location,manager,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam                                  EmployeesListRequestExpand = "employments,work_location,manager,team"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany                           EmployeesListRequestExpand = "employments,work_location,manager,team,company"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup                   EmployeesListRequestExpand = "employments,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup                          EmployeesListRequestExpand = "employments,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationPayGroup                                     EmployeesListRequestExpand = "employments,work_location,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationTeam                                         EmployeesListRequestExpand = "employments,work_location,team"
+	EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany                                  EmployeesListRequestExpand = "employments,work_location,team,company"
+	EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup                          EmployeesListRequestExpand = "employments,work_location,team,company,pay_group"
+	EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup                                 EmployeesListRequestExpand = "employments,work_location,team,pay_group"
+	EmployeesListRequestExpandGroups                                                              EmployeesListRequestExpand = "groups"
+	EmployeesListRequestExpandGroupsCompany                                                       EmployeesListRequestExpand = "groups,company"
+	EmployeesListRequestExpandGroupsCompanyPayGroup                                               EmployeesListRequestExpand = "groups,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocation                                                  EmployeesListRequestExpand = "groups,home_location"
+	EmployeesListRequestExpandGroupsHomeLocationCompany                                           EmployeesListRequestExpand = "groups,home_location,company"
+	EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup                                   EmployeesListRequestExpand = "groups,home_location,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationManager                                           EmployeesListRequestExpand = "groups,home_location,manager"
+	EmployeesListRequestExpandGroupsHomeLocationManagerCompany                                    EmployeesListRequestExpand = "groups,home_location,manager,company"
+	EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup                            EmployeesListRequestExpand = "groups,home_location,manager,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup                                   EmployeesListRequestExpand = "groups,home_location,manager,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeam                                       EmployeesListRequestExpand = "groups,home_location,manager,team"
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany                                EmployeesListRequestExpand = "groups,home_location,manager,team,company"
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup                        EmployeesListRequestExpand = "groups,home_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup                               EmployeesListRequestExpand = "groups,home_location,manager,team,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationPayGroup                                          EmployeesListRequestExpand = "groups,home_location,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationTeam                                              EmployeesListRequestExpand = "groups,home_location,team"
+	EmployeesListRequestExpandGroupsHomeLocationTeamCompany                                       EmployeesListRequestExpand = "groups,home_location,team,company"
+	EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup                               EmployeesListRequestExpand = "groups,home_location,team,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup                                      EmployeesListRequestExpand = "groups,home_location,team,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocation                                      EmployeesListRequestExpand = "groups,home_location,work_location"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany                               EmployeesListRequestExpand = "groups,home_location,work_location,company"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup                       EmployeesListRequestExpand = "groups,home_location,work_location,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager                               EmployeesListRequestExpand = "groups,home_location,work_location,manager"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany                        EmployeesListRequestExpand = "groups,home_location,work_location,manager,company"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup                EmployeesListRequestExpand = "groups,home_location,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup                       EmployeesListRequestExpand = "groups,home_location,work_location,manager,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam                           EmployeesListRequestExpand = "groups,home_location,work_location,manager,team"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany                    EmployeesListRequestExpand = "groups,home_location,work_location,manager,team,company"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup            EmployeesListRequestExpand = "groups,home_location,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup                   EmployeesListRequestExpand = "groups,home_location,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup                              EmployeesListRequestExpand = "groups,home_location,work_location,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam                                  EmployeesListRequestExpand = "groups,home_location,work_location,team"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany                           EmployeesListRequestExpand = "groups,home_location,work_location,team,company"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup                   EmployeesListRequestExpand = "groups,home_location,work_location,team,company,pay_group"
+	EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup                          EmployeesListRequestExpand = "groups,home_location,work_location,team,pay_group"
+	EmployeesListRequestExpandGroupsManager                                                       EmployeesListRequestExpand = "groups,manager"
+	EmployeesListRequestExpandGroupsManagerCompany                                                EmployeesListRequestExpand = "groups,manager,company"
+	EmployeesListRequestExpandGroupsManagerCompanyPayGroup                                        EmployeesListRequestExpand = "groups,manager,company,pay_group"
+	EmployeesListRequestExpandGroupsManagerPayGroup                                               EmployeesListRequestExpand = "groups,manager,pay_group"
+	EmployeesListRequestExpandGroupsManagerTeam                                                   EmployeesListRequestExpand = "groups,manager,team"
+	EmployeesListRequestExpandGroupsManagerTeamCompany                                            EmployeesListRequestExpand = "groups,manager,team,company"
+	EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup                                    EmployeesListRequestExpand = "groups,manager,team,company,pay_group"
+	EmployeesListRequestExpandGroupsManagerTeamPayGroup                                           EmployeesListRequestExpand = "groups,manager,team,pay_group"
+	EmployeesListRequestExpandGroupsPayGroup                                                      EmployeesListRequestExpand = "groups,pay_group"
+	EmployeesListRequestExpandGroupsTeam                                                          EmployeesListRequestExpand = "groups,team"
+	EmployeesListRequestExpandGroupsTeamCompany                                                   EmployeesListRequestExpand = "groups,team,company"
+	EmployeesListRequestExpandGroupsTeamCompanyPayGroup                                           EmployeesListRequestExpand = "groups,team,company,pay_group"
+	EmployeesListRequestExpandGroupsTeamPayGroup                                                  EmployeesListRequestExpand = "groups,team,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocation                                                  EmployeesListRequestExpand = "groups,work_location"
+	EmployeesListRequestExpandGroupsWorkLocationCompany                                           EmployeesListRequestExpand = "groups,work_location,company"
+	EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup                                   EmployeesListRequestExpand = "groups,work_location,company,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationManager                                           EmployeesListRequestExpand = "groups,work_location,manager"
+	EmployeesListRequestExpandGroupsWorkLocationManagerCompany                                    EmployeesListRequestExpand = "groups,work_location,manager,company"
+	EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup                            EmployeesListRequestExpand = "groups,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup                                   EmployeesListRequestExpand = "groups,work_location,manager,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeam                                       EmployeesListRequestExpand = "groups,work_location,manager,team"
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany                                EmployeesListRequestExpand = "groups,work_location,manager,team,company"
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup                        EmployeesListRequestExpand = "groups,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup                               EmployeesListRequestExpand = "groups,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationPayGroup                                          EmployeesListRequestExpand = "groups,work_location,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationTeam                                              EmployeesListRequestExpand = "groups,work_location,team"
+	EmployeesListRequestExpandGroupsWorkLocationTeamCompany                                       EmployeesListRequestExpand = "groups,work_location,team,company"
+	EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup                               EmployeesListRequestExpand = "groups,work_location,team,company,pay_group"
+	EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup                                      EmployeesListRequestExpand = "groups,work_location,team,pay_group"
+	EmployeesListRequestExpandHomeLocation                                                        EmployeesListRequestExpand = "home_location"
+	EmployeesListRequestExpandHomeLocationCompany                                                 EmployeesListRequestExpand = "home_location,company"
+	EmployeesListRequestExpandHomeLocationCompanyPayGroup                                         EmployeesListRequestExpand = "home_location,company,pay_group"
+	EmployeesListRequestExpandHomeLocationManager                                                 EmployeesListRequestExpand = "home_location,manager"
+	EmployeesListRequestExpandHomeLocationManagerCompany                                          EmployeesListRequestExpand = "home_location,manager,company"
+	EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup                                  EmployeesListRequestExpand = "home_location,manager,company,pay_group"
+	EmployeesListRequestExpandHomeLocationManagerPayGroup                                         EmployeesListRequestExpand = "home_location,manager,pay_group"
+	EmployeesListRequestExpandHomeLocationManagerTeam                                             EmployeesListRequestExpand = "home_location,manager,team"
+	EmployeesListRequestExpandHomeLocationManagerTeamCompany                                      EmployeesListRequestExpand = "home_location,manager,team,company"
+	EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup                              EmployeesListRequestExpand = "home_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandHomeLocationManagerTeamPayGroup                                     EmployeesListRequestExpand = "home_location,manager,team,pay_group"
+	EmployeesListRequestExpandHomeLocationPayGroup                                                EmployeesListRequestExpand = "home_location,pay_group"
+	EmployeesListRequestExpandHomeLocationTeam                                                    EmployeesListRequestExpand = "home_location,team"
+	EmployeesListRequestExpandHomeLocationTeamCompany                                             EmployeesListRequestExpand = "home_location,team,company"
+	EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup                                     EmployeesListRequestExpand = "home_location,team,company,pay_group"
+	EmployeesListRequestExpandHomeLocationTeamPayGroup                                            EmployeesListRequestExpand = "home_location,team,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocation                                            EmployeesListRequestExpand = "home_location,work_location"
+	EmployeesListRequestExpandHomeLocationWorkLocationCompany                                     EmployeesListRequestExpand = "home_location,work_location,company"
+	EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup                             EmployeesListRequestExpand = "home_location,work_location,company,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationManager                                     EmployeesListRequestExpand = "home_location,work_location,manager"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany                              EmployeesListRequestExpand = "home_location,work_location,manager,company"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup                      EmployeesListRequestExpand = "home_location,work_location,manager,company,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup                             EmployeesListRequestExpand = "home_location,work_location,manager,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam                                 EmployeesListRequestExpand = "home_location,work_location,manager,team"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany                          EmployeesListRequestExpand = "home_location,work_location,manager,team,company"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup                  EmployeesListRequestExpand = "home_location,work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup                         EmployeesListRequestExpand = "home_location,work_location,manager,team,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationPayGroup                                    EmployeesListRequestExpand = "home_location,work_location,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationTeam                                        EmployeesListRequestExpand = "home_location,work_location,team"
+	EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany                                 EmployeesListRequestExpand = "home_location,work_location,team,company"
+	EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup                         EmployeesListRequestExpand = "home_location,work_location,team,company,pay_group"
+	EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup                                EmployeesListRequestExpand = "home_location,work_location,team,pay_group"
+	EmployeesListRequestExpandManager                                                             EmployeesListRequestExpand = "manager"
+	EmployeesListRequestExpandManagerCompany                                                      EmployeesListRequestExpand = "manager,company"
+	EmployeesListRequestExpandManagerCompanyPayGroup                                              EmployeesListRequestExpand = "manager,company,pay_group"
+	EmployeesListRequestExpandManagerPayGroup                                                     EmployeesListRequestExpand = "manager,pay_group"
+	EmployeesListRequestExpandManagerTeam                                                         EmployeesListRequestExpand = "manager,team"
+	EmployeesListRequestExpandManagerTeamCompany                                                  EmployeesListRequestExpand = "manager,team,company"
+	EmployeesListRequestExpandManagerTeamCompanyPayGroup                                          EmployeesListRequestExpand = "manager,team,company,pay_group"
+	EmployeesListRequestExpandManagerTeamPayGroup                                                 EmployeesListRequestExpand = "manager,team,pay_group"
+	EmployeesListRequestExpandPayGroup                                                            EmployeesListRequestExpand = "pay_group"
+	EmployeesListRequestExpandTeam                                                                EmployeesListRequestExpand = "team"
+	EmployeesListRequestExpandTeamCompany                                                         EmployeesListRequestExpand = "team,company"
+	EmployeesListRequestExpandTeamCompanyPayGroup                                                 EmployeesListRequestExpand = "team,company,pay_group"
+	EmployeesListRequestExpandTeamPayGroup                                                        EmployeesListRequestExpand = "team,pay_group"
+	EmployeesListRequestExpandWorkLocation                                                        EmployeesListRequestExpand = "work_location"
+	EmployeesListRequestExpandWorkLocationCompany                                                 EmployeesListRequestExpand = "work_location,company"
+	EmployeesListRequestExpandWorkLocationCompanyPayGroup                                         EmployeesListRequestExpand = "work_location,company,pay_group"
+	EmployeesListRequestExpandWorkLocationManager                                                 EmployeesListRequestExpand = "work_location,manager"
+	EmployeesListRequestExpandWorkLocationManagerCompany                                          EmployeesListRequestExpand = "work_location,manager,company"
+	EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup                                  EmployeesListRequestExpand = "work_location,manager,company,pay_group"
+	EmployeesListRequestExpandWorkLocationManagerPayGroup                                         EmployeesListRequestExpand = "work_location,manager,pay_group"
+	EmployeesListRequestExpandWorkLocationManagerTeam                                             EmployeesListRequestExpand = "work_location,manager,team"
+	EmployeesListRequestExpandWorkLocationManagerTeamCompany                                      EmployeesListRequestExpand = "work_location,manager,team,company"
+	EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup                              EmployeesListRequestExpand = "work_location,manager,team,company,pay_group"
+	EmployeesListRequestExpandWorkLocationManagerTeamPayGroup                                     EmployeesListRequestExpand = "work_location,manager,team,pay_group"
+	EmployeesListRequestExpandWorkLocationPayGroup                                                EmployeesListRequestExpand = "work_location,pay_group"
+	EmployeesListRequestExpandWorkLocationTeam                                                    EmployeesListRequestExpand = "work_location,team"
+	EmployeesListRequestExpandWorkLocationTeamCompany                                             EmployeesListRequestExpand = "work_location,team,company"
+	EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup                                     EmployeesListRequestExpand = "work_location,team,company,pay_group"
+	EmployeesListRequestExpandWorkLocationTeamPayGroup                                            EmployeesListRequestExpand = "work_location,team,pay_group"
+)
+
+func NewEmployeesListRequestExpandFromString(s string) (EmployeesListRequestExpand, error) {
+	switch s {
+	case "company":
+		return EmployeesListRequestExpandCompany, nil
+	case "company,pay_group":
+		return EmployeesListRequestExpandCompanyPayGroup, nil
+	case "employments":
+		return EmployeesListRequestExpandEmployments, nil
+	case "employments,company":
+		return EmployeesListRequestExpandEmploymentsCompany, nil
+	case "employments,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsCompanyPayGroup, nil
+	case "employments,groups":
+		return EmployeesListRequestExpandEmploymentsGroups, nil
+	case "employments,groups,company":
+		return EmployeesListRequestExpandEmploymentsGroupsCompany, nil
+	case "employments,groups,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsCompanyPayGroup, nil
+	case "employments,groups,home_location":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocation, nil
+	case "employments,groups,home_location,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompany, nil
+	case "employments,groups,home_location,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup, nil
+	case "employments,groups,home_location,manager":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManager, nil
+	case "employments,groups,home_location,manager,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompany, nil
+	case "employments,groups,home_location,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup, nil
+	case "employments,groups,home_location,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup, nil
+	case "employments,groups,home_location,manager,team":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeam, nil
+	case "employments,groups,home_location,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany, nil
+	case "employments,groups,home_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup, nil
+	case "employments,groups,home_location,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationPayGroup, nil
+	case "employments,groups,home_location,team":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeam, nil
+	case "employments,groups,home_location,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompany, nil
+	case "employments,groups,home_location,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup, nil
+	case "employments,groups,home_location,work_location":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocation, nil
+	case "employments,groups,home_location,work_location,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany, nil
+	case "employments,groups,home_location,work_location,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,manager":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager, nil
+	case "employments,groups,home_location,work_location,manager,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany, nil
+	case "employments,groups,home_location,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup, nil
+	case "employments,groups,home_location,work_location,manager,team":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam, nil
+	case "employments,groups,home_location,work_location,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany, nil
+	case "employments,groups,home_location,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "employments,groups,home_location,work_location,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup, nil
+	case "employments,groups,home_location,work_location,team":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam, nil
+	case "employments,groups,home_location,work_location,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany, nil
+	case "employments,groups,home_location,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup, nil
+	case "employments,groups,manager":
+		return EmployeesListRequestExpandEmploymentsGroupsManager, nil
+	case "employments,groups,manager,company":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerCompany, nil
+	case "employments,groups,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerCompanyPayGroup, nil
+	case "employments,groups,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerPayGroup, nil
+	case "employments,groups,manager,team":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerTeam, nil
+	case "employments,groups,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompany, nil
+	case "employments,groups,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup, nil
+	case "employments,groups,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsManagerTeamPayGroup, nil
+	case "employments,groups,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsPayGroup, nil
+	case "employments,groups,team":
+		return EmployeesListRequestExpandEmploymentsGroupsTeam, nil
+	case "employments,groups,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsTeamCompany, nil
+	case "employments,groups,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsTeamCompanyPayGroup, nil
+	case "employments,groups,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsTeamPayGroup, nil
+	case "employments,groups,work_location":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocation, nil
+	case "employments,groups,work_location,company":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompany, nil
+	case "employments,groups,work_location,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup, nil
+	case "employments,groups,work_location,manager":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManager, nil
+	case "employments,groups,work_location,manager,company":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompany, nil
+	case "employments,groups,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup, nil
+	case "employments,groups,work_location,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup, nil
+	case "employments,groups,work_location,manager,team":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeam, nil
+	case "employments,groups,work_location,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany, nil
+	case "employments,groups,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,groups,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup, nil
+	case "employments,groups,work_location,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationPayGroup, nil
+	case "employments,groups,work_location,team":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeam, nil
+	case "employments,groups,work_location,team,company":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompany, nil
+	case "employments,groups,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup, nil
+	case "employments,groups,work_location,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup, nil
+	case "employments,home_location":
+		return EmployeesListRequestExpandEmploymentsHomeLocation, nil
+	case "employments,home_location,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationCompany, nil
+	case "employments,home_location,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationCompanyPayGroup, nil
+	case "employments,home_location,manager":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManager, nil
+	case "employments,home_location,manager,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerCompany, nil
+	case "employments,home_location,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup, nil
+	case "employments,home_location,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerPayGroup, nil
+	case "employments,home_location,manager,team":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerTeam, nil
+	case "employments,home_location,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompany, nil
+	case "employments,home_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup, nil
+	case "employments,home_location,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationManagerTeamPayGroup, nil
+	case "employments,home_location,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationPayGroup, nil
+	case "employments,home_location,team":
+		return EmployeesListRequestExpandEmploymentsHomeLocationTeam, nil
+	case "employments,home_location,team,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationTeamCompany, nil
+	case "employments,home_location,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup, nil
+	case "employments,home_location,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationTeamPayGroup, nil
+	case "employments,home_location,work_location":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocation, nil
+	case "employments,home_location,work_location,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompany, nil
+	case "employments,home_location,work_location,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup, nil
+	case "employments,home_location,work_location,manager":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManager, nil
+	case "employments,home_location,work_location,manager,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany, nil
+	case "employments,home_location,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "employments,home_location,work_location,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup, nil
+	case "employments,home_location,work_location,manager,team":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam, nil
+	case "employments,home_location,work_location,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany, nil
+	case "employments,home_location,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,home_location,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "employments,home_location,work_location,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationPayGroup, nil
+	case "employments,home_location,work_location,team":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeam, nil
+	case "employments,home_location,work_location,team,company":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany, nil
+	case "employments,home_location,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "employments,home_location,work_location,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup, nil
+	case "employments,manager":
+		return EmployeesListRequestExpandEmploymentsManager, nil
+	case "employments,manager,company":
+		return EmployeesListRequestExpandEmploymentsManagerCompany, nil
+	case "employments,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsManagerCompanyPayGroup, nil
+	case "employments,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsManagerPayGroup, nil
+	case "employments,manager,team":
+		return EmployeesListRequestExpandEmploymentsManagerTeam, nil
+	case "employments,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsManagerTeamCompany, nil
+	case "employments,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsManagerTeamCompanyPayGroup, nil
+	case "employments,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsManagerTeamPayGroup, nil
+	case "employments,pay_group":
+		return EmployeesListRequestExpandEmploymentsPayGroup, nil
+	case "employments,team":
+		return EmployeesListRequestExpandEmploymentsTeam, nil
+	case "employments,team,company":
+		return EmployeesListRequestExpandEmploymentsTeamCompany, nil
+	case "employments,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsTeamCompanyPayGroup, nil
+	case "employments,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsTeamPayGroup, nil
+	case "employments,work_location":
+		return EmployeesListRequestExpandEmploymentsWorkLocation, nil
+	case "employments,work_location,company":
+		return EmployeesListRequestExpandEmploymentsWorkLocationCompany, nil
+	case "employments,work_location,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationCompanyPayGroup, nil
+	case "employments,work_location,manager":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManager, nil
+	case "employments,work_location,manager,company":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerCompany, nil
+	case "employments,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup, nil
+	case "employments,work_location,manager,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerPayGroup, nil
+	case "employments,work_location,manager,team":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerTeam, nil
+	case "employments,work_location,manager,team,company":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompany, nil
+	case "employments,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationManagerTeamPayGroup, nil
+	case "employments,work_location,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationPayGroup, nil
+	case "employments,work_location,team":
+		return EmployeesListRequestExpandEmploymentsWorkLocationTeam, nil
+	case "employments,work_location,team,company":
+		return EmployeesListRequestExpandEmploymentsWorkLocationTeamCompany, nil
+	case "employments,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup, nil
+	case "employments,work_location,team,pay_group":
+		return EmployeesListRequestExpandEmploymentsWorkLocationTeamPayGroup, nil
+	case "groups":
+		return EmployeesListRequestExpandGroups, nil
+	case "groups,company":
+		return EmployeesListRequestExpandGroupsCompany, nil
+	case "groups,company,pay_group":
+		return EmployeesListRequestExpandGroupsCompanyPayGroup, nil
+	case "groups,home_location":
+		return EmployeesListRequestExpandGroupsHomeLocation, nil
+	case "groups,home_location,company":
+		return EmployeesListRequestExpandGroupsHomeLocationCompany, nil
+	case "groups,home_location,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationCompanyPayGroup, nil
+	case "groups,home_location,manager":
+		return EmployeesListRequestExpandGroupsHomeLocationManager, nil
+	case "groups,home_location,manager,company":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerCompany, nil
+	case "groups,home_location,manager,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerCompanyPayGroup, nil
+	case "groups,home_location,manager,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerPayGroup, nil
+	case "groups,home_location,manager,team":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerTeam, nil
+	case "groups,home_location,manager,team,company":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompany, nil
+	case "groups,home_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup, nil
+	case "groups,home_location,manager,team,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationManagerTeamPayGroup, nil
+	case "groups,home_location,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationPayGroup, nil
+	case "groups,home_location,team":
+		return EmployeesListRequestExpandGroupsHomeLocationTeam, nil
+	case "groups,home_location,team,company":
+		return EmployeesListRequestExpandGroupsHomeLocationTeamCompany, nil
+	case "groups,home_location,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationTeamCompanyPayGroup, nil
+	case "groups,home_location,team,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationTeamPayGroup, nil
+	case "groups,home_location,work_location":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocation, nil
+	case "groups,home_location,work_location,company":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompany, nil
+	case "groups,home_location,work_location,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup, nil
+	case "groups,home_location,work_location,manager":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManager, nil
+	case "groups,home_location,work_location,manager,company":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompany, nil
+	case "groups,home_location,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "groups,home_location,work_location,manager,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup, nil
+	case "groups,home_location,work_location,manager,team":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeam, nil
+	case "groups,home_location,work_location,manager,team,company":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany, nil
+	case "groups,home_location,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "groups,home_location,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "groups,home_location,work_location,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationPayGroup, nil
+	case "groups,home_location,work_location,team":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeam, nil
+	case "groups,home_location,work_location,team,company":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompany, nil
+	case "groups,home_location,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "groups,home_location,work_location,team,pay_group":
+		return EmployeesListRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup, nil
+	case "groups,manager":
+		return EmployeesListRequestExpandGroupsManager, nil
+	case "groups,manager,company":
+		return EmployeesListRequestExpandGroupsManagerCompany, nil
+	case "groups,manager,company,pay_group":
+		return EmployeesListRequestExpandGroupsManagerCompanyPayGroup, nil
+	case "groups,manager,pay_group":
+		return EmployeesListRequestExpandGroupsManagerPayGroup, nil
+	case "groups,manager,team":
+		return EmployeesListRequestExpandGroupsManagerTeam, nil
+	case "groups,manager,team,company":
+		return EmployeesListRequestExpandGroupsManagerTeamCompany, nil
+	case "groups,manager,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsManagerTeamCompanyPayGroup, nil
+	case "groups,manager,team,pay_group":
+		return EmployeesListRequestExpandGroupsManagerTeamPayGroup, nil
+	case "groups,pay_group":
+		return EmployeesListRequestExpandGroupsPayGroup, nil
+	case "groups,team":
+		return EmployeesListRequestExpandGroupsTeam, nil
+	case "groups,team,company":
+		return EmployeesListRequestExpandGroupsTeamCompany, nil
+	case "groups,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsTeamCompanyPayGroup, nil
+	case "groups,team,pay_group":
+		return EmployeesListRequestExpandGroupsTeamPayGroup, nil
+	case "groups,work_location":
+		return EmployeesListRequestExpandGroupsWorkLocation, nil
+	case "groups,work_location,company":
+		return EmployeesListRequestExpandGroupsWorkLocationCompany, nil
+	case "groups,work_location,company,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationCompanyPayGroup, nil
+	case "groups,work_location,manager":
+		return EmployeesListRequestExpandGroupsWorkLocationManager, nil
+	case "groups,work_location,manager,company":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerCompany, nil
+	case "groups,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerCompanyPayGroup, nil
+	case "groups,work_location,manager,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerPayGroup, nil
+	case "groups,work_location,manager,team":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerTeam, nil
+	case "groups,work_location,manager,team,company":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompany, nil
+	case "groups,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup, nil
+	case "groups,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationManagerTeamPayGroup, nil
+	case "groups,work_location,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationPayGroup, nil
+	case "groups,work_location,team":
+		return EmployeesListRequestExpandGroupsWorkLocationTeam, nil
+	case "groups,work_location,team,company":
+		return EmployeesListRequestExpandGroupsWorkLocationTeamCompany, nil
+	case "groups,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationTeamCompanyPayGroup, nil
+	case "groups,work_location,team,pay_group":
+		return EmployeesListRequestExpandGroupsWorkLocationTeamPayGroup, nil
+	case "home_location":
+		return EmployeesListRequestExpandHomeLocation, nil
+	case "home_location,company":
+		return EmployeesListRequestExpandHomeLocationCompany, nil
+	case "home_location,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationCompanyPayGroup, nil
+	case "home_location,manager":
+		return EmployeesListRequestExpandHomeLocationManager, nil
+	case "home_location,manager,company":
+		return EmployeesListRequestExpandHomeLocationManagerCompany, nil
+	case "home_location,manager,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationManagerCompanyPayGroup, nil
+	case "home_location,manager,pay_group":
+		return EmployeesListRequestExpandHomeLocationManagerPayGroup, nil
+	case "home_location,manager,team":
+		return EmployeesListRequestExpandHomeLocationManagerTeam, nil
+	case "home_location,manager,team,company":
+		return EmployeesListRequestExpandHomeLocationManagerTeamCompany, nil
+	case "home_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationManagerTeamCompanyPayGroup, nil
+	case "home_location,manager,team,pay_group":
+		return EmployeesListRequestExpandHomeLocationManagerTeamPayGroup, nil
+	case "home_location,pay_group":
+		return EmployeesListRequestExpandHomeLocationPayGroup, nil
+	case "home_location,team":
+		return EmployeesListRequestExpandHomeLocationTeam, nil
+	case "home_location,team,company":
+		return EmployeesListRequestExpandHomeLocationTeamCompany, nil
+	case "home_location,team,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationTeamCompanyPayGroup, nil
+	case "home_location,team,pay_group":
+		return EmployeesListRequestExpandHomeLocationTeamPayGroup, nil
+	case "home_location,work_location":
+		return EmployeesListRequestExpandHomeLocationWorkLocation, nil
+	case "home_location,work_location,company":
+		return EmployeesListRequestExpandHomeLocationWorkLocationCompany, nil
+	case "home_location,work_location,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationCompanyPayGroup, nil
+	case "home_location,work_location,manager":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManager, nil
+	case "home_location,work_location,manager,company":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerCompany, nil
+	case "home_location,work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "home_location,work_location,manager,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerPayGroup, nil
+	case "home_location,work_location,manager,team":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerTeam, nil
+	case "home_location,work_location,manager,team,company":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompany, nil
+	case "home_location,work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "home_location,work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "home_location,work_location,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationPayGroup, nil
+	case "home_location,work_location,team":
+		return EmployeesListRequestExpandHomeLocationWorkLocationTeam, nil
+	case "home_location,work_location,team,company":
+		return EmployeesListRequestExpandHomeLocationWorkLocationTeamCompany, nil
+	case "home_location,work_location,team,company,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "home_location,work_location,team,pay_group":
+		return EmployeesListRequestExpandHomeLocationWorkLocationTeamPayGroup, nil
+	case "manager":
+		return EmployeesListRequestExpandManager, nil
+	case "manager,company":
+		return EmployeesListRequestExpandManagerCompany, nil
+	case "manager,company,pay_group":
+		return EmployeesListRequestExpandManagerCompanyPayGroup, nil
+	case "manager,pay_group":
+		return EmployeesListRequestExpandManagerPayGroup, nil
+	case "manager,team":
+		return EmployeesListRequestExpandManagerTeam, nil
+	case "manager,team,company":
+		return EmployeesListRequestExpandManagerTeamCompany, nil
+	case "manager,team,company,pay_group":
+		return EmployeesListRequestExpandManagerTeamCompanyPayGroup, nil
+	case "manager,team,pay_group":
+		return EmployeesListRequestExpandManagerTeamPayGroup, nil
+	case "pay_group":
+		return EmployeesListRequestExpandPayGroup, nil
+	case "team":
+		return EmployeesListRequestExpandTeam, nil
+	case "team,company":
+		return EmployeesListRequestExpandTeamCompany, nil
+	case "team,company,pay_group":
+		return EmployeesListRequestExpandTeamCompanyPayGroup, nil
+	case "team,pay_group":
+		return EmployeesListRequestExpandTeamPayGroup, nil
+	case "work_location":
+		return EmployeesListRequestExpandWorkLocation, nil
+	case "work_location,company":
+		return EmployeesListRequestExpandWorkLocationCompany, nil
+	case "work_location,company,pay_group":
+		return EmployeesListRequestExpandWorkLocationCompanyPayGroup, nil
+	case "work_location,manager":
+		return EmployeesListRequestExpandWorkLocationManager, nil
+	case "work_location,manager,company":
+		return EmployeesListRequestExpandWorkLocationManagerCompany, nil
+	case "work_location,manager,company,pay_group":
+		return EmployeesListRequestExpandWorkLocationManagerCompanyPayGroup, nil
+	case "work_location,manager,pay_group":
+		return EmployeesListRequestExpandWorkLocationManagerPayGroup, nil
+	case "work_location,manager,team":
+		return EmployeesListRequestExpandWorkLocationManagerTeam, nil
+	case "work_location,manager,team,company":
+		return EmployeesListRequestExpandWorkLocationManagerTeamCompany, nil
+	case "work_location,manager,team,company,pay_group":
+		return EmployeesListRequestExpandWorkLocationManagerTeamCompanyPayGroup, nil
+	case "work_location,manager,team,pay_group":
+		return EmployeesListRequestExpandWorkLocationManagerTeamPayGroup, nil
+	case "work_location,pay_group":
+		return EmployeesListRequestExpandWorkLocationPayGroup, nil
+	case "work_location,team":
+		return EmployeesListRequestExpandWorkLocationTeam, nil
+	case "work_location,team,company":
+		return EmployeesListRequestExpandWorkLocationTeamCompany, nil
+	case "work_location,team,company,pay_group":
+		return EmployeesListRequestExpandWorkLocationTeamCompanyPayGroup, nil
+	case "work_location,team,pay_group":
+		return EmployeesListRequestExpandWorkLocationTeamPayGroup, nil
+	}
+	var t EmployeesListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesListRequestExpand) Ptr() *EmployeesListRequestExpand {
+	return &e
+}
+
+type EmployeesListRequestRemoteFields string
+
+const (
+	EmployeesListRequestRemoteFieldsEmploymentStatus                             EmployeesListRequestRemoteFields = "employment_status"
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity                    EmployeesListRequestRemoteFields = "employment_status,ethnicity"
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender              EmployeesListRequestRemoteFields = "employment_status,ethnicity,gender"
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus EmployeesListRequestRemoteFields = "employment_status,ethnicity,gender,marital_status"
+	EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus       EmployeesListRequestRemoteFields = "employment_status,ethnicity,marital_status"
+	EmployeesListRequestRemoteFieldsEmploymentStatusGender                       EmployeesListRequestRemoteFields = "employment_status,gender"
+	EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus          EmployeesListRequestRemoteFields = "employment_status,gender,marital_status"
+	EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus                EmployeesListRequestRemoteFields = "employment_status,marital_status"
+	EmployeesListRequestRemoteFieldsEthnicity                                    EmployeesListRequestRemoteFields = "ethnicity"
+	EmployeesListRequestRemoteFieldsEthnicityGender                              EmployeesListRequestRemoteFields = "ethnicity,gender"
+	EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus                 EmployeesListRequestRemoteFields = "ethnicity,gender,marital_status"
+	EmployeesListRequestRemoteFieldsEthnicityMaritalStatus                       EmployeesListRequestRemoteFields = "ethnicity,marital_status"
+	EmployeesListRequestRemoteFieldsGender                                       EmployeesListRequestRemoteFields = "gender"
+	EmployeesListRequestRemoteFieldsGenderMaritalStatus                          EmployeesListRequestRemoteFields = "gender,marital_status"
+	EmployeesListRequestRemoteFieldsMaritalStatus                                EmployeesListRequestRemoteFields = "marital_status"
+)
+
+func NewEmployeesListRequestRemoteFieldsFromString(s string) (EmployeesListRequestRemoteFields, error) {
+	switch s {
+	case "employment_status":
+		return EmployeesListRequestRemoteFieldsEmploymentStatus, nil
+	case "employment_status,ethnicity":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusEthnicity, nil
+	case "employment_status,ethnicity,gender":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGender, nil
+	case "employment_status,ethnicity,gender,marital_status":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus, nil
+	case "employment_status,ethnicity,marital_status":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus, nil
+	case "employment_status,gender":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusGender, nil
+	case "employment_status,gender,marital_status":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusGenderMaritalStatus, nil
+	case "employment_status,marital_status":
+		return EmployeesListRequestRemoteFieldsEmploymentStatusMaritalStatus, nil
+	case "ethnicity":
+		return EmployeesListRequestRemoteFieldsEthnicity, nil
+	case "ethnicity,gender":
+		return EmployeesListRequestRemoteFieldsEthnicityGender, nil
+	case "ethnicity,gender,marital_status":
+		return EmployeesListRequestRemoteFieldsEthnicityGenderMaritalStatus, nil
+	case "ethnicity,marital_status":
+		return EmployeesListRequestRemoteFieldsEthnicityMaritalStatus, nil
+	case "gender":
+		return EmployeesListRequestRemoteFieldsGender, nil
+	case "gender,marital_status":
+		return EmployeesListRequestRemoteFieldsGenderMaritalStatus, nil
+	case "marital_status":
+		return EmployeesListRequestRemoteFieldsMaritalStatus, nil
+	}
+	var t EmployeesListRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesListRequestRemoteFields) Ptr() *EmployeesListRequestRemoteFields {
+	return &e
+}
+
+type EmployeesListRequestShowEnumOrigins string
+
+const (
+	EmployeesListRequestShowEnumOriginsEmploymentStatus                             EmployeesListRequestShowEnumOrigins = "employment_status"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity                    EmployeesListRequestShowEnumOrigins = "employment_status,ethnicity"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender              EmployeesListRequestShowEnumOrigins = "employment_status,ethnicity,gender"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus EmployeesListRequestShowEnumOrigins = "employment_status,ethnicity,gender,marital_status"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus       EmployeesListRequestShowEnumOrigins = "employment_status,ethnicity,marital_status"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusGender                       EmployeesListRequestShowEnumOrigins = "employment_status,gender"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus          EmployeesListRequestShowEnumOrigins = "employment_status,gender,marital_status"
+	EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus                EmployeesListRequestShowEnumOrigins = "employment_status,marital_status"
+	EmployeesListRequestShowEnumOriginsEthnicity                                    EmployeesListRequestShowEnumOrigins = "ethnicity"
+	EmployeesListRequestShowEnumOriginsEthnicityGender                              EmployeesListRequestShowEnumOrigins = "ethnicity,gender"
+	EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus                 EmployeesListRequestShowEnumOrigins = "ethnicity,gender,marital_status"
+	EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus                       EmployeesListRequestShowEnumOrigins = "ethnicity,marital_status"
+	EmployeesListRequestShowEnumOriginsGender                                       EmployeesListRequestShowEnumOrigins = "gender"
+	EmployeesListRequestShowEnumOriginsGenderMaritalStatus                          EmployeesListRequestShowEnumOrigins = "gender,marital_status"
+	EmployeesListRequestShowEnumOriginsMaritalStatus                                EmployeesListRequestShowEnumOrigins = "marital_status"
+)
+
+func NewEmployeesListRequestShowEnumOriginsFromString(s string) (EmployeesListRequestShowEnumOrigins, error) {
+	switch s {
+	case "employment_status":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatus, nil
+	case "employment_status,ethnicity":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicity, nil
+	case "employment_status,ethnicity,gender":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGender, nil
+	case "employment_status,ethnicity,gender,marital_status":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus, nil
+	case "employment_status,ethnicity,marital_status":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus, nil
+	case "employment_status,gender":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusGender, nil
+	case "employment_status,gender,marital_status":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus, nil
+	case "employment_status,marital_status":
+		return EmployeesListRequestShowEnumOriginsEmploymentStatusMaritalStatus, nil
+	case "ethnicity":
+		return EmployeesListRequestShowEnumOriginsEthnicity, nil
+	case "ethnicity,gender":
+		return EmployeesListRequestShowEnumOriginsEthnicityGender, nil
+	case "ethnicity,gender,marital_status":
+		return EmployeesListRequestShowEnumOriginsEthnicityGenderMaritalStatus, nil
+	case "ethnicity,marital_status":
+		return EmployeesListRequestShowEnumOriginsEthnicityMaritalStatus, nil
+	case "gender":
+		return EmployeesListRequestShowEnumOriginsGender, nil
+	case "gender,marital_status":
+		return EmployeesListRequestShowEnumOriginsGenderMaritalStatus, nil
+	case "marital_status":
+		return EmployeesListRequestShowEnumOriginsMaritalStatus, nil
+	}
+	var t EmployeesListRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesListRequestShowEnumOrigins) Ptr() *EmployeesListRequestShowEnumOrigins {
+	return &e
+}
+
+type EmployeesRetrieveRequestExpand string
+
+const (
+	EmployeesRetrieveRequestExpandCompany                                                             EmployeesRetrieveRequestExpand = "company"
+	EmployeesRetrieveRequestExpandCompanyPayGroup                                                     EmployeesRetrieveRequestExpand = "company,pay_group"
+	EmployeesRetrieveRequestExpandEmployments                                                         EmployeesRetrieveRequestExpand = "employments"
+	EmployeesRetrieveRequestExpandEmploymentsCompany                                                  EmployeesRetrieveRequestExpand = "employments,company"
+	EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup                                          EmployeesRetrieveRequestExpand = "employments,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroups                                                   EmployeesRetrieveRequestExpand = "employments,groups"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsCompany                                            EmployeesRetrieveRequestExpand = "employments,groups,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup                                    EmployeesRetrieveRequestExpand = "employments,groups,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation                                       EmployeesRetrieveRequestExpand = "employments,groups,home_location"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany                                EmployeesRetrieveRequestExpand = "employments,groups,home_location,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup                        EmployeesRetrieveRequestExpand = "employments,groups,home_location,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager                                EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany                         EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup                 EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup                        EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam                            EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany                     EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup             EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup                    EmployeesRetrieveRequestExpand = "employments,groups,home_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup                               EmployeesRetrieveRequestExpand = "employments,groups,home_location,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam                                   EmployeesRetrieveRequestExpand = "employments,groups,home_location,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany                            EmployeesRetrieveRequestExpand = "employments,groups,home_location,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup                    EmployeesRetrieveRequestExpand = "employments,groups,home_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup                           EmployeesRetrieveRequestExpand = "employments,groups,home_location,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation                           EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany                    EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup            EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager                    EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany             EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup     EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup            EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam                EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany         EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup        EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup                   EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam                       EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany                EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup        EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup               EmployeesRetrieveRequestExpand = "employments,groups,home_location,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManager                                            EmployeesRetrieveRequestExpand = "employments,groups,manager"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany                                     EmployeesRetrieveRequestExpand = "employments,groups,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup                             EmployeesRetrieveRequestExpand = "employments,groups,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup                                    EmployeesRetrieveRequestExpand = "employments,groups,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam                                        EmployeesRetrieveRequestExpand = "employments,groups,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany                                 EmployeesRetrieveRequestExpand = "employments,groups,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup                         EmployeesRetrieveRequestExpand = "employments,groups,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup                                EmployeesRetrieveRequestExpand = "employments,groups,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup                                           EmployeesRetrieveRequestExpand = "employments,groups,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeam                                               EmployeesRetrieveRequestExpand = "employments,groups,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany                                        EmployeesRetrieveRequestExpand = "employments,groups,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup                                EmployeesRetrieveRequestExpand = "employments,groups,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup                                       EmployeesRetrieveRequestExpand = "employments,groups,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation                                       EmployeesRetrieveRequestExpand = "employments,groups,work_location"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany                                EmployeesRetrieveRequestExpand = "employments,groups,work_location,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup                        EmployeesRetrieveRequestExpand = "employments,groups,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager                                EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany                         EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup                 EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup                        EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam                            EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany                     EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup             EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup                    EmployeesRetrieveRequestExpand = "employments,groups,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup                               EmployeesRetrieveRequestExpand = "employments,groups,work_location,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam                                   EmployeesRetrieveRequestExpand = "employments,groups,work_location,team"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany                            EmployeesRetrieveRequestExpand = "employments,groups,work_location,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup                    EmployeesRetrieveRequestExpand = "employments,groups,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup                           EmployeesRetrieveRequestExpand = "employments,groups,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocation                                             EmployeesRetrieveRequestExpand = "employments,home_location"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany                                      EmployeesRetrieveRequestExpand = "employments,home_location,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup                              EmployeesRetrieveRequestExpand = "employments,home_location,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager                                      EmployeesRetrieveRequestExpand = "employments,home_location,manager"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany                               EmployeesRetrieveRequestExpand = "employments,home_location,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup                       EmployeesRetrieveRequestExpand = "employments,home_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup                              EmployeesRetrieveRequestExpand = "employments,home_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam                                  EmployeesRetrieveRequestExpand = "employments,home_location,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany                           EmployeesRetrieveRequestExpand = "employments,home_location,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup                   EmployeesRetrieveRequestExpand = "employments,home_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup                          EmployeesRetrieveRequestExpand = "employments,home_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup                                     EmployeesRetrieveRequestExpand = "employments,home_location,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam                                         EmployeesRetrieveRequestExpand = "employments,home_location,team"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany                                  EmployeesRetrieveRequestExpand = "employments,home_location,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup                          EmployeesRetrieveRequestExpand = "employments,home_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup                                 EmployeesRetrieveRequestExpand = "employments,home_location,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation                                 EmployeesRetrieveRequestExpand = "employments,home_location,work_location"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany                          EmployeesRetrieveRequestExpand = "employments,home_location,work_location,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup                  EmployeesRetrieveRequestExpand = "employments,home_location,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager                          EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany                   EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup           EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup                  EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam                      EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany               EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup       EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup              EmployeesRetrieveRequestExpand = "employments,home_location,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup                         EmployeesRetrieveRequestExpand = "employments,home_location,work_location,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam                             EmployeesRetrieveRequestExpand = "employments,home_location,work_location,team"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany                      EmployeesRetrieveRequestExpand = "employments,home_location,work_location,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup              EmployeesRetrieveRequestExpand = "employments,home_location,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup                     EmployeesRetrieveRequestExpand = "employments,home_location,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsManager                                                  EmployeesRetrieveRequestExpand = "employments,manager"
+	EmployeesRetrieveRequestExpandEmploymentsManagerCompany                                           EmployeesRetrieveRequestExpand = "employments,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup                                   EmployeesRetrieveRequestExpand = "employments,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup                                          EmployeesRetrieveRequestExpand = "employments,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeam                                              EmployeesRetrieveRequestExpand = "employments,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany                                       EmployeesRetrieveRequestExpand = "employments,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup                               EmployeesRetrieveRequestExpand = "employments,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup                                      EmployeesRetrieveRequestExpand = "employments,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsPayGroup                                                 EmployeesRetrieveRequestExpand = "employments,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsTeam                                                     EmployeesRetrieveRequestExpand = "employments,team"
+	EmployeesRetrieveRequestExpandEmploymentsTeamCompany                                              EmployeesRetrieveRequestExpand = "employments,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup                                      EmployeesRetrieveRequestExpand = "employments,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup                                             EmployeesRetrieveRequestExpand = "employments,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocation                                             EmployeesRetrieveRequestExpand = "employments,work_location"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany                                      EmployeesRetrieveRequestExpand = "employments,work_location,company"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup                              EmployeesRetrieveRequestExpand = "employments,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager                                      EmployeesRetrieveRequestExpand = "employments,work_location,manager"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany                               EmployeesRetrieveRequestExpand = "employments,work_location,manager,company"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup                       EmployeesRetrieveRequestExpand = "employments,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup                              EmployeesRetrieveRequestExpand = "employments,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam                                  EmployeesRetrieveRequestExpand = "employments,work_location,manager,team"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany                           EmployeesRetrieveRequestExpand = "employments,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup                   EmployeesRetrieveRequestExpand = "employments,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup                          EmployeesRetrieveRequestExpand = "employments,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup                                     EmployeesRetrieveRequestExpand = "employments,work_location,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam                                         EmployeesRetrieveRequestExpand = "employments,work_location,team"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany                                  EmployeesRetrieveRequestExpand = "employments,work_location,team,company"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup                          EmployeesRetrieveRequestExpand = "employments,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup                                 EmployeesRetrieveRequestExpand = "employments,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandGroups                                                              EmployeesRetrieveRequestExpand = "groups"
+	EmployeesRetrieveRequestExpandGroupsCompany                                                       EmployeesRetrieveRequestExpand = "groups,company"
+	EmployeesRetrieveRequestExpandGroupsCompanyPayGroup                                               EmployeesRetrieveRequestExpand = "groups,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocation                                                  EmployeesRetrieveRequestExpand = "groups,home_location"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationCompany                                           EmployeesRetrieveRequestExpand = "groups,home_location,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup                                   EmployeesRetrieveRequestExpand = "groups,home_location,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManager                                           EmployeesRetrieveRequestExpand = "groups,home_location,manager"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany                                    EmployeesRetrieveRequestExpand = "groups,home_location,manager,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup                            EmployeesRetrieveRequestExpand = "groups,home_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup                                   EmployeesRetrieveRequestExpand = "groups,home_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam                                       EmployeesRetrieveRequestExpand = "groups,home_location,manager,team"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany                                EmployeesRetrieveRequestExpand = "groups,home_location,manager,team,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup                        EmployeesRetrieveRequestExpand = "groups,home_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup                               EmployeesRetrieveRequestExpand = "groups,home_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup                                          EmployeesRetrieveRequestExpand = "groups,home_location,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeam                                              EmployeesRetrieveRequestExpand = "groups,home_location,team"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany                                       EmployeesRetrieveRequestExpand = "groups,home_location,team,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup                               EmployeesRetrieveRequestExpand = "groups,home_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup                                      EmployeesRetrieveRequestExpand = "groups,home_location,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation                                      EmployeesRetrieveRequestExpand = "groups,home_location,work_location"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany                               EmployeesRetrieveRequestExpand = "groups,home_location,work_location,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup                       EmployeesRetrieveRequestExpand = "groups,home_location,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager                               EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany                        EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup                EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup                       EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam                           EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,team"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany                    EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup            EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup                   EmployeesRetrieveRequestExpand = "groups,home_location,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup                              EmployeesRetrieveRequestExpand = "groups,home_location,work_location,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam                                  EmployeesRetrieveRequestExpand = "groups,home_location,work_location,team"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany                           EmployeesRetrieveRequestExpand = "groups,home_location,work_location,team,company"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup                   EmployeesRetrieveRequestExpand = "groups,home_location,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup                          EmployeesRetrieveRequestExpand = "groups,home_location,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsManager                                                       EmployeesRetrieveRequestExpand = "groups,manager"
+	EmployeesRetrieveRequestExpandGroupsManagerCompany                                                EmployeesRetrieveRequestExpand = "groups,manager,company"
+	EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup                                        EmployeesRetrieveRequestExpand = "groups,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsManagerPayGroup                                               EmployeesRetrieveRequestExpand = "groups,manager,pay_group"
+	EmployeesRetrieveRequestExpandGroupsManagerTeam                                                   EmployeesRetrieveRequestExpand = "groups,manager,team"
+	EmployeesRetrieveRequestExpandGroupsManagerTeamCompany                                            EmployeesRetrieveRequestExpand = "groups,manager,team,company"
+	EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup                                    EmployeesRetrieveRequestExpand = "groups,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup                                           EmployeesRetrieveRequestExpand = "groups,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsPayGroup                                                      EmployeesRetrieveRequestExpand = "groups,pay_group"
+	EmployeesRetrieveRequestExpandGroupsTeam                                                          EmployeesRetrieveRequestExpand = "groups,team"
+	EmployeesRetrieveRequestExpandGroupsTeamCompany                                                   EmployeesRetrieveRequestExpand = "groups,team,company"
+	EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup                                           EmployeesRetrieveRequestExpand = "groups,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsTeamPayGroup                                                  EmployeesRetrieveRequestExpand = "groups,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocation                                                  EmployeesRetrieveRequestExpand = "groups,work_location"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationCompany                                           EmployeesRetrieveRequestExpand = "groups,work_location,company"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup                                   EmployeesRetrieveRequestExpand = "groups,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManager                                           EmployeesRetrieveRequestExpand = "groups,work_location,manager"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany                                    EmployeesRetrieveRequestExpand = "groups,work_location,manager,company"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup                            EmployeesRetrieveRequestExpand = "groups,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup                                   EmployeesRetrieveRequestExpand = "groups,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam                                       EmployeesRetrieveRequestExpand = "groups,work_location,manager,team"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany                                EmployeesRetrieveRequestExpand = "groups,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup                        EmployeesRetrieveRequestExpand = "groups,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup                               EmployeesRetrieveRequestExpand = "groups,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup                                          EmployeesRetrieveRequestExpand = "groups,work_location,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeam                                              EmployeesRetrieveRequestExpand = "groups,work_location,team"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany                                       EmployeesRetrieveRequestExpand = "groups,work_location,team,company"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup                               EmployeesRetrieveRequestExpand = "groups,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup                                      EmployeesRetrieveRequestExpand = "groups,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocation                                                        EmployeesRetrieveRequestExpand = "home_location"
+	EmployeesRetrieveRequestExpandHomeLocationCompany                                                 EmployeesRetrieveRequestExpand = "home_location,company"
+	EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup                                         EmployeesRetrieveRequestExpand = "home_location,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationManager                                                 EmployeesRetrieveRequestExpand = "home_location,manager"
+	EmployeesRetrieveRequestExpandHomeLocationManagerCompany                                          EmployeesRetrieveRequestExpand = "home_location,manager,company"
+	EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup                                  EmployeesRetrieveRequestExpand = "home_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup                                         EmployeesRetrieveRequestExpand = "home_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeam                                             EmployeesRetrieveRequestExpand = "home_location,manager,team"
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany                                      EmployeesRetrieveRequestExpand = "home_location,manager,team,company"
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup                              EmployeesRetrieveRequestExpand = "home_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup                                     EmployeesRetrieveRequestExpand = "home_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationPayGroup                                                EmployeesRetrieveRequestExpand = "home_location,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationTeam                                                    EmployeesRetrieveRequestExpand = "home_location,team"
+	EmployeesRetrieveRequestExpandHomeLocationTeamCompany                                             EmployeesRetrieveRequestExpand = "home_location,team,company"
+	EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup                                     EmployeesRetrieveRequestExpand = "home_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup                                            EmployeesRetrieveRequestExpand = "home_location,team,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocation                                            EmployeesRetrieveRequestExpand = "home_location,work_location"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany                                     EmployeesRetrieveRequestExpand = "home_location,work_location,company"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup                             EmployeesRetrieveRequestExpand = "home_location,work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager                                     EmployeesRetrieveRequestExpand = "home_location,work_location,manager"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany                              EmployeesRetrieveRequestExpand = "home_location,work_location,manager,company"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup                      EmployeesRetrieveRequestExpand = "home_location,work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup                             EmployeesRetrieveRequestExpand = "home_location,work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam                                 EmployeesRetrieveRequestExpand = "home_location,work_location,manager,team"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany                          EmployeesRetrieveRequestExpand = "home_location,work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup                  EmployeesRetrieveRequestExpand = "home_location,work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup                         EmployeesRetrieveRequestExpand = "home_location,work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup                                    EmployeesRetrieveRequestExpand = "home_location,work_location,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam                                        EmployeesRetrieveRequestExpand = "home_location,work_location,team"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany                                 EmployeesRetrieveRequestExpand = "home_location,work_location,team,company"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup                         EmployeesRetrieveRequestExpand = "home_location,work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup                                EmployeesRetrieveRequestExpand = "home_location,work_location,team,pay_group"
+	EmployeesRetrieveRequestExpandManager                                                             EmployeesRetrieveRequestExpand = "manager"
+	EmployeesRetrieveRequestExpandManagerCompany                                                      EmployeesRetrieveRequestExpand = "manager,company"
+	EmployeesRetrieveRequestExpandManagerCompanyPayGroup                                              EmployeesRetrieveRequestExpand = "manager,company,pay_group"
+	EmployeesRetrieveRequestExpandManagerPayGroup                                                     EmployeesRetrieveRequestExpand = "manager,pay_group"
+	EmployeesRetrieveRequestExpandManagerTeam                                                         EmployeesRetrieveRequestExpand = "manager,team"
+	EmployeesRetrieveRequestExpandManagerTeamCompany                                                  EmployeesRetrieveRequestExpand = "manager,team,company"
+	EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup                                          EmployeesRetrieveRequestExpand = "manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandManagerTeamPayGroup                                                 EmployeesRetrieveRequestExpand = "manager,team,pay_group"
+	EmployeesRetrieveRequestExpandPayGroup                                                            EmployeesRetrieveRequestExpand = "pay_group"
+	EmployeesRetrieveRequestExpandTeam                                                                EmployeesRetrieveRequestExpand = "team"
+	EmployeesRetrieveRequestExpandTeamCompany                                                         EmployeesRetrieveRequestExpand = "team,company"
+	EmployeesRetrieveRequestExpandTeamCompanyPayGroup                                                 EmployeesRetrieveRequestExpand = "team,company,pay_group"
+	EmployeesRetrieveRequestExpandTeamPayGroup                                                        EmployeesRetrieveRequestExpand = "team,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocation                                                        EmployeesRetrieveRequestExpand = "work_location"
+	EmployeesRetrieveRequestExpandWorkLocationCompany                                                 EmployeesRetrieveRequestExpand = "work_location,company"
+	EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup                                         EmployeesRetrieveRequestExpand = "work_location,company,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationManager                                                 EmployeesRetrieveRequestExpand = "work_location,manager"
+	EmployeesRetrieveRequestExpandWorkLocationManagerCompany                                          EmployeesRetrieveRequestExpand = "work_location,manager,company"
+	EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup                                  EmployeesRetrieveRequestExpand = "work_location,manager,company,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup                                         EmployeesRetrieveRequestExpand = "work_location,manager,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeam                                             EmployeesRetrieveRequestExpand = "work_location,manager,team"
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany                                      EmployeesRetrieveRequestExpand = "work_location,manager,team,company"
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup                              EmployeesRetrieveRequestExpand = "work_location,manager,team,company,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup                                     EmployeesRetrieveRequestExpand = "work_location,manager,team,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationPayGroup                                                EmployeesRetrieveRequestExpand = "work_location,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationTeam                                                    EmployeesRetrieveRequestExpand = "work_location,team"
+	EmployeesRetrieveRequestExpandWorkLocationTeamCompany                                             EmployeesRetrieveRequestExpand = "work_location,team,company"
+	EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup                                     EmployeesRetrieveRequestExpand = "work_location,team,company,pay_group"
+	EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup                                            EmployeesRetrieveRequestExpand = "work_location,team,pay_group"
+)
+
+func NewEmployeesRetrieveRequestExpandFromString(s string) (EmployeesRetrieveRequestExpand, error) {
+	switch s {
+	case "company":
+		return EmployeesRetrieveRequestExpandCompany, nil
+	case "company,pay_group":
+		return EmployeesRetrieveRequestExpandCompanyPayGroup, nil
+	case "employments":
+		return EmployeesRetrieveRequestExpandEmployments, nil
+	case "employments,company":
+		return EmployeesRetrieveRequestExpandEmploymentsCompany, nil
+	case "employments,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsCompanyPayGroup, nil
+	case "employments,groups":
+		return EmployeesRetrieveRequestExpandEmploymentsGroups, nil
+	case "employments,groups,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsCompany, nil
+	case "employments,groups,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsCompanyPayGroup, nil
+	case "employments,groups,home_location":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocation, nil
+	case "employments,groups,home_location,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompany, nil
+	case "employments,groups,home_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationCompanyPayGroup, nil
+	case "employments,groups,home_location,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManager, nil
+	case "employments,groups,home_location,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompany, nil
+	case "employments,groups,home_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerCompanyPayGroup, nil
+	case "employments,groups,home_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerPayGroup, nil
+	case "employments,groups,home_location,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeam, nil
+	case "employments,groups,home_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompany, nil
+	case "employments,groups,home_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationManagerTeamPayGroup, nil
+	case "employments,groups,home_location,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationPayGroup, nil
+	case "employments,groups,home_location,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeam, nil
+	case "employments,groups,home_location,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompany, nil
+	case "employments,groups,home_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationTeamPayGroup, nil
+	case "employments,groups,home_location,work_location":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocation, nil
+	case "employments,groups,home_location,work_location,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompany, nil
+	case "employments,groups,home_location,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManager, nil
+	case "employments,groups,home_location,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompany, nil
+	case "employments,groups,home_location,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerPayGroup, nil
+	case "employments,groups,home_location,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeam, nil
+	case "employments,groups,home_location,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompany, nil
+	case "employments,groups,home_location,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "employments,groups,home_location,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationPayGroup, nil
+	case "employments,groups,home_location,work_location,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeam, nil
+	case "employments,groups,home_location,work_location,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompany, nil
+	case "employments,groups,home_location,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "employments,groups,home_location,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsHomeLocationWorkLocationTeamPayGroup, nil
+	case "employments,groups,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManager, nil
+	case "employments,groups,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompany, nil
+	case "employments,groups,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerCompanyPayGroup, nil
+	case "employments,groups,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerPayGroup, nil
+	case "employments,groups,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeam, nil
+	case "employments,groups,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompany, nil
+	case "employments,groups,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamCompanyPayGroup, nil
+	case "employments,groups,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsManagerTeamPayGroup, nil
+	case "employments,groups,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsPayGroup, nil
+	case "employments,groups,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsTeam, nil
+	case "employments,groups,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompany, nil
+	case "employments,groups,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsTeamCompanyPayGroup, nil
+	case "employments,groups,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsTeamPayGroup, nil
+	case "employments,groups,work_location":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocation, nil
+	case "employments,groups,work_location,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompany, nil
+	case "employments,groups,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationCompanyPayGroup, nil
+	case "employments,groups,work_location,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManager, nil
+	case "employments,groups,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompany, nil
+	case "employments,groups,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerCompanyPayGroup, nil
+	case "employments,groups,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerPayGroup, nil
+	case "employments,groups,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeam, nil
+	case "employments,groups,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompany, nil
+	case "employments,groups,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,groups,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationManagerTeamPayGroup, nil
+	case "employments,groups,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationPayGroup, nil
+	case "employments,groups,work_location,team":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeam, nil
+	case "employments,groups,work_location,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompany, nil
+	case "employments,groups,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamCompanyPayGroup, nil
+	case "employments,groups,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsGroupsWorkLocationTeamPayGroup, nil
+	case "employments,home_location":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocation, nil
+	case "employments,home_location,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompany, nil
+	case "employments,home_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationCompanyPayGroup, nil
+	case "employments,home_location,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManager, nil
+	case "employments,home_location,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompany, nil
+	case "employments,home_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerCompanyPayGroup, nil
+	case "employments,home_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerPayGroup, nil
+	case "employments,home_location,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeam, nil
+	case "employments,home_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompany, nil
+	case "employments,home_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamCompanyPayGroup, nil
+	case "employments,home_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationManagerTeamPayGroup, nil
+	case "employments,home_location,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationPayGroup, nil
+	case "employments,home_location,team":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeam, nil
+	case "employments,home_location,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompany, nil
+	case "employments,home_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamCompanyPayGroup, nil
+	case "employments,home_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationTeamPayGroup, nil
+	case "employments,home_location,work_location":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocation, nil
+	case "employments,home_location,work_location,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompany, nil
+	case "employments,home_location,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationCompanyPayGroup, nil
+	case "employments,home_location,work_location,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManager, nil
+	case "employments,home_location,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompany, nil
+	case "employments,home_location,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "employments,home_location,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerPayGroup, nil
+	case "employments,home_location,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeam, nil
+	case "employments,home_location,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompany, nil
+	case "employments,home_location,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,home_location,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "employments,home_location,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationPayGroup, nil
+	case "employments,home_location,work_location,team":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeam, nil
+	case "employments,home_location,work_location,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompany, nil
+	case "employments,home_location,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "employments,home_location,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsHomeLocationWorkLocationTeamPayGroup, nil
+	case "employments,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsManager, nil
+	case "employments,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerCompany, nil
+	case "employments,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerCompanyPayGroup, nil
+	case "employments,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerPayGroup, nil
+	case "employments,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerTeam, nil
+	case "employments,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompany, nil
+	case "employments,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerTeamCompanyPayGroup, nil
+	case "employments,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsManagerTeamPayGroup, nil
+	case "employments,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsPayGroup, nil
+	case "employments,team":
+		return EmployeesRetrieveRequestExpandEmploymentsTeam, nil
+	case "employments,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsTeamCompany, nil
+	case "employments,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsTeamCompanyPayGroup, nil
+	case "employments,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsTeamPayGroup, nil
+	case "employments,work_location":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocation, nil
+	case "employments,work_location,company":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompany, nil
+	case "employments,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationCompanyPayGroup, nil
+	case "employments,work_location,manager":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManager, nil
+	case "employments,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompany, nil
+	case "employments,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerCompanyPayGroup, nil
+	case "employments,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerPayGroup, nil
+	case "employments,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeam, nil
+	case "employments,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompany, nil
+	case "employments,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamCompanyPayGroup, nil
+	case "employments,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationManagerTeamPayGroup, nil
+	case "employments,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationPayGroup, nil
+	case "employments,work_location,team":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeam, nil
+	case "employments,work_location,team,company":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompany, nil
+	case "employments,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamCompanyPayGroup, nil
+	case "employments,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandEmploymentsWorkLocationTeamPayGroup, nil
+	case "groups":
+		return EmployeesRetrieveRequestExpandGroups, nil
+	case "groups,company":
+		return EmployeesRetrieveRequestExpandGroupsCompany, nil
+	case "groups,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsCompanyPayGroup, nil
+	case "groups,home_location":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocation, nil
+	case "groups,home_location,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationCompany, nil
+	case "groups,home_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationCompanyPayGroup, nil
+	case "groups,home_location,manager":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManager, nil
+	case "groups,home_location,manager,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompany, nil
+	case "groups,home_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerCompanyPayGroup, nil
+	case "groups,home_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerPayGroup, nil
+	case "groups,home_location,manager,team":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeam, nil
+	case "groups,home_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompany, nil
+	case "groups,home_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamCompanyPayGroup, nil
+	case "groups,home_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationManagerTeamPayGroup, nil
+	case "groups,home_location,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationPayGroup, nil
+	case "groups,home_location,team":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationTeam, nil
+	case "groups,home_location,team,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompany, nil
+	case "groups,home_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationTeamCompanyPayGroup, nil
+	case "groups,home_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationTeamPayGroup, nil
+	case "groups,home_location,work_location":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocation, nil
+	case "groups,home_location,work_location,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompany, nil
+	case "groups,home_location,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationCompanyPayGroup, nil
+	case "groups,home_location,work_location,manager":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManager, nil
+	case "groups,home_location,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompany, nil
+	case "groups,home_location,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "groups,home_location,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerPayGroup, nil
+	case "groups,home_location,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeam, nil
+	case "groups,home_location,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompany, nil
+	case "groups,home_location,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "groups,home_location,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "groups,home_location,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationPayGroup, nil
+	case "groups,home_location,work_location,team":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeam, nil
+	case "groups,home_location,work_location,team,company":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompany, nil
+	case "groups,home_location,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "groups,home_location,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsHomeLocationWorkLocationTeamPayGroup, nil
+	case "groups,manager":
+		return EmployeesRetrieveRequestExpandGroupsManager, nil
+	case "groups,manager,company":
+		return EmployeesRetrieveRequestExpandGroupsManagerCompany, nil
+	case "groups,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsManagerCompanyPayGroup, nil
+	case "groups,manager,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsManagerPayGroup, nil
+	case "groups,manager,team":
+		return EmployeesRetrieveRequestExpandGroupsManagerTeam, nil
+	case "groups,manager,team,company":
+		return EmployeesRetrieveRequestExpandGroupsManagerTeamCompany, nil
+	case "groups,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsManagerTeamCompanyPayGroup, nil
+	case "groups,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsManagerTeamPayGroup, nil
+	case "groups,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsPayGroup, nil
+	case "groups,team":
+		return EmployeesRetrieveRequestExpandGroupsTeam, nil
+	case "groups,team,company":
+		return EmployeesRetrieveRequestExpandGroupsTeamCompany, nil
+	case "groups,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsTeamCompanyPayGroup, nil
+	case "groups,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsTeamPayGroup, nil
+	case "groups,work_location":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocation, nil
+	case "groups,work_location,company":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationCompany, nil
+	case "groups,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationCompanyPayGroup, nil
+	case "groups,work_location,manager":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManager, nil
+	case "groups,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompany, nil
+	case "groups,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerCompanyPayGroup, nil
+	case "groups,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerPayGroup, nil
+	case "groups,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeam, nil
+	case "groups,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompany, nil
+	case "groups,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamCompanyPayGroup, nil
+	case "groups,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationManagerTeamPayGroup, nil
+	case "groups,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationPayGroup, nil
+	case "groups,work_location,team":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationTeam, nil
+	case "groups,work_location,team,company":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompany, nil
+	case "groups,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationTeamCompanyPayGroup, nil
+	case "groups,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandGroupsWorkLocationTeamPayGroup, nil
+	case "home_location":
+		return EmployeesRetrieveRequestExpandHomeLocation, nil
+	case "home_location,company":
+		return EmployeesRetrieveRequestExpandHomeLocationCompany, nil
+	case "home_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationCompanyPayGroup, nil
+	case "home_location,manager":
+		return EmployeesRetrieveRequestExpandHomeLocationManager, nil
+	case "home_location,manager,company":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerCompany, nil
+	case "home_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerCompanyPayGroup, nil
+	case "home_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerPayGroup, nil
+	case "home_location,manager,team":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerTeam, nil
+	case "home_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompany, nil
+	case "home_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerTeamCompanyPayGroup, nil
+	case "home_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationManagerTeamPayGroup, nil
+	case "home_location,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationPayGroup, nil
+	case "home_location,team":
+		return EmployeesRetrieveRequestExpandHomeLocationTeam, nil
+	case "home_location,team,company":
+		return EmployeesRetrieveRequestExpandHomeLocationTeamCompany, nil
+	case "home_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationTeamCompanyPayGroup, nil
+	case "home_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationTeamPayGroup, nil
+	case "home_location,work_location":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocation, nil
+	case "home_location,work_location,company":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompany, nil
+	case "home_location,work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationCompanyPayGroup, nil
+	case "home_location,work_location,manager":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManager, nil
+	case "home_location,work_location,manager,company":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompany, nil
+	case "home_location,work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerCompanyPayGroup, nil
+	case "home_location,work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerPayGroup, nil
+	case "home_location,work_location,manager,team":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeam, nil
+	case "home_location,work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompany, nil
+	case "home_location,work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamCompanyPayGroup, nil
+	case "home_location,work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationManagerTeamPayGroup, nil
+	case "home_location,work_location,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationPayGroup, nil
+	case "home_location,work_location,team":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeam, nil
+	case "home_location,work_location,team,company":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompany, nil
+	case "home_location,work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamCompanyPayGroup, nil
+	case "home_location,work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandHomeLocationWorkLocationTeamPayGroup, nil
+	case "manager":
+		return EmployeesRetrieveRequestExpandManager, nil
+	case "manager,company":
+		return EmployeesRetrieveRequestExpandManagerCompany, nil
+	case "manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandManagerCompanyPayGroup, nil
+	case "manager,pay_group":
+		return EmployeesRetrieveRequestExpandManagerPayGroup, nil
+	case "manager,team":
+		return EmployeesRetrieveRequestExpandManagerTeam, nil
+	case "manager,team,company":
+		return EmployeesRetrieveRequestExpandManagerTeamCompany, nil
+	case "manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandManagerTeamCompanyPayGroup, nil
+	case "manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandManagerTeamPayGroup, nil
+	case "pay_group":
+		return EmployeesRetrieveRequestExpandPayGroup, nil
+	case "team":
+		return EmployeesRetrieveRequestExpandTeam, nil
+	case "team,company":
+		return EmployeesRetrieveRequestExpandTeamCompany, nil
+	case "team,company,pay_group":
+		return EmployeesRetrieveRequestExpandTeamCompanyPayGroup, nil
+	case "team,pay_group":
+		return EmployeesRetrieveRequestExpandTeamPayGroup, nil
+	case "work_location":
+		return EmployeesRetrieveRequestExpandWorkLocation, nil
+	case "work_location,company":
+		return EmployeesRetrieveRequestExpandWorkLocationCompany, nil
+	case "work_location,company,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationCompanyPayGroup, nil
+	case "work_location,manager":
+		return EmployeesRetrieveRequestExpandWorkLocationManager, nil
+	case "work_location,manager,company":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerCompany, nil
+	case "work_location,manager,company,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerCompanyPayGroup, nil
+	case "work_location,manager,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerPayGroup, nil
+	case "work_location,manager,team":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerTeam, nil
+	case "work_location,manager,team,company":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompany, nil
+	case "work_location,manager,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerTeamCompanyPayGroup, nil
+	case "work_location,manager,team,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationManagerTeamPayGroup, nil
+	case "work_location,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationPayGroup, nil
+	case "work_location,team":
+		return EmployeesRetrieveRequestExpandWorkLocationTeam, nil
+	case "work_location,team,company":
+		return EmployeesRetrieveRequestExpandWorkLocationTeamCompany, nil
+	case "work_location,team,company,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationTeamCompanyPayGroup, nil
+	case "work_location,team,pay_group":
+		return EmployeesRetrieveRequestExpandWorkLocationTeamPayGroup, nil
+	}
+	var t EmployeesRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesRetrieveRequestExpand) Ptr() *EmployeesRetrieveRequestExpand {
+	return &e
+}
+
+type EmployeesRetrieveRequestRemoteFields string
+
+const (
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatus                             EmployeesRetrieveRequestRemoteFields = "employment_status"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity                    EmployeesRetrieveRequestRemoteFields = "employment_status,ethnicity"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender              EmployeesRetrieveRequestRemoteFields = "employment_status,ethnicity,gender"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus EmployeesRetrieveRequestRemoteFields = "employment_status,ethnicity,gender,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus       EmployeesRetrieveRequestRemoteFields = "employment_status,ethnicity,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender                       EmployeesRetrieveRequestRemoteFields = "employment_status,gender"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus          EmployeesRetrieveRequestRemoteFields = "employment_status,gender,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus                EmployeesRetrieveRequestRemoteFields = "employment_status,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsEthnicity                                    EmployeesRetrieveRequestRemoteFields = "ethnicity"
+	EmployeesRetrieveRequestRemoteFieldsEthnicityGender                              EmployeesRetrieveRequestRemoteFields = "ethnicity,gender"
+	EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus                 EmployeesRetrieveRequestRemoteFields = "ethnicity,gender,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus                       EmployeesRetrieveRequestRemoteFields = "ethnicity,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsGender                                       EmployeesRetrieveRequestRemoteFields = "gender"
+	EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus                          EmployeesRetrieveRequestRemoteFields = "gender,marital_status"
+	EmployeesRetrieveRequestRemoteFieldsMaritalStatus                                EmployeesRetrieveRequestRemoteFields = "marital_status"
+)
+
+func NewEmployeesRetrieveRequestRemoteFieldsFromString(s string) (EmployeesRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "employment_status":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatus, nil
+	case "employment_status,ethnicity":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicity, nil
+	case "employment_status,ethnicity,gender":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGender, nil
+	case "employment_status,ethnicity,gender,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityGenderMaritalStatus, nil
+	case "employment_status,ethnicity,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusEthnicityMaritalStatus, nil
+	case "employment_status,gender":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGender, nil
+	case "employment_status,gender,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusGenderMaritalStatus, nil
+	case "employment_status,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsEmploymentStatusMaritalStatus, nil
+	case "ethnicity":
+		return EmployeesRetrieveRequestRemoteFieldsEthnicity, nil
+	case "ethnicity,gender":
+		return EmployeesRetrieveRequestRemoteFieldsEthnicityGender, nil
+	case "ethnicity,gender,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsEthnicityGenderMaritalStatus, nil
+	case "ethnicity,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsEthnicityMaritalStatus, nil
+	case "gender":
+		return EmployeesRetrieveRequestRemoteFieldsGender, nil
+	case "gender,marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsGenderMaritalStatus, nil
+	case "marital_status":
+		return EmployeesRetrieveRequestRemoteFieldsMaritalStatus, nil
+	}
+	var t EmployeesRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesRetrieveRequestRemoteFields) Ptr() *EmployeesRetrieveRequestRemoteFields {
+	return &e
+}
+
+type EmployeesRetrieveRequestShowEnumOrigins string
+
+const (
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus                             EmployeesRetrieveRequestShowEnumOrigins = "employment_status"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity                    EmployeesRetrieveRequestShowEnumOrigins = "employment_status,ethnicity"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender              EmployeesRetrieveRequestShowEnumOrigins = "employment_status,ethnicity,gender"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus EmployeesRetrieveRequestShowEnumOrigins = "employment_status,ethnicity,gender,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus       EmployeesRetrieveRequestShowEnumOrigins = "employment_status,ethnicity,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender                       EmployeesRetrieveRequestShowEnumOrigins = "employment_status,gender"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus          EmployeesRetrieveRequestShowEnumOrigins = "employment_status,gender,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus                EmployeesRetrieveRequestShowEnumOrigins = "employment_status,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsEthnicity                                    EmployeesRetrieveRequestShowEnumOrigins = "ethnicity"
+	EmployeesRetrieveRequestShowEnumOriginsEthnicityGender                              EmployeesRetrieveRequestShowEnumOrigins = "ethnicity,gender"
+	EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus                 EmployeesRetrieveRequestShowEnumOrigins = "ethnicity,gender,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus                       EmployeesRetrieveRequestShowEnumOrigins = "ethnicity,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsGender                                       EmployeesRetrieveRequestShowEnumOrigins = "gender"
+	EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus                          EmployeesRetrieveRequestShowEnumOrigins = "gender,marital_status"
+	EmployeesRetrieveRequestShowEnumOriginsMaritalStatus                                EmployeesRetrieveRequestShowEnumOrigins = "marital_status"
+)
+
+func NewEmployeesRetrieveRequestShowEnumOriginsFromString(s string) (EmployeesRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "employment_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatus, nil
+	case "employment_status,ethnicity":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicity, nil
+	case "employment_status,ethnicity,gender":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGender, nil
+	case "employment_status,ethnicity,gender,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityGenderMaritalStatus, nil
+	case "employment_status,ethnicity,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusEthnicityMaritalStatus, nil
+	case "employment_status,gender":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGender, nil
+	case "employment_status,gender,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusGenderMaritalStatus, nil
+	case "employment_status,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEmploymentStatusMaritalStatus, nil
+	case "ethnicity":
+		return EmployeesRetrieveRequestShowEnumOriginsEthnicity, nil
+	case "ethnicity,gender":
+		return EmployeesRetrieveRequestShowEnumOriginsEthnicityGender, nil
+	case "ethnicity,gender,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEthnicityGenderMaritalStatus, nil
+	case "ethnicity,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsEthnicityMaritalStatus, nil
+	case "gender":
+		return EmployeesRetrieveRequestShowEnumOriginsGender, nil
+	case "gender,marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsGenderMaritalStatus, nil
+	case "marital_status":
+		return EmployeesRetrieveRequestShowEnumOriginsMaritalStatus, nil
+	}
+	var t EmployeesRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EmployeesRetrieveRequestShowEnumOrigins) Ptr() *EmployeesRetrieveRequestShowEnumOrigins {
+	return &e
+}
+
+type IgnoreCommonModelRequestReason struct {
+	typeName   string
+	ReasonEnum ReasonEnum
+	String     string
+}
+
+func NewIgnoreCommonModelRequestReasonFromReasonEnum(value ReasonEnum) *IgnoreCommonModelRequestReason {
+	return &IgnoreCommonModelRequestReason{typeName: "reasonEnum", ReasonEnum: value}
+}
+
+func NewIgnoreCommonModelRequestReasonFromString(value string) *IgnoreCommonModelRequestReason {
+	return &IgnoreCommonModelRequestReason{typeName: "string", String: value}
+}
+
+func (i *IgnoreCommonModelRequestReason) UnmarshalJSON(data []byte) error {
+	var valueReasonEnum ReasonEnum
+	if err := json.Unmarshal(data, &valueReasonEnum); err == nil {
+		i.typeName = "reasonEnum"
+		i.ReasonEnum = valueReasonEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i IgnoreCommonModelRequestReason) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "reasonEnum":
+		return json.Marshal(i.ReasonEnum)
+	case "string":
+		return json.Marshal(i.String)
+	}
+}
+
+type IgnoreCommonModelRequestReasonVisitor interface {
+	VisitReasonEnum(ReasonEnum) error
+	VisitString(string) error
+}
+
+func (i *IgnoreCommonModelRequestReason) Accept(visitor IgnoreCommonModelRequestReasonVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "reasonEnum":
+		return visitor.VisitReasonEnum(i.ReasonEnum)
+	case "string":
+		return visitor.VisitString(i.String)
+	}
 }

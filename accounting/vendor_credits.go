@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -40,4 +41,222 @@ type VendorCreditsRetrieveRequest struct {
 	Expand *VendorCreditsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type VendorCreditsListRequestExpand string
+
+const (
+	VendorCreditsListRequestExpandAccountingPeriod                                     VendorCreditsListRequestExpand = "accounting_period"
+	VendorCreditsListRequestExpandCompany                                              VendorCreditsListRequestExpand = "company"
+	VendorCreditsListRequestExpandCompanyAccountingPeriod                              VendorCreditsListRequestExpand = "company,accounting_period"
+	VendorCreditsListRequestExpandLines                                                VendorCreditsListRequestExpand = "lines"
+	VendorCreditsListRequestExpandLinesAccountingPeriod                                VendorCreditsListRequestExpand = "lines,accounting_period"
+	VendorCreditsListRequestExpandLinesCompany                                         VendorCreditsListRequestExpand = "lines,company"
+	VendorCreditsListRequestExpandLinesCompanyAccountingPeriod                         VendorCreditsListRequestExpand = "lines,company,accounting_period"
+	VendorCreditsListRequestExpandLinesTrackingCategories                              VendorCreditsListRequestExpand = "lines,tracking_categories"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesAccountingPeriod              VendorCreditsListRequestExpand = "lines,tracking_categories,accounting_period"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesCompany                       VendorCreditsListRequestExpand = "lines,tracking_categories,company"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod       VendorCreditsListRequestExpand = "lines,tracking_categories,company,accounting_period"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesVendor                        VendorCreditsListRequestExpand = "lines,tracking_categories,vendor"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesVendorAccountingPeriod        VendorCreditsListRequestExpand = "lines,tracking_categories,vendor,accounting_period"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesVendorCompany                 VendorCreditsListRequestExpand = "lines,tracking_categories,vendor,company"
+	VendorCreditsListRequestExpandLinesTrackingCategoriesVendorCompanyAccountingPeriod VendorCreditsListRequestExpand = "lines,tracking_categories,vendor,company,accounting_period"
+	VendorCreditsListRequestExpandLinesVendor                                          VendorCreditsListRequestExpand = "lines,vendor"
+	VendorCreditsListRequestExpandLinesVendorAccountingPeriod                          VendorCreditsListRequestExpand = "lines,vendor,accounting_period"
+	VendorCreditsListRequestExpandLinesVendorCompany                                   VendorCreditsListRequestExpand = "lines,vendor,company"
+	VendorCreditsListRequestExpandLinesVendorCompanyAccountingPeriod                   VendorCreditsListRequestExpand = "lines,vendor,company,accounting_period"
+	VendorCreditsListRequestExpandTrackingCategories                                   VendorCreditsListRequestExpand = "tracking_categories"
+	VendorCreditsListRequestExpandTrackingCategoriesAccountingPeriod                   VendorCreditsListRequestExpand = "tracking_categories,accounting_period"
+	VendorCreditsListRequestExpandTrackingCategoriesCompany                            VendorCreditsListRequestExpand = "tracking_categories,company"
+	VendorCreditsListRequestExpandTrackingCategoriesCompanyAccountingPeriod            VendorCreditsListRequestExpand = "tracking_categories,company,accounting_period"
+	VendorCreditsListRequestExpandTrackingCategoriesVendor                             VendorCreditsListRequestExpand = "tracking_categories,vendor"
+	VendorCreditsListRequestExpandTrackingCategoriesVendorAccountingPeriod             VendorCreditsListRequestExpand = "tracking_categories,vendor,accounting_period"
+	VendorCreditsListRequestExpandTrackingCategoriesVendorCompany                      VendorCreditsListRequestExpand = "tracking_categories,vendor,company"
+	VendorCreditsListRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod      VendorCreditsListRequestExpand = "tracking_categories,vendor,company,accounting_period"
+	VendorCreditsListRequestExpandVendor                                               VendorCreditsListRequestExpand = "vendor"
+	VendorCreditsListRequestExpandVendorAccountingPeriod                               VendorCreditsListRequestExpand = "vendor,accounting_period"
+	VendorCreditsListRequestExpandVendorCompany                                        VendorCreditsListRequestExpand = "vendor,company"
+	VendorCreditsListRequestExpandVendorCompanyAccountingPeriod                        VendorCreditsListRequestExpand = "vendor,company,accounting_period"
+)
+
+func NewVendorCreditsListRequestExpandFromString(s string) (VendorCreditsListRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return VendorCreditsListRequestExpandAccountingPeriod, nil
+	case "company":
+		return VendorCreditsListRequestExpandCompany, nil
+	case "company,accounting_period":
+		return VendorCreditsListRequestExpandCompanyAccountingPeriod, nil
+	case "lines":
+		return VendorCreditsListRequestExpandLines, nil
+	case "lines,accounting_period":
+		return VendorCreditsListRequestExpandLinesAccountingPeriod, nil
+	case "lines,company":
+		return VendorCreditsListRequestExpandLinesCompany, nil
+	case "lines,company,accounting_period":
+		return VendorCreditsListRequestExpandLinesCompanyAccountingPeriod, nil
+	case "lines,tracking_categories":
+		return VendorCreditsListRequestExpandLinesTrackingCategories, nil
+	case "lines,tracking_categories,accounting_period":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesAccountingPeriod, nil
+	case "lines,tracking_categories,company":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesCompany, nil
+	case "lines,tracking_categories,company,accounting_period":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod, nil
+	case "lines,tracking_categories,vendor":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesVendor, nil
+	case "lines,tracking_categories,vendor,accounting_period":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesVendorAccountingPeriod, nil
+	case "lines,tracking_categories,vendor,company":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesVendorCompany, nil
+	case "lines,tracking_categories,vendor,company,accounting_period":
+		return VendorCreditsListRequestExpandLinesTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "lines,vendor":
+		return VendorCreditsListRequestExpandLinesVendor, nil
+	case "lines,vendor,accounting_period":
+		return VendorCreditsListRequestExpandLinesVendorAccountingPeriod, nil
+	case "lines,vendor,company":
+		return VendorCreditsListRequestExpandLinesVendorCompany, nil
+	case "lines,vendor,company,accounting_period":
+		return VendorCreditsListRequestExpandLinesVendorCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return VendorCreditsListRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return VendorCreditsListRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return VendorCreditsListRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return VendorCreditsListRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,vendor":
+		return VendorCreditsListRequestExpandTrackingCategoriesVendor, nil
+	case "tracking_categories,vendor,accounting_period":
+		return VendorCreditsListRequestExpandTrackingCategoriesVendorAccountingPeriod, nil
+	case "tracking_categories,vendor,company":
+		return VendorCreditsListRequestExpandTrackingCategoriesVendorCompany, nil
+	case "tracking_categories,vendor,company,accounting_period":
+		return VendorCreditsListRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "vendor":
+		return VendorCreditsListRequestExpandVendor, nil
+	case "vendor,accounting_period":
+		return VendorCreditsListRequestExpandVendorAccountingPeriod, nil
+	case "vendor,company":
+		return VendorCreditsListRequestExpandVendorCompany, nil
+	case "vendor,company,accounting_period":
+		return VendorCreditsListRequestExpandVendorCompanyAccountingPeriod, nil
+	}
+	var t VendorCreditsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (v VendorCreditsListRequestExpand) Ptr() *VendorCreditsListRequestExpand {
+	return &v
+}
+
+type VendorCreditsRetrieveRequestExpand string
+
+const (
+	VendorCreditsRetrieveRequestExpandAccountingPeriod                                     VendorCreditsRetrieveRequestExpand = "accounting_period"
+	VendorCreditsRetrieveRequestExpandCompany                                              VendorCreditsRetrieveRequestExpand = "company"
+	VendorCreditsRetrieveRequestExpandCompanyAccountingPeriod                              VendorCreditsRetrieveRequestExpand = "company,accounting_period"
+	VendorCreditsRetrieveRequestExpandLines                                                VendorCreditsRetrieveRequestExpand = "lines"
+	VendorCreditsRetrieveRequestExpandLinesAccountingPeriod                                VendorCreditsRetrieveRequestExpand = "lines,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesCompany                                         VendorCreditsRetrieveRequestExpand = "lines,company"
+	VendorCreditsRetrieveRequestExpandLinesCompanyAccountingPeriod                         VendorCreditsRetrieveRequestExpand = "lines,company,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategories                              VendorCreditsRetrieveRequestExpand = "lines,tracking_categories"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAccountingPeriod              VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompany                       VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,company"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod       VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,company,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendor                        VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,vendor"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorAccountingPeriod        VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,vendor,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorCompany                 VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,vendor,company"
+	VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorCompanyAccountingPeriod VendorCreditsRetrieveRequestExpand = "lines,tracking_categories,vendor,company,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesVendor                                          VendorCreditsRetrieveRequestExpand = "lines,vendor"
+	VendorCreditsRetrieveRequestExpandLinesVendorAccountingPeriod                          VendorCreditsRetrieveRequestExpand = "lines,vendor,accounting_period"
+	VendorCreditsRetrieveRequestExpandLinesVendorCompany                                   VendorCreditsRetrieveRequestExpand = "lines,vendor,company"
+	VendorCreditsRetrieveRequestExpandLinesVendorCompanyAccountingPeriod                   VendorCreditsRetrieveRequestExpand = "lines,vendor,company,accounting_period"
+	VendorCreditsRetrieveRequestExpandTrackingCategories                                   VendorCreditsRetrieveRequestExpand = "tracking_categories"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesAccountingPeriod                   VendorCreditsRetrieveRequestExpand = "tracking_categories,accounting_period"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesCompany                            VendorCreditsRetrieveRequestExpand = "tracking_categories,company"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod            VendorCreditsRetrieveRequestExpand = "tracking_categories,company,accounting_period"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesVendor                             VendorCreditsRetrieveRequestExpand = "tracking_categories,vendor"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorAccountingPeriod             VendorCreditsRetrieveRequestExpand = "tracking_categories,vendor,accounting_period"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorCompany                      VendorCreditsRetrieveRequestExpand = "tracking_categories,vendor,company"
+	VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod      VendorCreditsRetrieveRequestExpand = "tracking_categories,vendor,company,accounting_period"
+	VendorCreditsRetrieveRequestExpandVendor                                               VendorCreditsRetrieveRequestExpand = "vendor"
+	VendorCreditsRetrieveRequestExpandVendorAccountingPeriod                               VendorCreditsRetrieveRequestExpand = "vendor,accounting_period"
+	VendorCreditsRetrieveRequestExpandVendorCompany                                        VendorCreditsRetrieveRequestExpand = "vendor,company"
+	VendorCreditsRetrieveRequestExpandVendorCompanyAccountingPeriod                        VendorCreditsRetrieveRequestExpand = "vendor,company,accounting_period"
+)
+
+func NewVendorCreditsRetrieveRequestExpandFromString(s string) (VendorCreditsRetrieveRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return VendorCreditsRetrieveRequestExpandAccountingPeriod, nil
+	case "company":
+		return VendorCreditsRetrieveRequestExpandCompany, nil
+	case "company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandCompanyAccountingPeriod, nil
+	case "lines":
+		return VendorCreditsRetrieveRequestExpandLines, nil
+	case "lines,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesAccountingPeriod, nil
+	case "lines,company":
+		return VendorCreditsRetrieveRequestExpandLinesCompany, nil
+	case "lines,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesCompanyAccountingPeriod, nil
+	case "lines,tracking_categories":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategories, nil
+	case "lines,tracking_categories,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesAccountingPeriod, nil
+	case "lines,tracking_categories,company":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompany, nil
+	case "lines,tracking_categories,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesCompanyAccountingPeriod, nil
+	case "lines,tracking_categories,vendor":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendor, nil
+	case "lines,tracking_categories,vendor,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorAccountingPeriod, nil
+	case "lines,tracking_categories,vendor,company":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorCompany, nil
+	case "lines,tracking_categories,vendor,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "lines,vendor":
+		return VendorCreditsRetrieveRequestExpandLinesVendor, nil
+	case "lines,vendor,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesVendorAccountingPeriod, nil
+	case "lines,vendor,company":
+		return VendorCreditsRetrieveRequestExpandLinesVendorCompany, nil
+	case "lines,vendor,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandLinesVendorCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return VendorCreditsRetrieveRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,vendor":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesVendor, nil
+	case "tracking_categories,vendor,accounting_period":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorAccountingPeriod, nil
+	case "tracking_categories,vendor,company":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorCompany, nil
+	case "tracking_categories,vendor,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "vendor":
+		return VendorCreditsRetrieveRequestExpandVendor, nil
+	case "vendor,accounting_period":
+		return VendorCreditsRetrieveRequestExpandVendorAccountingPeriod, nil
+	case "vendor,company":
+		return VendorCreditsRetrieveRequestExpandVendorCompany, nil
+	case "vendor,company,accounting_period":
+		return VendorCreditsRetrieveRequestExpandVendorCompanyAccountingPeriod, nil
+	}
+	var t VendorCreditsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (v VendorCreditsRetrieveRequestExpand) Ptr() *VendorCreditsRetrieveRequestExpand {
+	return &v
 }

@@ -12,33 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *filestorage.FoldersListRequest) (*filestorage.PaginatedFolderList, error)
-	Create(ctx context.Context, request *filestorage.FileStorageFolderEndpointRequest) (*filestorage.FileStorageFolderResponse, error)
-	Retrieve(ctx context.Context, id string, request *filestorage.FoldersRetrieveRequest) (*filestorage.Folder, error)
-	MetaPostRetrieve(ctx context.Context) (*filestorage.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Folder` objects.
-func (c *client) List(ctx context.Context, request *filestorage.FoldersListRequest) (*filestorage.PaginatedFolderList, error) {
+func (c *Client) List(ctx context.Context, request *filestorage.FoldersListRequest) (*filestorage.PaginatedFolderList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -90,24 +83,22 @@ func (c *client) List(ctx context.Context, request *filestorage.FoldersListReque
 	}
 
 	var response *filestorage.PaginatedFolderList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates a `Folder` object with the given values.
-func (c *client) Create(ctx context.Context, request *filestorage.FileStorageFolderEndpointRequest) (*filestorage.FileStorageFolderResponse, error) {
+func (c *Client) Create(ctx context.Context, request *filestorage.FileStorageFolderEndpointRequest) (*filestorage.FileStorageFolderResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -126,24 +117,23 @@ func (c *client) Create(ctx context.Context, request *filestorage.FileStorageFol
 	}
 
 	var response *filestorage.FileStorageFolderResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `Folder` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.FoldersRetrieveRequest) (*filestorage.Folder, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.FoldersRetrieveRequest) (*filestorage.Folder, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -162,24 +152,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *filestorage.F
 	}
 
 	var response *filestorage.Folder
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `FileStorageFolder` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -187,18 +175,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaRespons
 	endpointURL := baseURL + "/" + "api/filestorage/v1/folders/meta/post"
 
 	var response *filestorage.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

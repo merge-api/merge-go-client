@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -56,4 +57,414 @@ type PurchaseOrdersRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type PurchaseOrdersListRequestExpand string
+
+const (
+	PurchaseOrdersListRequestExpandAccountingPeriod                                                        PurchaseOrdersListRequestExpand = "accounting_period"
+	PurchaseOrdersListRequestExpandCompany                                                                 PurchaseOrdersListRequestExpand = "company"
+	PurchaseOrdersListRequestExpandCompanyAccountingPeriod                                                 PurchaseOrdersListRequestExpand = "company,accounting_period"
+	PurchaseOrdersListRequestExpandDeliveryAddress                                                         PurchaseOrdersListRequestExpand = "delivery_address"
+	PurchaseOrdersListRequestExpandDeliveryAddressAccountingPeriod                                         PurchaseOrdersListRequestExpand = "delivery_address,accounting_period"
+	PurchaseOrdersListRequestExpandDeliveryAddressCompany                                                  PurchaseOrdersListRequestExpand = "delivery_address,company"
+	PurchaseOrdersListRequestExpandDeliveryAddressCompanyAccountingPeriod                                  PurchaseOrdersListRequestExpand = "delivery_address,company,accounting_period"
+	PurchaseOrdersListRequestExpandDeliveryAddressVendor                                                   PurchaseOrdersListRequestExpand = "delivery_address,vendor"
+	PurchaseOrdersListRequestExpandDeliveryAddressVendorAccountingPeriod                                   PurchaseOrdersListRequestExpand = "delivery_address,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandDeliveryAddressVendorCompany                                            PurchaseOrdersListRequestExpand = "delivery_address,vendor,company"
+	PurchaseOrdersListRequestExpandDeliveryAddressVendorCompanyAccountingPeriod                            PurchaseOrdersListRequestExpand = "delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItems                                                               PurchaseOrdersListRequestExpand = "line_items"
+	PurchaseOrdersListRequestExpandLineItemsAccountingPeriod                                               PurchaseOrdersListRequestExpand = "line_items,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsCompany                                                        PurchaseOrdersListRequestExpand = "line_items,company"
+	PurchaseOrdersListRequestExpandLineItemsCompanyAccountingPeriod                                        PurchaseOrdersListRequestExpand = "line_items,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddress                                                PurchaseOrdersListRequestExpand = "line_items,delivery_address"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressAccountingPeriod                                PurchaseOrdersListRequestExpand = "line_items,delivery_address,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressCompany                                         PurchaseOrdersListRequestExpand = "line_items,delivery_address,company"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressCompanyAccountingPeriod                         PurchaseOrdersListRequestExpand = "line_items,delivery_address,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendor                                          PurchaseOrdersListRequestExpand = "line_items,delivery_address,vendor"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendorAccountingPeriod                          PurchaseOrdersListRequestExpand = "line_items,delivery_address,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendorCompany                                   PurchaseOrdersListRequestExpand = "line_items,delivery_address,vendor,company"
+	PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendorCompanyAccountingPeriod                   PurchaseOrdersListRequestExpand = "line_items,delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategories                                             PurchaseOrdersListRequestExpand = "line_items,tracking_categories"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesAccountingPeriod                             PurchaseOrdersListRequestExpand = "line_items,tracking_categories,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesCompany                                      PurchaseOrdersListRequestExpand = "line_items,tracking_categories,company"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod                      PurchaseOrdersListRequestExpand = "line_items,tracking_categories,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddress                              PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressAccountingPeriod              PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompany                       PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,company"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompanyAccountingPeriod       PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendor                        PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,vendor"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorAccountingPeriod        PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompany                 PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,vendor,company"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod PurchaseOrdersListRequestExpand = "line_items,tracking_categories,delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendor                                       PurchaseOrdersListRequestExpand = "line_items,tracking_categories,vendor"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendorAccountingPeriod                       PurchaseOrdersListRequestExpand = "line_items,tracking_categories,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendorCompany                                PurchaseOrdersListRequestExpand = "line_items,tracking_categories,vendor,company"
+	PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendorCompanyAccountingPeriod                PurchaseOrdersListRequestExpand = "line_items,tracking_categories,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsVendor                                                         PurchaseOrdersListRequestExpand = "line_items,vendor"
+	PurchaseOrdersListRequestExpandLineItemsVendorAccountingPeriod                                         PurchaseOrdersListRequestExpand = "line_items,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandLineItemsVendorCompany                                                  PurchaseOrdersListRequestExpand = "line_items,vendor,company"
+	PurchaseOrdersListRequestExpandLineItemsVendorCompanyAccountingPeriod                                  PurchaseOrdersListRequestExpand = "line_items,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategories                                                      PurchaseOrdersListRequestExpand = "tracking_categories"
+	PurchaseOrdersListRequestExpandTrackingCategoriesAccountingPeriod                                      PurchaseOrdersListRequestExpand = "tracking_categories,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesCompany                                               PurchaseOrdersListRequestExpand = "tracking_categories,company"
+	PurchaseOrdersListRequestExpandTrackingCategoriesCompanyAccountingPeriod                               PurchaseOrdersListRequestExpand = "tracking_categories,company,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddress                                       PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressAccountingPeriod                       PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressCompany                                PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,company"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressCompanyAccountingPeriod                PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,company,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendor                                 PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,vendor"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendorAccountingPeriod                 PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendorCompany                          PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,vendor,company"
+	PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod          PurchaseOrdersListRequestExpand = "tracking_categories,delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesVendor                                                PurchaseOrdersListRequestExpand = "tracking_categories,vendor"
+	PurchaseOrdersListRequestExpandTrackingCategoriesVendorAccountingPeriod                                PurchaseOrdersListRequestExpand = "tracking_categories,vendor,accounting_period"
+	PurchaseOrdersListRequestExpandTrackingCategoriesVendorCompany                                         PurchaseOrdersListRequestExpand = "tracking_categories,vendor,company"
+	PurchaseOrdersListRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod                         PurchaseOrdersListRequestExpand = "tracking_categories,vendor,company,accounting_period"
+	PurchaseOrdersListRequestExpandVendor                                                                  PurchaseOrdersListRequestExpand = "vendor"
+	PurchaseOrdersListRequestExpandVendorAccountingPeriod                                                  PurchaseOrdersListRequestExpand = "vendor,accounting_period"
+	PurchaseOrdersListRequestExpandVendorCompany                                                           PurchaseOrdersListRequestExpand = "vendor,company"
+	PurchaseOrdersListRequestExpandVendorCompanyAccountingPeriod                                           PurchaseOrdersListRequestExpand = "vendor,company,accounting_period"
+)
+
+func NewPurchaseOrdersListRequestExpandFromString(s string) (PurchaseOrdersListRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return PurchaseOrdersListRequestExpandAccountingPeriod, nil
+	case "company":
+		return PurchaseOrdersListRequestExpandCompany, nil
+	case "company,accounting_period":
+		return PurchaseOrdersListRequestExpandCompanyAccountingPeriod, nil
+	case "delivery_address":
+		return PurchaseOrdersListRequestExpandDeliveryAddress, nil
+	case "delivery_address,accounting_period":
+		return PurchaseOrdersListRequestExpandDeliveryAddressAccountingPeriod, nil
+	case "delivery_address,company":
+		return PurchaseOrdersListRequestExpandDeliveryAddressCompany, nil
+	case "delivery_address,company,accounting_period":
+		return PurchaseOrdersListRequestExpandDeliveryAddressCompanyAccountingPeriod, nil
+	case "delivery_address,vendor":
+		return PurchaseOrdersListRequestExpandDeliveryAddressVendor, nil
+	case "delivery_address,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandDeliveryAddressVendorAccountingPeriod, nil
+	case "delivery_address,vendor,company":
+		return PurchaseOrdersListRequestExpandDeliveryAddressVendorCompany, nil
+	case "delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "line_items":
+		return PurchaseOrdersListRequestExpandLineItems, nil
+	case "line_items,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,company":
+		return PurchaseOrdersListRequestExpandLineItemsCompany, nil
+	case "line_items,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsCompanyAccountingPeriod, nil
+	case "line_items,delivery_address":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddress, nil
+	case "line_items,delivery_address,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressAccountingPeriod, nil
+	case "line_items,delivery_address,company":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressCompany, nil
+	case "line_items,delivery_address,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressCompanyAccountingPeriod, nil
+	case "line_items,delivery_address,vendor":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendor, nil
+	case "line_items,delivery_address,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendorAccountingPeriod, nil
+	case "line_items,delivery_address,vendor,company":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendorCompany, nil
+	case "line_items,delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,company":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesCompany, nil
+	case "line_items,tracking_categories,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddress, nil
+	case "line_items,tracking_categories,delivery_address,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address,company":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompany, nil
+	case "line_items,tracking_categories,delivery_address,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address,vendor":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendor, nil
+	case "line_items,tracking_categories,delivery_address,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address,vendor,company":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompany, nil
+	case "line_items,tracking_categories,delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,vendor":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendor, nil
+	case "line_items,tracking_categories,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendorAccountingPeriod, nil
+	case "line_items,tracking_categories,vendor,company":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendorCompany, nil
+	case "line_items,tracking_categories,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "line_items,vendor":
+		return PurchaseOrdersListRequestExpandLineItemsVendor, nil
+	case "line_items,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsVendorAccountingPeriod, nil
+	case "line_items,vendor,company":
+		return PurchaseOrdersListRequestExpandLineItemsVendorCompany, nil
+	case "line_items,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandLineItemsVendorCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return PurchaseOrdersListRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,delivery_address":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddress, nil
+	case "tracking_categories,delivery_address,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressAccountingPeriod, nil
+	case "tracking_categories,delivery_address,company":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressCompany, nil
+	case "tracking_categories,delivery_address,company,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressCompanyAccountingPeriod, nil
+	case "tracking_categories,delivery_address,vendor":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendor, nil
+	case "tracking_categories,delivery_address,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendorAccountingPeriod, nil
+	case "tracking_categories,delivery_address,vendor,company":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendorCompany, nil
+	case "tracking_categories,delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "tracking_categories,vendor":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesVendor, nil
+	case "tracking_categories,vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesVendorAccountingPeriod, nil
+	case "tracking_categories,vendor,company":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesVendorCompany, nil
+	case "tracking_categories,vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "vendor":
+		return PurchaseOrdersListRequestExpandVendor, nil
+	case "vendor,accounting_period":
+		return PurchaseOrdersListRequestExpandVendorAccountingPeriod, nil
+	case "vendor,company":
+		return PurchaseOrdersListRequestExpandVendorCompany, nil
+	case "vendor,company,accounting_period":
+		return PurchaseOrdersListRequestExpandVendorCompanyAccountingPeriod, nil
+	}
+	var t PurchaseOrdersListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PurchaseOrdersListRequestExpand) Ptr() *PurchaseOrdersListRequestExpand {
+	return &p
+}
+
+type PurchaseOrdersRetrieveRequestExpand string
+
+const (
+	PurchaseOrdersRetrieveRequestExpandAccountingPeriod                                                        PurchaseOrdersRetrieveRequestExpand = "accounting_period"
+	PurchaseOrdersRetrieveRequestExpandCompany                                                                 PurchaseOrdersRetrieveRequestExpand = "company"
+	PurchaseOrdersRetrieveRequestExpandCompanyAccountingPeriod                                                 PurchaseOrdersRetrieveRequestExpand = "company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddress                                                         PurchaseOrdersRetrieveRequestExpand = "delivery_address"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressAccountingPeriod                                         PurchaseOrdersRetrieveRequestExpand = "delivery_address,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressCompany                                                  PurchaseOrdersRetrieveRequestExpand = "delivery_address,company"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressCompanyAccountingPeriod                                  PurchaseOrdersRetrieveRequestExpand = "delivery_address,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendor                                                   PurchaseOrdersRetrieveRequestExpand = "delivery_address,vendor"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendorAccountingPeriod                                   PurchaseOrdersRetrieveRequestExpand = "delivery_address,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendorCompany                                            PurchaseOrdersRetrieveRequestExpand = "delivery_address,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendorCompanyAccountingPeriod                            PurchaseOrdersRetrieveRequestExpand = "delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItems                                                               PurchaseOrdersRetrieveRequestExpand = "line_items"
+	PurchaseOrdersRetrieveRequestExpandLineItemsAccountingPeriod                                               PurchaseOrdersRetrieveRequestExpand = "line_items,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsCompany                                                        PurchaseOrdersRetrieveRequestExpand = "line_items,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsCompanyAccountingPeriod                                        PurchaseOrdersRetrieveRequestExpand = "line_items,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddress                                                PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressAccountingPeriod                                PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressCompany                                         PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressCompanyAccountingPeriod                         PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendor                                          PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,vendor"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendorAccountingPeriod                          PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendorCompany                                   PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendorCompanyAccountingPeriod                   PurchaseOrdersRetrieveRequestExpand = "line_items,delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategories                                             PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod                             PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesCompany                                      PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod                      PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddress                              PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressAccountingPeriod              PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompany                       PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompanyAccountingPeriod       PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendor                        PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,vendor"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorAccountingPeriod        PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompany                 PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendor                                       PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,vendor"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendorAccountingPeriod                       PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendorCompany                                PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendorCompanyAccountingPeriod                PurchaseOrdersRetrieveRequestExpand = "line_items,tracking_categories,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsVendor                                                         PurchaseOrdersRetrieveRequestExpand = "line_items,vendor"
+	PurchaseOrdersRetrieveRequestExpandLineItemsVendorAccountingPeriod                                         PurchaseOrdersRetrieveRequestExpand = "line_items,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandLineItemsVendorCompany                                                  PurchaseOrdersRetrieveRequestExpand = "line_items,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandLineItemsVendorCompanyAccountingPeriod                                  PurchaseOrdersRetrieveRequestExpand = "line_items,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategories                                                      PurchaseOrdersRetrieveRequestExpand = "tracking_categories"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesAccountingPeriod                                      PurchaseOrdersRetrieveRequestExpand = "tracking_categories,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesCompany                                               PurchaseOrdersRetrieveRequestExpand = "tracking_categories,company"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod                               PurchaseOrdersRetrieveRequestExpand = "tracking_categories,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddress                                       PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressAccountingPeriod                       PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressCompany                                PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,company"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressCompanyAccountingPeriod                PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendor                                 PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,vendor"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendorAccountingPeriod                 PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendorCompany                          PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod          PurchaseOrdersRetrieveRequestExpand = "tracking_categories,delivery_address,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendor                                                PurchaseOrdersRetrieveRequestExpand = "tracking_categories,vendor"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendorAccountingPeriod                                PurchaseOrdersRetrieveRequestExpand = "tracking_categories,vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendorCompany                                         PurchaseOrdersRetrieveRequestExpand = "tracking_categories,vendor,company"
+	PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod                         PurchaseOrdersRetrieveRequestExpand = "tracking_categories,vendor,company,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandVendor                                                                  PurchaseOrdersRetrieveRequestExpand = "vendor"
+	PurchaseOrdersRetrieveRequestExpandVendorAccountingPeriod                                                  PurchaseOrdersRetrieveRequestExpand = "vendor,accounting_period"
+	PurchaseOrdersRetrieveRequestExpandVendorCompany                                                           PurchaseOrdersRetrieveRequestExpand = "vendor,company"
+	PurchaseOrdersRetrieveRequestExpandVendorCompanyAccountingPeriod                                           PurchaseOrdersRetrieveRequestExpand = "vendor,company,accounting_period"
+)
+
+func NewPurchaseOrdersRetrieveRequestExpandFromString(s string) (PurchaseOrdersRetrieveRequestExpand, error) {
+	switch s {
+	case "accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandAccountingPeriod, nil
+	case "company":
+		return PurchaseOrdersRetrieveRequestExpandCompany, nil
+	case "company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandCompanyAccountingPeriod, nil
+	case "delivery_address":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddress, nil
+	case "delivery_address,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressAccountingPeriod, nil
+	case "delivery_address,company":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressCompany, nil
+	case "delivery_address,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressCompanyAccountingPeriod, nil
+	case "delivery_address,vendor":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendor, nil
+	case "delivery_address,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendorAccountingPeriod, nil
+	case "delivery_address,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendorCompany, nil
+	case "delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "line_items":
+		return PurchaseOrdersRetrieveRequestExpandLineItems, nil
+	case "line_items,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsCompany, nil
+	case "line_items,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsCompanyAccountingPeriod, nil
+	case "line_items,delivery_address":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddress, nil
+	case "line_items,delivery_address,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressAccountingPeriod, nil
+	case "line_items,delivery_address,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressCompany, nil
+	case "line_items,delivery_address,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressCompanyAccountingPeriod, nil
+	case "line_items,delivery_address,vendor":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendor, nil
+	case "line_items,delivery_address,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendorAccountingPeriod, nil
+	case "line_items,delivery_address,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendorCompany, nil
+	case "line_items,delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesCompany, nil
+	case "line_items,tracking_categories,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddress, nil
+	case "line_items,tracking_categories,delivery_address,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompany, nil
+	case "line_items,tracking_categories,delivery_address,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address,vendor":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendor, nil
+	case "line_items,tracking_categories,delivery_address,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorAccountingPeriod, nil
+	case "line_items,tracking_categories,delivery_address,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompany, nil
+	case "line_items,tracking_categories,delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "line_items,tracking_categories,vendor":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendor, nil
+	case "line_items,tracking_categories,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendorAccountingPeriod, nil
+	case "line_items,tracking_categories,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendorCompany, nil
+	case "line_items,tracking_categories,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "line_items,vendor":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsVendor, nil
+	case "line_items,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsVendorAccountingPeriod, nil
+	case "line_items,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsVendorCompany, nil
+	case "line_items,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandLineItemsVendorCompanyAccountingPeriod, nil
+	case "tracking_categories":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategories, nil
+	case "tracking_categories,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,company":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesCompany, nil
+	case "tracking_categories,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,delivery_address":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddress, nil
+	case "tracking_categories,delivery_address,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressAccountingPeriod, nil
+	case "tracking_categories,delivery_address,company":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressCompany, nil
+	case "tracking_categories,delivery_address,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressCompanyAccountingPeriod, nil
+	case "tracking_categories,delivery_address,vendor":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendor, nil
+	case "tracking_categories,delivery_address,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendorAccountingPeriod, nil
+	case "tracking_categories,delivery_address,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendorCompany, nil
+	case "tracking_categories,delivery_address,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesDeliveryAddressVendorCompanyAccountingPeriod, nil
+	case "tracking_categories,vendor":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendor, nil
+	case "tracking_categories,vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendorAccountingPeriod, nil
+	case "tracking_categories,vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendorCompany, nil
+	case "tracking_categories,vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandTrackingCategoriesVendorCompanyAccountingPeriod, nil
+	case "vendor":
+		return PurchaseOrdersRetrieveRequestExpandVendor, nil
+	case "vendor,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandVendorAccountingPeriod, nil
+	case "vendor,company":
+		return PurchaseOrdersRetrieveRequestExpandVendorCompany, nil
+	case "vendor,company,accounting_period":
+		return PurchaseOrdersRetrieveRequestExpandVendorCompanyAccountingPeriod, nil
+	}
+	var t PurchaseOrdersRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PurchaseOrdersRetrieveRequestExpand) Ptr() *PurchaseOrdersRetrieveRequestExpand {
+	return &p
 }

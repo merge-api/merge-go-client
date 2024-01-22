@@ -3,6 +3,7 @@
 package hris
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -19,8 +20,8 @@ type LocationsListRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// If provided, will only return locations with this location_type
 	//
-	// * `HOME` - HOME
-	// * `WORK` - WORK
+	// - `HOME` - HOME
+	// - `WORK` - WORK
 	LocationType *LocationsListRequestLocationType `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
@@ -43,4 +44,26 @@ type LocationsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type LocationsListRequestLocationType string
+
+const (
+	LocationsListRequestLocationTypeHome LocationsListRequestLocationType = "HOME"
+	LocationsListRequestLocationTypeWork LocationsListRequestLocationType = "WORK"
+)
+
+func NewLocationsListRequestLocationTypeFromString(s string) (LocationsListRequestLocationType, error) {
+	switch s {
+	case "HOME":
+		return LocationsListRequestLocationTypeHome, nil
+	case "WORK":
+		return LocationsListRequestLocationTypeWork, nil
+	}
+	var t LocationsListRequestLocationType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LocationsListRequestLocationType) Ptr() *LocationsListRequestLocationType {
+	return &l
 }

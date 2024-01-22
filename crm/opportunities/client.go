@@ -12,36 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *crm.OpportunitiesListRequest) (*crm.PaginatedOpportunityList, error)
-	Create(ctx context.Context, request *crm.OpportunityEndpointRequest) (*crm.OpportunityResponse, error)
-	Retrieve(ctx context.Context, id string, request *crm.OpportunitiesRetrieveRequest) (*crm.Opportunity, error)
-	PartialUpdate(ctx context.Context, id string, request *crm.PatchedOpportunityEndpointRequest) (*crm.OpportunityResponse, error)
-	MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error)
-	MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error)
-	RemoteFieldClassesList(ctx context.Context, request *crm.OpportunitiesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Opportunity` objects.
-func (c *client) List(ctx context.Context, request *crm.OpportunitiesListRequest) (*crm.PaginatedOpportunityList, error) {
+func (c *Client) List(ctx context.Context, request *crm.OpportunitiesListRequest) (*crm.PaginatedOpportunityList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -86,13 +76,13 @@ func (c *client) List(ctx context.Context, request *crm.OpportunitiesListRequest
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}
 	if request.RemoteFields != nil {
-		queryParams.Add("remote_fields", fmt.Sprintf("%v", *request.RemoteFields))
+		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
 	}
 	if request.RemoteId != nil {
 		queryParams.Add("remote_id", fmt.Sprintf("%v", *request.RemoteId))
 	}
 	if request.ShowEnumOrigins != nil {
-		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
+		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", request.ShowEnumOrigins))
 	}
 	if request.StageId != nil {
 		queryParams.Add("stage_id", fmt.Sprintf("%v", *request.StageId))
@@ -105,24 +95,22 @@ func (c *client) List(ctx context.Context, request *crm.OpportunitiesListRequest
 	}
 
 	var response *crm.PaginatedOpportunityList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `Opportunity` object with the given values.
-func (c *client) Create(ctx context.Context, request *crm.OpportunityEndpointRequest) (*crm.OpportunityResponse, error) {
+func (c *Client) Create(ctx context.Context, request *crm.OpportunityEndpointRequest) (*crm.OpportunityResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -141,24 +129,23 @@ func (c *client) Create(ctx context.Context, request *crm.OpportunityEndpointReq
 	}
 
 	var response *crm.OpportunityResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `Opportunity` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *crm.OpportunitiesRetrieveRequest) (*crm.Opportunity, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *crm.OpportunitiesRetrieveRequest) (*crm.Opportunity, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -176,34 +163,32 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.Opportuni
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
 	}
 	if request.RemoteFields != nil {
-		queryParams.Add("remote_fields", fmt.Sprintf("%v", *request.RemoteFields))
+		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
 	}
 	if request.ShowEnumOrigins != nil {
-		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
+		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", request.ShowEnumOrigins))
 	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
 	}
 
 	var response *crm.Opportunity
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Updates an `Opportunity` object with the given `id`.
-func (c *client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedOpportunityEndpointRequest) (*crm.OpportunityResponse, error) {
+func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedOpportunityEndpointRequest) (*crm.OpportunityResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -222,24 +207,23 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 	}
 
 	var response *crm.OpportunityResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPatch,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPatch,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Opportunity` PATCHs.
-func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
+func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -247,24 +231,22 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/opportunities/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Opportunity` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -272,24 +254,22 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 	endpointURL := baseURL + "/" + "api/crm/v1/opportunities/meta/post"
 
 	var response *crm.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
-func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.OpportunitiesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
+func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.OpportunitiesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -317,18 +297,16 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.Opport
 	}
 
 	var response *crm.PaginatedRemoteFieldClassList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

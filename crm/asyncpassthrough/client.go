@@ -10,31 +10,26 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	Create(ctx context.Context, request *crm.DataPassthroughRequest) (*crm.AsyncPassthroughReciept, error)
-	Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*crm.RemoteResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Asynchronously pull data from an endpoint not currently supported by Merge.
-func (c *client) Create(ctx context.Context, request *crm.DataPassthroughRequest) (*crm.AsyncPassthroughReciept, error) {
+func (c *Client) Create(ctx context.Context, request *crm.DataPassthroughRequest) (*crm.AsyncPassthroughReciept, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -42,24 +37,23 @@ func (c *client) Create(ctx context.Context, request *crm.DataPassthroughRequest
 	endpointURL := baseURL + "/" + "api/crm/v1/async-passthrough"
 
 	var response *crm.AsyncPassthroughReciept
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Retrieves data from earlier async-passthrough POST request
-func (c *client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*crm.RemoteResponse, error) {
+func (c *Client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*crm.RemoteResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -67,18 +61,16 @@ func (c *client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string)
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/async-passthrough/%v", asyncPassthroughReceiptId)
 
 	var response *crm.RemoteResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

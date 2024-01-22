@@ -12,33 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *hris.TimesheetEntriesListRequest) (*hris.PaginatedTimesheetEntryList, error)
-	Create(ctx context.Context, request *hris.TimesheetEntryEndpointRequest) (*hris.TimesheetEntryResponse, error)
-	Retrieve(ctx context.Context, id string, request *hris.TimesheetEntriesRetrieveRequest) (*hris.TimesheetEntry, error)
-	MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `TimesheetEntry` objects.
-func (c *client) List(ctx context.Context, request *hris.TimesheetEntriesListRequest) (*hris.PaginatedTimesheetEntryList, error) {
+func (c *Client) List(ctx context.Context, request *hris.TimesheetEntriesListRequest) (*hris.PaginatedTimesheetEntryList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -96,24 +89,22 @@ func (c *client) List(ctx context.Context, request *hris.TimesheetEntriesListReq
 	}
 
 	var response *hris.PaginatedTimesheetEntryList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates a `TimesheetEntry` object with the given values.
-func (c *client) Create(ctx context.Context, request *hris.TimesheetEntryEndpointRequest) (*hris.TimesheetEntryResponse, error) {
+func (c *Client) Create(ctx context.Context, request *hris.TimesheetEntryEndpointRequest) (*hris.TimesheetEntryResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -132,24 +123,23 @@ func (c *client) Create(ctx context.Context, request *hris.TimesheetEntryEndpoin
 	}
 
 	var response *hris.TimesheetEntryResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a `TimesheetEntry` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *hris.TimesheetEntriesRetrieveRequest) (*hris.TimesheetEntry, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *hris.TimesheetEntriesRetrieveRequest) (*hris.TimesheetEntry, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -165,24 +155,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *hris.Timeshee
 	}
 
 	var response *hris.TimesheetEntry
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `TimesheetEntry` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -190,18 +178,16 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, erro
 	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries/meta/post"
 
 	var response *hris.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -56,4 +57,78 @@ type ContactsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type ContactsListRequestExpand string
+
+const (
+	ContactsListRequestExpandAddresses                    ContactsListRequestExpand = "addresses"
+	ContactsListRequestExpandAddressesCompany             ContactsListRequestExpand = "addresses,company"
+	ContactsListRequestExpandAddressesPhoneNumbers        ContactsListRequestExpand = "addresses,phone_numbers"
+	ContactsListRequestExpandAddressesPhoneNumbersCompany ContactsListRequestExpand = "addresses,phone_numbers,company"
+	ContactsListRequestExpandCompany                      ContactsListRequestExpand = "company"
+	ContactsListRequestExpandPhoneNumbers                 ContactsListRequestExpand = "phone_numbers"
+	ContactsListRequestExpandPhoneNumbersCompany          ContactsListRequestExpand = "phone_numbers,company"
+)
+
+func NewContactsListRequestExpandFromString(s string) (ContactsListRequestExpand, error) {
+	switch s {
+	case "addresses":
+		return ContactsListRequestExpandAddresses, nil
+	case "addresses,company":
+		return ContactsListRequestExpandAddressesCompany, nil
+	case "addresses,phone_numbers":
+		return ContactsListRequestExpandAddressesPhoneNumbers, nil
+	case "addresses,phone_numbers,company":
+		return ContactsListRequestExpandAddressesPhoneNumbersCompany, nil
+	case "company":
+		return ContactsListRequestExpandCompany, nil
+	case "phone_numbers":
+		return ContactsListRequestExpandPhoneNumbers, nil
+	case "phone_numbers,company":
+		return ContactsListRequestExpandPhoneNumbersCompany, nil
+	}
+	var t ContactsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ContactsListRequestExpand) Ptr() *ContactsListRequestExpand {
+	return &c
+}
+
+type ContactsRetrieveRequestExpand string
+
+const (
+	ContactsRetrieveRequestExpandAddresses                    ContactsRetrieveRequestExpand = "addresses"
+	ContactsRetrieveRequestExpandAddressesCompany             ContactsRetrieveRequestExpand = "addresses,company"
+	ContactsRetrieveRequestExpandAddressesPhoneNumbers        ContactsRetrieveRequestExpand = "addresses,phone_numbers"
+	ContactsRetrieveRequestExpandAddressesPhoneNumbersCompany ContactsRetrieveRequestExpand = "addresses,phone_numbers,company"
+	ContactsRetrieveRequestExpandCompany                      ContactsRetrieveRequestExpand = "company"
+	ContactsRetrieveRequestExpandPhoneNumbers                 ContactsRetrieveRequestExpand = "phone_numbers"
+	ContactsRetrieveRequestExpandPhoneNumbersCompany          ContactsRetrieveRequestExpand = "phone_numbers,company"
+)
+
+func NewContactsRetrieveRequestExpandFromString(s string) (ContactsRetrieveRequestExpand, error) {
+	switch s {
+	case "addresses":
+		return ContactsRetrieveRequestExpandAddresses, nil
+	case "addresses,company":
+		return ContactsRetrieveRequestExpandAddressesCompany, nil
+	case "addresses,phone_numbers":
+		return ContactsRetrieveRequestExpandAddressesPhoneNumbers, nil
+	case "addresses,phone_numbers,company":
+		return ContactsRetrieveRequestExpandAddressesPhoneNumbersCompany, nil
+	case "company":
+		return ContactsRetrieveRequestExpandCompany, nil
+	case "phone_numbers":
+		return ContactsRetrieveRequestExpandPhoneNumbers, nil
+	case "phone_numbers,company":
+		return ContactsRetrieveRequestExpandPhoneNumbersCompany, nil
+	}
+	var t ContactsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ContactsRetrieveRequestExpand) Ptr() *ContactsRetrieveRequestExpand {
+	return &c
 }

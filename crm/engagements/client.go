@@ -12,36 +12,26 @@ import (
 	time "time"
 )
 
-type Client interface {
-	List(ctx context.Context, request *crm.EngagementsListRequest) (*crm.PaginatedEngagementList, error)
-	Create(ctx context.Context, request *crm.EngagementEndpointRequest) (*crm.EngagementResponse, error)
-	Retrieve(ctx context.Context, id string, request *crm.EngagementsRetrieveRequest) (*crm.Engagement, error)
-	PartialUpdate(ctx context.Context, id string, request *crm.PatchedEngagementEndpointRequest) (*crm.EngagementResponse, error)
-	MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error)
-	MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error)
-	RemoteFieldClassesList(ctx context.Context, request *crm.EngagementsRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error)
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
+	return &Client{
+		baseURL: options.BaseURL,
+		caller:  core.NewCaller(options.HTTPClient),
+		header:  options.ToHeader(),
 	}
 }
 
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
-}
-
 // Returns a list of `Engagement` objects.
-func (c *client) List(ctx context.Context, request *crm.EngagementsListRequest) (*crm.PaginatedEngagementList, error) {
+func (c *Client) List(ctx context.Context, request *crm.EngagementsListRequest) (*crm.PaginatedEngagementList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -93,24 +83,22 @@ func (c *client) List(ctx context.Context, request *crm.EngagementsListRequest) 
 	}
 
 	var response *crm.PaginatedEngagementList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Creates an `Engagement` object with the given values.
-func (c *client) Create(ctx context.Context, request *crm.EngagementEndpointRequest) (*crm.EngagementResponse, error) {
+func (c *Client) Create(ctx context.Context, request *crm.EngagementEndpointRequest) (*crm.EngagementResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -129,24 +117,23 @@ func (c *client) Create(ctx context.Context, request *crm.EngagementEndpointRequ
 	}
 
 	var response *crm.EngagementResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns an `Engagement` object with the given `id`.
-func (c *client) Retrieve(ctx context.Context, id string, request *crm.EngagementsRetrieveRequest) (*crm.Engagement, error) {
+func (c *Client) Retrieve(ctx context.Context, id string, request *crm.EngagementsRetrieveRequest) (*crm.Engagement, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -168,24 +155,22 @@ func (c *client) Retrieve(ctx context.Context, id string, request *crm.Engagemen
 	}
 
 	var response *crm.Engagement
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Updates an `Engagement` object with the given `id`.
-func (c *client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedEngagementEndpointRequest) (*crm.EngagementResponse, error) {
+func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedEngagementEndpointRequest) (*crm.EngagementResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -204,24 +189,23 @@ func (c *client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 	}
 
 	var response *crm.EngagementResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPatch,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPatch,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Engagement` PATCHs.
-func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
+func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -229,24 +213,22 @@ func (c *client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/engagements/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns metadata for `Engagement` POSTs.
-func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -254,24 +236,22 @@ func (c *client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 	endpointURL := baseURL + "/" + "api/crm/v1/engagements/meta/post"
 
 	var response *crm.MetaResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
-func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.EngagementsRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
+func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.EngagementsRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -299,18 +279,16 @@ func (c *client) RemoteFieldClassesList(ctx context.Context, request *crm.Engage
 	}
 
 	var response *crm.PaginatedRemoteFieldClassList
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

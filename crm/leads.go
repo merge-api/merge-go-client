@@ -3,6 +3,7 @@
 package crm
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -69,4 +70,78 @@ type LeadsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+}
+
+type LeadsListRequestExpand string
+
+const (
+	LeadsListRequestExpandConvertedAccount                      LeadsListRequestExpand = "converted_account"
+	LeadsListRequestExpandConvertedContact                      LeadsListRequestExpand = "converted_contact"
+	LeadsListRequestExpandConvertedContactConvertedAccount      LeadsListRequestExpand = "converted_contact,converted_account"
+	LeadsListRequestExpandOwner                                 LeadsListRequestExpand = "owner"
+	LeadsListRequestExpandOwnerConvertedAccount                 LeadsListRequestExpand = "owner,converted_account"
+	LeadsListRequestExpandOwnerConvertedContact                 LeadsListRequestExpand = "owner,converted_contact"
+	LeadsListRequestExpandOwnerConvertedContactConvertedAccount LeadsListRequestExpand = "owner,converted_contact,converted_account"
+)
+
+func NewLeadsListRequestExpandFromString(s string) (LeadsListRequestExpand, error) {
+	switch s {
+	case "converted_account":
+		return LeadsListRequestExpandConvertedAccount, nil
+	case "converted_contact":
+		return LeadsListRequestExpandConvertedContact, nil
+	case "converted_contact,converted_account":
+		return LeadsListRequestExpandConvertedContactConvertedAccount, nil
+	case "owner":
+		return LeadsListRequestExpandOwner, nil
+	case "owner,converted_account":
+		return LeadsListRequestExpandOwnerConvertedAccount, nil
+	case "owner,converted_contact":
+		return LeadsListRequestExpandOwnerConvertedContact, nil
+	case "owner,converted_contact,converted_account":
+		return LeadsListRequestExpandOwnerConvertedContactConvertedAccount, nil
+	}
+	var t LeadsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LeadsListRequestExpand) Ptr() *LeadsListRequestExpand {
+	return &l
+}
+
+type LeadsRetrieveRequestExpand string
+
+const (
+	LeadsRetrieveRequestExpandConvertedAccount                      LeadsRetrieveRequestExpand = "converted_account"
+	LeadsRetrieveRequestExpandConvertedContact                      LeadsRetrieveRequestExpand = "converted_contact"
+	LeadsRetrieveRequestExpandConvertedContactConvertedAccount      LeadsRetrieveRequestExpand = "converted_contact,converted_account"
+	LeadsRetrieveRequestExpandOwner                                 LeadsRetrieveRequestExpand = "owner"
+	LeadsRetrieveRequestExpandOwnerConvertedAccount                 LeadsRetrieveRequestExpand = "owner,converted_account"
+	LeadsRetrieveRequestExpandOwnerConvertedContact                 LeadsRetrieveRequestExpand = "owner,converted_contact"
+	LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount LeadsRetrieveRequestExpand = "owner,converted_contact,converted_account"
+)
+
+func NewLeadsRetrieveRequestExpandFromString(s string) (LeadsRetrieveRequestExpand, error) {
+	switch s {
+	case "converted_account":
+		return LeadsRetrieveRequestExpandConvertedAccount, nil
+	case "converted_contact":
+		return LeadsRetrieveRequestExpandConvertedContact, nil
+	case "converted_contact,converted_account":
+		return LeadsRetrieveRequestExpandConvertedContactConvertedAccount, nil
+	case "owner":
+		return LeadsRetrieveRequestExpandOwner, nil
+	case "owner,converted_account":
+		return LeadsRetrieveRequestExpandOwnerConvertedAccount, nil
+	case "owner,converted_contact":
+		return LeadsRetrieveRequestExpandOwnerConvertedContact, nil
+	case "owner,converted_contact,converted_account":
+		return LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount, nil
+	}
+	var t LeadsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LeadsRetrieveRequestExpand) Ptr() *LeadsRetrieveRequestExpand {
+	return &l
 }

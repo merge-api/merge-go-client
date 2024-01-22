@@ -5,14 +5,18 @@ package crm
 import (
 	json "encoding/json"
 	fmt "fmt"
-	strconv "strconv"
+	core "github.com/merge-api/merge-go-client/core"
 	time "time"
 )
 
 // # The Account Object
+//
 // ### Description
+//
 // The `Account` object is used to represent a company in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type Account struct {
 	// The account's owner.
@@ -41,10 +45,35 @@ type Account struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *Account) UnmarshalJSON(data []byte) error {
+	type unmarshaler Account
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = Account(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *Account) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountDetails struct {
@@ -60,13 +89,41 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetails) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetails
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetails(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetails) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The LinkedAccount Object
+//
 // ### Description
+//
 // The `LinkedAccount` object is used to represent an end user's link with a specific integration.
 //
 // ### Usage Example
+//
 // View a list of your organization's `LinkedAccount` objects.
 type AccountDetailsAndActions struct {
 	Id                      string                             `json:"id"`
@@ -81,6 +138,31 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountDetailsAndActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountDetailsAndActions(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountDetailsAndActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AccountDetailsAndActionsIntegration struct {
@@ -92,53 +174,59 @@ type AccountDetailsAndActionsIntegration struct {
 	Slug                     string            `json:"slug"`
 	PassthroughAvailable     bool              `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `COMPLETE` - COMPLETE
-// * `INCOMPLETE` - INCOMPLETE
-// * `RELINK_NEEDED` - RELINK_NEEDED
-type AccountDetailsAndActionsStatusEnum uint
-
-const (
-	AccountDetailsAndActionsStatusEnumComplete AccountDetailsAndActionsStatusEnum = iota + 1
-	AccountDetailsAndActionsStatusEnumIncomplete
-	AccountDetailsAndActionsStatusEnumRelinkNeeded
-)
-
-func (a AccountDetailsAndActionsStatusEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AccountDetailsAndActionsStatusEnumComplete:
-		return "COMPLETE"
-	case AccountDetailsAndActionsStatusEnumIncomplete:
-		return "INCOMPLETE"
-	case AccountDetailsAndActionsStatusEnumRelinkNeeded:
-		return "RELINK_NEEDED"
-	}
-}
-
-func (a AccountDetailsAndActionsStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AccountDetailsAndActionsStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AccountDetailsAndActionsIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountDetailsAndActionsIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "COMPLETE":
-		value := AccountDetailsAndActionsStatusEnumComplete
-		*a = value
-	case "INCOMPLETE":
-		value := AccountDetailsAndActionsStatusEnumIncomplete
-		*a = value
-	case "RELINK_NEEDED":
-		value := AccountDetailsAndActionsStatusEnumRelinkNeeded
-		*a = value
-	}
+	*a = AccountDetailsAndActionsIntegration(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountDetailsAndActionsIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `COMPLETE` - COMPLETE
+// - `INCOMPLETE` - INCOMPLETE
+// - `RELINK_NEEDED` - RELINK_NEEDED
+type AccountDetailsAndActionsStatusEnum string
+
+const (
+	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
+	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
+	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+)
+
+func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
+	switch s {
+	case "COMPLETE":
+		return AccountDetailsAndActionsStatusEnumComplete, nil
+	case "INCOMPLETE":
+		return AccountDetailsAndActionsStatusEnumIncomplete, nil
+	case "RELINK_NEEDED":
+		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	}
+	var t AccountDetailsAndActionsStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatusEnum {
+	return &a
 }
 
 type AccountIntegration struct {
@@ -156,9 +244,34 @@ type AccountIntegration struct {
 	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
 	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
-	ApiEndpointsToDocumentationUrls map[string]any `json:"api_endpoints_to_documentation_urls,omitempty"`
+	ApiEndpointsToDocumentationUrls map[string]interface{} `json:"api_endpoints_to_documentation_urls,omitempty"`
 	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
 	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountIntegration) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountIntegration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountIntegration(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountIntegration) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // The account's owner.
@@ -220,9 +333,13 @@ func (a *AccountOwner) Accept(visitor AccountOwnerVisitor) error {
 }
 
 // # The Account Object
+//
 // ### Description
+//
 // The `Account` object is used to represent a company in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type AccountRequest struct {
 	// The account's owner.
@@ -238,10 +355,35 @@ type AccountRequest struct {
 	// The account's number of employees.
 	NumberOfEmployees *int `json:"number_of_employees,omitempty"`
 	// The last date (either most recent or furthest in the future) of when an activity occurs in an account.
-	LastActivityAt      *time.Time            `json:"last_activity_at,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	LastActivityAt      *time.Time             `json:"last_activity_at,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AccountRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AccountRequest(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AccountRequest) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // The account's owner.
@@ -305,59 +447,69 @@ func (a *AccountRequestOwner) Accept(visitor AccountRequestOwnerVisitor) error {
 type AccountToken struct {
 	AccountToken string              `json:"account_token"`
 	Integration  *AccountIntegration `json:"integration,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `CALL` - CALL
-// * `MEETING` - MEETING
-// * `EMAIL` - EMAIL
-type ActivityTypeEnum uint
-
-const (
-	ActivityTypeEnumCall ActivityTypeEnum = iota + 1
-	ActivityTypeEnumMeeting
-	ActivityTypeEnumEmail
-)
-
-func (a ActivityTypeEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case ActivityTypeEnumCall:
-		return "CALL"
-	case ActivityTypeEnumMeeting:
-		return "MEETING"
-	case ActivityTypeEnumEmail:
-		return "EMAIL"
-	}
-}
-
-func (a ActivityTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *ActivityTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AccountToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler AccountToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "CALL":
-		value := ActivityTypeEnumCall
-		*a = value
-	case "MEETING":
-		value := ActivityTypeEnumMeeting
-		*a = value
-	case "EMAIL":
-		value := ActivityTypeEnumEmail
-		*a = value
-	}
+	*a = AccountToken(value)
+	a._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (a *AccountToken) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `CALL` - CALL
+// - `MEETING` - MEETING
+// - `EMAIL` - EMAIL
+type ActivityTypeEnum string
+
+const (
+	ActivityTypeEnumCall    ActivityTypeEnum = "CALL"
+	ActivityTypeEnumMeeting ActivityTypeEnum = "MEETING"
+	ActivityTypeEnumEmail   ActivityTypeEnum = "EMAIL"
+)
+
+func NewActivityTypeEnumFromString(s string) (ActivityTypeEnum, error) {
+	switch s {
+	case "CALL":
+		return ActivityTypeEnumCall, nil
+	case "MEETING":
+		return ActivityTypeEnumMeeting, nil
+	case "EMAIL":
+		return ActivityTypeEnumEmail, nil
+	}
+	var t ActivityTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a ActivityTypeEnum) Ptr() *ActivityTypeEnum {
+	return &a
+}
+
 // # The Address Object
+//
 // ### Description
+//
 // The `Address` object is used to represent an entity's address.
+//
 // ### Usage Example
+//
 // TODO
 type Address struct {
 	// Line 1 of the address's street.
@@ -372,270 +524,295 @@ type Address struct {
 	PostalCode *string `json:"postal_code,omitempty"`
 	// The address's country.
 	//
-	// * `AF` - Afghanistan
-	// * `AX` - Åland Islands
-	// * `AL` - Albania
-	// * `DZ` - Algeria
-	// * `AS` - American Samoa
-	// * `AD` - Andorra
-	// * `AO` - Angola
-	// * `AI` - Anguilla
-	// * `AQ` - Antarctica
-	// * `AG` - Antigua and Barbuda
-	// * `AR` - Argentina
-	// * `AM` - Armenia
-	// * `AW` - Aruba
-	// * `AU` - Australia
-	// * `AT` - Austria
-	// * `AZ` - Azerbaijan
-	// * `BS` - Bahamas
-	// * `BH` - Bahrain
-	// * `BD` - Bangladesh
-	// * `BB` - Barbados
-	// * `BY` - Belarus
-	// * `BE` - Belgium
-	// * `BZ` - Belize
-	// * `BJ` - Benin
-	// * `BM` - Bermuda
-	// * `BT` - Bhutan
-	// * `BO` - Bolivia
-	// * `BQ` - Bonaire, Sint Eustatius and Saba
-	// * `BA` - Bosnia and Herzegovina
-	// * `BW` - Botswana
-	// * `BV` - Bouvet Island
-	// * `BR` - Brazil
-	// * `IO` - British Indian Ocean Territory
-	// * `BN` - Brunei
-	// * `BG` - Bulgaria
-	// * `BF` - Burkina Faso
-	// * `BI` - Burundi
-	// * `CV` - Cabo Verde
-	// * `KH` - Cambodia
-	// * `CM` - Cameroon
-	// * `CA` - Canada
-	// * `KY` - Cayman Islands
-	// * `CF` - Central African Republic
-	// * `TD` - Chad
-	// * `CL` - Chile
-	// * `CN` - China
-	// * `CX` - Christmas Island
-	// * `CC` - Cocos (Keeling) Islands
-	// * `CO` - Colombia
-	// * `KM` - Comoros
-	// * `CG` - Congo
-	// * `CD` - Congo (the Democratic Republic of the)
-	// * `CK` - Cook Islands
-	// * `CR` - Costa Rica
-	// * `CI` - Côte d'Ivoire
-	// * `HR` - Croatia
-	// * `CU` - Cuba
-	// * `CW` - Curaçao
-	// * `CY` - Cyprus
-	// * `CZ` - Czechia
-	// * `DK` - Denmark
-	// * `DJ` - Djibouti
-	// * `DM` - Dominica
-	// * `DO` - Dominican Republic
-	// * `EC` - Ecuador
-	// * `EG` - Egypt
-	// * `SV` - El Salvador
-	// * `GQ` - Equatorial Guinea
-	// * `ER` - Eritrea
-	// * `EE` - Estonia
-	// * `SZ` - Eswatini
-	// * `ET` - Ethiopia
-	// * `FK` - Falkland Islands (Malvinas)
-	// * `FO` - Faroe Islands
-	// * `FJ` - Fiji
-	// * `FI` - Finland
-	// * `FR` - France
-	// * `GF` - French Guiana
-	// * `PF` - French Polynesia
-	// * `TF` - French Southern Territories
-	// * `GA` - Gabon
-	// * `GM` - Gambia
-	// * `GE` - Georgia
-	// * `DE` - Germany
-	// * `GH` - Ghana
-	// * `GI` - Gibraltar
-	// * `GR` - Greece
-	// * `GL` - Greenland
-	// * `GD` - Grenada
-	// * `GP` - Guadeloupe
-	// * `GU` - Guam
-	// * `GT` - Guatemala
-	// * `GG` - Guernsey
-	// * `GN` - Guinea
-	// * `GW` - Guinea-Bissau
-	// * `GY` - Guyana
-	// * `HT` - Haiti
-	// * `HM` - Heard Island and McDonald Islands
-	// * `VA` - Holy See
-	// * `HN` - Honduras
-	// * `HK` - Hong Kong
-	// * `HU` - Hungary
-	// * `IS` - Iceland
-	// * `IN` - India
-	// * `ID` - Indonesia
-	// * `IR` - Iran
-	// * `IQ` - Iraq
-	// * `IE` - Ireland
-	// * `IM` - Isle of Man
-	// * `IL` - Israel
-	// * `IT` - Italy
-	// * `JM` - Jamaica
-	// * `JP` - Japan
-	// * `JE` - Jersey
-	// * `JO` - Jordan
-	// * `KZ` - Kazakhstan
-	// * `KE` - Kenya
-	// * `KI` - Kiribati
-	// * `KW` - Kuwait
-	// * `KG` - Kyrgyzstan
-	// * `LA` - Laos
-	// * `LV` - Latvia
-	// * `LB` - Lebanon
-	// * `LS` - Lesotho
-	// * `LR` - Liberia
-	// * `LY` - Libya
-	// * `LI` - Liechtenstein
-	// * `LT` - Lithuania
-	// * `LU` - Luxembourg
-	// * `MO` - Macao
-	// * `MG` - Madagascar
-	// * `MW` - Malawi
-	// * `MY` - Malaysia
-	// * `MV` - Maldives
-	// * `ML` - Mali
-	// * `MT` - Malta
-	// * `MH` - Marshall Islands
-	// * `MQ` - Martinique
-	// * `MR` - Mauritania
-	// * `MU` - Mauritius
-	// * `YT` - Mayotte
-	// * `MX` - Mexico
-	// * `FM` - Micronesia (Federated States of)
-	// * `MD` - Moldova
-	// * `MC` - Monaco
-	// * `MN` - Mongolia
-	// * `ME` - Montenegro
-	// * `MS` - Montserrat
-	// * `MA` - Morocco
-	// * `MZ` - Mozambique
-	// * `MM` - Myanmar
-	// * `NA` - Namibia
-	// * `NR` - Nauru
-	// * `NP` - Nepal
-	// * `NL` - Netherlands
-	// * `NC` - New Caledonia
-	// * `NZ` - New Zealand
-	// * `NI` - Nicaragua
-	// * `NE` - Niger
-	// * `NG` - Nigeria
-	// * `NU` - Niue
-	// * `NF` - Norfolk Island
-	// * `KP` - North Korea
-	// * `MK` - North Macedonia
-	// * `MP` - Northern Mariana Islands
-	// * `NO` - Norway
-	// * `OM` - Oman
-	// * `PK` - Pakistan
-	// * `PW` - Palau
-	// * `PS` - Palestine, State of
-	// * `PA` - Panama
-	// * `PG` - Papua New Guinea
-	// * `PY` - Paraguay
-	// * `PE` - Peru
-	// * `PH` - Philippines
-	// * `PN` - Pitcairn
-	// * `PL` - Poland
-	// * `PT` - Portugal
-	// * `PR` - Puerto Rico
-	// * `QA` - Qatar
-	// * `RE` - Réunion
-	// * `RO` - Romania
-	// * `RU` - Russia
-	// * `RW` - Rwanda
-	// * `BL` - Saint Barthélemy
-	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-	// * `KN` - Saint Kitts and Nevis
-	// * `LC` - Saint Lucia
-	// * `MF` - Saint Martin (French part)
-	// * `PM` - Saint Pierre and Miquelon
-	// * `VC` - Saint Vincent and the Grenadines
-	// * `WS` - Samoa
-	// * `SM` - San Marino
-	// * `ST` - Sao Tome and Principe
-	// * `SA` - Saudi Arabia
-	// * `SN` - Senegal
-	// * `RS` - Serbia
-	// * `SC` - Seychelles
-	// * `SL` - Sierra Leone
-	// * `SG` - Singapore
-	// * `SX` - Sint Maarten (Dutch part)
-	// * `SK` - Slovakia
-	// * `SI` - Slovenia
-	// * `SB` - Solomon Islands
-	// * `SO` - Somalia
-	// * `ZA` - South Africa
-	// * `GS` - South Georgia and the South Sandwich Islands
-	// * `KR` - South Korea
-	// * `SS` - South Sudan
-	// * `ES` - Spain
-	// * `LK` - Sri Lanka
-	// * `SD` - Sudan
-	// * `SR` - Suriname
-	// * `SJ` - Svalbard and Jan Mayen
-	// * `SE` - Sweden
-	// * `CH` - Switzerland
-	// * `SY` - Syria
-	// * `TW` - Taiwan
-	// * `TJ` - Tajikistan
-	// * `TZ` - Tanzania
-	// * `TH` - Thailand
-	// * `TL` - Timor-Leste
-	// * `TG` - Togo
-	// * `TK` - Tokelau
-	// * `TO` - Tonga
-	// * `TT` - Trinidad and Tobago
-	// * `TN` - Tunisia
-	// * `TR` - Turkey
-	// * `TM` - Turkmenistan
-	// * `TC` - Turks and Caicos Islands
-	// * `TV` - Tuvalu
-	// * `UG` - Uganda
-	// * `UA` - Ukraine
-	// * `AE` - United Arab Emirates
-	// * `GB` - United Kingdom
-	// * `UM` - United States Minor Outlying Islands
-	// * `US` - United States of America
-	// * `UY` - Uruguay
-	// * `UZ` - Uzbekistan
-	// * `VU` - Vanuatu
-	// * `VE` - Venezuela
-	// * `VN` - Vietnam
-	// * `VG` - Virgin Islands (British)
-	// * `VI` - Virgin Islands (U.S.)
-	// * `WF` - Wallis and Futuna
-	// * `EH` - Western Sahara
-	// * `YE` - Yemen
-	// * `ZM` - Zambia
-	// * `ZW` - Zimbabwe
+	// - `AF` - Afghanistan
+	// - `AX` - Åland Islands
+	// - `AL` - Albania
+	// - `DZ` - Algeria
+	// - `AS` - American Samoa
+	// - `AD` - Andorra
+	// - `AO` - Angola
+	// - `AI` - Anguilla
+	// - `AQ` - Antarctica
+	// - `AG` - Antigua and Barbuda
+	// - `AR` - Argentina
+	// - `AM` - Armenia
+	// - `AW` - Aruba
+	// - `AU` - Australia
+	// - `AT` - Austria
+	// - `AZ` - Azerbaijan
+	// - `BS` - Bahamas
+	// - `BH` - Bahrain
+	// - `BD` - Bangladesh
+	// - `BB` - Barbados
+	// - `BY` - Belarus
+	// - `BE` - Belgium
+	// - `BZ` - Belize
+	// - `BJ` - Benin
+	// - `BM` - Bermuda
+	// - `BT` - Bhutan
+	// - `BO` - Bolivia
+	// - `BQ` - Bonaire, Sint Eustatius and Saba
+	// - `BA` - Bosnia and Herzegovina
+	// - `BW` - Botswana
+	// - `BV` - Bouvet Island
+	// - `BR` - Brazil
+	// - `IO` - British Indian Ocean Territory
+	// - `BN` - Brunei
+	// - `BG` - Bulgaria
+	// - `BF` - Burkina Faso
+	// - `BI` - Burundi
+	// - `CV` - Cabo Verde
+	// - `KH` - Cambodia
+	// - `CM` - Cameroon
+	// - `CA` - Canada
+	// - `KY` - Cayman Islands
+	// - `CF` - Central African Republic
+	// - `TD` - Chad
+	// - `CL` - Chile
+	// - `CN` - China
+	// - `CX` - Christmas Island
+	// - `CC` - Cocos (Keeling) Islands
+	// - `CO` - Colombia
+	// - `KM` - Comoros
+	// - `CG` - Congo
+	// - `CD` - Congo (the Democratic Republic of the)
+	// - `CK` - Cook Islands
+	// - `CR` - Costa Rica
+	// - `CI` - Côte d'Ivoire
+	// - `HR` - Croatia
+	// - `CU` - Cuba
+	// - `CW` - Curaçao
+	// - `CY` - Cyprus
+	// - `CZ` - Czechia
+	// - `DK` - Denmark
+	// - `DJ` - Djibouti
+	// - `DM` - Dominica
+	// - `DO` - Dominican Republic
+	// - `EC` - Ecuador
+	// - `EG` - Egypt
+	// - `SV` - El Salvador
+	// - `GQ` - Equatorial Guinea
+	// - `ER` - Eritrea
+	// - `EE` - Estonia
+	// - `SZ` - Eswatini
+	// - `ET` - Ethiopia
+	// - `FK` - Falkland Islands (Malvinas)
+	// - `FO` - Faroe Islands
+	// - `FJ` - Fiji
+	// - `FI` - Finland
+	// - `FR` - France
+	// - `GF` - French Guiana
+	// - `PF` - French Polynesia
+	// - `TF` - French Southern Territories
+	// - `GA` - Gabon
+	// - `GM` - Gambia
+	// - `GE` - Georgia
+	// - `DE` - Germany
+	// - `GH` - Ghana
+	// - `GI` - Gibraltar
+	// - `GR` - Greece
+	// - `GL` - Greenland
+	// - `GD` - Grenada
+	// - `GP` - Guadeloupe
+	// - `GU` - Guam
+	// - `GT` - Guatemala
+	// - `GG` - Guernsey
+	// - `GN` - Guinea
+	// - `GW` - Guinea-Bissau
+	// - `GY` - Guyana
+	// - `HT` - Haiti
+	// - `HM` - Heard Island and McDonald Islands
+	// - `VA` - Holy See
+	// - `HN` - Honduras
+	// - `HK` - Hong Kong
+	// - `HU` - Hungary
+	// - `IS` - Iceland
+	// - `IN` - India
+	// - `ID` - Indonesia
+	// - `IR` - Iran
+	// - `IQ` - Iraq
+	// - `IE` - Ireland
+	// - `IM` - Isle of Man
+	// - `IL` - Israel
+	// - `IT` - Italy
+	// - `JM` - Jamaica
+	// - `JP` - Japan
+	// - `JE` - Jersey
+	// - `JO` - Jordan
+	// - `KZ` - Kazakhstan
+	// - `KE` - Kenya
+	// - `KI` - Kiribati
+	// - `KW` - Kuwait
+	// - `KG` - Kyrgyzstan
+	// - `LA` - Laos
+	// - `LV` - Latvia
+	// - `LB` - Lebanon
+	// - `LS` - Lesotho
+	// - `LR` - Liberia
+	// - `LY` - Libya
+	// - `LI` - Liechtenstein
+	// - `LT` - Lithuania
+	// - `LU` - Luxembourg
+	// - `MO` - Macao
+	// - `MG` - Madagascar
+	// - `MW` - Malawi
+	// - `MY` - Malaysia
+	// - `MV` - Maldives
+	// - `ML` - Mali
+	// - `MT` - Malta
+	// - `MH` - Marshall Islands
+	// - `MQ` - Martinique
+	// - `MR` - Mauritania
+	// - `MU` - Mauritius
+	// - `YT` - Mayotte
+	// - `MX` - Mexico
+	// - `FM` - Micronesia (Federated States of)
+	// - `MD` - Moldova
+	// - `MC` - Monaco
+	// - `MN` - Mongolia
+	// - `ME` - Montenegro
+	// - `MS` - Montserrat
+	// - `MA` - Morocco
+	// - `MZ` - Mozambique
+	// - `MM` - Myanmar
+	// - `NA` - Namibia
+	// - `NR` - Nauru
+	// - `NP` - Nepal
+	// - `NL` - Netherlands
+	// - `NC` - New Caledonia
+	// - `NZ` - New Zealand
+	// - `NI` - Nicaragua
+	// - `NE` - Niger
+	// - `NG` - Nigeria
+	// - `NU` - Niue
+	// - `NF` - Norfolk Island
+	// - `KP` - North Korea
+	// - `MK` - North Macedonia
+	// - `MP` - Northern Mariana Islands
+	// - `NO` - Norway
+	// - `OM` - Oman
+	// - `PK` - Pakistan
+	// - `PW` - Palau
+	// - `PS` - Palestine, State of
+	// - `PA` - Panama
+	// - `PG` - Papua New Guinea
+	// - `PY` - Paraguay
+	// - `PE` - Peru
+	// - `PH` - Philippines
+	// - `PN` - Pitcairn
+	// - `PL` - Poland
+	// - `PT` - Portugal
+	// - `PR` - Puerto Rico
+	// - `QA` - Qatar
+	// - `RE` - Réunion
+	// - `RO` - Romania
+	// - `RU` - Russia
+	// - `RW` - Rwanda
+	// - `BL` - Saint Barthélemy
+	// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+	// - `KN` - Saint Kitts and Nevis
+	// - `LC` - Saint Lucia
+	// - `MF` - Saint Martin (French part)
+	// - `PM` - Saint Pierre and Miquelon
+	// - `VC` - Saint Vincent and the Grenadines
+	// - `WS` - Samoa
+	// - `SM` - San Marino
+	// - `ST` - Sao Tome and Principe
+	// - `SA` - Saudi Arabia
+	// - `SN` - Senegal
+	// - `RS` - Serbia
+	// - `SC` - Seychelles
+	// - `SL` - Sierra Leone
+	// - `SG` - Singapore
+	// - `SX` - Sint Maarten (Dutch part)
+	// - `SK` - Slovakia
+	// - `SI` - Slovenia
+	// - `SB` - Solomon Islands
+	// - `SO` - Somalia
+	// - `ZA` - South Africa
+	// - `GS` - South Georgia and the South Sandwich Islands
+	// - `KR` - South Korea
+	// - `SS` - South Sudan
+	// - `ES` - Spain
+	// - `LK` - Sri Lanka
+	// - `SD` - Sudan
+	// - `SR` - Suriname
+	// - `SJ` - Svalbard and Jan Mayen
+	// - `SE` - Sweden
+	// - `CH` - Switzerland
+	// - `SY` - Syria
+	// - `TW` - Taiwan
+	// - `TJ` - Tajikistan
+	// - `TZ` - Tanzania
+	// - `TH` - Thailand
+	// - `TL` - Timor-Leste
+	// - `TG` - Togo
+	// - `TK` - Tokelau
+	// - `TO` - Tonga
+	// - `TT` - Trinidad and Tobago
+	// - `TN` - Tunisia
+	// - `TR` - Turkey
+	// - `TM` - Turkmenistan
+	// - `TC` - Turks and Caicos Islands
+	// - `TV` - Tuvalu
+	// - `UG` - Uganda
+	// - `UA` - Ukraine
+	// - `AE` - United Arab Emirates
+	// - `GB` - United Kingdom
+	// - `UM` - United States Minor Outlying Islands
+	// - `US` - United States of America
+	// - `UY` - Uruguay
+	// - `UZ` - Uzbekistan
+	// - `VU` - Vanuatu
+	// - `VE` - Venezuela
+	// - `VN` - Vietnam
+	// - `VG` - Virgin Islands (British)
+	// - `VI` - Virgin Islands (U.S.)
+	// - `WF` - Wallis and Futuna
+	// - `EH` - Western Sahara
+	// - `YE` - Yemen
+	// - `ZM` - Zambia
+	// - `ZW` - Zimbabwe
 	Country *AddressCountry `json:"country,omitempty"`
 	// The address type.
 	//
-	// * `BILLING` - BILLING
-	// * `SHIPPING` - SHIPPING
+	// - `BILLING` - BILLING
+	// - `SHIPPING` - SHIPPING
 	AddressType *AddressAddressType `json:"address_type,omitempty"`
 	CreatedAt   *time.Time          `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *Address) UnmarshalJSON(data []byte) error {
+	type unmarshaler Address
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = Address(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *Address) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // The address type.
 //
-// * `BILLING` - BILLING
-// * `SHIPPING` - SHIPPING
+// - `BILLING` - BILLING
+// - `SHIPPING` - SHIPPING
 type AddressAddressType struct {
 	typeName        string
 	AddressTypeEnum AddressTypeEnum
@@ -695,255 +872,255 @@ func (a *AddressAddressType) Accept(visitor AddressAddressTypeVisitor) error {
 
 // The address's country.
 //
-// * `AF` - Afghanistan
-// * `AX` - Åland Islands
-// * `AL` - Albania
-// * `DZ` - Algeria
-// * `AS` - American Samoa
-// * `AD` - Andorra
-// * `AO` - Angola
-// * `AI` - Anguilla
-// * `AQ` - Antarctica
-// * `AG` - Antigua and Barbuda
-// * `AR` - Argentina
-// * `AM` - Armenia
-// * `AW` - Aruba
-// * `AU` - Australia
-// * `AT` - Austria
-// * `AZ` - Azerbaijan
-// * `BS` - Bahamas
-// * `BH` - Bahrain
-// * `BD` - Bangladesh
-// * `BB` - Barbados
-// * `BY` - Belarus
-// * `BE` - Belgium
-// * `BZ` - Belize
-// * `BJ` - Benin
-// * `BM` - Bermuda
-// * `BT` - Bhutan
-// * `BO` - Bolivia
-// * `BQ` - Bonaire, Sint Eustatius and Saba
-// * `BA` - Bosnia and Herzegovina
-// * `BW` - Botswana
-// * `BV` - Bouvet Island
-// * `BR` - Brazil
-// * `IO` - British Indian Ocean Territory
-// * `BN` - Brunei
-// * `BG` - Bulgaria
-// * `BF` - Burkina Faso
-// * `BI` - Burundi
-// * `CV` - Cabo Verde
-// * `KH` - Cambodia
-// * `CM` - Cameroon
-// * `CA` - Canada
-// * `KY` - Cayman Islands
-// * `CF` - Central African Republic
-// * `TD` - Chad
-// * `CL` - Chile
-// * `CN` - China
-// * `CX` - Christmas Island
-// * `CC` - Cocos (Keeling) Islands
-// * `CO` - Colombia
-// * `KM` - Comoros
-// * `CG` - Congo
-// * `CD` - Congo (the Democratic Republic of the)
-// * `CK` - Cook Islands
-// * `CR` - Costa Rica
-// * `CI` - Côte d'Ivoire
-// * `HR` - Croatia
-// * `CU` - Cuba
-// * `CW` - Curaçao
-// * `CY` - Cyprus
-// * `CZ` - Czechia
-// * `DK` - Denmark
-// * `DJ` - Djibouti
-// * `DM` - Dominica
-// * `DO` - Dominican Republic
-// * `EC` - Ecuador
-// * `EG` - Egypt
-// * `SV` - El Salvador
-// * `GQ` - Equatorial Guinea
-// * `ER` - Eritrea
-// * `EE` - Estonia
-// * `SZ` - Eswatini
-// * `ET` - Ethiopia
-// * `FK` - Falkland Islands (Malvinas)
-// * `FO` - Faroe Islands
-// * `FJ` - Fiji
-// * `FI` - Finland
-// * `FR` - France
-// * `GF` - French Guiana
-// * `PF` - French Polynesia
-// * `TF` - French Southern Territories
-// * `GA` - Gabon
-// * `GM` - Gambia
-// * `GE` - Georgia
-// * `DE` - Germany
-// * `GH` - Ghana
-// * `GI` - Gibraltar
-// * `GR` - Greece
-// * `GL` - Greenland
-// * `GD` - Grenada
-// * `GP` - Guadeloupe
-// * `GU` - Guam
-// * `GT` - Guatemala
-// * `GG` - Guernsey
-// * `GN` - Guinea
-// * `GW` - Guinea-Bissau
-// * `GY` - Guyana
-// * `HT` - Haiti
-// * `HM` - Heard Island and McDonald Islands
-// * `VA` - Holy See
-// * `HN` - Honduras
-// * `HK` - Hong Kong
-// * `HU` - Hungary
-// * `IS` - Iceland
-// * `IN` - India
-// * `ID` - Indonesia
-// * `IR` - Iran
-// * `IQ` - Iraq
-// * `IE` - Ireland
-// * `IM` - Isle of Man
-// * `IL` - Israel
-// * `IT` - Italy
-// * `JM` - Jamaica
-// * `JP` - Japan
-// * `JE` - Jersey
-// * `JO` - Jordan
-// * `KZ` - Kazakhstan
-// * `KE` - Kenya
-// * `KI` - Kiribati
-// * `KW` - Kuwait
-// * `KG` - Kyrgyzstan
-// * `LA` - Laos
-// * `LV` - Latvia
-// * `LB` - Lebanon
-// * `LS` - Lesotho
-// * `LR` - Liberia
-// * `LY` - Libya
-// * `LI` - Liechtenstein
-// * `LT` - Lithuania
-// * `LU` - Luxembourg
-// * `MO` - Macao
-// * `MG` - Madagascar
-// * `MW` - Malawi
-// * `MY` - Malaysia
-// * `MV` - Maldives
-// * `ML` - Mali
-// * `MT` - Malta
-// * `MH` - Marshall Islands
-// * `MQ` - Martinique
-// * `MR` - Mauritania
-// * `MU` - Mauritius
-// * `YT` - Mayotte
-// * `MX` - Mexico
-// * `FM` - Micronesia (Federated States of)
-// * `MD` - Moldova
-// * `MC` - Monaco
-// * `MN` - Mongolia
-// * `ME` - Montenegro
-// * `MS` - Montserrat
-// * `MA` - Morocco
-// * `MZ` - Mozambique
-// * `MM` - Myanmar
-// * `NA` - Namibia
-// * `NR` - Nauru
-// * `NP` - Nepal
-// * `NL` - Netherlands
-// * `NC` - New Caledonia
-// * `NZ` - New Zealand
-// * `NI` - Nicaragua
-// * `NE` - Niger
-// * `NG` - Nigeria
-// * `NU` - Niue
-// * `NF` - Norfolk Island
-// * `KP` - North Korea
-// * `MK` - North Macedonia
-// * `MP` - Northern Mariana Islands
-// * `NO` - Norway
-// * `OM` - Oman
-// * `PK` - Pakistan
-// * `PW` - Palau
-// * `PS` - Palestine, State of
-// * `PA` - Panama
-// * `PG` - Papua New Guinea
-// * `PY` - Paraguay
-// * `PE` - Peru
-// * `PH` - Philippines
-// * `PN` - Pitcairn
-// * `PL` - Poland
-// * `PT` - Portugal
-// * `PR` - Puerto Rico
-// * `QA` - Qatar
-// * `RE` - Réunion
-// * `RO` - Romania
-// * `RU` - Russia
-// * `RW` - Rwanda
-// * `BL` - Saint Barthélemy
-// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-// * `KN` - Saint Kitts and Nevis
-// * `LC` - Saint Lucia
-// * `MF` - Saint Martin (French part)
-// * `PM` - Saint Pierre and Miquelon
-// * `VC` - Saint Vincent and the Grenadines
-// * `WS` - Samoa
-// * `SM` - San Marino
-// * `ST` - Sao Tome and Principe
-// * `SA` - Saudi Arabia
-// * `SN` - Senegal
-// * `RS` - Serbia
-// * `SC` - Seychelles
-// * `SL` - Sierra Leone
-// * `SG` - Singapore
-// * `SX` - Sint Maarten (Dutch part)
-// * `SK` - Slovakia
-// * `SI` - Slovenia
-// * `SB` - Solomon Islands
-// * `SO` - Somalia
-// * `ZA` - South Africa
-// * `GS` - South Georgia and the South Sandwich Islands
-// * `KR` - South Korea
-// * `SS` - South Sudan
-// * `ES` - Spain
-// * `LK` - Sri Lanka
-// * `SD` - Sudan
-// * `SR` - Suriname
-// * `SJ` - Svalbard and Jan Mayen
-// * `SE` - Sweden
-// * `CH` - Switzerland
-// * `SY` - Syria
-// * `TW` - Taiwan
-// * `TJ` - Tajikistan
-// * `TZ` - Tanzania
-// * `TH` - Thailand
-// * `TL` - Timor-Leste
-// * `TG` - Togo
-// * `TK` - Tokelau
-// * `TO` - Tonga
-// * `TT` - Trinidad and Tobago
-// * `TN` - Tunisia
-// * `TR` - Turkey
-// * `TM` - Turkmenistan
-// * `TC` - Turks and Caicos Islands
-// * `TV` - Tuvalu
-// * `UG` - Uganda
-// * `UA` - Ukraine
-// * `AE` - United Arab Emirates
-// * `GB` - United Kingdom
-// * `UM` - United States Minor Outlying Islands
-// * `US` - United States of America
-// * `UY` - Uruguay
-// * `UZ` - Uzbekistan
-// * `VU` - Vanuatu
-// * `VE` - Venezuela
-// * `VN` - Vietnam
-// * `VG` - Virgin Islands (British)
-// * `VI` - Virgin Islands (U.S.)
-// * `WF` - Wallis and Futuna
-// * `EH` - Western Sahara
-// * `YE` - Yemen
-// * `ZM` - Zambia
-// * `ZW` - Zimbabwe
+// - `AF` - Afghanistan
+// - `AX` - Åland Islands
+// - `AL` - Albania
+// - `DZ` - Algeria
+// - `AS` - American Samoa
+// - `AD` - Andorra
+// - `AO` - Angola
+// - `AI` - Anguilla
+// - `AQ` - Antarctica
+// - `AG` - Antigua and Barbuda
+// - `AR` - Argentina
+// - `AM` - Armenia
+// - `AW` - Aruba
+// - `AU` - Australia
+// - `AT` - Austria
+// - `AZ` - Azerbaijan
+// - `BS` - Bahamas
+// - `BH` - Bahrain
+// - `BD` - Bangladesh
+// - `BB` - Barbados
+// - `BY` - Belarus
+// - `BE` - Belgium
+// - `BZ` - Belize
+// - `BJ` - Benin
+// - `BM` - Bermuda
+// - `BT` - Bhutan
+// - `BO` - Bolivia
+// - `BQ` - Bonaire, Sint Eustatius and Saba
+// - `BA` - Bosnia and Herzegovina
+// - `BW` - Botswana
+// - `BV` - Bouvet Island
+// - `BR` - Brazil
+// - `IO` - British Indian Ocean Territory
+// - `BN` - Brunei
+// - `BG` - Bulgaria
+// - `BF` - Burkina Faso
+// - `BI` - Burundi
+// - `CV` - Cabo Verde
+// - `KH` - Cambodia
+// - `CM` - Cameroon
+// - `CA` - Canada
+// - `KY` - Cayman Islands
+// - `CF` - Central African Republic
+// - `TD` - Chad
+// - `CL` - Chile
+// - `CN` - China
+// - `CX` - Christmas Island
+// - `CC` - Cocos (Keeling) Islands
+// - `CO` - Colombia
+// - `KM` - Comoros
+// - `CG` - Congo
+// - `CD` - Congo (the Democratic Republic of the)
+// - `CK` - Cook Islands
+// - `CR` - Costa Rica
+// - `CI` - Côte d'Ivoire
+// - `HR` - Croatia
+// - `CU` - Cuba
+// - `CW` - Curaçao
+// - `CY` - Cyprus
+// - `CZ` - Czechia
+// - `DK` - Denmark
+// - `DJ` - Djibouti
+// - `DM` - Dominica
+// - `DO` - Dominican Republic
+// - `EC` - Ecuador
+// - `EG` - Egypt
+// - `SV` - El Salvador
+// - `GQ` - Equatorial Guinea
+// - `ER` - Eritrea
+// - `EE` - Estonia
+// - `SZ` - Eswatini
+// - `ET` - Ethiopia
+// - `FK` - Falkland Islands (Malvinas)
+// - `FO` - Faroe Islands
+// - `FJ` - Fiji
+// - `FI` - Finland
+// - `FR` - France
+// - `GF` - French Guiana
+// - `PF` - French Polynesia
+// - `TF` - French Southern Territories
+// - `GA` - Gabon
+// - `GM` - Gambia
+// - `GE` - Georgia
+// - `DE` - Germany
+// - `GH` - Ghana
+// - `GI` - Gibraltar
+// - `GR` - Greece
+// - `GL` - Greenland
+// - `GD` - Grenada
+// - `GP` - Guadeloupe
+// - `GU` - Guam
+// - `GT` - Guatemala
+// - `GG` - Guernsey
+// - `GN` - Guinea
+// - `GW` - Guinea-Bissau
+// - `GY` - Guyana
+// - `HT` - Haiti
+// - `HM` - Heard Island and McDonald Islands
+// - `VA` - Holy See
+// - `HN` - Honduras
+// - `HK` - Hong Kong
+// - `HU` - Hungary
+// - `IS` - Iceland
+// - `IN` - India
+// - `ID` - Indonesia
+// - `IR` - Iran
+// - `IQ` - Iraq
+// - `IE` - Ireland
+// - `IM` - Isle of Man
+// - `IL` - Israel
+// - `IT` - Italy
+// - `JM` - Jamaica
+// - `JP` - Japan
+// - `JE` - Jersey
+// - `JO` - Jordan
+// - `KZ` - Kazakhstan
+// - `KE` - Kenya
+// - `KI` - Kiribati
+// - `KW` - Kuwait
+// - `KG` - Kyrgyzstan
+// - `LA` - Laos
+// - `LV` - Latvia
+// - `LB` - Lebanon
+// - `LS` - Lesotho
+// - `LR` - Liberia
+// - `LY` - Libya
+// - `LI` - Liechtenstein
+// - `LT` - Lithuania
+// - `LU` - Luxembourg
+// - `MO` - Macao
+// - `MG` - Madagascar
+// - `MW` - Malawi
+// - `MY` - Malaysia
+// - `MV` - Maldives
+// - `ML` - Mali
+// - `MT` - Malta
+// - `MH` - Marshall Islands
+// - `MQ` - Martinique
+// - `MR` - Mauritania
+// - `MU` - Mauritius
+// - `YT` - Mayotte
+// - `MX` - Mexico
+// - `FM` - Micronesia (Federated States of)
+// - `MD` - Moldova
+// - `MC` - Monaco
+// - `MN` - Mongolia
+// - `ME` - Montenegro
+// - `MS` - Montserrat
+// - `MA` - Morocco
+// - `MZ` - Mozambique
+// - `MM` - Myanmar
+// - `NA` - Namibia
+// - `NR` - Nauru
+// - `NP` - Nepal
+// - `NL` - Netherlands
+// - `NC` - New Caledonia
+// - `NZ` - New Zealand
+// - `NI` - Nicaragua
+// - `NE` - Niger
+// - `NG` - Nigeria
+// - `NU` - Niue
+// - `NF` - Norfolk Island
+// - `KP` - North Korea
+// - `MK` - North Macedonia
+// - `MP` - Northern Mariana Islands
+// - `NO` - Norway
+// - `OM` - Oman
+// - `PK` - Pakistan
+// - `PW` - Palau
+// - `PS` - Palestine, State of
+// - `PA` - Panama
+// - `PG` - Papua New Guinea
+// - `PY` - Paraguay
+// - `PE` - Peru
+// - `PH` - Philippines
+// - `PN` - Pitcairn
+// - `PL` - Poland
+// - `PT` - Portugal
+// - `PR` - Puerto Rico
+// - `QA` - Qatar
+// - `RE` - Réunion
+// - `RO` - Romania
+// - `RU` - Russia
+// - `RW` - Rwanda
+// - `BL` - Saint Barthélemy
+// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+// - `KN` - Saint Kitts and Nevis
+// - `LC` - Saint Lucia
+// - `MF` - Saint Martin (French part)
+// - `PM` - Saint Pierre and Miquelon
+// - `VC` - Saint Vincent and the Grenadines
+// - `WS` - Samoa
+// - `SM` - San Marino
+// - `ST` - Sao Tome and Principe
+// - `SA` - Saudi Arabia
+// - `SN` - Senegal
+// - `RS` - Serbia
+// - `SC` - Seychelles
+// - `SL` - Sierra Leone
+// - `SG` - Singapore
+// - `SX` - Sint Maarten (Dutch part)
+// - `SK` - Slovakia
+// - `SI` - Slovenia
+// - `SB` - Solomon Islands
+// - `SO` - Somalia
+// - `ZA` - South Africa
+// - `GS` - South Georgia and the South Sandwich Islands
+// - `KR` - South Korea
+// - `SS` - South Sudan
+// - `ES` - Spain
+// - `LK` - Sri Lanka
+// - `SD` - Sudan
+// - `SR` - Suriname
+// - `SJ` - Svalbard and Jan Mayen
+// - `SE` - Sweden
+// - `CH` - Switzerland
+// - `SY` - Syria
+// - `TW` - Taiwan
+// - `TJ` - Tajikistan
+// - `TZ` - Tanzania
+// - `TH` - Thailand
+// - `TL` - Timor-Leste
+// - `TG` - Togo
+// - `TK` - Tokelau
+// - `TO` - Tonga
+// - `TT` - Trinidad and Tobago
+// - `TN` - Tunisia
+// - `TR` - Turkey
+// - `TM` - Turkmenistan
+// - `TC` - Turks and Caicos Islands
+// - `TV` - Tuvalu
+// - `UG` - Uganda
+// - `UA` - Ukraine
+// - `AE` - United Arab Emirates
+// - `GB` - United Kingdom
+// - `UM` - United States Minor Outlying Islands
+// - `US` - United States of America
+// - `UY` - Uruguay
+// - `UZ` - Uzbekistan
+// - `VU` - Vanuatu
+// - `VE` - Venezuela
+// - `VN` - Vietnam
+// - `VG` - Virgin Islands (British)
+// - `VI` - Virgin Islands (U.S.)
+// - `WF` - Wallis and Futuna
+// - `EH` - Western Sahara
+// - `YE` - Yemen
+// - `ZM` - Zambia
+// - `ZW` - Zimbabwe
 type AddressCountry struct {
 	typeName    string
 	CountryEnum CountryEnum
@@ -1002,9 +1179,13 @@ func (a *AddressCountry) Accept(visitor AddressCountryVisitor) error {
 }
 
 // # The Address Object
+//
 // ### Description
+//
 // The `Address` object is used to represent an entity's address.
+//
 // ### Usage Example
+//
 // TODO
 type AddressRequest struct {
 	// Line 1 of the address's street.
@@ -1019,269 +1200,294 @@ type AddressRequest struct {
 	PostalCode *string `json:"postal_code,omitempty"`
 	// The address's country.
 	//
-	// * `AF` - Afghanistan
-	// * `AX` - Åland Islands
-	// * `AL` - Albania
-	// * `DZ` - Algeria
-	// * `AS` - American Samoa
-	// * `AD` - Andorra
-	// * `AO` - Angola
-	// * `AI` - Anguilla
-	// * `AQ` - Antarctica
-	// * `AG` - Antigua and Barbuda
-	// * `AR` - Argentina
-	// * `AM` - Armenia
-	// * `AW` - Aruba
-	// * `AU` - Australia
-	// * `AT` - Austria
-	// * `AZ` - Azerbaijan
-	// * `BS` - Bahamas
-	// * `BH` - Bahrain
-	// * `BD` - Bangladesh
-	// * `BB` - Barbados
-	// * `BY` - Belarus
-	// * `BE` - Belgium
-	// * `BZ` - Belize
-	// * `BJ` - Benin
-	// * `BM` - Bermuda
-	// * `BT` - Bhutan
-	// * `BO` - Bolivia
-	// * `BQ` - Bonaire, Sint Eustatius and Saba
-	// * `BA` - Bosnia and Herzegovina
-	// * `BW` - Botswana
-	// * `BV` - Bouvet Island
-	// * `BR` - Brazil
-	// * `IO` - British Indian Ocean Territory
-	// * `BN` - Brunei
-	// * `BG` - Bulgaria
-	// * `BF` - Burkina Faso
-	// * `BI` - Burundi
-	// * `CV` - Cabo Verde
-	// * `KH` - Cambodia
-	// * `CM` - Cameroon
-	// * `CA` - Canada
-	// * `KY` - Cayman Islands
-	// * `CF` - Central African Republic
-	// * `TD` - Chad
-	// * `CL` - Chile
-	// * `CN` - China
-	// * `CX` - Christmas Island
-	// * `CC` - Cocos (Keeling) Islands
-	// * `CO` - Colombia
-	// * `KM` - Comoros
-	// * `CG` - Congo
-	// * `CD` - Congo (the Democratic Republic of the)
-	// * `CK` - Cook Islands
-	// * `CR` - Costa Rica
-	// * `CI` - Côte d'Ivoire
-	// * `HR` - Croatia
-	// * `CU` - Cuba
-	// * `CW` - Curaçao
-	// * `CY` - Cyprus
-	// * `CZ` - Czechia
-	// * `DK` - Denmark
-	// * `DJ` - Djibouti
-	// * `DM` - Dominica
-	// * `DO` - Dominican Republic
-	// * `EC` - Ecuador
-	// * `EG` - Egypt
-	// * `SV` - El Salvador
-	// * `GQ` - Equatorial Guinea
-	// * `ER` - Eritrea
-	// * `EE` - Estonia
-	// * `SZ` - Eswatini
-	// * `ET` - Ethiopia
-	// * `FK` - Falkland Islands (Malvinas)
-	// * `FO` - Faroe Islands
-	// * `FJ` - Fiji
-	// * `FI` - Finland
-	// * `FR` - France
-	// * `GF` - French Guiana
-	// * `PF` - French Polynesia
-	// * `TF` - French Southern Territories
-	// * `GA` - Gabon
-	// * `GM` - Gambia
-	// * `GE` - Georgia
-	// * `DE` - Germany
-	// * `GH` - Ghana
-	// * `GI` - Gibraltar
-	// * `GR` - Greece
-	// * `GL` - Greenland
-	// * `GD` - Grenada
-	// * `GP` - Guadeloupe
-	// * `GU` - Guam
-	// * `GT` - Guatemala
-	// * `GG` - Guernsey
-	// * `GN` - Guinea
-	// * `GW` - Guinea-Bissau
-	// * `GY` - Guyana
-	// * `HT` - Haiti
-	// * `HM` - Heard Island and McDonald Islands
-	// * `VA` - Holy See
-	// * `HN` - Honduras
-	// * `HK` - Hong Kong
-	// * `HU` - Hungary
-	// * `IS` - Iceland
-	// * `IN` - India
-	// * `ID` - Indonesia
-	// * `IR` - Iran
-	// * `IQ` - Iraq
-	// * `IE` - Ireland
-	// * `IM` - Isle of Man
-	// * `IL` - Israel
-	// * `IT` - Italy
-	// * `JM` - Jamaica
-	// * `JP` - Japan
-	// * `JE` - Jersey
-	// * `JO` - Jordan
-	// * `KZ` - Kazakhstan
-	// * `KE` - Kenya
-	// * `KI` - Kiribati
-	// * `KW` - Kuwait
-	// * `KG` - Kyrgyzstan
-	// * `LA` - Laos
-	// * `LV` - Latvia
-	// * `LB` - Lebanon
-	// * `LS` - Lesotho
-	// * `LR` - Liberia
-	// * `LY` - Libya
-	// * `LI` - Liechtenstein
-	// * `LT` - Lithuania
-	// * `LU` - Luxembourg
-	// * `MO` - Macao
-	// * `MG` - Madagascar
-	// * `MW` - Malawi
-	// * `MY` - Malaysia
-	// * `MV` - Maldives
-	// * `ML` - Mali
-	// * `MT` - Malta
-	// * `MH` - Marshall Islands
-	// * `MQ` - Martinique
-	// * `MR` - Mauritania
-	// * `MU` - Mauritius
-	// * `YT` - Mayotte
-	// * `MX` - Mexico
-	// * `FM` - Micronesia (Federated States of)
-	// * `MD` - Moldova
-	// * `MC` - Monaco
-	// * `MN` - Mongolia
-	// * `ME` - Montenegro
-	// * `MS` - Montserrat
-	// * `MA` - Morocco
-	// * `MZ` - Mozambique
-	// * `MM` - Myanmar
-	// * `NA` - Namibia
-	// * `NR` - Nauru
-	// * `NP` - Nepal
-	// * `NL` - Netherlands
-	// * `NC` - New Caledonia
-	// * `NZ` - New Zealand
-	// * `NI` - Nicaragua
-	// * `NE` - Niger
-	// * `NG` - Nigeria
-	// * `NU` - Niue
-	// * `NF` - Norfolk Island
-	// * `KP` - North Korea
-	// * `MK` - North Macedonia
-	// * `MP` - Northern Mariana Islands
-	// * `NO` - Norway
-	// * `OM` - Oman
-	// * `PK` - Pakistan
-	// * `PW` - Palau
-	// * `PS` - Palestine, State of
-	// * `PA` - Panama
-	// * `PG` - Papua New Guinea
-	// * `PY` - Paraguay
-	// * `PE` - Peru
-	// * `PH` - Philippines
-	// * `PN` - Pitcairn
-	// * `PL` - Poland
-	// * `PT` - Portugal
-	// * `PR` - Puerto Rico
-	// * `QA` - Qatar
-	// * `RE` - Réunion
-	// * `RO` - Romania
-	// * `RU` - Russia
-	// * `RW` - Rwanda
-	// * `BL` - Saint Barthélemy
-	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-	// * `KN` - Saint Kitts and Nevis
-	// * `LC` - Saint Lucia
-	// * `MF` - Saint Martin (French part)
-	// * `PM` - Saint Pierre and Miquelon
-	// * `VC` - Saint Vincent and the Grenadines
-	// * `WS` - Samoa
-	// * `SM` - San Marino
-	// * `ST` - Sao Tome and Principe
-	// * `SA` - Saudi Arabia
-	// * `SN` - Senegal
-	// * `RS` - Serbia
-	// * `SC` - Seychelles
-	// * `SL` - Sierra Leone
-	// * `SG` - Singapore
-	// * `SX` - Sint Maarten (Dutch part)
-	// * `SK` - Slovakia
-	// * `SI` - Slovenia
-	// * `SB` - Solomon Islands
-	// * `SO` - Somalia
-	// * `ZA` - South Africa
-	// * `GS` - South Georgia and the South Sandwich Islands
-	// * `KR` - South Korea
-	// * `SS` - South Sudan
-	// * `ES` - Spain
-	// * `LK` - Sri Lanka
-	// * `SD` - Sudan
-	// * `SR` - Suriname
-	// * `SJ` - Svalbard and Jan Mayen
-	// * `SE` - Sweden
-	// * `CH` - Switzerland
-	// * `SY` - Syria
-	// * `TW` - Taiwan
-	// * `TJ` - Tajikistan
-	// * `TZ` - Tanzania
-	// * `TH` - Thailand
-	// * `TL` - Timor-Leste
-	// * `TG` - Togo
-	// * `TK` - Tokelau
-	// * `TO` - Tonga
-	// * `TT` - Trinidad and Tobago
-	// * `TN` - Tunisia
-	// * `TR` - Turkey
-	// * `TM` - Turkmenistan
-	// * `TC` - Turks and Caicos Islands
-	// * `TV` - Tuvalu
-	// * `UG` - Uganda
-	// * `UA` - Ukraine
-	// * `AE` - United Arab Emirates
-	// * `GB` - United Kingdom
-	// * `UM` - United States Minor Outlying Islands
-	// * `US` - United States of America
-	// * `UY` - Uruguay
-	// * `UZ` - Uzbekistan
-	// * `VU` - Vanuatu
-	// * `VE` - Venezuela
-	// * `VN` - Vietnam
-	// * `VG` - Virgin Islands (British)
-	// * `VI` - Virgin Islands (U.S.)
-	// * `WF` - Wallis and Futuna
-	// * `EH` - Western Sahara
-	// * `YE` - Yemen
-	// * `ZM` - Zambia
-	// * `ZW` - Zimbabwe
+	// - `AF` - Afghanistan
+	// - `AX` - Åland Islands
+	// - `AL` - Albania
+	// - `DZ` - Algeria
+	// - `AS` - American Samoa
+	// - `AD` - Andorra
+	// - `AO` - Angola
+	// - `AI` - Anguilla
+	// - `AQ` - Antarctica
+	// - `AG` - Antigua and Barbuda
+	// - `AR` - Argentina
+	// - `AM` - Armenia
+	// - `AW` - Aruba
+	// - `AU` - Australia
+	// - `AT` - Austria
+	// - `AZ` - Azerbaijan
+	// - `BS` - Bahamas
+	// - `BH` - Bahrain
+	// - `BD` - Bangladesh
+	// - `BB` - Barbados
+	// - `BY` - Belarus
+	// - `BE` - Belgium
+	// - `BZ` - Belize
+	// - `BJ` - Benin
+	// - `BM` - Bermuda
+	// - `BT` - Bhutan
+	// - `BO` - Bolivia
+	// - `BQ` - Bonaire, Sint Eustatius and Saba
+	// - `BA` - Bosnia and Herzegovina
+	// - `BW` - Botswana
+	// - `BV` - Bouvet Island
+	// - `BR` - Brazil
+	// - `IO` - British Indian Ocean Territory
+	// - `BN` - Brunei
+	// - `BG` - Bulgaria
+	// - `BF` - Burkina Faso
+	// - `BI` - Burundi
+	// - `CV` - Cabo Verde
+	// - `KH` - Cambodia
+	// - `CM` - Cameroon
+	// - `CA` - Canada
+	// - `KY` - Cayman Islands
+	// - `CF` - Central African Republic
+	// - `TD` - Chad
+	// - `CL` - Chile
+	// - `CN` - China
+	// - `CX` - Christmas Island
+	// - `CC` - Cocos (Keeling) Islands
+	// - `CO` - Colombia
+	// - `KM` - Comoros
+	// - `CG` - Congo
+	// - `CD` - Congo (the Democratic Republic of the)
+	// - `CK` - Cook Islands
+	// - `CR` - Costa Rica
+	// - `CI` - Côte d'Ivoire
+	// - `HR` - Croatia
+	// - `CU` - Cuba
+	// - `CW` - Curaçao
+	// - `CY` - Cyprus
+	// - `CZ` - Czechia
+	// - `DK` - Denmark
+	// - `DJ` - Djibouti
+	// - `DM` - Dominica
+	// - `DO` - Dominican Republic
+	// - `EC` - Ecuador
+	// - `EG` - Egypt
+	// - `SV` - El Salvador
+	// - `GQ` - Equatorial Guinea
+	// - `ER` - Eritrea
+	// - `EE` - Estonia
+	// - `SZ` - Eswatini
+	// - `ET` - Ethiopia
+	// - `FK` - Falkland Islands (Malvinas)
+	// - `FO` - Faroe Islands
+	// - `FJ` - Fiji
+	// - `FI` - Finland
+	// - `FR` - France
+	// - `GF` - French Guiana
+	// - `PF` - French Polynesia
+	// - `TF` - French Southern Territories
+	// - `GA` - Gabon
+	// - `GM` - Gambia
+	// - `GE` - Georgia
+	// - `DE` - Germany
+	// - `GH` - Ghana
+	// - `GI` - Gibraltar
+	// - `GR` - Greece
+	// - `GL` - Greenland
+	// - `GD` - Grenada
+	// - `GP` - Guadeloupe
+	// - `GU` - Guam
+	// - `GT` - Guatemala
+	// - `GG` - Guernsey
+	// - `GN` - Guinea
+	// - `GW` - Guinea-Bissau
+	// - `GY` - Guyana
+	// - `HT` - Haiti
+	// - `HM` - Heard Island and McDonald Islands
+	// - `VA` - Holy See
+	// - `HN` - Honduras
+	// - `HK` - Hong Kong
+	// - `HU` - Hungary
+	// - `IS` - Iceland
+	// - `IN` - India
+	// - `ID` - Indonesia
+	// - `IR` - Iran
+	// - `IQ` - Iraq
+	// - `IE` - Ireland
+	// - `IM` - Isle of Man
+	// - `IL` - Israel
+	// - `IT` - Italy
+	// - `JM` - Jamaica
+	// - `JP` - Japan
+	// - `JE` - Jersey
+	// - `JO` - Jordan
+	// - `KZ` - Kazakhstan
+	// - `KE` - Kenya
+	// - `KI` - Kiribati
+	// - `KW` - Kuwait
+	// - `KG` - Kyrgyzstan
+	// - `LA` - Laos
+	// - `LV` - Latvia
+	// - `LB` - Lebanon
+	// - `LS` - Lesotho
+	// - `LR` - Liberia
+	// - `LY` - Libya
+	// - `LI` - Liechtenstein
+	// - `LT` - Lithuania
+	// - `LU` - Luxembourg
+	// - `MO` - Macao
+	// - `MG` - Madagascar
+	// - `MW` - Malawi
+	// - `MY` - Malaysia
+	// - `MV` - Maldives
+	// - `ML` - Mali
+	// - `MT` - Malta
+	// - `MH` - Marshall Islands
+	// - `MQ` - Martinique
+	// - `MR` - Mauritania
+	// - `MU` - Mauritius
+	// - `YT` - Mayotte
+	// - `MX` - Mexico
+	// - `FM` - Micronesia (Federated States of)
+	// - `MD` - Moldova
+	// - `MC` - Monaco
+	// - `MN` - Mongolia
+	// - `ME` - Montenegro
+	// - `MS` - Montserrat
+	// - `MA` - Morocco
+	// - `MZ` - Mozambique
+	// - `MM` - Myanmar
+	// - `NA` - Namibia
+	// - `NR` - Nauru
+	// - `NP` - Nepal
+	// - `NL` - Netherlands
+	// - `NC` - New Caledonia
+	// - `NZ` - New Zealand
+	// - `NI` - Nicaragua
+	// - `NE` - Niger
+	// - `NG` - Nigeria
+	// - `NU` - Niue
+	// - `NF` - Norfolk Island
+	// - `KP` - North Korea
+	// - `MK` - North Macedonia
+	// - `MP` - Northern Mariana Islands
+	// - `NO` - Norway
+	// - `OM` - Oman
+	// - `PK` - Pakistan
+	// - `PW` - Palau
+	// - `PS` - Palestine, State of
+	// - `PA` - Panama
+	// - `PG` - Papua New Guinea
+	// - `PY` - Paraguay
+	// - `PE` - Peru
+	// - `PH` - Philippines
+	// - `PN` - Pitcairn
+	// - `PL` - Poland
+	// - `PT` - Portugal
+	// - `PR` - Puerto Rico
+	// - `QA` - Qatar
+	// - `RE` - Réunion
+	// - `RO` - Romania
+	// - `RU` - Russia
+	// - `RW` - Rwanda
+	// - `BL` - Saint Barthélemy
+	// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+	// - `KN` - Saint Kitts and Nevis
+	// - `LC` - Saint Lucia
+	// - `MF` - Saint Martin (French part)
+	// - `PM` - Saint Pierre and Miquelon
+	// - `VC` - Saint Vincent and the Grenadines
+	// - `WS` - Samoa
+	// - `SM` - San Marino
+	// - `ST` - Sao Tome and Principe
+	// - `SA` - Saudi Arabia
+	// - `SN` - Senegal
+	// - `RS` - Serbia
+	// - `SC` - Seychelles
+	// - `SL` - Sierra Leone
+	// - `SG` - Singapore
+	// - `SX` - Sint Maarten (Dutch part)
+	// - `SK` - Slovakia
+	// - `SI` - Slovenia
+	// - `SB` - Solomon Islands
+	// - `SO` - Somalia
+	// - `ZA` - South Africa
+	// - `GS` - South Georgia and the South Sandwich Islands
+	// - `KR` - South Korea
+	// - `SS` - South Sudan
+	// - `ES` - Spain
+	// - `LK` - Sri Lanka
+	// - `SD` - Sudan
+	// - `SR` - Suriname
+	// - `SJ` - Svalbard and Jan Mayen
+	// - `SE` - Sweden
+	// - `CH` - Switzerland
+	// - `SY` - Syria
+	// - `TW` - Taiwan
+	// - `TJ` - Tajikistan
+	// - `TZ` - Tanzania
+	// - `TH` - Thailand
+	// - `TL` - Timor-Leste
+	// - `TG` - Togo
+	// - `TK` - Tokelau
+	// - `TO` - Tonga
+	// - `TT` - Trinidad and Tobago
+	// - `TN` - Tunisia
+	// - `TR` - Turkey
+	// - `TM` - Turkmenistan
+	// - `TC` - Turks and Caicos Islands
+	// - `TV` - Tuvalu
+	// - `UG` - Uganda
+	// - `UA` - Ukraine
+	// - `AE` - United Arab Emirates
+	// - `GB` - United Kingdom
+	// - `UM` - United States Minor Outlying Islands
+	// - `US` - United States of America
+	// - `UY` - Uruguay
+	// - `UZ` - Uzbekistan
+	// - `VU` - Vanuatu
+	// - `VE` - Venezuela
+	// - `VN` - Vietnam
+	// - `VG` - Virgin Islands (British)
+	// - `VI` - Virgin Islands (U.S.)
+	// - `WF` - Wallis and Futuna
+	// - `EH` - Western Sahara
+	// - `YE` - Yemen
+	// - `ZM` - Zambia
+	// - `ZW` - Zimbabwe
 	Country *AddressRequestCountry `json:"country,omitempty"`
 	// The address type.
 	//
-	// * `BILLING` - BILLING
-	// * `SHIPPING` - SHIPPING
+	// - `BILLING` - BILLING
+	// - `SHIPPING` - SHIPPING
 	AddressType         *AddressRequestAddressType `json:"address_type,omitempty"`
-	IntegrationParams   map[string]any             `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any             `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}     `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}     `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AddressRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler AddressRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AddressRequest(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AddressRequest) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // The address type.
 //
-// * `BILLING` - BILLING
-// * `SHIPPING` - SHIPPING
+// - `BILLING` - BILLING
+// - `SHIPPING` - SHIPPING
 type AddressRequestAddressType struct {
 	typeName        string
 	AddressTypeEnum AddressTypeEnum
@@ -1341,255 +1547,255 @@ func (a *AddressRequestAddressType) Accept(visitor AddressRequestAddressTypeVisi
 
 // The address's country.
 //
-// * `AF` - Afghanistan
-// * `AX` - Åland Islands
-// * `AL` - Albania
-// * `DZ` - Algeria
-// * `AS` - American Samoa
-// * `AD` - Andorra
-// * `AO` - Angola
-// * `AI` - Anguilla
-// * `AQ` - Antarctica
-// * `AG` - Antigua and Barbuda
-// * `AR` - Argentina
-// * `AM` - Armenia
-// * `AW` - Aruba
-// * `AU` - Australia
-// * `AT` - Austria
-// * `AZ` - Azerbaijan
-// * `BS` - Bahamas
-// * `BH` - Bahrain
-// * `BD` - Bangladesh
-// * `BB` - Barbados
-// * `BY` - Belarus
-// * `BE` - Belgium
-// * `BZ` - Belize
-// * `BJ` - Benin
-// * `BM` - Bermuda
-// * `BT` - Bhutan
-// * `BO` - Bolivia
-// * `BQ` - Bonaire, Sint Eustatius and Saba
-// * `BA` - Bosnia and Herzegovina
-// * `BW` - Botswana
-// * `BV` - Bouvet Island
-// * `BR` - Brazil
-// * `IO` - British Indian Ocean Territory
-// * `BN` - Brunei
-// * `BG` - Bulgaria
-// * `BF` - Burkina Faso
-// * `BI` - Burundi
-// * `CV` - Cabo Verde
-// * `KH` - Cambodia
-// * `CM` - Cameroon
-// * `CA` - Canada
-// * `KY` - Cayman Islands
-// * `CF` - Central African Republic
-// * `TD` - Chad
-// * `CL` - Chile
-// * `CN` - China
-// * `CX` - Christmas Island
-// * `CC` - Cocos (Keeling) Islands
-// * `CO` - Colombia
-// * `KM` - Comoros
-// * `CG` - Congo
-// * `CD` - Congo (the Democratic Republic of the)
-// * `CK` - Cook Islands
-// * `CR` - Costa Rica
-// * `CI` - Côte d'Ivoire
-// * `HR` - Croatia
-// * `CU` - Cuba
-// * `CW` - Curaçao
-// * `CY` - Cyprus
-// * `CZ` - Czechia
-// * `DK` - Denmark
-// * `DJ` - Djibouti
-// * `DM` - Dominica
-// * `DO` - Dominican Republic
-// * `EC` - Ecuador
-// * `EG` - Egypt
-// * `SV` - El Salvador
-// * `GQ` - Equatorial Guinea
-// * `ER` - Eritrea
-// * `EE` - Estonia
-// * `SZ` - Eswatini
-// * `ET` - Ethiopia
-// * `FK` - Falkland Islands (Malvinas)
-// * `FO` - Faroe Islands
-// * `FJ` - Fiji
-// * `FI` - Finland
-// * `FR` - France
-// * `GF` - French Guiana
-// * `PF` - French Polynesia
-// * `TF` - French Southern Territories
-// * `GA` - Gabon
-// * `GM` - Gambia
-// * `GE` - Georgia
-// * `DE` - Germany
-// * `GH` - Ghana
-// * `GI` - Gibraltar
-// * `GR` - Greece
-// * `GL` - Greenland
-// * `GD` - Grenada
-// * `GP` - Guadeloupe
-// * `GU` - Guam
-// * `GT` - Guatemala
-// * `GG` - Guernsey
-// * `GN` - Guinea
-// * `GW` - Guinea-Bissau
-// * `GY` - Guyana
-// * `HT` - Haiti
-// * `HM` - Heard Island and McDonald Islands
-// * `VA` - Holy See
-// * `HN` - Honduras
-// * `HK` - Hong Kong
-// * `HU` - Hungary
-// * `IS` - Iceland
-// * `IN` - India
-// * `ID` - Indonesia
-// * `IR` - Iran
-// * `IQ` - Iraq
-// * `IE` - Ireland
-// * `IM` - Isle of Man
-// * `IL` - Israel
-// * `IT` - Italy
-// * `JM` - Jamaica
-// * `JP` - Japan
-// * `JE` - Jersey
-// * `JO` - Jordan
-// * `KZ` - Kazakhstan
-// * `KE` - Kenya
-// * `KI` - Kiribati
-// * `KW` - Kuwait
-// * `KG` - Kyrgyzstan
-// * `LA` - Laos
-// * `LV` - Latvia
-// * `LB` - Lebanon
-// * `LS` - Lesotho
-// * `LR` - Liberia
-// * `LY` - Libya
-// * `LI` - Liechtenstein
-// * `LT` - Lithuania
-// * `LU` - Luxembourg
-// * `MO` - Macao
-// * `MG` - Madagascar
-// * `MW` - Malawi
-// * `MY` - Malaysia
-// * `MV` - Maldives
-// * `ML` - Mali
-// * `MT` - Malta
-// * `MH` - Marshall Islands
-// * `MQ` - Martinique
-// * `MR` - Mauritania
-// * `MU` - Mauritius
-// * `YT` - Mayotte
-// * `MX` - Mexico
-// * `FM` - Micronesia (Federated States of)
-// * `MD` - Moldova
-// * `MC` - Monaco
-// * `MN` - Mongolia
-// * `ME` - Montenegro
-// * `MS` - Montserrat
-// * `MA` - Morocco
-// * `MZ` - Mozambique
-// * `MM` - Myanmar
-// * `NA` - Namibia
-// * `NR` - Nauru
-// * `NP` - Nepal
-// * `NL` - Netherlands
-// * `NC` - New Caledonia
-// * `NZ` - New Zealand
-// * `NI` - Nicaragua
-// * `NE` - Niger
-// * `NG` - Nigeria
-// * `NU` - Niue
-// * `NF` - Norfolk Island
-// * `KP` - North Korea
-// * `MK` - North Macedonia
-// * `MP` - Northern Mariana Islands
-// * `NO` - Norway
-// * `OM` - Oman
-// * `PK` - Pakistan
-// * `PW` - Palau
-// * `PS` - Palestine, State of
-// * `PA` - Panama
-// * `PG` - Papua New Guinea
-// * `PY` - Paraguay
-// * `PE` - Peru
-// * `PH` - Philippines
-// * `PN` - Pitcairn
-// * `PL` - Poland
-// * `PT` - Portugal
-// * `PR` - Puerto Rico
-// * `QA` - Qatar
-// * `RE` - Réunion
-// * `RO` - Romania
-// * `RU` - Russia
-// * `RW` - Rwanda
-// * `BL` - Saint Barthélemy
-// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-// * `KN` - Saint Kitts and Nevis
-// * `LC` - Saint Lucia
-// * `MF` - Saint Martin (French part)
-// * `PM` - Saint Pierre and Miquelon
-// * `VC` - Saint Vincent and the Grenadines
-// * `WS` - Samoa
-// * `SM` - San Marino
-// * `ST` - Sao Tome and Principe
-// * `SA` - Saudi Arabia
-// * `SN` - Senegal
-// * `RS` - Serbia
-// * `SC` - Seychelles
-// * `SL` - Sierra Leone
-// * `SG` - Singapore
-// * `SX` - Sint Maarten (Dutch part)
-// * `SK` - Slovakia
-// * `SI` - Slovenia
-// * `SB` - Solomon Islands
-// * `SO` - Somalia
-// * `ZA` - South Africa
-// * `GS` - South Georgia and the South Sandwich Islands
-// * `KR` - South Korea
-// * `SS` - South Sudan
-// * `ES` - Spain
-// * `LK` - Sri Lanka
-// * `SD` - Sudan
-// * `SR` - Suriname
-// * `SJ` - Svalbard and Jan Mayen
-// * `SE` - Sweden
-// * `CH` - Switzerland
-// * `SY` - Syria
-// * `TW` - Taiwan
-// * `TJ` - Tajikistan
-// * `TZ` - Tanzania
-// * `TH` - Thailand
-// * `TL` - Timor-Leste
-// * `TG` - Togo
-// * `TK` - Tokelau
-// * `TO` - Tonga
-// * `TT` - Trinidad and Tobago
-// * `TN` - Tunisia
-// * `TR` - Turkey
-// * `TM` - Turkmenistan
-// * `TC` - Turks and Caicos Islands
-// * `TV` - Tuvalu
-// * `UG` - Uganda
-// * `UA` - Ukraine
-// * `AE` - United Arab Emirates
-// * `GB` - United Kingdom
-// * `UM` - United States Minor Outlying Islands
-// * `US` - United States of America
-// * `UY` - Uruguay
-// * `UZ` - Uzbekistan
-// * `VU` - Vanuatu
-// * `VE` - Venezuela
-// * `VN` - Vietnam
-// * `VG` - Virgin Islands (British)
-// * `VI` - Virgin Islands (U.S.)
-// * `WF` - Wallis and Futuna
-// * `EH` - Western Sahara
-// * `YE` - Yemen
-// * `ZM` - Zambia
-// * `ZW` - Zimbabwe
+// - `AF` - Afghanistan
+// - `AX` - Åland Islands
+// - `AL` - Albania
+// - `DZ` - Algeria
+// - `AS` - American Samoa
+// - `AD` - Andorra
+// - `AO` - Angola
+// - `AI` - Anguilla
+// - `AQ` - Antarctica
+// - `AG` - Antigua and Barbuda
+// - `AR` - Argentina
+// - `AM` - Armenia
+// - `AW` - Aruba
+// - `AU` - Australia
+// - `AT` - Austria
+// - `AZ` - Azerbaijan
+// - `BS` - Bahamas
+// - `BH` - Bahrain
+// - `BD` - Bangladesh
+// - `BB` - Barbados
+// - `BY` - Belarus
+// - `BE` - Belgium
+// - `BZ` - Belize
+// - `BJ` - Benin
+// - `BM` - Bermuda
+// - `BT` - Bhutan
+// - `BO` - Bolivia
+// - `BQ` - Bonaire, Sint Eustatius and Saba
+// - `BA` - Bosnia and Herzegovina
+// - `BW` - Botswana
+// - `BV` - Bouvet Island
+// - `BR` - Brazil
+// - `IO` - British Indian Ocean Territory
+// - `BN` - Brunei
+// - `BG` - Bulgaria
+// - `BF` - Burkina Faso
+// - `BI` - Burundi
+// - `CV` - Cabo Verde
+// - `KH` - Cambodia
+// - `CM` - Cameroon
+// - `CA` - Canada
+// - `KY` - Cayman Islands
+// - `CF` - Central African Republic
+// - `TD` - Chad
+// - `CL` - Chile
+// - `CN` - China
+// - `CX` - Christmas Island
+// - `CC` - Cocos (Keeling) Islands
+// - `CO` - Colombia
+// - `KM` - Comoros
+// - `CG` - Congo
+// - `CD` - Congo (the Democratic Republic of the)
+// - `CK` - Cook Islands
+// - `CR` - Costa Rica
+// - `CI` - Côte d'Ivoire
+// - `HR` - Croatia
+// - `CU` - Cuba
+// - `CW` - Curaçao
+// - `CY` - Cyprus
+// - `CZ` - Czechia
+// - `DK` - Denmark
+// - `DJ` - Djibouti
+// - `DM` - Dominica
+// - `DO` - Dominican Republic
+// - `EC` - Ecuador
+// - `EG` - Egypt
+// - `SV` - El Salvador
+// - `GQ` - Equatorial Guinea
+// - `ER` - Eritrea
+// - `EE` - Estonia
+// - `SZ` - Eswatini
+// - `ET` - Ethiopia
+// - `FK` - Falkland Islands (Malvinas)
+// - `FO` - Faroe Islands
+// - `FJ` - Fiji
+// - `FI` - Finland
+// - `FR` - France
+// - `GF` - French Guiana
+// - `PF` - French Polynesia
+// - `TF` - French Southern Territories
+// - `GA` - Gabon
+// - `GM` - Gambia
+// - `GE` - Georgia
+// - `DE` - Germany
+// - `GH` - Ghana
+// - `GI` - Gibraltar
+// - `GR` - Greece
+// - `GL` - Greenland
+// - `GD` - Grenada
+// - `GP` - Guadeloupe
+// - `GU` - Guam
+// - `GT` - Guatemala
+// - `GG` - Guernsey
+// - `GN` - Guinea
+// - `GW` - Guinea-Bissau
+// - `GY` - Guyana
+// - `HT` - Haiti
+// - `HM` - Heard Island and McDonald Islands
+// - `VA` - Holy See
+// - `HN` - Honduras
+// - `HK` - Hong Kong
+// - `HU` - Hungary
+// - `IS` - Iceland
+// - `IN` - India
+// - `ID` - Indonesia
+// - `IR` - Iran
+// - `IQ` - Iraq
+// - `IE` - Ireland
+// - `IM` - Isle of Man
+// - `IL` - Israel
+// - `IT` - Italy
+// - `JM` - Jamaica
+// - `JP` - Japan
+// - `JE` - Jersey
+// - `JO` - Jordan
+// - `KZ` - Kazakhstan
+// - `KE` - Kenya
+// - `KI` - Kiribati
+// - `KW` - Kuwait
+// - `KG` - Kyrgyzstan
+// - `LA` - Laos
+// - `LV` - Latvia
+// - `LB` - Lebanon
+// - `LS` - Lesotho
+// - `LR` - Liberia
+// - `LY` - Libya
+// - `LI` - Liechtenstein
+// - `LT` - Lithuania
+// - `LU` - Luxembourg
+// - `MO` - Macao
+// - `MG` - Madagascar
+// - `MW` - Malawi
+// - `MY` - Malaysia
+// - `MV` - Maldives
+// - `ML` - Mali
+// - `MT` - Malta
+// - `MH` - Marshall Islands
+// - `MQ` - Martinique
+// - `MR` - Mauritania
+// - `MU` - Mauritius
+// - `YT` - Mayotte
+// - `MX` - Mexico
+// - `FM` - Micronesia (Federated States of)
+// - `MD` - Moldova
+// - `MC` - Monaco
+// - `MN` - Mongolia
+// - `ME` - Montenegro
+// - `MS` - Montserrat
+// - `MA` - Morocco
+// - `MZ` - Mozambique
+// - `MM` - Myanmar
+// - `NA` - Namibia
+// - `NR` - Nauru
+// - `NP` - Nepal
+// - `NL` - Netherlands
+// - `NC` - New Caledonia
+// - `NZ` - New Zealand
+// - `NI` - Nicaragua
+// - `NE` - Niger
+// - `NG` - Nigeria
+// - `NU` - Niue
+// - `NF` - Norfolk Island
+// - `KP` - North Korea
+// - `MK` - North Macedonia
+// - `MP` - Northern Mariana Islands
+// - `NO` - Norway
+// - `OM` - Oman
+// - `PK` - Pakistan
+// - `PW` - Palau
+// - `PS` - Palestine, State of
+// - `PA` - Panama
+// - `PG` - Papua New Guinea
+// - `PY` - Paraguay
+// - `PE` - Peru
+// - `PH` - Philippines
+// - `PN` - Pitcairn
+// - `PL` - Poland
+// - `PT` - Portugal
+// - `PR` - Puerto Rico
+// - `QA` - Qatar
+// - `RE` - Réunion
+// - `RO` - Romania
+// - `RU` - Russia
+// - `RW` - Rwanda
+// - `BL` - Saint Barthélemy
+// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+// - `KN` - Saint Kitts and Nevis
+// - `LC` - Saint Lucia
+// - `MF` - Saint Martin (French part)
+// - `PM` - Saint Pierre and Miquelon
+// - `VC` - Saint Vincent and the Grenadines
+// - `WS` - Samoa
+// - `SM` - San Marino
+// - `ST` - Sao Tome and Principe
+// - `SA` - Saudi Arabia
+// - `SN` - Senegal
+// - `RS` - Serbia
+// - `SC` - Seychelles
+// - `SL` - Sierra Leone
+// - `SG` - Singapore
+// - `SX` - Sint Maarten (Dutch part)
+// - `SK` - Slovakia
+// - `SI` - Slovenia
+// - `SB` - Solomon Islands
+// - `SO` - Somalia
+// - `ZA` - South Africa
+// - `GS` - South Georgia and the South Sandwich Islands
+// - `KR` - South Korea
+// - `SS` - South Sudan
+// - `ES` - Spain
+// - `LK` - Sri Lanka
+// - `SD` - Sudan
+// - `SR` - Suriname
+// - `SJ` - Svalbard and Jan Mayen
+// - `SE` - Sweden
+// - `CH` - Switzerland
+// - `SY` - Syria
+// - `TW` - Taiwan
+// - `TJ` - Tajikistan
+// - `TZ` - Tanzania
+// - `TH` - Thailand
+// - `TL` - Timor-Leste
+// - `TG` - Togo
+// - `TK` - Tokelau
+// - `TO` - Tonga
+// - `TT` - Trinidad and Tobago
+// - `TN` - Tunisia
+// - `TR` - Turkey
+// - `TM` - Turkmenistan
+// - `TC` - Turks and Caicos Islands
+// - `TV` - Tuvalu
+// - `UG` - Uganda
+// - `UA` - Ukraine
+// - `AE` - United Arab Emirates
+// - `GB` - United Kingdom
+// - `UM` - United States Minor Outlying Islands
+// - `US` - United States of America
+// - `UY` - Uruguay
+// - `UZ` - Uzbekistan
+// - `VU` - Vanuatu
+// - `VE` - Venezuela
+// - `VN` - Vietnam
+// - `VG` - Virgin Islands (British)
+// - `VI` - Virgin Islands (U.S.)
+// - `WF` - Wallis and Futuna
+// - `EH` - Western Sahara
+// - `YE` - Yemen
+// - `ZM` - Zambia
+// - `ZW` - Zimbabwe
 type AddressRequestCountry struct {
 	typeName    string
 	CountryEnum CountryEnum
@@ -1647,58 +1853,71 @@ func (a *AddressRequestCountry) Accept(visitor AddressRequestCountryVisitor) err
 	}
 }
 
-// * `BILLING` - BILLING
-// * `SHIPPING` - SHIPPING
-type AddressTypeEnum uint
+// - `BILLING` - BILLING
+// - `SHIPPING` - SHIPPING
+type AddressTypeEnum string
 
 const (
-	AddressTypeEnumBilling AddressTypeEnum = iota + 1
-	AddressTypeEnumShipping
+	AddressTypeEnumBilling  AddressTypeEnum = "BILLING"
+	AddressTypeEnumShipping AddressTypeEnum = "SHIPPING"
 )
 
-func (a AddressTypeEnum) String() string {
-	switch a {
-	default:
-		return strconv.Itoa(int(a))
-	case AddressTypeEnumBilling:
-		return "BILLING"
-	case AddressTypeEnumShipping:
-		return "SHIPPING"
-	}
-}
-
-func (a AddressTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", a.String())), nil
-}
-
-func (a *AddressTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewAddressTypeEnumFromString(s string) (AddressTypeEnum, error) {
+	switch s {
 	case "BILLING":
-		value := AddressTypeEnumBilling
-		*a = value
+		return AddressTypeEnumBilling, nil
 	case "SHIPPING":
-		value := AddressTypeEnumShipping
-		*a = value
+		return AddressTypeEnumShipping, nil
 	}
-	return nil
+	var t AddressTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AddressTypeEnum) Ptr() *AddressTypeEnum {
+	return &a
 }
 
 // # The Association Object
+//
 // ### Description
+//
 // The `Association` record refers to an instance of an Association Type.
+//
 // ### Usage Example
+//
 // TODO
 type Association struct {
-	SourceObject    map[string]any              `json:"source_object,omitempty"`
-	TargetObject    map[string]any              `json:"target_object,omitempty"`
+	SourceObject    map[string]interface{}      `json:"source_object,omitempty"`
+	TargetObject    map[string]interface{}      `json:"target_object,omitempty"`
 	AssociationType *AssociationAssociationType `json:"association_type,omitempty"`
 	CreatedAt       *time.Time                  `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *Association) UnmarshalJSON(data []byte) error {
+	type unmarshaler Association
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = Association(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *Association) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AssociationAssociationType struct {
@@ -1764,15 +1983,44 @@ type AssociationSubType struct {
 	CreatedAt  *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AssociationSubType) UnmarshalJSON(data []byte) error {
+	type unmarshaler AssociationSubType
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AssociationSubType(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AssociationSubType) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // # The AssociationType Object
+//
 // ### Description
+//
 // The `Association Type` object represents the relationship between two objects.
+//
 // ### Usage Example
+//
 // TODO
 type AssociationType struct {
-	SourceObjectClass   map[string]any              `json:"source_object_class,omitempty"`
+	SourceObjectClass   map[string]interface{}      `json:"source_object_class,omitempty"`
 	TargetObjectClasses []*AssociationSubType       `json:"target_object_classes,omitempty"`
 	RemoteKeyName       *string                     `json:"remote_key_name,omitempty"`
 	DisplayName         *string                     `json:"display_name,omitempty"`
@@ -1784,6 +2032,31 @@ type AssociationType struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AssociationType) UnmarshalJSON(data []byte) error {
+	type unmarshaler AssociationType
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AssociationType(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AssociationType) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AssociationTypeCardinality struct {
@@ -1850,10 +2123,60 @@ type AssociationTypeRequestRequest struct {
 	DisplayName         *string                          `json:"display_name,omitempty"`
 	Cardinality         *CardinalityEnum                 `json:"cardinality,omitempty"`
 	IsRequired          *bool                            `json:"is_required,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AssociationTypeRequestRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler AssociationTypeRequestRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AssociationTypeRequestRequest(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AssociationTypeRequestRequest) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AsyncPassthroughReciept) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncPassthroughReciept
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncPassthroughReciept(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncPassthroughReciept) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 type AuditLogEvent struct {
@@ -1864,83 +2187,108 @@ type AuditLogEvent struct {
 	UserEmail *string `json:"user_email,omitempty"`
 	// Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 	//
-	// * `ADMIN` - ADMIN
-	// * `DEVELOPER` - DEVELOPER
-	// * `MEMBER` - MEMBER
-	// * `API` - API
-	// * `SYSTEM` - SYSTEM
-	// * `MERGE_TEAM` - MERGE_TEAM
+	// - `ADMIN` - ADMIN
+	// - `DEVELOPER` - DEVELOPER
+	// - `MEMBER` - MEMBER
+	// - `API` - API
+	// - `SYSTEM` - SYSTEM
+	// - `MERGE_TEAM` - MERGE_TEAM
 	Role      *AuditLogEventRole `json:"role,omitempty"`
 	IpAddress string             `json:"ip_address"`
 	// Designates the type of event that occurred.
 	//
-	// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-	// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-	// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-	// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-	// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-	// * `INVITED_USER` - INVITED_USER
-	// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-	// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-	// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-	// * `CREATED_DESTINATION` - CREATED_DESTINATION
-	// * `DELETED_DESTINATION` - DELETED_DESTINATION
-	// * `CHANGED_SCOPES` - CHANGED_SCOPES
-	// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-	// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-	// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-	// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-	// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-	// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-	// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-	// * `RESET_PASSWORD` - RESET_PASSWORD
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-	// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-	// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-	// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-	// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+	// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+	// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+	// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+	// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+	// - `INVITED_USER` - INVITED_USER
+	// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+	// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+	// - `CREATED_DESTINATION` - CREATED_DESTINATION
+	// - `DELETED_DESTINATION` - DELETED_DESTINATION
+	// - `CHANGED_SCOPES` - CHANGED_SCOPES
+	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+	// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+	// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+	// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+	// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+	// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+	// - `RESET_PASSWORD` - RESET_PASSWORD
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+	// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+	// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AuditLogEvent) UnmarshalJSON(data []byte) error {
+	type unmarshaler AuditLogEvent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AuditLogEvent(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AuditLogEvent) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
 }
 
 // Designates the type of event that occurred.
 //
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -2000,12 +2348,12 @@ func (a *AuditLogEventEventType) Accept(visitor AuditLogEventEventTypeVisitor) e
 
 // Designates the role of the user (or SYSTEM/API if action not taken by a user) at the time of this Event occurring.
 //
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
 type AuditLogEventRole struct {
 	typeName string
 	RoleEnum RoleEnum
@@ -2064,225 +2412,194 @@ func (a *AuditLogEventRole) Accept(visitor AuditLogEventRoleVisitor) error {
 }
 
 // # The AvailableActions Object
+//
 // ### Description
+//
 // The `Activity` object is used to see all available model/operation combinations for an integration.
 //
 // ### Usage Example
+//
 // Fetch all the actions available for the `Zenefits` integration.
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration,omitempty"`
 	PassthroughAvailable     bool                `json:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `ONE_TO_ONE` - ONE_TO_ONE
-// * `MANY_TO_ONE` - MANY_TO_ONE
-// * `MANY_TO_MANY` - MANY_TO_MANY
-// * `ONE_TO_MANY` - ONE_TO_MANY
-type CardinalityEnum uint
-
-const (
-	CardinalityEnumOneToOne CardinalityEnum = iota + 1
-	CardinalityEnumManyToOne
-	CardinalityEnumManyToMany
-	CardinalityEnumOneToMany
-)
-
-func (c CardinalityEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CardinalityEnumOneToOne:
-		return "ONE_TO_ONE"
-	case CardinalityEnumManyToOne:
-		return "MANY_TO_ONE"
-	case CardinalityEnumManyToMany:
-		return "MANY_TO_MANY"
-	case CardinalityEnumOneToMany:
-		return "ONE_TO_MANY"
-	}
-}
-
-func (c CardinalityEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CardinalityEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (a *AvailableActions) UnmarshalJSON(data []byte) error {
+	type unmarshaler AvailableActions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*a = AvailableActions(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AvailableActions) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// - `ONE_TO_ONE` - ONE_TO_ONE
+// - `MANY_TO_ONE` - MANY_TO_ONE
+// - `MANY_TO_MANY` - MANY_TO_MANY
+// - `ONE_TO_MANY` - ONE_TO_MANY
+type CardinalityEnum string
+
+const (
+	CardinalityEnumOneToOne   CardinalityEnum = "ONE_TO_ONE"
+	CardinalityEnumManyToOne  CardinalityEnum = "MANY_TO_ONE"
+	CardinalityEnumManyToMany CardinalityEnum = "MANY_TO_MANY"
+	CardinalityEnumOneToMany  CardinalityEnum = "ONE_TO_MANY"
+)
+
+func NewCardinalityEnumFromString(s string) (CardinalityEnum, error) {
+	switch s {
 	case "ONE_TO_ONE":
-		value := CardinalityEnumOneToOne
-		*c = value
+		return CardinalityEnumOneToOne, nil
 	case "MANY_TO_ONE":
-		value := CardinalityEnumManyToOne
-		*c = value
+		return CardinalityEnumManyToOne, nil
 	case "MANY_TO_MANY":
-		value := CardinalityEnumManyToMany
-		*c = value
+		return CardinalityEnumManyToMany, nil
 	case "ONE_TO_MANY":
-		value := CardinalityEnumOneToMany
-		*c = value
+		return CardinalityEnumOneToMany, nil
 	}
-	return nil
+	var t CardinalityEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoriesEnum uint
+func (c CardinalityEnum) Ptr() *CardinalityEnum {
+	return &c
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoriesEnum string
 
 const (
-	CategoriesEnumHris CategoriesEnum = iota + 1
-	CategoriesEnumAts
-	CategoriesEnumAccounting
-	CategoriesEnumTicketing
-	CategoriesEnumCrm
-	CategoriesEnumMktg
-	CategoriesEnumFilestorage
+	CategoriesEnumHris        CategoriesEnum = "hris"
+	CategoriesEnumAts         CategoriesEnum = "ats"
+	CategoriesEnumAccounting  CategoriesEnum = "accounting"
+	CategoriesEnumTicketing   CategoriesEnum = "ticketing"
+	CategoriesEnumCrm         CategoriesEnum = "crm"
+	CategoriesEnumMktg        CategoriesEnum = "mktg"
+	CategoriesEnumFilestorage CategoriesEnum = "filestorage"
 )
 
-func (c CategoriesEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoriesEnumHris:
-		return "hris"
-	case CategoriesEnumAts:
-		return "ats"
-	case CategoriesEnumAccounting:
-		return "accounting"
-	case CategoriesEnumTicketing:
-		return "ticketing"
-	case CategoriesEnumCrm:
-		return "crm"
-	case CategoriesEnumMktg:
-		return "mktg"
-	case CategoriesEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoriesEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoriesEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCategoriesEnumFromString(s string) (CategoriesEnum, error) {
+	switch s {
 	case "hris":
-		value := CategoriesEnumHris
-		*c = value
+		return CategoriesEnumHris, nil
 	case "ats":
-		value := CategoriesEnumAts
-		*c = value
+		return CategoriesEnumAts, nil
 	case "accounting":
-		value := CategoriesEnumAccounting
-		*c = value
+		return CategoriesEnumAccounting, nil
 	case "ticketing":
-		value := CategoriesEnumTicketing
-		*c = value
+		return CategoriesEnumTicketing, nil
 	case "crm":
-		value := CategoriesEnumCrm
-		*c = value
+		return CategoriesEnumCrm, nil
 	case "mktg":
-		value := CategoriesEnumMktg
-		*c = value
+		return CategoriesEnumMktg, nil
 	case "filestorage":
-		value := CategoriesEnumFilestorage
-		*c = value
+		return CategoriesEnumFilestorage, nil
 	}
-	return nil
+	var t CategoriesEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `hris` - hris
-// * `ats` - ats
-// * `accounting` - accounting
-// * `ticketing` - ticketing
-// * `crm` - crm
-// * `mktg` - mktg
-// * `filestorage` - filestorage
-type CategoryEnum uint
+func (c CategoriesEnum) Ptr() *CategoriesEnum {
+	return &c
+}
+
+// - `hris` - hris
+// - `ats` - ats
+// - `accounting` - accounting
+// - `ticketing` - ticketing
+// - `crm` - crm
+// - `mktg` - mktg
+// - `filestorage` - filestorage
+type CategoryEnum string
 
 const (
-	CategoryEnumHris CategoryEnum = iota + 1
-	CategoryEnumAts
-	CategoryEnumAccounting
-	CategoryEnumTicketing
-	CategoryEnumCrm
-	CategoryEnumMktg
-	CategoryEnumFilestorage
+	CategoryEnumHris        CategoryEnum = "hris"
+	CategoryEnumAts         CategoryEnum = "ats"
+	CategoryEnumAccounting  CategoryEnum = "accounting"
+	CategoryEnumTicketing   CategoryEnum = "ticketing"
+	CategoryEnumCrm         CategoryEnum = "crm"
+	CategoryEnumMktg        CategoryEnum = "mktg"
+	CategoryEnumFilestorage CategoryEnum = "filestorage"
 )
 
-func (c CategoryEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CategoryEnumHris:
-		return "hris"
-	case CategoryEnumAts:
-		return "ats"
-	case CategoryEnumAccounting:
-		return "accounting"
-	case CategoryEnumTicketing:
-		return "ticketing"
-	case CategoryEnumCrm:
-		return "crm"
-	case CategoryEnumMktg:
-		return "mktg"
-	case CategoryEnumFilestorage:
-		return "filestorage"
-	}
-}
-
-func (c CategoryEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CategoryEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCategoryEnumFromString(s string) (CategoryEnum, error) {
+	switch s {
 	case "hris":
-		value := CategoryEnumHris
-		*c = value
+		return CategoryEnumHris, nil
 	case "ats":
-		value := CategoryEnumAts
-		*c = value
+		return CategoryEnumAts, nil
 	case "accounting":
-		value := CategoryEnumAccounting
-		*c = value
+		return CategoryEnumAccounting, nil
 	case "ticketing":
-		value := CategoryEnumTicketing
-		*c = value
+		return CategoryEnumTicketing, nil
 	case "crm":
-		value := CategoryEnumCrm
-		*c = value
+		return CategoryEnumCrm, nil
 	case "mktg":
-		value := CategoryEnumMktg
-		*c = value
+		return CategoryEnumMktg, nil
 	case "filestorage":
-		value := CategoryEnumFilestorage
-		*c = value
+		return CategoryEnumFilestorage, nil
 	}
-	return nil
+	var t CategoryEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CategoryEnum) Ptr() *CategoryEnum {
+	return &c
 }
 
 type CommonModelScopesBodyRequest struct {
 	ModelId        string               `json:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions,omitempty"`
 	DisabledFields []string             `json:"disabled_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommonModelScopesBodyRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommonModelScopesBodyRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommonModelScopesBodyRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommonModelScopesBodyRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type ConditionSchema struct {
@@ -2290,7 +2607,7 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
@@ -2298,27 +2615,52 @@ type ConditionSchema struct {
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
 	//
-	// * `BOOLEAN` - BOOLEAN
-	// * `DATE` - DATE
-	// * `DATE_TIME` - DATE_TIME
-	// * `INTEGER` - INTEGER
-	// * `FLOAT` - FLOAT
-	// * `STRING` - STRING
-	// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+	// - `BOOLEAN` - BOOLEAN
+	// - `DATE` - DATE
+	// - `DATE_TIME` - DATE_TIME
+	// - `INTEGER` - INTEGER
+	// - `FLOAT` - FLOAT
+	// - `STRING` - STRING
+	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
 	// The schemas for the operators that can be used on a condition.
 	Operators []*OperatorSchema `json:"operators,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *ConditionSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ConditionSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = ConditionSchema(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *ConditionSchema) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The type of value(s) that can be set for this condition.
 //
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
 type ConditionSchemaConditionType struct {
 	typeName          string
 	ConditionTypeEnum ConditionTypeEnum
@@ -2376,85 +2718,58 @@ func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTy
 	}
 }
 
-// * `BOOLEAN` - BOOLEAN
-// * `DATE` - DATE
-// * `DATE_TIME` - DATE_TIME
-// * `INTEGER` - INTEGER
-// * `FLOAT` - FLOAT
-// * `STRING` - STRING
-// * `LIST_OF_STRINGS` - LIST_OF_STRINGS
-type ConditionTypeEnum uint
+// - `BOOLEAN` - BOOLEAN
+// - `DATE` - DATE
+// - `DATE_TIME` - DATE_TIME
+// - `INTEGER` - INTEGER
+// - `FLOAT` - FLOAT
+// - `STRING` - STRING
+// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
+type ConditionTypeEnum string
 
 const (
-	ConditionTypeEnumBoolean ConditionTypeEnum = iota + 1
-	ConditionTypeEnumDate
-	ConditionTypeEnumDateTime
-	ConditionTypeEnumInteger
-	ConditionTypeEnumFloat
-	ConditionTypeEnumString
-	ConditionTypeEnumListOfStrings
+	ConditionTypeEnumBoolean       ConditionTypeEnum = "BOOLEAN"
+	ConditionTypeEnumDate          ConditionTypeEnum = "DATE"
+	ConditionTypeEnumDateTime      ConditionTypeEnum = "DATE_TIME"
+	ConditionTypeEnumInteger       ConditionTypeEnum = "INTEGER"
+	ConditionTypeEnumFloat         ConditionTypeEnum = "FLOAT"
+	ConditionTypeEnumString        ConditionTypeEnum = "STRING"
+	ConditionTypeEnumListOfStrings ConditionTypeEnum = "LIST_OF_STRINGS"
 )
 
-func (c ConditionTypeEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ConditionTypeEnumBoolean:
-		return "BOOLEAN"
-	case ConditionTypeEnumDate:
-		return "DATE"
-	case ConditionTypeEnumDateTime:
-		return "DATE_TIME"
-	case ConditionTypeEnumInteger:
-		return "INTEGER"
-	case ConditionTypeEnumFloat:
-		return "FLOAT"
-	case ConditionTypeEnumString:
-		return "STRING"
-	case ConditionTypeEnumListOfStrings:
-		return "LIST_OF_STRINGS"
-	}
-}
-
-func (c ConditionTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ConditionTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewConditionTypeEnumFromString(s string) (ConditionTypeEnum, error) {
+	switch s {
 	case "BOOLEAN":
-		value := ConditionTypeEnumBoolean
-		*c = value
+		return ConditionTypeEnumBoolean, nil
 	case "DATE":
-		value := ConditionTypeEnumDate
-		*c = value
+		return ConditionTypeEnumDate, nil
 	case "DATE_TIME":
-		value := ConditionTypeEnumDateTime
-		*c = value
+		return ConditionTypeEnumDateTime, nil
 	case "INTEGER":
-		value := ConditionTypeEnumInteger
-		*c = value
+		return ConditionTypeEnumInteger, nil
 	case "FLOAT":
-		value := ConditionTypeEnumFloat
-		*c = value
+		return ConditionTypeEnumFloat, nil
 	case "STRING":
-		value := ConditionTypeEnumString
-		*c = value
+		return ConditionTypeEnumString, nil
 	case "LIST_OF_STRINGS":
-		value := ConditionTypeEnumListOfStrings
-		*c = value
+		return ConditionTypeEnumListOfStrings, nil
 	}
-	return nil
+	var t ConditionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
+	return &c
 }
 
 // # The Contact Object
+//
 // ### Description
+//
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type Contact struct {
 	// The contact's first name.
@@ -2478,10 +2793,35 @@ type Contact struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *Contact) UnmarshalJSON(data []byte) error {
+	type unmarshaler Contact
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = Contact(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *Contact) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The contact's account.
@@ -2601,9 +2941,13 @@ func (c *ContactOwner) Accept(visitor ContactOwnerVisitor) error {
 }
 
 // # The Contact Object
+//
 // ### Description
+//
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type ContactRequest struct {
 	// The contact's first name.
@@ -2618,10 +2962,35 @@ type ContactRequest struct {
 	EmailAddresses []*EmailAddressRequest `json:"email_addresses,omitempty"`
 	PhoneNumbers   []*PhoneNumberRequest  `json:"phone_numbers,omitempty"`
 	// When the contact's last activity occurred.
-	LastActivityAt      *time.Time            `json:"last_activity_at,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	LastActivityAt      *time.Time             `json:"last_activity_at,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *ContactRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler ContactRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = ContactRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *ContactRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // The contact's account.
@@ -2740,1861 +3109,1016 @@ func (c *ContactRequestOwner) Accept(visitor ContactRequestOwnerVisitor) error {
 	}
 }
 
-type ContactsListRequestExpand uint
+// - `AF` - Afghanistan
+// - `AX` - Åland Islands
+// - `AL` - Albania
+// - `DZ` - Algeria
+// - `AS` - American Samoa
+// - `AD` - Andorra
+// - `AO` - Angola
+// - `AI` - Anguilla
+// - `AQ` - Antarctica
+// - `AG` - Antigua and Barbuda
+// - `AR` - Argentina
+// - `AM` - Armenia
+// - `AW` - Aruba
+// - `AU` - Australia
+// - `AT` - Austria
+// - `AZ` - Azerbaijan
+// - `BS` - Bahamas
+// - `BH` - Bahrain
+// - `BD` - Bangladesh
+// - `BB` - Barbados
+// - `BY` - Belarus
+// - `BE` - Belgium
+// - `BZ` - Belize
+// - `BJ` - Benin
+// - `BM` - Bermuda
+// - `BT` - Bhutan
+// - `BO` - Bolivia
+// - `BQ` - Bonaire, Sint Eustatius and Saba
+// - `BA` - Bosnia and Herzegovina
+// - `BW` - Botswana
+// - `BV` - Bouvet Island
+// - `BR` - Brazil
+// - `IO` - British Indian Ocean Territory
+// - `BN` - Brunei
+// - `BG` - Bulgaria
+// - `BF` - Burkina Faso
+// - `BI` - Burundi
+// - `CV` - Cabo Verde
+// - `KH` - Cambodia
+// - `CM` - Cameroon
+// - `CA` - Canada
+// - `KY` - Cayman Islands
+// - `CF` - Central African Republic
+// - `TD` - Chad
+// - `CL` - Chile
+// - `CN` - China
+// - `CX` - Christmas Island
+// - `CC` - Cocos (Keeling) Islands
+// - `CO` - Colombia
+// - `KM` - Comoros
+// - `CG` - Congo
+// - `CD` - Congo (the Democratic Republic of the)
+// - `CK` - Cook Islands
+// - `CR` - Costa Rica
+// - `CI` - Côte d'Ivoire
+// - `HR` - Croatia
+// - `CU` - Cuba
+// - `CW` - Curaçao
+// - `CY` - Cyprus
+// - `CZ` - Czechia
+// - `DK` - Denmark
+// - `DJ` - Djibouti
+// - `DM` - Dominica
+// - `DO` - Dominican Republic
+// - `EC` - Ecuador
+// - `EG` - Egypt
+// - `SV` - El Salvador
+// - `GQ` - Equatorial Guinea
+// - `ER` - Eritrea
+// - `EE` - Estonia
+// - `SZ` - Eswatini
+// - `ET` - Ethiopia
+// - `FK` - Falkland Islands (Malvinas)
+// - `FO` - Faroe Islands
+// - `FJ` - Fiji
+// - `FI` - Finland
+// - `FR` - France
+// - `GF` - French Guiana
+// - `PF` - French Polynesia
+// - `TF` - French Southern Territories
+// - `GA` - Gabon
+// - `GM` - Gambia
+// - `GE` - Georgia
+// - `DE` - Germany
+// - `GH` - Ghana
+// - `GI` - Gibraltar
+// - `GR` - Greece
+// - `GL` - Greenland
+// - `GD` - Grenada
+// - `GP` - Guadeloupe
+// - `GU` - Guam
+// - `GT` - Guatemala
+// - `GG` - Guernsey
+// - `GN` - Guinea
+// - `GW` - Guinea-Bissau
+// - `GY` - Guyana
+// - `HT` - Haiti
+// - `HM` - Heard Island and McDonald Islands
+// - `VA` - Holy See
+// - `HN` - Honduras
+// - `HK` - Hong Kong
+// - `HU` - Hungary
+// - `IS` - Iceland
+// - `IN` - India
+// - `ID` - Indonesia
+// - `IR` - Iran
+// - `IQ` - Iraq
+// - `IE` - Ireland
+// - `IM` - Isle of Man
+// - `IL` - Israel
+// - `IT` - Italy
+// - `JM` - Jamaica
+// - `JP` - Japan
+// - `JE` - Jersey
+// - `JO` - Jordan
+// - `KZ` - Kazakhstan
+// - `KE` - Kenya
+// - `KI` - Kiribati
+// - `KW` - Kuwait
+// - `KG` - Kyrgyzstan
+// - `LA` - Laos
+// - `LV` - Latvia
+// - `LB` - Lebanon
+// - `LS` - Lesotho
+// - `LR` - Liberia
+// - `LY` - Libya
+// - `LI` - Liechtenstein
+// - `LT` - Lithuania
+// - `LU` - Luxembourg
+// - `MO` - Macao
+// - `MG` - Madagascar
+// - `MW` - Malawi
+// - `MY` - Malaysia
+// - `MV` - Maldives
+// - `ML` - Mali
+// - `MT` - Malta
+// - `MH` - Marshall Islands
+// - `MQ` - Martinique
+// - `MR` - Mauritania
+// - `MU` - Mauritius
+// - `YT` - Mayotte
+// - `MX` - Mexico
+// - `FM` - Micronesia (Federated States of)
+// - `MD` - Moldova
+// - `MC` - Monaco
+// - `MN` - Mongolia
+// - `ME` - Montenegro
+// - `MS` - Montserrat
+// - `MA` - Morocco
+// - `MZ` - Mozambique
+// - `MM` - Myanmar
+// - `NA` - Namibia
+// - `NR` - Nauru
+// - `NP` - Nepal
+// - `NL` - Netherlands
+// - `NC` - New Caledonia
+// - `NZ` - New Zealand
+// - `NI` - Nicaragua
+// - `NE` - Niger
+// - `NG` - Nigeria
+// - `NU` - Niue
+// - `NF` - Norfolk Island
+// - `KP` - North Korea
+// - `MK` - North Macedonia
+// - `MP` - Northern Mariana Islands
+// - `NO` - Norway
+// - `OM` - Oman
+// - `PK` - Pakistan
+// - `PW` - Palau
+// - `PS` - Palestine, State of
+// - `PA` - Panama
+// - `PG` - Papua New Guinea
+// - `PY` - Paraguay
+// - `PE` - Peru
+// - `PH` - Philippines
+// - `PN` - Pitcairn
+// - `PL` - Poland
+// - `PT` - Portugal
+// - `PR` - Puerto Rico
+// - `QA` - Qatar
+// - `RE` - Réunion
+// - `RO` - Romania
+// - `RU` - Russia
+// - `RW` - Rwanda
+// - `BL` - Saint Barthélemy
+// - `SH` - Saint Helena, Ascension and Tristan da Cunha
+// - `KN` - Saint Kitts and Nevis
+// - `LC` - Saint Lucia
+// - `MF` - Saint Martin (French part)
+// - `PM` - Saint Pierre and Miquelon
+// - `VC` - Saint Vincent and the Grenadines
+// - `WS` - Samoa
+// - `SM` - San Marino
+// - `ST` - Sao Tome and Principe
+// - `SA` - Saudi Arabia
+// - `SN` - Senegal
+// - `RS` - Serbia
+// - `SC` - Seychelles
+// - `SL` - Sierra Leone
+// - `SG` - Singapore
+// - `SX` - Sint Maarten (Dutch part)
+// - `SK` - Slovakia
+// - `SI` - Slovenia
+// - `SB` - Solomon Islands
+// - `SO` - Somalia
+// - `ZA` - South Africa
+// - `GS` - South Georgia and the South Sandwich Islands
+// - `KR` - South Korea
+// - `SS` - South Sudan
+// - `ES` - Spain
+// - `LK` - Sri Lanka
+// - `SD` - Sudan
+// - `SR` - Suriname
+// - `SJ` - Svalbard and Jan Mayen
+// - `SE` - Sweden
+// - `CH` - Switzerland
+// - `SY` - Syria
+// - `TW` - Taiwan
+// - `TJ` - Tajikistan
+// - `TZ` - Tanzania
+// - `TH` - Thailand
+// - `TL` - Timor-Leste
+// - `TG` - Togo
+// - `TK` - Tokelau
+// - `TO` - Tonga
+// - `TT` - Trinidad and Tobago
+// - `TN` - Tunisia
+// - `TR` - Turkey
+// - `TM` - Turkmenistan
+// - `TC` - Turks and Caicos Islands
+// - `TV` - Tuvalu
+// - `UG` - Uganda
+// - `UA` - Ukraine
+// - `AE` - United Arab Emirates
+// - `GB` - United Kingdom
+// - `UM` - United States Minor Outlying Islands
+// - `US` - United States of America
+// - `UY` - Uruguay
+// - `UZ` - Uzbekistan
+// - `VU` - Vanuatu
+// - `VE` - Venezuela
+// - `VN` - Vietnam
+// - `VG` - Virgin Islands (British)
+// - `VI` - Virgin Islands (U.S.)
+// - `WF` - Wallis and Futuna
+// - `EH` - Western Sahara
+// - `YE` - Yemen
+// - `ZM` - Zambia
+// - `ZW` - Zimbabwe
+type CountryEnum string
 
 const (
-	ContactsListRequestExpandAccount ContactsListRequestExpand = iota + 1
-	ContactsListRequestExpandAccountOwner
-	ContactsListRequestExpandOwner
+	CountryEnumAf CountryEnum = "AF"
+	CountryEnumAx CountryEnum = "AX"
+	CountryEnumAl CountryEnum = "AL"
+	CountryEnumDz CountryEnum = "DZ"
+	CountryEnumAs CountryEnum = "AS"
+	CountryEnumAd CountryEnum = "AD"
+	CountryEnumAo CountryEnum = "AO"
+	CountryEnumAi CountryEnum = "AI"
+	CountryEnumAq CountryEnum = "AQ"
+	CountryEnumAg CountryEnum = "AG"
+	CountryEnumAr CountryEnum = "AR"
+	CountryEnumAm CountryEnum = "AM"
+	CountryEnumAw CountryEnum = "AW"
+	CountryEnumAu CountryEnum = "AU"
+	CountryEnumAt CountryEnum = "AT"
+	CountryEnumAz CountryEnum = "AZ"
+	CountryEnumBs CountryEnum = "BS"
+	CountryEnumBh CountryEnum = "BH"
+	CountryEnumBd CountryEnum = "BD"
+	CountryEnumBb CountryEnum = "BB"
+	CountryEnumBy CountryEnum = "BY"
+	CountryEnumBe CountryEnum = "BE"
+	CountryEnumBz CountryEnum = "BZ"
+	CountryEnumBj CountryEnum = "BJ"
+	CountryEnumBm CountryEnum = "BM"
+	CountryEnumBt CountryEnum = "BT"
+	CountryEnumBo CountryEnum = "BO"
+	CountryEnumBq CountryEnum = "BQ"
+	CountryEnumBa CountryEnum = "BA"
+	CountryEnumBw CountryEnum = "BW"
+	CountryEnumBv CountryEnum = "BV"
+	CountryEnumBr CountryEnum = "BR"
+	CountryEnumIo CountryEnum = "IO"
+	CountryEnumBn CountryEnum = "BN"
+	CountryEnumBg CountryEnum = "BG"
+	CountryEnumBf CountryEnum = "BF"
+	CountryEnumBi CountryEnum = "BI"
+	CountryEnumCv CountryEnum = "CV"
+	CountryEnumKh CountryEnum = "KH"
+	CountryEnumCm CountryEnum = "CM"
+	CountryEnumCa CountryEnum = "CA"
+	CountryEnumKy CountryEnum = "KY"
+	CountryEnumCf CountryEnum = "CF"
+	CountryEnumTd CountryEnum = "TD"
+	CountryEnumCl CountryEnum = "CL"
+	CountryEnumCn CountryEnum = "CN"
+	CountryEnumCx CountryEnum = "CX"
+	CountryEnumCc CountryEnum = "CC"
+	CountryEnumCo CountryEnum = "CO"
+	CountryEnumKm CountryEnum = "KM"
+	CountryEnumCg CountryEnum = "CG"
+	CountryEnumCd CountryEnum = "CD"
+	CountryEnumCk CountryEnum = "CK"
+	CountryEnumCr CountryEnum = "CR"
+	CountryEnumCi CountryEnum = "CI"
+	CountryEnumHr CountryEnum = "HR"
+	CountryEnumCu CountryEnum = "CU"
+	CountryEnumCw CountryEnum = "CW"
+	CountryEnumCy CountryEnum = "CY"
+	CountryEnumCz CountryEnum = "CZ"
+	CountryEnumDk CountryEnum = "DK"
+	CountryEnumDj CountryEnum = "DJ"
+	CountryEnumDm CountryEnum = "DM"
+	CountryEnumDo CountryEnum = "DO"
+	CountryEnumEc CountryEnum = "EC"
+	CountryEnumEg CountryEnum = "EG"
+	CountryEnumSv CountryEnum = "SV"
+	CountryEnumGq CountryEnum = "GQ"
+	CountryEnumEr CountryEnum = "ER"
+	CountryEnumEe CountryEnum = "EE"
+	CountryEnumSz CountryEnum = "SZ"
+	CountryEnumEt CountryEnum = "ET"
+	CountryEnumFk CountryEnum = "FK"
+	CountryEnumFo CountryEnum = "FO"
+	CountryEnumFj CountryEnum = "FJ"
+	CountryEnumFi CountryEnum = "FI"
+	CountryEnumFr CountryEnum = "FR"
+	CountryEnumGf CountryEnum = "GF"
+	CountryEnumPf CountryEnum = "PF"
+	CountryEnumTf CountryEnum = "TF"
+	CountryEnumGa CountryEnum = "GA"
+	CountryEnumGm CountryEnum = "GM"
+	CountryEnumGe CountryEnum = "GE"
+	CountryEnumDe CountryEnum = "DE"
+	CountryEnumGh CountryEnum = "GH"
+	CountryEnumGi CountryEnum = "GI"
+	CountryEnumGr CountryEnum = "GR"
+	CountryEnumGl CountryEnum = "GL"
+	CountryEnumGd CountryEnum = "GD"
+	CountryEnumGp CountryEnum = "GP"
+	CountryEnumGu CountryEnum = "GU"
+	CountryEnumGt CountryEnum = "GT"
+	CountryEnumGg CountryEnum = "GG"
+	CountryEnumGn CountryEnum = "GN"
+	CountryEnumGw CountryEnum = "GW"
+	CountryEnumGy CountryEnum = "GY"
+	CountryEnumHt CountryEnum = "HT"
+	CountryEnumHm CountryEnum = "HM"
+	CountryEnumVa CountryEnum = "VA"
+	CountryEnumHn CountryEnum = "HN"
+	CountryEnumHk CountryEnum = "HK"
+	CountryEnumHu CountryEnum = "HU"
+	CountryEnumIs CountryEnum = "IS"
+	CountryEnumIn CountryEnum = "IN"
+	CountryEnumId CountryEnum = "ID"
+	CountryEnumIr CountryEnum = "IR"
+	CountryEnumIq CountryEnum = "IQ"
+	CountryEnumIe CountryEnum = "IE"
+	CountryEnumIm CountryEnum = "IM"
+	CountryEnumIl CountryEnum = "IL"
+	CountryEnumIt CountryEnum = "IT"
+	CountryEnumJm CountryEnum = "JM"
+	CountryEnumJp CountryEnum = "JP"
+	CountryEnumJe CountryEnum = "JE"
+	CountryEnumJo CountryEnum = "JO"
+	CountryEnumKz CountryEnum = "KZ"
+	CountryEnumKe CountryEnum = "KE"
+	CountryEnumKi CountryEnum = "KI"
+	CountryEnumKw CountryEnum = "KW"
+	CountryEnumKg CountryEnum = "KG"
+	CountryEnumLa CountryEnum = "LA"
+	CountryEnumLv CountryEnum = "LV"
+	CountryEnumLb CountryEnum = "LB"
+	CountryEnumLs CountryEnum = "LS"
+	CountryEnumLr CountryEnum = "LR"
+	CountryEnumLy CountryEnum = "LY"
+	CountryEnumLi CountryEnum = "LI"
+	CountryEnumLt CountryEnum = "LT"
+	CountryEnumLu CountryEnum = "LU"
+	CountryEnumMo CountryEnum = "MO"
+	CountryEnumMg CountryEnum = "MG"
+	CountryEnumMw CountryEnum = "MW"
+	CountryEnumMy CountryEnum = "MY"
+	CountryEnumMv CountryEnum = "MV"
+	CountryEnumMl CountryEnum = "ML"
+	CountryEnumMt CountryEnum = "MT"
+	CountryEnumMh CountryEnum = "MH"
+	CountryEnumMq CountryEnum = "MQ"
+	CountryEnumMr CountryEnum = "MR"
+	CountryEnumMu CountryEnum = "MU"
+	CountryEnumYt CountryEnum = "YT"
+	CountryEnumMx CountryEnum = "MX"
+	CountryEnumFm CountryEnum = "FM"
+	CountryEnumMd CountryEnum = "MD"
+	CountryEnumMc CountryEnum = "MC"
+	CountryEnumMn CountryEnum = "MN"
+	CountryEnumMe CountryEnum = "ME"
+	CountryEnumMs CountryEnum = "MS"
+	CountryEnumMa CountryEnum = "MA"
+	CountryEnumMz CountryEnum = "MZ"
+	CountryEnumMm CountryEnum = "MM"
+	CountryEnumNa CountryEnum = "NA"
+	CountryEnumNr CountryEnum = "NR"
+	CountryEnumNp CountryEnum = "NP"
+	CountryEnumNl CountryEnum = "NL"
+	CountryEnumNc CountryEnum = "NC"
+	CountryEnumNz CountryEnum = "NZ"
+	CountryEnumNi CountryEnum = "NI"
+	CountryEnumNe CountryEnum = "NE"
+	CountryEnumNg CountryEnum = "NG"
+	CountryEnumNu CountryEnum = "NU"
+	CountryEnumNf CountryEnum = "NF"
+	CountryEnumKp CountryEnum = "KP"
+	CountryEnumMk CountryEnum = "MK"
+	CountryEnumMp CountryEnum = "MP"
+	CountryEnumNo CountryEnum = "NO"
+	CountryEnumOm CountryEnum = "OM"
+	CountryEnumPk CountryEnum = "PK"
+	CountryEnumPw CountryEnum = "PW"
+	CountryEnumPs CountryEnum = "PS"
+	CountryEnumPa CountryEnum = "PA"
+	CountryEnumPg CountryEnum = "PG"
+	CountryEnumPy CountryEnum = "PY"
+	CountryEnumPe CountryEnum = "PE"
+	CountryEnumPh CountryEnum = "PH"
+	CountryEnumPn CountryEnum = "PN"
+	CountryEnumPl CountryEnum = "PL"
+	CountryEnumPt CountryEnum = "PT"
+	CountryEnumPr CountryEnum = "PR"
+	CountryEnumQa CountryEnum = "QA"
+	CountryEnumRe CountryEnum = "RE"
+	CountryEnumRo CountryEnum = "RO"
+	CountryEnumRu CountryEnum = "RU"
+	CountryEnumRw CountryEnum = "RW"
+	CountryEnumBl CountryEnum = "BL"
+	CountryEnumSh CountryEnum = "SH"
+	CountryEnumKn CountryEnum = "KN"
+	CountryEnumLc CountryEnum = "LC"
+	CountryEnumMf CountryEnum = "MF"
+	CountryEnumPm CountryEnum = "PM"
+	CountryEnumVc CountryEnum = "VC"
+	CountryEnumWs CountryEnum = "WS"
+	CountryEnumSm CountryEnum = "SM"
+	CountryEnumSt CountryEnum = "ST"
+	CountryEnumSa CountryEnum = "SA"
+	CountryEnumSn CountryEnum = "SN"
+	CountryEnumRs CountryEnum = "RS"
+	CountryEnumSc CountryEnum = "SC"
+	CountryEnumSl CountryEnum = "SL"
+	CountryEnumSg CountryEnum = "SG"
+	CountryEnumSx CountryEnum = "SX"
+	CountryEnumSk CountryEnum = "SK"
+	CountryEnumSi CountryEnum = "SI"
+	CountryEnumSb CountryEnum = "SB"
+	CountryEnumSo CountryEnum = "SO"
+	CountryEnumZa CountryEnum = "ZA"
+	CountryEnumGs CountryEnum = "GS"
+	CountryEnumKr CountryEnum = "KR"
+	CountryEnumSs CountryEnum = "SS"
+	CountryEnumEs CountryEnum = "ES"
+	CountryEnumLk CountryEnum = "LK"
+	CountryEnumSd CountryEnum = "SD"
+	CountryEnumSr CountryEnum = "SR"
+	CountryEnumSj CountryEnum = "SJ"
+	CountryEnumSe CountryEnum = "SE"
+	CountryEnumCh CountryEnum = "CH"
+	CountryEnumSy CountryEnum = "SY"
+	CountryEnumTw CountryEnum = "TW"
+	CountryEnumTj CountryEnum = "TJ"
+	CountryEnumTz CountryEnum = "TZ"
+	CountryEnumTh CountryEnum = "TH"
+	CountryEnumTl CountryEnum = "TL"
+	CountryEnumTg CountryEnum = "TG"
+	CountryEnumTk CountryEnum = "TK"
+	CountryEnumTo CountryEnum = "TO"
+	CountryEnumTt CountryEnum = "TT"
+	CountryEnumTn CountryEnum = "TN"
+	CountryEnumTr CountryEnum = "TR"
+	CountryEnumTm CountryEnum = "TM"
+	CountryEnumTc CountryEnum = "TC"
+	CountryEnumTv CountryEnum = "TV"
+	CountryEnumUg CountryEnum = "UG"
+	CountryEnumUa CountryEnum = "UA"
+	CountryEnumAe CountryEnum = "AE"
+	CountryEnumGb CountryEnum = "GB"
+	CountryEnumUm CountryEnum = "UM"
+	CountryEnumUs CountryEnum = "US"
+	CountryEnumUy CountryEnum = "UY"
+	CountryEnumUz CountryEnum = "UZ"
+	CountryEnumVu CountryEnum = "VU"
+	CountryEnumVe CountryEnum = "VE"
+	CountryEnumVn CountryEnum = "VN"
+	CountryEnumVg CountryEnum = "VG"
+	CountryEnumVi CountryEnum = "VI"
+	CountryEnumWf CountryEnum = "WF"
+	CountryEnumEh CountryEnum = "EH"
+	CountryEnumYe CountryEnum = "YE"
+	CountryEnumZm CountryEnum = "ZM"
+	CountryEnumZw CountryEnum = "ZW"
 )
 
-func (c ContactsListRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ContactsListRequestExpandAccount:
-		return "account"
-	case ContactsListRequestExpandAccountOwner:
-		return "account,owner"
-	case ContactsListRequestExpandOwner:
-		return "owner"
-	}
-}
-
-func (c ContactsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ContactsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := ContactsListRequestExpandAccount
-		*c = value
-	case "account,owner":
-		value := ContactsListRequestExpandAccountOwner
-		*c = value
-	case "owner":
-		value := ContactsListRequestExpandOwner
-		*c = value
-	}
-	return nil
-}
-
-type ContactsRetrieveRequestExpand uint
-
-const (
-	ContactsRetrieveRequestExpandAccount ContactsRetrieveRequestExpand = iota + 1
-	ContactsRetrieveRequestExpandAccountOwner
-	ContactsRetrieveRequestExpandOwner
-)
-
-func (c ContactsRetrieveRequestExpand) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case ContactsRetrieveRequestExpandAccount:
-		return "account"
-	case ContactsRetrieveRequestExpandAccountOwner:
-		return "account,owner"
-	case ContactsRetrieveRequestExpandOwner:
-		return "owner"
-	}
-}
-
-func (c ContactsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *ContactsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := ContactsRetrieveRequestExpandAccount
-		*c = value
-	case "account,owner":
-		value := ContactsRetrieveRequestExpandAccountOwner
-		*c = value
-	case "owner":
-		value := ContactsRetrieveRequestExpandOwner
-		*c = value
-	}
-	return nil
-}
-
-// * `AF` - Afghanistan
-// * `AX` - Åland Islands
-// * `AL` - Albania
-// * `DZ` - Algeria
-// * `AS` - American Samoa
-// * `AD` - Andorra
-// * `AO` - Angola
-// * `AI` - Anguilla
-// * `AQ` - Antarctica
-// * `AG` - Antigua and Barbuda
-// * `AR` - Argentina
-// * `AM` - Armenia
-// * `AW` - Aruba
-// * `AU` - Australia
-// * `AT` - Austria
-// * `AZ` - Azerbaijan
-// * `BS` - Bahamas
-// * `BH` - Bahrain
-// * `BD` - Bangladesh
-// * `BB` - Barbados
-// * `BY` - Belarus
-// * `BE` - Belgium
-// * `BZ` - Belize
-// * `BJ` - Benin
-// * `BM` - Bermuda
-// * `BT` - Bhutan
-// * `BO` - Bolivia
-// * `BQ` - Bonaire, Sint Eustatius and Saba
-// * `BA` - Bosnia and Herzegovina
-// * `BW` - Botswana
-// * `BV` - Bouvet Island
-// * `BR` - Brazil
-// * `IO` - British Indian Ocean Territory
-// * `BN` - Brunei
-// * `BG` - Bulgaria
-// * `BF` - Burkina Faso
-// * `BI` - Burundi
-// * `CV` - Cabo Verde
-// * `KH` - Cambodia
-// * `CM` - Cameroon
-// * `CA` - Canada
-// * `KY` - Cayman Islands
-// * `CF` - Central African Republic
-// * `TD` - Chad
-// * `CL` - Chile
-// * `CN` - China
-// * `CX` - Christmas Island
-// * `CC` - Cocos (Keeling) Islands
-// * `CO` - Colombia
-// * `KM` - Comoros
-// * `CG` - Congo
-// * `CD` - Congo (the Democratic Republic of the)
-// * `CK` - Cook Islands
-// * `CR` - Costa Rica
-// * `CI` - Côte d'Ivoire
-// * `HR` - Croatia
-// * `CU` - Cuba
-// * `CW` - Curaçao
-// * `CY` - Cyprus
-// * `CZ` - Czechia
-// * `DK` - Denmark
-// * `DJ` - Djibouti
-// * `DM` - Dominica
-// * `DO` - Dominican Republic
-// * `EC` - Ecuador
-// * `EG` - Egypt
-// * `SV` - El Salvador
-// * `GQ` - Equatorial Guinea
-// * `ER` - Eritrea
-// * `EE` - Estonia
-// * `SZ` - Eswatini
-// * `ET` - Ethiopia
-// * `FK` - Falkland Islands (Malvinas)
-// * `FO` - Faroe Islands
-// * `FJ` - Fiji
-// * `FI` - Finland
-// * `FR` - France
-// * `GF` - French Guiana
-// * `PF` - French Polynesia
-// * `TF` - French Southern Territories
-// * `GA` - Gabon
-// * `GM` - Gambia
-// * `GE` - Georgia
-// * `DE` - Germany
-// * `GH` - Ghana
-// * `GI` - Gibraltar
-// * `GR` - Greece
-// * `GL` - Greenland
-// * `GD` - Grenada
-// * `GP` - Guadeloupe
-// * `GU` - Guam
-// * `GT` - Guatemala
-// * `GG` - Guernsey
-// * `GN` - Guinea
-// * `GW` - Guinea-Bissau
-// * `GY` - Guyana
-// * `HT` - Haiti
-// * `HM` - Heard Island and McDonald Islands
-// * `VA` - Holy See
-// * `HN` - Honduras
-// * `HK` - Hong Kong
-// * `HU` - Hungary
-// * `IS` - Iceland
-// * `IN` - India
-// * `ID` - Indonesia
-// * `IR` - Iran
-// * `IQ` - Iraq
-// * `IE` - Ireland
-// * `IM` - Isle of Man
-// * `IL` - Israel
-// * `IT` - Italy
-// * `JM` - Jamaica
-// * `JP` - Japan
-// * `JE` - Jersey
-// * `JO` - Jordan
-// * `KZ` - Kazakhstan
-// * `KE` - Kenya
-// * `KI` - Kiribati
-// * `KW` - Kuwait
-// * `KG` - Kyrgyzstan
-// * `LA` - Laos
-// * `LV` - Latvia
-// * `LB` - Lebanon
-// * `LS` - Lesotho
-// * `LR` - Liberia
-// * `LY` - Libya
-// * `LI` - Liechtenstein
-// * `LT` - Lithuania
-// * `LU` - Luxembourg
-// * `MO` - Macao
-// * `MG` - Madagascar
-// * `MW` - Malawi
-// * `MY` - Malaysia
-// * `MV` - Maldives
-// * `ML` - Mali
-// * `MT` - Malta
-// * `MH` - Marshall Islands
-// * `MQ` - Martinique
-// * `MR` - Mauritania
-// * `MU` - Mauritius
-// * `YT` - Mayotte
-// * `MX` - Mexico
-// * `FM` - Micronesia (Federated States of)
-// * `MD` - Moldova
-// * `MC` - Monaco
-// * `MN` - Mongolia
-// * `ME` - Montenegro
-// * `MS` - Montserrat
-// * `MA` - Morocco
-// * `MZ` - Mozambique
-// * `MM` - Myanmar
-// * `NA` - Namibia
-// * `NR` - Nauru
-// * `NP` - Nepal
-// * `NL` - Netherlands
-// * `NC` - New Caledonia
-// * `NZ` - New Zealand
-// * `NI` - Nicaragua
-// * `NE` - Niger
-// * `NG` - Nigeria
-// * `NU` - Niue
-// * `NF` - Norfolk Island
-// * `KP` - North Korea
-// * `MK` - North Macedonia
-// * `MP` - Northern Mariana Islands
-// * `NO` - Norway
-// * `OM` - Oman
-// * `PK` - Pakistan
-// * `PW` - Palau
-// * `PS` - Palestine, State of
-// * `PA` - Panama
-// * `PG` - Papua New Guinea
-// * `PY` - Paraguay
-// * `PE` - Peru
-// * `PH` - Philippines
-// * `PN` - Pitcairn
-// * `PL` - Poland
-// * `PT` - Portugal
-// * `PR` - Puerto Rico
-// * `QA` - Qatar
-// * `RE` - Réunion
-// * `RO` - Romania
-// * `RU` - Russia
-// * `RW` - Rwanda
-// * `BL` - Saint Barthélemy
-// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-// * `KN` - Saint Kitts and Nevis
-// * `LC` - Saint Lucia
-// * `MF` - Saint Martin (French part)
-// * `PM` - Saint Pierre and Miquelon
-// * `VC` - Saint Vincent and the Grenadines
-// * `WS` - Samoa
-// * `SM` - San Marino
-// * `ST` - Sao Tome and Principe
-// * `SA` - Saudi Arabia
-// * `SN` - Senegal
-// * `RS` - Serbia
-// * `SC` - Seychelles
-// * `SL` - Sierra Leone
-// * `SG` - Singapore
-// * `SX` - Sint Maarten (Dutch part)
-// * `SK` - Slovakia
-// * `SI` - Slovenia
-// * `SB` - Solomon Islands
-// * `SO` - Somalia
-// * `ZA` - South Africa
-// * `GS` - South Georgia and the South Sandwich Islands
-// * `KR` - South Korea
-// * `SS` - South Sudan
-// * `ES` - Spain
-// * `LK` - Sri Lanka
-// * `SD` - Sudan
-// * `SR` - Suriname
-// * `SJ` - Svalbard and Jan Mayen
-// * `SE` - Sweden
-// * `CH` - Switzerland
-// * `SY` - Syria
-// * `TW` - Taiwan
-// * `TJ` - Tajikistan
-// * `TZ` - Tanzania
-// * `TH` - Thailand
-// * `TL` - Timor-Leste
-// * `TG` - Togo
-// * `TK` - Tokelau
-// * `TO` - Tonga
-// * `TT` - Trinidad and Tobago
-// * `TN` - Tunisia
-// * `TR` - Turkey
-// * `TM` - Turkmenistan
-// * `TC` - Turks and Caicos Islands
-// * `TV` - Tuvalu
-// * `UG` - Uganda
-// * `UA` - Ukraine
-// * `AE` - United Arab Emirates
-// * `GB` - United Kingdom
-// * `UM` - United States Minor Outlying Islands
-// * `US` - United States of America
-// * `UY` - Uruguay
-// * `UZ` - Uzbekistan
-// * `VU` - Vanuatu
-// * `VE` - Venezuela
-// * `VN` - Vietnam
-// * `VG` - Virgin Islands (British)
-// * `VI` - Virgin Islands (U.S.)
-// * `WF` - Wallis and Futuna
-// * `EH` - Western Sahara
-// * `YE` - Yemen
-// * `ZM` - Zambia
-// * `ZW` - Zimbabwe
-type CountryEnum uint
-
-const (
-	CountryEnumAf CountryEnum = iota + 1
-	CountryEnumAx
-	CountryEnumAl
-	CountryEnumDz
-	CountryEnumAs
-	CountryEnumAd
-	CountryEnumAo
-	CountryEnumAi
-	CountryEnumAq
-	CountryEnumAg
-	CountryEnumAr
-	CountryEnumAm
-	CountryEnumAw
-	CountryEnumAu
-	CountryEnumAt
-	CountryEnumAz
-	CountryEnumBs
-	CountryEnumBh
-	CountryEnumBd
-	CountryEnumBb
-	CountryEnumBy
-	CountryEnumBe
-	CountryEnumBz
-	CountryEnumBj
-	CountryEnumBm
-	CountryEnumBt
-	CountryEnumBo
-	CountryEnumBq
-	CountryEnumBa
-	CountryEnumBw
-	CountryEnumBv
-	CountryEnumBr
-	CountryEnumIo
-	CountryEnumBn
-	CountryEnumBg
-	CountryEnumBf
-	CountryEnumBi
-	CountryEnumCv
-	CountryEnumKh
-	CountryEnumCm
-	CountryEnumCa
-	CountryEnumKy
-	CountryEnumCf
-	CountryEnumTd
-	CountryEnumCl
-	CountryEnumCn
-	CountryEnumCx
-	CountryEnumCc
-	CountryEnumCo
-	CountryEnumKm
-	CountryEnumCg
-	CountryEnumCd
-	CountryEnumCk
-	CountryEnumCr
-	CountryEnumCi
-	CountryEnumHr
-	CountryEnumCu
-	CountryEnumCw
-	CountryEnumCy
-	CountryEnumCz
-	CountryEnumDk
-	CountryEnumDj
-	CountryEnumDm
-	CountryEnumDo
-	CountryEnumEc
-	CountryEnumEg
-	CountryEnumSv
-	CountryEnumGq
-	CountryEnumEr
-	CountryEnumEe
-	CountryEnumSz
-	CountryEnumEt
-	CountryEnumFk
-	CountryEnumFo
-	CountryEnumFj
-	CountryEnumFi
-	CountryEnumFr
-	CountryEnumGf
-	CountryEnumPf
-	CountryEnumTf
-	CountryEnumGa
-	CountryEnumGm
-	CountryEnumGe
-	CountryEnumDe
-	CountryEnumGh
-	CountryEnumGi
-	CountryEnumGr
-	CountryEnumGl
-	CountryEnumGd
-	CountryEnumGp
-	CountryEnumGu
-	CountryEnumGt
-	CountryEnumGg
-	CountryEnumGn
-	CountryEnumGw
-	CountryEnumGy
-	CountryEnumHt
-	CountryEnumHm
-	CountryEnumVa
-	CountryEnumHn
-	CountryEnumHk
-	CountryEnumHu
-	CountryEnumIs
-	CountryEnumIn
-	CountryEnumId
-	CountryEnumIr
-	CountryEnumIq
-	CountryEnumIe
-	CountryEnumIm
-	CountryEnumIl
-	CountryEnumIt
-	CountryEnumJm
-	CountryEnumJp
-	CountryEnumJe
-	CountryEnumJo
-	CountryEnumKz
-	CountryEnumKe
-	CountryEnumKi
-	CountryEnumKw
-	CountryEnumKg
-	CountryEnumLa
-	CountryEnumLv
-	CountryEnumLb
-	CountryEnumLs
-	CountryEnumLr
-	CountryEnumLy
-	CountryEnumLi
-	CountryEnumLt
-	CountryEnumLu
-	CountryEnumMo
-	CountryEnumMg
-	CountryEnumMw
-	CountryEnumMy
-	CountryEnumMv
-	CountryEnumMl
-	CountryEnumMt
-	CountryEnumMh
-	CountryEnumMq
-	CountryEnumMr
-	CountryEnumMu
-	CountryEnumYt
-	CountryEnumMx
-	CountryEnumFm
-	CountryEnumMd
-	CountryEnumMc
-	CountryEnumMn
-	CountryEnumMe
-	CountryEnumMs
-	CountryEnumMa
-	CountryEnumMz
-	CountryEnumMm
-	CountryEnumNa
-	CountryEnumNr
-	CountryEnumNp
-	CountryEnumNl
-	CountryEnumNc
-	CountryEnumNz
-	CountryEnumNi
-	CountryEnumNe
-	CountryEnumNg
-	CountryEnumNu
-	CountryEnumNf
-	CountryEnumKp
-	CountryEnumMk
-	CountryEnumMp
-	CountryEnumNo
-	CountryEnumOm
-	CountryEnumPk
-	CountryEnumPw
-	CountryEnumPs
-	CountryEnumPa
-	CountryEnumPg
-	CountryEnumPy
-	CountryEnumPe
-	CountryEnumPh
-	CountryEnumPn
-	CountryEnumPl
-	CountryEnumPt
-	CountryEnumPr
-	CountryEnumQa
-	CountryEnumRe
-	CountryEnumRo
-	CountryEnumRu
-	CountryEnumRw
-	CountryEnumBl
-	CountryEnumSh
-	CountryEnumKn
-	CountryEnumLc
-	CountryEnumMf
-	CountryEnumPm
-	CountryEnumVc
-	CountryEnumWs
-	CountryEnumSm
-	CountryEnumSt
-	CountryEnumSa
-	CountryEnumSn
-	CountryEnumRs
-	CountryEnumSc
-	CountryEnumSl
-	CountryEnumSg
-	CountryEnumSx
-	CountryEnumSk
-	CountryEnumSi
-	CountryEnumSb
-	CountryEnumSo
-	CountryEnumZa
-	CountryEnumGs
-	CountryEnumKr
-	CountryEnumSs
-	CountryEnumEs
-	CountryEnumLk
-	CountryEnumSd
-	CountryEnumSr
-	CountryEnumSj
-	CountryEnumSe
-	CountryEnumCh
-	CountryEnumSy
-	CountryEnumTw
-	CountryEnumTj
-	CountryEnumTz
-	CountryEnumTh
-	CountryEnumTl
-	CountryEnumTg
-	CountryEnumTk
-	CountryEnumTo
-	CountryEnumTt
-	CountryEnumTn
-	CountryEnumTr
-	CountryEnumTm
-	CountryEnumTc
-	CountryEnumTv
-	CountryEnumUg
-	CountryEnumUa
-	CountryEnumAe
-	CountryEnumGb
-	CountryEnumUm
-	CountryEnumUs
-	CountryEnumUy
-	CountryEnumUz
-	CountryEnumVu
-	CountryEnumVe
-	CountryEnumVn
-	CountryEnumVg
-	CountryEnumVi
-	CountryEnumWf
-	CountryEnumEh
-	CountryEnumYe
-	CountryEnumZm
-	CountryEnumZw
-)
-
-func (c CountryEnum) String() string {
-	switch c {
-	default:
-		return strconv.Itoa(int(c))
-	case CountryEnumAf:
-		return "AF"
-	case CountryEnumAx:
-		return "AX"
-	case CountryEnumAl:
-		return "AL"
-	case CountryEnumDz:
-		return "DZ"
-	case CountryEnumAs:
-		return "AS"
-	case CountryEnumAd:
-		return "AD"
-	case CountryEnumAo:
-		return "AO"
-	case CountryEnumAi:
-		return "AI"
-	case CountryEnumAq:
-		return "AQ"
-	case CountryEnumAg:
-		return "AG"
-	case CountryEnumAr:
-		return "AR"
-	case CountryEnumAm:
-		return "AM"
-	case CountryEnumAw:
-		return "AW"
-	case CountryEnumAu:
-		return "AU"
-	case CountryEnumAt:
-		return "AT"
-	case CountryEnumAz:
-		return "AZ"
-	case CountryEnumBs:
-		return "BS"
-	case CountryEnumBh:
-		return "BH"
-	case CountryEnumBd:
-		return "BD"
-	case CountryEnumBb:
-		return "BB"
-	case CountryEnumBy:
-		return "BY"
-	case CountryEnumBe:
-		return "BE"
-	case CountryEnumBz:
-		return "BZ"
-	case CountryEnumBj:
-		return "BJ"
-	case CountryEnumBm:
-		return "BM"
-	case CountryEnumBt:
-		return "BT"
-	case CountryEnumBo:
-		return "BO"
-	case CountryEnumBq:
-		return "BQ"
-	case CountryEnumBa:
-		return "BA"
-	case CountryEnumBw:
-		return "BW"
-	case CountryEnumBv:
-		return "BV"
-	case CountryEnumBr:
-		return "BR"
-	case CountryEnumIo:
-		return "IO"
-	case CountryEnumBn:
-		return "BN"
-	case CountryEnumBg:
-		return "BG"
-	case CountryEnumBf:
-		return "BF"
-	case CountryEnumBi:
-		return "BI"
-	case CountryEnumCv:
-		return "CV"
-	case CountryEnumKh:
-		return "KH"
-	case CountryEnumCm:
-		return "CM"
-	case CountryEnumCa:
-		return "CA"
-	case CountryEnumKy:
-		return "KY"
-	case CountryEnumCf:
-		return "CF"
-	case CountryEnumTd:
-		return "TD"
-	case CountryEnumCl:
-		return "CL"
-	case CountryEnumCn:
-		return "CN"
-	case CountryEnumCx:
-		return "CX"
-	case CountryEnumCc:
-		return "CC"
-	case CountryEnumCo:
-		return "CO"
-	case CountryEnumKm:
-		return "KM"
-	case CountryEnumCg:
-		return "CG"
-	case CountryEnumCd:
-		return "CD"
-	case CountryEnumCk:
-		return "CK"
-	case CountryEnumCr:
-		return "CR"
-	case CountryEnumCi:
-		return "CI"
-	case CountryEnumHr:
-		return "HR"
-	case CountryEnumCu:
-		return "CU"
-	case CountryEnumCw:
-		return "CW"
-	case CountryEnumCy:
-		return "CY"
-	case CountryEnumCz:
-		return "CZ"
-	case CountryEnumDk:
-		return "DK"
-	case CountryEnumDj:
-		return "DJ"
-	case CountryEnumDm:
-		return "DM"
-	case CountryEnumDo:
-		return "DO"
-	case CountryEnumEc:
-		return "EC"
-	case CountryEnumEg:
-		return "EG"
-	case CountryEnumSv:
-		return "SV"
-	case CountryEnumGq:
-		return "GQ"
-	case CountryEnumEr:
-		return "ER"
-	case CountryEnumEe:
-		return "EE"
-	case CountryEnumSz:
-		return "SZ"
-	case CountryEnumEt:
-		return "ET"
-	case CountryEnumFk:
-		return "FK"
-	case CountryEnumFo:
-		return "FO"
-	case CountryEnumFj:
-		return "FJ"
-	case CountryEnumFi:
-		return "FI"
-	case CountryEnumFr:
-		return "FR"
-	case CountryEnumGf:
-		return "GF"
-	case CountryEnumPf:
-		return "PF"
-	case CountryEnumTf:
-		return "TF"
-	case CountryEnumGa:
-		return "GA"
-	case CountryEnumGm:
-		return "GM"
-	case CountryEnumGe:
-		return "GE"
-	case CountryEnumDe:
-		return "DE"
-	case CountryEnumGh:
-		return "GH"
-	case CountryEnumGi:
-		return "GI"
-	case CountryEnumGr:
-		return "GR"
-	case CountryEnumGl:
-		return "GL"
-	case CountryEnumGd:
-		return "GD"
-	case CountryEnumGp:
-		return "GP"
-	case CountryEnumGu:
-		return "GU"
-	case CountryEnumGt:
-		return "GT"
-	case CountryEnumGg:
-		return "GG"
-	case CountryEnumGn:
-		return "GN"
-	case CountryEnumGw:
-		return "GW"
-	case CountryEnumGy:
-		return "GY"
-	case CountryEnumHt:
-		return "HT"
-	case CountryEnumHm:
-		return "HM"
-	case CountryEnumVa:
-		return "VA"
-	case CountryEnumHn:
-		return "HN"
-	case CountryEnumHk:
-		return "HK"
-	case CountryEnumHu:
-		return "HU"
-	case CountryEnumIs:
-		return "IS"
-	case CountryEnumIn:
-		return "IN"
-	case CountryEnumId:
-		return "ID"
-	case CountryEnumIr:
-		return "IR"
-	case CountryEnumIq:
-		return "IQ"
-	case CountryEnumIe:
-		return "IE"
-	case CountryEnumIm:
-		return "IM"
-	case CountryEnumIl:
-		return "IL"
-	case CountryEnumIt:
-		return "IT"
-	case CountryEnumJm:
-		return "JM"
-	case CountryEnumJp:
-		return "JP"
-	case CountryEnumJe:
-		return "JE"
-	case CountryEnumJo:
-		return "JO"
-	case CountryEnumKz:
-		return "KZ"
-	case CountryEnumKe:
-		return "KE"
-	case CountryEnumKi:
-		return "KI"
-	case CountryEnumKw:
-		return "KW"
-	case CountryEnumKg:
-		return "KG"
-	case CountryEnumLa:
-		return "LA"
-	case CountryEnumLv:
-		return "LV"
-	case CountryEnumLb:
-		return "LB"
-	case CountryEnumLs:
-		return "LS"
-	case CountryEnumLr:
-		return "LR"
-	case CountryEnumLy:
-		return "LY"
-	case CountryEnumLi:
-		return "LI"
-	case CountryEnumLt:
-		return "LT"
-	case CountryEnumLu:
-		return "LU"
-	case CountryEnumMo:
-		return "MO"
-	case CountryEnumMg:
-		return "MG"
-	case CountryEnumMw:
-		return "MW"
-	case CountryEnumMy:
-		return "MY"
-	case CountryEnumMv:
-		return "MV"
-	case CountryEnumMl:
-		return "ML"
-	case CountryEnumMt:
-		return "MT"
-	case CountryEnumMh:
-		return "MH"
-	case CountryEnumMq:
-		return "MQ"
-	case CountryEnumMr:
-		return "MR"
-	case CountryEnumMu:
-		return "MU"
-	case CountryEnumYt:
-		return "YT"
-	case CountryEnumMx:
-		return "MX"
-	case CountryEnumFm:
-		return "FM"
-	case CountryEnumMd:
-		return "MD"
-	case CountryEnumMc:
-		return "MC"
-	case CountryEnumMn:
-		return "MN"
-	case CountryEnumMe:
-		return "ME"
-	case CountryEnumMs:
-		return "MS"
-	case CountryEnumMa:
-		return "MA"
-	case CountryEnumMz:
-		return "MZ"
-	case CountryEnumMm:
-		return "MM"
-	case CountryEnumNa:
-		return "NA"
-	case CountryEnumNr:
-		return "NR"
-	case CountryEnumNp:
-		return "NP"
-	case CountryEnumNl:
-		return "NL"
-	case CountryEnumNc:
-		return "NC"
-	case CountryEnumNz:
-		return "NZ"
-	case CountryEnumNi:
-		return "NI"
-	case CountryEnumNe:
-		return "NE"
-	case CountryEnumNg:
-		return "NG"
-	case CountryEnumNu:
-		return "NU"
-	case CountryEnumNf:
-		return "NF"
-	case CountryEnumKp:
-		return "KP"
-	case CountryEnumMk:
-		return "MK"
-	case CountryEnumMp:
-		return "MP"
-	case CountryEnumNo:
-		return "NO"
-	case CountryEnumOm:
-		return "OM"
-	case CountryEnumPk:
-		return "PK"
-	case CountryEnumPw:
-		return "PW"
-	case CountryEnumPs:
-		return "PS"
-	case CountryEnumPa:
-		return "PA"
-	case CountryEnumPg:
-		return "PG"
-	case CountryEnumPy:
-		return "PY"
-	case CountryEnumPe:
-		return "PE"
-	case CountryEnumPh:
-		return "PH"
-	case CountryEnumPn:
-		return "PN"
-	case CountryEnumPl:
-		return "PL"
-	case CountryEnumPt:
-		return "PT"
-	case CountryEnumPr:
-		return "PR"
-	case CountryEnumQa:
-		return "QA"
-	case CountryEnumRe:
-		return "RE"
-	case CountryEnumRo:
-		return "RO"
-	case CountryEnumRu:
-		return "RU"
-	case CountryEnumRw:
-		return "RW"
-	case CountryEnumBl:
-		return "BL"
-	case CountryEnumSh:
-		return "SH"
-	case CountryEnumKn:
-		return "KN"
-	case CountryEnumLc:
-		return "LC"
-	case CountryEnumMf:
-		return "MF"
-	case CountryEnumPm:
-		return "PM"
-	case CountryEnumVc:
-		return "VC"
-	case CountryEnumWs:
-		return "WS"
-	case CountryEnumSm:
-		return "SM"
-	case CountryEnumSt:
-		return "ST"
-	case CountryEnumSa:
-		return "SA"
-	case CountryEnumSn:
-		return "SN"
-	case CountryEnumRs:
-		return "RS"
-	case CountryEnumSc:
-		return "SC"
-	case CountryEnumSl:
-		return "SL"
-	case CountryEnumSg:
-		return "SG"
-	case CountryEnumSx:
-		return "SX"
-	case CountryEnumSk:
-		return "SK"
-	case CountryEnumSi:
-		return "SI"
-	case CountryEnumSb:
-		return "SB"
-	case CountryEnumSo:
-		return "SO"
-	case CountryEnumZa:
-		return "ZA"
-	case CountryEnumGs:
-		return "GS"
-	case CountryEnumKr:
-		return "KR"
-	case CountryEnumSs:
-		return "SS"
-	case CountryEnumEs:
-		return "ES"
-	case CountryEnumLk:
-		return "LK"
-	case CountryEnumSd:
-		return "SD"
-	case CountryEnumSr:
-		return "SR"
-	case CountryEnumSj:
-		return "SJ"
-	case CountryEnumSe:
-		return "SE"
-	case CountryEnumCh:
-		return "CH"
-	case CountryEnumSy:
-		return "SY"
-	case CountryEnumTw:
-		return "TW"
-	case CountryEnumTj:
-		return "TJ"
-	case CountryEnumTz:
-		return "TZ"
-	case CountryEnumTh:
-		return "TH"
-	case CountryEnumTl:
-		return "TL"
-	case CountryEnumTg:
-		return "TG"
-	case CountryEnumTk:
-		return "TK"
-	case CountryEnumTo:
-		return "TO"
-	case CountryEnumTt:
-		return "TT"
-	case CountryEnumTn:
-		return "TN"
-	case CountryEnumTr:
-		return "TR"
-	case CountryEnumTm:
-		return "TM"
-	case CountryEnumTc:
-		return "TC"
-	case CountryEnumTv:
-		return "TV"
-	case CountryEnumUg:
-		return "UG"
-	case CountryEnumUa:
-		return "UA"
-	case CountryEnumAe:
-		return "AE"
-	case CountryEnumGb:
-		return "GB"
-	case CountryEnumUm:
-		return "UM"
-	case CountryEnumUs:
-		return "US"
-	case CountryEnumUy:
-		return "UY"
-	case CountryEnumUz:
-		return "UZ"
-	case CountryEnumVu:
-		return "VU"
-	case CountryEnumVe:
-		return "VE"
-	case CountryEnumVn:
-		return "VN"
-	case CountryEnumVg:
-		return "VG"
-	case CountryEnumVi:
-		return "VI"
-	case CountryEnumWf:
-		return "WF"
-	case CountryEnumEh:
-		return "EH"
-	case CountryEnumYe:
-		return "YE"
-	case CountryEnumZm:
-		return "ZM"
-	case CountryEnumZw:
-		return "ZW"
-	}
-}
-
-func (c CountryEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", c.String())), nil
-}
-
-func (c *CountryEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewCountryEnumFromString(s string) (CountryEnum, error) {
+	switch s {
 	case "AF":
-		value := CountryEnumAf
-		*c = value
+		return CountryEnumAf, nil
 	case "AX":
-		value := CountryEnumAx
-		*c = value
+		return CountryEnumAx, nil
 	case "AL":
-		value := CountryEnumAl
-		*c = value
+		return CountryEnumAl, nil
 	case "DZ":
-		value := CountryEnumDz
-		*c = value
+		return CountryEnumDz, nil
 	case "AS":
-		value := CountryEnumAs
-		*c = value
+		return CountryEnumAs, nil
 	case "AD":
-		value := CountryEnumAd
-		*c = value
+		return CountryEnumAd, nil
 	case "AO":
-		value := CountryEnumAo
-		*c = value
+		return CountryEnumAo, nil
 	case "AI":
-		value := CountryEnumAi
-		*c = value
+		return CountryEnumAi, nil
 	case "AQ":
-		value := CountryEnumAq
-		*c = value
+		return CountryEnumAq, nil
 	case "AG":
-		value := CountryEnumAg
-		*c = value
+		return CountryEnumAg, nil
 	case "AR":
-		value := CountryEnumAr
-		*c = value
+		return CountryEnumAr, nil
 	case "AM":
-		value := CountryEnumAm
-		*c = value
+		return CountryEnumAm, nil
 	case "AW":
-		value := CountryEnumAw
-		*c = value
+		return CountryEnumAw, nil
 	case "AU":
-		value := CountryEnumAu
-		*c = value
+		return CountryEnumAu, nil
 	case "AT":
-		value := CountryEnumAt
-		*c = value
+		return CountryEnumAt, nil
 	case "AZ":
-		value := CountryEnumAz
-		*c = value
+		return CountryEnumAz, nil
 	case "BS":
-		value := CountryEnumBs
-		*c = value
+		return CountryEnumBs, nil
 	case "BH":
-		value := CountryEnumBh
-		*c = value
+		return CountryEnumBh, nil
 	case "BD":
-		value := CountryEnumBd
-		*c = value
+		return CountryEnumBd, nil
 	case "BB":
-		value := CountryEnumBb
-		*c = value
+		return CountryEnumBb, nil
 	case "BY":
-		value := CountryEnumBy
-		*c = value
+		return CountryEnumBy, nil
 	case "BE":
-		value := CountryEnumBe
-		*c = value
+		return CountryEnumBe, nil
 	case "BZ":
-		value := CountryEnumBz
-		*c = value
+		return CountryEnumBz, nil
 	case "BJ":
-		value := CountryEnumBj
-		*c = value
+		return CountryEnumBj, nil
 	case "BM":
-		value := CountryEnumBm
-		*c = value
+		return CountryEnumBm, nil
 	case "BT":
-		value := CountryEnumBt
-		*c = value
+		return CountryEnumBt, nil
 	case "BO":
-		value := CountryEnumBo
-		*c = value
+		return CountryEnumBo, nil
 	case "BQ":
-		value := CountryEnumBq
-		*c = value
+		return CountryEnumBq, nil
 	case "BA":
-		value := CountryEnumBa
-		*c = value
+		return CountryEnumBa, nil
 	case "BW":
-		value := CountryEnumBw
-		*c = value
+		return CountryEnumBw, nil
 	case "BV":
-		value := CountryEnumBv
-		*c = value
+		return CountryEnumBv, nil
 	case "BR":
-		value := CountryEnumBr
-		*c = value
+		return CountryEnumBr, nil
 	case "IO":
-		value := CountryEnumIo
-		*c = value
+		return CountryEnumIo, nil
 	case "BN":
-		value := CountryEnumBn
-		*c = value
+		return CountryEnumBn, nil
 	case "BG":
-		value := CountryEnumBg
-		*c = value
+		return CountryEnumBg, nil
 	case "BF":
-		value := CountryEnumBf
-		*c = value
+		return CountryEnumBf, nil
 	case "BI":
-		value := CountryEnumBi
-		*c = value
+		return CountryEnumBi, nil
 	case "CV":
-		value := CountryEnumCv
-		*c = value
+		return CountryEnumCv, nil
 	case "KH":
-		value := CountryEnumKh
-		*c = value
+		return CountryEnumKh, nil
 	case "CM":
-		value := CountryEnumCm
-		*c = value
+		return CountryEnumCm, nil
 	case "CA":
-		value := CountryEnumCa
-		*c = value
+		return CountryEnumCa, nil
 	case "KY":
-		value := CountryEnumKy
-		*c = value
+		return CountryEnumKy, nil
 	case "CF":
-		value := CountryEnumCf
-		*c = value
+		return CountryEnumCf, nil
 	case "TD":
-		value := CountryEnumTd
-		*c = value
+		return CountryEnumTd, nil
 	case "CL":
-		value := CountryEnumCl
-		*c = value
+		return CountryEnumCl, nil
 	case "CN":
-		value := CountryEnumCn
-		*c = value
+		return CountryEnumCn, nil
 	case "CX":
-		value := CountryEnumCx
-		*c = value
+		return CountryEnumCx, nil
 	case "CC":
-		value := CountryEnumCc
-		*c = value
+		return CountryEnumCc, nil
 	case "CO":
-		value := CountryEnumCo
-		*c = value
+		return CountryEnumCo, nil
 	case "KM":
-		value := CountryEnumKm
-		*c = value
+		return CountryEnumKm, nil
 	case "CG":
-		value := CountryEnumCg
-		*c = value
+		return CountryEnumCg, nil
 	case "CD":
-		value := CountryEnumCd
-		*c = value
+		return CountryEnumCd, nil
 	case "CK":
-		value := CountryEnumCk
-		*c = value
+		return CountryEnumCk, nil
 	case "CR":
-		value := CountryEnumCr
-		*c = value
+		return CountryEnumCr, nil
 	case "CI":
-		value := CountryEnumCi
-		*c = value
+		return CountryEnumCi, nil
 	case "HR":
-		value := CountryEnumHr
-		*c = value
+		return CountryEnumHr, nil
 	case "CU":
-		value := CountryEnumCu
-		*c = value
+		return CountryEnumCu, nil
 	case "CW":
-		value := CountryEnumCw
-		*c = value
+		return CountryEnumCw, nil
 	case "CY":
-		value := CountryEnumCy
-		*c = value
+		return CountryEnumCy, nil
 	case "CZ":
-		value := CountryEnumCz
-		*c = value
+		return CountryEnumCz, nil
 	case "DK":
-		value := CountryEnumDk
-		*c = value
+		return CountryEnumDk, nil
 	case "DJ":
-		value := CountryEnumDj
-		*c = value
+		return CountryEnumDj, nil
 	case "DM":
-		value := CountryEnumDm
-		*c = value
+		return CountryEnumDm, nil
 	case "DO":
-		value := CountryEnumDo
-		*c = value
+		return CountryEnumDo, nil
 	case "EC":
-		value := CountryEnumEc
-		*c = value
+		return CountryEnumEc, nil
 	case "EG":
-		value := CountryEnumEg
-		*c = value
+		return CountryEnumEg, nil
 	case "SV":
-		value := CountryEnumSv
-		*c = value
+		return CountryEnumSv, nil
 	case "GQ":
-		value := CountryEnumGq
-		*c = value
+		return CountryEnumGq, nil
 	case "ER":
-		value := CountryEnumEr
-		*c = value
+		return CountryEnumEr, nil
 	case "EE":
-		value := CountryEnumEe
-		*c = value
+		return CountryEnumEe, nil
 	case "SZ":
-		value := CountryEnumSz
-		*c = value
+		return CountryEnumSz, nil
 	case "ET":
-		value := CountryEnumEt
-		*c = value
+		return CountryEnumEt, nil
 	case "FK":
-		value := CountryEnumFk
-		*c = value
+		return CountryEnumFk, nil
 	case "FO":
-		value := CountryEnumFo
-		*c = value
+		return CountryEnumFo, nil
 	case "FJ":
-		value := CountryEnumFj
-		*c = value
+		return CountryEnumFj, nil
 	case "FI":
-		value := CountryEnumFi
-		*c = value
+		return CountryEnumFi, nil
 	case "FR":
-		value := CountryEnumFr
-		*c = value
+		return CountryEnumFr, nil
 	case "GF":
-		value := CountryEnumGf
-		*c = value
+		return CountryEnumGf, nil
 	case "PF":
-		value := CountryEnumPf
-		*c = value
+		return CountryEnumPf, nil
 	case "TF":
-		value := CountryEnumTf
-		*c = value
+		return CountryEnumTf, nil
 	case "GA":
-		value := CountryEnumGa
-		*c = value
+		return CountryEnumGa, nil
 	case "GM":
-		value := CountryEnumGm
-		*c = value
+		return CountryEnumGm, nil
 	case "GE":
-		value := CountryEnumGe
-		*c = value
+		return CountryEnumGe, nil
 	case "DE":
-		value := CountryEnumDe
-		*c = value
+		return CountryEnumDe, nil
 	case "GH":
-		value := CountryEnumGh
-		*c = value
+		return CountryEnumGh, nil
 	case "GI":
-		value := CountryEnumGi
-		*c = value
+		return CountryEnumGi, nil
 	case "GR":
-		value := CountryEnumGr
-		*c = value
+		return CountryEnumGr, nil
 	case "GL":
-		value := CountryEnumGl
-		*c = value
+		return CountryEnumGl, nil
 	case "GD":
-		value := CountryEnumGd
-		*c = value
+		return CountryEnumGd, nil
 	case "GP":
-		value := CountryEnumGp
-		*c = value
+		return CountryEnumGp, nil
 	case "GU":
-		value := CountryEnumGu
-		*c = value
+		return CountryEnumGu, nil
 	case "GT":
-		value := CountryEnumGt
-		*c = value
+		return CountryEnumGt, nil
 	case "GG":
-		value := CountryEnumGg
-		*c = value
+		return CountryEnumGg, nil
 	case "GN":
-		value := CountryEnumGn
-		*c = value
+		return CountryEnumGn, nil
 	case "GW":
-		value := CountryEnumGw
-		*c = value
+		return CountryEnumGw, nil
 	case "GY":
-		value := CountryEnumGy
-		*c = value
+		return CountryEnumGy, nil
 	case "HT":
-		value := CountryEnumHt
-		*c = value
+		return CountryEnumHt, nil
 	case "HM":
-		value := CountryEnumHm
-		*c = value
+		return CountryEnumHm, nil
 	case "VA":
-		value := CountryEnumVa
-		*c = value
+		return CountryEnumVa, nil
 	case "HN":
-		value := CountryEnumHn
-		*c = value
+		return CountryEnumHn, nil
 	case "HK":
-		value := CountryEnumHk
-		*c = value
+		return CountryEnumHk, nil
 	case "HU":
-		value := CountryEnumHu
-		*c = value
+		return CountryEnumHu, nil
 	case "IS":
-		value := CountryEnumIs
-		*c = value
+		return CountryEnumIs, nil
 	case "IN":
-		value := CountryEnumIn
-		*c = value
+		return CountryEnumIn, nil
 	case "ID":
-		value := CountryEnumId
-		*c = value
+		return CountryEnumId, nil
 	case "IR":
-		value := CountryEnumIr
-		*c = value
+		return CountryEnumIr, nil
 	case "IQ":
-		value := CountryEnumIq
-		*c = value
+		return CountryEnumIq, nil
 	case "IE":
-		value := CountryEnumIe
-		*c = value
+		return CountryEnumIe, nil
 	case "IM":
-		value := CountryEnumIm
-		*c = value
+		return CountryEnumIm, nil
 	case "IL":
-		value := CountryEnumIl
-		*c = value
+		return CountryEnumIl, nil
 	case "IT":
-		value := CountryEnumIt
-		*c = value
+		return CountryEnumIt, nil
 	case "JM":
-		value := CountryEnumJm
-		*c = value
+		return CountryEnumJm, nil
 	case "JP":
-		value := CountryEnumJp
-		*c = value
+		return CountryEnumJp, nil
 	case "JE":
-		value := CountryEnumJe
-		*c = value
+		return CountryEnumJe, nil
 	case "JO":
-		value := CountryEnumJo
-		*c = value
+		return CountryEnumJo, nil
 	case "KZ":
-		value := CountryEnumKz
-		*c = value
+		return CountryEnumKz, nil
 	case "KE":
-		value := CountryEnumKe
-		*c = value
+		return CountryEnumKe, nil
 	case "KI":
-		value := CountryEnumKi
-		*c = value
+		return CountryEnumKi, nil
 	case "KW":
-		value := CountryEnumKw
-		*c = value
+		return CountryEnumKw, nil
 	case "KG":
-		value := CountryEnumKg
-		*c = value
+		return CountryEnumKg, nil
 	case "LA":
-		value := CountryEnumLa
-		*c = value
+		return CountryEnumLa, nil
 	case "LV":
-		value := CountryEnumLv
-		*c = value
+		return CountryEnumLv, nil
 	case "LB":
-		value := CountryEnumLb
-		*c = value
+		return CountryEnumLb, nil
 	case "LS":
-		value := CountryEnumLs
-		*c = value
+		return CountryEnumLs, nil
 	case "LR":
-		value := CountryEnumLr
-		*c = value
+		return CountryEnumLr, nil
 	case "LY":
-		value := CountryEnumLy
-		*c = value
+		return CountryEnumLy, nil
 	case "LI":
-		value := CountryEnumLi
-		*c = value
+		return CountryEnumLi, nil
 	case "LT":
-		value := CountryEnumLt
-		*c = value
+		return CountryEnumLt, nil
 	case "LU":
-		value := CountryEnumLu
-		*c = value
+		return CountryEnumLu, nil
 	case "MO":
-		value := CountryEnumMo
-		*c = value
+		return CountryEnumMo, nil
 	case "MG":
-		value := CountryEnumMg
-		*c = value
+		return CountryEnumMg, nil
 	case "MW":
-		value := CountryEnumMw
-		*c = value
+		return CountryEnumMw, nil
 	case "MY":
-		value := CountryEnumMy
-		*c = value
+		return CountryEnumMy, nil
 	case "MV":
-		value := CountryEnumMv
-		*c = value
+		return CountryEnumMv, nil
 	case "ML":
-		value := CountryEnumMl
-		*c = value
+		return CountryEnumMl, nil
 	case "MT":
-		value := CountryEnumMt
-		*c = value
+		return CountryEnumMt, nil
 	case "MH":
-		value := CountryEnumMh
-		*c = value
+		return CountryEnumMh, nil
 	case "MQ":
-		value := CountryEnumMq
-		*c = value
+		return CountryEnumMq, nil
 	case "MR":
-		value := CountryEnumMr
-		*c = value
+		return CountryEnumMr, nil
 	case "MU":
-		value := CountryEnumMu
-		*c = value
+		return CountryEnumMu, nil
 	case "YT":
-		value := CountryEnumYt
-		*c = value
+		return CountryEnumYt, nil
 	case "MX":
-		value := CountryEnumMx
-		*c = value
+		return CountryEnumMx, nil
 	case "FM":
-		value := CountryEnumFm
-		*c = value
+		return CountryEnumFm, nil
 	case "MD":
-		value := CountryEnumMd
-		*c = value
+		return CountryEnumMd, nil
 	case "MC":
-		value := CountryEnumMc
-		*c = value
+		return CountryEnumMc, nil
 	case "MN":
-		value := CountryEnumMn
-		*c = value
+		return CountryEnumMn, nil
 	case "ME":
-		value := CountryEnumMe
-		*c = value
+		return CountryEnumMe, nil
 	case "MS":
-		value := CountryEnumMs
-		*c = value
+		return CountryEnumMs, nil
 	case "MA":
-		value := CountryEnumMa
-		*c = value
+		return CountryEnumMa, nil
 	case "MZ":
-		value := CountryEnumMz
-		*c = value
+		return CountryEnumMz, nil
 	case "MM":
-		value := CountryEnumMm
-		*c = value
+		return CountryEnumMm, nil
 	case "NA":
-		value := CountryEnumNa
-		*c = value
+		return CountryEnumNa, nil
 	case "NR":
-		value := CountryEnumNr
-		*c = value
+		return CountryEnumNr, nil
 	case "NP":
-		value := CountryEnumNp
-		*c = value
+		return CountryEnumNp, nil
 	case "NL":
-		value := CountryEnumNl
-		*c = value
+		return CountryEnumNl, nil
 	case "NC":
-		value := CountryEnumNc
-		*c = value
+		return CountryEnumNc, nil
 	case "NZ":
-		value := CountryEnumNz
-		*c = value
+		return CountryEnumNz, nil
 	case "NI":
-		value := CountryEnumNi
-		*c = value
+		return CountryEnumNi, nil
 	case "NE":
-		value := CountryEnumNe
-		*c = value
+		return CountryEnumNe, nil
 	case "NG":
-		value := CountryEnumNg
-		*c = value
+		return CountryEnumNg, nil
 	case "NU":
-		value := CountryEnumNu
-		*c = value
+		return CountryEnumNu, nil
 	case "NF":
-		value := CountryEnumNf
-		*c = value
+		return CountryEnumNf, nil
 	case "KP":
-		value := CountryEnumKp
-		*c = value
+		return CountryEnumKp, nil
 	case "MK":
-		value := CountryEnumMk
-		*c = value
+		return CountryEnumMk, nil
 	case "MP":
-		value := CountryEnumMp
-		*c = value
+		return CountryEnumMp, nil
 	case "NO":
-		value := CountryEnumNo
-		*c = value
+		return CountryEnumNo, nil
 	case "OM":
-		value := CountryEnumOm
-		*c = value
+		return CountryEnumOm, nil
 	case "PK":
-		value := CountryEnumPk
-		*c = value
+		return CountryEnumPk, nil
 	case "PW":
-		value := CountryEnumPw
-		*c = value
+		return CountryEnumPw, nil
 	case "PS":
-		value := CountryEnumPs
-		*c = value
+		return CountryEnumPs, nil
 	case "PA":
-		value := CountryEnumPa
-		*c = value
+		return CountryEnumPa, nil
 	case "PG":
-		value := CountryEnumPg
-		*c = value
+		return CountryEnumPg, nil
 	case "PY":
-		value := CountryEnumPy
-		*c = value
+		return CountryEnumPy, nil
 	case "PE":
-		value := CountryEnumPe
-		*c = value
+		return CountryEnumPe, nil
 	case "PH":
-		value := CountryEnumPh
-		*c = value
+		return CountryEnumPh, nil
 	case "PN":
-		value := CountryEnumPn
-		*c = value
+		return CountryEnumPn, nil
 	case "PL":
-		value := CountryEnumPl
-		*c = value
+		return CountryEnumPl, nil
 	case "PT":
-		value := CountryEnumPt
-		*c = value
+		return CountryEnumPt, nil
 	case "PR":
-		value := CountryEnumPr
-		*c = value
+		return CountryEnumPr, nil
 	case "QA":
-		value := CountryEnumQa
-		*c = value
+		return CountryEnumQa, nil
 	case "RE":
-		value := CountryEnumRe
-		*c = value
+		return CountryEnumRe, nil
 	case "RO":
-		value := CountryEnumRo
-		*c = value
+		return CountryEnumRo, nil
 	case "RU":
-		value := CountryEnumRu
-		*c = value
+		return CountryEnumRu, nil
 	case "RW":
-		value := CountryEnumRw
-		*c = value
+		return CountryEnumRw, nil
 	case "BL":
-		value := CountryEnumBl
-		*c = value
+		return CountryEnumBl, nil
 	case "SH":
-		value := CountryEnumSh
-		*c = value
+		return CountryEnumSh, nil
 	case "KN":
-		value := CountryEnumKn
-		*c = value
+		return CountryEnumKn, nil
 	case "LC":
-		value := CountryEnumLc
-		*c = value
+		return CountryEnumLc, nil
 	case "MF":
-		value := CountryEnumMf
-		*c = value
+		return CountryEnumMf, nil
 	case "PM":
-		value := CountryEnumPm
-		*c = value
+		return CountryEnumPm, nil
 	case "VC":
-		value := CountryEnumVc
-		*c = value
+		return CountryEnumVc, nil
 	case "WS":
-		value := CountryEnumWs
-		*c = value
+		return CountryEnumWs, nil
 	case "SM":
-		value := CountryEnumSm
-		*c = value
+		return CountryEnumSm, nil
 	case "ST":
-		value := CountryEnumSt
-		*c = value
+		return CountryEnumSt, nil
 	case "SA":
-		value := CountryEnumSa
-		*c = value
+		return CountryEnumSa, nil
 	case "SN":
-		value := CountryEnumSn
-		*c = value
+		return CountryEnumSn, nil
 	case "RS":
-		value := CountryEnumRs
-		*c = value
+		return CountryEnumRs, nil
 	case "SC":
-		value := CountryEnumSc
-		*c = value
+		return CountryEnumSc, nil
 	case "SL":
-		value := CountryEnumSl
-		*c = value
+		return CountryEnumSl, nil
 	case "SG":
-		value := CountryEnumSg
-		*c = value
+		return CountryEnumSg, nil
 	case "SX":
-		value := CountryEnumSx
-		*c = value
+		return CountryEnumSx, nil
 	case "SK":
-		value := CountryEnumSk
-		*c = value
+		return CountryEnumSk, nil
 	case "SI":
-		value := CountryEnumSi
-		*c = value
+		return CountryEnumSi, nil
 	case "SB":
-		value := CountryEnumSb
-		*c = value
+		return CountryEnumSb, nil
 	case "SO":
-		value := CountryEnumSo
-		*c = value
+		return CountryEnumSo, nil
 	case "ZA":
-		value := CountryEnumZa
-		*c = value
+		return CountryEnumZa, nil
 	case "GS":
-		value := CountryEnumGs
-		*c = value
+		return CountryEnumGs, nil
 	case "KR":
-		value := CountryEnumKr
-		*c = value
+		return CountryEnumKr, nil
 	case "SS":
-		value := CountryEnumSs
-		*c = value
+		return CountryEnumSs, nil
 	case "ES":
-		value := CountryEnumEs
-		*c = value
+		return CountryEnumEs, nil
 	case "LK":
-		value := CountryEnumLk
-		*c = value
+		return CountryEnumLk, nil
 	case "SD":
-		value := CountryEnumSd
-		*c = value
+		return CountryEnumSd, nil
 	case "SR":
-		value := CountryEnumSr
-		*c = value
+		return CountryEnumSr, nil
 	case "SJ":
-		value := CountryEnumSj
-		*c = value
+		return CountryEnumSj, nil
 	case "SE":
-		value := CountryEnumSe
-		*c = value
+		return CountryEnumSe, nil
 	case "CH":
-		value := CountryEnumCh
-		*c = value
+		return CountryEnumCh, nil
 	case "SY":
-		value := CountryEnumSy
-		*c = value
+		return CountryEnumSy, nil
 	case "TW":
-		value := CountryEnumTw
-		*c = value
+		return CountryEnumTw, nil
 	case "TJ":
-		value := CountryEnumTj
-		*c = value
+		return CountryEnumTj, nil
 	case "TZ":
-		value := CountryEnumTz
-		*c = value
+		return CountryEnumTz, nil
 	case "TH":
-		value := CountryEnumTh
-		*c = value
+		return CountryEnumTh, nil
 	case "TL":
-		value := CountryEnumTl
-		*c = value
+		return CountryEnumTl, nil
 	case "TG":
-		value := CountryEnumTg
-		*c = value
+		return CountryEnumTg, nil
 	case "TK":
-		value := CountryEnumTk
-		*c = value
+		return CountryEnumTk, nil
 	case "TO":
-		value := CountryEnumTo
-		*c = value
+		return CountryEnumTo, nil
 	case "TT":
-		value := CountryEnumTt
-		*c = value
+		return CountryEnumTt, nil
 	case "TN":
-		value := CountryEnumTn
-		*c = value
+		return CountryEnumTn, nil
 	case "TR":
-		value := CountryEnumTr
-		*c = value
+		return CountryEnumTr, nil
 	case "TM":
-		value := CountryEnumTm
-		*c = value
+		return CountryEnumTm, nil
 	case "TC":
-		value := CountryEnumTc
-		*c = value
+		return CountryEnumTc, nil
 	case "TV":
-		value := CountryEnumTv
-		*c = value
+		return CountryEnumTv, nil
 	case "UG":
-		value := CountryEnumUg
-		*c = value
+		return CountryEnumUg, nil
 	case "UA":
-		value := CountryEnumUa
-		*c = value
+		return CountryEnumUa, nil
 	case "AE":
-		value := CountryEnumAe
-		*c = value
+		return CountryEnumAe, nil
 	case "GB":
-		value := CountryEnumGb
-		*c = value
+		return CountryEnumGb, nil
 	case "UM":
-		value := CountryEnumUm
-		*c = value
+		return CountryEnumUm, nil
 	case "US":
-		value := CountryEnumUs
-		*c = value
+		return CountryEnumUs, nil
 	case "UY":
-		value := CountryEnumUy
-		*c = value
+		return CountryEnumUy, nil
 	case "UZ":
-		value := CountryEnumUz
-		*c = value
+		return CountryEnumUz, nil
 	case "VU":
-		value := CountryEnumVu
-		*c = value
+		return CountryEnumVu, nil
 	case "VE":
-		value := CountryEnumVe
-		*c = value
+		return CountryEnumVe, nil
 	case "VN":
-		value := CountryEnumVn
-		*c = value
+		return CountryEnumVn, nil
 	case "VG":
-		value := CountryEnumVg
-		*c = value
+		return CountryEnumVg, nil
 	case "VI":
-		value := CountryEnumVi
-		*c = value
+		return CountryEnumVi, nil
 	case "WF":
-		value := CountryEnumWf
-		*c = value
+		return CountryEnumWf, nil
 	case "EH":
-		value := CountryEnumEh
-		*c = value
+		return CountryEnumEh, nil
 	case "YE":
-		value := CountryEnumYe
-		*c = value
+		return CountryEnumYe, nil
 	case "ZM":
-		value := CountryEnumZm
-		*c = value
+		return CountryEnumZm, nil
 	case "ZW":
-		value := CountryEnumZw
-		*c = value
+		return CountryEnumZw, nil
 	}
-	return nil
+	var t CountryEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CountryEnum) Ptr() *CountryEnum {
+	return &c
 }
 
 type CrmAccountResponse struct {
@@ -4602,6 +4126,31 @@ type CrmAccountResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CrmAccountResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CrmAccountResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CrmAccountResponse(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CrmAccountResponse) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type CrmAssociationTypeResponse struct {
@@ -4609,6 +4158,31 @@ type CrmAssociationTypeResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CrmAssociationTypeResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CrmAssociationTypeResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CrmAssociationTypeResponse(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CrmAssociationTypeResponse) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type CrmContactResponse struct {
@@ -4616,6 +4190,31 @@ type CrmContactResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CrmContactResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CrmContactResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CrmContactResponse(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CrmContactResponse) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type CrmCustomObjectResponse struct {
@@ -4623,16 +4222,45 @@ type CrmCustomObjectResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CrmCustomObjectResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CrmCustomObjectResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CrmCustomObjectResponse(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CrmCustomObjectResponse) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // # The CustomObject Object
+//
 // ### Description
+//
 // The `Custom Object` record refers to an instance of a Custom Object Class.
+//
 // ### Usage Example
+//
 // TODO
 type CustomObject struct {
-	ObjectClass *string        `json:"object_class,omitempty"`
-	Fields      map[string]any `json:"fields,omitempty"`
+	ObjectClass *string                `json:"object_class,omitempty"`
+	Fields      map[string]interface{} `json:"fields,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	Id        *string    `json:"id,omitempty"`
@@ -4640,35 +4268,117 @@ type CustomObject struct {
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt   *time.Time     `json:"modified_at,omitempty"`
 	RemoteFields []*RemoteField `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CustomObject) UnmarshalJSON(data []byte) error {
+	type unmarshaler CustomObject
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CustomObject(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CustomObject) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // # The Custom Object Class Object
+//
 // ### Description
+//
 // The `Custom Object Class` object is used to represent a Custom Object Schema in the remote system.
+//
 // ### Usage Example
+//
 // TODO
 type CustomObjectClass struct {
 	Name             *string                                 `json:"name,omitempty"`
 	Description      *string                                 `json:"description,omitempty"`
 	Labels           map[string]*string                      `json:"labels,omitempty"`
 	Fields           []*RemoteFieldClassForCustomObjectClass `json:"fields,omitempty"`
-	AssociationTypes []map[string]any                        `json:"association_types,omitempty"`
+	AssociationTypes []map[string]interface{}                `json:"association_types,omitempty"`
 	Id               *string                                 `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId   *string    `json:"remote_id,omitempty"`
 	CreatedAt  *time.Time `json:"created_at,omitempty"`
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CustomObjectClass) UnmarshalJSON(data []byte) error {
+	type unmarshaler CustomObjectClass
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CustomObjectClass(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CustomObjectClass) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type CustomObjectRequest struct {
-	Fields map[string]any `json:"fields,omitempty"`
+	Fields map[string]interface{} `json:"fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CustomObjectRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CustomObjectRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CustomObjectRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CustomObjectRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 // # The DataPassthrough Object
+//
 // ### Description
+//
 // The `DataPassthrough` object is used to send information to an otherwise-unsupported third-party endpoint.
 //
 // ### Usage Example
+//
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
 	Method          MethodEnum `json:"method,omitempty"`
@@ -4678,68 +4388,131 @@ type DataPassthroughRequest struct {
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
-	Headers       map[string]any     `json:"headers,omitempty"`
-	RequestFormat *RequestFormatEnum `json:"request_format,omitempty"`
+	Headers       map[string]interface{} `json:"headers,omitempty"`
+	RequestFormat *RequestFormatEnum     `json:"request_format,omitempty"`
 	// Optional. If true, the response will always be an object of the form `{"type": T, "value": ...}` where `T` will be one of `string, boolean, number, null, array, object`.
 	NormalizeResponse *bool `json:"normalize_response,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DataPassthroughRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler DataPassthroughRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DataPassthroughRequest(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DataPassthroughRequest) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModeLog struct {
 	LogId         string                `json:"log_id"`
 	DashboardView string                `json:"dashboard_view"`
 	LogSummary    *DebugModelLogSummary `json:"log_summary,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (d *DebugModeLog) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModeLog
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DebugModeLog(value)
+	d._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DebugModeLog) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
 }
 
 type DebugModelLogSummary struct {
 	Url        string `json:"url"`
 	Method     string `json:"method"`
 	StatusCode int    `json:"status_code"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `INBOUND` - INBOUND
-// * `OUTBOUND` - OUTBOUND
-type DirectionEnum uint
-
-const (
-	DirectionEnumInbound DirectionEnum = iota + 1
-	DirectionEnumOutbound
-)
-
-func (d DirectionEnum) String() string {
-	switch d {
-	default:
-		return strconv.Itoa(int(d))
-	case DirectionEnumInbound:
-		return "INBOUND"
-	case DirectionEnumOutbound:
-		return "OUTBOUND"
-	}
-}
-
-func (d DirectionEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", d.String())), nil
-}
-
-func (d *DirectionEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (d *DebugModelLogSummary) UnmarshalJSON(data []byte) error {
+	type unmarshaler DebugModelLogSummary
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "INBOUND":
-		value := DirectionEnumInbound
-		*d = value
-	case "OUTBOUND":
-		value := DirectionEnumOutbound
-		*d = value
-	}
+	*d = DebugModelLogSummary(value)
+	d._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (d *DebugModelLogSummary) String() string {
+	if len(d._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(d._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
+// - `INBOUND` - INBOUND
+// - `OUTBOUND` - OUTBOUND
+type DirectionEnum string
+
+const (
+	DirectionEnumInbound  DirectionEnum = "INBOUND"
+	DirectionEnumOutbound DirectionEnum = "OUTBOUND"
+)
+
+func NewDirectionEnumFromString(s string) (DirectionEnum, error) {
+	switch s {
+	case "INBOUND":
+		return DirectionEnumInbound, nil
+	case "OUTBOUND":
+		return DirectionEnumOutbound, nil
+	}
+	var t DirectionEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (d DirectionEnum) Ptr() *DirectionEnum {
+	return &d
+}
+
 // # The EmailAddress Object
+//
 // ### Description
+//
 // The `EmailAddress` object is used to represent an entity's email address.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Contact` endpoint and view their email addresses.
 type EmailAddress struct {
 	// The email address.
@@ -4749,113 +4522,136 @@ type EmailAddress struct {
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EmailAddress) UnmarshalJSON(data []byte) error {
+	type unmarshaler EmailAddress
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EmailAddress(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EmailAddress) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // # The EmailAddress Object
+//
 // ### Description
+//
 // The `EmailAddress` object is used to represent an entity's email address.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Contact` endpoint and view their email addresses.
 type EmailAddressRequest struct {
 	// The email address.
 	EmailAddress *string `json:"email_address,omitempty"`
 	// The email address's type.
-	EmailAddressType    *string        `json:"email_address_type,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	EmailAddressType    *string                `json:"email_address_type,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `READ` - READ
-// * `WRITE` - WRITE
-type EnabledActionsEnum uint
-
-const (
-	EnabledActionsEnumRead EnabledActionsEnum = iota + 1
-	EnabledActionsEnumWrite
-)
-
-func (e EnabledActionsEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EnabledActionsEnumRead:
-		return "READ"
-	case EnabledActionsEnumWrite:
-		return "WRITE"
-	}
-}
-
-func (e EnabledActionsEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EnabledActionsEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (e *EmailAddressRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler EmailAddressRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*e = EmailAddressRequest(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EmailAddressRequest) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+// - `READ` - READ
+// - `WRITE` - WRITE
+type EnabledActionsEnum string
+
+const (
+	EnabledActionsEnumRead  EnabledActionsEnum = "READ"
+	EnabledActionsEnumWrite EnabledActionsEnum = "WRITE"
+)
+
+func NewEnabledActionsEnumFromString(s string) (EnabledActionsEnum, error) {
+	switch s {
 	case "READ":
-		value := EnabledActionsEnumRead
-		*e = value
+		return EnabledActionsEnumRead, nil
 	case "WRITE":
-		value := EnabledActionsEnumWrite
-		*e = value
+		return EnabledActionsEnumWrite, nil
 	}
-	return nil
+	var t EnabledActionsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
-type EncodingEnum uint
+func (e EnabledActionsEnum) Ptr() *EnabledActionsEnum {
+	return &e
+}
+
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
+type EncodingEnum string
 
 const (
-	EncodingEnumRaw EncodingEnum = iota + 1
-	EncodingEnumBase64
-	EncodingEnumGzipBase64
+	EncodingEnumRaw        EncodingEnum = "RAW"
+	EncodingEnumBase64     EncodingEnum = "BASE64"
+	EncodingEnumGzipBase64 EncodingEnum = "GZIP_BASE64"
 )
 
-func (e EncodingEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EncodingEnumRaw:
-		return "RAW"
-	case EncodingEnumBase64:
-		return "BASE64"
-	case EncodingEnumGzipBase64:
-		return "GZIP_BASE64"
-	}
-}
-
-func (e EncodingEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EncodingEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewEncodingEnumFromString(s string) (EncodingEnum, error) {
+	switch s {
 	case "RAW":
-		value := EncodingEnumRaw
-		*e = value
+		return EncodingEnumRaw, nil
 	case "BASE64":
-		value := EncodingEnumBase64
-		*e = value
+		return EncodingEnumBase64, nil
 	case "GZIP_BASE64":
-		value := EncodingEnumGzipBase64
-		*e = value
+		return EncodingEnumGzipBase64, nil
 	}
-	return nil
+	var t EncodingEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EncodingEnum) Ptr() *EncodingEnum {
+	return &e
 }
 
 // # The Engagement Object
+//
 // ### Description
+//
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type Engagement struct {
 	// The engagement's owner.
@@ -4866,8 +4662,8 @@ type Engagement struct {
 	Subject *string `json:"subject,omitempty"`
 	// The engagement's direction.
 	//
-	// * `INBOUND` - INBOUND
-	// * `OUTBOUND` - OUTBOUND
+	// - `INBOUND` - INBOUND
+	// - `OUTBOUND` - OUTBOUND
 	Direction *EngagementDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
 	EngagementType *EngagementEngagementType `json:"engagement_type,omitempty"`
@@ -4885,10 +4681,35 @@ type Engagement struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *Engagement) UnmarshalJSON(data []byte) error {
+	type unmarshaler Engagement
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = Engagement(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *Engagement) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The account of the engagement.
@@ -5008,8 +4829,8 @@ func (e *EngagementContactsItem) Accept(visitor EngagementContactsItemVisitor) e
 
 // The engagement's direction.
 //
-// * `INBOUND` - INBOUND
-// * `OUTBOUND` - OUTBOUND
+// - `INBOUND` - INBOUND
+// - `OUTBOUND` - OUTBOUND
 type EngagementDirection struct {
 	typeName      string
 	DirectionEnum DirectionEnum
@@ -5184,9 +5005,13 @@ func (e *EngagementOwner) Accept(visitor EngagementOwnerVisitor) error {
 }
 
 // # The Engagement Object
+//
 // ### Description
+//
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type EngagementRequest struct {
 	// The engagement's owner.
@@ -5197,8 +5022,8 @@ type EngagementRequest struct {
 	Subject *string `json:"subject,omitempty"`
 	// The engagement's direction.
 	//
-	// * `INBOUND` - INBOUND
-	// * `OUTBOUND` - OUTBOUND
+	// - `INBOUND` - INBOUND
+	// - `OUTBOUND` - OUTBOUND
 	Direction *EngagementRequestDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
 	EngagementType *EngagementRequestEngagementType `json:"engagement_type,omitempty"`
@@ -5209,9 +5034,34 @@ type EngagementRequest struct {
 	// The account of the engagement.
 	Account             *EngagementRequestAccount        `json:"account,omitempty"`
 	Contacts            []*EngagementRequestContactsItem `json:"contacts,omitempty"`
-	IntegrationParams   map[string]any                   `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any                   `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}           `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}           `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest            `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EngagementRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler EngagementRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EngagementRequest(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EngagementRequest) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The account of the engagement.
@@ -5331,8 +5181,8 @@ func (e *EngagementRequestContactsItem) Accept(visitor EngagementRequestContacts
 
 // The engagement's direction.
 //
-// * `INBOUND` - INBOUND
-// * `OUTBOUND` - OUTBOUND
+// - `INBOUND` - INBOUND
+// - `OUTBOUND` - OUTBOUND
 type EngagementRequestDirection struct {
 	typeName      string
 	DirectionEnum DirectionEnum
@@ -5511,19 +5361,48 @@ type EngagementResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EngagementResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler EngagementResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EngagementResponse(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EngagementResponse) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // # The Engagement Type Object
+//
 // ### Description
+//
 // The `Engagement Type` object is used to represent an interaction activity. A given `Engagement` typically has an `Engagement Type` object represented in the engagement_type field.
+//
 // ### Usage Example
+//
 // TODO
 type EngagementType struct {
 	// The engagement type's activity type.
 	//
-	// * `CALL` - CALL
-	// * `MEETING` - MEETING
-	// * `EMAIL` - EMAIL
+	// - `CALL` - CALL
+	// - `MEETING` - MEETING
+	// - `EMAIL` - EMAIL
 	ActivityType *EngagementTypeActivityType `json:"activity_type,omitempty"`
 	// The engagement type's name.
 	Name *string `json:"name,omitempty"`
@@ -5534,13 +5413,38 @@ type EngagementType struct {
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt   *time.Time     `json:"modified_at,omitempty"`
 	RemoteFields []*RemoteField `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *EngagementType) UnmarshalJSON(data []byte) error {
+	type unmarshaler EngagementType
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = EngagementType(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *EngagementType) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
 }
 
 // The engagement type's activity type.
 //
-// * `CALL` - CALL
-// * `MEETING` - MEETING
-// * `EMAIL` - EMAIL
+// - `CALL` - CALL
+// - `MEETING` - MEETING
+// - `EMAIL` - EMAIL
 type EngagementTypeActivityType struct {
 	typeName         string
 	ActivityTypeEnum ActivityTypeEnum
@@ -5598,641 +5502,328 @@ func (e *EngagementTypeActivityType) Accept(visitor EngagementTypeActivityTypeVi
 	}
 }
 
-type EngagementsListRequestExpand uint
-
-const (
-	EngagementsListRequestExpandAccount EngagementsListRequestExpand = iota + 1
-	EngagementsListRequestExpandAccountEngagementType
-	EngagementsListRequestExpandContacts
-	EngagementsListRequestExpandContactsAccount
-	EngagementsListRequestExpandContactsAccountEngagementType
-	EngagementsListRequestExpandContactsEngagementType
-	EngagementsListRequestExpandContactsOwner
-	EngagementsListRequestExpandContactsOwnerAccount
-	EngagementsListRequestExpandContactsOwnerAccountEngagementType
-	EngagementsListRequestExpandContactsOwnerEngagementType
-	EngagementsListRequestExpandEngagementType
-	EngagementsListRequestExpandOwner
-	EngagementsListRequestExpandOwnerAccount
-	EngagementsListRequestExpandOwnerAccountEngagementType
-	EngagementsListRequestExpandOwnerEngagementType
-)
-
-func (e EngagementsListRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EngagementsListRequestExpandAccount:
-		return "account"
-	case EngagementsListRequestExpandAccountEngagementType:
-		return "account,engagement_type"
-	case EngagementsListRequestExpandContacts:
-		return "contacts"
-	case EngagementsListRequestExpandContactsAccount:
-		return "contacts,account"
-	case EngagementsListRequestExpandContactsAccountEngagementType:
-		return "contacts,account,engagement_type"
-	case EngagementsListRequestExpandContactsEngagementType:
-		return "contacts,engagement_type"
-	case EngagementsListRequestExpandContactsOwner:
-		return "contacts,owner"
-	case EngagementsListRequestExpandContactsOwnerAccount:
-		return "contacts,owner,account"
-	case EngagementsListRequestExpandContactsOwnerAccountEngagementType:
-		return "contacts,owner,account,engagement_type"
-	case EngagementsListRequestExpandContactsOwnerEngagementType:
-		return "contacts,owner,engagement_type"
-	case EngagementsListRequestExpandEngagementType:
-		return "engagement_type"
-	case EngagementsListRequestExpandOwner:
-		return "owner"
-	case EngagementsListRequestExpandOwnerAccount:
-		return "owner,account"
-	case EngagementsListRequestExpandOwnerAccountEngagementType:
-		return "owner,account,engagement_type"
-	case EngagementsListRequestExpandOwnerEngagementType:
-		return "owner,engagement_type"
-	}
-}
-
-func (e EngagementsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EngagementsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := EngagementsListRequestExpandAccount
-		*e = value
-	case "account,engagement_type":
-		value := EngagementsListRequestExpandAccountEngagementType
-		*e = value
-	case "contacts":
-		value := EngagementsListRequestExpandContacts
-		*e = value
-	case "contacts,account":
-		value := EngagementsListRequestExpandContactsAccount
-		*e = value
-	case "contacts,account,engagement_type":
-		value := EngagementsListRequestExpandContactsAccountEngagementType
-		*e = value
-	case "contacts,engagement_type":
-		value := EngagementsListRequestExpandContactsEngagementType
-		*e = value
-	case "contacts,owner":
-		value := EngagementsListRequestExpandContactsOwner
-		*e = value
-	case "contacts,owner,account":
-		value := EngagementsListRequestExpandContactsOwnerAccount
-		*e = value
-	case "contacts,owner,account,engagement_type":
-		value := EngagementsListRequestExpandContactsOwnerAccountEngagementType
-		*e = value
-	case "contacts,owner,engagement_type":
-		value := EngagementsListRequestExpandContactsOwnerEngagementType
-		*e = value
-	case "engagement_type":
-		value := EngagementsListRequestExpandEngagementType
-		*e = value
-	case "owner":
-		value := EngagementsListRequestExpandOwner
-		*e = value
-	case "owner,account":
-		value := EngagementsListRequestExpandOwnerAccount
-		*e = value
-	case "owner,account,engagement_type":
-		value := EngagementsListRequestExpandOwnerAccountEngagementType
-		*e = value
-	case "owner,engagement_type":
-		value := EngagementsListRequestExpandOwnerEngagementType
-		*e = value
-	}
-	return nil
-}
-
-type EngagementsRetrieveRequestExpand uint
-
-const (
-	EngagementsRetrieveRequestExpandAccount EngagementsRetrieveRequestExpand = iota + 1
-	EngagementsRetrieveRequestExpandAccountEngagementType
-	EngagementsRetrieveRequestExpandContacts
-	EngagementsRetrieveRequestExpandContactsAccount
-	EngagementsRetrieveRequestExpandContactsAccountEngagementType
-	EngagementsRetrieveRequestExpandContactsEngagementType
-	EngagementsRetrieveRequestExpandContactsOwner
-	EngagementsRetrieveRequestExpandContactsOwnerAccount
-	EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType
-	EngagementsRetrieveRequestExpandContactsOwnerEngagementType
-	EngagementsRetrieveRequestExpandEngagementType
-	EngagementsRetrieveRequestExpandOwner
-	EngagementsRetrieveRequestExpandOwnerAccount
-	EngagementsRetrieveRequestExpandOwnerAccountEngagementType
-	EngagementsRetrieveRequestExpandOwnerEngagementType
-)
-
-func (e EngagementsRetrieveRequestExpand) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EngagementsRetrieveRequestExpandAccount:
-		return "account"
-	case EngagementsRetrieveRequestExpandAccountEngagementType:
-		return "account,engagement_type"
-	case EngagementsRetrieveRequestExpandContacts:
-		return "contacts"
-	case EngagementsRetrieveRequestExpandContactsAccount:
-		return "contacts,account"
-	case EngagementsRetrieveRequestExpandContactsAccountEngagementType:
-		return "contacts,account,engagement_type"
-	case EngagementsRetrieveRequestExpandContactsEngagementType:
-		return "contacts,engagement_type"
-	case EngagementsRetrieveRequestExpandContactsOwner:
-		return "contacts,owner"
-	case EngagementsRetrieveRequestExpandContactsOwnerAccount:
-		return "contacts,owner,account"
-	case EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType:
-		return "contacts,owner,account,engagement_type"
-	case EngagementsRetrieveRequestExpandContactsOwnerEngagementType:
-		return "contacts,owner,engagement_type"
-	case EngagementsRetrieveRequestExpandEngagementType:
-		return "engagement_type"
-	case EngagementsRetrieveRequestExpandOwner:
-		return "owner"
-	case EngagementsRetrieveRequestExpandOwnerAccount:
-		return "owner,account"
-	case EngagementsRetrieveRequestExpandOwnerAccountEngagementType:
-		return "owner,account,engagement_type"
-	case EngagementsRetrieveRequestExpandOwnerEngagementType:
-		return "owner,engagement_type"
-	}
-}
-
-func (e EngagementsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EngagementsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := EngagementsRetrieveRequestExpandAccount
-		*e = value
-	case "account,engagement_type":
-		value := EngagementsRetrieveRequestExpandAccountEngagementType
-		*e = value
-	case "contacts":
-		value := EngagementsRetrieveRequestExpandContacts
-		*e = value
-	case "contacts,account":
-		value := EngagementsRetrieveRequestExpandContactsAccount
-		*e = value
-	case "contacts,account,engagement_type":
-		value := EngagementsRetrieveRequestExpandContactsAccountEngagementType
-		*e = value
-	case "contacts,engagement_type":
-		value := EngagementsRetrieveRequestExpandContactsEngagementType
-		*e = value
-	case "contacts,owner":
-		value := EngagementsRetrieveRequestExpandContactsOwner
-		*e = value
-	case "contacts,owner,account":
-		value := EngagementsRetrieveRequestExpandContactsOwnerAccount
-		*e = value
-	case "contacts,owner,account,engagement_type":
-		value := EngagementsRetrieveRequestExpandContactsOwnerAccountEngagementType
-		*e = value
-	case "contacts,owner,engagement_type":
-		value := EngagementsRetrieveRequestExpandContactsOwnerEngagementType
-		*e = value
-	case "engagement_type":
-		value := EngagementsRetrieveRequestExpandEngagementType
-		*e = value
-	case "owner":
-		value := EngagementsRetrieveRequestExpandOwner
-		*e = value
-	case "owner,account":
-		value := EngagementsRetrieveRequestExpandOwnerAccount
-		*e = value
-	case "owner,account,engagement_type":
-		value := EngagementsRetrieveRequestExpandOwnerAccountEngagementType
-		*e = value
-	case "owner,engagement_type":
-		value := EngagementsRetrieveRequestExpandOwnerEngagementType
-		*e = value
-	}
-	return nil
-}
-
 type ErrorValidationProblem struct {
 	Source      *ValidationProblemSource `json:"source,omitempty"`
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
-// * `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
-// * `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
-// * `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
-// * `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
-// * `INVITED_USER` - INVITED_USER
-// * `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
-// * `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
-// * `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
-// * `CREATED_DESTINATION` - CREATED_DESTINATION
-// * `DELETED_DESTINATION` - DELETED_DESTINATION
-// * `CHANGED_SCOPES` - CHANGED_SCOPES
-// * `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
-// * `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
-// * `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
-// * `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
-// * `ENABLED_CATEGORY` - ENABLED_CATEGORY
-// * `DISABLED_CATEGORY` - DISABLED_CATEGORY
-// * `CHANGED_PASSWORD` - CHANGED_PASSWORD
-// * `RESET_PASSWORD` - RESET_PASSWORD
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
-// * `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
-// * `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
-// * `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
-// * `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
-type EventTypeEnum uint
-
-const (
-	EventTypeEnumCreatedRemoteProductionApiKey EventTypeEnum = iota + 1
-	EventTypeEnumDeletedRemoteProductionApiKey
-	EventTypeEnumCreatedTestApiKey
-	EventTypeEnumDeletedTestApiKey
-	EventTypeEnumRegeneratedProductionApiKey
-	EventTypeEnumInvitedUser
-	EventTypeEnumTwoFactorAuthEnabled
-	EventTypeEnumTwoFactorAuthDisabled
-	EventTypeEnumDeletedLinkedAccount
-	EventTypeEnumCreatedDestination
-	EventTypeEnumDeletedDestination
-	EventTypeEnumChangedScopes
-	EventTypeEnumChangedPersonalInformation
-	EventTypeEnumChangedOrganizationSettings
-	EventTypeEnumEnabledIntegration
-	EventTypeEnumDisabledIntegration
-	EventTypeEnumEnabledCategory
-	EventTypeEnumDisabledCategory
-	EventTypeEnumChangedPassword
-	EventTypeEnumResetPassword
-	EventTypeEnumEnabledRedactUnmappedDataForOrganization
-	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumDisabledRedactUnmappedDataForOrganization
-	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-	EventTypeEnumCreatedIntegrationWideFieldMapping
-	EventTypeEnumCreatedLinkedAccountFieldMapping
-	EventTypeEnumChangedIntegrationWideFieldMapping
-	EventTypeEnumChangedLinkedAccountFieldMapping
-	EventTypeEnumDeletedIntegrationWideFieldMapping
-	EventTypeEnumDeletedLinkedAccountFieldMapping
-)
-
-func (e EventTypeEnum) String() string {
-	switch e {
-	default:
-		return strconv.Itoa(int(e))
-	case EventTypeEnumCreatedRemoteProductionApiKey:
-		return "CREATED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumDeletedRemoteProductionApiKey:
-		return "DELETED_REMOTE_PRODUCTION_API_KEY"
-	case EventTypeEnumCreatedTestApiKey:
-		return "CREATED_TEST_API_KEY"
-	case EventTypeEnumDeletedTestApiKey:
-		return "DELETED_TEST_API_KEY"
-	case EventTypeEnumRegeneratedProductionApiKey:
-		return "REGENERATED_PRODUCTION_API_KEY"
-	case EventTypeEnumInvitedUser:
-		return "INVITED_USER"
-	case EventTypeEnumTwoFactorAuthEnabled:
-		return "TWO_FACTOR_AUTH_ENABLED"
-	case EventTypeEnumTwoFactorAuthDisabled:
-		return "TWO_FACTOR_AUTH_DISABLED"
-	case EventTypeEnumDeletedLinkedAccount:
-		return "DELETED_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedDestination:
-		return "CREATED_DESTINATION"
-	case EventTypeEnumDeletedDestination:
-		return "DELETED_DESTINATION"
-	case EventTypeEnumChangedScopes:
-		return "CHANGED_SCOPES"
-	case EventTypeEnumChangedPersonalInformation:
-		return "CHANGED_PERSONAL_INFORMATION"
-	case EventTypeEnumChangedOrganizationSettings:
-		return "CHANGED_ORGANIZATION_SETTINGS"
-	case EventTypeEnumEnabledIntegration:
-		return "ENABLED_INTEGRATION"
-	case EventTypeEnumDisabledIntegration:
-		return "DISABLED_INTEGRATION"
-	case EventTypeEnumEnabledCategory:
-		return "ENABLED_CATEGORY"
-	case EventTypeEnumDisabledCategory:
-		return "DISABLED_CATEGORY"
-	case EventTypeEnumChangedPassword:
-		return "CHANGED_PASSWORD"
-	case EventTypeEnumResetPassword:
-		return "RESET_PASSWORD"
-	case EventTypeEnumEnabledRedactUnmappedDataForOrganization:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount:
-		return "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumDisabledRedactUnmappedDataForOrganization:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
-	case EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount:
-		return "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
-	case EventTypeEnumCreatedIntegrationWideFieldMapping:
-		return "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumCreatedLinkedAccountFieldMapping:
-		return "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumChangedIntegrationWideFieldMapping:
-		return "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumChangedLinkedAccountFieldMapping:
-		return "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
-	case EventTypeEnumDeletedIntegrationWideFieldMapping:
-		return "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
-	case EventTypeEnumDeletedLinkedAccountFieldMapping:
-		return "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
-	}
-}
-
-func (e EventTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", e.String())), nil
-}
-
-func (e *EventTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (e *ErrorValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler ErrorValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*e = ErrorValidationProblem(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *ErrorValidationProblem) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+// - `CREATED_REMOTE_PRODUCTION_API_KEY` - CREATED_REMOTE_PRODUCTION_API_KEY
+// - `DELETED_REMOTE_PRODUCTION_API_KEY` - DELETED_REMOTE_PRODUCTION_API_KEY
+// - `CREATED_TEST_API_KEY` - CREATED_TEST_API_KEY
+// - `DELETED_TEST_API_KEY` - DELETED_TEST_API_KEY
+// - `REGENERATED_PRODUCTION_API_KEY` - REGENERATED_PRODUCTION_API_KEY
+// - `INVITED_USER` - INVITED_USER
+// - `TWO_FACTOR_AUTH_ENABLED` - TWO_FACTOR_AUTH_ENABLED
+// - `TWO_FACTOR_AUTH_DISABLED` - TWO_FACTOR_AUTH_DISABLED
+// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
+// - `CREATED_DESTINATION` - CREATED_DESTINATION
+// - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_SCOPES` - CHANGED_SCOPES
+// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
+// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
+// - `ENABLED_INTEGRATION` - ENABLED_INTEGRATION
+// - `DISABLED_INTEGRATION` - DISABLED_INTEGRATION
+// - `ENABLED_CATEGORY` - ENABLED_CATEGORY
+// - `DISABLED_CATEGORY` - DISABLED_CATEGORY
+// - `CHANGED_PASSWORD` - CHANGED_PASSWORD
+// - `RESET_PASSWORD` - RESET_PASSWORD
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION` - DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION
+// - `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT` - DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT
+// - `CREATED_INTEGRATION_WIDE_FIELD_MAPPING` - CREATED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_FIELD_MAPPING` - CREATED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING` - CHANGED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
+// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+type EventTypeEnum string
+
+const (
+	EventTypeEnumCreatedRemoteProductionApiKey              EventTypeEnum = "CREATED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumDeletedRemoteProductionApiKey              EventTypeEnum = "DELETED_REMOTE_PRODUCTION_API_KEY"
+	EventTypeEnumCreatedTestApiKey                          EventTypeEnum = "CREATED_TEST_API_KEY"
+	EventTypeEnumDeletedTestApiKey                          EventTypeEnum = "DELETED_TEST_API_KEY"
+	EventTypeEnumRegeneratedProductionApiKey                EventTypeEnum = "REGENERATED_PRODUCTION_API_KEY"
+	EventTypeEnumInvitedUser                                EventTypeEnum = "INVITED_USER"
+	EventTypeEnumTwoFactorAuthEnabled                       EventTypeEnum = "TWO_FACTOR_AUTH_ENABLED"
+	EventTypeEnumTwoFactorAuthDisabled                      EventTypeEnum = "TWO_FACTOR_AUTH_DISABLED"
+	EventTypeEnumDeletedLinkedAccount                       EventTypeEnum = "DELETED_LINKED_ACCOUNT"
+	EventTypeEnumCreatedDestination                         EventTypeEnum = "CREATED_DESTINATION"
+	EventTypeEnumDeletedDestination                         EventTypeEnum = "DELETED_DESTINATION"
+	EventTypeEnumChangedScopes                              EventTypeEnum = "CHANGED_SCOPES"
+	EventTypeEnumChangedPersonalInformation                 EventTypeEnum = "CHANGED_PERSONAL_INFORMATION"
+	EventTypeEnumChangedOrganizationSettings                EventTypeEnum = "CHANGED_ORGANIZATION_SETTINGS"
+	EventTypeEnumEnabledIntegration                         EventTypeEnum = "ENABLED_INTEGRATION"
+	EventTypeEnumDisabledIntegration                        EventTypeEnum = "DISABLED_INTEGRATION"
+	EventTypeEnumEnabledCategory                            EventTypeEnum = "ENABLED_CATEGORY"
+	EventTypeEnumDisabledCategory                           EventTypeEnum = "DISABLED_CATEGORY"
+	EventTypeEnumChangedPassword                            EventTypeEnum = "CHANGED_PASSWORD"
+	EventTypeEnumResetPassword                              EventTypeEnum = "RESET_PASSWORD"
+	EventTypeEnumEnabledRedactUnmappedDataForOrganization   EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount  EventTypeEnum = "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumDisabledRedactUnmappedDataForOrganization  EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION"
+	EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount EventTypeEnum = "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT"
+	EventTypeEnumCreatedIntegrationWideFieldMapping         EventTypeEnum = "CREATED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountFieldMapping           EventTypeEnum = "CREATED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumChangedIntegrationWideFieldMapping         EventTypeEnum = "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
+	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+)
+
+func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
+	switch s {
 	case "CREATED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumCreatedRemoteProductionApiKey
-		*e = value
+		return EventTypeEnumCreatedRemoteProductionApiKey, nil
 	case "DELETED_REMOTE_PRODUCTION_API_KEY":
-		value := EventTypeEnumDeletedRemoteProductionApiKey
-		*e = value
+		return EventTypeEnumDeletedRemoteProductionApiKey, nil
 	case "CREATED_TEST_API_KEY":
-		value := EventTypeEnumCreatedTestApiKey
-		*e = value
+		return EventTypeEnumCreatedTestApiKey, nil
 	case "DELETED_TEST_API_KEY":
-		value := EventTypeEnumDeletedTestApiKey
-		*e = value
+		return EventTypeEnumDeletedTestApiKey, nil
 	case "REGENERATED_PRODUCTION_API_KEY":
-		value := EventTypeEnumRegeneratedProductionApiKey
-		*e = value
+		return EventTypeEnumRegeneratedProductionApiKey, nil
 	case "INVITED_USER":
-		value := EventTypeEnumInvitedUser
-		*e = value
+		return EventTypeEnumInvitedUser, nil
 	case "TWO_FACTOR_AUTH_ENABLED":
-		value := EventTypeEnumTwoFactorAuthEnabled
-		*e = value
+		return EventTypeEnumTwoFactorAuthEnabled, nil
 	case "TWO_FACTOR_AUTH_DISABLED":
-		value := EventTypeEnumTwoFactorAuthDisabled
-		*e = value
+		return EventTypeEnumTwoFactorAuthDisabled, nil
 	case "DELETED_LINKED_ACCOUNT":
-		value := EventTypeEnumDeletedLinkedAccount
-		*e = value
+		return EventTypeEnumDeletedLinkedAccount, nil
 	case "CREATED_DESTINATION":
-		value := EventTypeEnumCreatedDestination
-		*e = value
+		return EventTypeEnumCreatedDestination, nil
 	case "DELETED_DESTINATION":
-		value := EventTypeEnumDeletedDestination
-		*e = value
+		return EventTypeEnumDeletedDestination, nil
 	case "CHANGED_SCOPES":
-		value := EventTypeEnumChangedScopes
-		*e = value
+		return EventTypeEnumChangedScopes, nil
 	case "CHANGED_PERSONAL_INFORMATION":
-		value := EventTypeEnumChangedPersonalInformation
-		*e = value
+		return EventTypeEnumChangedPersonalInformation, nil
 	case "CHANGED_ORGANIZATION_SETTINGS":
-		value := EventTypeEnumChangedOrganizationSettings
-		*e = value
+		return EventTypeEnumChangedOrganizationSettings, nil
 	case "ENABLED_INTEGRATION":
-		value := EventTypeEnumEnabledIntegration
-		*e = value
+		return EventTypeEnumEnabledIntegration, nil
 	case "DISABLED_INTEGRATION":
-		value := EventTypeEnumDisabledIntegration
-		*e = value
+		return EventTypeEnumDisabledIntegration, nil
 	case "ENABLED_CATEGORY":
-		value := EventTypeEnumEnabledCategory
-		*e = value
+		return EventTypeEnumEnabledCategory, nil
 	case "DISABLED_CATEGORY":
-		value := EventTypeEnumDisabledCategory
-		*e = value
+		return EventTypeEnumDisabledCategory, nil
 	case "CHANGED_PASSWORD":
-		value := EventTypeEnumChangedPassword
-		*e = value
+		return EventTypeEnumChangedPassword, nil
 	case "RESET_PASSWORD":
-		value := EventTypeEnumResetPassword
-		*e = value
+		return EventTypeEnumResetPassword, nil
 	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumEnabledRedactUnmappedDataForOrganization
-		*e = value
+		return EventTypeEnumEnabledRedactUnmappedDataForOrganization, nil
 	case "ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount
-		*e = value
+		return EventTypeEnumEnabledRedactUnmappedDataForLinkedAccount, nil
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION":
-		value := EventTypeEnumDisabledRedactUnmappedDataForOrganization
-		*e = value
+		return EventTypeEnumDisabledRedactUnmappedDataForOrganization, nil
 	case "DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT":
-		value := EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount
-		*e = value
+		return EventTypeEnumDisabledRedactUnmappedDataForLinkedAccount, nil
 	case "CREATED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumCreatedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumCreatedIntegrationWideFieldMapping, nil
 	case "CREATED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumCreatedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumCreatedLinkedAccountFieldMapping, nil
 	case "CHANGED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumChangedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumChangedIntegrationWideFieldMapping, nil
 	case "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumChangedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumChangedLinkedAccountFieldMapping, nil
 	case "DELETED_INTEGRATION_WIDE_FIELD_MAPPING":
-		value := EventTypeEnumDeletedIntegrationWideFieldMapping
-		*e = value
+		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
-		value := EventTypeEnumDeletedLinkedAccountFieldMapping
-		*e = value
+		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
 	}
-	return nil
+	var t EventTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `string` - string
-// * `number` - number
-// * `date` - date
-// * `datetime` - datetime
-// * `bool` - bool
-// * `list` - list
-type FieldFormatEnum uint
+func (e EventTypeEnum) Ptr() *EventTypeEnum {
+	return &e
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type FieldFormatEnum string
 
 const (
-	FieldFormatEnumString FieldFormatEnum = iota + 1
-	FieldFormatEnumNumber
-	FieldFormatEnumDate
-	FieldFormatEnumDatetime
-	FieldFormatEnumBool
-	FieldFormatEnumList
+	FieldFormatEnumString   FieldFormatEnum = "string"
+	FieldFormatEnumNumber   FieldFormatEnum = "number"
+	FieldFormatEnumDate     FieldFormatEnum = "date"
+	FieldFormatEnumDatetime FieldFormatEnum = "datetime"
+	FieldFormatEnumBool     FieldFormatEnum = "bool"
+	FieldFormatEnumList     FieldFormatEnum = "list"
 )
 
-func (f FieldFormatEnum) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FieldFormatEnumString:
-		return "string"
-	case FieldFormatEnumNumber:
-		return "number"
-	case FieldFormatEnumDate:
-		return "date"
-	case FieldFormatEnumDatetime:
-		return "datetime"
-	case FieldFormatEnumBool:
-		return "bool"
-	case FieldFormatEnumList:
-		return "list"
-	}
-}
-
-func (f FieldFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FieldFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewFieldFormatEnumFromString(s string) (FieldFormatEnum, error) {
+	switch s {
 	case "string":
-		value := FieldFormatEnumString
-		*f = value
+		return FieldFormatEnumString, nil
 	case "number":
-		value := FieldFormatEnumNumber
-		*f = value
+		return FieldFormatEnumNumber, nil
 	case "date":
-		value := FieldFormatEnumDate
-		*f = value
+		return FieldFormatEnumDate, nil
 	case "datetime":
-		value := FieldFormatEnumDatetime
-		*f = value
+		return FieldFormatEnumDatetime, nil
 	case "bool":
-		value := FieldFormatEnumBool
-		*f = value
+		return FieldFormatEnumBool, nil
 	case "list":
-		value := FieldFormatEnumList
-		*f = value
+		return FieldFormatEnumList, nil
 	}
-	return nil
+	var t FieldFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `string` - string
-// * `number` - number
-// * `date` - date
-// * `datetime` - datetime
-// * `bool` - bool
-// * `list` - list
-type FieldTypeEnum uint
+func (f FieldFormatEnum) Ptr() *FieldFormatEnum {
+	return &f
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type FieldTypeEnum string
 
 const (
-	FieldTypeEnumString FieldTypeEnum = iota + 1
-	FieldTypeEnumNumber
-	FieldTypeEnumDate
-	FieldTypeEnumDatetime
-	FieldTypeEnumBool
-	FieldTypeEnumList
+	FieldTypeEnumString   FieldTypeEnum = "string"
+	FieldTypeEnumNumber   FieldTypeEnum = "number"
+	FieldTypeEnumDate     FieldTypeEnum = "date"
+	FieldTypeEnumDatetime FieldTypeEnum = "datetime"
+	FieldTypeEnumBool     FieldTypeEnum = "bool"
+	FieldTypeEnumList     FieldTypeEnum = "list"
 )
 
-func (f FieldTypeEnum) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FieldTypeEnumString:
-		return "string"
-	case FieldTypeEnumNumber:
-		return "number"
-	case FieldTypeEnumDate:
-		return "date"
-	case FieldTypeEnumDatetime:
-		return "datetime"
-	case FieldTypeEnumBool:
-		return "bool"
-	case FieldTypeEnumList:
-		return "list"
-	}
-}
-
-func (f FieldTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FieldTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewFieldTypeEnumFromString(s string) (FieldTypeEnum, error) {
+	switch s {
 	case "string":
-		value := FieldTypeEnumString
-		*f = value
+		return FieldTypeEnumString, nil
 	case "number":
-		value := FieldTypeEnumNumber
-		*f = value
+		return FieldTypeEnumNumber, nil
 	case "date":
-		value := FieldTypeEnumDate
-		*f = value
+		return FieldTypeEnumDate, nil
 	case "datetime":
-		value := FieldTypeEnumDatetime
-		*f = value
+		return FieldTypeEnumDatetime, nil
 	case "bool":
-		value := FieldTypeEnumBool
-		*f = value
+		return FieldTypeEnumBool, nil
 	case "list":
-		value := FieldTypeEnumList
-		*f = value
+		return FieldTypeEnumList, nil
 	}
-	return nil
+	var t FieldTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FieldTypeEnum) Ptr() *FieldTypeEnum {
+	return &f
 }
 
 type IgnoreCommonModelRequest struct {
 	Reason  ReasonEnum `json:"reason,omitempty"`
 	Message *string    `json:"message,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *IgnoreCommonModelRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler IgnoreCommonModelRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = IgnoreCommonModelRequest(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *IgnoreCommonModelRequest) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 type Issue struct {
 	Id *string `json:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
 	//
-	// * `ONGOING` - ONGOING
-	// * `RESOLVED` - RESOLVED
-	Status            *IssueStatus   `json:"status,omitempty"`
-	ErrorDescription  string         `json:"error_description"`
-	EndUser           map[string]any `json:"end_user,omitempty"`
-	FirstIncidentTime *time.Time     `json:"first_incident_time,omitempty"`
-	LastIncidentTime  *time.Time     `json:"last_incident_time,omitempty"`
-	IsMuted           *bool          `json:"is_muted,omitempty"`
-	ErrorDetails      []string       `json:"error_details,omitempty"`
+	// - `ONGOING` - ONGOING
+	// - `RESOLVED` - RESOLVED
+	Status            *IssueStatus           `json:"status,omitempty"`
+	ErrorDescription  string                 `json:"error_description"`
+	EndUser           map[string]interface{} `json:"end_user,omitempty"`
+	FirstIncidentTime *time.Time             `json:"first_incident_time,omitempty"`
+	LastIncidentTime  *time.Time             `json:"last_incident_time,omitempty"`
+	IsMuted           *bool                  `json:"is_muted,omitempty"`
+	ErrorDetails      []string               `json:"error_details,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *Issue) UnmarshalJSON(data []byte) error {
+	type unmarshaler Issue
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = Issue(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *Issue) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 // Status of the issue. Options: ('ONGOING', 'RESOLVED')
 //
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
 type IssueStatus struct {
 	typeName        string
 	IssueStatusEnum IssueStatusEnum
@@ -6290,230 +5881,149 @@ func (i *IssueStatus) Accept(visitor IssueStatusVisitor) error {
 	}
 }
 
-// * `ONGOING` - ONGOING
-// * `RESOLVED` - RESOLVED
-type IssueStatusEnum uint
+// - `ONGOING` - ONGOING
+// - `RESOLVED` - RESOLVED
+type IssueStatusEnum string
 
 const (
-	IssueStatusEnumOngoing IssueStatusEnum = iota + 1
-	IssueStatusEnumResolved
+	IssueStatusEnumOngoing  IssueStatusEnum = "ONGOING"
+	IssueStatusEnumResolved IssueStatusEnum = "RESOLVED"
 )
 
-func (i IssueStatusEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssueStatusEnumOngoing:
-		return "ONGOING"
-	case IssueStatusEnumResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssueStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssueStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewIssueStatusEnumFromString(s string) (IssueStatusEnum, error) {
+	switch s {
 	case "ONGOING":
-		value := IssueStatusEnumOngoing
-		*i = value
+		return IssueStatusEnumOngoing, nil
 	case "RESOLVED":
-		value := IssueStatusEnumResolved
-		*i = value
+		return IssueStatusEnumResolved, nil
 	}
-	return nil
+	var t IssueStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type IssuesListRequestStatus uint
+func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
+	return &i
+}
+
+// - `string` - uuid
+// - `number` - url
+// - `date` - email
+// - `datetime` - phone
+// - `bool` - currency
+// - `list` - decimal
+type ItemFormatEnum string
 
 const (
-	IssuesListRequestStatusOngoing IssuesListRequestStatus = iota + 1
-	IssuesListRequestStatusResolved
+	ItemFormatEnumString   ItemFormatEnum = "string"
+	ItemFormatEnumNumber   ItemFormatEnum = "number"
+	ItemFormatEnumDate     ItemFormatEnum = "date"
+	ItemFormatEnumDatetime ItemFormatEnum = "datetime"
+	ItemFormatEnumBool     ItemFormatEnum = "bool"
+	ItemFormatEnumList     ItemFormatEnum = "list"
 )
 
-func (i IssuesListRequestStatus) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case IssuesListRequestStatusOngoing:
-		return "ONGOING"
-	case IssuesListRequestStatusResolved:
-		return "RESOLVED"
-	}
-}
-
-func (i IssuesListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *IssuesListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ONGOING":
-		value := IssuesListRequestStatusOngoing
-		*i = value
-	case "RESOLVED":
-		value := IssuesListRequestStatusResolved
-		*i = value
-	}
-	return nil
-}
-
-// * `string` - uuid
-// * `number` - url
-// * `date` - email
-// * `datetime` - phone
-// * `bool` - currency
-// * `list` - decimal
-type ItemFormatEnum uint
-
-const (
-	ItemFormatEnumString ItemFormatEnum = iota + 1
-	ItemFormatEnumNumber
-	ItemFormatEnumDate
-	ItemFormatEnumDatetime
-	ItemFormatEnumBool
-	ItemFormatEnumList
-)
-
-func (i ItemFormatEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case ItemFormatEnumString:
-		return "string"
-	case ItemFormatEnumNumber:
-		return "number"
-	case ItemFormatEnumDate:
-		return "date"
-	case ItemFormatEnumDatetime:
-		return "datetime"
-	case ItemFormatEnumBool:
-		return "bool"
-	case ItemFormatEnumList:
-		return "list"
-	}
-}
-
-func (i ItemFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *ItemFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewItemFormatEnumFromString(s string) (ItemFormatEnum, error) {
+	switch s {
 	case "string":
-		value := ItemFormatEnumString
-		*i = value
+		return ItemFormatEnumString, nil
 	case "number":
-		value := ItemFormatEnumNumber
-		*i = value
+		return ItemFormatEnumNumber, nil
 	case "date":
-		value := ItemFormatEnumDate
-		*i = value
+		return ItemFormatEnumDate, nil
 	case "datetime":
-		value := ItemFormatEnumDatetime
-		*i = value
+		return ItemFormatEnumDatetime, nil
 	case "bool":
-		value := ItemFormatEnumBool
-		*i = value
+		return ItemFormatEnumBool, nil
 	case "list":
-		value := ItemFormatEnumList
-		*i = value
+		return ItemFormatEnumList, nil
 	}
-	return nil
+	var t ItemFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemFormatEnum) Ptr() *ItemFormatEnum {
+	return &i
 }
 
 type ItemSchema struct {
 	ItemType    *ItemTypeEnum   `json:"item_type,omitempty"`
 	ItemFormat  *ItemFormatEnum `json:"item_format,omitempty"`
 	ItemChoices []string        `json:"item_choices,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `string` - string
-// * `number` - number
-// * `date` - date
-// * `datetime` - datetime
-// * `bool` - bool
-// * `list` - list
-type ItemTypeEnum uint
-
-const (
-	ItemTypeEnumString ItemTypeEnum = iota + 1
-	ItemTypeEnumNumber
-	ItemTypeEnumDate
-	ItemTypeEnumDatetime
-	ItemTypeEnumBool
-	ItemTypeEnumList
-)
-
-func (i ItemTypeEnum) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case ItemTypeEnumString:
-		return "string"
-	case ItemTypeEnumNumber:
-		return "number"
-	case ItemTypeEnumDate:
-		return "date"
-	case ItemTypeEnumDatetime:
-		return "datetime"
-	case ItemTypeEnumBool:
-		return "bool"
-	case ItemTypeEnumList:
-		return "list"
-	}
-}
-
-func (i ItemTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *ItemTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (i *ItemSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ItemSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "string":
-		value := ItemTypeEnumString
-		*i = value
-	case "number":
-		value := ItemTypeEnumNumber
-		*i = value
-	case "date":
-		value := ItemTypeEnumDate
-		*i = value
-	case "datetime":
-		value := ItemTypeEnumDatetime
-		*i = value
-	case "bool":
-		value := ItemTypeEnumBool
-		*i = value
-	case "list":
-		value := ItemTypeEnumList
-		*i = value
-	}
+	*i = ItemSchema(value)
+	i._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (i *ItemSchema) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type ItemTypeEnum string
+
+const (
+	ItemTypeEnumString   ItemTypeEnum = "string"
+	ItemTypeEnumNumber   ItemTypeEnum = "number"
+	ItemTypeEnumDate     ItemTypeEnum = "date"
+	ItemTypeEnumDatetime ItemTypeEnum = "datetime"
+	ItemTypeEnumBool     ItemTypeEnum = "bool"
+	ItemTypeEnumList     ItemTypeEnum = "list"
+)
+
+func NewItemTypeEnumFromString(s string) (ItemTypeEnum, error) {
+	switch s {
+	case "string":
+		return ItemTypeEnumString, nil
+	case "number":
+		return ItemTypeEnumNumber, nil
+	case "date":
+		return ItemTypeEnumDate, nil
+	case "datetime":
+		return ItemTypeEnumDatetime, nil
+	case "bool":
+		return ItemTypeEnumBool, nil
+	case "list":
+		return ItemTypeEnumList, nil
+	}
+	var t ItemTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemTypeEnum) Ptr() *ItemTypeEnum {
+	return &i
+}
+
 // # The Lead Object
+//
 // ### Description
+//
 // The `Lead` object is used to represent an individual who is a potential customer.
+//
 // ### Usage Example
+//
 // TODO
 type Lead struct {
 	// The lead's owner.
@@ -6547,10 +6057,35 @@ type Lead struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *Lead) UnmarshalJSON(data []byte) error {
+	type unmarshaler Lead
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = Lead(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *Lead) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 // The account of the converted lead.
@@ -6728,9 +6263,13 @@ func (l *LeadOwner) Accept(visitor LeadOwnerVisitor) error {
 }
 
 // # The Lead Object
+//
 // ### Description
+//
 // The `Lead` object is used to represent an individual who is a potential customer.
+//
 // ### Usage Example
+//
 // TODO
 type LeadRequest struct {
 	// The lead's owner.
@@ -6754,9 +6293,34 @@ type LeadRequest struct {
 	ConvertedContact *LeadRequestConvertedContact `json:"converted_contact,omitempty"`
 	// The account of the converted lead.
 	ConvertedAccount    *LeadRequestConvertedAccount `json:"converted_account,omitempty"`
-	IntegrationParams   map[string]any               `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any               `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}       `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}       `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest        `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LeadRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LeadRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LeadRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LeadRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 // The account of the converted lead.
@@ -6938,148 +6502,62 @@ type LeadResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type LeadsListRequestExpand uint
-
-const (
-	LeadsListRequestExpandConvertedAccount LeadsListRequestExpand = iota + 1
-	LeadsListRequestExpandConvertedContact
-	LeadsListRequestExpandConvertedContactConvertedAccount
-	LeadsListRequestExpandOwner
-	LeadsListRequestExpandOwnerConvertedAccount
-	LeadsListRequestExpandOwnerConvertedContact
-	LeadsListRequestExpandOwnerConvertedContactConvertedAccount
-)
-
-func (l LeadsListRequestExpand) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LeadsListRequestExpandConvertedAccount:
-		return "converted_account"
-	case LeadsListRequestExpandConvertedContact:
-		return "converted_contact"
-	case LeadsListRequestExpandConvertedContactConvertedAccount:
-		return "converted_contact,converted_account"
-	case LeadsListRequestExpandOwner:
-		return "owner"
-	case LeadsListRequestExpandOwnerConvertedAccount:
-		return "owner,converted_account"
-	case LeadsListRequestExpandOwnerConvertedContact:
-		return "owner,converted_contact"
-	case LeadsListRequestExpandOwnerConvertedContactConvertedAccount:
-		return "owner,converted_contact,converted_account"
-	}
-}
-
-func (l LeadsListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LeadsListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (l *LeadResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler LeadResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "converted_account":
-		value := LeadsListRequestExpandConvertedAccount
-		*l = value
-	case "converted_contact":
-		value := LeadsListRequestExpandConvertedContact
-		*l = value
-	case "converted_contact,converted_account":
-		value := LeadsListRequestExpandConvertedContactConvertedAccount
-		*l = value
-	case "owner":
-		value := LeadsListRequestExpandOwner
-		*l = value
-	case "owner,converted_account":
-		value := LeadsListRequestExpandOwnerConvertedAccount
-		*l = value
-	case "owner,converted_contact":
-		value := LeadsListRequestExpandOwnerConvertedContact
-		*l = value
-	case "owner,converted_contact,converted_account":
-		value := LeadsListRequestExpandOwnerConvertedContactConvertedAccount
-		*l = value
-	}
+	*l = LeadResponse(value)
+	l._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-type LeadsRetrieveRequestExpand uint
-
-const (
-	LeadsRetrieveRequestExpandConvertedAccount LeadsRetrieveRequestExpand = iota + 1
-	LeadsRetrieveRequestExpandConvertedContact
-	LeadsRetrieveRequestExpandConvertedContactConvertedAccount
-	LeadsRetrieveRequestExpandOwner
-	LeadsRetrieveRequestExpandOwnerConvertedAccount
-	LeadsRetrieveRequestExpandOwnerConvertedContact
-	LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount
-)
-
-func (l LeadsRetrieveRequestExpand) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LeadsRetrieveRequestExpandConvertedAccount:
-		return "converted_account"
-	case LeadsRetrieveRequestExpandConvertedContact:
-		return "converted_contact"
-	case LeadsRetrieveRequestExpandConvertedContactConvertedAccount:
-		return "converted_contact,converted_account"
-	case LeadsRetrieveRequestExpandOwner:
-		return "owner"
-	case LeadsRetrieveRequestExpandOwnerConvertedAccount:
-		return "owner,converted_account"
-	case LeadsRetrieveRequestExpandOwnerConvertedContact:
-		return "owner,converted_contact"
-	case LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount:
-		return "owner,converted_contact,converted_account"
+func (l *LeadResponse) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
 	}
-}
-
-func (l LeadsRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LeadsRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
 	}
-	switch raw {
-	case "converted_account":
-		value := LeadsRetrieveRequestExpandConvertedAccount
-		*l = value
-	case "converted_contact":
-		value := LeadsRetrieveRequestExpandConvertedContact
-		*l = value
-	case "converted_contact,converted_account":
-		value := LeadsRetrieveRequestExpandConvertedContactConvertedAccount
-		*l = value
-	case "owner":
-		value := LeadsRetrieveRequestExpandOwner
-		*l = value
-	case "owner,converted_account":
-		value := LeadsRetrieveRequestExpandOwnerConvertedAccount
-		*l = value
-	case "owner,converted_contact":
-		value := LeadsRetrieveRequestExpandOwnerConvertedContact
-		*l = value
-	case "owner,converted_contact,converted_account":
-		value := LeadsRetrieveRequestExpandOwnerConvertedContactConvertedAccount
-		*l = value
-	}
-	return nil
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
 	MagicLinkUrl    *string `json:"magic_link_url,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkToken(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkToken) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountCondition struct {
@@ -7087,207 +6565,289 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing *native condition* name. e.g. "Skip Manager".
+	// User-facing _native condition_ name. e.g. "Skip Manager".
 	NativeName *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    *any   `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
 	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
 	FieldName *string `json:"field_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountCondition) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountCondition
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountCondition(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountCondition) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountConditionRequest struct {
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
-	Operator string `json:"operator"`
-	Value    any    `json:"value,omitempty"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountConditionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountConditionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountConditionRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountConditionRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfiguration struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountCondition `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfiguration
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfiguration(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfiguration) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountSelectiveSyncConfigurationRequest struct {
 	// The conditions belonging to a selective sync.
 	LinkedAccountConditions []*LinkedAccountConditionRequest `json:"linked_account_conditions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountSelectiveSyncConfigurationRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LinkedAccountSelectiveSyncConfigurationRequest(value)
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LinkedAccountSelectiveSyncConfigurationRequest) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type LinkedAccountStatus struct {
 	LinkedAccountStatus string `json:"linked_account_status"`
 	CanMakeRequest      bool   `json:"can_make_request"`
+
+	_rawJSON json.RawMessage
 }
 
-type LinkedAccountsListRequestCategory uint
-
-const (
-	LinkedAccountsListRequestCategoryAccounting LinkedAccountsListRequestCategory = iota + 1
-	LinkedAccountsListRequestCategoryAts
-	LinkedAccountsListRequestCategoryCrm
-	LinkedAccountsListRequestCategoryFilestorage
-	LinkedAccountsListRequestCategoryHris
-	LinkedAccountsListRequestCategoryMktg
-	LinkedAccountsListRequestCategoryTicketing
-)
-
-func (l LinkedAccountsListRequestCategory) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LinkedAccountsListRequestCategoryAccounting:
-		return "accounting"
-	case LinkedAccountsListRequestCategoryAts:
-		return "ats"
-	case LinkedAccountsListRequestCategoryCrm:
-		return "crm"
-	case LinkedAccountsListRequestCategoryFilestorage:
-		return "filestorage"
-	case LinkedAccountsListRequestCategoryHris:
-		return "hris"
-	case LinkedAccountsListRequestCategoryMktg:
-		return "mktg"
-	case LinkedAccountsListRequestCategoryTicketing:
-		return "ticketing"
-	}
-}
-
-func (l LinkedAccountsListRequestCategory) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LinkedAccountsListRequestCategory) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (l *LinkedAccountStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler LinkedAccountStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "accounting":
-		value := LinkedAccountsListRequestCategoryAccounting
-		*l = value
-	case "ats":
-		value := LinkedAccountsListRequestCategoryAts
-		*l = value
-	case "crm":
-		value := LinkedAccountsListRequestCategoryCrm
-		*l = value
-	case "filestorage":
-		value := LinkedAccountsListRequestCategoryFilestorage
-		*l = value
-	case "hris":
-		value := LinkedAccountsListRequestCategoryHris
-		*l = value
-	case "mktg":
-		value := LinkedAccountsListRequestCategoryMktg
-		*l = value
-	case "ticketing":
-		value := LinkedAccountsListRequestCategoryTicketing
-		*l = value
-	}
+	*l = LinkedAccountStatus(value)
+	l._rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (l *LinkedAccountStatus) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
 }
 
 type MetaResponse struct {
-	RequestSchema                  map[string]any       `json:"request_schema,omitempty"`
-	RemoteFieldClasses             map[string]any       `json:"remote_field_classes,omitempty"`
-	Status                         *LinkedAccountStatus `json:"status,omitempty"`
-	HasConditionalParams           bool                 `json:"has_conditional_params"`
-	HasRequiredLinkedAccountParams bool                 `json:"has_required_linked_account_params"`
+	RequestSchema                  map[string]interface{} `json:"request_schema,omitempty"`
+	RemoteFieldClasses             map[string]interface{} `json:"remote_field_classes,omitempty"`
+	Status                         *LinkedAccountStatus   `json:"status,omitempty"`
+	HasConditionalParams           bool                   `json:"has_conditional_params"`
+	HasRequiredLinkedAccountParams bool                   `json:"has_required_linked_account_params"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `GET` - GET
-// * `OPTIONS` - OPTIONS
-// * `HEAD` - HEAD
-// * `POST` - POST
-// * `PUT` - PUT
-// * `PATCH` - PATCH
-// * `DELETE` - DELETE
-type MethodEnum uint
-
-const (
-	MethodEnumGet MethodEnum = iota + 1
-	MethodEnumOptions
-	MethodEnumHead
-	MethodEnumPost
-	MethodEnumPut
-	MethodEnumPatch
-	MethodEnumDelete
-)
-
-func (m MethodEnum) String() string {
-	switch m {
-	default:
-		return strconv.Itoa(int(m))
-	case MethodEnumGet:
-		return "GET"
-	case MethodEnumOptions:
-		return "OPTIONS"
-	case MethodEnumHead:
-		return "HEAD"
-	case MethodEnumPost:
-		return "POST"
-	case MethodEnumPut:
-		return "PUT"
-	case MethodEnumPatch:
-		return "PATCH"
-	case MethodEnumDelete:
-		return "DELETE"
-	}
-}
-
-func (m MethodEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", m.String())), nil
-}
-
-func (m *MethodEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (m *MetaResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler MetaResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "GET":
-		value := MethodEnumGet
-		*m = value
-	case "OPTIONS":
-		value := MethodEnumOptions
-		*m = value
-	case "HEAD":
-		value := MethodEnumHead
-		*m = value
-	case "POST":
-		value := MethodEnumPost
-		*m = value
-	case "PUT":
-		value := MethodEnumPut
-		*m = value
-	case "PATCH":
-		value := MethodEnumPatch
-		*m = value
-	case "DELETE":
-		value := MethodEnumDelete
-		*m = value
-	}
+	*m = MetaResponse(value)
+	m._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (m *MetaResponse) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
+}
+
+// - `GET` - GET
+// - `OPTIONS` - OPTIONS
+// - `HEAD` - HEAD
+// - `POST` - POST
+// - `PUT` - PUT
+// - `PATCH` - PATCH
+// - `DELETE` - DELETE
+type MethodEnum string
+
+const (
+	MethodEnumGet     MethodEnum = "GET"
+	MethodEnumOptions MethodEnum = "OPTIONS"
+	MethodEnumHead    MethodEnum = "HEAD"
+	MethodEnumPost    MethodEnum = "POST"
+	MethodEnumPut     MethodEnum = "PUT"
+	MethodEnumPatch   MethodEnum = "PATCH"
+	MethodEnumDelete  MethodEnum = "DELETE"
+)
+
+func NewMethodEnumFromString(s string) (MethodEnum, error) {
+	switch s {
+	case "GET":
+		return MethodEnumGet, nil
+	case "OPTIONS":
+		return MethodEnumOptions, nil
+	case "HEAD":
+		return MethodEnumHead, nil
+	case "POST":
+		return MethodEnumPost, nil
+	case "PUT":
+		return MethodEnumPut, nil
+	case "PATCH":
+		return MethodEnumPatch, nil
+	case "DELETE":
+		return MethodEnumDelete, nil
+	}
+	var t MethodEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (m MethodEnum) Ptr() *MethodEnum {
+	return &m
+}
+
 // # The ModelOperation Object
+//
 // ### Description
+//
 // The `ModelOperation` object is used to represent the operations that are currently supported for a given model.
 //
 // ### Usage Example
+//
 // View what operations are supported for the `Candidate` endpoint.
 type ModelOperation struct {
 	ModelName              string   `json:"model_name"`
 	AvailableOperations    []string `json:"available_operations,omitempty"`
 	RequiredPostParameters []string `json:"required_post_parameters,omitempty"`
 	SupportedFields        []string `json:"supported_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *ModelOperation) UnmarshalJSON(data []byte) error {
+	type unmarshaler ModelOperation
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = ModelOperation(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *ModelOperation) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // # The MultipartFormField Object
+//
 // ### Description
+//
 // The `MultipartFormField` object is used to represent fields in an HTTP request using `multipart/form-data`.
 //
 // ### Usage Example
+//
 // Create a `MultipartFormField` to define a multipart form entry.
 type MultipartFormFieldRequest struct {
 	// The name of the form field
@@ -7296,21 +6856,46 @@ type MultipartFormFieldRequest struct {
 	Data string `json:"data"`
 	// The encoding of the value of `data`. Defaults to `RAW` if not defined.
 	//
-	// * `RAW` - RAW
-	// * `BASE64` - BASE64
-	// * `GZIP_BASE64` - GZIP_BASE64
+	// - `RAW` - RAW
+	// - `BASE64` - BASE64
+	// - `GZIP_BASE64` - GZIP_BASE64
 	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty"`
 	// The MIME type of the file, if the field is for a file.
 	ContentType *string `json:"content_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *MultipartFormFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler MultipartFormFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = MultipartFormFieldRequest(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *MultipartFormFieldRequest) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
 }
 
 // The encoding of the value of `data`. Defaults to `RAW` if not defined.
 //
-// * `RAW` - RAW
-// * `BASE64` - BASE64
-// * `GZIP_BASE64` - GZIP_BASE64
+// - `RAW` - RAW
+// - `BASE64` - BASE64
+// - `GZIP_BASE64` - GZIP_BASE64
 type MultipartFormFieldRequestEncoding struct {
 	typeName     string
 	EncodingEnum EncodingEnum
@@ -7369,9 +6954,13 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 }
 
 // # The Note Object
+//
 // ### Description
+//
 // The `Note` object is used to represent a note on another object.
+//
 // ### Usage Example
+//
 // TODO
 type Note struct {
 	// The note's owner.
@@ -7394,10 +6983,35 @@ type Note struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (n *Note) UnmarshalJSON(data []byte) error {
+	type unmarshaler Note
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*n = Note(value)
+	n._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (n *Note) String() string {
+	if len(n._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(n._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(n); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", n)
 }
 
 // The note's account.
@@ -7633,9 +7247,13 @@ func (n *NoteOwner) Accept(visitor NoteOwnerVisitor) error {
 }
 
 // # The Note Object
+//
 // ### Description
+//
 // The `Note` object is used to represent a note on another object.
+//
 // ### Usage Example
+//
 // TODO
 type NoteRequest struct {
 	// The note's owner.
@@ -7648,9 +7266,34 @@ type NoteRequest struct {
 	Account *NoteRequestAccount `json:"account,omitempty"`
 	// The note's opportunity.
 	Opportunity         *NoteRequestOpportunity `json:"opportunity,omitempty"`
-	IntegrationParams   map[string]any          `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any          `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}  `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}  `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest   `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (n *NoteRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler NoteRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*n = NoteRequest(value)
+	n._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (n *NoteRequest) String() string {
+	if len(n._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(n._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(n); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", n)
 }
 
 // The note's account.
@@ -7890,243 +7533,61 @@ type NoteResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type NotesListRequestExpand uint
-
-const (
-	NotesListRequestExpandAccount NotesListRequestExpand = iota + 1
-	NotesListRequestExpandAccountOpportunity
-	NotesListRequestExpandContact
-	NotesListRequestExpandContactAccount
-	NotesListRequestExpandContactAccountOpportunity
-	NotesListRequestExpandContactOpportunity
-	NotesListRequestExpandOpportunity
-	NotesListRequestExpandOwner
-	NotesListRequestExpandOwnerAccount
-	NotesListRequestExpandOwnerAccountOpportunity
-	NotesListRequestExpandOwnerContact
-	NotesListRequestExpandOwnerContactAccount
-	NotesListRequestExpandOwnerContactAccountOpportunity
-	NotesListRequestExpandOwnerContactOpportunity
-	NotesListRequestExpandOwnerOpportunity
-)
-
-func (n NotesListRequestExpand) String() string {
-	switch n {
-	default:
-		return strconv.Itoa(int(n))
-	case NotesListRequestExpandAccount:
-		return "account"
-	case NotesListRequestExpandAccountOpportunity:
-		return "account,opportunity"
-	case NotesListRequestExpandContact:
-		return "contact"
-	case NotesListRequestExpandContactAccount:
-		return "contact,account"
-	case NotesListRequestExpandContactAccountOpportunity:
-		return "contact,account,opportunity"
-	case NotesListRequestExpandContactOpportunity:
-		return "contact,opportunity"
-	case NotesListRequestExpandOpportunity:
-		return "opportunity"
-	case NotesListRequestExpandOwner:
-		return "owner"
-	case NotesListRequestExpandOwnerAccount:
-		return "owner,account"
-	case NotesListRequestExpandOwnerAccountOpportunity:
-		return "owner,account,opportunity"
-	case NotesListRequestExpandOwnerContact:
-		return "owner,contact"
-	case NotesListRequestExpandOwnerContactAccount:
-		return "owner,contact,account"
-	case NotesListRequestExpandOwnerContactAccountOpportunity:
-		return "owner,contact,account,opportunity"
-	case NotesListRequestExpandOwnerContactOpportunity:
-		return "owner,contact,opportunity"
-	case NotesListRequestExpandOwnerOpportunity:
-		return "owner,opportunity"
-	}
-}
-
-func (n NotesListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", n.String())), nil
-}
-
-func (n *NotesListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (n *NoteResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler NoteResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "account":
-		value := NotesListRequestExpandAccount
-		*n = value
-	case "account,opportunity":
-		value := NotesListRequestExpandAccountOpportunity
-		*n = value
-	case "contact":
-		value := NotesListRequestExpandContact
-		*n = value
-	case "contact,account":
-		value := NotesListRequestExpandContactAccount
-		*n = value
-	case "contact,account,opportunity":
-		value := NotesListRequestExpandContactAccountOpportunity
-		*n = value
-	case "contact,opportunity":
-		value := NotesListRequestExpandContactOpportunity
-		*n = value
-	case "opportunity":
-		value := NotesListRequestExpandOpportunity
-		*n = value
-	case "owner":
-		value := NotesListRequestExpandOwner
-		*n = value
-	case "owner,account":
-		value := NotesListRequestExpandOwnerAccount
-		*n = value
-	case "owner,account,opportunity":
-		value := NotesListRequestExpandOwnerAccountOpportunity
-		*n = value
-	case "owner,contact":
-		value := NotesListRequestExpandOwnerContact
-		*n = value
-	case "owner,contact,account":
-		value := NotesListRequestExpandOwnerContactAccount
-		*n = value
-	case "owner,contact,account,opportunity":
-		value := NotesListRequestExpandOwnerContactAccountOpportunity
-		*n = value
-	case "owner,contact,opportunity":
-		value := NotesListRequestExpandOwnerContactOpportunity
-		*n = value
-	case "owner,opportunity":
-		value := NotesListRequestExpandOwnerOpportunity
-		*n = value
-	}
+	*n = NoteResponse(value)
+	n._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-type NotesRetrieveRequestExpand uint
-
-const (
-	NotesRetrieveRequestExpandAccount NotesRetrieveRequestExpand = iota + 1
-	NotesRetrieveRequestExpandAccountOpportunity
-	NotesRetrieveRequestExpandContact
-	NotesRetrieveRequestExpandContactAccount
-	NotesRetrieveRequestExpandContactAccountOpportunity
-	NotesRetrieveRequestExpandContactOpportunity
-	NotesRetrieveRequestExpandOpportunity
-	NotesRetrieveRequestExpandOwner
-	NotesRetrieveRequestExpandOwnerAccount
-	NotesRetrieveRequestExpandOwnerAccountOpportunity
-	NotesRetrieveRequestExpandOwnerContact
-	NotesRetrieveRequestExpandOwnerContactAccount
-	NotesRetrieveRequestExpandOwnerContactAccountOpportunity
-	NotesRetrieveRequestExpandOwnerContactOpportunity
-	NotesRetrieveRequestExpandOwnerOpportunity
-)
-
-func (n NotesRetrieveRequestExpand) String() string {
-	switch n {
-	default:
-		return strconv.Itoa(int(n))
-	case NotesRetrieveRequestExpandAccount:
-		return "account"
-	case NotesRetrieveRequestExpandAccountOpportunity:
-		return "account,opportunity"
-	case NotesRetrieveRequestExpandContact:
-		return "contact"
-	case NotesRetrieveRequestExpandContactAccount:
-		return "contact,account"
-	case NotesRetrieveRequestExpandContactAccountOpportunity:
-		return "contact,account,opportunity"
-	case NotesRetrieveRequestExpandContactOpportunity:
-		return "contact,opportunity"
-	case NotesRetrieveRequestExpandOpportunity:
-		return "opportunity"
-	case NotesRetrieveRequestExpandOwner:
-		return "owner"
-	case NotesRetrieveRequestExpandOwnerAccount:
-		return "owner,account"
-	case NotesRetrieveRequestExpandOwnerAccountOpportunity:
-		return "owner,account,opportunity"
-	case NotesRetrieveRequestExpandOwnerContact:
-		return "owner,contact"
-	case NotesRetrieveRequestExpandOwnerContactAccount:
-		return "owner,contact,account"
-	case NotesRetrieveRequestExpandOwnerContactAccountOpportunity:
-		return "owner,contact,account,opportunity"
-	case NotesRetrieveRequestExpandOwnerContactOpportunity:
-		return "owner,contact,opportunity"
-	case NotesRetrieveRequestExpandOwnerOpportunity:
-		return "owner,opportunity"
+func (n *NoteResponse) String() string {
+	if len(n._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(n._rawJSON); err == nil {
+			return value
+		}
 	}
-}
-
-func (n NotesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", n.String())), nil
-}
-
-func (n *NotesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+	if value, err := core.StringifyJSON(n); err == nil {
+		return value
 	}
-	switch raw {
-	case "account":
-		value := NotesRetrieveRequestExpandAccount
-		*n = value
-	case "account,opportunity":
-		value := NotesRetrieveRequestExpandAccountOpportunity
-		*n = value
-	case "contact":
-		value := NotesRetrieveRequestExpandContact
-		*n = value
-	case "contact,account":
-		value := NotesRetrieveRequestExpandContactAccount
-		*n = value
-	case "contact,account,opportunity":
-		value := NotesRetrieveRequestExpandContactAccountOpportunity
-		*n = value
-	case "contact,opportunity":
-		value := NotesRetrieveRequestExpandContactOpportunity
-		*n = value
-	case "opportunity":
-		value := NotesRetrieveRequestExpandOpportunity
-		*n = value
-	case "owner":
-		value := NotesRetrieveRequestExpandOwner
-		*n = value
-	case "owner,account":
-		value := NotesRetrieveRequestExpandOwnerAccount
-		*n = value
-	case "owner,account,opportunity":
-		value := NotesRetrieveRequestExpandOwnerAccountOpportunity
-		*n = value
-	case "owner,contact":
-		value := NotesRetrieveRequestExpandOwnerContact
-		*n = value
-	case "owner,contact,account":
-		value := NotesRetrieveRequestExpandOwnerContactAccount
-		*n = value
-	case "owner,contact,account,opportunity":
-		value := NotesRetrieveRequestExpandOwnerContactAccountOpportunity
-		*n = value
-	case "owner,contact,opportunity":
-		value := NotesRetrieveRequestExpandOwnerContactOpportunity
-		*n = value
-	case "owner,opportunity":
-		value := NotesRetrieveRequestExpandOwnerOpportunity
-		*n = value
-	}
-	return nil
+	return fmt.Sprintf("%#v", n)
 }
 
 type ObjectClassDescriptionRequest struct {
 	Id         string         `json:"id"`
 	OriginType OriginTypeEnum `json:"origin_type,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *ObjectClassDescriptionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler ObjectClassDescriptionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = ObjectClassDescriptionRequest(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *ObjectClassDescriptionRequest) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 type OperatorSchema struct {
@@ -8134,192 +7595,41 @@ type OperatorSchema struct {
 	Operator *string `json:"operator,omitempty"`
 	// Whether the operator can be repeated multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-type OpportunitiesListRequestExpand uint
-
-const (
-	OpportunitiesListRequestExpandAccount OpportunitiesListRequestExpand = iota + 1
-	OpportunitiesListRequestExpandOwner
-	OpportunitiesListRequestExpandOwnerAccount
-	OpportunitiesListRequestExpandOwnerStage
-	OpportunitiesListRequestExpandOwnerStageAccount
-	OpportunitiesListRequestExpandStage
-	OpportunitiesListRequestExpandStageAccount
-)
-
-func (o OpportunitiesListRequestExpand) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OpportunitiesListRequestExpandAccount:
-		return "account"
-	case OpportunitiesListRequestExpandOwner:
-		return "owner"
-	case OpportunitiesListRequestExpandOwnerAccount:
-		return "owner,account"
-	case OpportunitiesListRequestExpandOwnerStage:
-		return "owner,stage"
-	case OpportunitiesListRequestExpandOwnerStageAccount:
-		return "owner,stage,account"
-	case OpportunitiesListRequestExpandStage:
-		return "stage"
-	case OpportunitiesListRequestExpandStageAccount:
-		return "stage,account"
-	}
-}
-
-func (o OpportunitiesListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OpportunitiesListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (o *OperatorSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler OperatorSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "account":
-		value := OpportunitiesListRequestExpandAccount
-		*o = value
-	case "owner":
-		value := OpportunitiesListRequestExpandOwner
-		*o = value
-	case "owner,account":
-		value := OpportunitiesListRequestExpandOwnerAccount
-		*o = value
-	case "owner,stage":
-		value := OpportunitiesListRequestExpandOwnerStage
-		*o = value
-	case "owner,stage,account":
-		value := OpportunitiesListRequestExpandOwnerStageAccount
-		*o = value
-	case "stage":
-		value := OpportunitiesListRequestExpandStage
-		*o = value
-	case "stage,account":
-		value := OpportunitiesListRequestExpandStageAccount
-		*o = value
-	}
+	*o = OperatorSchema(value)
+	o._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-type OpportunitiesListRequestStatus uint
-
-const (
-	OpportunitiesListRequestStatusLost OpportunitiesListRequestStatus = iota + 1
-	OpportunitiesListRequestStatusOpen
-	OpportunitiesListRequestStatusWon
-)
-
-func (o OpportunitiesListRequestStatus) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OpportunitiesListRequestStatusLost:
-		return "LOST"
-	case OpportunitiesListRequestStatusOpen:
-		return "OPEN"
-	case OpportunitiesListRequestStatusWon:
-		return "WON"
+func (o *OperatorSchema) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
 	}
-}
-
-func (o OpportunitiesListRequestStatus) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OpportunitiesListRequestStatus) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
 	}
-	switch raw {
-	case "LOST":
-		value := OpportunitiesListRequestStatusLost
-		*o = value
-	case "OPEN":
-		value := OpportunitiesListRequestStatusOpen
-		*o = value
-	case "WON":
-		value := OpportunitiesListRequestStatusWon
-		*o = value
-	}
-	return nil
-}
-
-type OpportunitiesRetrieveRequestExpand uint
-
-const (
-	OpportunitiesRetrieveRequestExpandAccount OpportunitiesRetrieveRequestExpand = iota + 1
-	OpportunitiesRetrieveRequestExpandOwner
-	OpportunitiesRetrieveRequestExpandOwnerAccount
-	OpportunitiesRetrieveRequestExpandOwnerStage
-	OpportunitiesRetrieveRequestExpandOwnerStageAccount
-	OpportunitiesRetrieveRequestExpandStage
-	OpportunitiesRetrieveRequestExpandStageAccount
-)
-
-func (o OpportunitiesRetrieveRequestExpand) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OpportunitiesRetrieveRequestExpandAccount:
-		return "account"
-	case OpportunitiesRetrieveRequestExpandOwner:
-		return "owner"
-	case OpportunitiesRetrieveRequestExpandOwnerAccount:
-		return "owner,account"
-	case OpportunitiesRetrieveRequestExpandOwnerStage:
-		return "owner,stage"
-	case OpportunitiesRetrieveRequestExpandOwnerStageAccount:
-		return "owner,stage,account"
-	case OpportunitiesRetrieveRequestExpandStage:
-		return "stage"
-	case OpportunitiesRetrieveRequestExpandStageAccount:
-		return "stage,account"
-	}
-}
-
-func (o OpportunitiesRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OpportunitiesRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := OpportunitiesRetrieveRequestExpandAccount
-		*o = value
-	case "owner":
-		value := OpportunitiesRetrieveRequestExpandOwner
-		*o = value
-	case "owner,account":
-		value := OpportunitiesRetrieveRequestExpandOwnerAccount
-		*o = value
-	case "owner,stage":
-		value := OpportunitiesRetrieveRequestExpandOwnerStage
-		*o = value
-	case "owner,stage,account":
-		value := OpportunitiesRetrieveRequestExpandOwnerStageAccount
-		*o = value
-	case "stage":
-		value := OpportunitiesRetrieveRequestExpandStage
-		*o = value
-	case "stage,account":
-		value := OpportunitiesRetrieveRequestExpandStageAccount
-		*o = value
-	}
-	return nil
+	return fmt.Sprintf("%#v", o)
 }
 
 // # The Opportunity Object
+//
 // ### Description
+//
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type Opportunity struct {
 	// The opportunity's name.
@@ -8336,9 +7646,9 @@ type Opportunity struct {
 	Stage *OpportunityStage `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
-	// * `OPEN` - OPEN
-	// * `WON` - WON
-	// * `LOST` - LOST
+	// - `OPEN` - OPEN
+	// - `WON` - WON
+	// - `LOST` - LOST
 	Status *OpportunityStatus `json:"status,omitempty"`
 	// When the opportunity's last activity occurred.
 	LastActivityAt *time.Time `json:"last_activity_at,omitempty"`
@@ -8352,10 +7662,35 @@ type Opportunity struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *Opportunity) UnmarshalJSON(data []byte) error {
+	type unmarshaler Opportunity
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = Opportunity(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *Opportunity) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 // The account of the opportunity.
@@ -8475,9 +7810,13 @@ func (o *OpportunityOwner) Accept(visitor OpportunityOwnerVisitor) error {
 }
 
 // # The Opportunity Object
+//
 // ### Description
+//
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type OpportunityRequest struct {
 	// The opportunity's name.
@@ -8494,17 +7833,42 @@ type OpportunityRequest struct {
 	Stage *OpportunityRequestStage `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
-	// * `OPEN` - OPEN
-	// * `WON` - WON
-	// * `LOST` - LOST
+	// - `OPEN` - OPEN
+	// - `WON` - WON
+	// - `LOST` - LOST
 	Status *OpportunityRequestStatus `json:"status,omitempty"`
 	// When the opportunity's last activity occurred.
 	LastActivityAt *time.Time `json:"last_activity_at,omitempty"`
 	// When the opportunity was closed.
-	CloseDate           *time.Time            `json:"close_date,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	CloseDate           *time.Time             `json:"close_date,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *OpportunityRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler OpportunityRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = OpportunityRequest(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *OpportunityRequest) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 // The account of the opportunity.
@@ -8683,9 +8047,9 @@ func (o *OpportunityRequestStage) Accept(visitor OpportunityRequestStageVisitor)
 
 // The opportunity's status.
 //
-// * `OPEN` - OPEN
-// * `WON` - WON
-// * `LOST` - LOST
+// - `OPEN` - OPEN
+// - `WON` - WON
+// - `LOST` - LOST
 type OpportunityRequestStatus struct {
 	typeName              string
 	OpportunityStatusEnum OpportunityStatusEnum
@@ -8748,6 +8112,31 @@ type OpportunityResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (o *OpportunityResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler OpportunityResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*o = OpportunityResponse(value)
+	o._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (o *OpportunityResponse) String() string {
+	if len(o._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(o); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", o)
 }
 
 // The stage of the opportunity.
@@ -8810,9 +8199,9 @@ func (o *OpportunityStage) Accept(visitor OpportunityStageVisitor) error {
 
 // The opportunity's status.
 //
-// * `OPEN` - OPEN
-// * `WON` - WON
-// * `LOST` - LOST
+// - `OPEN` - OPEN
+// - `WON` - WON
+// - `LOST` - LOST
 type OpportunityStatus struct {
 	typeName              string
 	OpportunityStatusEnum OpportunityStatusEnum
@@ -8870,224 +8259,690 @@ func (o *OpportunityStatus) Accept(visitor OpportunityStatusVisitor) error {
 	}
 }
 
-// * `OPEN` - OPEN
-// * `WON` - WON
-// * `LOST` - LOST
-type OpportunityStatusEnum uint
+// - `OPEN` - OPEN
+// - `WON` - WON
+// - `LOST` - LOST
+type OpportunityStatusEnum string
 
 const (
-	OpportunityStatusEnumOpen OpportunityStatusEnum = iota + 1
-	OpportunityStatusEnumWon
-	OpportunityStatusEnumLost
+	OpportunityStatusEnumOpen OpportunityStatusEnum = "OPEN"
+	OpportunityStatusEnumWon  OpportunityStatusEnum = "WON"
+	OpportunityStatusEnumLost OpportunityStatusEnum = "LOST"
 )
 
-func (o OpportunityStatusEnum) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OpportunityStatusEnumOpen:
-		return "OPEN"
-	case OpportunityStatusEnumWon:
-		return "WON"
-	case OpportunityStatusEnumLost:
-		return "LOST"
-	}
-}
-
-func (o OpportunityStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OpportunityStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewOpportunityStatusEnumFromString(s string) (OpportunityStatusEnum, error) {
+	switch s {
 	case "OPEN":
-		value := OpportunityStatusEnumOpen
-		*o = value
+		return OpportunityStatusEnumOpen, nil
 	case "WON":
-		value := OpportunityStatusEnumWon
-		*o = value
+		return OpportunityStatusEnumWon, nil
 	case "LOST":
-		value := OpportunityStatusEnumLost
-		*o = value
+		return OpportunityStatusEnumLost, nil
 	}
-	return nil
+	var t OpportunityStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-// * `CUSTOM_OBJECT` - CUSTOM_OBJECT
-// * `COMMON_MODEL` - COMMON_MODEL
-// * `REMOTE_ONLY_MODEL` - REMOTE_ONLY_MODEL
-type OriginTypeEnum uint
+func (o OpportunityStatusEnum) Ptr() *OpportunityStatusEnum {
+	return &o
+}
+
+// - `CUSTOM_OBJECT` - CUSTOM_OBJECT
+// - `COMMON_MODEL` - COMMON_MODEL
+// - `REMOTE_ONLY_MODEL` - REMOTE_ONLY_MODEL
+type OriginTypeEnum string
 
 const (
-	OriginTypeEnumCustomObject OriginTypeEnum = iota + 1
-	OriginTypeEnumCommonModel
-	OriginTypeEnumRemoteOnlyModel
+	OriginTypeEnumCustomObject    OriginTypeEnum = "CUSTOM_OBJECT"
+	OriginTypeEnumCommonModel     OriginTypeEnum = "COMMON_MODEL"
+	OriginTypeEnumRemoteOnlyModel OriginTypeEnum = "REMOTE_ONLY_MODEL"
 )
 
-func (o OriginTypeEnum) String() string {
-	switch o {
-	default:
-		return strconv.Itoa(int(o))
-	case OriginTypeEnumCustomObject:
-		return "CUSTOM_OBJECT"
-	case OriginTypeEnumCommonModel:
-		return "COMMON_MODEL"
-	case OriginTypeEnumRemoteOnlyModel:
-		return "REMOTE_ONLY_MODEL"
-	}
-}
-
-func (o OriginTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", o.String())), nil
-}
-
-func (o *OriginTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewOriginTypeEnumFromString(s string) (OriginTypeEnum, error) {
+	switch s {
 	case "CUSTOM_OBJECT":
-		value := OriginTypeEnumCustomObject
-		*o = value
+		return OriginTypeEnumCustomObject, nil
 	case "COMMON_MODEL":
-		value := OriginTypeEnumCommonModel
-		*o = value
+		return OriginTypeEnumCommonModel, nil
 	case "REMOTE_ONLY_MODEL":
-		value := OriginTypeEnumRemoteOnlyModel
-		*o = value
+		return OriginTypeEnumRemoteOnlyModel, nil
 	}
-	return nil
+	var t OriginTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OriginTypeEnum) Ptr() *OriginTypeEnum {
+	return &o
 }
 
 type PaginatedAccountDetailsAndActionsList struct {
 	Next     *string                     `json:"next,omitempty"`
 	Previous *string                     `json:"previous,omitempty"`
 	Results  []*AccountDetailsAndActions `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAccountDetailsAndActionsList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAccountDetailsAndActionsList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAccountList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Account `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAccountList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAccountList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAccountList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAccountList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAssociationList struct {
 	Next     *string        `json:"next,omitempty"`
 	Previous *string        `json:"previous,omitempty"`
 	Results  []*Association `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAssociationList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAssociationList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAssociationList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAssociationList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAssociationTypeList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
 	Results  []*AssociationType `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAssociationTypeList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAssociationTypeList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAssociationTypeList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAssociationTypeList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedAuditLogEventList struct {
 	Next     *string          `json:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty"`
 	Results  []*AuditLogEvent `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedAuditLogEventList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedAuditLogEventList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedAuditLogEventList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedAuditLogEventList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedConditionSchemaList struct {
 	Next     *string            `json:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty"`
 	Results  []*ConditionSchema `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedConditionSchemaList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedConditionSchemaList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedConditionSchemaList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedConditionSchemaList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedContactList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
 	Results  []*Contact `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedContactList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedContactList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedContactList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedContactList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedCustomObjectClassList struct {
 	Next     *string              `json:"next,omitempty"`
 	Previous *string              `json:"previous,omitempty"`
 	Results  []*CustomObjectClass `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedCustomObjectClassList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedCustomObjectClassList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedCustomObjectClassList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedCustomObjectClassList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedCustomObjectList struct {
 	Next     *string         `json:"next,omitempty"`
 	Previous *string         `json:"previous,omitempty"`
 	Results  []*CustomObject `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedCustomObjectList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedCustomObjectList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedCustomObjectList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedCustomObjectList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedEngagementList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*Engagement `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEngagementList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEngagementList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEngagementList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEngagementList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedEngagementTypeList struct {
 	Next     *string           `json:"next,omitempty"`
 	Previous *string           `json:"previous,omitempty"`
 	Results  []*EngagementType `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEngagementTypeList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEngagementTypeList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEngagementTypeList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEngagementTypeList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedIssueList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Issue `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedIssueList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedIssueList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedIssueList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedIssueList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedLeadList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Lead `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedLeadList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedLeadList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedLeadList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedLeadList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedNoteList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Note `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedNoteList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedNoteList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedNoteList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedNoteList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedOpportunityList struct {
 	Next     *string        `json:"next,omitempty"`
 	Previous *string        `json:"previous,omitempty"`
 	Results  []*Opportunity `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedOpportunityList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedOpportunityList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedOpportunityList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedOpportunityList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedRemoteFieldClassList struct {
 	Next     *string             `json:"next,omitempty"`
 	Previous *string             `json:"previous,omitempty"`
 	Results  []*RemoteFieldClass `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedRemoteFieldClassList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedRemoteFieldClassList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedRemoteFieldClassList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedRemoteFieldClassList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedStageList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
 	Results  []*Stage `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedStageList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedStageList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedStageList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedStageList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedSyncStatusList struct {
 	Next     *string       `json:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty"`
 	Results  []*SyncStatus `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedSyncStatusList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedSyncStatusList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedSyncStatusList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedSyncStatusList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedTaskList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*Task `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedTaskList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedTaskList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedTaskList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedTaskList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 type PaginatedUserList struct {
 	Next     *string `json:"next,omitempty"`
 	Previous *string `json:"previous,omitempty"`
 	Results  []*User `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedUserList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedUserList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedUserList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedUserList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // # The Account Object
+//
 // ### Description
+//
 // The `Account` object is used to represent a company in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type PatchedAccountRequest struct {
 	// The account's owner.
@@ -9103,16 +8958,45 @@ type PatchedAccountRequest struct {
 	// The account's number of employees.
 	NumberOfEmployees *int `json:"number_of_employees,omitempty"`
 	// The last date (either most recent or furthest in the future) of when an activity occurs in an account.
-	LastActivityAt      *time.Time            `json:"last_activity_at,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	LastActivityAt      *time.Time             `json:"last_activity_at,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedAccountRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedAccountRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedAccountRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedAccountRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // # The Contact Object
+//
 // ### Description
+//
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type PatchedContactRequest struct {
 	// The contact's first name.
@@ -9127,10 +9011,35 @@ type PatchedContactRequest struct {
 	EmailAddresses []*EmailAddressRequest      `json:"email_addresses,omitempty"`
 	PhoneNumbers   []*PhoneNumberRequest       `json:"phone_numbers,omitempty"`
 	// When the contact's last activity occurred.
-	LastActivityAt      *time.Time            `json:"last_activity_at,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	LastActivityAt      *time.Time             `json:"last_activity_at,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedContactRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedContactRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedContactRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedContactRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The contact's owner.
@@ -9192,9 +9101,13 @@ func (p *PatchedContactRequestOwner) Accept(visitor PatchedContactRequestOwnerVi
 }
 
 // # The Engagement Object
+//
 // ### Description
+//
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type PatchedEngagementRequest struct {
 	// The engagement's owner.
@@ -9205,8 +9118,8 @@ type PatchedEngagementRequest struct {
 	Subject *string `json:"subject,omitempty"`
 	// The engagement's direction.
 	//
-	// * `INBOUND` - INBOUND
-	// * `OUTBOUND` - OUTBOUND
+	// - `INBOUND` - INBOUND
+	// - `OUTBOUND` - OUTBOUND
 	Direction *PatchedEngagementRequestDirection `json:"direction,omitempty"`
 	// The engagement type of the engagement.
 	EngagementType *string `json:"engagement_type,omitempty"`
@@ -9215,17 +9128,42 @@ type PatchedEngagementRequest struct {
 	// The time at which the engagement ended.
 	EndTime *time.Time `json:"end_time,omitempty"`
 	// The account of the engagement.
-	Account             *string               `json:"account,omitempty"`
-	Contacts            []*string             `json:"contacts,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	Account             *string                `json:"account,omitempty"`
+	Contacts            []*string              `json:"contacts,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedEngagementRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedEngagementRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedEngagementRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedEngagementRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The engagement's direction.
 //
-// * `INBOUND` - INBOUND
-// * `OUTBOUND` - OUTBOUND
+// - `INBOUND` - INBOUND
+// - `OUTBOUND` - OUTBOUND
 type PatchedEngagementRequestDirection struct {
 	typeName      string
 	DirectionEnum DirectionEnum
@@ -9284,9 +9222,13 @@ func (p *PatchedEngagementRequestDirection) Accept(visitor PatchedEngagementRequ
 }
 
 // # The Opportunity Object
+//
 // ### Description
+//
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type PatchedOpportunityRequest struct {
 	// The opportunity's name.
@@ -9303,24 +9245,49 @@ type PatchedOpportunityRequest struct {
 	Stage *string `json:"stage,omitempty"`
 	// The opportunity's status.
 	//
-	// * `OPEN` - OPEN
-	// * `WON` - WON
-	// * `LOST` - LOST
+	// - `OPEN` - OPEN
+	// - `WON` - WON
+	// - `LOST` - LOST
 	Status *PatchedOpportunityRequestStatus `json:"status,omitempty"`
 	// When the opportunity's last activity occurred.
 	LastActivityAt *time.Time `json:"last_activity_at,omitempty"`
 	// When the opportunity was closed.
-	CloseDate           *time.Time            `json:"close_date,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	CloseDate           *time.Time             `json:"close_date,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedOpportunityRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedOpportunityRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedOpportunityRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedOpportunityRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The opportunity's status.
 //
-// * `OPEN` - OPEN
-// * `WON` - WON
-// * `LOST` - LOST
+// - `OPEN` - OPEN
+// - `WON` - WON
+// - `LOST` - LOST
 type PatchedOpportunityRequestStatus struct {
 	typeName              string
 	OpportunityStatusEnum OpportunityStatusEnum
@@ -9379,9 +9346,13 @@ func (p *PatchedOpportunityRequestStatus) Accept(visitor PatchedOpportunityReque
 }
 
 // # The Task Object
+//
 // ### Description
+//
 // The `Task` object is used to represent a task, such as a to-do item.
+//
 // ### Usage Example
+//
 // TODO
 type PatchedTaskRequest struct {
 	// The task's subject.
@@ -9400,18 +9371,43 @@ type PatchedTaskRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The task's status.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
 	Status              *PatchedTaskRequestStatus `json:"status,omitempty"`
-	IntegrationParams   map[string]any            `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any            `json:"linked_account_params,omitempty"`
+	IntegrationParams   map[string]interface{}    `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}    `json:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest     `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedTaskRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedTaskRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedTaskRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedTaskRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // The task's status.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
 type PatchedTaskRequestStatus struct {
 	typeName       string
 	TaskStatusEnum TaskStatusEnum
@@ -9470,9 +9466,13 @@ func (p *PatchedTaskRequestStatus) Accept(visitor PatchedTaskRequestStatusVisito
 }
 
 // # The PhoneNumber Object
+//
 // ### Description
+//
 // The `PhoneNumber` object is used to represent an entity's phone number.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Contact` endpoint and view their phone numbers.
 type PhoneNumber struct {
 	// The phone number.
@@ -9482,77 +9482,162 @@ type PhoneNumber struct {
 	CreatedAt       *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PhoneNumber) UnmarshalJSON(data []byte) error {
+	type unmarshaler PhoneNumber
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PhoneNumber(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PhoneNumber) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
 }
 
 // # The PhoneNumber Object
+//
 // ### Description
+//
 // The `PhoneNumber` object is used to represent an entity's phone number.
+//
 // ### Usage Example
+//
 // Fetch from the `GET Contact` endpoint and view their phone numbers.
 type PhoneNumberRequest struct {
 	// The phone number.
 	PhoneNumber *string `json:"phone_number,omitempty"`
 	// The phone number's type.
-	PhoneNumberType     *string        `json:"phone_number_type,omitempty"`
-	IntegrationParams   map[string]any `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any `json:"linked_account_params,omitempty"`
+	PhoneNumberType     *string                `json:"phone_number_type,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
-// * `GDPR` - GDPR
-// * `OTHER` - OTHER
-type ReasonEnum uint
-
-const (
-	ReasonEnumGeneralCustomerRequest ReasonEnum = iota + 1
-	ReasonEnumGdpr
-	ReasonEnumOther
-)
-
-func (r ReasonEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case ReasonEnumGeneralCustomerRequest:
-		return "GENERAL_CUSTOMER_REQUEST"
-	case ReasonEnumGdpr:
-		return "GDPR"
-	case ReasonEnumOther:
-		return "OTHER"
-	}
-}
-
-func (r ReasonEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *ReasonEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (p *PhoneNumberRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PhoneNumberRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "GENERAL_CUSTOMER_REQUEST":
-		value := ReasonEnumGeneralCustomerRequest
-		*r = value
-	case "GDPR":
-		value := ReasonEnumGdpr
-		*r = value
-	case "OTHER":
-		value := ReasonEnumOther
-		*r = value
-	}
+	*p = PhoneNumberRequest(value)
+	p._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (p *PhoneNumberRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// - `GENERAL_CUSTOMER_REQUEST` - GENERAL_CUSTOMER_REQUEST
+// - `GDPR` - GDPR
+// - `OTHER` - OTHER
+type ReasonEnum string
+
+const (
+	ReasonEnumGeneralCustomerRequest ReasonEnum = "GENERAL_CUSTOMER_REQUEST"
+	ReasonEnumGdpr                   ReasonEnum = "GDPR"
+	ReasonEnumOther                  ReasonEnum = "OTHER"
+)
+
+func NewReasonEnumFromString(s string) (ReasonEnum, error) {
+	switch s {
+	case "GENERAL_CUSTOMER_REQUEST":
+		return ReasonEnumGeneralCustomerRequest, nil
+	case "GDPR":
+		return ReasonEnumGdpr, nil
+	case "OTHER":
+		return ReasonEnumOther, nil
+	}
+	var t ReasonEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r ReasonEnum) Ptr() *ReasonEnum {
+	return &r
+}
+
 type RemoteData struct {
-	Path string `json:"path"`
-	Data *any   `json:"data,omitempty"`
+	Path string      `json:"path"`
+	Data interface{} `json:"data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteData) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteData
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteData(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteData) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteField struct {
 	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            *any                         `json:"value,omitempty"`
+	Value            interface{}                  `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteField) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteField
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteField(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteField) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClass struct {
@@ -9566,11 +9651,61 @@ type RemoteFieldClass struct {
 	FieldFormat   *RemoteFieldClassFieldFormat        `json:"field_format,omitempty"`
 	FieldChoices  []*RemoteFieldClassFieldChoicesItem `json:"field_choices,omitempty"`
 	ItemSchema    *ItemSchema                         `json:"item_schema,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClass) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClass
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClass(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClass) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClassFieldChoicesItem struct {
-	Value       *any    `json:"value,omitempty"`
-	DisplayName *string `json:"display_name,omitempty"`
+	Value       interface{} `json:"value,omitempty"`
+	DisplayName *string     `json:"display_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClassFieldChoicesItem) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClassFieldChoicesItem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClassFieldChoicesItem(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClassFieldChoicesItem) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClassFieldFormat struct {
@@ -9699,11 +9834,61 @@ type RemoteFieldClassForCustomObjectClass struct {
 	CreatedAt     *time.Time                                              `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClassForCustomObjectClass) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClassForCustomObjectClass
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClassForCustomObjectClass(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClassForCustomObjectClass) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClassForCustomObjectClassFieldChoicesItem struct {
-	Value       *any    `json:"value,omitempty"`
-	DisplayName *string `json:"display_name,omitempty"`
+	Value       interface{} `json:"value,omitempty"`
+	DisplayName *string     `json:"display_name,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClassForCustomObjectClassFieldChoicesItem) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClassForCustomObjectClassFieldChoicesItem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClassForCustomObjectClassFieldChoicesItem(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClassForCustomObjectClassFieldChoicesItem) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldClassForCustomObjectClassFieldFormat struct {
@@ -9824,6 +10009,31 @@ type RemoteFieldClassForCustomObjectClassItemSchema struct {
 	ItemType    *string   `json:"item_type,omitempty"`
 	ItemFormat  *string   `json:"item_format,omitempty"`
 	ItemChoices []*string `json:"item_choices,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClassForCustomObjectClassItemSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClassForCustomObjectClassItemSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClassForCustomObjectClassItemSchema(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClassForCustomObjectClassItemSchema) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldRemoteFieldClass struct {
@@ -9886,6 +10096,31 @@ func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClass
 type RemoteFieldRequest struct {
 	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
 	Value            *string                             `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldRequest(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldRequest) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteFieldRequestRemoteFieldClass struct {
@@ -9946,231 +10181,212 @@ func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRe
 }
 
 // # The RemoteKey Object
+//
 // ### Description
+//
 // The `RemoteKey` object is used to represent a request for a new remote key.
 //
 // ### Usage Example
+//
 // Post a `GenerateRemoteKey` to receive a new `RemoteKey`.
 type RemoteKey struct {
 	Name string `json:"name"`
 	Key  string `json:"key"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteKey) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteKey
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteKey(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteKey) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 // # The RemoteResponse Object
+//
 // ### Description
+//
 // The `RemoteResponse` object is used to represent information returned from a third-party endpoint.
 //
 // ### Usage Example
+//
 // View the `RemoteResponse` returned from your `DataPassthrough`.
 type RemoteResponse struct {
-	Method          string            `json:"method"`
-	Path            string            `json:"path"`
-	Status          int               `json:"status"`
-	Response        any               `json:"response,omitempty"`
-	ResponseHeaders map[string]any    `json:"response_headers,omitempty"`
-	ResponseType    *ResponseTypeEnum `json:"response_type,omitempty"`
-	Headers         map[string]any    `json:"headers,omitempty"`
+	Method          string                 `json:"method"`
+	Path            string                 `json:"path"`
+	Status          int                    `json:"status"`
+	Response        interface{}            `json:"response,omitempty"`
+	ResponseHeaders map[string]interface{} `json:"response_headers,omitempty"`
+	ResponseType    *ResponseTypeEnum      `json:"response_type,omitempty"`
+	Headers         map[string]interface{} `json:"headers,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `JSON` - JSON
-// * `XML` - XML
-// * `MULTIPART` - MULTIPART
-type RequestFormatEnum uint
-
-const (
-	RequestFormatEnumJson RequestFormatEnum = iota + 1
-	RequestFormatEnumXml
-	RequestFormatEnumMultipart
-)
-
-func (r RequestFormatEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RequestFormatEnumJson:
-		return "JSON"
-	case RequestFormatEnumXml:
-		return "XML"
-	case RequestFormatEnumMultipart:
-		return "MULTIPART"
-	}
-}
-
-func (r RequestFormatEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RequestFormatEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (r *RemoteResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "JSON":
-		value := RequestFormatEnumJson
-		*r = value
-	case "XML":
-		value := RequestFormatEnumXml
-		*r = value
-	case "MULTIPART":
-		value := RequestFormatEnumMultipart
-		*r = value
-	}
+	*r = RemoteResponse(value)
+	r._rawJSON = json.RawMessage(data)
 	return nil
 }
 
-// * `JSON` - JSON
-// * `BASE64_GZIP` - BASE64_GZIP
-type ResponseTypeEnum uint
+func (r *RemoteResponse) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+// - `JSON` - JSON
+// - `XML` - XML
+// - `MULTIPART` - MULTIPART
+type RequestFormatEnum string
 
 const (
-	ResponseTypeEnumJson ResponseTypeEnum = iota + 1
-	ResponseTypeEnumBase64Gzip
+	RequestFormatEnumJson      RequestFormatEnum = "JSON"
+	RequestFormatEnumXml       RequestFormatEnum = "XML"
+	RequestFormatEnumMultipart RequestFormatEnum = "MULTIPART"
 )
 
-func (r ResponseTypeEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case ResponseTypeEnumJson:
-		return "JSON"
-	case ResponseTypeEnumBase64Gzip:
-		return "BASE64_GZIP"
-	}
-}
-
-func (r ResponseTypeEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *ResponseTypeEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "JSON":
-		value := ResponseTypeEnumJson
-		*r = value
-	case "BASE64_GZIP":
-		value := ResponseTypeEnumBase64Gzip
-		*r = value
-	}
-	return nil
-}
-
-// * `ADMIN` - ADMIN
-// * `DEVELOPER` - DEVELOPER
-// * `MEMBER` - MEMBER
-// * `API` - API
-// * `SYSTEM` - SYSTEM
-// * `MERGE_TEAM` - MERGE_TEAM
-type RoleEnum uint
-
-const (
-	RoleEnumAdmin RoleEnum = iota + 1
-	RoleEnumDeveloper
-	RoleEnumMember
-	RoleEnumApi
-	RoleEnumSystem
-	RoleEnumMergeTeam
-)
-
-func (r RoleEnum) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RoleEnumAdmin:
-		return "ADMIN"
-	case RoleEnumDeveloper:
-		return "DEVELOPER"
-	case RoleEnumMember:
-		return "MEMBER"
-	case RoleEnumApi:
-		return "API"
-	case RoleEnumSystem:
-		return "SYSTEM"
-	case RoleEnumMergeTeam:
-		return "MERGE_TEAM"
-	}
-}
-
-func (r RoleEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RoleEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "ADMIN":
-		value := RoleEnumAdmin
-		*r = value
-	case "DEVELOPER":
-		value := RoleEnumDeveloper
-		*r = value
-	case "MEMBER":
-		value := RoleEnumMember
-		*r = value
-	case "API":
-		value := RoleEnumApi
-		*r = value
-	case "SYSTEM":
-		value := RoleEnumSystem
-		*r = value
-	case "MERGE_TEAM":
-		value := RoleEnumMergeTeam
-		*r = value
-	}
-	return nil
-}
-
-// * `IN_NEXT_SYNC` - IN_NEXT_SYNC
-// * `IN_LAST_SYNC` - IN_LAST_SYNC
-type SelectiveSyncConfigurationsUsageEnum uint
-
-const (
-	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = iota + 1
-	SelectiveSyncConfigurationsUsageEnumInLastSync
-)
-
-func (s SelectiveSyncConfigurationsUsageEnum) String() string {
+func NewRequestFormatEnumFromString(s string) (RequestFormatEnum, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SelectiveSyncConfigurationsUsageEnumInNextSync:
-		return "IN_NEXT_SYNC"
-	case SelectiveSyncConfigurationsUsageEnumInLastSync:
-		return "IN_LAST_SYNC"
+	case "JSON":
+		return RequestFormatEnumJson, nil
+	case "XML":
+		return RequestFormatEnumXml, nil
+	case "MULTIPART":
+		return RequestFormatEnumMultipart, nil
 	}
+	var t RequestFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-func (s SelectiveSyncConfigurationsUsageEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
+func (r RequestFormatEnum) Ptr() *RequestFormatEnum {
+	return &r
 }
 
-func (s *SelectiveSyncConfigurationsUsageEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+// - `JSON` - JSON
+// - `BASE64_GZIP` - BASE64_GZIP
+type ResponseTypeEnum string
+
+const (
+	ResponseTypeEnumJson       ResponseTypeEnum = "JSON"
+	ResponseTypeEnumBase64Gzip ResponseTypeEnum = "BASE64_GZIP"
+)
+
+func NewResponseTypeEnumFromString(s string) (ResponseTypeEnum, error) {
+	switch s {
+	case "JSON":
+		return ResponseTypeEnumJson, nil
+	case "BASE64_GZIP":
+		return ResponseTypeEnumBase64Gzip, nil
 	}
-	switch raw {
+	var t ResponseTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r ResponseTypeEnum) Ptr() *ResponseTypeEnum {
+	return &r
+}
+
+// - `ADMIN` - ADMIN
+// - `DEVELOPER` - DEVELOPER
+// - `MEMBER` - MEMBER
+// - `API` - API
+// - `SYSTEM` - SYSTEM
+// - `MERGE_TEAM` - MERGE_TEAM
+type RoleEnum string
+
+const (
+	RoleEnumAdmin     RoleEnum = "ADMIN"
+	RoleEnumDeveloper RoleEnum = "DEVELOPER"
+	RoleEnumMember    RoleEnum = "MEMBER"
+	RoleEnumApi       RoleEnum = "API"
+	RoleEnumSystem    RoleEnum = "SYSTEM"
+	RoleEnumMergeTeam RoleEnum = "MERGE_TEAM"
+)
+
+func NewRoleEnumFromString(s string) (RoleEnum, error) {
+	switch s {
+	case "ADMIN":
+		return RoleEnumAdmin, nil
+	case "DEVELOPER":
+		return RoleEnumDeveloper, nil
+	case "MEMBER":
+		return RoleEnumMember, nil
+	case "API":
+		return RoleEnumApi, nil
+	case "SYSTEM":
+		return RoleEnumSystem, nil
+	case "MERGE_TEAM":
+		return RoleEnumMergeTeam, nil
+	}
+	var t RoleEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (r RoleEnum) Ptr() *RoleEnum {
+	return &r
+}
+
+// - `IN_NEXT_SYNC` - IN_NEXT_SYNC
+// - `IN_LAST_SYNC` - IN_LAST_SYNC
+type SelectiveSyncConfigurationsUsageEnum string
+
+const (
+	SelectiveSyncConfigurationsUsageEnumInNextSync SelectiveSyncConfigurationsUsageEnum = "IN_NEXT_SYNC"
+	SelectiveSyncConfigurationsUsageEnumInLastSync SelectiveSyncConfigurationsUsageEnum = "IN_LAST_SYNC"
+)
+
+func NewSelectiveSyncConfigurationsUsageEnumFromString(s string) (SelectiveSyncConfigurationsUsageEnum, error) {
+	switch s {
 	case "IN_NEXT_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInNextSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInNextSync, nil
 	case "IN_LAST_SYNC":
-		value := SelectiveSyncConfigurationsUsageEnumInLastSync
-		*s = value
+		return SelectiveSyncConfigurationsUsageEnumInLastSync, nil
 	}
-	return nil
+	var t SelectiveSyncConfigurationsUsageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SelectiveSyncConfigurationsUsageEnum) Ptr() *SelectiveSyncConfigurationsUsageEnum {
+	return &s
 }
 
 // # The Stage Object
+//
 // ### Description
+//
 // The `Stage` object is used to represent the stage of an opportunity.
+//
 // ### Usage Example
+//
 // TODO
 type Stage struct {
 	// The stage's name.
@@ -10182,17 +10398,45 @@ type Stage struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (s *Stage) UnmarshalJSON(data []byte) error {
+	type unmarshaler Stage
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = Stage(value)
+	s._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *Stage) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
 }
 
 // # The SyncStatus Object
+//
 // ### Description
-// The `SyncStatus` object is used to represent the syncing state of an account
+//
+// # The `SyncStatus` object is used to represent the syncing state of an account
 //
 // ### Usage Example
+//
 // View the `SyncStatus` for an account to see how recently its models were synced.
 type SyncStatus struct {
 	ModelName                        string                                `json:"model_name"`
@@ -10202,80 +10446,81 @@ type SyncStatus struct {
 	Status                           SyncStatusStatusEnum                  `json:"status,omitempty"`
 	IsInitialSync                    bool                                  `json:"is_initial_sync"`
 	SelectiveSyncConfigurationsUsage *SelectiveSyncConfigurationsUsageEnum `json:"selective_sync_configurations_usage,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-// * `SYNCING` - SYNCING
-// * `DONE` - DONE
-// * `FAILED` - FAILED
-// * `DISABLED` - DISABLED
-// * `PAUSED` - PAUSED
-// * `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
-type SyncStatusStatusEnum uint
-
-const (
-	SyncStatusStatusEnumSyncing SyncStatusStatusEnum = iota + 1
-	SyncStatusStatusEnumDone
-	SyncStatusStatusEnumFailed
-	SyncStatusStatusEnumDisabled
-	SyncStatusStatusEnumPaused
-	SyncStatusStatusEnumPartiallySynced
-)
-
-func (s SyncStatusStatusEnum) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SyncStatusStatusEnumSyncing:
-		return "SYNCING"
-	case SyncStatusStatusEnumDone:
-		return "DONE"
-	case SyncStatusStatusEnumFailed:
-		return "FAILED"
-	case SyncStatusStatusEnumDisabled:
-		return "DISABLED"
-	case SyncStatusStatusEnumPaused:
-		return "PAUSED"
-	case SyncStatusStatusEnumPartiallySynced:
-		return "PARTIALLY_SYNCED"
-	}
-}
-
-func (s SyncStatusStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *SyncStatusStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (s *SyncStatus) UnmarshalJSON(data []byte) error {
+	type unmarshaler SyncStatus
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "SYNCING":
-		value := SyncStatusStatusEnumSyncing
-		*s = value
-	case "DONE":
-		value := SyncStatusStatusEnumDone
-		*s = value
-	case "FAILED":
-		value := SyncStatusStatusEnumFailed
-		*s = value
-	case "DISABLED":
-		value := SyncStatusStatusEnumDisabled
-		*s = value
-	case "PAUSED":
-		value := SyncStatusStatusEnumPaused
-		*s = value
-	case "PARTIALLY_SYNCED":
-		value := SyncStatusStatusEnumPartiallySynced
-		*s = value
-	}
+	*s = SyncStatus(value)
+	s._rawJSON = json.RawMessage(data)
 	return nil
 }
 
+func (s *SyncStatus) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// - `SYNCING` - SYNCING
+// - `DONE` - DONE
+// - `FAILED` - FAILED
+// - `DISABLED` - DISABLED
+// - `PAUSED` - PAUSED
+// - `PARTIALLY_SYNCED` - PARTIALLY_SYNCED
+type SyncStatusStatusEnum string
+
+const (
+	SyncStatusStatusEnumSyncing         SyncStatusStatusEnum = "SYNCING"
+	SyncStatusStatusEnumDone            SyncStatusStatusEnum = "DONE"
+	SyncStatusStatusEnumFailed          SyncStatusStatusEnum = "FAILED"
+	SyncStatusStatusEnumDisabled        SyncStatusStatusEnum = "DISABLED"
+	SyncStatusStatusEnumPaused          SyncStatusStatusEnum = "PAUSED"
+	SyncStatusStatusEnumPartiallySynced SyncStatusStatusEnum = "PARTIALLY_SYNCED"
+)
+
+func NewSyncStatusStatusEnumFromString(s string) (SyncStatusStatusEnum, error) {
+	switch s {
+	case "SYNCING":
+		return SyncStatusStatusEnumSyncing, nil
+	case "DONE":
+		return SyncStatusStatusEnumDone, nil
+	case "FAILED":
+		return SyncStatusStatusEnumFailed, nil
+	case "DISABLED":
+		return SyncStatusStatusEnumDisabled, nil
+	case "PAUSED":
+		return SyncStatusStatusEnumPaused, nil
+	case "PARTIALLY_SYNCED":
+		return SyncStatusStatusEnumPartiallySynced, nil
+	}
+	var t SyncStatusStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
+	return &s
+}
+
 // # The Task Object
+//
 // ### Description
+//
 // The `Task` object is used to represent a task, such as a to-do item.
+//
 // ### Usage Example
+//
 // TODO
 type Task struct {
 	// The task's subject.
@@ -10294,8 +10539,8 @@ type Task struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The task's status.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
 	Status *TaskStatus `json:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
@@ -10304,10 +10549,35 @@ type Task struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *Task) UnmarshalJSON(data []byte) error {
+	type unmarshaler Task
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = Task(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *Task) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The task's account.
@@ -10485,9 +10755,13 @@ func (t *TaskOwner) Accept(visitor TaskOwnerVisitor) error {
 }
 
 // # The Task Object
+//
 // ### Description
+//
 // The `Task` object is used to represent a task, such as a to-do item.
+//
 // ### Usage Example
+//
 // TODO
 type TaskRequest struct {
 	// The task's subject.
@@ -10506,12 +10780,37 @@ type TaskRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The task's status.
 	//
-	// * `OPEN` - OPEN
-	// * `CLOSED` - CLOSED
-	Status              *TaskRequestStatus    `json:"status,omitempty"`
-	IntegrationParams   map[string]any        `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]any        `json:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest `json:"remote_fields,omitempty"`
+	// - `OPEN` - OPEN
+	// - `CLOSED` - CLOSED
+	Status              *TaskRequestStatus     `json:"status,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TaskRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler TaskRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TaskRequest(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TaskRequest) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The task's account.
@@ -10690,8 +10989,8 @@ func (t *TaskRequestOwner) Accept(visitor TaskRequestOwnerVisitor) error {
 
 // The task's status.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
 type TaskRequestStatus struct {
 	typeName       string
 	TaskStatusEnum TaskStatusEnum
@@ -10754,12 +11053,37 @@ type TaskResponse struct {
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
 	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TaskResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler TaskResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TaskResponse(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TaskResponse) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
 }
 
 // The task's status.
 //
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
 type TaskStatus struct {
 	typeName       string
 	TaskStatusEnum TaskStatusEnum
@@ -10817,186 +11141,38 @@ func (t *TaskStatus) Accept(visitor TaskStatusVisitor) error {
 	}
 }
 
-// * `OPEN` - OPEN
-// * `CLOSED` - CLOSED
-type TaskStatusEnum uint
+// - `OPEN` - OPEN
+// - `CLOSED` - CLOSED
+type TaskStatusEnum string
 
 const (
-	TaskStatusEnumOpen TaskStatusEnum = iota + 1
-	TaskStatusEnumClosed
+	TaskStatusEnumOpen   TaskStatusEnum = "OPEN"
+	TaskStatusEnumClosed TaskStatusEnum = "CLOSED"
 )
 
-func (t TaskStatusEnum) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TaskStatusEnumOpen:
-		return "OPEN"
-	case TaskStatusEnumClosed:
-		return "CLOSED"
-	}
-}
-
-func (t TaskStatusEnum) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TaskStatusEnum) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewTaskStatusEnumFromString(s string) (TaskStatusEnum, error) {
+	switch s {
 	case "OPEN":
-		value := TaskStatusEnumOpen
-		*t = value
+		return TaskStatusEnumOpen, nil
 	case "CLOSED":
-		value := TaskStatusEnumClosed
-		*t = value
+		return TaskStatusEnumClosed, nil
 	}
-	return nil
+	var t TaskStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type TasksListRequestExpand uint
-
-const (
-	TasksListRequestExpandAccount TasksListRequestExpand = iota + 1
-	TasksListRequestExpandAccountOpportunity
-	TasksListRequestExpandOpportunity
-	TasksListRequestExpandOwner
-	TasksListRequestExpandOwnerAccount
-	TasksListRequestExpandOwnerAccountOpportunity
-	TasksListRequestExpandOwnerOpportunity
-)
-
-func (t TasksListRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TasksListRequestExpandAccount:
-		return "account"
-	case TasksListRequestExpandAccountOpportunity:
-		return "account,opportunity"
-	case TasksListRequestExpandOpportunity:
-		return "opportunity"
-	case TasksListRequestExpandOwner:
-		return "owner"
-	case TasksListRequestExpandOwnerAccount:
-		return "owner,account"
-	case TasksListRequestExpandOwnerAccountOpportunity:
-		return "owner,account,opportunity"
-	case TasksListRequestExpandOwnerOpportunity:
-		return "owner,opportunity"
-	}
-}
-
-func (t TasksListRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TasksListRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := TasksListRequestExpandAccount
-		*t = value
-	case "account,opportunity":
-		value := TasksListRequestExpandAccountOpportunity
-		*t = value
-	case "opportunity":
-		value := TasksListRequestExpandOpportunity
-		*t = value
-	case "owner":
-		value := TasksListRequestExpandOwner
-		*t = value
-	case "owner,account":
-		value := TasksListRequestExpandOwnerAccount
-		*t = value
-	case "owner,account,opportunity":
-		value := TasksListRequestExpandOwnerAccountOpportunity
-		*t = value
-	case "owner,opportunity":
-		value := TasksListRequestExpandOwnerOpportunity
-		*t = value
-	}
-	return nil
-}
-
-type TasksRetrieveRequestExpand uint
-
-const (
-	TasksRetrieveRequestExpandAccount TasksRetrieveRequestExpand = iota + 1
-	TasksRetrieveRequestExpandAccountOpportunity
-	TasksRetrieveRequestExpandOpportunity
-	TasksRetrieveRequestExpandOwner
-	TasksRetrieveRequestExpandOwnerAccount
-	TasksRetrieveRequestExpandOwnerAccountOpportunity
-	TasksRetrieveRequestExpandOwnerOpportunity
-)
-
-func (t TasksRetrieveRequestExpand) String() string {
-	switch t {
-	default:
-		return strconv.Itoa(int(t))
-	case TasksRetrieveRequestExpandAccount:
-		return "account"
-	case TasksRetrieveRequestExpandAccountOpportunity:
-		return "account,opportunity"
-	case TasksRetrieveRequestExpandOpportunity:
-		return "opportunity"
-	case TasksRetrieveRequestExpandOwner:
-		return "owner"
-	case TasksRetrieveRequestExpandOwnerAccount:
-		return "owner,account"
-	case TasksRetrieveRequestExpandOwnerAccountOpportunity:
-		return "owner,account,opportunity"
-	case TasksRetrieveRequestExpandOwnerOpportunity:
-		return "owner,opportunity"
-	}
-}
-
-func (t TasksRetrieveRequestExpand) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", t.String())), nil
-}
-
-func (t *TasksRetrieveRequestExpand) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "account":
-		value := TasksRetrieveRequestExpandAccount
-		*t = value
-	case "account,opportunity":
-		value := TasksRetrieveRequestExpandAccountOpportunity
-		*t = value
-	case "opportunity":
-		value := TasksRetrieveRequestExpandOpportunity
-		*t = value
-	case "owner":
-		value := TasksRetrieveRequestExpandOwner
-		*t = value
-	case "owner,account":
-		value := TasksRetrieveRequestExpandOwnerAccount
-		*t = value
-	case "owner,account,opportunity":
-		value := TasksRetrieveRequestExpandOwnerAccountOpportunity
-		*t = value
-	case "owner,opportunity":
-		value := TasksRetrieveRequestExpandOwnerOpportunity
-		*t = value
-	}
-	return nil
+func (t TaskStatusEnum) Ptr() *TaskStatusEnum {
+	return &t
 }
 
 // # The User Object
+//
 // ### Description
+//
 // The `User` object is used to represent a user with a login to the CRM system.
+//
 // ### Usage Example
+//
 // TODO
 type User struct {
 	// The user's name.
@@ -11012,14 +11188,64 @@ type User struct {
 	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time     `json:"modified_at,omitempty"`
-	FieldMappings map[string]any `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData  `json:"remote_data,omitempty"`
-	RemoteFields  []*RemoteField `json:"remote_fields,omitempty"`
+	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (u *User) UnmarshalJSON(data []byte) error {
+	type unmarshaler User
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = User(value)
+	u._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *User) String() string {
+	if len(u._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(u._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
 }
 
 type ValidationProblemSource struct {
 	Pointer string `json:"pointer"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *ValidationProblemSource) UnmarshalJSON(data []byte) error {
+	type unmarshaler ValidationProblemSource
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = ValidationProblemSource(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *ValidationProblemSource) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
 }
 
 type WarningValidationProblem struct {
@@ -11027,10 +11253,60 @@ type WarningValidationProblem struct {
 	Title       string                   `json:"title"`
 	Detail      string                   `json:"detail"`
 	ProblemType string                   `json:"problem_type"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WarningValidationProblem) UnmarshalJSON(data []byte) error {
+	type unmarshaler WarningValidationProblem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WarningValidationProblem(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WarningValidationProblem) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }
 
 type WebhookReceiver struct {
 	Event    string  `json:"event"`
 	IsActive bool    `json:"is_active"`
 	Key      *string `json:"key,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (w *WebhookReceiver) UnmarshalJSON(data []byte) error {
+	type unmarshaler WebhookReceiver
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*w = WebhookReceiver(value)
+	w._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (w *WebhookReceiver) String() string {
+	if len(w._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(w._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(w); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", w)
 }

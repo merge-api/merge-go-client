@@ -39,247 +39,85 @@ import (
 	http "net/http"
 )
 
-type Client interface {
-	AccountDetails() accountdetails.Client
-	AccountToken() accounttoken.Client
-	AsyncPassthrough() asyncpassthrough.Client
-	AuditTrail() audittrail.Client
-	AvailableActions() availableactions.Client
-	BankInfo() bankinfo.Client
-	Benefits() benefits.Client
-	Companies() companies.Client
-	DeleteAccount() deleteaccount.Client
-	Dependents() dependents.Client
-	EmployeePayrollRuns() employeepayrollruns.Client
-	Employees() employees.Client
-	EmployerBenefits() employerbenefits.Client
-	Employments() employments.Client
-	GenerateKey() generatekey.Client
-	Groups() groups.Client
-	Issues() issues.Client
-	LinkToken() linktoken.Client
-	LinkedAccounts() linkedaccounts.Client
-	Locations() locations.Client
-	Passthrough() passthrough.Client
-	PayGroups() paygroups.Client
-	PayrollRuns() payrollruns.Client
-	RegenerateKey() regeneratekey.Client
-	SelectiveSync() selectivesync.Client
-	SyncStatus() syncstatus.Client
-	ForceResync() forceresync.Client
-	Teams() teams.Client
-	TimeOff() timeoff.Client
-	TimeOffBalances() timeoffbalances.Client
-	TimesheetEntries() timesheetentries.Client
-	WebhookReceivers() webhookreceivers.Client
+type Client struct {
+	baseURL string
+	caller  *core.Caller
+	header  http.Header
+
+	AccountDetails      *accountdetails.Client
+	AccountToken        *accounttoken.Client
+	AsyncPassthrough    *asyncpassthrough.Client
+	AuditTrail          *audittrail.Client
+	AvailableActions    *availableactions.Client
+	BankInfo            *bankinfo.Client
+	Benefits            *benefits.Client
+	Companies           *companies.Client
+	DeleteAccount       *deleteaccount.Client
+	Dependents          *dependents.Client
+	EmployeePayrollRuns *employeepayrollruns.Client
+	Employees           *employees.Client
+	EmployerBenefits    *employerbenefits.Client
+	Employments         *employments.Client
+	GenerateKey         *generatekey.Client
+	Groups              *groups.Client
+	Issues              *issues.Client
+	LinkToken           *linktoken.Client
+	LinkedAccounts      *linkedaccounts.Client
+	Locations           *locations.Client
+	Passthrough         *passthrough.Client
+	PayGroups           *paygroups.Client
+	PayrollRuns         *payrollruns.Client
+	RegenerateKey       *regeneratekey.Client
+	SelectiveSync       *selectivesync.Client
+	SyncStatus          *syncstatus.Client
+	ForceResync         *forceresync.Client
+	Teams               *teams.Client
+	TimeOff             *timeoff.Client
+	TimeOffBalances     *timeoffbalances.Client
+	TimesheetEntries    *timesheetentries.Client
+	WebhookReceivers    *webhookreceivers.Client
 }
 
-func NewClient(opts ...core.ClientOption) Client {
+func NewClient(opts ...core.ClientOption) *Client {
 	options := core.NewClientOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &client{
-		baseURL:                   options.BaseURL,
-		httpClient:                options.HTTPClient,
-		header:                    options.ToHeader(),
-		accountDetailsClient:      accountdetails.NewClient(opts...),
-		accountTokenClient:        accounttoken.NewClient(opts...),
-		asyncPassthroughClient:    asyncpassthrough.NewClient(opts...),
-		auditTrailClient:          audittrail.NewClient(opts...),
-		availableActionsClient:    availableactions.NewClient(opts...),
-		bankInfoClient:            bankinfo.NewClient(opts...),
-		benefitsClient:            benefits.NewClient(opts...),
-		companiesClient:           companies.NewClient(opts...),
-		deleteAccountClient:       deleteaccount.NewClient(opts...),
-		dependentsClient:          dependents.NewClient(opts...),
-		employeePayrollRunsClient: employeepayrollruns.NewClient(opts...),
-		employeesClient:           employees.NewClient(opts...),
-		employerBenefitsClient:    employerbenefits.NewClient(opts...),
-		employmentsClient:         employments.NewClient(opts...),
-		generateKeyClient:         generatekey.NewClient(opts...),
-		groupsClient:              groups.NewClient(opts...),
-		issuesClient:              issues.NewClient(opts...),
-		linkTokenClient:           linktoken.NewClient(opts...),
-		linkedAccountsClient:      linkedaccounts.NewClient(opts...),
-		locationsClient:           locations.NewClient(opts...),
-		passthroughClient:         passthrough.NewClient(opts...),
-		payGroupsClient:           paygroups.NewClient(opts...),
-		payrollRunsClient:         payrollruns.NewClient(opts...),
-		regenerateKeyClient:       regeneratekey.NewClient(opts...),
-		selectiveSyncClient:       selectivesync.NewClient(opts...),
-		syncStatusClient:          syncstatus.NewClient(opts...),
-		forceResyncClient:         forceresync.NewClient(opts...),
-		teamsClient:               teams.NewClient(opts...),
-		timeOffClient:             timeoff.NewClient(opts...),
-		timeOffBalancesClient:     timeoffbalances.NewClient(opts...),
-		timesheetEntriesClient:    timesheetentries.NewClient(opts...),
-		webhookReceiversClient:    webhookreceivers.NewClient(opts...),
+	return &Client{
+		baseURL:             options.BaseURL,
+		caller:              core.NewCaller(options.HTTPClient),
+		header:              options.ToHeader(),
+		AccountDetails:      accountdetails.NewClient(opts...),
+		AccountToken:        accounttoken.NewClient(opts...),
+		AsyncPassthrough:    asyncpassthrough.NewClient(opts...),
+		AuditTrail:          audittrail.NewClient(opts...),
+		AvailableActions:    availableactions.NewClient(opts...),
+		BankInfo:            bankinfo.NewClient(opts...),
+		Benefits:            benefits.NewClient(opts...),
+		Companies:           companies.NewClient(opts...),
+		DeleteAccount:       deleteaccount.NewClient(opts...),
+		Dependents:          dependents.NewClient(opts...),
+		EmployeePayrollRuns: employeepayrollruns.NewClient(opts...),
+		Employees:           employees.NewClient(opts...),
+		EmployerBenefits:    employerbenefits.NewClient(opts...),
+		Employments:         employments.NewClient(opts...),
+		GenerateKey:         generatekey.NewClient(opts...),
+		Groups:              groups.NewClient(opts...),
+		Issues:              issues.NewClient(opts...),
+		LinkToken:           linktoken.NewClient(opts...),
+		LinkedAccounts:      linkedaccounts.NewClient(opts...),
+		Locations:           locations.NewClient(opts...),
+		Passthrough:         passthrough.NewClient(opts...),
+		PayGroups:           paygroups.NewClient(opts...),
+		PayrollRuns:         payrollruns.NewClient(opts...),
+		RegenerateKey:       regeneratekey.NewClient(opts...),
+		SelectiveSync:       selectivesync.NewClient(opts...),
+		SyncStatus:          syncstatus.NewClient(opts...),
+		ForceResync:         forceresync.NewClient(opts...),
+		Teams:               teams.NewClient(opts...),
+		TimeOff:             timeoff.NewClient(opts...),
+		TimeOffBalances:     timeoffbalances.NewClient(opts...),
+		TimesheetEntries:    timesheetentries.NewClient(opts...),
+		WebhookReceivers:    webhookreceivers.NewClient(opts...),
 	}
-}
-
-type client struct {
-	baseURL                   string
-	httpClient                core.HTTPClient
-	header                    http.Header
-	accountDetailsClient      accountdetails.Client
-	accountTokenClient        accounttoken.Client
-	asyncPassthroughClient    asyncpassthrough.Client
-	auditTrailClient          audittrail.Client
-	availableActionsClient    availableactions.Client
-	bankInfoClient            bankinfo.Client
-	benefitsClient            benefits.Client
-	companiesClient           companies.Client
-	deleteAccountClient       deleteaccount.Client
-	dependentsClient          dependents.Client
-	employeePayrollRunsClient employeepayrollruns.Client
-	employeesClient           employees.Client
-	employerBenefitsClient    employerbenefits.Client
-	employmentsClient         employments.Client
-	generateKeyClient         generatekey.Client
-	groupsClient              groups.Client
-	issuesClient              issues.Client
-	linkTokenClient           linktoken.Client
-	linkedAccountsClient      linkedaccounts.Client
-	locationsClient           locations.Client
-	passthroughClient         passthrough.Client
-	payGroupsClient           paygroups.Client
-	payrollRunsClient         payrollruns.Client
-	regenerateKeyClient       regeneratekey.Client
-	selectiveSyncClient       selectivesync.Client
-	syncStatusClient          syncstatus.Client
-	forceResyncClient         forceresync.Client
-	teamsClient               teams.Client
-	timeOffClient             timeoff.Client
-	timeOffBalancesClient     timeoffbalances.Client
-	timesheetEntriesClient    timesheetentries.Client
-	webhookReceiversClient    webhookreceivers.Client
-}
-
-func (c *client) AccountDetails() accountdetails.Client {
-	return c.accountDetailsClient
-}
-
-func (c *client) AccountToken() accounttoken.Client {
-	return c.accountTokenClient
-}
-
-func (c *client) AsyncPassthrough() asyncpassthrough.Client {
-	return c.asyncPassthroughClient
-}
-
-func (c *client) AuditTrail() audittrail.Client {
-	return c.auditTrailClient
-}
-
-func (c *client) AvailableActions() availableactions.Client {
-	return c.availableActionsClient
-}
-
-func (c *client) BankInfo() bankinfo.Client {
-	return c.bankInfoClient
-}
-
-func (c *client) Benefits() benefits.Client {
-	return c.benefitsClient
-}
-
-func (c *client) Companies() companies.Client {
-	return c.companiesClient
-}
-
-func (c *client) DeleteAccount() deleteaccount.Client {
-	return c.deleteAccountClient
-}
-
-func (c *client) Dependents() dependents.Client {
-	return c.dependentsClient
-}
-
-func (c *client) EmployeePayrollRuns() employeepayrollruns.Client {
-	return c.employeePayrollRunsClient
-}
-
-func (c *client) Employees() employees.Client {
-	return c.employeesClient
-}
-
-func (c *client) EmployerBenefits() employerbenefits.Client {
-	return c.employerBenefitsClient
-}
-
-func (c *client) Employments() employments.Client {
-	return c.employmentsClient
-}
-
-func (c *client) GenerateKey() generatekey.Client {
-	return c.generateKeyClient
-}
-
-func (c *client) Groups() groups.Client {
-	return c.groupsClient
-}
-
-func (c *client) Issues() issues.Client {
-	return c.issuesClient
-}
-
-func (c *client) LinkToken() linktoken.Client {
-	return c.linkTokenClient
-}
-
-func (c *client) LinkedAccounts() linkedaccounts.Client {
-	return c.linkedAccountsClient
-}
-
-func (c *client) Locations() locations.Client {
-	return c.locationsClient
-}
-
-func (c *client) Passthrough() passthrough.Client {
-	return c.passthroughClient
-}
-
-func (c *client) PayGroups() paygroups.Client {
-	return c.payGroupsClient
-}
-
-func (c *client) PayrollRuns() payrollruns.Client {
-	return c.payrollRunsClient
-}
-
-func (c *client) RegenerateKey() regeneratekey.Client {
-	return c.regenerateKeyClient
-}
-
-func (c *client) SelectiveSync() selectivesync.Client {
-	return c.selectiveSyncClient
-}
-
-func (c *client) SyncStatus() syncstatus.Client {
-	return c.syncStatusClient
-}
-
-func (c *client) ForceResync() forceresync.Client {
-	return c.forceResyncClient
-}
-
-func (c *client) Teams() teams.Client {
-	return c.teamsClient
-}
-
-func (c *client) TimeOff() timeoff.Client {
-	return c.timeOffClient
-}
-
-func (c *client) TimeOffBalances() timeoffbalances.Client {
-	return c.timeOffBalancesClient
-}
-
-func (c *client) TimesheetEntries() timesheetentries.Client {
-	return c.timesheetEntriesClient
-}
-
-func (c *client) WebhookReceivers() webhookreceivers.Client {
-	return c.webhookReceiversClient
 }

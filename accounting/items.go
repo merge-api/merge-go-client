@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -44,4 +45,78 @@ type ItemsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
+}
+
+type ItemsListRequestExpand string
+
+const (
+	ItemsListRequestExpandCompany                            ItemsListRequestExpand = "company"
+	ItemsListRequestExpandPurchaseAccount                    ItemsListRequestExpand = "purchase_account"
+	ItemsListRequestExpandPurchaseAccountCompany             ItemsListRequestExpand = "purchase_account,company"
+	ItemsListRequestExpandPurchaseAccountSalesAccount        ItemsListRequestExpand = "purchase_account,sales_account"
+	ItemsListRequestExpandPurchaseAccountSalesAccountCompany ItemsListRequestExpand = "purchase_account,sales_account,company"
+	ItemsListRequestExpandSalesAccount                       ItemsListRequestExpand = "sales_account"
+	ItemsListRequestExpandSalesAccountCompany                ItemsListRequestExpand = "sales_account,company"
+)
+
+func NewItemsListRequestExpandFromString(s string) (ItemsListRequestExpand, error) {
+	switch s {
+	case "company":
+		return ItemsListRequestExpandCompany, nil
+	case "purchase_account":
+		return ItemsListRequestExpandPurchaseAccount, nil
+	case "purchase_account,company":
+		return ItemsListRequestExpandPurchaseAccountCompany, nil
+	case "purchase_account,sales_account":
+		return ItemsListRequestExpandPurchaseAccountSalesAccount, nil
+	case "purchase_account,sales_account,company":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountCompany, nil
+	case "sales_account":
+		return ItemsListRequestExpandSalesAccount, nil
+	case "sales_account,company":
+		return ItemsListRequestExpandSalesAccountCompany, nil
+	}
+	var t ItemsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemsListRequestExpand) Ptr() *ItemsListRequestExpand {
+	return &i
+}
+
+type ItemsRetrieveRequestExpand string
+
+const (
+	ItemsRetrieveRequestExpandCompany                            ItemsRetrieveRequestExpand = "company"
+	ItemsRetrieveRequestExpandPurchaseAccount                    ItemsRetrieveRequestExpand = "purchase_account"
+	ItemsRetrieveRequestExpandPurchaseAccountCompany             ItemsRetrieveRequestExpand = "purchase_account,company"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccount        ItemsRetrieveRequestExpand = "purchase_account,sales_account"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompany ItemsRetrieveRequestExpand = "purchase_account,sales_account,company"
+	ItemsRetrieveRequestExpandSalesAccount                       ItemsRetrieveRequestExpand = "sales_account"
+	ItemsRetrieveRequestExpandSalesAccountCompany                ItemsRetrieveRequestExpand = "sales_account,company"
+)
+
+func NewItemsRetrieveRequestExpandFromString(s string) (ItemsRetrieveRequestExpand, error) {
+	switch s {
+	case "company":
+		return ItemsRetrieveRequestExpandCompany, nil
+	case "purchase_account":
+		return ItemsRetrieveRequestExpandPurchaseAccount, nil
+	case "purchase_account,company":
+		return ItemsRetrieveRequestExpandPurchaseAccountCompany, nil
+	case "purchase_account,sales_account":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccount, nil
+	case "purchase_account,sales_account,company":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompany, nil
+	case "sales_account":
+		return ItemsRetrieveRequestExpandSalesAccount, nil
+	case "sales_account,company":
+		return ItemsRetrieveRequestExpandSalesAccountCompany, nil
+	}
+	var t ItemsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemsRetrieveRequestExpand) Ptr() *ItemsRetrieveRequestExpand {
+	return &i
 }

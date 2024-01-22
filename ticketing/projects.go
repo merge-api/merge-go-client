@@ -3,6 +3,7 @@
 package ticketing
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -30,6 +31,31 @@ type ProjectsListRequest struct {
 type ProjectsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type ProjectsUsersListRequestExpand string
+
+const (
+	ProjectsUsersListRequestExpandRoles      ProjectsUsersListRequestExpand = "roles"
+	ProjectsUsersListRequestExpandTeams      ProjectsUsersListRequestExpand = "teams"
+	ProjectsUsersListRequestExpandTeamsRoles ProjectsUsersListRequestExpand = "teams,roles"
+)
+
+func NewProjectsUsersListRequestExpandFromString(s string) (ProjectsUsersListRequestExpand, error) {
+	switch s {
+	case "roles":
+		return ProjectsUsersListRequestExpandRoles, nil
+	case "teams":
+		return ProjectsUsersListRequestExpandTeams, nil
+	case "teams,roles":
+		return ProjectsUsersListRequestExpandTeamsRoles, nil
+	}
+	var t ProjectsUsersListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p ProjectsUsersListRequestExpand) Ptr() *ProjectsUsersListRequestExpand {
+	return &p
 }
 
 type ProjectsUsersListRequest struct {

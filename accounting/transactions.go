@@ -3,6 +3,7 @@
 package accounting
 
 import (
+	fmt "fmt"
 	time "time"
 )
 
@@ -40,4 +41,222 @@ type TransactionsRetrieveRequest struct {
 	Expand *TransactionsRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+}
+
+type TransactionsListRequestExpand string
+
+const (
+	TransactionsListRequestExpandAccount                                                   TransactionsListRequestExpand = "account"
+	TransactionsListRequestExpandAccountAccountingPeriod                                   TransactionsListRequestExpand = "account,accounting_period"
+	TransactionsListRequestExpandAccountingPeriod                                          TransactionsListRequestExpand = "accounting_period"
+	TransactionsListRequestExpandContact                                                   TransactionsListRequestExpand = "contact"
+	TransactionsListRequestExpandContactAccount                                            TransactionsListRequestExpand = "contact,account"
+	TransactionsListRequestExpandContactAccountAccountingPeriod                            TransactionsListRequestExpand = "contact,account,accounting_period"
+	TransactionsListRequestExpandContactAccountingPeriod                                   TransactionsListRequestExpand = "contact,accounting_period"
+	TransactionsListRequestExpandLineItems                                                 TransactionsListRequestExpand = "line_items"
+	TransactionsListRequestExpandLineItemsAccount                                          TransactionsListRequestExpand = "line_items,account"
+	TransactionsListRequestExpandLineItemsAccountAccountingPeriod                          TransactionsListRequestExpand = "line_items,account,accounting_period"
+	TransactionsListRequestExpandLineItemsAccountingPeriod                                 TransactionsListRequestExpand = "line_items,accounting_period"
+	TransactionsListRequestExpandLineItemsContact                                          TransactionsListRequestExpand = "line_items,contact"
+	TransactionsListRequestExpandLineItemsContactAccount                                   TransactionsListRequestExpand = "line_items,contact,account"
+	TransactionsListRequestExpandLineItemsContactAccountAccountingPeriod                   TransactionsListRequestExpand = "line_items,contact,account,accounting_period"
+	TransactionsListRequestExpandLineItemsContactAccountingPeriod                          TransactionsListRequestExpand = "line_items,contact,accounting_period"
+	TransactionsListRequestExpandLineItemsTrackingCategories                               TransactionsListRequestExpand = "line_items,tracking_categories"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesAccount                        TransactionsListRequestExpand = "line_items,tracking_categories,account"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesAccountAccountingPeriod        TransactionsListRequestExpand = "line_items,tracking_categories,account,accounting_period"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesAccountingPeriod               TransactionsListRequestExpand = "line_items,tracking_categories,accounting_period"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesContact                        TransactionsListRequestExpand = "line_items,tracking_categories,contact"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesContactAccount                 TransactionsListRequestExpand = "line_items,tracking_categories,contact,account"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesContactAccountAccountingPeriod TransactionsListRequestExpand = "line_items,tracking_categories,contact,account,accounting_period"
+	TransactionsListRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod        TransactionsListRequestExpand = "line_items,tracking_categories,contact,accounting_period"
+	TransactionsListRequestExpandTrackingCategories                                        TransactionsListRequestExpand = "tracking_categories"
+	TransactionsListRequestExpandTrackingCategoriesAccount                                 TransactionsListRequestExpand = "tracking_categories,account"
+	TransactionsListRequestExpandTrackingCategoriesAccountAccountingPeriod                 TransactionsListRequestExpand = "tracking_categories,account,accounting_period"
+	TransactionsListRequestExpandTrackingCategoriesAccountingPeriod                        TransactionsListRequestExpand = "tracking_categories,accounting_period"
+	TransactionsListRequestExpandTrackingCategoriesContact                                 TransactionsListRequestExpand = "tracking_categories,contact"
+	TransactionsListRequestExpandTrackingCategoriesContactAccount                          TransactionsListRequestExpand = "tracking_categories,contact,account"
+	TransactionsListRequestExpandTrackingCategoriesContactAccountAccountingPeriod          TransactionsListRequestExpand = "tracking_categories,contact,account,accounting_period"
+	TransactionsListRequestExpandTrackingCategoriesContactAccountingPeriod                 TransactionsListRequestExpand = "tracking_categories,contact,accounting_period"
+)
+
+func NewTransactionsListRequestExpandFromString(s string) (TransactionsListRequestExpand, error) {
+	switch s {
+	case "account":
+		return TransactionsListRequestExpandAccount, nil
+	case "account,accounting_period":
+		return TransactionsListRequestExpandAccountAccountingPeriod, nil
+	case "accounting_period":
+		return TransactionsListRequestExpandAccountingPeriod, nil
+	case "contact":
+		return TransactionsListRequestExpandContact, nil
+	case "contact,account":
+		return TransactionsListRequestExpandContactAccount, nil
+	case "contact,account,accounting_period":
+		return TransactionsListRequestExpandContactAccountAccountingPeriod, nil
+	case "contact,accounting_period":
+		return TransactionsListRequestExpandContactAccountingPeriod, nil
+	case "line_items":
+		return TransactionsListRequestExpandLineItems, nil
+	case "line_items,account":
+		return TransactionsListRequestExpandLineItemsAccount, nil
+	case "line_items,account,accounting_period":
+		return TransactionsListRequestExpandLineItemsAccountAccountingPeriod, nil
+	case "line_items,accounting_period":
+		return TransactionsListRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,contact":
+		return TransactionsListRequestExpandLineItemsContact, nil
+	case "line_items,contact,account":
+		return TransactionsListRequestExpandLineItemsContactAccount, nil
+	case "line_items,contact,account,accounting_period":
+		return TransactionsListRequestExpandLineItemsContactAccountAccountingPeriod, nil
+	case "line_items,contact,accounting_period":
+		return TransactionsListRequestExpandLineItemsContactAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return TransactionsListRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,account":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesAccount, nil
+	case "line_items,tracking_categories,account,accounting_period":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesAccountAccountingPeriod, nil
+	case "line_items,tracking_categories,accounting_period":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,contact":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesContact, nil
+	case "line_items,tracking_categories,contact,account":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesContactAccount, nil
+	case "line_items,tracking_categories,contact,account,accounting_period":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesContactAccountAccountingPeriod, nil
+	case "line_items,tracking_categories,contact,accounting_period":
+		return TransactionsListRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories":
+		return TransactionsListRequestExpandTrackingCategories, nil
+	case "tracking_categories,account":
+		return TransactionsListRequestExpandTrackingCategoriesAccount, nil
+	case "tracking_categories,account,accounting_period":
+		return TransactionsListRequestExpandTrackingCategoriesAccountAccountingPeriod, nil
+	case "tracking_categories,accounting_period":
+		return TransactionsListRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return TransactionsListRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,account":
+		return TransactionsListRequestExpandTrackingCategoriesContactAccount, nil
+	case "tracking_categories,contact,account,accounting_period":
+		return TransactionsListRequestExpandTrackingCategoriesContactAccountAccountingPeriod, nil
+	case "tracking_categories,contact,accounting_period":
+		return TransactionsListRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	}
+	var t TransactionsListRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TransactionsListRequestExpand) Ptr() *TransactionsListRequestExpand {
+	return &t
+}
+
+type TransactionsRetrieveRequestExpand string
+
+const (
+	TransactionsRetrieveRequestExpandAccount                                                   TransactionsRetrieveRequestExpand = "account"
+	TransactionsRetrieveRequestExpandAccountAccountingPeriod                                   TransactionsRetrieveRequestExpand = "account,accounting_period"
+	TransactionsRetrieveRequestExpandAccountingPeriod                                          TransactionsRetrieveRequestExpand = "accounting_period"
+	TransactionsRetrieveRequestExpandContact                                                   TransactionsRetrieveRequestExpand = "contact"
+	TransactionsRetrieveRequestExpandContactAccount                                            TransactionsRetrieveRequestExpand = "contact,account"
+	TransactionsRetrieveRequestExpandContactAccountAccountingPeriod                            TransactionsRetrieveRequestExpand = "contact,account,accounting_period"
+	TransactionsRetrieveRequestExpandContactAccountingPeriod                                   TransactionsRetrieveRequestExpand = "contact,accounting_period"
+	TransactionsRetrieveRequestExpandLineItems                                                 TransactionsRetrieveRequestExpand = "line_items"
+	TransactionsRetrieveRequestExpandLineItemsAccount                                          TransactionsRetrieveRequestExpand = "line_items,account"
+	TransactionsRetrieveRequestExpandLineItemsAccountAccountingPeriod                          TransactionsRetrieveRequestExpand = "line_items,account,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsAccountingPeriod                                 TransactionsRetrieveRequestExpand = "line_items,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsContact                                          TransactionsRetrieveRequestExpand = "line_items,contact"
+	TransactionsRetrieveRequestExpandLineItemsContactAccount                                   TransactionsRetrieveRequestExpand = "line_items,contact,account"
+	TransactionsRetrieveRequestExpandLineItemsContactAccountAccountingPeriod                   TransactionsRetrieveRequestExpand = "line_items,contact,account,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsContactAccountingPeriod                          TransactionsRetrieveRequestExpand = "line_items,contact,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategories                               TransactionsRetrieveRequestExpand = "line_items,tracking_categories"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesAccount                        TransactionsRetrieveRequestExpand = "line_items,tracking_categories,account"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesAccountAccountingPeriod        TransactionsRetrieveRequestExpand = "line_items,tracking_categories,account,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod               TransactionsRetrieveRequestExpand = "line_items,tracking_categories,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContact                        TransactionsRetrieveRequestExpand = "line_items,tracking_categories,contact"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContactAccount                 TransactionsRetrieveRequestExpand = "line_items,tracking_categories,contact,account"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountAccountingPeriod TransactionsRetrieveRequestExpand = "line_items,tracking_categories,contact,account,accounting_period"
+	TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod        TransactionsRetrieveRequestExpand = "line_items,tracking_categories,contact,accounting_period"
+	TransactionsRetrieveRequestExpandTrackingCategories                                        TransactionsRetrieveRequestExpand = "tracking_categories"
+	TransactionsRetrieveRequestExpandTrackingCategoriesAccount                                 TransactionsRetrieveRequestExpand = "tracking_categories,account"
+	TransactionsRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod                 TransactionsRetrieveRequestExpand = "tracking_categories,account,accounting_period"
+	TransactionsRetrieveRequestExpandTrackingCategoriesAccountingPeriod                        TransactionsRetrieveRequestExpand = "tracking_categories,accounting_period"
+	TransactionsRetrieveRequestExpandTrackingCategoriesContact                                 TransactionsRetrieveRequestExpand = "tracking_categories,contact"
+	TransactionsRetrieveRequestExpandTrackingCategoriesContactAccount                          TransactionsRetrieveRequestExpand = "tracking_categories,contact,account"
+	TransactionsRetrieveRequestExpandTrackingCategoriesContactAccountAccountingPeriod          TransactionsRetrieveRequestExpand = "tracking_categories,contact,account,accounting_period"
+	TransactionsRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod                 TransactionsRetrieveRequestExpand = "tracking_categories,contact,accounting_period"
+)
+
+func NewTransactionsRetrieveRequestExpandFromString(s string) (TransactionsRetrieveRequestExpand, error) {
+	switch s {
+	case "account":
+		return TransactionsRetrieveRequestExpandAccount, nil
+	case "account,accounting_period":
+		return TransactionsRetrieveRequestExpandAccountAccountingPeriod, nil
+	case "accounting_period":
+		return TransactionsRetrieveRequestExpandAccountingPeriod, nil
+	case "contact":
+		return TransactionsRetrieveRequestExpandContact, nil
+	case "contact,account":
+		return TransactionsRetrieveRequestExpandContactAccount, nil
+	case "contact,account,accounting_period":
+		return TransactionsRetrieveRequestExpandContactAccountAccountingPeriod, nil
+	case "contact,accounting_period":
+		return TransactionsRetrieveRequestExpandContactAccountingPeriod, nil
+	case "line_items":
+		return TransactionsRetrieveRequestExpandLineItems, nil
+	case "line_items,account":
+		return TransactionsRetrieveRequestExpandLineItemsAccount, nil
+	case "line_items,account,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsAccountAccountingPeriod, nil
+	case "line_items,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsAccountingPeriod, nil
+	case "line_items,contact":
+		return TransactionsRetrieveRequestExpandLineItemsContact, nil
+	case "line_items,contact,account":
+		return TransactionsRetrieveRequestExpandLineItemsContactAccount, nil
+	case "line_items,contact,account,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsContactAccountAccountingPeriod, nil
+	case "line_items,contact,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsContactAccountingPeriod, nil
+	case "line_items,tracking_categories":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategories, nil
+	case "line_items,tracking_categories,account":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesAccount, nil
+	case "line_items,tracking_categories,account,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesAccountAccountingPeriod, nil
+	case "line_items,tracking_categories,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesAccountingPeriod, nil
+	case "line_items,tracking_categories,contact":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContact, nil
+	case "line_items,tracking_categories,contact,account":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContactAccount, nil
+	case "line_items,tracking_categories,contact,account,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountAccountingPeriod, nil
+	case "line_items,tracking_categories,contact,accounting_period":
+		return TransactionsRetrieveRequestExpandLineItemsTrackingCategoriesContactAccountingPeriod, nil
+	case "tracking_categories":
+		return TransactionsRetrieveRequestExpandTrackingCategories, nil
+	case "tracking_categories,account":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesAccount, nil
+	case "tracking_categories,account,accounting_period":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod, nil
+	case "tracking_categories,accounting_period":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
+	case "tracking_categories,contact":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesContact, nil
+	case "tracking_categories,contact,account":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesContactAccount, nil
+	case "tracking_categories,contact,account,accounting_period":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesContactAccountAccountingPeriod, nil
+	case "tracking_categories,contact,accounting_period":
+		return TransactionsRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod, nil
+	}
+	var t TransactionsRetrieveRequestExpand
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TransactionsRetrieveRequestExpand) Ptr() *TransactionsRetrieveRequestExpand {
+	return &t
 }
