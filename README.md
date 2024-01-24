@@ -2,7 +2,6 @@
 
 The Merge Go library provides convenient access to the Merge API from Go.
 
-[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://buildwithfern.com/?utm_source=merge-api/merge-go-client/readme)
 [![go shield](https://img.shields.io/badge/go-docs-blue)](https://pkg.go.dev/github.com/merge-api/merge-go-client)
 
 ## Requirements
