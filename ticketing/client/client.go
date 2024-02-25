@@ -15,6 +15,7 @@ import (
 	comments "github.com/merge-api/merge-go-client/ticketing/comments"
 	contacts "github.com/merge-api/merge-go-client/ticketing/contacts"
 	deleteaccount "github.com/merge-api/merge-go-client/ticketing/deleteaccount"
+	fieldmapping "github.com/merge-api/merge-go-client/ticketing/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/ticketing/forceresync"
 	generatekey "github.com/merge-api/merge-go-client/ticketing/generatekey"
 	issues "github.com/merge-api/merge-go-client/ticketing/issues"
@@ -24,6 +25,7 @@ import (
 	projects "github.com/merge-api/merge-go-client/ticketing/projects"
 	regeneratekey "github.com/merge-api/merge-go-client/ticketing/regeneratekey"
 	roles "github.com/merge-api/merge-go-client/ticketing/roles"
+	scopes "github.com/merge-api/merge-go-client/ticketing/scopes"
 	selectivesync "github.com/merge-api/merge-go-client/ticketing/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/ticketing/syncstatus"
 	tags "github.com/merge-api/merge-go-client/ticketing/tags"
@@ -49,7 +51,9 @@ type Client struct {
 	Collections      *collections.Client
 	Comments         *comments.Client
 	Contacts         *contacts.Client
+	Scopes           *scopes.Client
 	DeleteAccount    *deleteaccount.Client
+	FieldMapping     *fieldmapping.Client
 	GenerateKey      *generatekey.Client
 	Issues           *issues.Client
 	LinkToken        *linktoken.Client
@@ -87,7 +91,9 @@ func NewClient(opts ...core.ClientOption) *Client {
 		Collections:      collections.NewClient(opts...),
 		Comments:         comments.NewClient(opts...),
 		Contacts:         contacts.NewClient(opts...),
+		Scopes:           scopes.NewClient(opts...),
 		DeleteAccount:    deleteaccount.NewClient(opts...),
+		FieldMapping:     fieldmapping.NewClient(opts...),
 		GenerateKey:      generatekey.NewClient(opts...),
 		Issues:           issues.NewClient(opts...),
 		LinkToken:        linktoken.NewClient(opts...),

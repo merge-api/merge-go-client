@@ -15,6 +15,7 @@ import (
 	deleteaccount "github.com/merge-api/merge-go-client/ats/deleteaccount"
 	departments "github.com/merge-api/merge-go-client/ats/departments"
 	eeocs "github.com/merge-api/merge-go-client/ats/eeocs"
+	fieldmapping "github.com/merge-api/merge-go-client/ats/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/ats/forceresync"
 	generatekey "github.com/merge-api/merge-go-client/ats/generatekey"
 	interviews "github.com/merge-api/merge-go-client/ats/interviews"
@@ -28,6 +29,7 @@ import (
 	passthrough "github.com/merge-api/merge-go-client/ats/passthrough"
 	regeneratekey "github.com/merge-api/merge-go-client/ats/regeneratekey"
 	rejectreasons "github.com/merge-api/merge-go-client/ats/rejectreasons"
+	scopes "github.com/merge-api/merge-go-client/ats/scopes"
 	scorecards "github.com/merge-api/merge-go-client/ats/scorecards"
 	selectivesync "github.com/merge-api/merge-go-client/ats/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/ats/syncstatus"
@@ -52,9 +54,11 @@ type Client struct {
 	AuditTrail         *audittrail.Client
 	AvailableActions   *availableactions.Client
 	Candidates         *candidates.Client
+	Scopes             *scopes.Client
 	DeleteAccount      *deleteaccount.Client
 	Departments        *departments.Client
 	Eeocs              *eeocs.Client
+	FieldMapping       *fieldmapping.Client
 	GenerateKey        *generatekey.Client
 	Interviews         *interviews.Client
 	Issues             *issues.Client
@@ -94,9 +98,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 		AuditTrail:         audittrail.NewClient(opts...),
 		AvailableActions:   availableactions.NewClient(opts...),
 		Candidates:         candidates.NewClient(opts...),
+		Scopes:             scopes.NewClient(opts...),
 		DeleteAccount:      deleteaccount.NewClient(opts...),
 		Departments:        departments.NewClient(opts...),
 		Eeocs:              eeocs.NewClient(opts...),
+		FieldMapping:       fieldmapping.NewClient(opts...),
 		GenerateKey:        generatekey.NewClient(opts...),
 		Interviews:         interviews.NewClient(opts...),
 		Issues:             issues.NewClient(opts...),

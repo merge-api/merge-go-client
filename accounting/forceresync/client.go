@@ -27,7 +27,7 @@ func NewClient(opts ...core.ClientOption) *Client {
 	}
 }
 
-// Force re-sync of all models. This is available for all organizations via the dashboard. Force re-sync is also available programmatically via API for monthly, quarterly, and highest sync frequency customers on the Core, Professional, or Enterprise plans. Doing so will consume a sync credit for the relevant linked account.
+// Force re-sync of all models. This is available for all organizations via the dashboard. Force re-sync is also available programmatically via API for monthly, quarterly, and highest sync frequency customers on the Launch, Professional, or Enterprise plans. Doing so will consume a sync credit for the relevant linked account.
 func (c *Client) SyncStatusResyncCreate(ctx context.Context) ([]*accounting.SyncStatus, error) {
 	baseURL := "https://api.merge.dev"
 	if c.baseURL != "" {

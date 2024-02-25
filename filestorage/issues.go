@@ -18,7 +18,7 @@ type IssuesListRequest struct {
 	FirstIncidentTimeAfter *time.Time `json:"-"`
 	// If provided, will only return issues whose first incident time was before this datetime.
 	FirstIncidentTimeBefore *time.Time `json:"-"`
-	// If True, will include muted issues
+	// If true, will include muted issues
 	IncludeMuted    *string `json:"-"`
 	IntegrationName *string `json:"-"`
 	// If provided, will only return issues whose last incident time was after this datetime.

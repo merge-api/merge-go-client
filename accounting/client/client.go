@@ -19,6 +19,7 @@ import (
 	creditnotes "github.com/merge-api/merge-go-client/accounting/creditnotes"
 	deleteaccount "github.com/merge-api/merge-go-client/accounting/deleteaccount"
 	expenses "github.com/merge-api/merge-go-client/accounting/expenses"
+	fieldmapping "github.com/merge-api/merge-go-client/accounting/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/accounting/forceresync"
 	generatekey "github.com/merge-api/merge-go-client/accounting/generatekey"
 	incomestatements "github.com/merge-api/merge-go-client/accounting/incomestatements"
@@ -33,6 +34,7 @@ import (
 	phonenumbers "github.com/merge-api/merge-go-client/accounting/phonenumbers"
 	purchaseorders "github.com/merge-api/merge-go-client/accounting/purchaseorders"
 	regeneratekey "github.com/merge-api/merge-go-client/accounting/regeneratekey"
+	scopes "github.com/merge-api/merge-go-client/accounting/scopes"
 	selectivesync "github.com/merge-api/merge-go-client/accounting/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/accounting/syncstatus"
 	taxrates "github.com/merge-api/merge-go-client/accounting/taxrates"
@@ -63,8 +65,10 @@ type Client struct {
 	CompanyInfo        *companyinfo.Client
 	Contacts           *contacts.Client
 	CreditNotes        *creditnotes.Client
+	Scopes             *scopes.Client
 	DeleteAccount      *deleteaccount.Client
 	Expenses           *expenses.Client
+	FieldMapping       *fieldmapping.Client
 	GenerateKey        *generatekey.Client
 	IncomeStatements   *incomestatements.Client
 	Invoices           *invoices.Client
@@ -111,8 +115,10 @@ func NewClient(opts ...core.ClientOption) *Client {
 		CompanyInfo:        companyinfo.NewClient(opts...),
 		Contacts:           contacts.NewClient(opts...),
 		CreditNotes:        creditnotes.NewClient(opts...),
+		Scopes:             scopes.NewClient(opts...),
 		DeleteAccount:      deleteaccount.NewClient(opts...),
 		Expenses:           expenses.NewClient(opts...),
+		FieldMapping:       fieldmapping.NewClient(opts...),
 		GenerateKey:        generatekey.NewClient(opts...),
 		IncomeStatements:   incomestatements.NewClient(opts...),
 		Invoices:           invoices.NewClient(opts...),

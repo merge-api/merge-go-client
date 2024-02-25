@@ -9,10 +9,7 @@ import (
 
 type CollectionsListRequest struct {
 	// If provided, will only return collections of the given type.
-	//
-	// - `LIST` - LIST
-	// - `PROJECT` - PROJECT
-	CollectionType *CollectionsListRequestCollectionType `json:"-"`
+	CollectionType *string `json:"-"`
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-"`
 	// If provided, will only return objects created before this datetime.
@@ -50,28 +47,6 @@ type CollectionsRetrieveRequest struct {
 	RemoteFields *string `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *string `json:"-"`
-}
-
-type CollectionsListRequestCollectionType string
-
-const (
-	CollectionsListRequestCollectionTypeList    CollectionsListRequestCollectionType = "LIST"
-	CollectionsListRequestCollectionTypeProject CollectionsListRequestCollectionType = "PROJECT"
-)
-
-func NewCollectionsListRequestCollectionTypeFromString(s string) (CollectionsListRequestCollectionType, error) {
-	switch s {
-	case "LIST":
-		return CollectionsListRequestCollectionTypeList, nil
-	case "PROJECT":
-		return CollectionsListRequestCollectionTypeProject, nil
-	}
-	var t CollectionsListRequestCollectionType
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (c CollectionsListRequestCollectionType) Ptr() *CollectionsListRequestCollectionType {
-	return &c
 }
 
 type CollectionsUsersListRequestExpand string
