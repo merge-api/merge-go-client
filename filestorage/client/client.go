@@ -11,6 +11,7 @@ import (
 	availableactions "github.com/merge-api/merge-go-client/filestorage/availableactions"
 	deleteaccount "github.com/merge-api/merge-go-client/filestorage/deleteaccount"
 	drives "github.com/merge-api/merge-go-client/filestorage/drives"
+	fieldmapping "github.com/merge-api/merge-go-client/filestorage/fieldmapping"
 	files "github.com/merge-api/merge-go-client/filestorage/files"
 	folders "github.com/merge-api/merge-go-client/filestorage/folders"
 	forceresync "github.com/merge-api/merge-go-client/filestorage/forceresync"
@@ -21,6 +22,7 @@ import (
 	linktoken "github.com/merge-api/merge-go-client/filestorage/linktoken"
 	passthrough "github.com/merge-api/merge-go-client/filestorage/passthrough"
 	regeneratekey "github.com/merge-api/merge-go-client/filestorage/regeneratekey"
+	scopes "github.com/merge-api/merge-go-client/filestorage/scopes"
 	selectivesync "github.com/merge-api/merge-go-client/filestorage/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/filestorage/syncstatus"
 	users "github.com/merge-api/merge-go-client/filestorage/users"
@@ -38,8 +40,10 @@ type Client struct {
 	AsyncPassthrough *asyncpassthrough.Client
 	AuditTrail       *audittrail.Client
 	AvailableActions *availableactions.Client
+	Scopes           *scopes.Client
 	DeleteAccount    *deleteaccount.Client
 	Drives           *drives.Client
+	FieldMapping     *fieldmapping.Client
 	Files            *files.Client
 	Folders          *folders.Client
 	GenerateKey      *generatekey.Client
@@ -70,8 +74,10 @@ func NewClient(opts ...core.ClientOption) *Client {
 		AsyncPassthrough: asyncpassthrough.NewClient(opts...),
 		AuditTrail:       audittrail.NewClient(opts...),
 		AvailableActions: availableactions.NewClient(opts...),
+		Scopes:           scopes.NewClient(opts...),
 		DeleteAccount:    deleteaccount.NewClient(opts...),
 		Drives:           drives.NewClient(opts...),
+		FieldMapping:     fieldmapping.NewClient(opts...),
 		Files:            files.NewClient(opts...),
 		Folders:          folders.NewClient(opts...),
 		GenerateKey:      generatekey.NewClient(opts...),

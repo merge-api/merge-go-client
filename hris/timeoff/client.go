@@ -54,6 +54,12 @@ func (c *Client) List(ctx context.Context, request *hris.TimeOffListRequest) (*h
 	if request.EmployeeId != nil {
 		queryParams.Add("employee_id", fmt.Sprintf("%v", *request.EmployeeId))
 	}
+	if request.EndedAfter != nil {
+		queryParams.Add("ended_after", fmt.Sprintf("%v", request.EndedAfter.Format(time.RFC3339)))
+	}
+	if request.EndedBefore != nil {
+		queryParams.Add("ended_before", fmt.Sprintf("%v", request.EndedBefore.Format(time.RFC3339)))
+	}
 	if request.Expand != nil {
 		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
 	}
@@ -83,6 +89,12 @@ func (c *Client) List(ctx context.Context, request *hris.TimeOffListRequest) (*h
 	}
 	if request.ShowEnumOrigins != nil {
 		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
+	}
+	if request.StartedAfter != nil {
+		queryParams.Add("started_after", fmt.Sprintf("%v", request.StartedAfter.Format(time.RFC3339)))
+	}
+	if request.StartedBefore != nil {
+		queryParams.Add("started_before", fmt.Sprintf("%v", request.StartedBefore.Format(time.RFC3339)))
 	}
 	if request.Status != nil {
 		queryParams.Add("status", fmt.Sprintf("%v", *request.Status))

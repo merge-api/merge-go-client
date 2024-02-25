@@ -18,6 +18,7 @@ import (
 	employees "github.com/merge-api/merge-go-client/hris/employees"
 	employerbenefits "github.com/merge-api/merge-go-client/hris/employerbenefits"
 	employments "github.com/merge-api/merge-go-client/hris/employments"
+	fieldmapping "github.com/merge-api/merge-go-client/hris/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/hris/forceresync"
 	generatekey "github.com/merge-api/merge-go-client/hris/generatekey"
 	groups "github.com/merge-api/merge-go-client/hris/groups"
@@ -29,6 +30,7 @@ import (
 	paygroups "github.com/merge-api/merge-go-client/hris/paygroups"
 	payrollruns "github.com/merge-api/merge-go-client/hris/payrollruns"
 	regeneratekey "github.com/merge-api/merge-go-client/hris/regeneratekey"
+	scopes "github.com/merge-api/merge-go-client/hris/scopes"
 	selectivesync "github.com/merge-api/merge-go-client/hris/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/hris/syncstatus"
 	teams "github.com/merge-api/merge-go-client/hris/teams"
@@ -52,12 +54,14 @@ type Client struct {
 	BankInfo            *bankinfo.Client
 	Benefits            *benefits.Client
 	Companies           *companies.Client
+	Scopes              *scopes.Client
 	DeleteAccount       *deleteaccount.Client
 	Dependents          *dependents.Client
 	EmployeePayrollRuns *employeepayrollruns.Client
 	Employees           *employees.Client
 	EmployerBenefits    *employerbenefits.Client
 	Employments         *employments.Client
+	FieldMapping        *fieldmapping.Client
 	GenerateKey         *generatekey.Client
 	Groups              *groups.Client
 	Issues              *issues.Client
@@ -95,12 +99,14 @@ func NewClient(opts ...core.ClientOption) *Client {
 		BankInfo:            bankinfo.NewClient(opts...),
 		Benefits:            benefits.NewClient(opts...),
 		Companies:           companies.NewClient(opts...),
+		Scopes:              scopes.NewClient(opts...),
 		DeleteAccount:       deleteaccount.NewClient(opts...),
 		Dependents:          dependents.NewClient(opts...),
 		EmployeePayrollRuns: employeepayrollruns.NewClient(opts...),
 		Employees:           employees.NewClient(opts...),
 		EmployerBenefits:    employerbenefits.NewClient(opts...),
 		Employments:         employments.NewClient(opts...),
+		FieldMapping:        fieldmapping.NewClient(opts...),
 		GenerateKey:         generatekey.NewClient(opts...),
 		Groups:              groups.NewClient(opts...),
 		Issues:              issues.NewClient(opts...),

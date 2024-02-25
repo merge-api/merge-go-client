@@ -26,6 +26,10 @@ type TimeOffListRequest struct {
 	Cursor *string `json:"-"`
 	// If provided, will only return time off for this employee.
 	EmployeeId *string `json:"-"`
+	// If provided, will only return employees that ended after this datetime.
+	EndedAfter *time.Time `json:"-"`
+	// If provided, will only return time-offs that ended before this datetime.
+	EndedBefore *time.Time `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *TimeOffListRequestExpand `json:"-"`
 	// Whether to include data that was marked as deleted by third party webhooks.
@@ -53,6 +57,10 @@ type TimeOffListRequest struct {
 	RequestType *TimeOffListRequestRequestType `json:"-"`
 	// Which fields should be returned in non-normalized form.
 	ShowEnumOrigins *TimeOffListRequestShowEnumOrigins `json:"-"`
+	// If provided, will only return time-offs that started after this datetime.
+	StartedAfter *time.Time `json:"-"`
+	// If provided, will only return time-offs that started before this datetime.
+	StartedBefore *time.Time `json:"-"`
 	// If provided, will only return TimeOff with this status. Options: ('REQUESTED', 'APPROVED', 'DECLINED', 'CANCELLED', 'DELETED')
 	//
 	// - `REQUESTED` - REQUESTED

@@ -19,4 +19,6 @@ type EndUserDetailsRequest struct {
 	ShouldCreateMagicLinkUrl *bool `json:"should_create_magic_link_url,omitempty"`
 	// An array of objects to specify the models and fields that will be disabled for a given Linked Account. Each object uses model_id, enabled_actions, and disabled_fields to specify the model, method, and fields that are scoped for a given Linked Account.
 	CommonModels []*CommonModelScopesBodyRequest `json:"common_models,omitempty"`
+	// When creating a Link Token, you can set permissions for Common Models that will apply to the account that is going to be linked. Any model or field not specified in link token payload will default to existing settings.
+	CategoryCommonModelScopes map[string][]*IndividualCommonModelScopeDeserializerRequest `json:"category_common_model_scopes,omitempty"`
 }

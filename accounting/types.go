@@ -995,12 +995,12 @@ type AccountIntegration struct {
 	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
 	Slug  *string `json:"slug,omitempty"`
-	// If checked, this integration will not appear in the linking flow, and will appear elsewhere with a Beta tag.
-	IsInBeta *bool `json:"is_in_beta,omitempty"`
 	// Mapping of API endpoints to documentation urls for support. Example: {'GET': [['/common-model-scopes', 'https://docs.merge.dev/accounting/common-model-scopes/#common_model_scopes_retrieve'],['/common-model-actions', 'https://docs.merge.dev/accounting/common-model-actions/#common_model_actions_retrieve']], 'POST': []}
 	ApiEndpointsToDocumentationUrls map[string]interface{} `json:"api_endpoints_to_documentation_urls,omitempty"`
 	// Setup guide URL for third party webhook creation. Exposed in Merge Docs.
 	WebhookSetupGuideUrl *string `json:"webhook_setup_guide_url,omitempty"`
+	// Category or categories this integration is in beta status for.
+	CategoryBetaStatus map[string]interface{} `json:"category_beta_status,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3777,6 +3777,40 @@ func (a AddressTypeEnum) Ptr() *AddressTypeEnum {
 	return &a
 }
 
+type AdvancedMetadata struct {
+	Id           string        `json:"id"`
+	DisplayName  *string       `json:"display_name,omitempty"`
+	Description  *string       `json:"description,omitempty"`
+	IsRequired   *bool         `json:"is_required,omitempty"`
+	IsCustom     *bool         `json:"is_custom,omitempty"`
+	FieldChoices []interface{} `json:"field_choices,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AdvancedMetadata) UnmarshalJSON(data []byte) error {
+	type unmarshaler AdvancedMetadata
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AdvancedMetadata(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AdvancedMetadata) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id"`
 
@@ -3835,6 +3869,7 @@ type AuditLogEvent struct {
 	// - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
 	// - `CREATED_DESTINATION` - CREATED_DESTINATION
 	// - `DELETED_DESTINATION` - DELETED_DESTINATION
+	// - `CHANGED_DESTINATION` - CHANGED_DESTINATION
 	// - `CHANGED_SCOPES` - CHANGED_SCOPES
 	// - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
 	// - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
@@ -3897,6 +3932,7 @@ func (a *AuditLogEvent) String() string {
 // - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
 // - `CREATED_DESTINATION` - CREATED_DESTINATION
 // - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_DESTINATION` - CHANGED_DESTINATION
 // - `CHANGED_SCOPES` - CHANGED_SCOPES
 // - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
 // - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
@@ -5812,6 +5848,36 @@ func NewClassificationEnumFromString(s string) (ClassificationEnum, error) {
 
 func (c ClassificationEnum) Ptr() *ClassificationEnum {
 	return &c
+}
+
+type CommonModelScopeApi struct {
+	// The common models you want to update the scopes for
+	CommonModels []*IndividualCommonModelScopeDeserializer `json:"common_models,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CommonModelScopeApi) UnmarshalJSON(data []byte) error {
+	type unmarshaler CommonModelScopeApi
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CommonModelScopeApi(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CommonModelScopeApi) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type CommonModelScopesBodyRequest struct {
@@ -10969,6 +11035,7 @@ func (e *ErrorValidationProblem) String() string {
 // - `DELETED_LINKED_ACCOUNT` - DELETED_LINKED_ACCOUNT
 // - `CREATED_DESTINATION` - CREATED_DESTINATION
 // - `DELETED_DESTINATION` - DELETED_DESTINATION
+// - `CHANGED_DESTINATION` - CHANGED_DESTINATION
 // - `CHANGED_SCOPES` - CHANGED_SCOPES
 // - `CHANGED_PERSONAL_INFORMATION` - CHANGED_PERSONAL_INFORMATION
 // - `CHANGED_ORGANIZATION_SETTINGS` - CHANGED_ORGANIZATION_SETTINGS
@@ -11002,6 +11069,7 @@ const (
 	EventTypeEnumDeletedLinkedAccount                       EventTypeEnum = "DELETED_LINKED_ACCOUNT"
 	EventTypeEnumCreatedDestination                         EventTypeEnum = "CREATED_DESTINATION"
 	EventTypeEnumDeletedDestination                         EventTypeEnum = "DELETED_DESTINATION"
+	EventTypeEnumChangedDestination                         EventTypeEnum = "CHANGED_DESTINATION"
 	EventTypeEnumChangedScopes                              EventTypeEnum = "CHANGED_SCOPES"
 	EventTypeEnumChangedPersonalInformation                 EventTypeEnum = "CHANGED_PERSONAL_INFORMATION"
 	EventTypeEnumChangedOrganizationSettings                EventTypeEnum = "CHANGED_ORGANIZATION_SETTINGS"
@@ -11047,6 +11115,8 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumCreatedDestination, nil
 	case "DELETED_DESTINATION":
 		return EventTypeEnumDeletedDestination, nil
+	case "CHANGED_DESTINATION":
+		return EventTypeEnumChangedDestination, nil
 	case "CHANGED_SCOPES":
 		return EventTypeEnumChangedScopes, nil
 	case "CHANGED_PERSONAL_INFORMATION":
@@ -15230,6 +15300,348 @@ func (e *ExpenseTrackingCategoriesItem) Accept(visitor ExpenseTrackingCategories
 	}
 }
 
+type ExternalTargetFieldApi struct {
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	IsMapped    *string `json:"is_mapped,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *ExternalTargetFieldApi) UnmarshalJSON(data []byte) error {
+	type unmarshaler ExternalTargetFieldApi
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = ExternalTargetFieldApi(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *ExternalTargetFieldApi) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+type ExternalTargetFieldApiResponse struct {
+	Account                  []*ExternalTargetFieldApi `json:"Account,omitempty"`
+	AccountingAttachment     []*ExternalTargetFieldApi `json:"AccountingAttachment,omitempty"`
+	BalanceSheet             []*ExternalTargetFieldApi `json:"BalanceSheet,omitempty"`
+	CashFlowStatement        []*ExternalTargetFieldApi `json:"CashFlowStatement,omitempty"`
+	CompanyInfo              []*ExternalTargetFieldApi `json:"CompanyInfo,omitempty"`
+	Contact                  []*ExternalTargetFieldApi `json:"Contact,omitempty"`
+	IncomeStatement          []*ExternalTargetFieldApi `json:"IncomeStatement,omitempty"`
+	CreditNote               []*ExternalTargetFieldApi `json:"CreditNote,omitempty"`
+	Item                     []*ExternalTargetFieldApi `json:"Item,omitempty"`
+	PurchaseOrder            []*ExternalTargetFieldApi `json:"PurchaseOrder,omitempty"`
+	TrackingCategory         []*ExternalTargetFieldApi `json:"TrackingCategory,omitempty"`
+	JournalEntry             []*ExternalTargetFieldApi `json:"JournalEntry,omitempty"`
+	TaxRate                  []*ExternalTargetFieldApi `json:"TaxRate,omitempty"`
+	Invoice                  []*ExternalTargetFieldApi `json:"Invoice,omitempty"`
+	Payment                  []*ExternalTargetFieldApi `json:"Payment,omitempty"`
+	Expense                  []*ExternalTargetFieldApi `json:"Expense,omitempty"`
+	VendorCredit             []*ExternalTargetFieldApi `json:"VendorCredit,omitempty"`
+	Transaction              []*ExternalTargetFieldApi `json:"Transaction,omitempty"`
+	GeneralLedgerTransaction []*ExternalTargetFieldApi `json:"GeneralLedgerTransaction,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *ExternalTargetFieldApiResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler ExternalTargetFieldApiResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = ExternalTargetFieldApiResponse(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *ExternalTargetFieldApiResponse) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+type FieldMappingApiInstance struct {
+	Id                *string                             `json:"id,omitempty"`
+	IsIntegrationWide *bool                               `json:"is_integration_wide,omitempty"`
+	TargetField       *FieldMappingApiInstanceTargetField `json:"target_field,omitempty"`
+	RemoteField       *FieldMappingApiInstanceRemoteField `json:"remote_field,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldMappingApiInstance) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldMappingApiInstance
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldMappingApiInstance(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldMappingApiInstance) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldMappingApiInstanceRemoteField struct {
+	RemoteKeyName      string                                                `json:"remote_key_name"`
+	Schema             map[string]interface{}                                `json:"schema,omitempty"`
+	RemoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo `json:"remote_endpoint_info,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldMappingApiInstanceRemoteField) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldMappingApiInstanceRemoteField
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldMappingApiInstanceRemoteField(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldMappingApiInstanceRemoteField) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo struct {
+	Method             *string  `json:"method,omitempty"`
+	UrlPath            *string  `json:"url_path,omitempty"`
+	FieldTraversalPath []string `json:"field_traversal_path,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldMappingApiInstanceResponse struct {
+	Account                  []*FieldMappingApiInstance `json:"Account,omitempty"`
+	AccountingAttachment     []*FieldMappingApiInstance `json:"AccountingAttachment,omitempty"`
+	BalanceSheet             []*FieldMappingApiInstance `json:"BalanceSheet,omitempty"`
+	CashFlowStatement        []*FieldMappingApiInstance `json:"CashFlowStatement,omitempty"`
+	CompanyInfo              []*FieldMappingApiInstance `json:"CompanyInfo,omitempty"`
+	Contact                  []*FieldMappingApiInstance `json:"Contact,omitempty"`
+	IncomeStatement          []*FieldMappingApiInstance `json:"IncomeStatement,omitempty"`
+	CreditNote               []*FieldMappingApiInstance `json:"CreditNote,omitempty"`
+	Item                     []*FieldMappingApiInstance `json:"Item,omitempty"`
+	PurchaseOrder            []*FieldMappingApiInstance `json:"PurchaseOrder,omitempty"`
+	TrackingCategory         []*FieldMappingApiInstance `json:"TrackingCategory,omitempty"`
+	JournalEntry             []*FieldMappingApiInstance `json:"JournalEntry,omitempty"`
+	TaxRate                  []*FieldMappingApiInstance `json:"TaxRate,omitempty"`
+	Invoice                  []*FieldMappingApiInstance `json:"Invoice,omitempty"`
+	Payment                  []*FieldMappingApiInstance `json:"Payment,omitempty"`
+	Expense                  []*FieldMappingApiInstance `json:"Expense,omitempty"`
+	VendorCredit             []*FieldMappingApiInstance `json:"VendorCredit,omitempty"`
+	Transaction              []*FieldMappingApiInstance `json:"Transaction,omitempty"`
+	GeneralLedgerTransaction []*FieldMappingApiInstance `json:"GeneralLedgerTransaction,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldMappingApiInstanceResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldMappingApiInstanceResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldMappingApiInstanceResponse(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldMappingApiInstanceResponse) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldMappingApiInstanceTargetField struct {
+	Name               string `json:"name"`
+	Description        string `json:"description"`
+	IsOrganizationWide bool   `json:"is_organization_wide"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldMappingApiInstanceTargetField) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldMappingApiInstanceTargetField
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldMappingApiInstanceTargetField(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldMappingApiInstanceTargetField) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldMappingInstanceResponse struct {
+	Model    *FieldMappingApiInstance    `json:"model,omitempty"`
+	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
+	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
+	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldMappingInstanceResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldMappingInstanceResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldMappingInstanceResponse(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldMappingInstanceResponse) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldPermissionDeserializer struct {
+	Enabled  []interface{} `json:"enabled,omitempty"`
+	Disabled []interface{} `json:"disabled,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldPermissionDeserializer) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldPermissionDeserializer
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldPermissionDeserializer(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldPermissionDeserializer) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
+type FieldPermissionDeserializerRequest struct {
+	Enabled  []interface{} `json:"enabled,omitempty"`
+	Disabled []interface{} `json:"disabled,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (f *FieldPermissionDeserializerRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler FieldPermissionDeserializerRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*f = FieldPermissionDeserializerRequest(value)
+	f._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (f *FieldPermissionDeserializerRequest) String() string {
+	if len(f._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(f._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(f); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", f)
+}
+
 // # The IncomeStatement Object
 //
 // ### Description
@@ -16027,6 +16439,68 @@ func (i *IncomeStatementCurrency) Accept(visitor IncomeStatementCurrencyVisitor)
 	}
 }
 
+type IndividualCommonModelScopeDeserializer struct {
+	ModelName        string                                  `json:"model_name"`
+	ModelPermissions map[string]*ModelPermissionDeserializer `json:"model_permissions,omitempty"`
+	FieldPermissions *FieldPermissionDeserializer            `json:"field_permissions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *IndividualCommonModelScopeDeserializer) UnmarshalJSON(data []byte) error {
+	type unmarshaler IndividualCommonModelScopeDeserializer
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = IndividualCommonModelScopeDeserializer(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *IndividualCommonModelScopeDeserializer) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+type IndividualCommonModelScopeDeserializerRequest struct {
+	ModelName        string                                         `json:"model_name"`
+	ModelPermissions map[string]*ModelPermissionDeserializerRequest `json:"model_permissions,omitempty"`
+	FieldPermissions *FieldPermissionDeserializerRequest            `json:"field_permissions,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *IndividualCommonModelScopeDeserializerRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler IndividualCommonModelScopeDeserializerRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = IndividualCommonModelScopeDeserializerRequest(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *IndividualCommonModelScopeDeserializerRequest) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
 // # The Invoice Object
 //
 // ### Description
@@ -16038,7 +16512,7 @@ func (i *IncomeStatementCurrency) Accept(visitor IncomeStatementCurrencyVisitor)
 // Fetch from the `LIST Invoices` endpoint and view a company's invoices.
 type Invoice struct {
 	Id *string `json:"id,omitempty"`
-	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `accounts_payable`, the invoice is a bill. If `type` is `accounts_receivable`, it is an invoice.
+	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 	//
 	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 	// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
@@ -19076,7 +19550,7 @@ func (i *InvoicePurchaseOrdersItem) Accept(visitor InvoicePurchaseOrdersItemVisi
 //	### Usage Example
 //	Fetch from the `LIST Invoices` endpoint and view a company's invoices.
 type InvoiceRequest struct {
-	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `accounts_payable`, the invoice is a bill. If `type` is `accounts_receivable`, it is an invoice.
+	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 	//
 	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 	// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
@@ -20176,7 +20650,7 @@ func (i *InvoiceRequestTrackingCategoriesItem) Accept(visitor InvoiceRequestTrac
 	}
 }
 
-// Whether the invoice is an accounts receivable or accounts payable. If `type` is `accounts_payable`, the invoice is a bill. If `type` is `accounts_receivable`, it is an invoice.
+// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 //
 // - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 // - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
@@ -20431,7 +20905,7 @@ func (i *InvoiceTrackingCategoriesItem) Accept(visitor InvoiceTrackingCategories
 	}
 }
 
-// Whether the invoice is an accounts receivable or accounts payable. If `type` is `accounts_payable`, the invoice is a bill. If `type` is `accounts_receivable`, it is an invoice.
+// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 //
 // - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 // - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
@@ -25138,6 +25612,64 @@ func (m *ModelOperation) UnmarshalJSON(data []byte) error {
 }
 
 func (m *ModelOperation) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
+}
+
+type ModelPermissionDeserializer struct {
+	IsEnabled *bool `json:"is_enabled,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *ModelPermissionDeserializer) UnmarshalJSON(data []byte) error {
+	type unmarshaler ModelPermissionDeserializer
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = ModelPermissionDeserializer(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *ModelPermissionDeserializer) String() string {
+	if len(m._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(m); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", m)
+}
+
+type ModelPermissionDeserializerRequest struct {
+	IsEnabled *bool `json:"is_enabled,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (m *ModelPermissionDeserializerRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler ModelPermissionDeserializerRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*m = ModelPermissionDeserializerRequest(value)
+	m._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (m *ModelPermissionDeserializerRequest) String() string {
 	if len(m._rawJSON) > 0 {
 		if value, err := core.StringifyJSON(m._rawJSON); err == nil {
 			return value
@@ -32181,6 +32713,117 @@ func (r *RemoteData) UnmarshalJSON(data []byte) error {
 }
 
 func (r *RemoteData) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteEndpointInfo struct {
+	Method             string        `json:"method"`
+	UrlPath            string        `json:"url_path"`
+	FieldTraversalPath []interface{} `json:"field_traversal_path,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteEndpointInfo) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteEndpointInfo
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteEndpointInfo(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteEndpointInfo) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldApi struct {
+	Schema             map[string]interface{} `json:"schema,omitempty"`
+	RemoteKeyName      string                 `json:"remote_key_name"`
+	RemoteEndpointInfo *RemoteEndpointInfo    `json:"remote_endpoint_info,omitempty"`
+	ExampleValues      []interface{}          `json:"example_values,omitempty"`
+	AdvancedMetadata   *AdvancedMetadata      `json:"advanced_metadata,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldApi) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldApi
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldApi(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldApi) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldApiResponse struct {
+	Account                  []*RemoteFieldApi `json:"Account,omitempty"`
+	AccountingAttachment     []*RemoteFieldApi `json:"AccountingAttachment,omitempty"`
+	BalanceSheet             []*RemoteFieldApi `json:"BalanceSheet,omitempty"`
+	CashFlowStatement        []*RemoteFieldApi `json:"CashFlowStatement,omitempty"`
+	CompanyInfo              []*RemoteFieldApi `json:"CompanyInfo,omitempty"`
+	Contact                  []*RemoteFieldApi `json:"Contact,omitempty"`
+	IncomeStatement          []*RemoteFieldApi `json:"IncomeStatement,omitempty"`
+	CreditNote               []*RemoteFieldApi `json:"CreditNote,omitempty"`
+	Item                     []*RemoteFieldApi `json:"Item,omitempty"`
+	PurchaseOrder            []*RemoteFieldApi `json:"PurchaseOrder,omitempty"`
+	TrackingCategory         []*RemoteFieldApi `json:"TrackingCategory,omitempty"`
+	JournalEntry             []*RemoteFieldApi `json:"JournalEntry,omitempty"`
+	TaxRate                  []*RemoteFieldApi `json:"TaxRate,omitempty"`
+	Invoice                  []*RemoteFieldApi `json:"Invoice,omitempty"`
+	Payment                  []*RemoteFieldApi `json:"Payment,omitempty"`
+	Expense                  []*RemoteFieldApi `json:"Expense,omitempty"`
+	VendorCredit             []*RemoteFieldApi `json:"VendorCredit,omitempty"`
+	Transaction              []*RemoteFieldApi `json:"Transaction,omitempty"`
+	GeneralLedgerTransaction []*RemoteFieldApi `json:"GeneralLedgerTransaction,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldApiResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldApiResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldApiResponse(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldApiResponse) String() string {
 	if len(r._rawJSON) > 0 {
 		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
 			return value

@@ -18,6 +18,7 @@ import (
 	deleteaccount "github.com/merge-api/merge-go-client/crm/deleteaccount"
 	engagements "github.com/merge-api/merge-go-client/crm/engagements"
 	engagementtypes "github.com/merge-api/merge-go-client/crm/engagementtypes"
+	fieldmapping "github.com/merge-api/merge-go-client/crm/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/crm/forceresync"
 	generatekey "github.com/merge-api/merge-go-client/crm/generatekey"
 	issues "github.com/merge-api/merge-go-client/crm/issues"
@@ -28,6 +29,7 @@ import (
 	opportunities "github.com/merge-api/merge-go-client/crm/opportunities"
 	passthrough "github.com/merge-api/merge-go-client/crm/passthrough"
 	regeneratekey "github.com/merge-api/merge-go-client/crm/regeneratekey"
+	scopes "github.com/merge-api/merge-go-client/crm/scopes"
 	selectivesync "github.com/merge-api/merge-go-client/crm/selectivesync"
 	stages "github.com/merge-api/merge-go-client/crm/stages"
 	syncstatus "github.com/merge-api/merge-go-client/crm/syncstatus"
@@ -53,9 +55,11 @@ type Client struct {
 	AssociationTypes    *associationtypes.Client
 	CustomObjects       *customobjects.Client
 	Associations        *associations.Client
+	Scopes              *scopes.Client
 	DeleteAccount       *deleteaccount.Client
 	EngagementTypes     *engagementtypes.Client
 	Engagements         *engagements.Client
+	FieldMapping        *fieldmapping.Client
 	GenerateKey         *generatekey.Client
 	Issues              *issues.Client
 	Leads               *leads.Client
@@ -94,9 +98,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 		AssociationTypes:    associationtypes.NewClient(opts...),
 		CustomObjects:       customobjects.NewClient(opts...),
 		Associations:        associations.NewClient(opts...),
+		Scopes:              scopes.NewClient(opts...),
 		DeleteAccount:       deleteaccount.NewClient(opts...),
 		EngagementTypes:     engagementtypes.NewClient(opts...),
 		Engagements:         engagements.NewClient(opts...),
+		FieldMapping:        fieldmapping.NewClient(opts...),
 		GenerateKey:         generatekey.NewClient(opts...),
 		Issues:              issues.NewClient(opts...),
 		Leads:               leads.NewClient(opts...),
