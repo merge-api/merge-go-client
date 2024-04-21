@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `EngagementType` objects.
 func (c *Client) List(ctx context.Context, request *crm.EngagementTypesListRequest) (*crm.PaginatedEngagementTypeList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagement-types"
+	endpointURL := baseURL + "/" + "crm/v1/engagement-types"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *crm.EngagementTypesListReque
 
 // Returns an `EngagementType` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.EngagementTypesRetrieveRequest) (*crm.EngagementType, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/engagement-types/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/engagement-types/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -124,11 +124,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.Engagemen
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.EngagementTypesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagement-types/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/engagement-types/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

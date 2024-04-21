@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Role` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.RolesListRequest) (*ticketing.PaginatedRoleList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/roles"
+	endpointURL := baseURL + "/" + "ticketing/v1/roles"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.RolesListRequest) 
 
 // Returns a `Role` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.RolesRetrieveRequest) (*ticketing.Role, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/roles/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/roles/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

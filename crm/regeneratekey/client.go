@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Exchange remote keys.
 func (c *Client) Create(ctx context.Context, request *crm.RemoteKeyForRegenerationRequest) (*crm.RemoteKey, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/regenerate-key"
+	endpointURL := baseURL + "/" + "crm/v1/regenerate-key"
 
 	var response *crm.RemoteKey
 	if err := c.caller.Call(

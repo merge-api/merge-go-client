@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `CustomObject` objects.
 func (c *Client) CustomObjectClassesCustomObjectsList(ctx context.Context, customObjectClassId string, request *crm.CustomObjectClassesCustomObjectsListRequest) (*crm.PaginatedCustomObjectList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/custom-objects", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) CustomObjectClassesCustomObjectsList(ctx context.Context, custo
 
 // Creates a `CustomObject` object with the given values.
 func (c *Client) CustomObjectClassesCustomObjectsCreate(ctx context.Context, customObjectClassId string, request *crm.CrmCustomObjectEndpointRequest) (*crm.CrmCustomObjectResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/custom-objects", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -125,11 +125,11 @@ func (c *Client) CustomObjectClassesCustomObjectsCreate(ctx context.Context, cus
 
 // Returns a `CustomObject` object with the given `id`.
 func (c *Client) CustomObjectClassesCustomObjectsRetrieve(ctx context.Context, customObjectClassId string, id string, request *crm.CustomObjectClassesCustomObjectsRetrieveRequest) (*crm.CustomObject, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v", customObjectClassId, id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/custom-objects/%v", customObjectClassId, id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -157,36 +157,13 @@ func (c *Client) CustomObjectClassesCustomObjectsRetrieve(ctx context.Context, c
 	return response, nil
 }
 
-// Returns metadata for `CRMCustomObject` PATCHs.
-func (c *Client) CustomObjectClassesCustomObjectsMetaPatchRetrieve(ctx context.Context, customObjectClassId string, id string) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/meta/patch/%v", customObjectClassId, id)
-
-	var response *crm.MetaResponse
-	if err := c.caller.Call(
-		ctx,
-		&core.CallParams{
-			URL:      endpointURL,
-			Method:   http.MethodGet,
-			Headers:  c.header,
-			Response: &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
-}
-
 // Returns metadata for `CRMCustomObject` POSTs.
 func (c *Client) CustomObjectClassesCustomObjectsMetaPostRetrieve(ctx context.Context, customObjectClassId string) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/meta/post", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/custom-objects/meta/post", customObjectClassId)
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(

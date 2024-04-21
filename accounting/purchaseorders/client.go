@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `PurchaseOrder` objects.
 func (c *Client) List(ctx context.Context, request *accounting.PurchaseOrdersListRequest) (*accounting.PaginatedPurchaseOrderList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/purchase-orders"
+	endpointURL := baseURL + "/" + "accounting/v1/purchase-orders"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *accounting.PurchaseOrdersLis
 
 // Creates a `PurchaseOrder` object with the given values.
 func (c *Client) Create(ctx context.Context, request *accounting.PurchaseOrderEndpointRequest) (*accounting.PurchaseOrderResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/purchase-orders"
+	endpointURL := baseURL + "/" + "accounting/v1/purchase-orders"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -140,11 +140,11 @@ func (c *Client) Create(ctx context.Context, request *accounting.PurchaseOrderEn
 
 // Returns a `PurchaseOrder` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.PurchaseOrdersRetrieveRequest) (*accounting.PurchaseOrder, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/purchase-orders/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/purchase-orders/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -180,11 +180,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Pu
 
 // Returns metadata for `PurchaseOrder` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/purchase-orders/meta/post"
+	endpointURL := baseURL + "/" + "accounting/v1/purchase-orders/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := c.caller.Call(

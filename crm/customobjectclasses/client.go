@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `CustomObjectClass` objects.
 func (c *Client) List(ctx context.Context, request *crm.CustomObjectClassesListRequest) (*crm.PaginatedCustomObjectClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/custom-object-classes"
+	endpointURL := baseURL + "/" + "crm/v1/custom-object-classes"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *crm.CustomObjectClassesListR
 
 // Returns a `CustomObjectClass` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.CustomObjectClassesRetrieveRequest) (*crm.CustomObjectClass, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

@@ -32,7 +32,7 @@ type EeocsListRequest struct {
 	RemoteFields *EeocsListRequestRemoteFields `json:"-"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *EeocsListRequestShowEnumOrigins `json:"-"`
 }
 
@@ -43,7 +43,7 @@ type EeocsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *EeocsRetrieveRequestRemoteFields `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *EeocsRetrieveRequestShowEnumOrigins `json:"-"`
 }
 

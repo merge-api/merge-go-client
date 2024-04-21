@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `RemoteUser` objects.
 func (c *Client) List(ctx context.Context, request *ats.UsersListRequest) (*ats.PaginatedRemoteUserList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/users"
+	endpointURL := baseURL + "/" + "ats/v1/users"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -96,11 +96,11 @@ func (c *Client) List(ctx context.Context, request *ats.UsersListRequest) (*ats.
 
 // Returns a `RemoteUser` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.UsersRetrieveRequest) (*ats.RemoteUser, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/users/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/users/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

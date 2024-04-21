@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Account` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.AccountsListRequest) (*ticketing.PaginatedAccountList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/accounts"
+	endpointURL := baseURL + "/" + "ticketing/v1/accounts"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.AccountsListReques
 
 // Returns an `Account` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.AccountsRetrieveRequest) (*ticketing.Account, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/accounts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/accounts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

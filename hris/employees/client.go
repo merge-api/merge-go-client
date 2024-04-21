@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Employee` objects.
 func (c *Client) List(ctx context.Context, request *hris.EmployeesListRequest) (*hris.PaginatedEmployeeList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employees"
+	endpointURL := baseURL + "/" + "hris/v1/employees"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -156,11 +156,11 @@ func (c *Client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 
 // Creates an `Employee` object with the given values.
 func (c *Client) Create(ctx context.Context, request *hris.EmployeeEndpointRequest) (*hris.EmployeeResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employees"
+	endpointURL := baseURL + "/" + "hris/v1/employees"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -191,11 +191,11 @@ func (c *Client) Create(ctx context.Context, request *hris.EmployeeEndpointReque
 
 // Returns an `Employee` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.EmployeesRetrieveRequest) (*hris.Employee, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/employees/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/employees/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -234,11 +234,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *hris.Employee
 
 // Ignores a specific row based on the `model_id` in the url. These records will have their properties set to null, and will not be updated in future syncs. The "reason" and "message" fields in the request body will be stored for audit purposes.
 func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *hris.IgnoreCommonModelRequest) error {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/employees/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/employees/ignore/%v", modelId)
 
 	if err := c.caller.Call(
 		ctx,
@@ -256,11 +256,11 @@ func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *hris
 
 // Returns metadata for `Employee` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/employees/meta/post"
+	endpointURL := baseURL + "/" + "hris/v1/employees/meta/post"
 
 	var response *hris.MetaResponse
 	if err := c.caller.Call(

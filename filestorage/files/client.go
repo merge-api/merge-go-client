@@ -34,11 +34,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `File` objects.
 func (c *Client) List(ctx context.Context, request *filestorage.FilesListRequest) (*filestorage.PaginatedFileList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/files"
+	endpointURL := baseURL + "/" + "filestorage/v1/files"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -64,6 +64,9 @@ func (c *Client) List(ctx context.Context, request *filestorage.FilesListRequest
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.MimeType != nil {
+		queryParams.Add("mime_type", fmt.Sprintf("%v", *request.MimeType))
 	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
@@ -101,11 +104,11 @@ func (c *Client) List(ctx context.Context, request *filestorage.FilesListRequest
 
 // Creates a `File` object with the given values.
 func (c *Client) Create(ctx context.Context, request *filestorage.FileStorageFileEndpointRequest) (*filestorage.FileStorageFileResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/files"
+	endpointURL := baseURL + "/" + "filestorage/v1/files"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -136,11 +139,11 @@ func (c *Client) Create(ctx context.Context, request *filestorage.FileStorageFil
 
 // Returns a `File` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.FilesRetrieveRequest) (*filestorage.File, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/files/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/files/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -170,11 +173,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.F
 
 // Returns a `File` object with the given `id`.
 func (c *Client) DownloadRetrieve(ctx context.Context, id string, request *filestorage.FilesDownloadRetrieveRequest) (io.Reader, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/files/%v/download", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/files/%v/download", id)
 
 	queryParams := make(url.Values)
 	if request.MimeType != nil {
@@ -201,11 +204,11 @@ func (c *Client) DownloadRetrieve(ctx context.Context, id string, request *files
 
 // Returns metadata for `FileStorageFile` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/files/meta/post"
+	endpointURL := baseURL + "/" + "filestorage/v1/files/meta/post"
 
 	var response *filestorage.MetaResponse
 	if err := c.caller.Call(

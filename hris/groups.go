@@ -21,13 +21,15 @@ type GroupsListRequest struct {
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-"`
+	// If provided, will only return groups with these names. Multiple values can be separated by commas.
+	Names *string `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-"`
 	// If provided, will only return groups of these types. Multiple values can be separated by commas.
 	Types *string `json:"-"`
@@ -38,6 +40,6 @@ type GroupsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-"`
 }

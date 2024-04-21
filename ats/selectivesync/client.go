@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get a linked account's selective syncs.
 func (c *Client) ConfigurationsList(ctx context.Context) ([]*ats.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "ats/v1/selective-sync/configurations"
 
 	var response []*ats.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -54,11 +54,11 @@ func (c *Client) ConfigurationsList(ctx context.Context) ([]*ats.LinkedAccountSe
 
 // Replace a linked account's selective syncs.
 func (c *Client) ConfigurationsUpdate(ctx context.Context, request *ats.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*ats.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "ats/v1/selective-sync/configurations"
 
 	var response []*ats.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -78,11 +78,11 @@ func (c *Client) ConfigurationsUpdate(ctx context.Context, request *ats.LinkedAc
 
 // Get metadata for the conditions available to a linked account.
 func (c *Client) MetaList(ctx context.Context, request *ats.SelectiveSyncMetaListRequest) (*ats.PaginatedConditionSchemaList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "ats/v1/selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `TimeOff` objects.
 func (c *Client) List(ctx context.Context, request *hris.TimeOffListRequest) (*hris.PaginatedTimeOffList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/time-off"
+	endpointURL := baseURL + "/" + "hris/v1/time-off"
 
 	queryParams := make(url.Values)
 	if request.ApproverId != nil {
@@ -120,11 +120,11 @@ func (c *Client) List(ctx context.Context, request *hris.TimeOffListRequest) (*h
 
 // Creates a `TimeOff` object with the given values.
 func (c *Client) Create(ctx context.Context, request *hris.TimeOffEndpointRequest) (*hris.TimeOffResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/time-off"
+	endpointURL := baseURL + "/" + "hris/v1/time-off"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -155,11 +155,11 @@ func (c *Client) Create(ctx context.Context, request *hris.TimeOffEndpointReques
 
 // Returns a `TimeOff` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.TimeOffRetrieveRequest) (*hris.TimeOff, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/time-off/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/time-off/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -195,11 +195,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *hris.TimeOffR
 
 // Returns metadata for `TimeOff` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/time-off/meta/post"
+	endpointURL := baseURL + "/" + "hris/v1/time-off/meta/post"
 
 	var response *hris.MetaResponse
 	if err := c.caller.Call(

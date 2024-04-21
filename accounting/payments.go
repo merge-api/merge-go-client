@@ -48,6 +48,14 @@ type PaymentsListRequest struct {
 	TransactionDateBefore *time.Time `json:"-"`
 }
 
+type PatchedPaymentEndpointRequest struct {
+	// Whether to include debug fields (such as log file links) in the response.
+	IsDebugMode *bool `json:"-"`
+	// Whether or not third-party updates should be run asynchronously.
+	RunAsync *bool                  `json:"-"`
+	Model    *PatchedPaymentRequest `json:"model,omitempty"`
+}
+
 type PaymentsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *PaymentsRetrieveRequestExpand `json:"-"`

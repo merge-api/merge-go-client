@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Application` objects.
 func (c *Client) List(ctx context.Context, request *ats.ApplicationsListRequest) (*ats.PaginatedApplicationList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/applications"
+	endpointURL := baseURL + "/" + "ats/v1/applications"
 
 	queryParams := make(url.Values)
 	if request.CandidateId != nil {
@@ -108,11 +108,11 @@ func (c *Client) List(ctx context.Context, request *ats.ApplicationsListRequest)
 
 // Creates an `Application` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ats.ApplicationEndpointRequest) (*ats.ApplicationResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/applications"
+	endpointURL := baseURL + "/" + "ats/v1/applications"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -143,11 +143,11 @@ func (c *Client) Create(ctx context.Context, request *ats.ApplicationEndpointReq
 
 // Returns an `Application` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.ApplicationsRetrieveRequest) (*ats.Application, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/applications/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/applications/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -177,11 +177,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ats.Applicati
 
 // Updates the `current_stage` field of an `Application` object
 func (c *Client) ChangeStageCreate(ctx context.Context, id string, request *ats.UpdateApplicationStageRequest) (*ats.ApplicationResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/applications/%v/change-stage", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/applications/%v/change-stage", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -212,11 +212,11 @@ func (c *Client) ChangeStageCreate(ctx context.Context, id string, request *ats.
 
 // Returns metadata for `Application` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context, request *ats.ApplicationsMetaPostRetrieveRequest) (*ats.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/applications/meta/post"
+	endpointURL := baseURL + "/" + "ats/v1/applications/meta/post"
 
 	queryParams := make(url.Values)
 	if request.ApplicationRemoteTemplateId != nil {

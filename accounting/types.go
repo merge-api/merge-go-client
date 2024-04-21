@@ -29,7 +29,10 @@ import (
 type Account struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The account's name.
 	Name *string `json:"name,omitempty"`
 	// The account's description.
@@ -368,12 +371,9 @@ type Account struct {
 	// The company the account belongs to.
 	Company *string `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -887,7 +887,9 @@ type AccountDetailsAndActions struct {
 	EndUserOriginId         *string                            `json:"end_user_origin_id,omitempty"`
 	EndUserOrganizationName string                             `json:"end_user_organization_name"`
 	EndUserEmailAddress     string                             `json:"end_user_email_address"`
-	WebhookListenerUrl      string                             `json:"webhook_listener_url"`
+	// The tenant or domain the customer has provided access to.
+	Subdomain          *string `json:"subdomain,omitempty"`
+	WebhookListenerUrl string  `json:"webhook_listener_url"`
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
@@ -2067,7 +2069,10 @@ func (a *AccountToken) String() string {
 type AccountingAttachment struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The attachment's name.
 	FileName *string `json:"file_name,omitempty"`
 	// The attachment's url.
@@ -2075,12 +2080,9 @@ type AccountingAttachment struct {
 	// The company the accounting attachment belongs to.
 	Company *string `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2195,17 +2197,17 @@ func (a *AccountingAttachmentResponse) String() string {
 //
 // Common models like `Invoice` and `Transaction` will have `AccountingPeriod` objects which will denote when they occurred.
 type AccountingPeriod struct {
+	Id        *string    `json:"id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// Beginning date of the period
 	StartDate *time.Time `json:"start_date,omitempty"`
 	// End date of the period
 	EndDate *time.Time              `json:"end_date,omitempty"`
 	Status  *AccountingPeriodStatus `json:"status,omitempty"`
 	// Name of the accounting period.
-	Name      *string    `json:"name,omitempty"`
-	Id        *string    `json:"id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2324,13 +2326,13 @@ func (a AccountingPeriodStatusEnum) Ptr() *AccountingPeriodStatusEnum {
 //
 // Fetch from the `GET CompanyInfo` endpoint and view the company's phone numbers.
 type AccountingPhoneNumber struct {
-	// The phone number.
-	Number *string `json:"number,omitempty"`
-	// The phone number's type.
-	Type      *string    `json:"type,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The phone number.
+	Number *string `json:"number,omitempty"`
+	// The phone number's type.
+	Type *string `json:"type,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2411,6 +2413,9 @@ func (a *AccountingPhoneNumberRequest) String() string {
 //
 // Fetch from the `GET CompanyInfo` endpoint and view the company's addresses.
 type Address struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The address type.
 	//
 	// - `BILLING` - BILLING
@@ -2678,10 +2683,7 @@ type Address struct {
 	// - `ZW` - Zimbabwe
 	Country *AddressCountry `json:"country,omitempty"`
 	// The address's zip code.
-	ZipCode   *string    `json:"zip_code,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	ZipCode *string `json:"zip_code,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3889,6 +3891,9 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+	// - `MUTED_ISSUE` - MUTED_ISSUE
+	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -3952,6 +3957,9 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+// - `MUTED_ISSUE` - MUTED_ISSUE
+// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -4126,7 +4134,10 @@ func (a *AvailableActions) String() string {
 type BalanceSheet struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The balance sheet's name.
 	Name *string `json:"name,omitempty"`
 	// The balance sheet's currency.
@@ -4450,12 +4461,9 @@ type BalanceSheet struct {
 	// The time that balance sheet was generated by the accounting system.
 	RemoteGeneratedAt *time.Time `json:"remote_generated_at,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4918,7 +4926,10 @@ func (b *BalanceSheetCurrency) Accept(visitor BalanceSheetCurrencyVisitor) error
 type CashFlowStatement struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The cash flow statement's name.
 	Name *string `json:"name,omitempty"`
 	// The cash flow statement's currency.
@@ -5246,12 +5257,9 @@ type CashFlowStatement struct {
 	// The time that cash flow statement was generated by the accounting system.
 	RemoteGeneratedAt *time.Time `json:"remote_generated_at,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5923,7 +5931,10 @@ func (c *CommonModelScopesBodyRequest) String() string {
 type CompanyInfo struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The company's name.
 	Name *string `json:"name,omitempty"`
 	// The company's legal name.
@@ -6250,12 +6261,9 @@ type CompanyInfo struct {
 	Addresses    []*Address               `json:"addresses,omitempty"`
 	PhoneNumbers []*AccountingPhoneNumber `json:"phone_numbers,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -6653,10 +6661,8 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
-	NativeName *string `json:"native_name,omitempty"`
-	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
-	FieldName *string `json:"field_name,omitempty"`
+	NativeName  *string `json:"native_name,omitempty"`
+	FieldName   *string `json:"field_name,omitempty"`
 	// Whether this condition can only be applied once. If false, the condition can be AND'd together multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
@@ -6823,7 +6829,10 @@ func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
 type Contact struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The contact's name.
 	Name *string `json:"name,omitempty"`
 	// Whether the contact is a supplier.
@@ -6850,12 +6859,9 @@ type Contact struct {
 	// `AccountingPhoneNumber` object for the given `Contacts` object.
 	PhoneNumbers []*AccountingPhoneNumber `json:"phone_numbers,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8240,7 +8246,10 @@ func (c CountryEnum) Ptr() *CountryEnum {
 type CreditNote struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The credit note's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The credit note's status.
@@ -8584,11 +8593,8 @@ type CreditNote struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the CreditNote was generated in.
 	AccountingPeriod *CreditNoteAccountingPeriod `json:"accounting_period,omitempty"`
-	CreatedAt        *time.Time                  `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}      `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData               `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -9213,7 +9219,13 @@ func (c *CreditNoteCurrency) Accept(visitor CreditNoteCurrencyVisitor) error {
 }
 
 type CreditNoteLineItem struct {
-	Item *CreditNoteLineItemItem `json:"item,omitempty"`
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time              `json:"modified_at,omitempty"`
+	Item       *CreditNoteLineItemItem `json:"item,omitempty"`
 	// The credit note line item's name.
 	Name *string `json:"name,omitempty"`
 	// The description of the item that is owed.
@@ -9236,14 +9248,8 @@ type CreditNoteLineItem struct {
 	Account *string `json:"account,omitempty"`
 	// The company the credit note belongs to.
 	Company *CreditNoteLineItemCompany `json:"company,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -10840,10 +10846,13 @@ func (c CurrencyEnum) Ptr() *CurrencyEnum {
 //
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
-	Method          MethodEnum `json:"method,omitempty"`
-	Path            string     `json:"path"`
-	BaseUrlOverride *string    `json:"base_url_override,omitempty"`
-	Data            *string    `json:"data,omitempty"`
+	Method MethodEnum `json:"method,omitempty"`
+	// The path of the request in the third party's platform.
+	Path string `json:"path"`
+	// An optional override of the third party's base url for the request.
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// The data with the request. You must include a `request_format` parameter matching the data's format
+	Data *string `json:"data,omitempty"`
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
@@ -11055,6 +11064,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+// - `MUTED_ISSUE` - MUTED_ISSUE
+// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 type EventTypeEnum string
 
 const (
@@ -11089,6 +11101,9 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
+	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
+	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -11155,6 +11170,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "FORCED_LINKED_ACCOUNT_RESYNC":
+		return EventTypeEnumForcedLinkedAccountResync, nil
+	case "MUTED_ISSUE":
+		return EventTypeEnumMutedIssue, nil
+	case "GENERATED_MAGIC_LINK":
+		return EventTypeEnumGeneratedMagicLink, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -11176,6 +11197,12 @@ func (e EventTypeEnum) Ptr() *EventTypeEnum {
 //
 // Fetch from the `GET Expense` endpoint and view a company's expense.
 type Expense struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// When the transaction occurred.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// When the expense was created.
@@ -11511,14 +11538,8 @@ type Expense struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Expense was generated in.
 	AccountingPeriod *ExpenseAccountingPeriod `json:"accounting_period,omitempty"`
-	Id               *string                  `json:"id,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData            `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -12153,8 +12174,12 @@ func (e *ExpenseCurrency) Accept(visitor ExpenseCurrencyVisitor) error {
 //
 // Fetch from the `GET Expense` endpoint and view the expense's line items.
 type ExpenseLine struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The line's item.
 	Item *ExpenseLineItem `json:"item,omitempty"`
 	// The line's net amount.
@@ -12481,11 +12506,7 @@ type ExpenseLine struct {
 	// The expense line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -15654,7 +15675,10 @@ func (f *FieldPermissionDeserializerRequest) String() string {
 type IncomeStatement struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The income statement's name.
 	Name *string `json:"name,omitempty"`
 	// The income statement's currency.
@@ -15983,12 +16007,9 @@ type IncomeStatement struct {
 	// The gross profit minus the total expenses.
 	NetIncome *float64 `json:"net_income,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -16512,6 +16533,11 @@ func (i *IndividualCommonModelScopeDeserializerRequest) String() string {
 // Fetch from the `LIST Invoices` endpoint and view a company's invoices.
 type Invoice struct {
 	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 	//
 	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
@@ -16873,13 +16899,8 @@ type Invoice struct {
 	// The accounting period that the Invoice was generated in.
 	AccountingPeriod *InvoiceAccountingPeriod     `json:"accounting_period,omitempty"`
 	PurchaseOrders   []*InvoicePurchaseOrdersItem `json:"purchase_orders,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}       `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData                `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -17513,8 +17534,12 @@ func (i *InvoiceCurrency) Accept(visitor InvoiceCurrencyVisitor) error {
 //
 // Fetch from the `GET Invoice` endpoint and view the invoice's line items.
 type InvoiceLineItem struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The line item's description.
 	Description *string `json:"description,omitempty"`
 	// The line item's unit price.
@@ -17841,12 +17866,8 @@ type InvoiceLineItem struct {
 	// The company the line item belongs to.
 	Company *string `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -21127,7 +21148,10 @@ func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
 type Item struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The item's name.
 	Name *string `json:"name,omitempty"`
 	// The item's status.
@@ -21148,12 +21172,9 @@ type Item struct {
 	// When the third party's item note was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -21430,6 +21451,12 @@ func (i *ItemStatus) Accept(visitor ItemStatusVisitor) error {
 //
 // Fetch from the `GET JournalEntry` endpoint and view a company's journey entry.
 type JournalEntry struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The journal entry's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// When the third party's journal entry was created.
@@ -21767,14 +21794,8 @@ type JournalEntry struct {
 	PostingStatus *JournalEntryPostingStatus `json:"posting_status,omitempty"`
 	// The accounting period that the JournalEntry was generated in.
 	AccountingPeriod *JournalEntryAccountingPeriod `json:"accounting_period,omitempty"`
-	Id               *string                       `json:"id,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}        `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData                 `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -23522,9 +23543,13 @@ func (j *JournalEntryTrackingCategoriesItem) Accept(visitor JournalEntryTracking
 //
 // Fetch from the `GET JournalEntry` endpoint and view the journal entry's line items.
 type JournalLine struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string             `json:"remote_id,omitempty"`
-	Account  *JournalLineAccount `json:"account,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time          `json:"modified_at,omitempty"`
+	Account    *JournalLineAccount `json:"account,omitempty"`
 	// The value of the line item including taxes and other fees.
 	NetAmount          *float64                             `json:"net_amount,omitempty"`
 	TrackingCategory   *JournalLineTrackingCategory         `json:"tracking_category,omitempty"`
@@ -23846,11 +23871,7 @@ type JournalLine struct {
 	// The journal line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -25348,13 +25369,11 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
-	NativeName *string `json:"native_name,omitempty"`
+	NativeName  *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string      `json:"operator"`
-	Value    interface{} `json:"value,omitempty"`
-	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
-	FieldName *string `json:"field_name,omitempty"`
+	Operator  string      `json:"operator"`
+	Value     interface{} `json:"value,omitempty"`
+	FieldName *string     `json:"field_name,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -25383,6 +25402,8 @@ func (l *LinkedAccountCondition) String() string {
 }
 
 type LinkedAccountConditionRequest struct {
+	// The ID indicating which Linked Account Condition this is.
+	Id *string `json:"id,omitempty"`
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
@@ -26579,10 +26600,1089 @@ func (p *PaginatedVendorCreditList) String() string {
 // ### Usage Example
 //
 // Fetch from the `GET Payment` endpoint and view an invoice's payment.
+type PatchedPaymentRequest struct {
+	// The payment's transaction date.
+	TransactionDate *time.Time `json:"transaction_date,omitempty"`
+	// The supplier, or customer involved in the payment.
+	Contact *PatchedPaymentRequestContact `json:"contact,omitempty"`
+	// The supplier’s or customer’s account in which the payment is made.
+	Account *PatchedPaymentRequestAccount `json:"account,omitempty"`
+	// The payment's currency.
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	Currency *PatchedPaymentRequestCurrency `json:"currency,omitempty"`
+	// The payment's exchange rate.
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// The company the payment belongs to.
+	Company *PatchedPaymentRequestCompany `json:"company,omitempty"`
+	// The total amount of money being paid to the supplier, or customer, after taxes.
+	TotalAmount        *float64                                       `json:"total_amount,omitempty"`
+	TrackingCategories []*PatchedPaymentRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	// The accounting period that the Payment was generated in.
+	AccountingPeriod *PatchedPaymentRequestAccountingPeriod `json:"accounting_period,omitempty"`
+	// A list of “Payment Applied to Lines” objects.
+	AppliedToLines      []*PatchedPaymentRequestAppliedToLinesItem `json:"applied_to_lines,omitempty"`
+	IntegrationParams   map[string]interface{}                     `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}                     `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PatchedPaymentRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedPaymentRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedPaymentRequest(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedPaymentRequest) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// The supplier’s or customer’s account in which the payment is made.
+type PatchedPaymentRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewPatchedPaymentRequestAccountFromString(value string) *PatchedPaymentRequestAccount {
+	return &PatchedPaymentRequestAccount{typeName: "string", String: value}
+}
+
+func NewPatchedPaymentRequestAccountFromAccount(value *Account) *PatchedPaymentRequestAccount {
+	return &PatchedPaymentRequestAccount{typeName: "account", Account: value}
+}
+
+func (p *PatchedPaymentRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		p.typeName = "account"
+		p.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestAccount) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "account":
+		return json.Marshal(p.Account)
+	}
+}
+
+type PatchedPaymentRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (p *PatchedPaymentRequestAccount) Accept(visitor PatchedPaymentRequestAccountVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "account":
+		return visitor.VisitAccount(p.Account)
+	}
+}
+
+// The accounting period that the Payment was generated in.
+type PatchedPaymentRequestAccountingPeriod struct {
+	typeName         string
+	String           string
+	AccountingPeriod *AccountingPeriod
+}
+
+func NewPatchedPaymentRequestAccountingPeriodFromString(value string) *PatchedPaymentRequestAccountingPeriod {
+	return &PatchedPaymentRequestAccountingPeriod{typeName: "string", String: value}
+}
+
+func NewPatchedPaymentRequestAccountingPeriodFromAccountingPeriod(value *AccountingPeriod) *PatchedPaymentRequestAccountingPeriod {
+	return &PatchedPaymentRequestAccountingPeriod{typeName: "accountingPeriod", AccountingPeriod: value}
+}
+
+func (p *PatchedPaymentRequestAccountingPeriod) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueAccountingPeriod := new(AccountingPeriod)
+	if err := json.Unmarshal(data, &valueAccountingPeriod); err == nil {
+		p.typeName = "accountingPeriod"
+		p.AccountingPeriod = valueAccountingPeriod
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestAccountingPeriod) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "accountingPeriod":
+		return json.Marshal(p.AccountingPeriod)
+	}
+}
+
+type PatchedPaymentRequestAccountingPeriodVisitor interface {
+	VisitString(string) error
+	VisitAccountingPeriod(*AccountingPeriod) error
+}
+
+func (p *PatchedPaymentRequestAccountingPeriod) Accept(visitor PatchedPaymentRequestAccountingPeriodVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "accountingPeriod":
+		return visitor.VisitAccountingPeriod(p.AccountingPeriod)
+	}
+}
+
+type PatchedPaymentRequestAppliedToLinesItem struct {
+	typeName        string
+	String          string
+	PaymentLineItem *PaymentLineItem
+}
+
+func NewPatchedPaymentRequestAppliedToLinesItemFromString(value string) *PatchedPaymentRequestAppliedToLinesItem {
+	return &PatchedPaymentRequestAppliedToLinesItem{typeName: "string", String: value}
+}
+
+func NewPatchedPaymentRequestAppliedToLinesItemFromPaymentLineItem(value *PaymentLineItem) *PatchedPaymentRequestAppliedToLinesItem {
+	return &PatchedPaymentRequestAppliedToLinesItem{typeName: "paymentLineItem", PaymentLineItem: value}
+}
+
+func (p *PatchedPaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		p.typeName = "paymentLineItem"
+		p.PaymentLineItem = valuePaymentLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestAppliedToLinesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "paymentLineItem":
+		return json.Marshal(p.PaymentLineItem)
+	}
+}
+
+type PatchedPaymentRequestAppliedToLinesItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItem(*PaymentLineItem) error
+}
+
+func (p *PatchedPaymentRequestAppliedToLinesItem) Accept(visitor PatchedPaymentRequestAppliedToLinesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "paymentLineItem":
+		return visitor.VisitPaymentLineItem(p.PaymentLineItem)
+	}
+}
+
+// The company the payment belongs to.
+type PatchedPaymentRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewPatchedPaymentRequestCompanyFromString(value string) *PatchedPaymentRequestCompany {
+	return &PatchedPaymentRequestCompany{typeName: "string", String: value}
+}
+
+func NewPatchedPaymentRequestCompanyFromCompanyInfo(value *CompanyInfo) *PatchedPaymentRequestCompany {
+	return &PatchedPaymentRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (p *PatchedPaymentRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		p.typeName = "companyInfo"
+		p.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestCompany) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "companyInfo":
+		return json.Marshal(p.CompanyInfo)
+	}
+}
+
+type PatchedPaymentRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (p *PatchedPaymentRequestCompany) Accept(visitor PatchedPaymentRequestCompanyVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(p.CompanyInfo)
+	}
+}
+
+// The supplier, or customer involved in the payment.
+type PatchedPaymentRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewPatchedPaymentRequestContactFromString(value string) *PatchedPaymentRequestContact {
+	return &PatchedPaymentRequestContact{typeName: "string", String: value}
+}
+
+func NewPatchedPaymentRequestContactFromContact(value *Contact) *PatchedPaymentRequestContact {
+	return &PatchedPaymentRequestContact{typeName: "contact", Contact: value}
+}
+
+func (p *PatchedPaymentRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		p.typeName = "contact"
+		p.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestContact) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "contact":
+		return json.Marshal(p.Contact)
+	}
+}
+
+type PatchedPaymentRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (p *PatchedPaymentRequestContact) Accept(visitor PatchedPaymentRequestContactVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "contact":
+		return visitor.VisitContact(p.Contact)
+	}
+}
+
+// The payment's currency.
+//
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type PatchedPaymentRequestCurrency struct {
+	typeName     string
+	CurrencyEnum CurrencyEnum
+	String       string
+}
+
+func NewPatchedPaymentRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *PatchedPaymentRequestCurrency {
+	return &PatchedPaymentRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+}
+
+func NewPatchedPaymentRequestCurrencyFromString(value string) *PatchedPaymentRequestCurrency {
+	return &PatchedPaymentRequestCurrency{typeName: "string", String: value}
+}
+
+func (p *PatchedPaymentRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueCurrencyEnum CurrencyEnum
+	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
+		p.typeName = "currencyEnum"
+		p.CurrencyEnum = valueCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestCurrency) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "currencyEnum":
+		return json.Marshal(p.CurrencyEnum)
+	case "string":
+		return json.Marshal(p.String)
+	}
+}
+
+type PatchedPaymentRequestCurrencyVisitor interface {
+	VisitCurrencyEnum(CurrencyEnum) error
+	VisitString(string) error
+}
+
+func (p *PatchedPaymentRequestCurrency) Accept(visitor PatchedPaymentRequestCurrencyVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "currencyEnum":
+		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "string":
+		return visitor.VisitString(p.String)
+	}
+}
+
+type PatchedPaymentRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewPatchedPaymentRequestTrackingCategoriesItemFromString(value string) *PatchedPaymentRequestTrackingCategoriesItem {
+	return &PatchedPaymentRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewPatchedPaymentRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *PatchedPaymentRequestTrackingCategoriesItem {
+	return &PatchedPaymentRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (p *PatchedPaymentRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typeName = "string"
+		p.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		p.typeName = "trackingCategory"
+		p.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedPaymentRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch p.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return json.Marshal(p.String)
+	case "trackingCategory":
+		return json.Marshal(p.TrackingCategory)
+	}
+}
+
+type PatchedPaymentRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (p *PatchedPaymentRequestTrackingCategoriesItem) Accept(visitor PatchedPaymentRequestTrackingCategoriesItemVisitor) error {
+	switch p.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
+	case "string":
+		return visitor.VisitString(p.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(p.TrackingCategory)
+	}
+}
+
+// # The Payment Object
+//
+// ### Description
+//
+// The `Payment` object represents general payments made towards a specific transaction.
+//
+// ### Usage Example
+//
+// Fetch from the `GET Payment` endpoint and view an invoice's payment.
 type Payment struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
 	// The supplier, or customer involved in the payment.
@@ -26913,11 +28013,8 @@ type Payment struct {
 	AccountingPeriod *PaymentAccountingPeriod `json:"accounting_period,omitempty"`
 	// A list of “Payment Applied to Lines” objects.
 	AppliedToLines []*PaymentAppliedToLinesItem `json:"applied_to_lines,omitempty"`
-	CreatedAt      *time.Time                   `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings  map[string]interface{}       `json:"field_mappings,omitempty"`
+	RemoteData     []*RemoteData                `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -27609,20 +28706,20 @@ func (p *PaymentCurrency) Accept(visitor PaymentCurrencyVisitor) error {
 //
 // `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemInternalMappingSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
 type PaymentLineItem struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The amount being applied to the transaction.
 	AppliedAmount *string `json:"applied_amount,omitempty"`
 	// The date the payment portion is applied.
 	AppliedDate *time.Time `json:"applied_date,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
 	// The Merge ID of the transaction the payment portion is being applied to.
 	RelatedObjectId *string `json:"related_object_id,omitempty"`
 	// The type of transaction the payment portion is being applied to. Possible values include: INVOICE, JOURNAL_ENTRY, or CREDIT_NOTE.
-	RelatedObjectType *string    `json:"related_object_type,omitempty"`
-	Id                *string    `json:"id,omitempty"`
-	CreatedAt         *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RelatedObjectType *string `json:"related_object_type,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -27660,12 +28757,12 @@ func (p *PaymentLineItem) String() string {
 //
 // `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemInternalMappingSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
 type PaymentLineItemRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
 	// The amount being applied to the transaction.
 	AppliedAmount *string `json:"applied_amount,omitempty"`
 	// The date the payment portion is applied.
 	AppliedDate *time.Time `json:"applied_date,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
 	// The Merge ID of the transaction the payment portion is being applied to.
 	RelatedObjectId *string `json:"related_object_id,omitempty"`
 	// The type of transaction the payment portion is being applied to. Possible values include: INVOICE, JOURNAL_ENTRY, or CREDIT_NOTE.
@@ -28900,6 +29997,12 @@ func (p PostingStatusEnum) Ptr() *PostingStatusEnum {
 //
 // Fetch from the `LIST PurchaseOrders` endpoint and view a company's purchase orders.
 type PurchaseOrder struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The purchase order's status.
 	//
 	// - `DRAFT` - DRAFT
@@ -29247,14 +30350,8 @@ type PurchaseOrder struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the PurchaseOrder was generated in.
 	AccountingPeriod *PurchaseOrderAccountingPeriod `json:"accounting_period,omitempty"`
-	Id               *string                        `json:"id,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}         `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData                  `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -29831,8 +30928,12 @@ func (p *PurchaseOrderDeliveryAddress) Accept(visitor PurchaseOrderDeliveryAddre
 //
 // Fetch from the `GET PurchaseOrder` endpoint and view a company's purchase orders.
 type PurchaseOrderLineItem struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// A description of the good being purchased.
 	Description *string `json:"description,omitempty"`
 	// The line item's unit price.
@@ -30164,11 +31265,7 @@ type PurchaseOrderLineItem struct {
 	// The company the purchase order line item belongs to.
 	Company *string `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -32929,17 +34026,17 @@ func (r *RemoteResponse) String() string {
 // Fetch from the `GET BalanceSheet` endpoint and view the balance sheet's report items.
 type ReportItem struct {
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The report item's name.
 	Name *string `json:"name,omitempty"`
 	// The report item's value.
 	Value    *float64                 `json:"value,omitempty"`
 	SubItems []map[string]interface{} `json:"sub_items,omitempty"`
 	// The company the report item belongs to.
-	Company   *string    `json:"company,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	Company *string `json:"company,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -33201,6 +34298,12 @@ func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
 //
 // Fetch from the `LIST TaxRates` endpoint and view tax rates relevant to a company.
 type TaxRate struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The tax rate's description.
 	Description *string `json:"description,omitempty"`
 	// The tax rate's total tax rate.
@@ -33210,15 +34313,9 @@ type TaxRate struct {
 	// The company the tax rate belongs to.
 	Company *TaxRateCompany `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
-	Id               *string `json:"id,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -33314,6 +34411,12 @@ func (t *TaxRateCompany) Accept(visitor TaxRateCompanyVisitor) error {
 //
 // Fetch from the `GET TrackingCategory` endpoint and view a company's tracking category.
 type TrackingCategory struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The tracking category's name.
 	Name *string `json:"name,omitempty"`
 	// The tracking category's status.
@@ -33331,15 +34434,9 @@ type TrackingCategory struct {
 	// The company the tracking category belongs to.
 	Company *TrackingCategoryCompany `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool   `json:"remote_was_deleted,omitempty"`
-	Id               *string `json:"id,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -33565,6 +34662,12 @@ func (t *TrackingCategoryStatus) Accept(visitor TrackingCategoryStatusVisitor) e
 //
 // Fetch from the `GET Transaction` endpoint and view a company's transactions.
 type Transaction struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The type of transaction, which can by any transaction object not already included in Merge’s common model.
 	TransactionType *string `json:"transaction_type,omitempty"`
 	// The transaction's number used for identifying purposes.
@@ -33896,14 +34999,8 @@ type Transaction struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Transaction was generated in.
 	AccountingPeriod *TransactionAccountingPeriod `json:"accounting_period,omitempty"`
-	Id               *string                      `json:"id,omitempty"`
-	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}       `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData                `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -34480,8 +35577,12 @@ func (t *TransactionCurrency) Accept(visitor TransactionCurrencyVisitor) error {
 //
 // Fetch from the `GET TransactionLineItem` endpoint and view the transaction's line items.
 type TransactionLineItem struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// An internal note used by the business to clarify purpose of the transaction.
 	Memo *string `json:"memo,omitempty"`
 	// The line item's unit price.
@@ -34813,11 +35914,7 @@ type TransactionLineItem struct {
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -35365,7 +36462,10 @@ func (v *ValidationProblemSource) String() string {
 type VendorCredit struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The vendor credit's number.
 	Number *string `json:"number,omitempty"`
 	// The vendor credit's transaction date.
@@ -35693,11 +36793,8 @@ type VendorCredit struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the VendorCredit was generated in.
 	AccountingPeriod *VendorCreditAccountingPeriod `json:"accounting_period,omitempty"`
-	CreatedAt        *time.Time                    `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}        `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData                 `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -36216,8 +37313,12 @@ func (v *VendorCreditCurrency) Accept(visitor VendorCreditCurrencyVisitor) error
 //
 // Fetch from the `GET VendorCredit` endpoint and view the vendor credit's line items.
 type VendorCreditLine struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The full value of the credit.
 	NetAmount *float64 `json:"net_amount,omitempty"`
 	// The line's associated tracking category.
@@ -36233,11 +37334,7 @@ type VendorCreditLine struct {
 	// The vendor credit line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	Id               *string    `json:"id,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }

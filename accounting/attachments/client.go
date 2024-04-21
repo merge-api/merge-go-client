@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `AccountingAttachment` objects.
 func (c *Client) List(ctx context.Context, request *accounting.AttachmentsListRequest) (*accounting.PaginatedAccountingAttachmentList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/attachments"
+	endpointURL := baseURL + "/" + "accounting/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *accounting.AttachmentsListRe
 
 // Creates an `AccountingAttachment` object with the given values.
 func (c *Client) Create(ctx context.Context, request *accounting.AccountingAttachmentEndpointRequest) (*accounting.AccountingAttachmentResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/attachments"
+	endpointURL := baseURL + "/" + "accounting/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -125,11 +125,11 @@ func (c *Client) Create(ctx context.Context, request *accounting.AccountingAttac
 
 // Returns an `AccountingAttachment` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.AttachmentsRetrieveRequest) (*accounting.AccountingAttachment, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/attachments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/attachments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -156,11 +156,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.At
 
 // Returns metadata for `AccountingAttachment` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/attachments/meta/post"
+	endpointURL := baseURL + "/" + "accounting/v1/attachments/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := c.caller.Call(

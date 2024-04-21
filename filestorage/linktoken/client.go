@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Creates a link token to be used when linking a new end user.
 func (c *Client) Create(ctx context.Context, request *filestorage.EndUserDetailsRequest) (*filestorage.LinkToken, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/link-token"
+	endpointURL := baseURL + "/" + "filestorage/v1/link-token"
 
 	var response *filestorage.LinkToken
 	if err := c.caller.Call(

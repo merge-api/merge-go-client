@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Activity` objects.
 func (c *Client) List(ctx context.Context, request *ats.ActivitiesListRequest) (*ats.PaginatedActivityList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/activities"
+	endpointURL := baseURL + "/" + "ats/v1/activities"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *ats.ActivitiesListRequest) (
 
 // Creates an `Activity` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ats.ActivityEndpointRequest) (*ats.ActivityResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/activities"
+	endpointURL := baseURL + "/" + "ats/v1/activities"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -134,11 +134,11 @@ func (c *Client) Create(ctx context.Context, request *ats.ActivityEndpointReques
 
 // Returns an `Activity` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.ActivitiesRetrieveRequest) (*ats.Activity, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/activities/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/activities/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -174,11 +174,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ats.Activitie
 
 // Returns metadata for `Activity` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/activities/meta/post"
+	endpointURL := baseURL + "/" + "ats/v1/activities/meta/post"
 
 	var response *ats.MetaResponse
 	if err := c.caller.Call(

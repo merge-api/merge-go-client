@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Opportunity` objects.
 func (c *Client) List(ctx context.Context, request *crm.OpportunitiesListRequest) (*crm.PaginatedOpportunityList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/opportunities"
+	endpointURL := baseURL + "/" + "crm/v1/opportunities"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -111,11 +111,11 @@ func (c *Client) List(ctx context.Context, request *crm.OpportunitiesListRequest
 
 // Creates an `Opportunity` object with the given values.
 func (c *Client) Create(ctx context.Context, request *crm.OpportunityEndpointRequest) (*crm.OpportunityResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/opportunities"
+	endpointURL := baseURL + "/" + "crm/v1/opportunities"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -146,11 +146,11 @@ func (c *Client) Create(ctx context.Context, request *crm.OpportunityEndpointReq
 
 // Returns an `Opportunity` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.OpportunitiesRetrieveRequest) (*crm.Opportunity, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/opportunities/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/opportunities/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -189,11 +189,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.Opportuni
 
 // Updates an `Opportunity` object with the given `id`.
 func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedOpportunityEndpointRequest) (*crm.OpportunityResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/opportunities/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/opportunities/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -224,11 +224,11 @@ func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 
 // Returns metadata for `Opportunity` PATCHs.
 func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/opportunities/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/opportunities/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -247,11 +247,11 @@ func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 
 // Returns metadata for `Opportunity` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/opportunities/meta/post"
+	endpointURL := baseURL + "/" + "crm/v1/opportunities/meta/post"
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -270,11 +270,11 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.OpportunitiesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/opportunities/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/opportunities/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

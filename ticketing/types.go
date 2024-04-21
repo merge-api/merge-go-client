@@ -51,18 +51,18 @@ func (a AccessLevelEnum) Ptr() *AccessLevelEnum {
 type Account struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The account's name.
 	Name *string `json:"name,omitempty"`
 	// The account's domain names.
 	Domains []*string `json:"domains,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -147,7 +147,9 @@ type AccountDetailsAndActions struct {
 	EndUserOriginId         *string                            `json:"end_user_origin_id,omitempty"`
 	EndUserOrganizationName string                             `json:"end_user_organization_name"`
 	EndUserEmailAddress     string                             `json:"end_user_email_address"`
-	WebhookListenerUrl      string                             `json:"webhook_listener_url"`
+	// The tenant or domain the customer has provided access to.
+	Subdomain          *string `json:"subdomain,omitempty"`
+	WebhookListenerUrl string  `json:"webhook_listener_url"`
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
@@ -393,7 +395,10 @@ func (a *AsyncPassthroughReciept) String() string {
 type Attachment struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The attachment's name. It is required to include the file extension in the attachment's name.
 	FileName *string `json:"file_name,omitempty"`
 	// The ticket associated with the attachment.
@@ -405,13 +410,10 @@ type Attachment struct {
 	// The user who uploaded the attachment.
 	UploadedBy *string `json:"uploaded_by,omitempty"`
 	// When the third party's attachment was created.
-	RemoteCreatedAt  *time.Time `json:"remote_created_at,omitempty"`
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteCreatedAt  *time.Time             `json:"remote_created_at,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -653,6 +655,9 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+	// - `MUTED_ISSUE` - MUTED_ISSUE
+	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -716,6 +721,9 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+// - `MUTED_ISSUE` - MUTED_ISSUE
+// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -979,7 +987,10 @@ func (c CategoryEnum) Ptr() *CategoryEnum {
 type Collection struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The collection's name.
 	Name *string `json:"name,omitempty"`
 	// The collection's description.
@@ -998,10 +1009,7 @@ type Collection struct {
 	// - `PRIVATE` - PRIVATE
 	// - `COMPANY` - COMPANY
 	// - `PUBLIC` - PUBLIC
-	AccessLevel *CollectionAccessLevel `json:"access_level,omitempty"`
-	CreatedAt   *time.Time             `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	AccessLevel   *CollectionAccessLevel `json:"access_level,omitempty"`
 	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
 
@@ -1248,7 +1256,10 @@ func (c CollectionTypeEnum) Ptr() *CollectionTypeEnum {
 type Comment struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The author of the Comment, if the author is a User.
 	User *CommentUser `json:"user,omitempty"`
 	// The author of the Comment, if the author is a Contact.
@@ -1262,13 +1273,10 @@ type Comment struct {
 	// Whether or not the comment is internal.
 	IsPrivate *bool `json:"is_private,omitempty"`
 	// When the third party's comment was created.
-	RemoteCreatedAt  *time.Time `json:"remote_created_at,omitempty"`
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteCreatedAt  *time.Time             `json:"remote_created_at,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1793,10 +1801,8 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
-	NativeName *string `json:"native_name,omitempty"`
-	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
-	FieldName *string `json:"field_name,omitempty"`
+	NativeName  *string `json:"native_name,omitempty"`
+	FieldName   *string `json:"field_name,omitempty"`
 	// Whether this condition can only be applied once. If false, the condition can be AND'd together multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
@@ -1960,7 +1966,10 @@ func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
 type Contact struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The contact's name.
 	Name *string `json:"name,omitempty"`
 	// The contact's email address.
@@ -1972,12 +1981,9 @@ type Contact struct {
 	// The contact's account.
 	Account *ContactAccount `json:"account,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2073,10 +2079,13 @@ func (c *ContactAccount) Accept(visitor ContactAccountVisitor) error {
 //
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
-	Method          MethodEnum `json:"method,omitempty"`
-	Path            string     `json:"path"`
-	BaseUrlOverride *string    `json:"base_url_override,omitempty"`
-	Data            *string    `json:"data,omitempty"`
+	Method MethodEnum `json:"method,omitempty"`
+	// The path of the request in the third party's platform.
+	Path string `json:"path"`
+	// An optional override of the third party's base url for the request.
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// The data with the request. You must include a `request_format` parameter matching the data's format
+	Data *string `json:"data,omitempty"`
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
@@ -2288,6 +2297,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+// - `MUTED_ISSUE` - MUTED_ISSUE
+// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 type EventTypeEnum string
 
 const (
@@ -2322,6 +2334,9 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
+	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
+	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -2388,6 +2403,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "FORCED_LINKED_ACCOUNT_RESYNC":
+		return EventTypeEnumForcedLinkedAccountResync, nil
+	case "MUTED_ISSUE":
+		return EventTypeEnumMutedIssue, nil
+	case "GENERATED_MAGIC_LINK":
+		return EventTypeEnumGeneratedMagicLink, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -3137,13 +3158,11 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
-	NativeName *string `json:"native_name,omitempty"`
+	NativeName  *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string      `json:"operator"`
-	Value    interface{} `json:"value,omitempty"`
-	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
-	FieldName *string `json:"field_name,omitempty"`
+	Operator  string      `json:"operator"`
+	Value     interface{} `json:"value,omitempty"`
+	FieldName *string     `json:"field_name,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3172,6 +3191,8 @@ func (l *LinkedAccountCondition) String() string {
 }
 
 type LinkedAccountConditionRequest struct {
+	// The ID indicating which Linked Account Condition this is.
+	Id *string `json:"id,omitempty"`
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
@@ -4169,7 +4190,7 @@ type PatchedTicketRequest struct {
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string   `json:"description,omitempty"`
 	Collections []*string `json:"collections,omitempty"`
-	// The ticket's type.
+	// The sub category of the ticket within the 3rd party system. Examples include incident, task, subtask or to-do.
 	TicketType *string `json:"ticket_type,omitempty"`
 	// The account associated with the ticket.
 	Account *string `json:"account,omitempty"`
@@ -4389,18 +4410,18 @@ func (p PriorityEnum) Ptr() *PriorityEnum {
 type Project struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The project's name.
 	Name *string `json:"name,omitempty"`
 	// The project's description.
 	Description *string `json:"description,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5064,7 +5085,10 @@ func (r ResponseTypeEnum) Ptr() *ResponseTypeEnum {
 type Role struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The name of the Role.
 	Name *string `json:"name,omitempty"`
 	// The set of actions that a User with this Role can perform. Possible enum values include: `VIEW`, `CREATE`, `EDIT`, `DELETE`, `CLOSE`, and `ASSIGN`.
@@ -5076,12 +5100,9 @@ type Role struct {
 	// - `TEAM_ONLY` - TEAM_ONLY
 	TicketAccess *RoleTicketAccess `json:"ticket_access,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5387,16 +5408,16 @@ func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
 // TODO
 type Tag struct {
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The tag's name.
 	Name *string `json:"name,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5436,18 +5457,18 @@ func (t *Tag) String() string {
 type Team struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The team's name.
 	Name *string `json:"name,omitempty"`
 	// The team's description.
 	Description *string `json:"description,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5487,7 +5508,10 @@ func (t *Team) String() string {
 type Ticket struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The ticket's name.
 	Name      *string                `json:"name,omitempty"`
 	Assignees []*TicketAssigneesItem `json:"assignees,omitempty"`
@@ -5505,7 +5529,7 @@ type Ticket struct {
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string                  `json:"description,omitempty"`
 	Collections []*TicketCollectionsItem `json:"collections,omitempty"`
-	// The ticket's type.
+	// The sub category of the ticket within the 3rd party system. Examples include incident, task, subtask or to-do.
 	TicketType *string `json:"ticket_type,omitempty"`
 	// The account associated with the ticket.
 	Account *TicketAccount `json:"account,omitempty"`
@@ -5530,10 +5554,7 @@ type Ticket struct {
 	// - `HIGH` - HIGH
 	// - `NORMAL` - NORMAL
 	// - `LOW` - LOW
-	Priority  *TicketPriority `json:"priority,omitempty"`
-	CreatedAt *time.Time      `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
+	Priority      *TicketPriority        `json:"priority,omitempty"`
 	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
 	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty"`
@@ -6125,7 +6146,7 @@ type TicketRequest struct {
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
 	Description *string                         `json:"description,omitempty"`
 	Collections []*TicketRequestCollectionsItem `json:"collections,omitempty"`
-	// The ticket's type.
+	// The sub category of the ticket within the 3rd party system. Examples include incident, task, subtask or to-do.
 	TicketType *string `json:"ticket_type,omitempty"`
 	// The account associated with the ticket.
 	Account *TicketRequestAccount `json:"account,omitempty"`
@@ -6876,7 +6897,10 @@ func (t *TicketingAttachmentResponse) String() string {
 type User struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The user's name.
 	Name *string `json:"name,omitempty"`
 	// The user's email address.
@@ -6888,12 +6912,9 @@ type User struct {
 	// The user's avatar picture.
 	Avatar *string `json:"avatar,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }

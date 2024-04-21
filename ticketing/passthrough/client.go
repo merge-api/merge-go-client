@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Pull data from an endpoint not currently supported by Merge.
 func (c *Client) Create(ctx context.Context, request *ticketing.DataPassthroughRequest) (*ticketing.RemoteResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/passthrough"
+	endpointURL := baseURL + "/" + "ticketing/v1/passthrough"
 
 	var response *ticketing.RemoteResponse
 	if err := c.caller.Call(

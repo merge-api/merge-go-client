@@ -102,7 +102,9 @@ type AccountDetailsAndActions struct {
 	EndUserOriginId         *string                            `json:"end_user_origin_id,omitempty"`
 	EndUserOrganizationName string                             `json:"end_user_organization_name"`
 	EndUserEmailAddress     string                             `json:"end_user_email_address"`
-	WebhookListenerUrl      string                             `json:"webhook_listener_url"`
+	// The tenant or domain the customer has provided access to.
+	Subdomain          *string `json:"subdomain,omitempty"`
+	WebhookListenerUrl string  `json:"webhook_listener_url"`
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
@@ -285,7 +287,10 @@ func (a *AccountToken) String() string {
 type Activity struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The user that performed the action.
 	User *ActivityUser `json:"user,omitempty"`
 	// When the third party's activity was created.
@@ -309,12 +314,9 @@ type Activity struct {
 	// The activity’s candidate.
 	Candidate *string `json:"candidate,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -871,7 +873,10 @@ func (a *AdvancedMetadata) String() string {
 type Application struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The candidate applying.
 	Candidate *ApplicationCandidate `json:"candidate,omitempty"`
 	// The job being applied for.
@@ -879,7 +884,8 @@ type Application struct {
 	// When the application was submitted.
 	AppliedAt *time.Time `json:"applied_at,omitempty"`
 	// When the application was rejected.
-	RejectedAt *time.Time `json:"rejected_at,omitempty"`
+	RejectedAt *time.Time               `json:"rejected_at,omitempty"`
+	Offers     []*ApplicationOffersItem `json:"offers,omitempty"`
 	// The application's source.
 	Source *string `json:"source,omitempty"`
 	// The user credited for this application.
@@ -889,11 +895,8 @@ type Application struct {
 	// The application's reason for rejection.
 	RejectReason     *ApplicationRejectReason `json:"reject_reason,omitempty"`
 	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time               `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData            `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1153,6 +1156,63 @@ func (a *ApplicationJob) Accept(visitor ApplicationJobVisitor) error {
 	}
 }
 
+type ApplicationOffersItem struct {
+	typeName string
+	String   string
+	Offer    *Offer
+}
+
+func NewApplicationOffersItemFromString(value string) *ApplicationOffersItem {
+	return &ApplicationOffersItem{typeName: "string", String: value}
+}
+
+func NewApplicationOffersItemFromOffer(value *Offer) *ApplicationOffersItem {
+	return &ApplicationOffersItem{typeName: "offer", Offer: value}
+}
+
+func (a *ApplicationOffersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueOffer := new(Offer)
+	if err := json.Unmarshal(data, &valueOffer); err == nil {
+		a.typeName = "offer"
+		a.Offer = valueOffer
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationOffersItem) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "offer":
+		return json.Marshal(a.Offer)
+	}
+}
+
+type ApplicationOffersItemVisitor interface {
+	VisitString(string) error
+	VisitOffer(*Offer) error
+}
+
+func (a *ApplicationOffersItem) Accept(visitor ApplicationOffersItemVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "offer":
+		return visitor.VisitOffer(a.Offer)
+	}
+}
+
 // The application's reason for rejection.
 type ApplicationRejectReason struct {
 	typeName     string
@@ -1228,7 +1288,8 @@ type ApplicationRequest struct {
 	// When the application was submitted.
 	AppliedAt *time.Time `json:"applied_at,omitempty"`
 	// When the application was rejected.
-	RejectedAt *time.Time `json:"rejected_at,omitempty"`
+	RejectedAt *time.Time                      `json:"rejected_at,omitempty"`
+	Offers     []*ApplicationRequestOffersItem `json:"offers,omitempty"`
 	// The application's source.
 	Source *string `json:"source,omitempty"`
 	// The user credited for this application.
@@ -1499,6 +1560,63 @@ func (a *ApplicationRequestJob) Accept(visitor ApplicationRequestJobVisitor) err
 	}
 }
 
+type ApplicationRequestOffersItem struct {
+	typeName string
+	String   string
+	Offer    *Offer
+}
+
+func NewApplicationRequestOffersItemFromString(value string) *ApplicationRequestOffersItem {
+	return &ApplicationRequestOffersItem{typeName: "string", String: value}
+}
+
+func NewApplicationRequestOffersItemFromOffer(value *Offer) *ApplicationRequestOffersItem {
+	return &ApplicationRequestOffersItem{typeName: "offer", Offer: value}
+}
+
+func (a *ApplicationRequestOffersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueOffer := new(Offer)
+	if err := json.Unmarshal(data, &valueOffer); err == nil {
+		a.typeName = "offer"
+		a.Offer = valueOffer
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestOffersItem) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "offer":
+		return json.Marshal(a.Offer)
+	}
+}
+
+type ApplicationRequestOffersItemVisitor interface {
+	VisitString(string) error
+	VisitOffer(*Offer) error
+}
+
+func (a *ApplicationRequestOffersItem) Accept(visitor ApplicationRequestOffersItemVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "offer":
+		return visitor.VisitOffer(a.Offer)
+	}
+}
+
 // The application's reason for rejection.
 type ApplicationRequestRejectReason struct {
 	typeName     string
@@ -1630,7 +1748,10 @@ func (a *AsyncPassthroughReciept) String() string {
 type Attachment struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The attachment's name.
 	FileName *string `json:"file_name,omitempty"`
 	// The attachment's url.
@@ -1644,11 +1765,8 @@ type Attachment struct {
 	// - `OTHER` - OTHER
 	AttachmentType   *AttachmentAttachmentType `json:"attachment_type,omitempty"`
 	RemoteWasDeleted *bool                     `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time                `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}    `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData             `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1966,6 +2084,9 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+	// - `MUTED_ISSUE` - MUTED_ISSUE
+	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -2029,6 +2150,9 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+// - `MUTED_ISSUE` - MUTED_ISSUE
+// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -2203,7 +2327,10 @@ func (a *AvailableActions) String() string {
 type Candidate struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The candidate's first name.
 	FirstName *string `json:"first_name,omitempty"`
 	// The candidate's last name.
@@ -2234,11 +2361,8 @@ type Candidate struct {
 	// Array of `Attachment` object IDs.
 	Attachments      []*CandidateAttachmentsItem `json:"attachments,omitempty"`
 	RemoteWasDeleted *bool                       `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time                  `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	FieldMappings    map[string]interface{}      `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData               `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2745,10 +2869,8 @@ type ConditionSchema struct {
 	Id string `json:"id"`
 	// The common model for which a condition schema is defined.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
-	NativeName *string `json:"native_name,omitempty"`
-	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
-	FieldName *string `json:"field_name,omitempty"`
+	NativeName  *string `json:"native_name,omitempty"`
+	FieldName   *string `json:"field_name,omitempty"`
 	// Whether this condition can only be applied once. If false, the condition can be AND'd together multiple times.
 	IsUnique *bool `json:"is_unique,omitempty"`
 	// The type of value(s) that can be set for this condition.
@@ -2910,10 +3032,13 @@ func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
 //
 // Create a `DataPassthrough` to get team hierarchies from your Rippling integration.
 type DataPassthroughRequest struct {
-	Method          MethodEnum `json:"method,omitempty"`
-	Path            string     `json:"path"`
-	BaseUrlOverride *string    `json:"base_url_override,omitempty"`
-	Data            *string    `json:"data,omitempty"`
+	Method MethodEnum `json:"method,omitempty"`
+	// The path of the request in the third party's platform.
+	Path string `json:"path"`
+	// An optional override of the third party's base url for the request.
+	BaseUrlOverride *string `json:"base_url_override,omitempty"`
+	// The data with the request. You must include a `request_format` parameter matching the data's format
+	Data *string `json:"data,omitempty"`
 	// Pass an array of `MultipartFormField` objects in here instead of using the `data` param if `request_format` is set to `MULTIPART`.
 	MultipartFormData []*MultipartFormFieldRequest `json:"multipart_form_data,omitempty"`
 	// The headers to use for the request (Merge will handle the account's authorization headers). `Content-Type` header is required for passthrough. Choose content type corresponding to expected format of receiving server.
@@ -3022,16 +3147,16 @@ func (d *DebugModelLogSummary) String() string {
 type Department struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The department's name.
 	Name *string `json:"name,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3099,7 +3224,10 @@ func (d DisabilityStatusEnum) Ptr() *DisabilityStatusEnum {
 type Eeoc struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The candidate being represented.
 	Candidate *EeocCandidate `json:"candidate,omitempty"`
 	// When the information was submitted.
@@ -3136,12 +3264,9 @@ type Eeoc struct {
 	// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 	DisabilityStatus *EeocDisabilityStatus `json:"disability_status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3492,6 +3617,9 @@ func (e *EeocVeteranStatus) Accept(visitor EeocVeteranStatusVisitor) error {
 //
 // Fetch from the `GET Candidate` endpoint and view their email addresses.
 type EmailAddress struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The email address.
 	Value *string `json:"value,omitempty"`
 	// The type of email address.
@@ -3500,9 +3628,6 @@ type EmailAddress struct {
 	// - `WORK` - WORK
 	// - `OTHER` - OTHER
 	EmailAddressType *EmailAddressEmailAddressType `json:"email_address_type,omitempty"`
-	CreatedAt        *time.Time                    `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3844,6 +3969,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
+// - `MUTED_ISSUE` - MUTED_ISSUE
+// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 type EventTypeEnum string
 
 const (
@@ -3878,6 +4006,9 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
+	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
+	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -3944,6 +4075,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "FORCED_LINKED_ACCOUNT_RESYNC":
+		return EventTypeEnumForcedLinkedAccountResync, nil
+	case "MUTED_ISSUE":
+		return EventTypeEnumMutedIssue, nil
+	case "GENERATED_MAGIC_LINK":
+		return EventTypeEnumGeneratedMagicLink, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -3993,6 +4130,7 @@ type ExternalTargetFieldApiResponse struct {
 	Eeoc               []*ExternalTargetFieldApi `json:"EEOC,omitempty"`
 	ScheduledInterview []*ExternalTargetFieldApi `json:"ScheduledInterview,omitempty"`
 	Job                []*ExternalTargetFieldApi `json:"Job,omitempty"`
+	JobPosting         []*ExternalTargetFieldApi `json:"JobPosting,omitempty"`
 	JobInterviewStage  []*ExternalTargetFieldApi `json:"JobInterviewStage,omitempty"`
 	Offer              []*ExternalTargetFieldApi `json:"Offer,omitempty"`
 	Office             []*ExternalTargetFieldApi `json:"Office,omitempty"`
@@ -4130,6 +4268,7 @@ type FieldMappingApiInstanceResponse struct {
 	Eeoc               []*FieldMappingApiInstance `json:"EEOC,omitempty"`
 	ScheduledInterview []*FieldMappingApiInstance `json:"ScheduledInterview,omitempty"`
 	Job                []*FieldMappingApiInstance `json:"Job,omitempty"`
+	JobPosting         []*FieldMappingApiInstance `json:"JobPosting,omitempty"`
 	JobInterviewStage  []*FieldMappingApiInstance `json:"JobInterviewStage,omitempty"`
 	Offer              []*FieldMappingApiInstance `json:"Offer,omitempty"`
 	Office             []*FieldMappingApiInstance `json:"Office,omitempty"`
@@ -4522,7 +4661,10 @@ func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
 type Job struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The job's name.
 	Name *string `json:"name,omitempty"`
 	// The job's description.
@@ -4536,8 +4678,16 @@ type Job struct {
 	// - `DRAFT` - DRAFT
 	// - `ARCHIVED` - ARCHIVED
 	// - `PENDING` - PENDING
-	Status         *JobStatus `json:"status,omitempty"`
-	JobPostingUrls []*Url     `json:"job_posting_urls,omitempty"`
+	Status *JobStatus `json:"status,omitempty"`
+	// The job's type.
+	//
+	// - `POSTING` - POSTING
+	// - `REQUISITION` - REQUISITION
+	// - `PROFILE` - PROFILE
+	Type *JobTypeEnum `json:"type,omitempty"`
+	// IDs of `JobPosting` objects that serve as job postings for this `Job`.
+	JobPostings    []*string `json:"job_postings,omitempty"`
+	JobPostingUrls []*Url    `json:"job_posting_urls,omitempty"`
 	// When the third party's job was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's job was updated.
@@ -4553,12 +4703,9 @@ type Job struct {
 	// IDs of `RemoteUser` objects that serve as recruiters for this `Job`.
 	Recruiters []*JobRecruitersItem `json:"recruiters,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4712,7 +4859,10 @@ func (j *JobHiringManagersItem) Accept(visitor JobHiringManagersItemVisitor) err
 type JobInterviewStage struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// Standard stage names are offered by ATS systems but can be modified by users.
 	Name *string `json:"name,omitempty"`
 	// This field is populated only if the stage is specific to a particular job. If the stage is generic, this field will not be populated.
@@ -4720,12 +4870,9 @@ type JobInterviewStage struct {
 	// The stage’s order, with the lowest values ordered first. If the third-party does not return details on the order of stages, this field will not be populated.
 	StageOrder *int `json:"stage_order,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4866,6 +5013,226 @@ func (j *JobOfficesItem) Accept(visitor JobOfficesItemVisitor) error {
 	case "office":
 		return visitor.VisitOffice(j.Office)
 	}
+}
+
+// # The JobPosting Object
+//
+// ### Description
+//
+// # The `JobPosting` object represents an external announcement on a job board created by an organization to attract qualified candidates to apply for a specific `Job` opening
+//
+// ### Usage Example
+//
+// Fetch from the `LIST JobPostings` endpoint to show all job postings.
+type JobPosting struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The job posting’s title.
+	Title *string `json:"title,omitempty"`
+	// The Url object is used to represent hyperlinks for a candidate to apply to a given job.
+	JobPostingUrls []*JobPostingJobPostingUrlsItem `json:"job_posting_urls,omitempty"`
+	// ID of `Job` object for this `JobPosting`.
+	Job *JobPostingJob `json:"job,omitempty"`
+	// The job posting's status.
+	//
+	// - `PUBLISHED` - PUBLISHED
+	// - `CLOSED` - CLOSED
+	// - `DRAFT` - DRAFT
+	// - `INTERNAL` - INTERNAL
+	// - `PENDING` - PENDING
+	Status *JobPostingStatusEnum `json:"status,omitempty"`
+	// The job posting’s content.
+	Content *string `json:"content,omitempty"`
+	// When the third party's job posting was created.
+	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
+	// When the third party's job posting was updated.
+	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
+	// Indicates whether the job posting is internal or external.
+	IsInternal *bool `json:"is_internal,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (j *JobPosting) UnmarshalJSON(data []byte) error {
+	type unmarshaler JobPosting
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*j = JobPosting(value)
+	j._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (j *JobPosting) String() string {
+	if len(j._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(j._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(j); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", j)
+}
+
+// ID of `Job` object for this `JobPosting`.
+type JobPostingJob struct {
+	typeName string
+	String   string
+	Job      *Job
+}
+
+func NewJobPostingJobFromString(value string) *JobPostingJob {
+	return &JobPostingJob{typeName: "string", String: value}
+}
+
+func NewJobPostingJobFromJob(value *Job) *JobPostingJob {
+	return &JobPostingJob{typeName: "job", Job: value}
+}
+
+func (j *JobPostingJob) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueJob := new(Job)
+	if err := json.Unmarshal(data, &valueJob); err == nil {
+		j.typeName = "job"
+		j.Job = valueJob
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobPostingJob) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "job":
+		return json.Marshal(j.Job)
+	}
+}
+
+type JobPostingJobVisitor interface {
+	VisitString(string) error
+	VisitJob(*Job) error
+}
+
+func (j *JobPostingJob) Accept(visitor JobPostingJobVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "job":
+		return visitor.VisitJob(j.Job)
+	}
+}
+
+type JobPostingJobPostingUrlsItem struct {
+	typeName string
+	String   string
+	Url      *Url
+}
+
+func NewJobPostingJobPostingUrlsItemFromString(value string) *JobPostingJobPostingUrlsItem {
+	return &JobPostingJobPostingUrlsItem{typeName: "string", String: value}
+}
+
+func NewJobPostingJobPostingUrlsItemFromUrl(value *Url) *JobPostingJobPostingUrlsItem {
+	return &JobPostingJobPostingUrlsItem{typeName: "url", Url: value}
+}
+
+func (j *JobPostingJobPostingUrlsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typeName = "string"
+		j.String = valueString
+		return nil
+	}
+	valueUrl := new(Url)
+	if err := json.Unmarshal(data, &valueUrl); err == nil {
+		j.typeName = "url"
+		j.Url = valueUrl
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JobPostingJobPostingUrlsItem) MarshalJSON() ([]byte, error) {
+	switch j.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return json.Marshal(j.String)
+	case "url":
+		return json.Marshal(j.Url)
+	}
+}
+
+type JobPostingJobPostingUrlsItemVisitor interface {
+	VisitString(string) error
+	VisitUrl(*Url) error
+}
+
+func (j *JobPostingJobPostingUrlsItem) Accept(visitor JobPostingJobPostingUrlsItemVisitor) error {
+	switch j.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
+	case "string":
+		return visitor.VisitString(j.String)
+	case "url":
+		return visitor.VisitUrl(j.Url)
+	}
+}
+
+// - `PUBLISHED` - PUBLISHED
+// - `CLOSED` - CLOSED
+// - `DRAFT` - DRAFT
+// - `INTERNAL` - INTERNAL
+// - `PENDING` - PENDING
+type JobPostingStatusEnum string
+
+const (
+	JobPostingStatusEnumPublished JobPostingStatusEnum = "PUBLISHED"
+	JobPostingStatusEnumClosed    JobPostingStatusEnum = "CLOSED"
+	JobPostingStatusEnumDraft     JobPostingStatusEnum = "DRAFT"
+	JobPostingStatusEnumInternal  JobPostingStatusEnum = "INTERNAL"
+	JobPostingStatusEnumPending   JobPostingStatusEnum = "PENDING"
+)
+
+func NewJobPostingStatusEnumFromString(s string) (JobPostingStatusEnum, error) {
+	switch s {
+	case "PUBLISHED":
+		return JobPostingStatusEnumPublished, nil
+	case "CLOSED":
+		return JobPostingStatusEnumClosed, nil
+	case "DRAFT":
+		return JobPostingStatusEnumDraft, nil
+	case "INTERNAL":
+		return JobPostingStatusEnumInternal, nil
+	case "PENDING":
+		return JobPostingStatusEnumPending, nil
+	}
+	var t JobPostingStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (j JobPostingStatusEnum) Ptr() *JobPostingStatusEnum {
+	return &j
 }
 
 type JobRecruitersItem struct {
@@ -5025,6 +5392,34 @@ func (j JobStatusEnum) Ptr() *JobStatusEnum {
 	return &j
 }
 
+// - `POSTING` - POSTING
+// - `REQUISITION` - REQUISITION
+// - `PROFILE` - PROFILE
+type JobTypeEnum string
+
+const (
+	JobTypeEnumPosting     JobTypeEnum = "POSTING"
+	JobTypeEnumRequisition JobTypeEnum = "REQUISITION"
+	JobTypeEnumProfile     JobTypeEnum = "PROFILE"
+)
+
+func NewJobTypeEnumFromString(s string) (JobTypeEnum, error) {
+	switch s {
+	case "POSTING":
+		return JobTypeEnumPosting, nil
+	case "REQUISITION":
+		return JobTypeEnumRequisition, nil
+	case "PROFILE":
+		return JobTypeEnumProfile, nil
+	}
+	var t JobTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (j JobTypeEnum) Ptr() *JobTypeEnum {
+	return &j
+}
+
 type LinkToken struct {
 	LinkToken       string  `json:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty"`
@@ -5061,13 +5456,11 @@ type LinkedAccountCondition struct {
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The common model for a specific condition.
 	CommonModel *string `json:"common_model,omitempty"`
-	// User-facing _native condition_ name. e.g. "Skip Manager".
-	NativeName *string `json:"native_name,omitempty"`
+	NativeName  *string `json:"native_name,omitempty"`
 	// The operator for a specific condition.
-	Operator string      `json:"operator"`
-	Value    interface{} `json:"value,omitempty"`
-	// The name of the field on the common model that this condition corresponds to, if they conceptually match. e.g. "location_type".
-	FieldName *string `json:"field_name,omitempty"`
+	Operator  string      `json:"operator"`
+	Value     interface{} `json:"value,omitempty"`
+	FieldName *string     `json:"field_name,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5096,6 +5489,8 @@ func (l *LinkedAccountCondition) String() string {
 }
 
 type LinkedAccountConditionRequest struct {
+	// The ID indicating which Linked Account Condition this is.
+	Id *string `json:"id,omitempty"`
 	// The ID indicating which condition schema to use for a specific condition.
 	ConditionSchemaId string `json:"condition_schema_id"`
 	// The operator for a specific condition.
@@ -5519,7 +5914,10 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 type Offer struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The application who is receiving the offer.
 	Application *OfferApplication `json:"application,omitempty"`
 	// The user who created the offer.
@@ -5545,12 +5943,9 @@ type Offer struct {
 	// - `DEPRECATED` - DEPRECATED
 	Status *OfferStatus `json:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -5826,18 +6221,18 @@ func (o OfferStatusEnum) Ptr() *OfferStatusEnum {
 type Office struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The office's name.
 	Name *string `json:"name,omitempty"`
 	// The office's location.
 	Location *string `json:"location,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -6305,6 +6700,37 @@ func (p *PaginatedJobList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+type PaginatedJobPostingList struct {
+	Next     *string       `json:"next,omitempty"`
+	Previous *string       `json:"previous,omitempty"`
+	Results  []*JobPosting `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedJobPostingList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedJobPostingList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedJobPostingList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedJobPostingList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
 type PaginatedOfferList struct {
 	Next     *string  `json:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty"`
@@ -6659,6 +7085,9 @@ func (p *PatchedCandidateRequest) String() string {
 //
 // Fetch from the `GET Candidate` endpoint and view their phone numbers.
 type PhoneNumber struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The phone number.
 	Value *string `json:"value,omitempty"`
 	// The type of phone number.
@@ -6669,9 +7098,6 @@ type PhoneNumber struct {
 	// - `SKYPE` - SKYPE
 	// - `OTHER` - OTHER
 	PhoneNumberType *PhoneNumberPhoneNumberType `json:"phone_number_type,omitempty"`
-	CreatedAt       *time.Time                  `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -7000,16 +7426,16 @@ func (r ReasonEnum) Ptr() *ReasonEnum {
 type RejectReason struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The rejection reason’s name.
 	Name *string `json:"name,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -7140,6 +7566,7 @@ type RemoteFieldApiResponse struct {
 	Eeoc               []*RemoteFieldApi `json:"EEOC,omitempty"`
 	ScheduledInterview []*RemoteFieldApi `json:"ScheduledInterview,omitempty"`
 	Job                []*RemoteFieldApi `json:"Job,omitempty"`
+	JobPosting         []*RemoteFieldApi `json:"JobPosting,omitempty"`
 	JobInterviewStage  []*RemoteFieldApi `json:"JobInterviewStage,omitempty"`
 	Offer              []*RemoteFieldApi `json:"Offer,omitempty"`
 	Office             []*RemoteFieldApi `json:"Office,omitempty"`
@@ -7326,7 +7753,10 @@ func (r *RemoteResponseResponseType) Accept(visitor RemoteResponseResponseTypeVi
 type RemoteUser struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The user's first name.
 	FirstName *string `json:"first_name,omitempty"`
 	// The user's last name.
@@ -7346,12 +7776,9 @@ type RemoteUser struct {
 	// - `INTERVIEWER` - INTERVIEWER
 	AccessRole *RemoteUserAccessRole `json:"access_role,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -7547,7 +7974,10 @@ func (r RoleEnum) Ptr() *RoleEnum {
 type ScheduledInterview struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The application being interviewed.
 	Application *ScheduledInterviewApplication `json:"application,omitempty"`
 	// The stage of the interview.
@@ -7573,12 +8003,9 @@ type ScheduledInterview struct {
 	// - `COMPLETE` - COMPLETE
 	Status *ScheduledInterviewStatus `json:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8323,7 +8750,10 @@ func (s ScheduledInterviewStatusEnum) Ptr() *ScheduledInterviewStatusEnum {
 type Scorecard struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The application being scored.
 	Application *ScorecardApplication `json:"application,omitempty"`
 	// The interview being scored.
@@ -8343,12 +8773,9 @@ type Scorecard struct {
 	// - `NO_DECISION` - NO_DECISION
 	OverallRecommendation *ScorecardOverallRecommendation `json:"overall_recommendation,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time             `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8626,7 +9053,10 @@ func (s *ScorecardOverallRecommendation) Accept(visitor ScorecardOverallRecommen
 type ScreeningQuestion struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The job associated with the screening question.
 	Job *ScreeningQuestionJob `json:"job,omitempty"`
 	// The description of the screening question
@@ -8645,11 +9075,8 @@ type ScreeningQuestion struct {
 	// - `BOOLEAN` - BOOLEAN
 	Type *ScreeningQuestionType `json:"type,omitempty"`
 	// Whether or not the screening question is required.
-	Required  *bool         `json:"required,omitempty"`
-	Options   []interface{} `json:"options,omitempty"`
-	CreatedAt *time.Time    `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	Required *bool         `json:"required,omitempty"`
+	Options  []interface{} `json:"options,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8745,14 +9172,14 @@ func (s *ScreeningQuestionJob) Accept(visitor ScreeningQuestionJobVisitor) error
 //
 // TODO
 type ScreeningQuestionOption struct {
+	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
-	// Available response options
-	Label     *string    `json:"label,omitempty"`
-	Id        *string    `json:"id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// This is the datetime that this object was last updated by Merge
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// Available response options
+	Label *string `json:"label,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8791,13 +9218,13 @@ func (s *ScreeningQuestionOption) String() string {
 // - `NUMERIC` - NUMERIC
 // - `BOOLEAN` - BOOLEAN
 type ScreeningQuestionType struct {
-	typeName string
-	TypeEnum TypeEnum
-	String   string
+	typeName                  string
+	ScreeningQuestionTypeEnum ScreeningQuestionTypeEnum
+	String                    string
 }
 
-func NewScreeningQuestionTypeFromTypeEnum(value TypeEnum) *ScreeningQuestionType {
-	return &ScreeningQuestionType{typeName: "typeEnum", TypeEnum: value}
+func NewScreeningQuestionTypeFromScreeningQuestionTypeEnum(value ScreeningQuestionTypeEnum) *ScreeningQuestionType {
+	return &ScreeningQuestionType{typeName: "screeningQuestionTypeEnum", ScreeningQuestionTypeEnum: value}
 }
 
 func NewScreeningQuestionTypeFromString(value string) *ScreeningQuestionType {
@@ -8805,10 +9232,10 @@ func NewScreeningQuestionTypeFromString(value string) *ScreeningQuestionType {
 }
 
 func (s *ScreeningQuestionType) UnmarshalJSON(data []byte) error {
-	var valueTypeEnum TypeEnum
-	if err := json.Unmarshal(data, &valueTypeEnum); err == nil {
-		s.typeName = "typeEnum"
-		s.TypeEnum = valueTypeEnum
+	var valueScreeningQuestionTypeEnum ScreeningQuestionTypeEnum
+	if err := json.Unmarshal(data, &valueScreeningQuestionTypeEnum); err == nil {
+		s.typeName = "screeningQuestionTypeEnum"
+		s.ScreeningQuestionTypeEnum = valueScreeningQuestionTypeEnum
 		return nil
 	}
 	var valueString string
@@ -8824,15 +9251,15 @@ func (s ScreeningQuestionType) MarshalJSON() ([]byte, error) {
 	switch s.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
-	case "typeEnum":
-		return json.Marshal(s.TypeEnum)
+	case "screeningQuestionTypeEnum":
+		return json.Marshal(s.ScreeningQuestionTypeEnum)
 	case "string":
 		return json.Marshal(s.String)
 	}
 }
 
 type ScreeningQuestionTypeVisitor interface {
-	VisitTypeEnum(TypeEnum) error
+	VisitScreeningQuestionTypeEnum(ScreeningQuestionTypeEnum) error
 	VisitString(string) error
 }
 
@@ -8840,11 +9267,59 @@ func (s *ScreeningQuestionType) Accept(visitor ScreeningQuestionTypeVisitor) err
 	switch s.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
-	case "typeEnum":
-		return visitor.VisitTypeEnum(s.TypeEnum)
+	case "screeningQuestionTypeEnum":
+		return visitor.VisitScreeningQuestionTypeEnum(s.ScreeningQuestionTypeEnum)
 	case "string":
 		return visitor.VisitString(s.String)
 	}
+}
+
+// - `DATE` - DATE
+// - `FILE` - FILE
+// - `SINGLE_SELECT` - SINGLE_SELECT
+// - `MULTI_SELECT` - MULTI_SELECT
+// - `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
+// - `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
+// - `NUMERIC` - NUMERIC
+// - `BOOLEAN` - BOOLEAN
+type ScreeningQuestionTypeEnum string
+
+const (
+	ScreeningQuestionTypeEnumDate           ScreeningQuestionTypeEnum = "DATE"
+	ScreeningQuestionTypeEnumFile           ScreeningQuestionTypeEnum = "FILE"
+	ScreeningQuestionTypeEnumSingleSelect   ScreeningQuestionTypeEnum = "SINGLE_SELECT"
+	ScreeningQuestionTypeEnumMultiSelect    ScreeningQuestionTypeEnum = "MULTI_SELECT"
+	ScreeningQuestionTypeEnumSingleLineText ScreeningQuestionTypeEnum = "SINGLE_LINE_TEXT"
+	ScreeningQuestionTypeEnumMultiLineText  ScreeningQuestionTypeEnum = "MULTI_LINE_TEXT"
+	ScreeningQuestionTypeEnumNumeric        ScreeningQuestionTypeEnum = "NUMERIC"
+	ScreeningQuestionTypeEnumBoolean        ScreeningQuestionTypeEnum = "BOOLEAN"
+)
+
+func NewScreeningQuestionTypeEnumFromString(s string) (ScreeningQuestionTypeEnum, error) {
+	switch s {
+	case "DATE":
+		return ScreeningQuestionTypeEnumDate, nil
+	case "FILE":
+		return ScreeningQuestionTypeEnumFile, nil
+	case "SINGLE_SELECT":
+		return ScreeningQuestionTypeEnumSingleSelect, nil
+	case "MULTI_SELECT":
+		return ScreeningQuestionTypeEnumMultiSelect, nil
+	case "SINGLE_LINE_TEXT":
+		return ScreeningQuestionTypeEnumSingleLineText, nil
+	case "MULTI_LINE_TEXT":
+		return ScreeningQuestionTypeEnumMultiLineText, nil
+	case "NUMERIC":
+		return ScreeningQuestionTypeEnumNumeric, nil
+	case "BOOLEAN":
+		return ScreeningQuestionTypeEnumBoolean, nil
+	}
+	var t ScreeningQuestionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s ScreeningQuestionTypeEnum) Ptr() *ScreeningQuestionTypeEnum {
+	return &s
 }
 
 // - `IN_NEXT_SYNC` - IN_NEXT_SYNC
@@ -8966,16 +9441,16 @@ func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
 // Fetch from the `LIST Tags` endpoint and view the tags used within a company.
 type Tag struct {
 	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty"`
+	RemoteId  *string    `json:"remote_id,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The tag's name.
 	Name *string `json:"name,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
-	CreatedAt        *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt    *time.Time               `json:"modified_at,omitempty"`
-	FieldMappings map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData    []map[string]interface{} `json:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -9003,54 +9478,6 @@ func (t *Tag) String() string {
 	return fmt.Sprintf("%#v", t)
 }
 
-// - `DATE` - DATE
-// - `FILE` - FILE
-// - `SINGLE_SELECT` - SINGLE_SELECT
-// - `MULTI_SELECT` - MULTI_SELECT
-// - `SINGLE_LINE_TEXT` - SINGLE_LINE_TEXT
-// - `MULTI_LINE_TEXT` - MULTI_LINE_TEXT
-// - `NUMERIC` - NUMERIC
-// - `BOOLEAN` - BOOLEAN
-type TypeEnum string
-
-const (
-	TypeEnumDate           TypeEnum = "DATE"
-	TypeEnumFile           TypeEnum = "FILE"
-	TypeEnumSingleSelect   TypeEnum = "SINGLE_SELECT"
-	TypeEnumMultiSelect    TypeEnum = "MULTI_SELECT"
-	TypeEnumSingleLineText TypeEnum = "SINGLE_LINE_TEXT"
-	TypeEnumMultiLineText  TypeEnum = "MULTI_LINE_TEXT"
-	TypeEnumNumeric        TypeEnum = "NUMERIC"
-	TypeEnumBoolean        TypeEnum = "BOOLEAN"
-)
-
-func NewTypeEnumFromString(s string) (TypeEnum, error) {
-	switch s {
-	case "DATE":
-		return TypeEnumDate, nil
-	case "FILE":
-		return TypeEnumFile, nil
-	case "SINGLE_SELECT":
-		return TypeEnumSingleSelect, nil
-	case "MULTI_SELECT":
-		return TypeEnumMultiSelect, nil
-	case "SINGLE_LINE_TEXT":
-		return TypeEnumSingleLineText, nil
-	case "MULTI_LINE_TEXT":
-		return TypeEnumMultiLineText, nil
-	case "NUMERIC":
-		return TypeEnumNumeric, nil
-	case "BOOLEAN":
-		return TypeEnumBoolean, nil
-	}
-	var t TypeEnum
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (t TypeEnum) Ptr() *TypeEnum {
-	return &t
-}
-
 // # The Url Object
 //
 // ### Description
@@ -9061,6 +9488,9 @@ func (t TypeEnum) Ptr() *TypeEnum {
 //
 // Fetch from the `GET Candidate` endpoint and view their website urls.
 type Url struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// This is the datetime that this object was last updated by Merge
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The site's url.
 	Value *string `json:"value,omitempty"`
 	// The type of site.
@@ -9072,10 +9502,7 @@ type Url struct {
 	// - `SOCIAL_MEDIA` - SOCIAL_MEDIA
 	// - `OTHER` - OTHER
 	// - `JOB_POSTING` - JOB_POSTING
-	UrlType   *UrlUrlType `json:"url_type,omitempty"`
-	CreatedAt *time.Time  `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	UrlType *UrlUrlType `json:"url_type,omitempty"`
 
 	_rawJSON json.RawMessage
 }

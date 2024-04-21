@@ -40,7 +40,7 @@ type PayrollRunsListRequest struct {
 	// - `TERMINATION` - TERMINATION
 	// - `SIGN_ON_BONUS` - SIGN_ON_BONUS
 	RunType *PayrollRunsListRequestRunType `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *PayrollRunsListRequestShowEnumOrigins `json:"-"`
 	// If provided, will only return payroll runs started after this datetime.
 	StartedAfter *time.Time `json:"-"`
@@ -53,7 +53,7 @@ type PayrollRunsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *PayrollRunsRetrieveRequestRemoteFields `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *PayrollRunsRetrieveRequestShowEnumOrigins `json:"-"`
 }
 

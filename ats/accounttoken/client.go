@@ -30,11 +30,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns the account token for the end user with the provided public token.
 func (c *Client) Retrieve(ctx context.Context, publicToken string) (*ats.AccountToken, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/account-token/%v", publicToken)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/account-token/%v", publicToken)
 
 	var response *ats.AccountToken
 	if err := c.caller.Call(

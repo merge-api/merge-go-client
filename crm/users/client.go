@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `User` objects.
 func (c *Client) List(ctx context.Context, request *crm.UsersListRequest) (*crm.PaginatedUserList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/users"
+	endpointURL := baseURL + "/" + "crm/v1/users"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *crm.UsersListRequest) (*crm.
 
 // Returns a `User` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.UsersRetrieveRequest) (*crm.User, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/users/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/users/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -124,11 +124,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.UsersRetr
 
 // Ignores a specific row based on the `model_id` in the url. These records will have their properties set to null, and will not be updated in future syncs. The "reason" and "message" fields in the request body will be stored for audit purposes.
 func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *crm.IgnoreCommonModelRequest) error {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/users/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/users/ignore/%v", modelId)
 
 	if err := c.caller.Call(
 		ctx,
@@ -146,11 +146,11 @@ func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *crm.
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.UsersRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/users/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/users/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

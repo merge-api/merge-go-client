@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `AccountingPeriod` objects.
 func (c *Client) List(ctx context.Context, request *accounting.AccountingPeriodsListRequest) (*accounting.PaginatedAccountingPeriodList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/accounting-periods"
+	endpointURL := baseURL + "/" + "accounting/v1/accounting-periods"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {
@@ -71,11 +71,11 @@ func (c *Client) List(ctx context.Context, request *accounting.AccountingPeriods
 
 // Returns an `AccountingPeriod` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.AccountingPeriodsRetrieveRequest) (*accounting.AccountingPeriod, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/accounting-periods/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/accounting-periods/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

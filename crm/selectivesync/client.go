@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get a linked account's selective syncs.
 func (c *Client) ConfigurationsList(ctx context.Context) ([]*crm.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "crm/v1/selective-sync/configurations"
 
 	var response []*crm.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -54,11 +54,11 @@ func (c *Client) ConfigurationsList(ctx context.Context) ([]*crm.LinkedAccountSe
 
 // Replace a linked account's selective syncs.
 func (c *Client) ConfigurationsUpdate(ctx context.Context, request *crm.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*crm.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "crm/v1/selective-sync/configurations"
 
 	var response []*crm.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -78,11 +78,11 @@ func (c *Client) ConfigurationsUpdate(ctx context.Context, request *crm.LinkedAc
 
 // Get metadata for the conditions available to a linked account.
 func (c *Client) MetaList(ctx context.Context, request *crm.SelectiveSyncMetaListRequest) (*crm.PaginatedConditionSchemaList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "crm/v1/selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Attachment` objects.
 func (c *Client) List(ctx context.Context, request *ats.AttachmentsListRequest) (*ats.PaginatedAttachmentList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/attachments"
+	endpointURL := baseURL + "/" + "ats/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.CandidateId != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *ats.AttachmentsListRequest) 
 
 // Creates an `Attachment` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ats.AttachmentEndpointRequest) (*ats.AttachmentResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/attachments"
+	endpointURL := baseURL + "/" + "ats/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -134,11 +134,11 @@ func (c *Client) Create(ctx context.Context, request *ats.AttachmentEndpointRequ
 
 // Returns an `Attachment` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.AttachmentsRetrieveRequest) (*ats.Attachment, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/attachments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/attachments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -174,11 +174,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ats.Attachmen
 
 // Returns metadata for `Attachment` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/attachments/meta/post"
+	endpointURL := baseURL + "/" + "ats/v1/attachments/meta/post"
 
 	var response *ats.MetaResponse
 	if err := c.caller.Call(

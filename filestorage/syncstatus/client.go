@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get syncing status. Possible values: `DISABLED`, `DONE`, `FAILED`, `PARTIALLY_SYNCED`, `PAUSED`, `SYNCING`. Learn more about sync status in our [Help Center](https://help.merge.dev/en/articles/8184193-merge-sync-statuses).
 func (c *Client) List(ctx context.Context, request *filestorage.SyncStatusListRequest) (*filestorage.PaginatedSyncStatusList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/sync-status"
+	endpointURL := baseURL + "/" + "filestorage/v1/sync-status"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

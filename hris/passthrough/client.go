@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Pull data from an endpoint not currently supported by Merge.
 func (c *Client) Create(ctx context.Context, request *hris.DataPassthroughRequest) (*hris.RemoteResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/passthrough"
+	endpointURL := baseURL + "/" + "hris/v1/passthrough"
 
 	var response *hris.RemoteResponse
 	if err := c.caller.Call(

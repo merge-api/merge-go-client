@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Tag` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.TagsListRequest) (*ticketing.PaginatedTagList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tags"
+	endpointURL := baseURL + "/" + "ticketing/v1/tags"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.TagsListRequest) (
 
 // Returns a `Tag` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.TagsRetrieveRequest) (*ticketing.Tag, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tags/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tags/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

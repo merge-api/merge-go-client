@@ -19,8 +19,8 @@ type Client struct {
 	header  http.Header
 
 	Ats         *atsclient.Client
-	Crm         *crmclient.Client
 	Filestorage *filestorageclient.Client
+	Crm         *crmclient.Client
 	Hris        *hrisclient.Client
 	Ticketing   *ticketingclient.Client
 	Accounting  *accountingclient.Client
@@ -36,8 +36,8 @@ func NewClient(opts ...core.ClientOption) *Client {
 		caller:      core.NewCaller(options.HTTPClient),
 		header:      options.ToHeader(),
 		Ats:         atsclient.NewClient(opts...),
-		Crm:         crmclient.NewClient(opts...),
 		Filestorage: filestorageclient.NewClient(opts...),
+		Crm:         crmclient.NewClient(opts...),
 		Hris:        hrisclient.NewClient(opts...),
 		Ticketing:   ticketingclient.NewClient(opts...),
 		Accounting:  accountingclient.NewClient(opts...),

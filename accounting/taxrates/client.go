@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `TaxRate` objects.
 func (c *Client) List(ctx context.Context, request *accounting.TaxRatesListRequest) (*accounting.PaginatedTaxRateList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/tax-rates"
+	endpointURL := baseURL + "/" + "accounting/v1/tax-rates"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -93,11 +93,11 @@ func (c *Client) List(ctx context.Context, request *accounting.TaxRatesListReque
 
 // Returns a `TaxRate` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.TaxRatesRetrieveRequest) (*accounting.TaxRate, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/tax-rates/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/tax-rates/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

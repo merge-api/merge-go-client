@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Creates a link token to be used when linking a new end user.
 func (c *Client) Create(ctx context.Context, request *crm.EndUserDetailsRequest) (*crm.LinkToken, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/link-token"
+	endpointURL := baseURL + "/" + "crm/v1/link-token"
 
 	var response *crm.LinkToken
 	if err := c.caller.Call(

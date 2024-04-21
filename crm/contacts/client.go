@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Contact` objects.
 func (c *Client) List(ctx context.Context, request *crm.ContactsListRequest) (*crm.PaginatedContactList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/contacts"
+	endpointURL := baseURL + "/" + "crm/v1/contacts"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -102,11 +102,11 @@ func (c *Client) List(ctx context.Context, request *crm.ContactsListRequest) (*c
 
 // Creates a `Contact` object with the given values.
 func (c *Client) Create(ctx context.Context, request *crm.CrmContactEndpointRequest) (*crm.CrmContactResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/contacts"
+	endpointURL := baseURL + "/" + "crm/v1/contacts"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -137,11 +137,11 @@ func (c *Client) Create(ctx context.Context, request *crm.CrmContactEndpointRequ
 
 // Returns a `Contact` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.ContactsRetrieveRequest) (*crm.Contact, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/contacts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/contacts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -174,11 +174,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.ContactsR
 
 // Updates a `Contact` object with the given `id`.
 func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedCrmContactEndpointRequest) (*crm.CrmContactResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/contacts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/contacts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -209,11 +209,11 @@ func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 
 // Ignores a specific row based on the `model_id` in the url. These records will have their properties set to null, and will not be updated in future syncs. The "reason" and "message" fields in the request body will be stored for audit purposes.
 func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *crm.IgnoreCommonModelRequest) error {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/contacts/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/contacts/ignore/%v", modelId)
 
 	if err := c.caller.Call(
 		ctx,
@@ -231,11 +231,11 @@ func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *crm.
 
 // Returns metadata for `CRMContact` PATCHs.
 func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/contacts/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/contacts/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -254,11 +254,11 @@ func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 
 // Returns metadata for `CRMContact` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/contacts/meta/post"
+	endpointURL := baseURL + "/" + "crm/v1/contacts/meta/post"
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -277,11 +277,11 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.ContactsRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/contacts/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/contacts/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

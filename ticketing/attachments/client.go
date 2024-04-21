@@ -34,11 +34,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Attachment` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.AttachmentsListRequest) (*ticketing.PaginatedAttachmentList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments"
+	endpointURL := baseURL + "/" + "ticketing/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -98,11 +98,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.AttachmentsListReq
 
 // Creates an `Attachment` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ticketing.TicketingAttachmentEndpointRequest) (*ticketing.TicketingAttachmentResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments"
+	endpointURL := baseURL + "/" + "ticketing/v1/attachments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -133,11 +133,11 @@ func (c *Client) Create(ctx context.Context, request *ticketing.TicketingAttachm
 
 // Returns an `Attachment` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.AttachmentsRetrieveRequest) (*ticketing.Attachment, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/attachments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/attachments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -167,11 +167,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Att
 
 // Returns an `Attachment` object with the given `id`.
 func (c *Client) DownloadRetrieve(ctx context.Context, id string, request *ticketing.AttachmentsDownloadRetrieveRequest) (io.Reader, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/attachments/%v/download", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/attachments/%v/download", id)
 
 	queryParams := make(url.Values)
 	if request.MimeType != nil {
@@ -198,11 +198,11 @@ func (c *Client) DownloadRetrieve(ctx context.Context, id string, request *ticke
 
 // Returns metadata for `TicketingAttachment` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/attachments/meta/post"
+	endpointURL := baseURL + "/" + "ticketing/v1/attachments/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := c.caller.Call(

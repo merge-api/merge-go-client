@@ -3,5 +3,6 @@
 package hris
 
 type RemoteKeyForRegenerationRequest struct {
+	// The name of the remote key
 	Name string `json:"name"`
 }

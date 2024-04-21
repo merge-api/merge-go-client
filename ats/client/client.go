@@ -21,6 +21,7 @@ import (
 	interviews "github.com/merge-api/merge-go-client/ats/interviews"
 	issues "github.com/merge-api/merge-go-client/ats/issues"
 	jobinterviewstages "github.com/merge-api/merge-go-client/ats/jobinterviewstages"
+	jobpostings "github.com/merge-api/merge-go-client/ats/jobpostings"
 	jobs "github.com/merge-api/merge-go-client/ats/jobs"
 	linkedaccounts "github.com/merge-api/merge-go-client/ats/linkedaccounts"
 	linktoken "github.com/merge-api/merge-go-client/ats/linktoken"
@@ -63,6 +64,7 @@ type Client struct {
 	Interviews         *interviews.Client
 	Issues             *issues.Client
 	JobInterviewStages *jobinterviewstages.Client
+	JobPostings        *jobpostings.Client
 	Jobs               *jobs.Client
 	LinkToken          *linktoken.Client
 	LinkedAccounts     *linkedaccounts.Client
@@ -107,6 +109,7 @@ func NewClient(opts ...core.ClientOption) *Client {
 		Interviews:         interviews.NewClient(opts...),
 		Issues:             issues.NewClient(opts...),
 		JobInterviewStages: jobinterviewstages.NewClient(opts...),
+		JobPostings:        jobpostings.NewClient(opts...),
 		Jobs:               jobs.NewClient(opts...),
 		LinkToken:          linktoken.NewClient(opts...),
 		LinkedAccounts:     linkedaccounts.NewClient(opts...),
