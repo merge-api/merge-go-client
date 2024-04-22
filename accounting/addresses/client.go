@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns an `Address` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.AddressesRetrieveRequest) (*accounting.Address, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/addresses/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/addresses/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

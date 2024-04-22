@@ -74,8 +74,6 @@ type TicketsListRequest struct {
 	// - `NORMAL` - NORMAL
 	// - `LOW` - LOW
 	Priority *TicketsListRequestPriority `json:"-"`
-	// If provided, will only return tickets for this project.
-	ProjectId *string `json:"-"`
 	// If provided, will only return tickets created in the third party platform after this datetime.
 	RemoteCreatedAfter *time.Time `json:"-"`
 	// If provided, will only return tickets created in the third party platform before this datetime.
@@ -88,7 +86,7 @@ type TicketsListRequest struct {
 	RemoteUpdatedAfter *time.Time `json:"-"`
 	// If provided, will only return tickets updated in the third party platform before this datetime.
 	RemoteUpdatedBefore *time.Time `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *TicketsListRequestShowEnumOrigins `json:"-"`
 	// If provided, will only return tickets of this status.
 	//
@@ -131,7 +129,7 @@ type TicketsRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *TicketsRetrieveRequestRemoteFields `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *TicketsRetrieveRequestShowEnumOrigins `json:"-"`
 }
 

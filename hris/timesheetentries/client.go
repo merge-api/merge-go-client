@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `TimesheetEntry` objects.
 func (c *Client) List(ctx context.Context, request *hris.TimesheetEntriesListRequest) (*hris.PaginatedTimesheetEntryList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries"
+	endpointURL := baseURL + "/" + "hris/v1/timesheet-entries"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *hris.TimesheetEntriesListReq
 
 // Creates a `TimesheetEntry` object with the given values.
 func (c *Client) Create(ctx context.Context, request *hris.TimesheetEntryEndpointRequest) (*hris.TimesheetEntryResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries"
+	endpointURL := baseURL + "/" + "hris/v1/timesheet-entries"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -140,11 +140,11 @@ func (c *Client) Create(ctx context.Context, request *hris.TimesheetEntryEndpoin
 
 // Returns a `TimesheetEntry` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.TimesheetEntriesRetrieveRequest) (*hris.TimesheetEntry, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/timesheet-entries/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/timesheet-entries/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -171,11 +171,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *hris.Timeshee
 
 // Returns metadata for `TimesheetEntry` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*hris.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/timesheet-entries/meta/post"
+	endpointURL := baseURL + "/" + "hris/v1/timesheet-entries/meta/post"
 
 	var response *hris.MetaResponse
 	if err := c.caller.Call(

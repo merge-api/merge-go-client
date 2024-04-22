@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `CreditNote` objects.
 func (c *Client) List(ctx context.Context, request *accounting.CreditNotesListRequest) (*accounting.PaginatedCreditNoteList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/credit-notes"
+	endpointURL := baseURL + "/" + "accounting/v1/credit-notes"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *accounting.CreditNotesListRe
 
 // Returns a `CreditNote` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.CreditNotesRetrieveRequest) (*accounting.CreditNote, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/credit-notes/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/credit-notes/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

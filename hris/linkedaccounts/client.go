@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // List linked accounts for your organization.
 func (c *Client) List(ctx context.Context, request *hris.LinkedAccountsListRequest) (*hris.PaginatedAccountDetailsAndActionsList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/linked-accounts"
+	endpointURL := baseURL + "/" + "hris/v1/linked-accounts"
 
 	queryParams := make(url.Values)
 	if request.Category != nil {

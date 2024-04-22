@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `AssociationType` objects.
 func (c *Client) CustomObjectClassesAssociationTypesList(ctx context.Context, customObjectClassId string, request *crm.CustomObjectClassesAssociationTypesListRequest) (*crm.PaginatedAssociationTypeList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/association-types", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) CustomObjectClassesAssociationTypesList(ctx context.Context, cu
 
 // Creates an `AssociationType` object with the given values.
 func (c *Client) CustomObjectClassesAssociationTypesCreate(ctx context.Context, customObjectClassId string, request *crm.CrmAssociationTypeEndpointRequest) (*crm.CrmAssociationTypeResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/association-types", customObjectClassId)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -125,11 +125,11 @@ func (c *Client) CustomObjectClassesAssociationTypesCreate(ctx context.Context, 
 
 // Returns an `AssociationType` object with the given `id`.
 func (c *Client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context, customObjectClassId string, id string, request *crm.CustomObjectClassesAssociationTypesRetrieveRequest) (*crm.AssociationType, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types/%v", customObjectClassId, id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/association-types/%v", customObjectClassId, id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -159,11 +159,11 @@ func (c *Client) CustomObjectClassesAssociationTypesRetrieve(ctx context.Context
 
 // Returns metadata for `CRMAssociationType` POSTs.
 func (c *Client) CustomObjectClassesAssociationTypesMetaPostRetrieve(ctx context.Context, customObjectClassId string) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/association-types/meta/post", customObjectClassId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/association-types/meta/post", customObjectClassId)
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(

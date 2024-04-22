@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Gets issues.
 func (c *Client) List(ctx context.Context, request *filestorage.IssuesListRequest) (*filestorage.PaginatedIssueList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/issues"
+	endpointURL := baseURL + "/" + "filestorage/v1/issues"
 
 	queryParams := make(url.Values)
 	if request.AccountToken != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *filestorage.IssuesListReques
 
 // Get a specific issue.
 func (c *Client) Retrieve(ctx context.Context, id string) (*filestorage.Issue, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/issues/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/issues/%v", id)
 
 	var response *filestorage.Issue
 	if err := c.caller.Call(

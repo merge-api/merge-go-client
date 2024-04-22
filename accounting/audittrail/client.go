@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Gets a list of audit trail events.
 func (c *Client) List(ctx context.Context, request *accounting.AuditTrailListRequest) (*accounting.PaginatedAuditLogEventList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/audit-trail"
+	endpointURL := baseURL + "/" + "accounting/v1/audit-trail"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

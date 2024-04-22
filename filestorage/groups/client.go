@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Group` objects.
 func (c *Client) List(ctx context.Context, request *filestorage.GroupsListRequest) (*filestorage.PaginatedGroupList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/groups"
+	endpointURL := baseURL + "/" + "filestorage/v1/groups"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *filestorage.GroupsListReques
 
 // Returns a `Group` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.GroupsRetrieveRequest) (*filestorage.Group, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/groups/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/groups/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

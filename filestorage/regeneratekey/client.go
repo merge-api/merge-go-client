@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Exchange remote keys.
 func (c *Client) Create(ctx context.Context, request *filestorage.RemoteKeyForRegenerationRequest) (*filestorage.RemoteKey, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/regenerate-key"
+	endpointURL := baseURL + "/" + "filestorage/v1/regenerate-key"
 
 	var response *filestorage.RemoteKey
 	if err := c.caller.Call(

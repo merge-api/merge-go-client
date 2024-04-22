@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Comment` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.CommentsListRequest) (*ticketing.PaginatedCommentList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/comments"
+	endpointURL := baseURL + "/" + "ticketing/v1/comments"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -96,11 +96,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.CommentsListReques
 
 // Creates a `Comment` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ticketing.CommentEndpointRequest) (*ticketing.CommentResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/comments"
+	endpointURL := baseURL + "/" + "ticketing/v1/comments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -131,11 +131,11 @@ func (c *Client) Create(ctx context.Context, request *ticketing.CommentEndpointR
 
 // Returns a `Comment` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.CommentsRetrieveRequest) (*ticketing.Comment, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/comments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/comments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -165,11 +165,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Com
 
 // Returns metadata for `Comment` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/comments/meta/post"
+	endpointURL := baseURL + "/" + "ticketing/v1/comments/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := c.caller.Call(

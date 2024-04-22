@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `BalanceSheet` objects.
 func (c *Client) List(ctx context.Context, request *accounting.BalanceSheetsListRequest) (*accounting.PaginatedBalanceSheetList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/balance-sheets"
+	endpointURL := baseURL + "/" + "accounting/v1/balance-sheets"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -93,11 +93,11 @@ func (c *Client) List(ctx context.Context, request *accounting.BalanceSheetsList
 
 // Returns a `BalanceSheet` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.BalanceSheetsRetrieveRequest) (*accounting.BalanceSheet, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/balance-sheets/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/balance-sheets/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

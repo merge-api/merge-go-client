@@ -7,7 +7,7 @@ import (
 )
 
 type LinkedAccountsListRequest struct {
-	// Options: ('hris', 'ats', 'accounting', 'ticketing', 'crm', 'mktg', 'filestorage')
+	// Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 	//
 	// - `hris` - hris
 	// - `ats` - ats

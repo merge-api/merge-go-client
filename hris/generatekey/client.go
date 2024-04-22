@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Create a remote key.
 func (c *Client) Create(ctx context.Context, request *hris.GenerateRemoteKeyRequest) (*hris.RemoteKey, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/generate-key"
+	endpointURL := baseURL + "/" + "hris/v1/generate-key"
 
 	var response *hris.RemoteKey
 	if err := c.caller.Call(

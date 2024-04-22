@@ -34,7 +34,7 @@ type JobsListRequest struct {
 	RemoteFields *string `json:"-"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-"`
 	// If provided, will only return jobs with this status. Options: ('OPEN', 'CLOSED', 'DRAFT', 'ARCHIVED', 'PENDING')
 	//
@@ -53,7 +53,7 @@ type JobsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-"`
-	// Which fields should be returned in non-normalized form.
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-"`
 }
 
@@ -73,21 +73,37 @@ type JobsScreeningQuestionsListRequest struct {
 type JobsListRequestExpand string
 
 const (
-	JobsListRequestExpandDepartments                                JobsListRequestExpand = "departments"
-	JobsListRequestExpandDepartmentsHiringManagers                  JobsListRequestExpand = "departments,hiring_managers"
-	JobsListRequestExpandDepartmentsHiringManagersRecruiters        JobsListRequestExpand = "departments,hiring_managers,recruiters"
-	JobsListRequestExpandDepartmentsOffices                         JobsListRequestExpand = "departments,offices"
-	JobsListRequestExpandDepartmentsOfficesHiringManagers           JobsListRequestExpand = "departments,offices,hiring_managers"
-	JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters JobsListRequestExpand = "departments,offices,hiring_managers,recruiters"
-	JobsListRequestExpandDepartmentsOfficesRecruiters               JobsListRequestExpand = "departments,offices,recruiters"
-	JobsListRequestExpandDepartmentsRecruiters                      JobsListRequestExpand = "departments,recruiters"
-	JobsListRequestExpandHiringManagers                             JobsListRequestExpand = "hiring_managers"
-	JobsListRequestExpandHiringManagersRecruiters                   JobsListRequestExpand = "hiring_managers,recruiters"
-	JobsListRequestExpandOffices                                    JobsListRequestExpand = "offices"
-	JobsListRequestExpandOfficesHiringManagers                      JobsListRequestExpand = "offices,hiring_managers"
-	JobsListRequestExpandOfficesHiringManagersRecruiters            JobsListRequestExpand = "offices,hiring_managers,recruiters"
-	JobsListRequestExpandOfficesRecruiters                          JobsListRequestExpand = "offices,recruiters"
-	JobsListRequestExpandRecruiters                                 JobsListRequestExpand = "recruiters"
+	JobsListRequestExpandDepartments                                           JobsListRequestExpand = "departments"
+	JobsListRequestExpandDepartmentsHiringManagers                             JobsListRequestExpand = "departments,hiring_managers"
+	JobsListRequestExpandDepartmentsHiringManagersJobPostings                  JobsListRequestExpand = "departments,hiring_managers,job_postings"
+	JobsListRequestExpandDepartmentsHiringManagersJobPostingsRecruiters        JobsListRequestExpand = "departments,hiring_managers,job_postings,recruiters"
+	JobsListRequestExpandDepartmentsHiringManagersRecruiters                   JobsListRequestExpand = "departments,hiring_managers,recruiters"
+	JobsListRequestExpandDepartmentsJobPostings                                JobsListRequestExpand = "departments,job_postings"
+	JobsListRequestExpandDepartmentsJobPostingsRecruiters                      JobsListRequestExpand = "departments,job_postings,recruiters"
+	JobsListRequestExpandDepartmentsOffices                                    JobsListRequestExpand = "departments,offices"
+	JobsListRequestExpandDepartmentsOfficesHiringManagers                      JobsListRequestExpand = "departments,offices,hiring_managers"
+	JobsListRequestExpandDepartmentsOfficesHiringManagersJobPostings           JobsListRequestExpand = "departments,offices,hiring_managers,job_postings"
+	JobsListRequestExpandDepartmentsOfficesHiringManagersJobPostingsRecruiters JobsListRequestExpand = "departments,offices,hiring_managers,job_postings,recruiters"
+	JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters            JobsListRequestExpand = "departments,offices,hiring_managers,recruiters"
+	JobsListRequestExpandDepartmentsOfficesJobPostings                         JobsListRequestExpand = "departments,offices,job_postings"
+	JobsListRequestExpandDepartmentsOfficesJobPostingsRecruiters               JobsListRequestExpand = "departments,offices,job_postings,recruiters"
+	JobsListRequestExpandDepartmentsOfficesRecruiters                          JobsListRequestExpand = "departments,offices,recruiters"
+	JobsListRequestExpandDepartmentsRecruiters                                 JobsListRequestExpand = "departments,recruiters"
+	JobsListRequestExpandHiringManagers                                        JobsListRequestExpand = "hiring_managers"
+	JobsListRequestExpandHiringManagersJobPostings                             JobsListRequestExpand = "hiring_managers,job_postings"
+	JobsListRequestExpandHiringManagersJobPostingsRecruiters                   JobsListRequestExpand = "hiring_managers,job_postings,recruiters"
+	JobsListRequestExpandHiringManagersRecruiters                              JobsListRequestExpand = "hiring_managers,recruiters"
+	JobsListRequestExpandJobPostings                                           JobsListRequestExpand = "job_postings"
+	JobsListRequestExpandJobPostingsRecruiters                                 JobsListRequestExpand = "job_postings,recruiters"
+	JobsListRequestExpandOffices                                               JobsListRequestExpand = "offices"
+	JobsListRequestExpandOfficesHiringManagers                                 JobsListRequestExpand = "offices,hiring_managers"
+	JobsListRequestExpandOfficesHiringManagersJobPostings                      JobsListRequestExpand = "offices,hiring_managers,job_postings"
+	JobsListRequestExpandOfficesHiringManagersJobPostingsRecruiters            JobsListRequestExpand = "offices,hiring_managers,job_postings,recruiters"
+	JobsListRequestExpandOfficesHiringManagersRecruiters                       JobsListRequestExpand = "offices,hiring_managers,recruiters"
+	JobsListRequestExpandOfficesJobPostings                                    JobsListRequestExpand = "offices,job_postings"
+	JobsListRequestExpandOfficesJobPostingsRecruiters                          JobsListRequestExpand = "offices,job_postings,recruiters"
+	JobsListRequestExpandOfficesRecruiters                                     JobsListRequestExpand = "offices,recruiters"
+	JobsListRequestExpandRecruiters                                            JobsListRequestExpand = "recruiters"
 )
 
 func NewJobsListRequestExpandFromString(s string) (JobsListRequestExpand, error) {
@@ -96,28 +112,60 @@ func NewJobsListRequestExpandFromString(s string) (JobsListRequestExpand, error)
 		return JobsListRequestExpandDepartments, nil
 	case "departments,hiring_managers":
 		return JobsListRequestExpandDepartmentsHiringManagers, nil
+	case "departments,hiring_managers,job_postings":
+		return JobsListRequestExpandDepartmentsHiringManagersJobPostings, nil
+	case "departments,hiring_managers,job_postings,recruiters":
+		return JobsListRequestExpandDepartmentsHiringManagersJobPostingsRecruiters, nil
 	case "departments,hiring_managers,recruiters":
 		return JobsListRequestExpandDepartmentsHiringManagersRecruiters, nil
+	case "departments,job_postings":
+		return JobsListRequestExpandDepartmentsJobPostings, nil
+	case "departments,job_postings,recruiters":
+		return JobsListRequestExpandDepartmentsJobPostingsRecruiters, nil
 	case "departments,offices":
 		return JobsListRequestExpandDepartmentsOffices, nil
 	case "departments,offices,hiring_managers":
 		return JobsListRequestExpandDepartmentsOfficesHiringManagers, nil
+	case "departments,offices,hiring_managers,job_postings":
+		return JobsListRequestExpandDepartmentsOfficesHiringManagersJobPostings, nil
+	case "departments,offices,hiring_managers,job_postings,recruiters":
+		return JobsListRequestExpandDepartmentsOfficesHiringManagersJobPostingsRecruiters, nil
 	case "departments,offices,hiring_managers,recruiters":
 		return JobsListRequestExpandDepartmentsOfficesHiringManagersRecruiters, nil
+	case "departments,offices,job_postings":
+		return JobsListRequestExpandDepartmentsOfficesJobPostings, nil
+	case "departments,offices,job_postings,recruiters":
+		return JobsListRequestExpandDepartmentsOfficesJobPostingsRecruiters, nil
 	case "departments,offices,recruiters":
 		return JobsListRequestExpandDepartmentsOfficesRecruiters, nil
 	case "departments,recruiters":
 		return JobsListRequestExpandDepartmentsRecruiters, nil
 	case "hiring_managers":
 		return JobsListRequestExpandHiringManagers, nil
+	case "hiring_managers,job_postings":
+		return JobsListRequestExpandHiringManagersJobPostings, nil
+	case "hiring_managers,job_postings,recruiters":
+		return JobsListRequestExpandHiringManagersJobPostingsRecruiters, nil
 	case "hiring_managers,recruiters":
 		return JobsListRequestExpandHiringManagersRecruiters, nil
+	case "job_postings":
+		return JobsListRequestExpandJobPostings, nil
+	case "job_postings,recruiters":
+		return JobsListRequestExpandJobPostingsRecruiters, nil
 	case "offices":
 		return JobsListRequestExpandOffices, nil
 	case "offices,hiring_managers":
 		return JobsListRequestExpandOfficesHiringManagers, nil
+	case "offices,hiring_managers,job_postings":
+		return JobsListRequestExpandOfficesHiringManagersJobPostings, nil
+	case "offices,hiring_managers,job_postings,recruiters":
+		return JobsListRequestExpandOfficesHiringManagersJobPostingsRecruiters, nil
 	case "offices,hiring_managers,recruiters":
 		return JobsListRequestExpandOfficesHiringManagersRecruiters, nil
+	case "offices,job_postings":
+		return JobsListRequestExpandOfficesJobPostings, nil
+	case "offices,job_postings,recruiters":
+		return JobsListRequestExpandOfficesJobPostingsRecruiters, nil
 	case "offices,recruiters":
 		return JobsListRequestExpandOfficesRecruiters, nil
 	case "recruiters":
@@ -165,21 +213,37 @@ func (j JobsListRequestStatus) Ptr() *JobsListRequestStatus {
 type JobsRetrieveRequestExpand string
 
 const (
-	JobsRetrieveRequestExpandDepartments                                JobsRetrieveRequestExpand = "departments"
-	JobsRetrieveRequestExpandDepartmentsHiringManagers                  JobsRetrieveRequestExpand = "departments,hiring_managers"
-	JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters        JobsRetrieveRequestExpand = "departments,hiring_managers,recruiters"
-	JobsRetrieveRequestExpandDepartmentsOffices                         JobsRetrieveRequestExpand = "departments,offices"
-	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers           JobsRetrieveRequestExpand = "departments,offices,hiring_managers"
-	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters JobsRetrieveRequestExpand = "departments,offices,hiring_managers,recruiters"
-	JobsRetrieveRequestExpandDepartmentsOfficesRecruiters               JobsRetrieveRequestExpand = "departments,offices,recruiters"
-	JobsRetrieveRequestExpandDepartmentsRecruiters                      JobsRetrieveRequestExpand = "departments,recruiters"
-	JobsRetrieveRequestExpandHiringManagers                             JobsRetrieveRequestExpand = "hiring_managers"
-	JobsRetrieveRequestExpandHiringManagersRecruiters                   JobsRetrieveRequestExpand = "hiring_managers,recruiters"
-	JobsRetrieveRequestExpandOffices                                    JobsRetrieveRequestExpand = "offices"
-	JobsRetrieveRequestExpandOfficesHiringManagers                      JobsRetrieveRequestExpand = "offices,hiring_managers"
-	JobsRetrieveRequestExpandOfficesHiringManagersRecruiters            JobsRetrieveRequestExpand = "offices,hiring_managers,recruiters"
-	JobsRetrieveRequestExpandOfficesRecruiters                          JobsRetrieveRequestExpand = "offices,recruiters"
-	JobsRetrieveRequestExpandRecruiters                                 JobsRetrieveRequestExpand = "recruiters"
+	JobsRetrieveRequestExpandDepartments                                           JobsRetrieveRequestExpand = "departments"
+	JobsRetrieveRequestExpandDepartmentsHiringManagers                             JobsRetrieveRequestExpand = "departments,hiring_managers"
+	JobsRetrieveRequestExpandDepartmentsHiringManagersJobPostings                  JobsRetrieveRequestExpand = "departments,hiring_managers,job_postings"
+	JobsRetrieveRequestExpandDepartmentsHiringManagersJobPostingsRecruiters        JobsRetrieveRequestExpand = "departments,hiring_managers,job_postings,recruiters"
+	JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters                   JobsRetrieveRequestExpand = "departments,hiring_managers,recruiters"
+	JobsRetrieveRequestExpandDepartmentsJobPostings                                JobsRetrieveRequestExpand = "departments,job_postings"
+	JobsRetrieveRequestExpandDepartmentsJobPostingsRecruiters                      JobsRetrieveRequestExpand = "departments,job_postings,recruiters"
+	JobsRetrieveRequestExpandDepartmentsOffices                                    JobsRetrieveRequestExpand = "departments,offices"
+	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers                      JobsRetrieveRequestExpand = "departments,offices,hiring_managers"
+	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersJobPostings           JobsRetrieveRequestExpand = "departments,offices,hiring_managers,job_postings"
+	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersJobPostingsRecruiters JobsRetrieveRequestExpand = "departments,offices,hiring_managers,job_postings,recruiters"
+	JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters            JobsRetrieveRequestExpand = "departments,offices,hiring_managers,recruiters"
+	JobsRetrieveRequestExpandDepartmentsOfficesJobPostings                         JobsRetrieveRequestExpand = "departments,offices,job_postings"
+	JobsRetrieveRequestExpandDepartmentsOfficesJobPostingsRecruiters               JobsRetrieveRequestExpand = "departments,offices,job_postings,recruiters"
+	JobsRetrieveRequestExpandDepartmentsOfficesRecruiters                          JobsRetrieveRequestExpand = "departments,offices,recruiters"
+	JobsRetrieveRequestExpandDepartmentsRecruiters                                 JobsRetrieveRequestExpand = "departments,recruiters"
+	JobsRetrieveRequestExpandHiringManagers                                        JobsRetrieveRequestExpand = "hiring_managers"
+	JobsRetrieveRequestExpandHiringManagersJobPostings                             JobsRetrieveRequestExpand = "hiring_managers,job_postings"
+	JobsRetrieveRequestExpandHiringManagersJobPostingsRecruiters                   JobsRetrieveRequestExpand = "hiring_managers,job_postings,recruiters"
+	JobsRetrieveRequestExpandHiringManagersRecruiters                              JobsRetrieveRequestExpand = "hiring_managers,recruiters"
+	JobsRetrieveRequestExpandJobPostings                                           JobsRetrieveRequestExpand = "job_postings"
+	JobsRetrieveRequestExpandJobPostingsRecruiters                                 JobsRetrieveRequestExpand = "job_postings,recruiters"
+	JobsRetrieveRequestExpandOffices                                               JobsRetrieveRequestExpand = "offices"
+	JobsRetrieveRequestExpandOfficesHiringManagers                                 JobsRetrieveRequestExpand = "offices,hiring_managers"
+	JobsRetrieveRequestExpandOfficesHiringManagersJobPostings                      JobsRetrieveRequestExpand = "offices,hiring_managers,job_postings"
+	JobsRetrieveRequestExpandOfficesHiringManagersJobPostingsRecruiters            JobsRetrieveRequestExpand = "offices,hiring_managers,job_postings,recruiters"
+	JobsRetrieveRequestExpandOfficesHiringManagersRecruiters                       JobsRetrieveRequestExpand = "offices,hiring_managers,recruiters"
+	JobsRetrieveRequestExpandOfficesJobPostings                                    JobsRetrieveRequestExpand = "offices,job_postings"
+	JobsRetrieveRequestExpandOfficesJobPostingsRecruiters                          JobsRetrieveRequestExpand = "offices,job_postings,recruiters"
+	JobsRetrieveRequestExpandOfficesRecruiters                                     JobsRetrieveRequestExpand = "offices,recruiters"
+	JobsRetrieveRequestExpandRecruiters                                            JobsRetrieveRequestExpand = "recruiters"
 )
 
 func NewJobsRetrieveRequestExpandFromString(s string) (JobsRetrieveRequestExpand, error) {
@@ -188,28 +252,60 @@ func NewJobsRetrieveRequestExpandFromString(s string) (JobsRetrieveRequestExpand
 		return JobsRetrieveRequestExpandDepartments, nil
 	case "departments,hiring_managers":
 		return JobsRetrieveRequestExpandDepartmentsHiringManagers, nil
+	case "departments,hiring_managers,job_postings":
+		return JobsRetrieveRequestExpandDepartmentsHiringManagersJobPostings, nil
+	case "departments,hiring_managers,job_postings,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsHiringManagersJobPostingsRecruiters, nil
 	case "departments,hiring_managers,recruiters":
 		return JobsRetrieveRequestExpandDepartmentsHiringManagersRecruiters, nil
+	case "departments,job_postings":
+		return JobsRetrieveRequestExpandDepartmentsJobPostings, nil
+	case "departments,job_postings,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsJobPostingsRecruiters, nil
 	case "departments,offices":
 		return JobsRetrieveRequestExpandDepartmentsOffices, nil
 	case "departments,offices,hiring_managers":
 		return JobsRetrieveRequestExpandDepartmentsOfficesHiringManagers, nil
+	case "departments,offices,hiring_managers,job_postings":
+		return JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersJobPostings, nil
+	case "departments,offices,hiring_managers,job_postings,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersJobPostingsRecruiters, nil
 	case "departments,offices,hiring_managers,recruiters":
 		return JobsRetrieveRequestExpandDepartmentsOfficesHiringManagersRecruiters, nil
+	case "departments,offices,job_postings":
+		return JobsRetrieveRequestExpandDepartmentsOfficesJobPostings, nil
+	case "departments,offices,job_postings,recruiters":
+		return JobsRetrieveRequestExpandDepartmentsOfficesJobPostingsRecruiters, nil
 	case "departments,offices,recruiters":
 		return JobsRetrieveRequestExpandDepartmentsOfficesRecruiters, nil
 	case "departments,recruiters":
 		return JobsRetrieveRequestExpandDepartmentsRecruiters, nil
 	case "hiring_managers":
 		return JobsRetrieveRequestExpandHiringManagers, nil
+	case "hiring_managers,job_postings":
+		return JobsRetrieveRequestExpandHiringManagersJobPostings, nil
+	case "hiring_managers,job_postings,recruiters":
+		return JobsRetrieveRequestExpandHiringManagersJobPostingsRecruiters, nil
 	case "hiring_managers,recruiters":
 		return JobsRetrieveRequestExpandHiringManagersRecruiters, nil
+	case "job_postings":
+		return JobsRetrieveRequestExpandJobPostings, nil
+	case "job_postings,recruiters":
+		return JobsRetrieveRequestExpandJobPostingsRecruiters, nil
 	case "offices":
 		return JobsRetrieveRequestExpandOffices, nil
 	case "offices,hiring_managers":
 		return JobsRetrieveRequestExpandOfficesHiringManagers, nil
+	case "offices,hiring_managers,job_postings":
+		return JobsRetrieveRequestExpandOfficesHiringManagersJobPostings, nil
+	case "offices,hiring_managers,job_postings,recruiters":
+		return JobsRetrieveRequestExpandOfficesHiringManagersJobPostingsRecruiters, nil
 	case "offices,hiring_managers,recruiters":
 		return JobsRetrieveRequestExpandOfficesHiringManagersRecruiters, nil
+	case "offices,job_postings":
+		return JobsRetrieveRequestExpandOfficesJobPostings, nil
+	case "offices,job_postings,recruiters":
+		return JobsRetrieveRequestExpandOfficesJobPostingsRecruiters, nil
 	case "offices,recruiters":
 		return JobsRetrieveRequestExpandOfficesRecruiters, nil
 	case "recruiters":

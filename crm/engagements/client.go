@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Engagement` objects.
 func (c *Client) List(ctx context.Context, request *crm.EngagementsListRequest) (*crm.PaginatedEngagementList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagements"
+	endpointURL := baseURL + "/" + "crm/v1/engagements"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *crm.EngagementsListRequest) 
 
 // Creates an `Engagement` object with the given values.
 func (c *Client) Create(ctx context.Context, request *crm.EngagementEndpointRequest) (*crm.EngagementResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagements"
+	endpointURL := baseURL + "/" + "crm/v1/engagements"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -134,11 +134,11 @@ func (c *Client) Create(ctx context.Context, request *crm.EngagementEndpointRequ
 
 // Returns an `Engagement` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.EngagementsRetrieveRequest) (*crm.Engagement, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/engagements/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/engagements/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -171,11 +171,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.Engagemen
 
 // Updates an `Engagement` object with the given `id`.
 func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.PatchedEngagementEndpointRequest) (*crm.EngagementResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/engagements/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/engagements/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -206,11 +206,11 @@ func (c *Client) PartialUpdate(ctx context.Context, id string, request *crm.Patc
 
 // Returns metadata for `Engagement` PATCHs.
 func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/engagements/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/engagements/meta/patch/%v", id)
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -229,11 +229,11 @@ func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*crm.MetaRes
 
 // Returns metadata for `Engagement` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagements/meta/post"
+	endpointURL := baseURL + "/" + "crm/v1/engagements/meta/post"
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -252,11 +252,11 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.EngagementsRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/engagements/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/engagements/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

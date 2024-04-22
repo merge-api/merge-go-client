@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `CompanyInfo` objects.
 func (c *Client) List(ctx context.Context, request *accounting.CompanyInfoListRequest) (*accounting.PaginatedCompanyInfoList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/company-info"
+	endpointURL := baseURL + "/" + "accounting/v1/company-info"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *accounting.CompanyInfoListRe
 
 // Returns a `CompanyInfo` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.CompanyInfoRetrieveRequest) (*accounting.CompanyInfo, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/company-info/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/company-info/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

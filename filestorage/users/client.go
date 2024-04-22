@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `User` objects.
 func (c *Client) List(ctx context.Context, request *filestorage.UsersListRequest) (*filestorage.PaginatedUserList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/users"
+	endpointURL := baseURL + "/" + "filestorage/v1/users"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *filestorage.UsersListRequest
 
 // Returns a `User` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.UsersRetrieveRequest) (*filestorage.User, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/users/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/users/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

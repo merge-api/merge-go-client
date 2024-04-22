@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Ticket` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.TicketsListRequest) (*ticketing.PaginatedTicketList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets"
+	endpointURL := baseURL + "/" + "ticketing/v1/tickets"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -99,9 +99,6 @@ func (c *Client) List(ctx context.Context, request *ticketing.TicketsListRequest
 	if request.Priority != nil {
 		queryParams.Add("priority", fmt.Sprintf("%v", *request.Priority))
 	}
-	if request.ProjectId != nil {
-		queryParams.Add("project_id", fmt.Sprintf("%v", *request.ProjectId))
-	}
 	if request.RemoteCreatedAfter != nil {
 		queryParams.Add("remote_created_after", fmt.Sprintf("%v", request.RemoteCreatedAfter.Format(time.RFC3339)))
 	}
@@ -153,11 +150,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.TicketsListRequest
 
 // Creates a `Ticket` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ticketing.TicketEndpointRequest) (*ticketing.TicketResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets"
+	endpointURL := baseURL + "/" + "ticketing/v1/tickets"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -188,11 +185,11 @@ func (c *Client) Create(ctx context.Context, request *ticketing.TicketEndpointRe
 
 // Returns a `Ticket` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.TicketsRetrieveRequest) (*ticketing.Ticket, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tickets/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -231,11 +228,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Tic
 
 // Updates a `Ticket` object with the given `id`.
 func (c *Client) PartialUpdate(ctx context.Context, id string, request *ticketing.PatchedTicketEndpointRequest) (*ticketing.TicketResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tickets/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -266,11 +263,11 @@ func (c *Client) PartialUpdate(ctx context.Context, id string, request *ticketin
 
 // Returns a list of `User` objects.
 func (c *Client) CollaboratorsList(ctx context.Context, parentId string, request *ticketing.TicketsCollaboratorsListRequest) (*ticketing.PaginatedUserList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/%v/collaborators", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tickets/%v/collaborators", parentId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {
@@ -309,11 +306,11 @@ func (c *Client) CollaboratorsList(ctx context.Context, parentId string, request
 
 // Returns metadata for `Ticket` PATCHs.
 func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/tickets/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tickets/meta/patch/%v", id)
 
 	var response *ticketing.MetaResponse
 	if err := c.caller.Call(
@@ -332,11 +329,11 @@ func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*ticketing.M
 
 // Returns metadata for `Ticket` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets/meta/post"
+	endpointURL := baseURL + "/" + "ticketing/v1/tickets/meta/post"
 
 	var response *ticketing.MetaResponse
 	if err := c.caller.Call(
@@ -355,11 +352,11 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse,
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *ticketing.TicketsRemoteFieldClassesListRequest) (*ticketing.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/tickets/remote-field-classes"
+	endpointURL := baseURL + "/" + "ticketing/v1/tickets/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

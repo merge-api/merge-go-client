@@ -3,5 +3,6 @@
 package filestorage
 
 type GenerateRemoteKeyRequest struct {
+	// The name of the remote key
 	Name string `json:"name"`
 }

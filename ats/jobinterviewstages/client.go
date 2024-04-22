@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `JobInterviewStage` objects.
 func (c *Client) List(ctx context.Context, request *ats.JobInterviewStagesListRequest) (*ats.PaginatedJobInterviewStageList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/job-interview-stages"
+	endpointURL := baseURL + "/" + "ats/v1/job-interview-stages"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -93,11 +93,11 @@ func (c *Client) List(ctx context.Context, request *ats.JobInterviewStagesListRe
 
 // Returns a `JobInterviewStage` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.JobInterviewStagesRetrieveRequest) (*ats.JobInterviewStage, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/job-interview-stages/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/job-interview-stages/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

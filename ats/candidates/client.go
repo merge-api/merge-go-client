@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Candidate` objects.
 func (c *Client) List(ctx context.Context, request *ats.CandidatesListRequest) (*ats.PaginatedCandidateList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/candidates"
+	endpointURL := baseURL + "/" + "ats/v1/candidates"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -102,11 +102,11 @@ func (c *Client) List(ctx context.Context, request *ats.CandidatesListRequest) (
 
 // Creates a `Candidate` object with the given values.
 func (c *Client) Create(ctx context.Context, request *ats.CandidateEndpointRequest) (*ats.CandidateResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/candidates"
+	endpointURL := baseURL + "/" + "ats/v1/candidates"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -137,11 +137,11 @@ func (c *Client) Create(ctx context.Context, request *ats.CandidateEndpointReque
 
 // Returns a `Candidate` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.CandidatesRetrieveRequest) (*ats.Candidate, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/candidates/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -171,11 +171,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ats.Candidate
 
 // Updates a `Candidate` object with the given `id`.
 func (c *Client) PartialUpdate(ctx context.Context, id string, request *ats.PatchedCandidateEndpointRequest) (*ats.CandidateResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/candidates/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -206,11 +206,11 @@ func (c *Client) PartialUpdate(ctx context.Context, id string, request *ats.Patc
 
 // Ignores a specific row based on the `model_id` in the url. These records will have their properties set to null, and will not be updated in future syncs. The "reason" and "message" fields in the request body will be stored for audit purposes.
 func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *ats.IgnoreCommonModelRequest) error {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/ignore/%v", modelId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/candidates/ignore/%v", modelId)
 
 	if err := c.caller.Call(
 		ctx,
@@ -228,11 +228,11 @@ func (c *Client) IgnoreCreate(ctx context.Context, modelId string, request *ats.
 
 // Returns metadata for `Candidate` PATCHs.
 func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/candidates/meta/patch/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/candidates/meta/patch/%v", id)
 
 	var response *ats.MetaResponse
 	if err := c.caller.Call(
@@ -251,11 +251,11 @@ func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*ats.MetaRes
 
 // Returns metadata for `Candidate` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*ats.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/candidates/meta/post"
+	endpointURL := baseURL + "/" + "ats/v1/candidates/meta/post"
 
 	var response *ats.MetaResponse
 	if err := c.caller.Call(

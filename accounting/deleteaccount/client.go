@@ -28,11 +28,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Delete a linked account.
 func (c *Client) Delete(ctx context.Context) error {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/delete-account"
+	endpointURL := baseURL + "/" + "accounting/v1/delete-account"
 
 	if err := c.caller.Call(
 		ctx,

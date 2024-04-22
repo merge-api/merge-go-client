@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `TimeOffBalance` objects.
 func (c *Client) List(ctx context.Context, request *hris.TimeOffBalancesListRequest) (*hris.PaginatedTimeOffBalanceList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/time-off-balances"
+	endpointURL := baseURL + "/" + "hris/v1/time-off-balances"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -102,11 +102,11 @@ func (c *Client) List(ctx context.Context, request *hris.TimeOffBalancesListRequ
 
 // Returns a `TimeOffBalance` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.TimeOffBalancesRetrieveRequest) (*hris.TimeOffBalance, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/time-off-balances/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/time-off-balances/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

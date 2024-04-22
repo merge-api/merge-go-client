@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Drive` objects.
 func (c *Client) List(ctx context.Context, request *filestorage.DrivesListRequest) (*filestorage.PaginatedDriveList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/drives"
+	endpointURL := baseURL + "/" + "filestorage/v1/drives"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *filestorage.DrivesListReques
 
 // Returns a `Drive` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.DrivesRetrieveRequest) (*filestorage.Drive, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/drives/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/drives/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

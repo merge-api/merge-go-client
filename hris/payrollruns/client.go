@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `PayrollRun` objects.
 func (c *Client) List(ctx context.Context, request *hris.PayrollRunsListRequest) (*hris.PaginatedPayrollRunList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/payroll-runs"
+	endpointURL := baseURL + "/" + "hris/v1/payroll-runs"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -108,11 +108,11 @@ func (c *Client) List(ctx context.Context, request *hris.PayrollRunsListRequest)
 
 // Returns a `PayrollRun` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.PayrollRunsRetrieveRequest) (*hris.PayrollRun, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/payroll-runs/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/payroll-runs/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

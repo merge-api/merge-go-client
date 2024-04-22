@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Contact` objects.
 func (c *Client) List(ctx context.Context, request *accounting.ContactsListRequest) (*accounting.PaginatedContactList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/contacts"
+	endpointURL := baseURL + "/" + "accounting/v1/contacts"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *accounting.ContactsListReque
 
 // Creates a `Contact` object with the given values.
 func (c *Client) Create(ctx context.Context, request *accounting.ContactEndpointRequest) (*accounting.ContactResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/contacts"
+	endpointURL := baseURL + "/" + "accounting/v1/contacts"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -140,11 +140,11 @@ func (c *Client) Create(ctx context.Context, request *accounting.ContactEndpoint
 
 // Returns a `Contact` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.ContactsRetrieveRequest) (*accounting.Contact, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/contacts/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/contacts/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -180,11 +180,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Co
 
 // Returns metadata for `Contact` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/contacts/meta/post"
+	endpointURL := baseURL + "/" + "accounting/v1/contacts/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := c.caller.Call(

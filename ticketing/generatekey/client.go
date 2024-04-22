@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Create a remote key.
 func (c *Client) Create(ctx context.Context, request *ticketing.GenerateRemoteKeyRequest) (*ticketing.RemoteKey, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/generate-key"
+	endpointURL := baseURL + "/" + "ticketing/v1/generate-key"
 
 	var response *ticketing.RemoteKey
 	if err := c.caller.Call(

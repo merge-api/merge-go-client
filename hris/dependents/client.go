@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Dependent` objects.
 func (c *Client) List(ctx context.Context, request *hris.DependentsListRequest) (*hris.PaginatedDependentList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/dependents"
+	endpointURL := baseURL + "/" + "hris/v1/dependents"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *hris.DependentsListRequest) 
 
 // Returns a `Dependent` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.DependentsRetrieveRequest) (*hris.Dependent, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/dependents/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/dependents/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

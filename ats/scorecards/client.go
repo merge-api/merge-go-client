@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Scorecard` objects.
 func (c *Client) List(ctx context.Context, request *ats.ScorecardsListRequest) (*ats.PaginatedScorecardList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/scorecards"
+	endpointURL := baseURL + "/" + "ats/v1/scorecards"
 
 	queryParams := make(url.Values)
 	if request.ApplicationId != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *ats.ScorecardsListRequest) (
 
 // Returns a `Scorecard` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.ScorecardsRetrieveRequest) (*ats.Scorecard, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/scorecards/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/scorecards/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

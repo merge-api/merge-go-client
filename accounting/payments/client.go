@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Payment` objects.
 func (c *Client) List(ctx context.Context, request *accounting.PaymentsListRequest) (*accounting.PaginatedPaymentList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/payments"
+	endpointURL := baseURL + "/" + "accounting/v1/payments"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *accounting.PaymentsListReque
 
 // Creates a `Payment` object with the given values.
 func (c *Client) Create(ctx context.Context, request *accounting.PaymentEndpointRequest) (*accounting.PaymentResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/payments"
+	endpointURL := baseURL + "/" + "accounting/v1/payments"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -140,11 +140,11 @@ func (c *Client) Create(ctx context.Context, request *accounting.PaymentEndpoint
 
 // Returns a `Payment` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.PaymentsRetrieveRequest) (*accounting.Payment, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/payments/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/payments/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -172,13 +172,71 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Pa
 	return response, nil
 }
 
-// Returns metadata for `Payment` POSTs.
-func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+// Updates a `Payment` object with the given `id`.
+func (c *Client) PartialUpdate(ctx context.Context, id string, request *accounting.PatchedPaymentEndpointRequest) (*accounting.PaymentResponse, error) {
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/payments/meta/post"
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/payments/%v", id)
+
+	queryParams := make(url.Values)
+	if request.IsDebugMode != nil {
+		queryParams.Add("is_debug_mode", fmt.Sprintf("%v", *request.IsDebugMode))
+	}
+	if request.RunAsync != nil {
+		queryParams.Add("run_async", fmt.Sprintf("%v", *request.RunAsync))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *accounting.PaymentResponse
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPatch,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns metadata for `Payment` PATCHs.
+func (c *Client) MetaPatchRetrieve(ctx context.Context, id string) (*accounting.MetaResponse, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/payments/meta/patch/%v", id)
+
+	var response *accounting.MetaResponse
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns metadata for `Payment` POSTs.
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "accounting/v1/payments/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := c.caller.Call(

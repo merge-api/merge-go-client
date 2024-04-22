@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get a linked account's selective syncs.
 func (c *Client) ConfigurationsList(ctx context.Context) ([]*hris.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "hris/v1/selective-sync/configurations"
 
 	var response []*hris.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -54,11 +54,11 @@ func (c *Client) ConfigurationsList(ctx context.Context) ([]*hris.LinkedAccountS
 
 // Replace a linked account's selective syncs.
 func (c *Client) ConfigurationsUpdate(ctx context.Context, request *hris.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*hris.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "hris/v1/selective-sync/configurations"
 
 	var response []*hris.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -78,11 +78,11 @@ func (c *Client) ConfigurationsUpdate(ctx context.Context, request *hris.LinkedA
 
 // Get metadata for the conditions available to a linked account.
 func (c *Client) MetaList(ctx context.Context, request *hris.SelectiveSyncMetaListRequest) (*hris.PaginatedConditionSchemaList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "hris/v1/selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

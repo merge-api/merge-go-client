@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `VendorCredit` objects.
 func (c *Client) List(ctx context.Context, request *accounting.VendorCreditsListRequest) (*accounting.PaginatedVendorCreditList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/vendor-credits"
+	endpointURL := baseURL + "/" + "accounting/v1/vendor-credits"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *accounting.VendorCreditsList
 
 // Returns a `VendorCredit` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.VendorCreditsRetrieveRequest) (*accounting.VendorCredit, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/vendor-credits/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/vendor-credits/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

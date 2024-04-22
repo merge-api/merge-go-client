@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `PayGroup` objects.
 func (c *Client) List(ctx context.Context, request *hris.PayGroupsListRequest) (*hris.PaginatedPayGroupList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/pay-groups"
+	endpointURL := baseURL + "/" + "hris/v1/pay-groups"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *hris.PayGroupsListRequest) (
 
 // Returns a `PayGroup` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.PayGroupsRetrieveRequest) (*hris.PayGroup, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/pay-groups/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/pay-groups/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

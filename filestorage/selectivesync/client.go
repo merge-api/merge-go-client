@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get a linked account's selective syncs.
 func (c *Client) ConfigurationsList(ctx context.Context) ([]*filestorage.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "filestorage/v1/selective-sync/configurations"
 
 	var response []*filestorage.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -54,11 +54,11 @@ func (c *Client) ConfigurationsList(ctx context.Context) ([]*filestorage.LinkedA
 
 // Replace a linked account's selective syncs.
 func (c *Client) ConfigurationsUpdate(ctx context.Context, request *filestorage.LinkedAccountSelectiveSyncConfigurationListRequest) ([]*filestorage.LinkedAccountSelectiveSyncConfiguration, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/selective-sync/configurations"
+	endpointURL := baseURL + "/" + "filestorage/v1/selective-sync/configurations"
 
 	var response []*filestorage.LinkedAccountSelectiveSyncConfiguration
 	if err := c.caller.Call(
@@ -78,11 +78,11 @@ func (c *Client) ConfigurationsUpdate(ctx context.Context, request *filestorage.
 
 // Get metadata for the conditions available to a linked account.
 func (c *Client) MetaList(ctx context.Context, request *filestorage.SelectiveSyncMetaListRequest) (*filestorage.PaginatedConditionSchemaList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/selective-sync/meta"
+	endpointURL := baseURL + "/" + "filestorage/v1/selective-sync/meta"
 
 	queryParams := make(url.Values)
 	if request.CommonModel != nil {

@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Job` objects.
 func (c *Client) List(ctx context.Context, request *ats.JobsListRequest) (*ats.PaginatedJobList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/jobs"
+	endpointURL := baseURL + "/" + "ats/v1/jobs"
 
 	queryParams := make(url.Values)
 	if request.Code != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *ats.JobsListRequest) (*ats.P
 
 // Returns a `Job` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.JobsRetrieveRequest) (*ats.Job, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/jobs/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/jobs/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -145,11 +145,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ats.JobsRetri
 
 // Returns a list of `ScreeningQuestion` objects.
 func (c *Client) ScreeningQuestionsList(ctx context.Context, jobId string, request *ats.JobsScreeningQuestionsListRequest) (*ats.PaginatedScreeningQuestionList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/jobs/%v/screening-questions", jobId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/jobs/%v/screening-questions", jobId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

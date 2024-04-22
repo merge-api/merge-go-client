@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `WebhookReceiver` objects.
 func (c *Client) List(ctx context.Context) ([]*crm.WebhookReceiver, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/webhook-receivers"
+	endpointURL := baseURL + "/" + "crm/v1/webhook-receivers"
 
 	var response []*crm.WebhookReceiver
 	if err := c.caller.Call(
@@ -52,11 +52,11 @@ func (c *Client) List(ctx context.Context) ([]*crm.WebhookReceiver, error) {
 
 // Creates a `WebhookReceiver` object with the given values.
 func (c *Client) Create(ctx context.Context, request *crm.WebhookReceiverRequest) (*crm.WebhookReceiver, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/webhook-receivers"
+	endpointURL := baseURL + "/" + "crm/v1/webhook-receivers"
 
 	var response *crm.WebhookReceiver
 	if err := c.caller.Call(

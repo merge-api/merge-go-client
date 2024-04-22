@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Stage` objects.
 func (c *Client) List(ctx context.Context, request *crm.StagesListRequest) (*crm.PaginatedStageList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/stages"
+	endpointURL := baseURL + "/" + "crm/v1/stages"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -90,11 +90,11 @@ func (c *Client) List(ctx context.Context, request *crm.StagesListRequest) (*crm
 
 // Returns a `Stage` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.StagesRetrieveRequest) (*crm.Stage, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/stages/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/stages/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -124,11 +124,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.StagesRet
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.StagesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/stages/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/stages/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

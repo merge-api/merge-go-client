@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Note` objects.
 func (c *Client) List(ctx context.Context, request *crm.NotesListRequest) (*crm.PaginatedNoteList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/notes"
+	endpointURL := baseURL + "/" + "crm/v1/notes"
 
 	queryParams := make(url.Values)
 	if request.AccountId != nil {
@@ -105,11 +105,11 @@ func (c *Client) List(ctx context.Context, request *crm.NotesListRequest) (*crm.
 
 // Creates a `Note` object with the given values.
 func (c *Client) Create(ctx context.Context, request *crm.NoteEndpointRequest) (*crm.NoteResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/notes"
+	endpointURL := baseURL + "/" + "crm/v1/notes"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -140,11 +140,11 @@ func (c *Client) Create(ctx context.Context, request *crm.NoteEndpointRequest) (
 
 // Returns a `Note` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *crm.NotesRetrieveRequest) (*crm.Note, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/notes/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/notes/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -177,11 +177,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *crm.NotesRetr
 
 // Returns metadata for `Note` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/notes/meta/post"
+	endpointURL := baseURL + "/" + "crm/v1/notes/meta/post"
 
 	var response *crm.MetaResponse
 	if err := c.caller.Call(
@@ -200,11 +200,11 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*crm.MetaResponse, error
 
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.NotesRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/crm/v1/notes/remote-field-classes"
+	endpointURL := baseURL + "/" + "crm/v1/notes/remote-field-classes"
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

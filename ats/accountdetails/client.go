@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get details for a linked account.
 func (c *Client) Retrieve(ctx context.Context) (*ats.AccountDetails, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/account-details"
+	endpointURL := baseURL + "/" + "ats/v1/account-details"
 
 	var response *ats.AccountDetails
 	if err := c.caller.Call(

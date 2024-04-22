@@ -29,11 +29,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of models and actions available for an account.
 func (c *Client) Retrieve(ctx context.Context) (*ats.AvailableActions, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/available-actions"
+	endpointURL := baseURL + "/" + "ats/v1/available-actions"
 
 	var response *ats.AvailableActions
 	if err := c.caller.Call(

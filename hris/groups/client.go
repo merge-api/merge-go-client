@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Group` objects.
 func (c *Client) List(ctx context.Context, request *hris.GroupsListRequest) (*hris.PaginatedGroupList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/groups"
+	endpointURL := baseURL + "/" + "hris/v1/groups"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -59,6 +59,9 @@ func (c *Client) List(ctx context.Context, request *hris.GroupsListRequest) (*hr
 	}
 	if request.ModifiedBefore != nil {
 		queryParams.Add("modified_before", fmt.Sprintf("%v", request.ModifiedBefore.Format(time.RFC3339)))
+	}
+	if request.Names != nil {
+		queryParams.Add("names", fmt.Sprintf("%v", *request.Names))
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
@@ -96,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *hris.GroupsListRequest) (*hr
 
 // Returns a `Group` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.GroupsRetrieveRequest) (*hris.Group, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/groups/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/groups/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

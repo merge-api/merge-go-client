@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Benefit` objects.
 func (c *Client) List(ctx context.Context, request *hris.BenefitsListRequest) (*hris.PaginatedBenefitList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/benefits"
+	endpointURL := baseURL + "/" + "hris/v1/benefits"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -93,11 +93,11 @@ func (c *Client) List(ctx context.Context, request *hris.BenefitsListRequest) (*
 
 // Returns a `Benefit` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.BenefitsRetrieveRequest) (*hris.Benefit, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/benefits/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/benefits/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

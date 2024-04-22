@@ -31,11 +31,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Get all Field Mappings for this Linked Account. Field Mappings are mappings between third-party Remote Fields and user defined Merge fields. [Learn more](https://docs.merge.dev/supplemental-data/field-mappings/overview/).
 func (c *Client) FieldMappingsRetrieve(ctx context.Context) (*accounting.FieldMappingApiInstanceResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/field-mappings"
+	endpointURL := baseURL + "/" + "accounting/v1/field-mappings"
 
 	var response *accounting.FieldMappingApiInstanceResponse
 	if err := c.caller.Call(
@@ -54,11 +54,11 @@ func (c *Client) FieldMappingsRetrieve(ctx context.Context) (*accounting.FieldMa
 
 // Create new Field Mappings that will be available after the next scheduled sync. This will cause the next sync for this Linked Account to sync **ALL** data from start.
 func (c *Client) FieldMappingsCreate(ctx context.Context, request *accounting.CreateFieldMappingRequest) (*accounting.FieldMappingInstanceResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/field-mappings"
+	endpointURL := baseURL + "/" + "accounting/v1/field-mappings"
 
 	var response *accounting.FieldMappingInstanceResponse
 	if err := c.caller.Call(
@@ -78,11 +78,11 @@ func (c *Client) FieldMappingsCreate(ctx context.Context, request *accounting.Cr
 
 // Deletes Field Mappings for a Linked Account. All data related to this Field Mapping will be deleted and these changes will be reflected after the next scheduled sync. This will cause the next sync for this Linked Account to sync **ALL** data from start.
 func (c *Client) FieldMappingsDestroy(ctx context.Context, fieldMappingId string) (*accounting.FieldMappingInstanceResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/field-mappings/%v", fieldMappingId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/field-mappings/%v", fieldMappingId)
 
 	var response *accounting.FieldMappingInstanceResponse
 	if err := c.caller.Call(
@@ -101,11 +101,11 @@ func (c *Client) FieldMappingsDestroy(ctx context.Context, fieldMappingId string
 
 // Create or update existing Field Mappings for a Linked Account. Changes will be reflected after the next scheduled sync. This will cause the next sync for this Linked Account to sync **ALL** data from start.
 func (c *Client) FieldMappingsPartialUpdate(ctx context.Context, fieldMappingId string, request *accounting.PatchedEditFieldMappingRequest) (*accounting.FieldMappingInstanceResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/field-mappings/%v", fieldMappingId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/field-mappings/%v", fieldMappingId)
 
 	var response *accounting.FieldMappingInstanceResponse
 	if err := c.caller.Call(
@@ -125,11 +125,11 @@ func (c *Client) FieldMappingsPartialUpdate(ctx context.Context, fieldMappingId 
 
 // Get all remote fields for a Linked Account. Remote fields are third-party fields that are accessible after initial sync if remote_data is enabled. You can use remote fields to override existing Merge fields or map a new Merge field. [Learn more](https://docs.merge.dev/supplemental-data/field-mappings/overview/).
 func (c *Client) RemoteFieldsRetrieve(ctx context.Context, request *accounting.RemoteFieldsRetrieveRequest) (*accounting.RemoteFieldApiResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/remote-fields"
+	endpointURL := baseURL + "/" + "accounting/v1/remote-fields"
 
 	queryParams := make(url.Values)
 	if request.CommonModels != nil {
@@ -159,11 +159,11 @@ func (c *Client) RemoteFieldsRetrieve(ctx context.Context, request *accounting.R
 
 // Get all organization-wide Target Fields, this will not include any Linked Account specific Target Fields. Organization-wide Target Fields are additional fields appended to the Merge Common Model for all Linked Accounts in a category. [Learn more](https://docs.merge.dev/supplemental-data/field-mappings/target-fields/).
 func (c *Client) TargetFieldsRetrieve(ctx context.Context) (*accounting.ExternalTargetFieldApiResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/target-fields"
+	endpointURL := baseURL + "/" + "accounting/v1/target-fields"
 
 	var response *accounting.ExternalTargetFieldApiResponse
 	if err := c.caller.Call(

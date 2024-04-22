@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `TrackingCategory` objects.
 func (c *Client) List(ctx context.Context, request *accounting.TrackingCategoriesListRequest) (*accounting.PaginatedTrackingCategoryList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/tracking-categories"
+	endpointURL := baseURL + "/" + "accounting/v1/tracking-categories"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *accounting.TrackingCategorie
 
 // Returns a `TrackingCategory` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.TrackingCategoriesRetrieveRequest) (*accounting.TrackingCategory, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/tracking-categories/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/tracking-categories/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

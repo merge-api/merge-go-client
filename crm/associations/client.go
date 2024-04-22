@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Association` objects.
 func (c *Client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Context, customObjectClassId string, objectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsListRequest) (*crm.PaginatedAssociationList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v/associations", customObjectClassId, objectId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/custom-objects/%v/associations", customObjectClassId, objectId)
 
 	queryParams := make(url.Values)
 	if request.AssociationTypeId != nil {
@@ -93,11 +93,11 @@ func (c *Client) CustomObjectClassesCustomObjectsAssociationsList(ctx context.Co
 
 // Creates an Association between `source_object_id` and `target_object_id` of type `association_type_id`.
 func (c *Client) CustomObjectClassesCustomObjectsAssociationsUpdate(ctx context.Context, associationTypeId string, sourceClassId string, sourceObjectId string, targetClassId string, targetObjectId string, request *crm.CustomObjectClassesCustomObjectsAssociationsUpdateRequest) (*crm.Association, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/crm/v1/custom-object-classes/%v/custom-objects/%v/associations/%v/%v/%v", associationTypeId, sourceClassId, sourceObjectId, targetClassId, targetObjectId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"crm/v1/custom-object-classes/%v/custom-objects/%v/associations/%v/%v/%v", associationTypeId, sourceClassId, sourceObjectId, targetClassId, targetObjectId)
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {

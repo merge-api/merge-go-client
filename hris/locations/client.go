@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Location` objects.
 func (c *Client) List(ctx context.Context, request *hris.LocationsListRequest) (*hris.PaginatedLocationList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/hris/v1/locations"
+	endpointURL := baseURL + "/" + "hris/v1/locations"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -96,11 +96,11 @@ func (c *Client) List(ctx context.Context, request *hris.LocationsListRequest) (
 
 // Returns a `Location` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *hris.LocationsRetrieveRequest) (*hris.Location, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/hris/v1/locations/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/locations/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

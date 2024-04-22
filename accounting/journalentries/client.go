@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `JournalEntry` objects.
 func (c *Client) List(ctx context.Context, request *accounting.JournalEntriesListRequest) (*accounting.PaginatedJournalEntryList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/journal-entries"
+	endpointURL := baseURL + "/" + "accounting/v1/journal-entries"
 
 	queryParams := make(url.Values)
 	if request.CompanyId != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *accounting.JournalEntriesLis
 
 // Creates a `JournalEntry` object with the given values.
 func (c *Client) Create(ctx context.Context, request *accounting.JournalEntryEndpointRequest) (*accounting.JournalEntryResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/journal-entries"
+	endpointURL := baseURL + "/" + "accounting/v1/journal-entries"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -134,11 +134,11 @@ func (c *Client) Create(ctx context.Context, request *accounting.JournalEntryEnd
 
 // Returns a `JournalEntry` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.JournalEntriesRetrieveRequest) (*accounting.JournalEntry, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/accounting/v1/journal-entries/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"accounting/v1/journal-entries/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -168,11 +168,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Jo
 
 // Returns metadata for `JournalEntry` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/accounting/v1/journal-entries/meta/post"
+	endpointURL := baseURL + "/" + "accounting/v1/journal-entries/meta/post"
 
 	var response *accounting.MetaResponse
 	if err := c.caller.Call(

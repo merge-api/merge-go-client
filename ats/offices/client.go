@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Office` objects.
 func (c *Client) List(ctx context.Context, request *ats.OfficesListRequest) (*ats.PaginatedOfficeList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/offices"
+	endpointURL := baseURL + "/" + "ats/v1/offices"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *ats.OfficesListRequest) (*at
 
 // Returns an `Office` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.OfficesRetrieveRequest) (*ats.Office, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/offices/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/offices/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {

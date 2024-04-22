@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `EEOC` objects.
 func (c *Client) List(ctx context.Context, request *ats.EeocsListRequest) (*ats.PaginatedEeocList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/eeocs"
+	endpointURL := baseURL + "/" + "ats/v1/eeocs"
 
 	queryParams := make(url.Values)
 	if request.CandidateId != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *ats.EeocsListRequest) (*ats.
 
 // Returns an `EEOC` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.EeocsRetrieveRequest) (*ats.Eeoc, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/eeocs/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/eeocs/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

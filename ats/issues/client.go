@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Gets issues.
 func (c *Client) List(ctx context.Context, request *ats.IssuesListRequest) (*ats.PaginatedIssueList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/issues"
+	endpointURL := baseURL + "/" + "ats/v1/issues"
 
 	queryParams := make(url.Values)
 	if request.AccountToken != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *ats.IssuesListRequest) (*ats
 
 // Get a specific issue.
 func (c *Client) Retrieve(ctx context.Context, id string) (*ats.Issue, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/issues/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/issues/%v", id)
 
 	var response *ats.Issue
 	if err := c.caller.Call(

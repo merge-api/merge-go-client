@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Project` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.ProjectsListRequest) (*ticketing.PaginatedProjectList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/projects"
+	endpointURL := baseURL + "/" + "ticketing/v1/projects"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -87,11 +87,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.ProjectsListReques
 
 // Returns a `Project` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.ProjectsRetrieveRequest) (*ticketing.Project, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/projects/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/projects/%v", id)
 
 	queryParams := make(url.Values)
 	if request.IncludeRemoteData != nil {
@@ -118,11 +118,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Pro
 
 // Returns a list of `User` objects.
 func (c *Client) UsersList(ctx context.Context, parentId string, request *ticketing.ProjectsUsersListRequest) (*ticketing.PaginatedUserList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/projects/%v/users", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/projects/%v/users", parentId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Collection` objects.
 func (c *Client) List(ctx context.Context, request *ticketing.CollectionsListRequest) (*ticketing.PaginatedCollectionList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/collections"
+	endpointURL := baseURL + "/" + "ticketing/v1/collections"
 
 	queryParams := make(url.Values)
 	if request.CollectionType != nil {
@@ -102,11 +102,11 @@ func (c *Client) List(ctx context.Context, request *ticketing.CollectionsListReq
 
 // Returns a `Collection` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.CollectionsRetrieveRequest) (*ticketing.Collection, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/collections/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/collections/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -142,11 +142,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Col
 
 // Returns a list of `User` objects.
 func (c *Client) UsersList(ctx context.Context, parentId string, request *ticketing.CollectionsUsersListRequest) (*ticketing.PaginatedUserList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/collections/%v/users", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/collections/%v/users", parentId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {

@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Offer` objects.
 func (c *Client) List(ctx context.Context, request *ats.OffersListRequest) (*ats.PaginatedOfferList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ats/v1/offers"
+	endpointURL := baseURL + "/" + "ats/v1/offers"
 
 	queryParams := make(url.Values)
 	if request.ApplicationId != nil {
@@ -102,11 +102,11 @@ func (c *Client) List(ctx context.Context, request *ats.OffersListRequest) (*ats
 
 // Returns an `Offer` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ats.OffersRetrieveRequest) (*ats.Offer, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ats/v1/offers/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/offers/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {

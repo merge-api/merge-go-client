@@ -32,11 +32,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Returns a list of `Folder` objects.
 func (c *Client) List(ctx context.Context, request *filestorage.FoldersListRequest) (*filestorage.PaginatedFolderList, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/folders"
+	endpointURL := baseURL + "/" + "filestorage/v1/folders"
 
 	queryParams := make(url.Values)
 	if request.CreatedAfter != nil {
@@ -99,11 +99,11 @@ func (c *Client) List(ctx context.Context, request *filestorage.FoldersListReque
 
 // Creates a `Folder` object with the given values.
 func (c *Client) Create(ctx context.Context, request *filestorage.FileStorageFolderEndpointRequest) (*filestorage.FileStorageFolderResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/folders"
+	endpointURL := baseURL + "/" + "filestorage/v1/folders"
 
 	queryParams := make(url.Values)
 	if request.IsDebugMode != nil {
@@ -134,11 +134,11 @@ func (c *Client) Create(ctx context.Context, request *filestorage.FileStorageFol
 
 // Returns a `Folder` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.FoldersRetrieveRequest) (*filestorage.Folder, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/filestorage/v1/folders/%v", id)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"filestorage/v1/folders/%v", id)
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
@@ -168,11 +168,11 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.F
 
 // Returns metadata for `FileStorageFolder` POSTs.
 func (c *Client) MetaPostRetrieve(ctx context.Context) (*filestorage.MetaResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/filestorage/v1/folders/meta/post"
+	endpointURL := baseURL + "/" + "filestorage/v1/folders/meta/post"
 
 	var response *filestorage.MetaResponse
 	if err := c.caller.Call(

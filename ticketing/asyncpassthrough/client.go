@@ -30,11 +30,11 @@ func NewClient(opts ...core.ClientOption) *Client {
 
 // Asynchronously pull data from an endpoint not currently supported by Merge.
 func (c *Client) Create(ctx context.Context, request *ticketing.DataPassthroughRequest) (*ticketing.AsyncPassthroughReciept, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := baseURL + "/" + "api/ticketing/v1/async-passthrough"
+	endpointURL := baseURL + "/" + "ticketing/v1/async-passthrough"
 
 	var response *ticketing.AsyncPassthroughReciept
 	if err := c.caller.Call(
@@ -54,11 +54,11 @@ func (c *Client) Create(ctx context.Context, request *ticketing.DataPassthroughR
 
 // Retrieves data from earlier async-passthrough POST request
 func (c *Client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*ticketing.RemoteResponse, error) {
-	baseURL := "https://api.merge.dev"
+	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api/ticketing/v1/async-passthrough/%v", asyncPassthroughReceiptId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/async-passthrough/%v", asyncPassthroughReceiptId)
 
 	var response *ticketing.RemoteResponse
 	if err := c.caller.Call(
