@@ -6,6 +6,14 @@ import (
 	time "time"
 )
 
+type TicketingContactEndpointRequest struct {
+	// Whether to include debug fields (such as log file links) in the response.
+	IsDebugMode *bool `json:"-"`
+	// Whether or not third-party updates should be run asynchronously.
+	RunAsync *bool           `json:"-"`
+	Model    *ContactRequest `json:"model,omitempty"`
+}
+
 type ContactsListRequest struct {
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-"`

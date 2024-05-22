@@ -32,7 +32,6 @@ import (
 	rejectreasons "github.com/merge-api/merge-go-client/ats/rejectreasons"
 	scopes "github.com/merge-api/merge-go-client/ats/scopes"
 	scorecards "github.com/merge-api/merge-go-client/ats/scorecards"
-	selectivesync "github.com/merge-api/merge-go-client/ats/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/ats/syncstatus"
 	tags "github.com/merge-api/merge-go-client/ats/tags"
 	users "github.com/merge-api/merge-go-client/ats/users"
@@ -74,7 +73,6 @@ type Client struct {
 	RegenerateKey      *regeneratekey.Client
 	RejectReasons      *rejectreasons.Client
 	Scorecards         *scorecards.Client
-	SelectiveSync      *selectivesync.Client
 	SyncStatus         *syncstatus.Client
 	ForceResync        *forceresync.Client
 	Tags               *tags.Client
@@ -119,7 +117,6 @@ func NewClient(opts ...core.ClientOption) *Client {
 		RegenerateKey:      regeneratekey.NewClient(opts...),
 		RejectReasons:      rejectreasons.NewClient(opts...),
 		Scorecards:         scorecards.NewClient(opts...),
-		SelectiveSync:      selectivesync.NewClient(opts...),
 		SyncStatus:         syncstatus.NewClient(opts...),
 		ForceResync:        forceresync.NewClient(opts...),
 		Tags:               tags.NewClient(opts...),

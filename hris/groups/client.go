@@ -54,6 +54,9 @@ func (c *Client) List(ctx context.Context, request *hris.GroupsListRequest) (*hr
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IsCommonlyUsedAsTeam != nil {
+		queryParams.Add("is_commonly_used_as_team", fmt.Sprintf("%v", *request.IsCommonlyUsedAsTeam))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}

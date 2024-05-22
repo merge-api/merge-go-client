@@ -35,7 +35,6 @@ import (
 	purchaseorders "github.com/merge-api/merge-go-client/accounting/purchaseorders"
 	regeneratekey "github.com/merge-api/merge-go-client/accounting/regeneratekey"
 	scopes "github.com/merge-api/merge-go-client/accounting/scopes"
-	selectivesync "github.com/merge-api/merge-go-client/accounting/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/accounting/syncstatus"
 	taxrates "github.com/merge-api/merge-go-client/accounting/taxrates"
 	trackingcategories "github.com/merge-api/merge-go-client/accounting/trackingcategories"
@@ -82,7 +81,6 @@ type Client struct {
 	PhoneNumbers       *phonenumbers.Client
 	PurchaseOrders     *purchaseorders.Client
 	RegenerateKey      *regeneratekey.Client
-	SelectiveSync      *selectivesync.Client
 	SyncStatus         *syncstatus.Client
 	ForceResync        *forceresync.Client
 	TaxRates           *taxrates.Client
@@ -132,7 +130,6 @@ func NewClient(opts ...core.ClientOption) *Client {
 		PhoneNumbers:       phonenumbers.NewClient(opts...),
 		PurchaseOrders:     purchaseorders.NewClient(opts...),
 		RegenerateKey:      regeneratekey.NewClient(opts...),
-		SelectiveSync:      selectivesync.NewClient(opts...),
 		SyncStatus:         syncstatus.NewClient(opts...),
 		ForceResync:        forceresync.NewClient(opts...),
 		TaxRates:           taxrates.NewClient(opts...),

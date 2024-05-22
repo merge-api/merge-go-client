@@ -31,7 +31,6 @@ import (
 	payrollruns "github.com/merge-api/merge-go-client/hris/payrollruns"
 	regeneratekey "github.com/merge-api/merge-go-client/hris/regeneratekey"
 	scopes "github.com/merge-api/merge-go-client/hris/scopes"
-	selectivesync "github.com/merge-api/merge-go-client/hris/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/hris/syncstatus"
 	teams "github.com/merge-api/merge-go-client/hris/teams"
 	timeoff "github.com/merge-api/merge-go-client/hris/timeoff"
@@ -72,7 +71,6 @@ type Client struct {
 	PayGroups           *paygroups.Client
 	PayrollRuns         *payrollruns.Client
 	RegenerateKey       *regeneratekey.Client
-	SelectiveSync       *selectivesync.Client
 	SyncStatus          *syncstatus.Client
 	ForceResync         *forceresync.Client
 	Teams               *teams.Client
@@ -117,7 +115,6 @@ func NewClient(opts ...core.ClientOption) *Client {
 		PayGroups:           paygroups.NewClient(opts...),
 		PayrollRuns:         payrollruns.NewClient(opts...),
 		RegenerateKey:       regeneratekey.NewClient(opts...),
-		SelectiveSync:       selectivesync.NewClient(opts...),
 		SyncStatus:          syncstatus.NewClient(opts...),
 		ForceResync:         forceresync.NewClient(opts...),
 		Teams:               teams.NewClient(opts...),

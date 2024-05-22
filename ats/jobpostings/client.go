@@ -48,6 +48,9 @@ func (c *Client) List(ctx context.Context, request *ats.JobPostingsListRequest) 
 	if request.Cursor != nil {
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
+	if request.Expand != nil {
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
+	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
 	}
@@ -97,6 +100,9 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ats.JobPostin
 	endpointURL := fmt.Sprintf(baseURL+"/"+"ats/v1/job-postings/%v", id)
 
 	queryParams := make(url.Values)
+	if request.Expand != nil {
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
+	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}

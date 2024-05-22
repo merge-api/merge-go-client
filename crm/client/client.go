@@ -30,7 +30,6 @@ import (
 	passthrough "github.com/merge-api/merge-go-client/crm/passthrough"
 	regeneratekey "github.com/merge-api/merge-go-client/crm/regeneratekey"
 	scopes "github.com/merge-api/merge-go-client/crm/scopes"
-	selectivesync "github.com/merge-api/merge-go-client/crm/selectivesync"
 	stages "github.com/merge-api/merge-go-client/crm/stages"
 	syncstatus "github.com/merge-api/merge-go-client/crm/syncstatus"
 	tasks "github.com/merge-api/merge-go-client/crm/tasks"
@@ -69,7 +68,6 @@ type Client struct {
 	Opportunities       *opportunities.Client
 	Passthrough         *passthrough.Client
 	RegenerateKey       *regeneratekey.Client
-	SelectiveSync       *selectivesync.Client
 	Stages              *stages.Client
 	SyncStatus          *syncstatus.Client
 	ForceResync         *forceresync.Client
@@ -112,7 +110,6 @@ func NewClient(opts ...core.ClientOption) *Client {
 		Opportunities:       opportunities.NewClient(opts...),
 		Passthrough:         passthrough.NewClient(opts...),
 		RegenerateKey:       regeneratekey.NewClient(opts...),
-		SelectiveSync:       selectivesync.NewClient(opts...),
 		Stages:              stages.NewClient(opts...),
 		SyncStatus:          syncstatus.NewClient(opts...),
 		ForceResync:         forceresync.NewClient(opts...),
