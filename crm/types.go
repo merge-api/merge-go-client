@@ -21,9 +21,10 @@ import (
 type Account struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The account's owner.
 	Owner *AccountOwner `json:"owner,omitempty"`
@@ -355,7 +356,8 @@ type AccountRequest struct {
 	// The account's website.
 	Website *string `json:"website,omitempty"`
 	// The account's number of employees.
-	NumberOfEmployees *int `json:"number_of_employees,omitempty"`
+	NumberOfEmployees *int              `json:"number_of_employees,omitempty"`
+	Addresses         []*AddressRequest `json:"addresses,omitempty"`
 	// The last date (either most recent or furthest in the future) of when an activity occurs in an account.
 	LastActivityAt      *time.Time             `json:"last_activity_at,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
@@ -514,8 +516,9 @@ func (a ActivityTypeEnum) Ptr() *ActivityTypeEnum {
 //
 // TODO
 type Address struct {
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// Line 1 of the address's street.
 	Street1 *string `json:"street_1,omitempty"`
@@ -1923,11 +1926,13 @@ func (a *AdvancedMetadata) String() string {
 //
 // TODO
 type Association struct {
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt      *time.Time                  `json:"modified_at,omitempty"`
-	SourceObject    map[string]interface{}      `json:"source_object,omitempty"`
-	TargetObject    map[string]interface{}      `json:"target_object,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt   *time.Time             `json:"modified_at,omitempty"`
+	SourceObject map[string]interface{} `json:"source_object,omitempty"`
+	TargetObject map[string]interface{} `json:"target_object,omitempty"`
+	// The association type the association belongs to.
 	AssociationType *AssociationAssociationType `json:"association_type,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -1956,6 +1961,7 @@ func (a *Association) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+// The association type the association belongs to.
 type AssociationAssociationType struct {
 	typeName        string
 	String          string
@@ -2014,9 +2020,10 @@ func (a *AssociationAssociationType) Accept(visitor AssociationAssociationTypeVi
 }
 
 type AssociationSubType struct {
-	Id        *string    `json:"id,omitempty"`
+	Id *string `json:"id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	OriginType *string    `json:"origin_type,omitempty"`
 
@@ -2058,10 +2065,12 @@ func (a *AssociationSubType) String() string {
 type AssociationType struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt          *time.Time                  `json:"modified_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The class of the source object (Custom Object or Common Model) for the association type.
 	SourceObjectClass   map[string]interface{}      `json:"source_object_class,omitempty"`
 	TargetObjectClasses []*AssociationSubType       `json:"target_object_classes,omitempty"`
 	RemoteKeyName       *string                     `json:"remote_key_name,omitempty"`
@@ -2267,6 +2276,9 @@ type AuditLogEvent struct {
 	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 	// - `MUTED_ISSUE` - MUTED_ISSUE
 	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
+	// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
+	// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
+	// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -2333,6 +2345,9 @@ func (a *AuditLogEvent) String() string {
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
+// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
+// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
+// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -2676,164 +2691,6 @@ func (c *CommonModelScopesBodyRequest) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
-type ConditionSchema struct {
-	// The ID of the condition schema. This ID is used when updating selective syncs for a linked account.
-	Id string `json:"id"`
-	// The common model for which a condition schema is defined.
-	CommonModel *string `json:"common_model,omitempty"`
-	NativeName  *string `json:"native_name,omitempty"`
-	FieldName   *string `json:"field_name,omitempty"`
-	// Whether this condition can only be applied once. If false, the condition can be AND'd together multiple times.
-	IsUnique *bool `json:"is_unique,omitempty"`
-	// The type of value(s) that can be set for this condition.
-	//
-	// - `BOOLEAN` - BOOLEAN
-	// - `DATE` - DATE
-	// - `DATE_TIME` - DATE_TIME
-	// - `INTEGER` - INTEGER
-	// - `FLOAT` - FLOAT
-	// - `STRING` - STRING
-	// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
-	ConditionType *ConditionSchemaConditionType `json:"condition_type,omitempty"`
-	// The schemas for the operators that can be used on a condition.
-	Operators []*OperatorSchema `json:"operators,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (c *ConditionSchema) UnmarshalJSON(data []byte) error {
-	type unmarshaler ConditionSchema
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*c = ConditionSchema(value)
-	c._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (c *ConditionSchema) String() string {
-	if len(c._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(c); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", c)
-}
-
-// The type of value(s) that can be set for this condition.
-//
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
-type ConditionSchemaConditionType struct {
-	typeName          string
-	ConditionTypeEnum ConditionTypeEnum
-	String            string
-}
-
-func NewConditionSchemaConditionTypeFromConditionTypeEnum(value ConditionTypeEnum) *ConditionSchemaConditionType {
-	return &ConditionSchemaConditionType{typeName: "conditionTypeEnum", ConditionTypeEnum: value}
-}
-
-func NewConditionSchemaConditionTypeFromString(value string) *ConditionSchemaConditionType {
-	return &ConditionSchemaConditionType{typeName: "string", String: value}
-}
-
-func (c *ConditionSchemaConditionType) UnmarshalJSON(data []byte) error {
-	var valueConditionTypeEnum ConditionTypeEnum
-	if err := json.Unmarshal(data, &valueConditionTypeEnum); err == nil {
-		c.typeName = "conditionTypeEnum"
-		c.ConditionTypeEnum = valueConditionTypeEnum
-		return nil
-	}
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		c.typeName = "string"
-		c.String = valueString
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
-}
-
-func (c ConditionSchemaConditionType) MarshalJSON() ([]byte, error) {
-	switch c.typeName {
-	default:
-		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "conditionTypeEnum":
-		return json.Marshal(c.ConditionTypeEnum)
-	case "string":
-		return json.Marshal(c.String)
-	}
-}
-
-type ConditionSchemaConditionTypeVisitor interface {
-	VisitConditionTypeEnum(ConditionTypeEnum) error
-	VisitString(string) error
-}
-
-func (c *ConditionSchemaConditionType) Accept(visitor ConditionSchemaConditionTypeVisitor) error {
-	switch c.typeName {
-	default:
-		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "conditionTypeEnum":
-		return visitor.VisitConditionTypeEnum(c.ConditionTypeEnum)
-	case "string":
-		return visitor.VisitString(c.String)
-	}
-}
-
-// - `BOOLEAN` - BOOLEAN
-// - `DATE` - DATE
-// - `DATE_TIME` - DATE_TIME
-// - `INTEGER` - INTEGER
-// - `FLOAT` - FLOAT
-// - `STRING` - STRING
-// - `LIST_OF_STRINGS` - LIST_OF_STRINGS
-type ConditionTypeEnum string
-
-const (
-	ConditionTypeEnumBoolean       ConditionTypeEnum = "BOOLEAN"
-	ConditionTypeEnumDate          ConditionTypeEnum = "DATE"
-	ConditionTypeEnumDateTime      ConditionTypeEnum = "DATE_TIME"
-	ConditionTypeEnumInteger       ConditionTypeEnum = "INTEGER"
-	ConditionTypeEnumFloat         ConditionTypeEnum = "FLOAT"
-	ConditionTypeEnumString        ConditionTypeEnum = "STRING"
-	ConditionTypeEnumListOfStrings ConditionTypeEnum = "LIST_OF_STRINGS"
-)
-
-func NewConditionTypeEnumFromString(s string) (ConditionTypeEnum, error) {
-	switch s {
-	case "BOOLEAN":
-		return ConditionTypeEnumBoolean, nil
-	case "DATE":
-		return ConditionTypeEnumDate, nil
-	case "DATE_TIME":
-		return ConditionTypeEnumDateTime, nil
-	case "INTEGER":
-		return ConditionTypeEnumInteger, nil
-	case "FLOAT":
-		return ConditionTypeEnumFloat, nil
-	case "STRING":
-		return ConditionTypeEnumString, nil
-	case "LIST_OF_STRINGS":
-		return ConditionTypeEnumListOfStrings, nil
-	}
-	var t ConditionTypeEnum
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
-	return &c
-}
-
 // # The Contact Object
 //
 // ### Description
@@ -2846,9 +2703,10 @@ func (c ConditionTypeEnum) Ptr() *ConditionTypeEnum {
 type Contact struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The contact's first name.
 	FirstName *string `json:"first_name,omitempty"`
@@ -4333,11 +4191,14 @@ func (c *CrmCustomObjectResponse) String() string {
 type CustomObject struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
-	ModifiedAt   *time.Time             `json:"modified_at,omitempty"`
-	ObjectClass  *string                `json:"object_class,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The custom object class the custom object record belongs to.
+	ObjectClass *string `json:"object_class,omitempty"`
+	// The fields and values contained within the custom object record.
 	Fields       map[string]interface{} `json:"fields,omitempty"`
 	RemoteFields []*RemoteField         `json:"remote_fields,omitempty"`
 
@@ -4379,14 +4240,18 @@ func (c *CustomObject) String() string {
 type CustomObjectClass struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId         *string                                 `json:"remote_id,omitempty"`
-	CreatedAt        *time.Time                              `json:"created_at,omitempty"`
-	ModifiedAt       *time.Time                              `json:"modified_at,omitempty"`
-	Name             *string                                 `json:"name,omitempty"`
-	Description      *string                                 `json:"description,omitempty"`
-	Labels           map[string]*string                      `json:"labels,omitempty"`
-	Fields           []*RemoteFieldClassForCustomObjectClass `json:"fields,omitempty"`
-	AssociationTypes []map[string]interface{}                `json:"association_types,omitempty"`
+	RemoteId   *string    `json:"remote_id,omitempty"`
+	CreatedAt  *time.Time `json:"created_at,omitempty"`
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The custom object class's name.
+	Name *string `json:"name,omitempty"`
+	// The custom object class's description.
+	Description *string `json:"description,omitempty"`
+	// The custom object class's singular and plural labels.
+	Labels map[string]*string                      `json:"labels,omitempty"`
+	Fields []*RemoteFieldClassForCustomObjectClass `json:"fields,omitempty"`
+	// The types of associations with other models that the custom object class can have.
+	AssociationTypes []map[string]interface{} `json:"association_types,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4590,8 +4455,9 @@ func (d DirectionEnum) Ptr() *DirectionEnum {
 //
 // Fetch from the `GET Contact` endpoint and view their email addresses.
 type EmailAddress struct {
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The email address.
 	EmailAddress *string `json:"email_address,omitempty"`
@@ -4731,9 +4597,10 @@ func (e EncodingEnum) Ptr() *EncodingEnum {
 type Engagement struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The engagement's owner.
 	Owner *EngagementOwner `json:"owner,omitempty"`
@@ -5475,9 +5342,10 @@ func (e *EngagementResponse) String() string {
 type EngagementType struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The engagement type's activity type.
 	//
@@ -5643,6 +5511,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
+// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
+// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
+// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
 type EventTypeEnum string
 
 const (
@@ -5680,6 +5551,9 @@ const (
 	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
 	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
 	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
+	EventTypeEnumEnabledMergeWebhook                        EventTypeEnum = "ENABLED_MERGE_WEBHOOK"
+	EventTypeEnumDisabledMergeWebhook                       EventTypeEnum = "DISABLED_MERGE_WEBHOOK"
+	EventTypeEnumMergeWebhookTargetChanged                  EventTypeEnum = "MERGE_WEBHOOK_TARGET_CHANGED"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -5752,6 +5626,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumMutedIssue, nil
 	case "GENERATED_MAGIC_LINK":
 		return EventTypeEnumGeneratedMagicLink, nil
+	case "ENABLED_MERGE_WEBHOOK":
+		return EventTypeEnumEnabledMergeWebhook, nil
+	case "DISABLED_MERGE_WEBHOOK":
+		return EventTypeEnumDisabledMergeWebhook, nil
+	case "MERGE_WEBHOOK_TARGET_CHANGED":
+		return EventTypeEnumMergeWebhookTargetChanged, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -6503,9 +6383,10 @@ func (i ItemTypeEnum) Ptr() *ItemTypeEnum {
 type Lead struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The lead's owner.
 	Owner *LeadOwner `json:"owner,omitempty"`
@@ -7035,138 +6916,6 @@ func (l *LinkToken) String() string {
 	return fmt.Sprintf("%#v", l)
 }
 
-type LinkedAccountCondition struct {
-	// The ID indicating which condition schema to use for a specific condition.
-	ConditionSchemaId string `json:"condition_schema_id"`
-	// The common model for a specific condition.
-	CommonModel *string `json:"common_model,omitempty"`
-	NativeName  *string `json:"native_name,omitempty"`
-	// The operator for a specific condition.
-	Operator  string      `json:"operator"`
-	Value     interface{} `json:"value,omitempty"`
-	FieldName *string     `json:"field_name,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (l *LinkedAccountCondition) UnmarshalJSON(data []byte) error {
-	type unmarshaler LinkedAccountCondition
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*l = LinkedAccountCondition(value)
-	l._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (l *LinkedAccountCondition) String() string {
-	if len(l._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(l); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", l)
-}
-
-type LinkedAccountConditionRequest struct {
-	// The ID indicating which Linked Account Condition this is.
-	Id *string `json:"id,omitempty"`
-	// The ID indicating which condition schema to use for a specific condition.
-	ConditionSchemaId string `json:"condition_schema_id"`
-	// The operator for a specific condition.
-	Operator string      `json:"operator"`
-	Value    interface{} `json:"value,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (l *LinkedAccountConditionRequest) UnmarshalJSON(data []byte) error {
-	type unmarshaler LinkedAccountConditionRequest
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*l = LinkedAccountConditionRequest(value)
-	l._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (l *LinkedAccountConditionRequest) String() string {
-	if len(l._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(l); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", l)
-}
-
-type LinkedAccountSelectiveSyncConfiguration struct {
-	// The conditions belonging to a selective sync.
-	LinkedAccountConditions []*LinkedAccountCondition `json:"linked_account_conditions,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (l *LinkedAccountSelectiveSyncConfiguration) UnmarshalJSON(data []byte) error {
-	type unmarshaler LinkedAccountSelectiveSyncConfiguration
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*l = LinkedAccountSelectiveSyncConfiguration(value)
-	l._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (l *LinkedAccountSelectiveSyncConfiguration) String() string {
-	if len(l._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(l); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", l)
-}
-
-type LinkedAccountSelectiveSyncConfigurationRequest struct {
-	// The conditions belonging to a selective sync.
-	LinkedAccountConditions []*LinkedAccountConditionRequest `json:"linked_account_conditions,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (l *LinkedAccountSelectiveSyncConfigurationRequest) UnmarshalJSON(data []byte) error {
-	type unmarshaler LinkedAccountSelectiveSyncConfigurationRequest
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*l = LinkedAccountSelectiveSyncConfigurationRequest(value)
-	l._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (l *LinkedAccountSelectiveSyncConfigurationRequest) String() string {
-	if len(l._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(l); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", l)
-}
-
 type LinkedAccountStatus struct {
 	LinkedAccountStatus string `json:"linked_account_status"`
 	CanMakeRequest      bool   `json:"can_make_request"`
@@ -7498,9 +7247,10 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 type Note struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The note's owner.
 	Owner *NoteOwner `json:"owner,omitempty"`
@@ -8123,38 +7873,6 @@ func (o *ObjectClassDescriptionRequest) String() string {
 	return fmt.Sprintf("%#v", o)
 }
 
-type OperatorSchema struct {
-	// The operator for which an operator schema is defined.
-	Operator *string `json:"operator,omitempty"`
-	// Whether the operator can be repeated multiple times.
-	IsUnique *bool `json:"is_unique,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (o *OperatorSchema) UnmarshalJSON(data []byte) error {
-	type unmarshaler OperatorSchema
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*o = OperatorSchema(value)
-	o._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (o *OperatorSchema) String() string {
-	if len(o._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(o._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(o); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", o)
-}
-
 // # The Opportunity Object
 //
 // ### Description
@@ -8167,9 +7885,10 @@ func (o *OperatorSchema) String() string {
 type Opportunity struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The opportunity's name.
 	Name *string `json:"name,omitempty"`
@@ -9003,37 +8722,6 @@ func (p *PaginatedAuditLogEventList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
-type PaginatedConditionSchemaList struct {
-	Next     *string            `json:"next,omitempty"`
-	Previous *string            `json:"previous,omitempty"`
-	Results  []*ConditionSchema `json:"results,omitempty"`
-
-	_rawJSON json.RawMessage
-}
-
-func (p *PaginatedConditionSchemaList) UnmarshalJSON(data []byte) error {
-	type unmarshaler PaginatedConditionSchemaList
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*p = PaginatedConditionSchemaList(value)
-	p._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (p *PaginatedConditionSchemaList) String() string {
-	if len(p._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(p); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", p)
-}
-
 type PaginatedContactList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
@@ -9489,7 +9177,8 @@ type PatchedAccountRequest struct {
 	// The account's website.
 	Website *string `json:"website,omitempty"`
 	// The account's number of employees.
-	NumberOfEmployees *int `json:"number_of_employees,omitempty"`
+	NumberOfEmployees *int              `json:"number_of_employees,omitempty"`
+	Addresses         []*AddressRequest `json:"addresses,omitempty"`
 	// The last date (either most recent or furthest in the future) of when an activity occurs in an account.
 	LastActivityAt      *time.Time             `json:"last_activity_at,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
@@ -10008,8 +9697,9 @@ func (p *PatchedTaskRequestStatus) Accept(visitor PatchedTaskRequestStatusVisito
 //
 // Fetch from the `GET Contact` endpoint and view their phone numbers.
 type PhoneNumber struct {
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The phone number.
 	PhoneNumber *string `json:"phone_number,omitempty"`
@@ -10205,11 +9895,12 @@ func (r *RemoteField) String() string {
 }
 
 type RemoteFieldApi struct {
-	Schema             map[string]interface{} `json:"schema,omitempty"`
-	RemoteKeyName      string                 `json:"remote_key_name"`
-	RemoteEndpointInfo *RemoteEndpointInfo    `json:"remote_endpoint_info,omitempty"`
-	ExampleValues      []interface{}          `json:"example_values,omitempty"`
-	AdvancedMetadata   *AdvancedMetadata      `json:"advanced_metadata,omitempty"`
+	Schema             map[string]interface{}  `json:"schema,omitempty"`
+	RemoteKeyName      string                  `json:"remote_key_name"`
+	RemoteEndpointInfo *RemoteEndpointInfo     `json:"remote_endpoint_info,omitempty"`
+	ExampleValues      []interface{}           `json:"example_values,omitempty"`
+	AdvancedMetadata   *AdvancedMetadata       `json:"advanced_metadata,omitempty"`
+	Coverage           *RemoteFieldApiCoverage `json:"coverage,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -10235,6 +9926,63 @@ func (r *RemoteFieldApi) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldApiCoverage struct {
+	typeName string
+	Integer  int
+	Double   float64
+}
+
+func NewRemoteFieldApiCoverageFromInteger(value int) *RemoteFieldApiCoverage {
+	return &RemoteFieldApiCoverage{typeName: "integer", Integer: value}
+}
+
+func NewRemoteFieldApiCoverageFromDouble(value float64) *RemoteFieldApiCoverage {
+	return &RemoteFieldApiCoverage{typeName: "double", Double: value}
+}
+
+func (r *RemoteFieldApiCoverage) UnmarshalJSON(data []byte) error {
+	var valueInteger int
+	if err := json.Unmarshal(data, &valueInteger); err == nil {
+		r.typeName = "integer"
+		r.Integer = valueInteger
+		return nil
+	}
+	var valueDouble float64
+	if err := json.Unmarshal(data, &valueDouble); err == nil {
+		r.typeName = "double"
+		r.Double = valueDouble
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldApiCoverage) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "integer":
+		return json.Marshal(r.Integer)
+	case "double":
+		return json.Marshal(r.Double)
+	}
+}
+
+type RemoteFieldApiCoverageVisitor interface {
+	VisitInteger(int) error
+	VisitDouble(float64) error
+}
+
+func (r *RemoteFieldApiCoverage) Accept(visitor RemoteFieldApiCoverageVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "integer":
+		return visitor.VisitInteger(r.Integer)
+	case "double":
+		return visitor.VisitDouble(r.Double)
+	}
 }
 
 type RemoteFieldApiResponse struct {
@@ -10457,8 +10205,9 @@ func (r *RemoteFieldClassFieldType) Accept(visitor RemoteFieldClassFieldTypeVisi
 }
 
 type RemoteFieldClassForCustomObjectClass struct {
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt    *time.Time                                              `json:"modified_at,omitempty"`
 	DisplayName   *string                                                 `json:"display_name,omitempty"`
 	RemoteKeyName *string                                                 `json:"remote_key_name,omitempty"`
@@ -11025,9 +10774,10 @@ func (s SelectiveSyncConfigurationsUsageEnum) Ptr() *SelectiveSyncConfigurations
 type Stage struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The stage's name.
 	Name *string `json:"name,omitempty"`
@@ -11159,9 +10909,10 @@ func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
 type Task struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The task's subject.
 	Subject *string `json:"subject,omitempty"`
@@ -11811,9 +11562,10 @@ func (t TaskStatusEnum) Ptr() *TaskStatusEnum {
 type User struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
-	RemoteId  *string    `json:"remote_id,omitempty"`
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// This is the datetime that this object was last updated by Merge
+	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The user's name.
 	Name *string `json:"name,omitempty"`

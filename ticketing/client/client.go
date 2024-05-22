@@ -26,7 +26,6 @@ import (
 	regeneratekey "github.com/merge-api/merge-go-client/ticketing/regeneratekey"
 	roles "github.com/merge-api/merge-go-client/ticketing/roles"
 	scopes "github.com/merge-api/merge-go-client/ticketing/scopes"
-	selectivesync "github.com/merge-api/merge-go-client/ticketing/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/ticketing/syncstatus"
 	tags "github.com/merge-api/merge-go-client/ticketing/tags"
 	teams "github.com/merge-api/merge-go-client/ticketing/teams"
@@ -62,7 +61,6 @@ type Client struct {
 	Projects         *projects.Client
 	RegenerateKey    *regeneratekey.Client
 	Roles            *roles.Client
-	SelectiveSync    *selectivesync.Client
 	SyncStatus       *syncstatus.Client
 	ForceResync      *forceresync.Client
 	Tags             *tags.Client
@@ -102,7 +100,6 @@ func NewClient(opts ...core.ClientOption) *Client {
 		Projects:         projects.NewClient(opts...),
 		RegenerateKey:    regeneratekey.NewClient(opts...),
 		Roles:            roles.NewClient(opts...),
-		SelectiveSync:    selectivesync.NewClient(opts...),
 		SyncStatus:       syncstatus.NewClient(opts...),
 		ForceResync:      forceresync.NewClient(opts...),
 		Tags:             tags.NewClient(opts...),

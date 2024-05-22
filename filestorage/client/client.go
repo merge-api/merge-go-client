@@ -23,7 +23,6 @@ import (
 	passthrough "github.com/merge-api/merge-go-client/filestorage/passthrough"
 	regeneratekey "github.com/merge-api/merge-go-client/filestorage/regeneratekey"
 	scopes "github.com/merge-api/merge-go-client/filestorage/scopes"
-	selectivesync "github.com/merge-api/merge-go-client/filestorage/selectivesync"
 	syncstatus "github.com/merge-api/merge-go-client/filestorage/syncstatus"
 	users "github.com/merge-api/merge-go-client/filestorage/users"
 	webhookreceivers "github.com/merge-api/merge-go-client/filestorage/webhookreceivers"
@@ -53,7 +52,6 @@ type Client struct {
 	LinkedAccounts   *linkedaccounts.Client
 	Passthrough      *passthrough.Client
 	RegenerateKey    *regeneratekey.Client
-	SelectiveSync    *selectivesync.Client
 	SyncStatus       *syncstatus.Client
 	ForceResync      *forceresync.Client
 	Users            *users.Client
@@ -87,7 +85,6 @@ func NewClient(opts ...core.ClientOption) *Client {
 		LinkedAccounts:   linkedaccounts.NewClient(opts...),
 		Passthrough:      passthrough.NewClient(opts...),
 		RegenerateKey:    regeneratekey.NewClient(opts...),
-		SelectiveSync:    selectivesync.NewClient(opts...),
 		SyncStatus:       syncstatus.NewClient(opts...),
 		ForceResync:      forceresync.NewClient(opts...),
 		Users:            users.NewClient(opts...),

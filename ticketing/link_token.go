@@ -23,4 +23,6 @@ type EndUserDetailsRequest struct {
 	CategoryCommonModelScopes map[string][]*IndividualCommonModelScopeDeserializerRequest `json:"category_common_model_scopes,omitempty"`
 	// The language code for the language to localize Merge Link to.
 	Language *string `json:"language,omitempty"`
+	// A JSON object containing integration-specific configuration options.
+	IntegrationSpecificConfig map[string]interface{} `json:"integration_specific_config,omitempty"`
 }

@@ -88,6 +88,41 @@ func (c *Client) List(ctx context.Context, request *ticketing.ContactsListReques
 	return response, nil
 }
 
+// Creates a `Contact` object with the given values.
+func (c *Client) Create(ctx context.Context, request *ticketing.TicketingContactEndpointRequest) (*ticketing.TicketingContactResponse, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "ticketing/v1/contacts"
+
+	queryParams := make(url.Values)
+	if request.IsDebugMode != nil {
+		queryParams.Add("is_debug_mode", fmt.Sprintf("%v", *request.IsDebugMode))
+	}
+	if request.RunAsync != nil {
+		queryParams.Add("run_async", fmt.Sprintf("%v", *request.RunAsync))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *ticketing.TicketingContactResponse
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 // Returns a `Contact` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.ContactsRetrieveRequest) (*ticketing.Contact, error) {
 	baseURL := "https://api.merge.dev/api"
@@ -108,6 +143,29 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Con
 	}
 
 	var response *ticketing.Contact
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns metadata for `TicketingContact` POSTs.
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*ticketing.MetaResponse, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "ticketing/v1/contacts/meta/post"
+
+	var response *ticketing.MetaResponse
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{
