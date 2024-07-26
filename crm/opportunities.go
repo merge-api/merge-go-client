@@ -40,6 +40,8 @@ type OpportunitiesListRequest struct {
 	OwnerId *string `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
+	// If provided, will only return opportunities created in the third party platform after this datetime.
+	RemoteCreatedAfter *time.Time `json:"-"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-"`
 	// The API provider's ID for the given object.
@@ -73,6 +75,8 @@ type OpportunitiesRemoteFieldClassesListRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+	// If provided, will only return remote field classes with this is_common_model_field value
+	IsCommonModelField *bool `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
 }

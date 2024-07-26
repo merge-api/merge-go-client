@@ -203,6 +203,8 @@ func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatu
 type AccountIntegration struct {
 	// Company name.
 	Name string `json:"name"`
+	// Optional. This shortened name appears in places with limited space, usually in conjunction with the platform's logo (e.g., Merge Link menu).<br><br>Example: <i>Workforce Now (in lieu of ADP Workforce Now), SuccessFactors (in lieu of SAP SuccessFactors)</i>
+	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
 	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
@@ -312,8 +314,7 @@ type Activity struct {
 	// - `PUBLIC` - PUBLIC
 	// - `PRIVATE` - PRIVATE
 	Visibility *ActivityVisibility `json:"visibility,omitempty"`
-	// The activity’s candidate.
-	Candidate *string `json:"candidate,omitempty"`
+	Candidate  *string             `json:"candidate,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform.
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
@@ -434,11 +435,10 @@ type ActivityRequest struct {
 	// - `ADMIN_ONLY` - ADMIN_ONLY
 	// - `PUBLIC` - PUBLIC
 	// - `PRIVATE` - PRIVATE
-	Visibility *ActivityRequestVisibility `json:"visibility,omitempty"`
-	// The activity’s candidate.
-	Candidate           *string                `json:"candidate,omitempty"`
-	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	Visibility          *ActivityRequestVisibility `json:"visibility,omitempty"`
+	Candidate           *string                    `json:"candidate,omitempty"`
+	IntegrationParams   map[string]interface{}     `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}     `json:"linked_account_params,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -891,7 +891,8 @@ type Application struct {
 	// The application's source.
 	Source *string `json:"source,omitempty"`
 	// The user credited for this application.
-	CreditedTo *ApplicationCreditedTo `json:"credited_to,omitempty"`
+	CreditedTo               *ApplicationCreditedTo                     `json:"credited_to,omitempty"`
+	ScreeningQuestionAnswers []*ApplicationScreeningQuestionAnswersItem `json:"screening_question_answers,omitempty"`
 	// The application's current stage.
 	CurrentStage *ApplicationCurrentStage `json:"current_stage,omitempty"`
 	// The application's reason for rejection.
@@ -1295,7 +1296,8 @@ type ApplicationRequest struct {
 	// The application's source.
 	Source *string `json:"source,omitempty"`
 	// The user credited for this application.
-	CreditedTo *ApplicationRequestCreditedTo `json:"credited_to,omitempty"`
+	CreditedTo               *ApplicationRequestCreditedTo                     `json:"credited_to,omitempty"`
+	ScreeningQuestionAnswers []*ApplicationRequestScreeningQuestionAnswersItem `json:"screening_question_answers,omitempty"`
 	// The application's current stage.
 	CurrentStage *ApplicationRequestCurrentStage `json:"current_stage,omitempty"`
 	// The application's reason for rejection.
@@ -1677,6 +1679,63 @@ func (a *ApplicationRequestRejectReason) Accept(visitor ApplicationRequestReject
 	}
 }
 
+type ApplicationRequestScreeningQuestionAnswersItem struct {
+	typeName                       string
+	String                         string
+	ScreeningQuestionAnswerRequest *ScreeningQuestionAnswerRequest
+}
+
+func NewApplicationRequestScreeningQuestionAnswersItemFromString(value string) *ApplicationRequestScreeningQuestionAnswersItem {
+	return &ApplicationRequestScreeningQuestionAnswersItem{typeName: "string", String: value}
+}
+
+func NewApplicationRequestScreeningQuestionAnswersItemFromScreeningQuestionAnswerRequest(value *ScreeningQuestionAnswerRequest) *ApplicationRequestScreeningQuestionAnswersItem {
+	return &ApplicationRequestScreeningQuestionAnswersItem{typeName: "screeningQuestionAnswerRequest", ScreeningQuestionAnswerRequest: value}
+}
+
+func (a *ApplicationRequestScreeningQuestionAnswersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueScreeningQuestionAnswerRequest := new(ScreeningQuestionAnswerRequest)
+	if err := json.Unmarshal(data, &valueScreeningQuestionAnswerRequest); err == nil {
+		a.typeName = "screeningQuestionAnswerRequest"
+		a.ScreeningQuestionAnswerRequest = valueScreeningQuestionAnswerRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationRequestScreeningQuestionAnswersItem) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "screeningQuestionAnswerRequest":
+		return json.Marshal(a.ScreeningQuestionAnswerRequest)
+	}
+}
+
+type ApplicationRequestScreeningQuestionAnswersItemVisitor interface {
+	VisitString(string) error
+	VisitScreeningQuestionAnswerRequest(*ScreeningQuestionAnswerRequest) error
+}
+
+func (a *ApplicationRequestScreeningQuestionAnswersItem) Accept(visitor ApplicationRequestScreeningQuestionAnswersItemVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "screeningQuestionAnswerRequest":
+		return visitor.VisitScreeningQuestionAnswerRequest(a.ScreeningQuestionAnswerRequest)
+	}
+}
+
 type ApplicationResponse struct {
 	Model    *Application                `json:"model,omitempty"`
 	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
@@ -1707,6 +1766,63 @@ func (a *ApplicationResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", a)
+}
+
+type ApplicationScreeningQuestionAnswersItem struct {
+	typeName                string
+	String                  string
+	ScreeningQuestionAnswer *ScreeningQuestionAnswer
+}
+
+func NewApplicationScreeningQuestionAnswersItemFromString(value string) *ApplicationScreeningQuestionAnswersItem {
+	return &ApplicationScreeningQuestionAnswersItem{typeName: "string", String: value}
+}
+
+func NewApplicationScreeningQuestionAnswersItemFromScreeningQuestionAnswer(value *ScreeningQuestionAnswer) *ApplicationScreeningQuestionAnswersItem {
+	return &ApplicationScreeningQuestionAnswersItem{typeName: "screeningQuestionAnswer", ScreeningQuestionAnswer: value}
+}
+
+func (a *ApplicationScreeningQuestionAnswersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	valueScreeningQuestionAnswer := new(ScreeningQuestionAnswer)
+	if err := json.Unmarshal(data, &valueScreeningQuestionAnswer); err == nil {
+		a.typeName = "screeningQuestionAnswer"
+		a.ScreeningQuestionAnswer = valueScreeningQuestionAnswer
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a ApplicationScreeningQuestionAnswersItem) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return json.Marshal(a.String)
+	case "screeningQuestionAnswer":
+		return json.Marshal(a.ScreeningQuestionAnswer)
+	}
+}
+
+type ApplicationScreeningQuestionAnswersItemVisitor interface {
+	VisitString(string) error
+	VisitScreeningQuestionAnswer(*ScreeningQuestionAnswer) error
+}
+
+func (a *ApplicationScreeningQuestionAnswersItem) Accept(visitor ApplicationScreeningQuestionAnswersItemVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "string":
+		return visitor.VisitString(a.String)
+	case "screeningQuestionAnswer":
+		return visitor.VisitScreeningQuestionAnswer(a.ScreeningQuestionAnswer)
+	}
 }
 
 type AsyncPassthroughReciept struct {
@@ -2093,6 +2209,7 @@ type AuditLogEvent struct {
 	// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 	// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 	// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+	// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -2162,6 +2279,7 @@ func (a *AuditLogEvent) String() string {
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -3483,6 +3601,8 @@ type EmailAddress struct {
 	// - `WORK` - WORK
 	// - `OTHER` - OTHER
 	EmailAddressType *EmailAddressEmailAddressType `json:"email_address_type,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3830,6 +3950,7 @@ func (e *ErrorValidationProblem) String() string {
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type EventTypeEnum string
 
 const (
@@ -3870,6 +3991,7 @@ const (
 	EventTypeEnumEnabledMergeWebhook                        EventTypeEnum = "ENABLED_MERGE_WEBHOOK"
 	EventTypeEnumDisabledMergeWebhook                       EventTypeEnum = "DISABLED_MERGE_WEBHOOK"
 	EventTypeEnumMergeWebhookTargetChanged                  EventTypeEnum = "MERGE_WEBHOOK_TARGET_CHANGED"
+	EventTypeEnumEndUserCredentialsAccessed                 EventTypeEnum = "END_USER_CREDENTIALS_ACCESSED"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -3948,6 +4070,8 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDisabledMergeWebhook, nil
 	case "MERGE_WEBHOOK_TARGET_CHANGED":
 		return EventTypeEnumMergeWebhookTargetChanged, nil
+	case "END_USER_CREDENTIALS_ACCESSED":
+		return EventTypeEnumEndUserCredentialsAccessed, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -6776,6 +6900,8 @@ type PhoneNumber struct {
 	// - `SKYPE` - SKYPE
 	// - `OTHER` - OTHER
 	PhoneNumberType *PhoneNumberPhoneNumberType `json:"phone_number_type,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8818,6 +8944,8 @@ type ScreeningQuestion struct {
 	// Whether or not the screening question is required.
 	Required *bool         `json:"required,omitempty"`
 	Options  []interface{} `json:"options,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8843,6 +8971,217 @@ func (s *ScreeningQuestion) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", s)
+}
+
+// # The ScreeningQuestionAnswer Object
+//
+// ### Description
+//
+// The `ScreeningQuestionAnswer` object is used to represent candidate responses to a screening question, for a specific application.
+//
+// ### Usage Example
+//
+// TODO
+type ScreeningQuestionAnswer struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The screening question associated with the candidate’s answer. To determine the data type of the answer, you can expand on the screening question by adding `screening_question_answers.question` to the `expand` query parameter.
+	Question *ScreeningQuestionAnswerQuestion `json:"question,omitempty"`
+	// The candidate’s response to the screening question.
+	Answer *string `json:"answer,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (s *ScreeningQuestionAnswer) UnmarshalJSON(data []byte) error {
+	type unmarshaler ScreeningQuestionAnswer
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = ScreeningQuestionAnswer(value)
+	s._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *ScreeningQuestionAnswer) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// The screening question associated with the candidate’s answer. To determine the data type of the answer, you can expand on the screening question by adding `screening_question_answers.question` to the `expand` query parameter.
+type ScreeningQuestionAnswerQuestion struct {
+	typeName          string
+	String            string
+	ScreeningQuestion *ScreeningQuestion
+}
+
+func NewScreeningQuestionAnswerQuestionFromString(value string) *ScreeningQuestionAnswerQuestion {
+	return &ScreeningQuestionAnswerQuestion{typeName: "string", String: value}
+}
+
+func NewScreeningQuestionAnswerQuestionFromScreeningQuestion(value *ScreeningQuestion) *ScreeningQuestionAnswerQuestion {
+	return &ScreeningQuestionAnswerQuestion{typeName: "screeningQuestion", ScreeningQuestion: value}
+}
+
+func (s *ScreeningQuestionAnswerQuestion) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueScreeningQuestion := new(ScreeningQuestion)
+	if err := json.Unmarshal(data, &valueScreeningQuestion); err == nil {
+		s.typeName = "screeningQuestion"
+		s.ScreeningQuestion = valueScreeningQuestion
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScreeningQuestionAnswerQuestion) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "screeningQuestion":
+		return json.Marshal(s.ScreeningQuestion)
+	}
+}
+
+type ScreeningQuestionAnswerQuestionVisitor interface {
+	VisitString(string) error
+	VisitScreeningQuestion(*ScreeningQuestion) error
+}
+
+func (s *ScreeningQuestionAnswerQuestion) Accept(visitor ScreeningQuestionAnswerQuestionVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "screeningQuestion":
+		return visitor.VisitScreeningQuestion(s.ScreeningQuestion)
+	}
+}
+
+// # The ScreeningQuestionAnswer Object
+//
+// ### Description
+//
+// The `ScreeningQuestionAnswer` object is used to represent candidate responses to a screening question, for a specific application.
+//
+// ### Usage Example
+//
+// TODO
+type ScreeningQuestionAnswerRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The screening question associated with the candidate’s answer. To determine the data type of the answer, you can expand on the screening question by adding `screening_question_answers.question` to the `expand` query parameter.
+	Question *ScreeningQuestionAnswerRequestQuestion `json:"question,omitempty"`
+	// The candidate’s response to the screening question.
+	Answer              *string                `json:"answer,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (s *ScreeningQuestionAnswerRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler ScreeningQuestionAnswerRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = ScreeningQuestionAnswerRequest(value)
+	s._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *ScreeningQuestionAnswerRequest) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// The screening question associated with the candidate’s answer. To determine the data type of the answer, you can expand on the screening question by adding `screening_question_answers.question` to the `expand` query parameter.
+type ScreeningQuestionAnswerRequestQuestion struct {
+	typeName          string
+	String            string
+	ScreeningQuestion *ScreeningQuestion
+}
+
+func NewScreeningQuestionAnswerRequestQuestionFromString(value string) *ScreeningQuestionAnswerRequestQuestion {
+	return &ScreeningQuestionAnswerRequestQuestion{typeName: "string", String: value}
+}
+
+func NewScreeningQuestionAnswerRequestQuestionFromScreeningQuestion(value *ScreeningQuestion) *ScreeningQuestionAnswerRequestQuestion {
+	return &ScreeningQuestionAnswerRequestQuestion{typeName: "screeningQuestion", ScreeningQuestion: value}
+}
+
+func (s *ScreeningQuestionAnswerRequestQuestion) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typeName = "string"
+		s.String = valueString
+		return nil
+	}
+	valueScreeningQuestion := new(ScreeningQuestion)
+	if err := json.Unmarshal(data, &valueScreeningQuestion); err == nil {
+		s.typeName = "screeningQuestion"
+		s.ScreeningQuestion = valueScreeningQuestion
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScreeningQuestionAnswerRequestQuestion) MarshalJSON() ([]byte, error) {
+	switch s.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return json.Marshal(s.String)
+	case "screeningQuestion":
+		return json.Marshal(s.ScreeningQuestion)
+	}
+}
+
+type ScreeningQuestionAnswerRequestQuestionVisitor interface {
+	VisitString(string) error
+	VisitScreeningQuestion(*ScreeningQuestion) error
+}
+
+func (s *ScreeningQuestionAnswerRequestQuestion) Accept(visitor ScreeningQuestionAnswerRequestQuestionVisitor) error {
+	switch s.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", s.typeName, s)
+	case "string":
+		return visitor.VisitString(s.String)
+	case "screeningQuestion":
+		return visitor.VisitScreeningQuestion(s.ScreeningQuestion)
+	}
 }
 
 // The job associated with the screening question.
@@ -8922,6 +9261,8 @@ type ScreeningQuestionOption struct {
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// Available response options
 	Label *string `json:"label,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -9247,6 +9588,8 @@ type Url struct {
 	// - `OTHER` - OTHER
 	// - `JOB_POSTING` - JOB_POSTING
 	UrlType *UrlUrlType `json:"url_type,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform.
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }

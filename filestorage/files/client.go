@@ -171,7 +171,7 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *filestorage.F
 	return response, nil
 }
 
-// Returns a `File` object with the given `id`.
+// Returns the `File` content with the given `id` as a stream of bytes.
 func (c *Client) DownloadRetrieve(ctx context.Context, id string, request *filestorage.FilesDownloadRetrieveRequest) (io.Reader, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {

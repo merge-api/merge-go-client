@@ -235,6 +235,8 @@ func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatu
 type AccountIntegration struct {
 	// Company name.
 	Name string `json:"name"`
+	// Optional. This shortened name appears in places with limited space, usually in conjunction with the platform's logo (e.g., Merge Link menu).<br><br>Example: <i>Workforce Now (in lieu of ADP Workforce Now), SuccessFactors (in lieu of SAP SuccessFactors)</i>
+	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
 	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
@@ -1929,9 +1931,9 @@ type Association struct {
 	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// The datetime that this object was modified by Merge.
-	ModifiedAt   *time.Time             `json:"modified_at,omitempty"`
-	SourceObject map[string]interface{} `json:"source_object,omitempty"`
-	TargetObject map[string]interface{} `json:"target_object,omitempty"`
+	ModifiedAt   *time.Time `json:"modified_at,omitempty"`
+	SourceObject *string    `json:"source_object,omitempty"`
+	TargetObject *string    `json:"target_object,omitempty"`
 	// The association type the association belongs to.
 	AssociationType *AssociationAssociationType `json:"association_type,omitempty"`
 
@@ -2279,6 +2281,7 @@ type AuditLogEvent struct {
 	// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 	// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 	// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+	// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -2348,6 +2351,7 @@ func (a *AuditLogEvent) String() string {
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -5514,6 +5518,7 @@ func (e *ErrorValidationProblem) String() string {
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type EventTypeEnum string
 
 const (
@@ -5554,6 +5559,7 @@ const (
 	EventTypeEnumEnabledMergeWebhook                        EventTypeEnum = "ENABLED_MERGE_WEBHOOK"
 	EventTypeEnumDisabledMergeWebhook                       EventTypeEnum = "DISABLED_MERGE_WEBHOOK"
 	EventTypeEnumMergeWebhookTargetChanged                  EventTypeEnum = "MERGE_WEBHOOK_TARGET_CHANGED"
+	EventTypeEnumEndUserCredentialsAccessed                 EventTypeEnum = "END_USER_CREDENTIALS_ACCESSED"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -5632,6 +5638,8 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDisabledMergeWebhook, nil
 	case "MERGE_WEBHOOK_TARGET_CHANGED":
 		return EventTypeEnumMergeWebhookTargetChanged, nil
+	case "END_USER_CREDENTIALS_ACCESSED":
+		return EventTypeEnumEndUserCredentialsAccessed, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -9866,7 +9874,7 @@ func (r *RemoteEndpointInfo) String() string {
 
 type RemoteField struct {
 	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            map[string]interface{}       `json:"value,omitempty"`
+	Value            interface{}                  `json:"value,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -10478,7 +10486,7 @@ func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClass
 
 type RemoteFieldRequest struct {
 	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            *string                             `json:"value,omitempty"`
+	Value            interface{}                         `json:"value,omitempty"`
 
 	_rawJSON json.RawMessage
 }

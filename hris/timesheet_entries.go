@@ -22,11 +22,11 @@ type TimesheetEntriesListRequest struct {
 	CreatedBefore *time.Time `json:"-"`
 	// The pagination cursor value.
 	Cursor *string `json:"-"`
-	// If provided, will only return employee payroll runs for this employee.
+	// If provided, will only return timesheet entries for this employee.
 	EmployeeId *string `json:"-"`
-	// If provided, will only return employee payroll runs ended after this datetime.
+	// If provided, will only return timesheet entries ended after this datetime.
 	EndedAfter *string `json:"-"`
-	// If provided, will only return employee payroll runs ended before this datetime.
+	// If provided, will only return timesheet entries ended before this datetime.
 	EndedBefore *string `json:"-"`
 	// Whether to include data that was marked as deleted by third party webhooks.
 	IncludeDeletedData *bool `json:"-"`
@@ -42,9 +42,9 @@ type TimesheetEntriesListRequest struct {
 	PageSize *int `json:"-"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-"`
-	// If provided, will only return employee payroll runs started after this datetime.
+	// If provided, will only return timesheet entries started after this datetime.
 	StartedAfter *string `json:"-"`
-	// If provided, will only return employee payroll runs started before this datetime.
+	// If provided, will only return timesheet entries started before this datetime.
 	StartedBefore *string `json:"-"`
 }
 

@@ -129,6 +129,9 @@ func (c *Client) List(ctx context.Context, request *ticketing.TicketsListRequest
 	if request.TicketType != nil {
 		queryParams.Add("ticket_type", fmt.Sprintf("%v", *request.TicketType))
 	}
+	if request.TicketUrl != nil {
+		queryParams.Add("ticket_url", fmt.Sprintf("%v", *request.TicketUrl))
+	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
 	}
@@ -367,6 +370,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *ticketing.
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))

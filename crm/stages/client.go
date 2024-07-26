@@ -143,6 +143,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.Stages
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
 	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
+	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}

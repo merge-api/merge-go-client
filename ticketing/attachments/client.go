@@ -165,7 +165,7 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Att
 	return response, nil
 }
 
-// Returns an `Attachment` object with the given `id`.
+// Returns the `File` content with the given `id` as a stream of bytes.
 func (c *Client) DownloadRetrieve(ctx context.Context, id string, request *ticketing.AttachmentsDownloadRetrieveRequest) (io.Reader, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
