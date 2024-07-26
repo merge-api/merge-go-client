@@ -26,7 +26,7 @@ type EmploymentsListRequest struct {
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-"`
-	// Overrides the default ordering for this endpoint.
+	// Overrides the default ordering for this endpoint. Possible values include: effective_date, -effective_date.
 	OrderBy *EmploymentsListRequestOrderBy `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`

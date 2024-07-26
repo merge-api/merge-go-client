@@ -75,6 +75,9 @@ func (c *Client) List(ctx context.Context, request *crm.OpportunitiesListRequest
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}
+	if request.RemoteCreatedAfter != nil {
+		queryParams.Add("remote_created_after", fmt.Sprintf("%v", request.RemoteCreatedAfter.Format(time.RFC3339)))
+	}
 	if request.RemoteFields != nil {
 		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
 	}
@@ -288,6 +291,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.Opport
 	}
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))

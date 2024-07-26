@@ -30,7 +30,7 @@ func NewClient(opts ...core.ClientOption) *Client {
 	}
 }
 
-// Gets issues.
+// Gets all issues for Organization.
 func (c *Client) List(ctx context.Context, request *filestorage.IssuesListRequest) (*filestorage.PaginatedIssueList, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
@@ -68,6 +68,9 @@ func (c *Client) List(ctx context.Context, request *filestorage.IssuesListReques
 	}
 	if request.LastIncidentTimeBefore != nil {
 		queryParams.Add("last_incident_time_before", fmt.Sprintf("%v", request.LastIncidentTimeBefore.Format(time.RFC3339)))
+	}
+	if request.LinkedAccountId != nil {
+		queryParams.Add("linked_account_id", fmt.Sprintf("%v", *request.LinkedAccountId))
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))

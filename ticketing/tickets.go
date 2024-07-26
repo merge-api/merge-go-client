@@ -99,6 +99,8 @@ type TicketsListRequest struct {
 	Tags *string `json:"-"`
 	// If provided, will only return tickets of this type.
 	TicketType *string `json:"-"`
+	// If provided, will only return tickets where the URL matches or contains the substring
+	TicketUrl *string `json:"-"`
 }
 
 type PatchedTicketEndpointRequest struct {
@@ -116,6 +118,8 @@ type TicketsRemoteFieldClassesListRequest struct {
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// If provided, will only return remote field classes with this is_common_model_field value
+	IsCommonModelField *bool `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
 }

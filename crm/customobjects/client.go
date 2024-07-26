@@ -179,3 +179,49 @@ func (c *Client) CustomObjectClassesCustomObjectsMetaPostRetrieve(ctx context.Co
 	}
 	return response, nil
 }
+
+// Returns a list of `RemoteFieldClass` objects.
+func (c *Client) CustomObjectClassesCustomObjectsRemoteFieldClassesList(ctx context.Context, request *crm.CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) (*crm.PaginatedRemoteFieldClassList, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "crm/v1/custom-object-classes/custom-objects/remote-field-classes"
+
+	queryParams := make(url.Values)
+	if request.Cursor != nil {
+		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
+	}
+	if request.IncludeDeletedData != nil {
+		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
+	}
+	if request.IncludeRemoteData != nil {
+		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeRemoteFields != nil {
+		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
+	}
+	if request.PageSize != nil {
+		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *crm.PaginatedRemoteFieldClassList
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}

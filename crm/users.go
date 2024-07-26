@@ -38,6 +38,8 @@ type UsersRemoteFieldClassesListRequest struct {
 	IncludeRemoteData *bool `json:"-"`
 	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
 	IncludeRemoteFields *bool `json:"-"`
+	// If provided, will only return remote field classes with this is_common_model_field value
+	IsCommonModelField *bool `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
 }

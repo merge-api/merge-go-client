@@ -25,6 +25,8 @@ type IssuesListRequest struct {
 	LastIncidentTimeAfter *time.Time `json:"-"`
 	// If provided, will only return issues whose last incident time was before this datetime.
 	LastIncidentTimeBefore *time.Time `json:"-"`
+	// If provided, will only include issues pertaining to the linked account passed in.
+	LinkedAccountId *string `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
 	// If included, will only include issues whose most recent action occurred after this time

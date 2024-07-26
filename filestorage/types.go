@@ -167,6 +167,8 @@ func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatu
 type AccountIntegration struct {
 	// Company name.
 	Name string `json:"name"`
+	// Optional. This shortened name appears in places with limited space, usually in conjunction with the platform's logo (e.g., Merge Link menu).<br><br>Example: <i>Workforce Now (in lieu of ADP Workforce Now), SuccessFactors (in lieu of SAP SuccessFactors)</i>
+	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
 	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
@@ -357,6 +359,7 @@ type AuditLogEvent struct {
 	// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 	// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 	// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+	// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -426,6 +429,7 @@ func (a *AuditLogEvent) String() string {
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -1025,6 +1029,7 @@ func (e *ErrorValidationProblem) String() string {
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type EventTypeEnum string
 
 const (
@@ -1065,6 +1070,7 @@ const (
 	EventTypeEnumEnabledMergeWebhook                        EventTypeEnum = "ENABLED_MERGE_WEBHOOK"
 	EventTypeEnumDisabledMergeWebhook                       EventTypeEnum = "DISABLED_MERGE_WEBHOOK"
 	EventTypeEnumMergeWebhookTargetChanged                  EventTypeEnum = "MERGE_WEBHOOK_TARGET_CHANGED"
+	EventTypeEnumEndUserCredentialsAccessed                 EventTypeEnum = "END_USER_CREDENTIALS_ACCESSED"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -1143,6 +1149,8 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDisabledMergeWebhook, nil
 	case "MERGE_WEBHOOK_TARGET_CHANGED":
 		return EventTypeEnumMergeWebhookTargetChanged, nil
+	case "END_USER_CREDENTIALS_ACCESSED":
+		return EventTypeEnumEndUserCredentialsAccessed, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -2768,7 +2776,7 @@ func (f *FolderRequestPermissionsItem) Accept(visitor FolderRequestPermissionsIt
 //
 // ### Description
 //
-// The `Group` object is used to represent any subset of `User`s. This can extend to company domains as well.
+// The `Group` object is used to represent any subset of `Users`. This can extend to company domains as well.
 //
 // ### Usage Example
 //
