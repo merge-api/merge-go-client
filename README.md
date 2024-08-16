@@ -35,23 +35,6 @@ client := mergeclient.NewClient(
 
 ## Categories
 
-This SDK contains the ATS, HRIS, CRM, Ticketing, Accounting, and File Storage categories. Even if you do not plan on using more than one Merge API category right now, the SDK provides upgrade-flexibility in case you find new Merge API categories useful in the future.
-
-Each category is namespaced:
-
-```python
-client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
-)
-
-client.Ats(). # APIs specific to the ATS Category
-
-client.Hris(). # APIs specific to the HRIS Category
-```
-
-## Categories
-
 This SDK contains both the ATS, HRIS, CRM, Ticketing, and Accounting categories. Even if
 you do not plan on using more than one Merge API category right now, the SDK provides
 upgrade-flexibility in case you find new Merge API categories useful in the future.
