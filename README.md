@@ -6,7 +6,7 @@ The Merge Go library provides convenient access to the Merge API from Go.
 
 ## Requirements
 
-This module requires Go version >= 1.19.
+This module requires Go version >= 1.13.
 
 ## Installation
 
@@ -28,8 +28,8 @@ import (
 )
 
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 ```
 
@@ -39,15 +39,15 @@ This SDK contains the ATS, HRIS, CRM, Ticketing, Accounting, and File Storage ca
 
 Each category is namespaced:
 
-```python
+```go
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 
-client.Ats(). # APIs specific to the ATS Category
+client.Ats. # APIs specific to the ATS Category
 
-client.Hris(). # APIs specific to the HRIS Category
+client.Hris. # APIs specific to the HRIS Category
 ```
 
 ## Categories
@@ -60,13 +60,13 @@ Each category is namespaced:
 
 ```go
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 
-client.Ats(). // APIs specific to the ATS category
+client.Ats. // APIs specific to the ATS category
 
-client.Hris(). // APIs specific to the HRIS category
+client.Hris. // APIs specific to the HRIS category
 ```
 
 ## Usage
@@ -84,10 +84,10 @@ import (
 )
 
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
-linkTokenResponse, err := client.Ats().LinkToken().Create(
+linkTokenResponse, err := client.Ats.LinkToken.Create(
   context.TODO(),
   &ats.EndUserDetailsRequest{
     EndUserEmailAddress:     "john.smith@gmail.com",
@@ -116,10 +116,10 @@ import (
 )
 
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
-employee, err := client.Hris().Employees().Retrieve(
+employee, err := client.Hris.Employees.Retrieve(
   context.TODO(),
   "0958cbc6-6040-430a-848e-aafacbadf4ae",
   &hris.EmployeesRetrieveRequest{
@@ -145,10 +145,10 @@ import (
 )
 
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
-candidate, err := client.Ats().Candidates().Retrieve(
+candidate, err := client.Ats.Candidates.Retrieve(
   context.TODO(),
   "521b18c2-4d01-4297-b451-19858d07c133",
   &ats.CandidatesRetrieveRequest{
@@ -175,10 +175,10 @@ import (
 )
 
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
-candidateList, err := client.Ats().Candidates().List(
+candidateList, err := client.Ats.Candidates.List(
   context.TODO(),
   &ats.CandidatesListRequest{
     CreatedBefore: merge.Time(time.Now()),
@@ -204,10 +204,10 @@ import (
 )
 
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHeaderAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
-ticketResponse, err := client.Ticketing().Tickets().Create(
+ticketResponse, err := client.Ticketing.Tickets.Create(
   context.TODO(),
   &ticketing.TicketEndpointRequest{
     Model: &ticketing.TicketRequest{
@@ -236,7 +236,7 @@ like the following:
 ```go
 ctx, cancel := context.WithTimeout(context.TODO(), time.Second)
 defer cancel()
-employeeList, err := client.Hris().Employees().List(
+employeeList, err := client.Hris.Employees.List(
   ctx,
   &hris.EmployeesListRequest{
     CreatedBefore: merge.Time(time.Now()),
@@ -255,8 +255,8 @@ configuring authorization tokens to be sent on every request, or providing your 
 
 ```go
 client := mergeclient.NewClient(
-  mergeclient.ClientWithAuthApiKey("<YOUR_API_KEY>"),
-  mergeclient.ClientWithHTTPClient(
+  mergeclient.WithApiKey("<YOUR_API_KEY>"),
+  mergeclient.WithHTTPClient(
     &http.Client{
       Timeout: 5 * time.Second,
     },
@@ -274,7 +274,7 @@ Structured error types are returned from API calls that return non-success statu
 you can check if the error was due to a bad request (i.e. status code 400) with the following:
 
 ```go
-employeeList, err := client.Hris().Employees().List(
+employeeList, err := client.Hris.Employees.List(
   context.TODO(),
   &hris.EmployeesListRequest{
     CreatedBefore: merge.Time(time.Now()),
@@ -292,7 +292,7 @@ These errors are also compatible with the `errors.Is` and `errors.As` APIs, so y
 like so:
 
 ```go
-employeeList, err := client.Hris().Employees().List(
+employeeList, err := client.Hris.Employees.List(
   context.TODO(),
   &hris.EmployeesListRequest{
     CreatedBefore: merge.Time(time.Now()),
@@ -314,7 +314,7 @@ If you'd like to wrap the errors with additional information and still retain th
 with `errors.Is` and `errors.As`, you can use the `%w` directive:
 
 ```go
-employeeList, err := client.Hris().Employees().List(
+employeeList, err := client.Hris.Employees.List(
   context.TODO(),
   &hris.EmployeesListRequest{
     CreatedBefore: merge.Time(time.Now()),
