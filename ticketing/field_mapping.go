@@ -3,6 +3,8 @@
 package ticketing
 
 type CreateFieldMappingRequest struct {
+	// If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
+	ExcludeRemoteFieldMetadata *bool `json:"-"`
 	// The name of the target field you want this remote field to map to.
 	TargetFieldName string `json:"target_field_name"`
 	// The description of the target field you want this remote field to map to.
@@ -24,6 +26,11 @@ type PatchedEditFieldMappingRequest struct {
 	RemoteMethod *string `json:"remote_method,omitempty"`
 	// The path of the remote endpoint where the remote field is coming from.
 	RemoteUrlPath *string `json:"remote_url_path,omitempty"`
+}
+
+type FieldMappingsRetrieveRequest struct {
+	// If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
+	ExcludeRemoteFieldMetadata *bool `json:"-"`
 }
 
 type RemoteFieldsRetrieveRequest struct {

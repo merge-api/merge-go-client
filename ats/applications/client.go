@@ -66,6 +66,9 @@ func (c *Client) List(ctx context.Context, request *ats.ApplicationsListRequest)
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.JobId != nil {
 		queryParams.Add("job_id", fmt.Sprintf("%v", *request.JobId))
 	}
@@ -107,6 +110,9 @@ func (c *Client) List(ctx context.Context, request *ats.ApplicationsListRequest)
 }
 
 // Creates an `Application` object with the given values.
+// For certain integrations, but not all, our API detects duplicate candidates and will associate applications with existing records in the third-party. New candidates are created and automatically linked to the application.
+//
+// See our [Help Center article](https://help.merge.dev/en/articles/10012366-updates-to-post-applications-oct-2024) for detailed support per integration.
 func (c *Client) Create(ctx context.Context, request *ats.ApplicationEndpointRequest) (*ats.ApplicationResponse, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {

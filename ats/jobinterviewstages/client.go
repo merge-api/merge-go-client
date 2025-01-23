@@ -57,6 +57,9 @@ func (c *Client) List(ctx context.Context, request *ats.JobInterviewStagesListRe
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.JobId != nil {
 		queryParams.Add("job_id", fmt.Sprintf("%v", *request.JobId))
 	}

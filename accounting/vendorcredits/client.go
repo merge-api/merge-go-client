@@ -60,6 +60,9 @@ func (c *Client) List(ctx context.Context, request *accounting.VendorCreditsList
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}
@@ -97,6 +100,41 @@ func (c *Client) List(ctx context.Context, request *accounting.VendorCreditsList
 	return response, nil
 }
 
+// Creates a `VendorCredit` object with the given values.
+func (c *Client) Create(ctx context.Context, request *accounting.VendorCreditEndpointRequest) (*accounting.VendorCreditResponse, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "accounting/v1/vendor-credits"
+
+	queryParams := make(url.Values)
+	if request.IsDebugMode != nil {
+		queryParams.Add("is_debug_mode", fmt.Sprintf("%v", *request.IsDebugMode))
+	}
+	if request.RunAsync != nil {
+		queryParams.Add("run_async", fmt.Sprintf("%v", *request.RunAsync))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *accounting.VendorCreditResponse
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodPost,
+			Headers:  c.header,
+			Request:  request,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 // Returns a `VendorCredit` object with the given `id`.
 func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.VendorCreditsRetrieveRequest) (*accounting.VendorCredit, error) {
 	baseURL := "https://api.merge.dev/api"
@@ -117,6 +155,29 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Ve
 	}
 
 	var response *accounting.VendorCredit
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns metadata for `VendorCredit` POSTs.
+func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "accounting/v1/vendor-credits/meta/post"
+
+	var response *accounting.MetaResponse
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{

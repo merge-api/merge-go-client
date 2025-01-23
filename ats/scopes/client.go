@@ -27,7 +27,7 @@ func NewClient(opts ...core.ClientOption) *Client {
 	}
 }
 
-// Get the default permissions for Merge Common Models and fields across all Linked Accounts of a given category. [Learn more](https://help.merge.dev/en/articles/8828211-common-model-and-field-scopes).
+// Get the default permissions for Merge Common Models and fields across all Linked Accounts of a given category. [Learn more](https://help.merge.dev/en/articles/5950052-common-model-and-field-scopes).
 func (c *Client) DefaultScopesRetrieve(ctx context.Context) (*ats.CommonModelScopeApi, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
@@ -50,7 +50,7 @@ func (c *Client) DefaultScopesRetrieve(ctx context.Context) (*ats.CommonModelSco
 	return response, nil
 }
 
-// Get all available permissions for Merge Common Models and fields for a single Linked Account. [Learn more](https://help.merge.dev/en/articles/8828211-common-model-and-field-scopes).
+// Get all available permissions for Merge Common Models and fields for a single Linked Account. [Learn more](https://help.merge.dev/en/articles/5950052-common-model-and-field-scopes).
 func (c *Client) LinkedAccountScopesRetrieve(ctx context.Context) (*ats.CommonModelScopeApi, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
@@ -73,7 +73,7 @@ func (c *Client) LinkedAccountScopesRetrieve(ctx context.Context) (*ats.CommonMo
 	return response, nil
 }
 
-// Update permissions for any Common Model or field for a single Linked Account. Any Scopes not set in this POST request will inherit the default Scopes. [Learn more](https://help.merge.dev/en/articles/8828211-common-model-and-field-scopes)
+// Update permissions for any Common Model or field for a single Linked Account. Any Scopes not set in this POST request will inherit the default Scopes. [Learn more](https://help.merge.dev/en/articles/5950052-common-model-and-field-scopes)
 func (c *Client) LinkedAccountScopesCreate(ctx context.Context, request *ats.LinkedAccountCommonModelScopeDeserializerRequest) (*ats.CommonModelScopeApi, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {

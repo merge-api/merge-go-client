@@ -54,6 +54,9 @@ func (c *Client) List(ctx context.Context, request *filestorage.UsersListRequest
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.IsMe != nil {
 		queryParams.Add("is_me", fmt.Sprintf("%v", *request.IsMe))
 	}

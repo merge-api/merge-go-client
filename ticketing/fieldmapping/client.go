@@ -30,12 +30,20 @@ func NewClient(opts ...core.ClientOption) *Client {
 }
 
 // Get all Field Mappings for this Linked Account. Field Mappings are mappings between third-party Remote Fields and user defined Merge fields. [Learn more](https://docs.merge.dev/supplemental-data/field-mappings/overview/).
-func (c *Client) FieldMappingsRetrieve(ctx context.Context) (*ticketing.FieldMappingApiInstanceResponse, error) {
+func (c *Client) FieldMappingsRetrieve(ctx context.Context, request *ticketing.FieldMappingsRetrieveRequest) (*ticketing.FieldMappingApiInstanceResponse, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := baseURL + "/" + "ticketing/v1/field-mappings"
+
+	queryParams := make(url.Values)
+	if request.ExcludeRemoteFieldMetadata != nil {
+		queryParams.Add("exclude_remote_field_metadata", fmt.Sprintf("%v", *request.ExcludeRemoteFieldMetadata))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
 
 	var response *ticketing.FieldMappingApiInstanceResponse
 	if err := c.caller.Call(
@@ -59,6 +67,14 @@ func (c *Client) FieldMappingsCreate(ctx context.Context, request *ticketing.Cre
 		baseURL = c.baseURL
 	}
 	endpointURL := baseURL + "/" + "ticketing/v1/field-mappings"
+
+	queryParams := make(url.Values)
+	if request.ExcludeRemoteFieldMetadata != nil {
+		queryParams.Add("exclude_remote_field_metadata", fmt.Sprintf("%v", *request.ExcludeRemoteFieldMetadata))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
 
 	var response *ticketing.FieldMappingInstanceResponse
 	if err := c.caller.Call(

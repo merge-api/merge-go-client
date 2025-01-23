@@ -53,14 +53,14 @@ func (c *Client) Create(ctx context.Context, request *hris.DataPassthroughReques
 }
 
 // Retrieves data from earlier async-passthrough POST request
-func (c *Client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*hris.RemoteResponse, error) {
+func (c *Client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*hris.AsyncPassthroughRetrieveResponse, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/async-passthrough/%v", asyncPassthroughReceiptId)
 
-	var response *hris.RemoteResponse
+	var response *hris.AsyncPassthroughRetrieveResponse
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{

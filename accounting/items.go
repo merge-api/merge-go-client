@@ -18,10 +18,12 @@ type ItemsListRequest struct {
 	Cursor *string `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *ItemsListRequestExpand `json:"-"`
-	// Whether to include data that was marked as deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+	IncludeShellData *bool `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.
@@ -50,31 +52,103 @@ type ItemsRetrieveRequest struct {
 type ItemsListRequestExpand string
 
 const (
-	ItemsListRequestExpandCompany                            ItemsListRequestExpand = "company"
-	ItemsListRequestExpandPurchaseAccount                    ItemsListRequestExpand = "purchase_account"
-	ItemsListRequestExpandPurchaseAccountCompany             ItemsListRequestExpand = "purchase_account,company"
-	ItemsListRequestExpandPurchaseAccountSalesAccount        ItemsListRequestExpand = "purchase_account,sales_account"
-	ItemsListRequestExpandPurchaseAccountSalesAccountCompany ItemsListRequestExpand = "purchase_account,sales_account,company"
-	ItemsListRequestExpandSalesAccount                       ItemsListRequestExpand = "sales_account"
-	ItemsListRequestExpandSalesAccountCompany                ItemsListRequestExpand = "sales_account,company"
+	ItemsListRequestExpandCompany                                                       ItemsListRequestExpand = "company"
+	ItemsListRequestExpandCompanyPurchaseTaxRate                                        ItemsListRequestExpand = "company,purchase_tax_rate"
+	ItemsListRequestExpandCompanySalesTaxRate                                           ItemsListRequestExpand = "company,sales_tax_rate"
+	ItemsListRequestExpandCompanySalesTaxRatePurchaseTaxRate                            ItemsListRequestExpand = "company,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccount                                               ItemsListRequestExpand = "purchase_account"
+	ItemsListRequestExpandPurchaseAccountCompany                                        ItemsListRequestExpand = "purchase_account,company"
+	ItemsListRequestExpandPurchaseAccountCompanyPurchaseTaxRate                         ItemsListRequestExpand = "purchase_account,company,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountCompanySalesTaxRate                            ItemsListRequestExpand = "purchase_account,company,sales_tax_rate"
+	ItemsListRequestExpandPurchaseAccountCompanySalesTaxRatePurchaseTaxRate             ItemsListRequestExpand = "purchase_account,company,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountPurchaseTaxRate                                ItemsListRequestExpand = "purchase_account,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesAccount                                   ItemsListRequestExpand = "purchase_account,sales_account"
+	ItemsListRequestExpandPurchaseAccountSalesAccountCompany                            ItemsListRequestExpand = "purchase_account,sales_account,company"
+	ItemsListRequestExpandPurchaseAccountSalesAccountCompanyPurchaseTaxRate             ItemsListRequestExpand = "purchase_account,sales_account,company,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRate                ItemsListRequestExpand = "purchase_account,sales_account,company,sales_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRatePurchaseTaxRate ItemsListRequestExpand = "purchase_account,sales_account,company,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesAccountPurchaseTaxRate                    ItemsListRequestExpand = "purchase_account,sales_account,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesAccountSalesTaxRate                       ItemsListRequestExpand = "purchase_account,sales_account,sales_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesAccountSalesTaxRatePurchaseTaxRate        ItemsListRequestExpand = "purchase_account,sales_account,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesTaxRate                                   ItemsListRequestExpand = "purchase_account,sales_tax_rate"
+	ItemsListRequestExpandPurchaseAccountSalesTaxRatePurchaseTaxRate                    ItemsListRequestExpand = "purchase_account,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandPurchaseTaxRate                                               ItemsListRequestExpand = "purchase_tax_rate"
+	ItemsListRequestExpandSalesAccount                                                  ItemsListRequestExpand = "sales_account"
+	ItemsListRequestExpandSalesAccountCompany                                           ItemsListRequestExpand = "sales_account,company"
+	ItemsListRequestExpandSalesAccountCompanyPurchaseTaxRate                            ItemsListRequestExpand = "sales_account,company,purchase_tax_rate"
+	ItemsListRequestExpandSalesAccountCompanySalesTaxRate                               ItemsListRequestExpand = "sales_account,company,sales_tax_rate"
+	ItemsListRequestExpandSalesAccountCompanySalesTaxRatePurchaseTaxRate                ItemsListRequestExpand = "sales_account,company,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandSalesAccountPurchaseTaxRate                                   ItemsListRequestExpand = "sales_account,purchase_tax_rate"
+	ItemsListRequestExpandSalesAccountSalesTaxRate                                      ItemsListRequestExpand = "sales_account,sales_tax_rate"
+	ItemsListRequestExpandSalesAccountSalesTaxRatePurchaseTaxRate                       ItemsListRequestExpand = "sales_account,sales_tax_rate,purchase_tax_rate"
+	ItemsListRequestExpandSalesTaxRate                                                  ItemsListRequestExpand = "sales_tax_rate"
+	ItemsListRequestExpandSalesTaxRatePurchaseTaxRate                                   ItemsListRequestExpand = "sales_tax_rate,purchase_tax_rate"
 )
 
 func NewItemsListRequestExpandFromString(s string) (ItemsListRequestExpand, error) {
 	switch s {
 	case "company":
 		return ItemsListRequestExpandCompany, nil
+	case "company,purchase_tax_rate":
+		return ItemsListRequestExpandCompanyPurchaseTaxRate, nil
+	case "company,sales_tax_rate":
+		return ItemsListRequestExpandCompanySalesTaxRate, nil
+	case "company,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandCompanySalesTaxRatePurchaseTaxRate, nil
 	case "purchase_account":
 		return ItemsListRequestExpandPurchaseAccount, nil
 	case "purchase_account,company":
 		return ItemsListRequestExpandPurchaseAccountCompany, nil
+	case "purchase_account,company,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountCompanyPurchaseTaxRate, nil
+	case "purchase_account,company,sales_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountCompanySalesTaxRate, nil
+	case "purchase_account,company,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountCompanySalesTaxRatePurchaseTaxRate, nil
+	case "purchase_account,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountPurchaseTaxRate, nil
 	case "purchase_account,sales_account":
 		return ItemsListRequestExpandPurchaseAccountSalesAccount, nil
 	case "purchase_account,sales_account,company":
 		return ItemsListRequestExpandPurchaseAccountSalesAccountCompany, nil
+	case "purchase_account,sales_account,company,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountCompanyPurchaseTaxRate, nil
+	case "purchase_account,sales_account,company,sales_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRate, nil
+	case "purchase_account,sales_account,company,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRatePurchaseTaxRate, nil
+	case "purchase_account,sales_account,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountPurchaseTaxRate, nil
+	case "purchase_account,sales_account,sales_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountSalesTaxRate, nil
+	case "purchase_account,sales_account,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesAccountSalesTaxRatePurchaseTaxRate, nil
+	case "purchase_account,sales_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesTaxRate, nil
+	case "purchase_account,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseAccountSalesTaxRatePurchaseTaxRate, nil
+	case "purchase_tax_rate":
+		return ItemsListRequestExpandPurchaseTaxRate, nil
 	case "sales_account":
 		return ItemsListRequestExpandSalesAccount, nil
 	case "sales_account,company":
 		return ItemsListRequestExpandSalesAccountCompany, nil
+	case "sales_account,company,purchase_tax_rate":
+		return ItemsListRequestExpandSalesAccountCompanyPurchaseTaxRate, nil
+	case "sales_account,company,sales_tax_rate":
+		return ItemsListRequestExpandSalesAccountCompanySalesTaxRate, nil
+	case "sales_account,company,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandSalesAccountCompanySalesTaxRatePurchaseTaxRate, nil
+	case "sales_account,purchase_tax_rate":
+		return ItemsListRequestExpandSalesAccountPurchaseTaxRate, nil
+	case "sales_account,sales_tax_rate":
+		return ItemsListRequestExpandSalesAccountSalesTaxRate, nil
+	case "sales_account,sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandSalesAccountSalesTaxRatePurchaseTaxRate, nil
+	case "sales_tax_rate":
+		return ItemsListRequestExpandSalesTaxRate, nil
+	case "sales_tax_rate,purchase_tax_rate":
+		return ItemsListRequestExpandSalesTaxRatePurchaseTaxRate, nil
 	}
 	var t ItemsListRequestExpand
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -87,31 +161,103 @@ func (i ItemsListRequestExpand) Ptr() *ItemsListRequestExpand {
 type ItemsRetrieveRequestExpand string
 
 const (
-	ItemsRetrieveRequestExpandCompany                            ItemsRetrieveRequestExpand = "company"
-	ItemsRetrieveRequestExpandPurchaseAccount                    ItemsRetrieveRequestExpand = "purchase_account"
-	ItemsRetrieveRequestExpandPurchaseAccountCompany             ItemsRetrieveRequestExpand = "purchase_account,company"
-	ItemsRetrieveRequestExpandPurchaseAccountSalesAccount        ItemsRetrieveRequestExpand = "purchase_account,sales_account"
-	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompany ItemsRetrieveRequestExpand = "purchase_account,sales_account,company"
-	ItemsRetrieveRequestExpandSalesAccount                       ItemsRetrieveRequestExpand = "sales_account"
-	ItemsRetrieveRequestExpandSalesAccountCompany                ItemsRetrieveRequestExpand = "sales_account,company"
+	ItemsRetrieveRequestExpandCompany                                                       ItemsRetrieveRequestExpand = "company"
+	ItemsRetrieveRequestExpandCompanyPurchaseTaxRate                                        ItemsRetrieveRequestExpand = "company,purchase_tax_rate"
+	ItemsRetrieveRequestExpandCompanySalesTaxRate                                           ItemsRetrieveRequestExpand = "company,sales_tax_rate"
+	ItemsRetrieveRequestExpandCompanySalesTaxRatePurchaseTaxRate                            ItemsRetrieveRequestExpand = "company,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccount                                               ItemsRetrieveRequestExpand = "purchase_account"
+	ItemsRetrieveRequestExpandPurchaseAccountCompany                                        ItemsRetrieveRequestExpand = "purchase_account,company"
+	ItemsRetrieveRequestExpandPurchaseAccountCompanyPurchaseTaxRate                         ItemsRetrieveRequestExpand = "purchase_account,company,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountCompanySalesTaxRate                            ItemsRetrieveRequestExpand = "purchase_account,company,sales_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountCompanySalesTaxRatePurchaseTaxRate             ItemsRetrieveRequestExpand = "purchase_account,company,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountPurchaseTaxRate                                ItemsRetrieveRequestExpand = "purchase_account,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccount                                   ItemsRetrieveRequestExpand = "purchase_account,sales_account"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompany                            ItemsRetrieveRequestExpand = "purchase_account,sales_account,company"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompanyPurchaseTaxRate             ItemsRetrieveRequestExpand = "purchase_account,sales_account,company,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRate                ItemsRetrieveRequestExpand = "purchase_account,sales_account,company,sales_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRatePurchaseTaxRate ItemsRetrieveRequestExpand = "purchase_account,sales_account,company,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountPurchaseTaxRate                    ItemsRetrieveRequestExpand = "purchase_account,sales_account,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountSalesTaxRate                       ItemsRetrieveRequestExpand = "purchase_account,sales_account,sales_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesAccountSalesTaxRatePurchaseTaxRate        ItemsRetrieveRequestExpand = "purchase_account,sales_account,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesTaxRate                                   ItemsRetrieveRequestExpand = "purchase_account,sales_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseAccountSalesTaxRatePurchaseTaxRate                    ItemsRetrieveRequestExpand = "purchase_account,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandPurchaseTaxRate                                               ItemsRetrieveRequestExpand = "purchase_tax_rate"
+	ItemsRetrieveRequestExpandSalesAccount                                                  ItemsRetrieveRequestExpand = "sales_account"
+	ItemsRetrieveRequestExpandSalesAccountCompany                                           ItemsRetrieveRequestExpand = "sales_account,company"
+	ItemsRetrieveRequestExpandSalesAccountCompanyPurchaseTaxRate                            ItemsRetrieveRequestExpand = "sales_account,company,purchase_tax_rate"
+	ItemsRetrieveRequestExpandSalesAccountCompanySalesTaxRate                               ItemsRetrieveRequestExpand = "sales_account,company,sales_tax_rate"
+	ItemsRetrieveRequestExpandSalesAccountCompanySalesTaxRatePurchaseTaxRate                ItemsRetrieveRequestExpand = "sales_account,company,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandSalesAccountPurchaseTaxRate                                   ItemsRetrieveRequestExpand = "sales_account,purchase_tax_rate"
+	ItemsRetrieveRequestExpandSalesAccountSalesTaxRate                                      ItemsRetrieveRequestExpand = "sales_account,sales_tax_rate"
+	ItemsRetrieveRequestExpandSalesAccountSalesTaxRatePurchaseTaxRate                       ItemsRetrieveRequestExpand = "sales_account,sales_tax_rate,purchase_tax_rate"
+	ItemsRetrieveRequestExpandSalesTaxRate                                                  ItemsRetrieveRequestExpand = "sales_tax_rate"
+	ItemsRetrieveRequestExpandSalesTaxRatePurchaseTaxRate                                   ItemsRetrieveRequestExpand = "sales_tax_rate,purchase_tax_rate"
 )
 
 func NewItemsRetrieveRequestExpandFromString(s string) (ItemsRetrieveRequestExpand, error) {
 	switch s {
 	case "company":
 		return ItemsRetrieveRequestExpandCompany, nil
+	case "company,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandCompanyPurchaseTaxRate, nil
+	case "company,sales_tax_rate":
+		return ItemsRetrieveRequestExpandCompanySalesTaxRate, nil
+	case "company,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandCompanySalesTaxRatePurchaseTaxRate, nil
 	case "purchase_account":
 		return ItemsRetrieveRequestExpandPurchaseAccount, nil
 	case "purchase_account,company":
 		return ItemsRetrieveRequestExpandPurchaseAccountCompany, nil
+	case "purchase_account,company,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountCompanyPurchaseTaxRate, nil
+	case "purchase_account,company,sales_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountCompanySalesTaxRate, nil
+	case "purchase_account,company,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountCompanySalesTaxRatePurchaseTaxRate, nil
+	case "purchase_account,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountPurchaseTaxRate, nil
 	case "purchase_account,sales_account":
 		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccount, nil
 	case "purchase_account,sales_account,company":
 		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompany, nil
+	case "purchase_account,sales_account,company,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompanyPurchaseTaxRate, nil
+	case "purchase_account,sales_account,company,sales_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRate, nil
+	case "purchase_account,sales_account,company,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountCompanySalesTaxRatePurchaseTaxRate, nil
+	case "purchase_account,sales_account,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountPurchaseTaxRate, nil
+	case "purchase_account,sales_account,sales_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountSalesTaxRate, nil
+	case "purchase_account,sales_account,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesAccountSalesTaxRatePurchaseTaxRate, nil
+	case "purchase_account,sales_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesTaxRate, nil
+	case "purchase_account,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseAccountSalesTaxRatePurchaseTaxRate, nil
+	case "purchase_tax_rate":
+		return ItemsRetrieveRequestExpandPurchaseTaxRate, nil
 	case "sales_account":
 		return ItemsRetrieveRequestExpandSalesAccount, nil
 	case "sales_account,company":
 		return ItemsRetrieveRequestExpandSalesAccountCompany, nil
+	case "sales_account,company,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandSalesAccountCompanyPurchaseTaxRate, nil
+	case "sales_account,company,sales_tax_rate":
+		return ItemsRetrieveRequestExpandSalesAccountCompanySalesTaxRate, nil
+	case "sales_account,company,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandSalesAccountCompanySalesTaxRatePurchaseTaxRate, nil
+	case "sales_account,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandSalesAccountPurchaseTaxRate, nil
+	case "sales_account,sales_tax_rate":
+		return ItemsRetrieveRequestExpandSalesAccountSalesTaxRate, nil
+	case "sales_account,sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandSalesAccountSalesTaxRatePurchaseTaxRate, nil
+	case "sales_tax_rate":
+		return ItemsRetrieveRequestExpandSalesTaxRate, nil
+	case "sales_tax_rate,purchase_tax_rate":
+		return ItemsRetrieveRequestExpandSalesTaxRatePurchaseTaxRate, nil
 	}
 	var t ItemsRetrieveRequestExpand
 	return "", fmt.Errorf("%s is not a valid %T", s, t)

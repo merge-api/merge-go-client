@@ -22,6 +22,8 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+	// The time at which account completes the linking flow.
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -73,6 +75,7 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+	CompletedAt time.Time                            `json:"completed_at"`
 
 	_rawJSON json.RawMessage
 }
@@ -139,12 +142,14 @@ func (a *AccountDetailsAndActionsIntegration) String() string {
 // - `COMPLETE` - COMPLETE
 // - `INCOMPLETE` - INCOMPLETE
 // - `RELINK_NEEDED` - RELINK_NEEDED
+// - `IDLE` - IDLE
 type AccountDetailsAndActionsStatusEnum string
 
 const (
 	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
 	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
 	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+	AccountDetailsAndActionsStatusEnumIdle         AccountDetailsAndActionsStatusEnum = "IDLE"
 )
 
 func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
@@ -155,6 +160,8 @@ func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAn
 		return AccountDetailsAndActionsStatusEnumIncomplete, nil
 	case "RELINK_NEEDED":
 		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	case "IDLE":
+		return AccountDetailsAndActionsStatusEnumIdle, nil
 	}
 	var t AccountDetailsAndActionsStatusEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -171,9 +178,9 @@ type AccountIntegration struct {
 	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
-	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
+	// Company logo in rectangular shape.
 	Image *string `json:"image,omitempty"`
-	// Company logo in square shape. <b>Upload an image with a white background.</b>
+	// Company logo in square shape.
 	SquareImage *string `json:"square_image,omitempty"`
 	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
@@ -353,6 +360,9 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 	// - `MUTED_ISSUE` - MUTED_ISSUE
 	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -423,6 +433,9 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -877,10 +890,10 @@ type Drive struct {
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// The drive's url.
 	DriveUrl *string `json:"drive_url,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1023,6 +1036,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -1064,6 +1080,9 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountCommonModelOverride    EventTypeEnum = "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumChangedLinkedAccountCommonModelOverride    EventTypeEnum = "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumDeletedLinkedAccountCommonModelOverride    EventTypeEnum = "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
 	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
 	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
 	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
@@ -1137,6 +1156,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumCreatedLinkedAccountCommonModelOverride, nil
+	case "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumChangedLinkedAccountCommonModelOverride, nil
+	case "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumDeletedLinkedAccountCommonModelOverride, nil
 	case "FORCED_LINKED_ACCOUNT_RESYNC":
 		return EventTypeEnumForcedLinkedAccountResync, nil
 	case "MUTED_ISSUE":
@@ -1257,7 +1282,7 @@ func (f *FieldMappingApiInstance) String() string {
 }
 
 type FieldMappingApiInstanceRemoteField struct {
-	RemoteKeyName      string                                                `json:"remote_key_name"`
+	RemoteKeyName      *string                                               `json:"remote_key_name,omitempty"`
 	Schema             map[string]interface{}                                `json:"schema,omitempty"`
 	RemoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo `json:"remote_endpoint_info,omitempty"`
 
@@ -1415,8 +1440,8 @@ func (f *FieldMappingInstanceResponse) String() string {
 }
 
 type FieldPermissionDeserializer struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1445,8 +1470,8 @@ func (f *FieldPermissionDeserializer) String() string {
 }
 
 type FieldPermissionDeserializerRequest struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1498,7 +1523,7 @@ type File struct {
 	// The URL that produces a thumbnail preview of the file. Typically an image.
 	FileThumbnailUrl *string `json:"file_thumbnail_url,omitempty"`
 	// The file's size, in bytes.
-	Size *int `json:"size,omitempty"`
+	Size *int64 `json:"size,omitempty"`
 	// The file's mime type.
 	MimeType *string `json:"mime_type,omitempty"`
 	// The file's description.
@@ -1513,10 +1538,10 @@ type File struct {
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's file was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1808,7 +1833,7 @@ type FileRequest struct {
 	// The URL that produces a thumbnail preview of the file. Typically an image.
 	FileThumbnailUrl *string `json:"file_thumbnail_url,omitempty"`
 	// The file's size, in bytes.
-	Size *int `json:"size,omitempty"`
+	Size *int64 `json:"size,omitempty"`
 	// The file's mime type.
 	MimeType *string `json:"mime_type,omitempty"`
 	// The file's description.
@@ -2181,7 +2206,7 @@ type Folder struct {
 	// The URL to access the folder.
 	FolderUrl *string `json:"folder_url,omitempty"`
 	// The folder's size, in bytes.
-	Size *int `json:"size,omitempty"`
+	Size *int64 `json:"size,omitempty"`
 	// The folder's description.
 	Description *string `json:"description,omitempty"`
 	// The folder that the folder belongs to.
@@ -2194,10 +2219,10 @@ type Folder struct {
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's folder was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2487,7 +2512,7 @@ type FolderRequest struct {
 	// The URL to access the folder.
 	FolderUrl *string `json:"folder_url,omitempty"`
 	// The folder's size, in bytes.
-	Size *int `json:"size,omitempty"`
+	Size *int64 `json:"size,omitempty"`
 	// The folder's description.
 	Description *string `json:"description,omitempty"`
 	// The folder that the folder belongs to.
@@ -2793,10 +2818,12 @@ type Group struct {
 	Name *string `json:"name,omitempty"`
 	// The users that belong in the group. If null, this typically means it's either a domain or the third-party platform does not surface this information.
 	Users []string `json:"users,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
+	// Groups that inherit the permissions of the parent group.
+	ChildGroups []*GroupChildGroupsItem `json:"child_groups,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2822,6 +2849,63 @@ func (g *Group) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", g)
+}
+
+type GroupChildGroupsItem struct {
+	typeName string
+	String   string
+	Group    *Group
+}
+
+func NewGroupChildGroupsItemFromString(value string) *GroupChildGroupsItem {
+	return &GroupChildGroupsItem{typeName: "string", String: value}
+}
+
+func NewGroupChildGroupsItemFromGroup(value *Group) *GroupChildGroupsItem {
+	return &GroupChildGroupsItem{typeName: "group", Group: value}
+}
+
+func (g *GroupChildGroupsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueGroup := new(Group)
+	if err := json.Unmarshal(data, &valueGroup); err == nil {
+		g.typeName = "group"
+		g.Group = valueGroup
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GroupChildGroupsItem) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "group":
+		return json.Marshal(g.Group)
+	}
+}
+
+type GroupChildGroupsItemVisitor interface {
+	VisitString(string) error
+	VisitGroup(*Group) error
+}
+
+func (g *GroupChildGroupsItem) Accept(visitor GroupChildGroupsItemVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "group":
+		return visitor.VisitGroup(g.Group)
+	}
 }
 
 type IndividualCommonModelScopeDeserializer struct {
@@ -3009,6 +3093,30 @@ func NewIssueStatusEnumFromString(s string) (IssueStatusEnum, error) {
 
 func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
 	return &i
+}
+
+// - `en` - en
+// - `de` - de
+type LanguageEnum string
+
+const (
+	LanguageEnumEn LanguageEnum = "en"
+	LanguageEnumDe LanguageEnum = "de"
+)
+
+func NewLanguageEnumFromString(s string) (LanguageEnum, error) {
+	switch s {
+	case "en":
+		return LanguageEnumEn, nil
+	case "de":
+		return LanguageEnumDe, nil
+	}
+	var t LanguageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LanguageEnum) Ptr() *LanguageEnum {
+	return &l
 }
 
 type LinkToken struct {
@@ -3657,9 +3765,9 @@ type Permission struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
-	// The user that is granted this permission.
+	// The user that is granted this permission. This will only be populated if the type is `USER`.
 	User *PermissionUser `json:"user,omitempty"`
-	// The group that is granted this permission.
+	// The group that is granted this permission. This will only be populated if the type is `GROUP`.
 	Group *PermissionGroup `json:"group,omitempty"`
 	// Denotes what type of people have access to the file.
 	//
@@ -3697,7 +3805,7 @@ func (p *Permission) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
-// The group that is granted this permission.
+// The group that is granted this permission. This will only be populated if the type is `GROUP`.
 type PermissionGroup struct {
 	typeName string
 	String   string
@@ -3767,9 +3875,9 @@ func (p *PermissionGroup) Accept(visitor PermissionGroupVisitor) error {
 type PermissionRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty"`
-	// The user that is granted this permission.
+	// The user that is granted this permission. This will only be populated if the type is `USER`.
 	User *PermissionRequestUser `json:"user,omitempty"`
-	// The group that is granted this permission.
+	// The group that is granted this permission. This will only be populated if the type is `GROUP`.
 	Group *PermissionRequestGroup `json:"group,omitempty"`
 	// Denotes what type of people have access to the file.
 	//
@@ -3809,7 +3917,7 @@ func (p *PermissionRequest) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
-// The group that is granted this permission.
+// The group that is granted this permission. This will only be populated if the type is `GROUP`.
 type PermissionRequestGroup struct {
 	typeName string
 	String   string
@@ -3992,7 +4100,7 @@ func (p *PermissionRequestType) Accept(visitor PermissionRequestTypeVisitor) err
 	}
 }
 
-// The user that is granted this permission.
+// The user that is granted this permission. This will only be populated if the type is `USER`.
 type PermissionRequestUser struct {
 	typeName string
 	String   string
@@ -4175,7 +4283,7 @@ func (p *PermissionType) Accept(visitor PermissionTypeVisitor) error {
 	}
 }
 
-// The user that is granted this permission.
+// The user that is granted this permission. This will only be populated if the type is `USER`.
 type PermissionUser struct {
 	typeName string
 	String   string
@@ -4231,6 +4339,46 @@ func (p *PermissionUser) Accept(visitor PermissionUserVisitor) error {
 	case "user":
 		return visitor.VisitUser(p.User)
 	}
+}
+
+// # The RemoteData Object
+//
+// ### Description
+//
+// The `RemoteData` object is used to represent the full data pulled from the third-party API for an object.
+//
+// ### Usage Example
+//
+// TODO
+type RemoteData struct {
+	// The third-party API path that is being called.
+	Path string      `json:"path"`
+	Data interface{} `json:"data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteData) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteData
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteData(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteData) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
 }
 
 type RemoteEndpointInfo struct {
@@ -4754,10 +4902,10 @@ type User struct {
 	EmailAddress *string `json:"email_address,omitempty"`
 	// Whether the user is the one who linked this account.
 	IsMe *bool `json:"is_me,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }

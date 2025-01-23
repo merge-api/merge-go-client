@@ -48,6 +48,9 @@ func (c *Client) List(ctx context.Context, request *crm.UsersListRequest) (*crm.
 	if request.Cursor != nil {
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
+	if request.Email != nil {
+		queryParams.Add("email", fmt.Sprintf("%v", *request.Email))
+	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
 	}
@@ -56,6 +59,9 @@ func (c *Client) List(ctx context.Context, request *crm.UsersListRequest) (*crm.
 	}
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
@@ -164,6 +170,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.UsersR
 	}
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.IsCommonModelField != nil {
 		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))

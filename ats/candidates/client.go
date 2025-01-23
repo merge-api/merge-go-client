@@ -63,6 +63,9 @@ func (c *Client) List(ctx context.Context, request *ats.CandidatesListRequest) (
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.LastName != nil {
 		queryParams.Add("last_name", fmt.Sprintf("%v", *request.LastName))
 	}

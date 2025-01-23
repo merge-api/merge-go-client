@@ -7,6 +7,14 @@ import (
 	time "time"
 )
 
+type CreditNoteEndpointRequest struct {
+	// Whether to include debug fields (such as log file links) in the response.
+	IsDebugMode *bool `json:"-"`
+	// Whether or not third-party updates should be run asynchronously.
+	RunAsync *bool              `json:"-"`
+	Model    *CreditNoteRequest `json:"model,omitempty"`
+}
+
 type CreditNotesListRequest struct {
 	// If provided, will only return credit notes for this company.
 	CompanyId *string `json:"-"`
@@ -18,10 +26,12 @@ type CreditNotesListRequest struct {
 	Cursor *string `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *CreditNotesListRequestExpand `json:"-"`
-	// Whether to include data that was marked as deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+	IncludeShellData *bool `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.

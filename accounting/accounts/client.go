@@ -39,6 +39,9 @@ func (c *Client) List(ctx context.Context, request *accounting.AccountsListReque
 	endpointURL := baseURL + "/" + "accounting/v1/accounts"
 
 	queryParams := make(url.Values)
+	if request.AccountType != nil {
+		queryParams.Add("account_type", fmt.Sprintf("%v", *request.AccountType))
+	}
 	if request.CompanyId != nil {
 		queryParams.Add("company_id", fmt.Sprintf("%v", *request.CompanyId))
 	}
@@ -59,6 +62,9 @@ func (c *Client) List(ctx context.Context, request *accounting.AccountsListReque
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))

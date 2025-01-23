@@ -53,14 +53,14 @@ func (c *Client) Create(ctx context.Context, request *ticketing.DataPassthroughR
 }
 
 // Retrieves data from earlier async-passthrough POST request
-func (c *Client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*ticketing.RemoteResponse, error) {
+func (c *Client) Retrieve(ctx context.Context, asyncPassthroughReceiptId string) (*ticketing.AsyncPassthroughRetrieveResponse, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/async-passthrough/%v", asyncPassthroughReceiptId)
 
-	var response *ticketing.RemoteResponse
+	var response *ticketing.AsyncPassthroughRetrieveResponse
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{

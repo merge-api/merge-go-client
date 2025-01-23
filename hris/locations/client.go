@@ -54,6 +54,9 @@ func (c *Client) List(ctx context.Context, request *hris.LocationsListRequest) (
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.LocationType != nil {
 		queryParams.Add("location_type", fmt.Sprintf("%v", *request.LocationType))
 	}
@@ -67,13 +70,13 @@ func (c *Client) List(ctx context.Context, request *hris.LocationsListRequest) (
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}
 	if request.RemoteFields != nil {
-		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
+		queryParams.Add("remote_fields", fmt.Sprintf("%v", *request.RemoteFields))
 	}
 	if request.RemoteId != nil {
 		queryParams.Add("remote_id", fmt.Sprintf("%v", *request.RemoteId))
 	}
 	if request.ShowEnumOrigins != nil {
-		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", request.ShowEnumOrigins))
+		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
 	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
@@ -107,10 +110,10 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *hris.Location
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
 	if request.RemoteFields != nil {
-		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
+		queryParams.Add("remote_fields", fmt.Sprintf("%v", *request.RemoteFields))
 	}
 	if request.ShowEnumOrigins != nil {
-		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", request.ShowEnumOrigins))
+		queryParams.Add("show_enum_origins", fmt.Sprintf("%v", *request.ShowEnumOrigins))
 	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()

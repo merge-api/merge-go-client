@@ -58,6 +58,8 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+	// The time at which account completes the linking flow.
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -109,6 +111,7 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+	CompletedAt time.Time                            `json:"completed_at"`
 
 	_rawJSON json.RawMessage
 }
@@ -175,12 +178,14 @@ func (a *AccountDetailsAndActionsIntegration) String() string {
 // - `COMPLETE` - COMPLETE
 // - `INCOMPLETE` - INCOMPLETE
 // - `RELINK_NEEDED` - RELINK_NEEDED
+// - `IDLE` - IDLE
 type AccountDetailsAndActionsStatusEnum string
 
 const (
 	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
 	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
 	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+	AccountDetailsAndActionsStatusEnumIdle         AccountDetailsAndActionsStatusEnum = "IDLE"
 )
 
 func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
@@ -191,6 +196,8 @@ func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAn
 		return AccountDetailsAndActionsStatusEnumIncomplete, nil
 	case "RELINK_NEEDED":
 		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	case "IDLE":
+		return AccountDetailsAndActionsStatusEnumIdle, nil
 	}
 	var t AccountDetailsAndActionsStatusEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -207,9 +214,9 @@ type AccountIntegration struct {
 	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
-	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
+	// Company logo in rectangular shape.
 	Image *string `json:"image,omitempty"`
-	// Company logo in square shape. <b>Upload an image with a white background.</b>
+	// Company logo in square shape.
 	SquareImage *string `json:"square_image,omitempty"`
 	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
@@ -315,7 +322,7 @@ type Activity struct {
 	// - `PRIVATE` - PRIVATE
 	Visibility *ActivityVisibility `json:"visibility,omitempty"`
 	Candidate  *string             `json:"candidate,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -896,10 +903,11 @@ type Application struct {
 	// The application's current stage.
 	CurrentStage *ApplicationCurrentStage `json:"current_stage,omitempty"`
 	// The application's reason for rejection.
-	RejectReason     *ApplicationRejectReason `json:"reject_reason,omitempty"`
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData            `json:"remote_data,omitempty"`
+	RejectReason *ApplicationRejectReason `json:"reject_reason,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -1882,10 +1890,11 @@ type Attachment struct {
 	// - `COVER_LETTER` - COVER_LETTER
 	// - `OFFER_LETTER` - OFFER_LETTER
 	// - `OTHER` - OTHER
-	AttachmentType   *AttachmentAttachmentType `json:"attachment_type,omitempty"`
-	RemoteWasDeleted *bool                     `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}    `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData             `json:"remote_data,omitempty"`
+	AttachmentType *AttachmentAttachmentType `json:"attachment_type,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2203,6 +2212,9 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 	// - `MUTED_ISSUE` - MUTED_ISSUE
 	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -2273,6 +2285,9 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -2487,10 +2502,11 @@ type Candidate struct {
 	// Array of `Application` object IDs.
 	Applications []*CandidateApplicationsItem `json:"applications,omitempty"`
 	// Array of `Attachment` object IDs.
-	Attachments      []*CandidateAttachmentsItem `json:"attachments,omitempty"`
-	RemoteWasDeleted *bool                       `json:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}      `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData               `json:"remote_data,omitempty"`
+	Attachments []*CandidateAttachmentsItem `json:"attachments,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3124,7 +3140,7 @@ type Department struct {
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The department's name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -3235,7 +3251,7 @@ type Eeoc struct {
 	// - `NO_I_DONT_HAVE_A_DISABILITY` - NO_I_DONT_HAVE_A_DISABILITY
 	// - `I_DONT_WISH_TO_ANSWER` - I_DONT_WISH_TO_ANSWER
 	DisabilityStatus *EeocDisabilityStatus `json:"disability_status,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -3601,7 +3617,7 @@ type EmailAddress struct {
 	// - `WORK` - WORK
 	// - `OTHER` - OTHER
 	EmailAddressType *EmailAddressEmailAddressType `json:"email_address_type,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -3944,6 +3960,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -3985,6 +4004,9 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountCommonModelOverride    EventTypeEnum = "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumChangedLinkedAccountCommonModelOverride    EventTypeEnum = "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumDeletedLinkedAccountCommonModelOverride    EventTypeEnum = "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
 	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
 	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
 	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
@@ -4058,6 +4080,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumCreatedLinkedAccountCommonModelOverride, nil
+	case "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumChangedLinkedAccountCommonModelOverride, nil
+	case "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumDeletedLinkedAccountCommonModelOverride, nil
 	case "FORCED_LINKED_ACCOUNT_RESYNC":
 		return EventTypeEnumForcedLinkedAccountResync, nil
 	case "MUTED_ISSUE":
@@ -4189,7 +4217,7 @@ func (f *FieldMappingApiInstance) String() string {
 }
 
 type FieldMappingApiInstanceRemoteField struct {
-	RemoteKeyName      string                                                `json:"remote_key_name"`
+	RemoteKeyName      *string                                               `json:"remote_key_name,omitempty"`
 	Schema             map[string]interface{}                                `json:"schema,omitempty"`
 	RemoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo `json:"remote_endpoint_info,omitempty"`
 
@@ -4358,8 +4386,8 @@ func (f *FieldMappingInstanceResponse) String() string {
 }
 
 type FieldPermissionDeserializer struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4388,8 +4416,8 @@ func (f *FieldPermissionDeserializer) String() string {
 }
 
 type FieldPermissionDeserializerRequest struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4694,7 +4722,7 @@ type Job struct {
 	HiringManagers []*JobHiringManagersItem `json:"hiring_managers,omitempty"`
 	// IDs of `RemoteUser` objects that serve as recruiters for this `Job`.
 	Recruiters []*JobRecruitersItem `json:"recruiters,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -4862,7 +4890,7 @@ type JobInterviewStage struct {
 	Job *JobInterviewStageJob `json:"job,omitempty"`
 	// The stage’s order, with the lowest values ordered first. If the third-party does not return details on the order of stages, this field will not be populated.
 	StageOrder *int `json:"stage_order,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -5047,7 +5075,7 @@ type JobPosting struct {
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Indicates whether the job posting is internal or external.
 	IsInternal *bool `json:"is_internal,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -5412,6 +5440,30 @@ func NewJobTypeEnumFromString(s string) (JobTypeEnum, error) {
 
 func (j JobTypeEnum) Ptr() *JobTypeEnum {
 	return &j
+}
+
+// - `en` - en
+// - `de` - de
+type LanguageEnum string
+
+const (
+	LanguageEnumEn LanguageEnum = "en"
+	LanguageEnumDe LanguageEnum = "de"
+)
+
+func NewLanguageEnumFromString(s string) (LanguageEnum, error) {
+	switch s {
+	case "en":
+		return LanguageEnumEn, nil
+	case "de":
+		return LanguageEnumDe, nil
+	}
+	var t LanguageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LanguageEnum) Ptr() *LanguageEnum {
+	return &l
 }
 
 type LinkToken struct {
@@ -5805,7 +5857,7 @@ type Offer struct {
 	// - `SIGNED` - SIGNED
 	// - `DEPRECATED` - DEPRECATED
 	Status *OfferStatus `json:"status,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -6093,7 +6145,7 @@ type Office struct {
 	Name *string `json:"name,omitempty"`
 	// The office's location.
 	Location *string `json:"location,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -6900,7 +6952,7 @@ type PhoneNumber struct {
 	// - `SKYPE` - SKYPE
 	// - `OTHER` - OTHER
 	PhoneNumberType *PhoneNumberPhoneNumberType `json:"phone_number_type,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -7237,7 +7289,7 @@ type RejectReason struct {
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The rejection reason’s name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -7268,7 +7320,17 @@ func (r *RejectReason) String() string {
 	return fmt.Sprintf("%#v", r)
 }
 
+// # The RemoteData Object
+//
+// ### Description
+//
+// The `RemoteData` object is used to represent the full data pulled from the third-party API for an object.
+//
+// ### Usage Example
+//
+// TODO
 type RemoteData struct {
+	// The third-party API path that is being called.
 	Path string      `json:"path"`
 	Data interface{} `json:"data,omitempty"`
 
@@ -7639,7 +7701,7 @@ type RemoteUser struct {
 	// - `LIMITED_TEAM_MEMBER` - LIMITED_TEAM_MEMBER
 	// - `INTERVIEWER` - INTERVIEWER
 	AccessRole *RemoteUserAccessRole `json:"access_role,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -7867,7 +7929,7 @@ type ScheduledInterview struct {
 	// - `AWAITING_FEEDBACK` - AWAITING_FEEDBACK
 	// - `COMPLETE` - COMPLETE
 	Status *ScheduledInterviewStatus `json:"status,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -8638,7 +8700,7 @@ type Scorecard struct {
 	// - `STRONG_YES` - STRONG_YES
 	// - `NO_DECISION` - NO_DECISION
 	OverallRecommendation *ScorecardOverallRecommendation `json:"overall_recommendation,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -8944,7 +9006,7 @@ type ScreeningQuestion struct {
 	// Whether or not the screening question is required.
 	Required *bool         `json:"required,omitempty"`
 	Options  []interface{} `json:"options,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -8994,7 +9056,7 @@ type ScreeningQuestionAnswer struct {
 	Question *ScreeningQuestionAnswerQuestion `json:"question,omitempty"`
 	// The candidate’s response to the screening question.
 	Answer *string `json:"answer,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -9261,7 +9323,7 @@ type ScreeningQuestionOption struct {
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// Available response options
 	Label *string `json:"label,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -9531,7 +9593,7 @@ type Tag struct {
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The tag's name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
 	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
@@ -9588,7 +9650,7 @@ type Url struct {
 	// - `OTHER` - OTHER
 	// - `JOB_POSTING` - JOB_POSTING
 	UrlType *UrlUrlType `json:"url_type,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage

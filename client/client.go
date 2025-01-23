@@ -21,8 +21,8 @@ type Client struct {
 	Ats         *atsclient.Client
 	Crm         *crmclient.Client
 	Filestorage *filestorageclient.Client
-	Ticketing   *ticketingclient.Client
 	Hris        *hrisclient.Client
+	Ticketing   *ticketingclient.Client
 	Accounting  *accountingclient.Client
 }
 
@@ -38,8 +38,8 @@ func NewClient(opts ...core.ClientOption) *Client {
 		Ats:         atsclient.NewClient(opts...),
 		Crm:         crmclient.NewClient(opts...),
 		Filestorage: filestorageclient.NewClient(opts...),
-		Ticketing:   ticketingclient.NewClient(opts...),
 		Hris:        hrisclient.NewClient(opts...),
+		Ticketing:   ticketingclient.NewClient(opts...),
 		Accounting:  accountingclient.NewClient(opts...),
 	}
 }

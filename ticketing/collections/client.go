@@ -52,13 +52,16 @@ func (c *Client) List(ctx context.Context, request *ticketing.CollectionsListReq
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
 	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
@@ -110,7 +113,7 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Col
 
 	queryParams := make(url.Values)
 	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
+		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
@@ -126,49 +129,6 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *ticketing.Col
 	}
 
 	var response *ticketing.Collection
-	if err := c.caller.Call(
-		ctx,
-		&core.CallParams{
-			URL:      endpointURL,
-			Method:   http.MethodGet,
-			Headers:  c.header,
-			Response: &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
-}
-
-// Returns a list of `User` objects.
-func (c *Client) UsersList(ctx context.Context, parentId string, request *ticketing.CollectionsUsersListRequest) (*ticketing.PaginatedUserList, error) {
-	baseURL := "https://api.merge.dev/api"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/collections/%v/users", parentId)
-
-	queryParams := make(url.Values)
-	if request.Cursor != nil {
-		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
-	}
-	if request.Expand != nil {
-		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
-	}
-	if request.IncludeDeletedData != nil {
-		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
-	}
-	if request.IncludeRemoteData != nil {
-		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
-	}
-	if request.PageSize != nil {
-		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
-	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-
-	var response *ticketing.PaginatedUserList
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{

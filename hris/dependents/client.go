@@ -57,6 +57,9 @@ func (c *Client) List(ctx context.Context, request *hris.DependentsListRequest) 
 	if request.IncludeSensitiveFields != nil {
 		queryParams.Add("include_sensitive_fields", fmt.Sprintf("%v", *request.IncludeSensitiveFields))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}
