@@ -60,7 +60,7 @@ type Account struct {
 	Name *string `json:"name,omitempty"`
 	// The account's domain names.
 	Domains []*string `json:"domains,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -104,6 +104,8 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+	// The time at which account completes the linking flow.
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -155,6 +157,7 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+	CompletedAt time.Time                            `json:"completed_at"`
 
 	_rawJSON json.RawMessage
 }
@@ -221,12 +224,14 @@ func (a *AccountDetailsAndActionsIntegration) String() string {
 // - `COMPLETE` - COMPLETE
 // - `INCOMPLETE` - INCOMPLETE
 // - `RELINK_NEEDED` - RELINK_NEEDED
+// - `IDLE` - IDLE
 type AccountDetailsAndActionsStatusEnum string
 
 const (
 	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
 	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
 	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+	AccountDetailsAndActionsStatusEnumIdle         AccountDetailsAndActionsStatusEnum = "IDLE"
 )
 
 func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
@@ -237,6 +242,8 @@ func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAn
 		return AccountDetailsAndActionsStatusEnumIncomplete, nil
 	case "RELINK_NEEDED":
 		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	case "IDLE":
+		return AccountDetailsAndActionsStatusEnumIdle, nil
 	}
 	var t AccountDetailsAndActionsStatusEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -253,9 +260,9 @@ type AccountIntegration struct {
 	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
-	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
+	// Company logo in rectangular shape.
 	Image *string `json:"image,omitempty"`
-	// Company logo in square shape. <b>Upload an image with a white background.</b>
+	// Company logo in square shape.
 	SquareImage *string `json:"square_image,omitempty"`
 	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
@@ -414,7 +421,8 @@ type Attachment struct {
 	// The user who uploaded the attachment.
 	UploadedBy *string `json:"uploaded_by,omitempty"`
 	// When the third party's attachment was created.
-	RemoteCreatedAt  *time.Time             `json:"remote_created_at,omitempty"`
+	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -659,6 +667,9 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 	// - `MUTED_ISSUE` - MUTED_ISSUE
 	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -729,6 +740,9 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -990,8 +1004,7 @@ func (c CategoryEnum) Ptr() *CategoryEnum {
 //
 // ### Description
 //
-// The `Collection` object is used to represent collections of tickets. Collections may include other collections as
-// sub collections.
+// The `Collection` object is used to represent one or more `Tickets`. There can be a hierarchy of `Collections`, in which a sub-collection belongs to a parent-collection.
 //
 // ### Usage Example
 //
@@ -1015,7 +1028,8 @@ type Collection struct {
 	CollectionType *CollectionCollectionType `json:"collection_type,omitempty"`
 	// The parent collection for this collection.
 	ParentCollection *CollectionParentCollection `json:"parent_collection,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	Teams            []*CollectionTeamsItem      `json:"teams,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The level of access a User has to the Collection and its sub-objects.
 	//
@@ -1233,6 +1247,63 @@ func (c *CollectionParentCollection) Accept(visitor CollectionParentCollectionVi
 	}
 }
 
+type CollectionTeamsItem struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewCollectionTeamsItemFromString(value string) *CollectionTeamsItem {
+	return &CollectionTeamsItem{typeName: "string", String: value}
+}
+
+func NewCollectionTeamsItemFromTeam(value *Team) *CollectionTeamsItem {
+	return &CollectionTeamsItem{typeName: "team", Team: value}
+}
+
+func (c *CollectionTeamsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		c.typeName = "team"
+		c.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CollectionTeamsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "team":
+		return json.Marshal(c.Team)
+	}
+}
+
+type CollectionTeamsItemVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (c *CollectionTeamsItem) Accept(visitor CollectionTeamsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "team":
+		return visitor.VisitTeam(c.Team)
+	}
+}
+
 // - `LIST` - LIST
 // - `PROJECT` - PROJECT
 type CollectionTypeEnum string
@@ -1274,9 +1345,9 @@ type Comment struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
-	// The author of the Comment, if the author is a User.
+	// The author of the Comment, if the author is a User. If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 	User *CommentUser `json:"user,omitempty"`
-	// The author of the Comment, if the author is a Contact.
+	// The author of the Comment, if the author is a Contact.If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 	Contact *CommentContact `json:"contact,omitempty"`
 	// The comment's text body.
 	Body *string `json:"body,omitempty"`
@@ -1287,7 +1358,8 @@ type Comment struct {
 	// Whether or not the comment is internal.
 	IsPrivate *bool `json:"is_private,omitempty"`
 	// When the third party's comment was created.
-	RemoteCreatedAt  *time.Time             `json:"remote_created_at,omitempty"`
+	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -1318,7 +1390,7 @@ func (c *Comment) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
-// The author of the Comment, if the author is a Contact.
+// The author of the Comment, if the author is a Contact.If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 type CommentContact struct {
 	typeName string
 	String   string
@@ -1386,9 +1458,9 @@ func (c *CommentContact) Accept(visitor CommentContactVisitor) error {
 //
 // TODO
 type CommentRequest struct {
-	// The author of the Comment, if the author is a User.
+	// The author of the Comment, if the author is a User. If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 	User *CommentRequestUser `json:"user,omitempty"`
-	// The author of the Comment, if the author is a Contact.
+	// The author of the Comment, if the author is a Contact.If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 	Contact *CommentRequestContact `json:"contact,omitempty"`
 	// The comment's text body.
 	Body *string `json:"body,omitempty"`
@@ -1427,7 +1499,7 @@ func (c *CommentRequest) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
-// The author of the Comment, if the author is a Contact.
+// The author of the Comment, if the author is a Contact.If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 type CommentRequestContact struct {
 	typeName string
 	String   string
@@ -1543,7 +1615,7 @@ func (c *CommentRequestTicket) Accept(visitor CommentRequestTicketVisitor) error
 	}
 }
 
-// The author of the Comment, if the author is a User.
+// The author of the Comment, if the author is a User. If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 type CommentRequestUser struct {
 	typeName string
 	String   string
@@ -1691,7 +1763,7 @@ func (c *CommentTicket) Accept(visitor CommentTicketVisitor) error {
 	}
 }
 
-// The author of the Comment, if the author is a User.
+// The author of the Comment, if the author is a User. If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 type CommentUser struct {
 	typeName string
 	String   string
@@ -1837,7 +1909,7 @@ type Contact struct {
 	Details *string `json:"details,omitempty"`
 	// The contact's account.
 	Account *ContactAccount `json:"account,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -2261,6 +2333,9 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
@@ -2302,6 +2377,9 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountCommonModelOverride    EventTypeEnum = "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumChangedLinkedAccountCommonModelOverride    EventTypeEnum = "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumDeletedLinkedAccountCommonModelOverride    EventTypeEnum = "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
 	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
 	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
 	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
@@ -2375,6 +2453,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumCreatedLinkedAccountCommonModelOverride, nil
+	case "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumChangedLinkedAccountCommonModelOverride, nil
+	case "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumDeletedLinkedAccountCommonModelOverride, nil
 	case "FORCED_LINKED_ACCOUNT_RESYNC":
 		return EventTypeEnumForcedLinkedAccountResync, nil
 	case "MUTED_ISSUE":
@@ -2541,7 +2625,7 @@ func (f *FieldMappingApiInstance) String() string {
 }
 
 type FieldMappingApiInstanceRemoteField struct {
-	RemoteKeyName      string                                                `json:"remote_key_name"`
+	RemoteKeyName      *string                                               `json:"remote_key_name,omitempty"`
 	Schema             map[string]interface{}                                `json:"schema,omitempty"`
 	RemoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo `json:"remote_endpoint_info,omitempty"`
 
@@ -2705,8 +2789,8 @@ func (f *FieldMappingInstanceResponse) String() string {
 }
 
 type FieldPermissionDeserializer struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2735,8 +2819,8 @@ func (f *FieldPermissionDeserializer) String() string {
 }
 
 type FieldPermissionDeserializerRequest struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -3100,6 +3184,30 @@ func NewItemTypeEnumFromString(s string) (ItemTypeEnum, error) {
 
 func (i ItemTypeEnum) Ptr() *ItemTypeEnum {
 	return &i
+}
+
+// - `en` - en
+// - `de` - de
+type LanguageEnum string
+
+const (
+	LanguageEnumEn LanguageEnum = "en"
+	LanguageEnumDe LanguageEnum = "de"
+)
+
+func NewLanguageEnumFromString(s string) (LanguageEnum, error) {
+	switch s {
+	case "en":
+		return LanguageEnumEn, nil
+	case "de":
+		return LanguageEnumDe, nil
+	}
+	var t LanguageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LanguageEnum) Ptr() *LanguageEnum {
+	return &l
 }
 
 type LinkToken struct {
@@ -3948,19 +4056,53 @@ func (p *PaginatedUserList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+type PaginatedViewerList struct {
+	Next     *string   `json:"next,omitempty"`
+	Previous *string   `json:"previous,omitempty"`
+	Results  []*Viewer `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedViewerList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedViewerList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedViewerList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedViewerList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
 // # The Ticket Object
 //
 // ### Description
 //
-// The `Ticket` object is used to represent a ticket or a task within a system.
+// The `Ticket` object is used to represent a ticket, issue, task or case.
 //
 // ### Usage Example
 //
 // TODO
 type PatchedTicketRequest struct {
 	// The ticket's name.
-	Name      *string   `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
+	// The individual `Users` who are assigned to this ticket. This does not include `Users` who just have view access to this ticket.
 	Assignees []*string `json:"assignees,omitempty"`
+	// The `Teams` that are assigned to this ticket. This does not include `Teams` who just have view access to this ticket.
+	AssignedTeams []*string `json:"assigned_teams,omitempty"`
 	// The user who created this ticket.
 	Creator *string `json:"creator,omitempty"`
 	// The ticket's due date.
@@ -3973,7 +4115,8 @@ type PatchedTicketRequest struct {
 	// - `ON_HOLD` - ON_HOLD
 	Status *PatchedTicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
-	Description *string   `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
+	// The `Collections` that this `Ticket` is included in.
 	Collections []*string `json:"collections,omitempty"`
 	// The sub category of the ticket within the 3rd party system. Examples include incident, task, subtask or to-do.
 	TicketType *string `json:"ticket_type,omitempty"`
@@ -3984,6 +4127,7 @@ type PatchedTicketRequest struct {
 	// The ticket's parent ticket.
 	ParentTicket *string   `json:"parent_ticket,omitempty"`
 	Tags         []*string `json:"tags,omitempty"`
+	Roles        []*string `json:"roles,omitempty"`
 	// When the ticket was completed.
 	CompletedAt *time.Time `json:"completed_at,omitempty"`
 	// The 3rd party url of the Ticket.
@@ -4204,7 +4348,7 @@ type Project struct {
 	Name *string `json:"name,omitempty"`
 	// The project's description.
 	Description *string `json:"description,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -4235,7 +4379,17 @@ func (p *Project) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+// # The RemoteData Object
+//
+// ### Description
+//
+// The `RemoteData` object is used to represent the full data pulled from the third-party API for an object.
+//
+// ### Usage Example
+//
+// TODO
 type RemoteData struct {
+	// The third-party API path that is being called.
 	Path string      `json:"path"`
 	Data interface{} `json:"data,omitempty"`
 
@@ -4944,7 +5098,7 @@ type Role struct {
 	// - `ASSIGNED_ONLY` - ASSIGNED_ONLY
 	// - `TEAM_ONLY` - TEAM_ONLY
 	TicketAccess *RoleTicketAccess `json:"ticket_access,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -5261,7 +5415,7 @@ type Tag struct {
 	Id         *string    `json:"id,omitempty"`
 	// The tag's name.
 	Name *string `json:"name,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -5296,7 +5450,7 @@ func (t *Tag) String() string {
 //
 // ### Description
 //
-// The `Team` object is used to represent a team within the company receiving the ticket.
+// The `Team` object is used to represent one or more `Users` within the company receiving the ticket.
 //
 // ### Usage Example
 //
@@ -5313,7 +5467,7 @@ type Team struct {
 	Name *string `json:"name,omitempty"`
 	// The team's description.
 	Description *string `json:"description,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -5348,7 +5502,7 @@ func (t *Team) String() string {
 //
 // ### Description
 //
-// The `Ticket` object is used to represent a ticket or a task within a system.
+// The `Ticket` object is used to represent a ticket, issue, task or case.
 //
 // ### Usage Example
 //
@@ -5362,8 +5516,11 @@ type Ticket struct {
 	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The ticket's name.
-	Name      *string                `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
+	// The individual `Users` who are assigned to this ticket. This does not include `Users` who just have view access to this ticket.
 	Assignees []*TicketAssigneesItem `json:"assignees,omitempty"`
+	// The `Teams` that are assigned to this ticket. This does not include `Teams` who just have view access to this ticket.
+	AssignedTeams []*TicketAssignedTeamsItem `json:"assigned_teams,omitempty"`
 	// The user who created this ticket.
 	Creator *TicketCreator `json:"creator,omitempty"`
 	// The ticket's due date.
@@ -5376,7 +5533,8 @@ type Ticket struct {
 	// - `ON_HOLD` - ON_HOLD
 	Status *TicketStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
-	Description *string                  `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
+	// The `Collections` that this `Ticket` is included in.
 	Collections []*TicketCollectionsItem `json:"collections,omitempty"`
 	// The sub category of the ticket within the 3rd party system. Examples include incident, task, subtask or to-do.
 	TicketType *string `json:"ticket_type,omitempty"`
@@ -5388,13 +5546,15 @@ type Ticket struct {
 	ParentTicket *TicketParentTicket      `json:"parent_ticket,omitempty"`
 	Attachments  []*TicketAttachmentsItem `json:"attachments,omitempty"`
 	Tags         []*string                `json:"tags,omitempty"`
+	Roles        []*string                `json:"roles,omitempty"`
 	// When the third party's ticket was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's ticket was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// When the ticket was completed.
-	CompletedAt      *time.Time `json:"completed_at,omitempty"`
-	RemoteWasDeleted *bool      `json:"remote_was_deleted,omitempty"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The 3rd party url of the Ticket.
 	TicketUrl *string `json:"ticket_url,omitempty"`
 	// The priority or urgency of the Ticket.
@@ -5558,6 +5718,63 @@ func NewTicketActionsEnumFromString(s string) (TicketActionsEnum, error) {
 
 func (t TicketActionsEnum) Ptr() *TicketActionsEnum {
 	return &t
+}
+
+type TicketAssignedTeamsItem struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewTicketAssignedTeamsItemFromString(value string) *TicketAssignedTeamsItem {
+	return &TicketAssignedTeamsItem{typeName: "string", String: value}
+}
+
+func NewTicketAssignedTeamsItemFromTeam(value *Team) *TicketAssignedTeamsItem {
+	return &TicketAssignedTeamsItem{typeName: "team", Team: value}
+}
+
+func (t *TicketAssignedTeamsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		t.typeName = "team"
+		t.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketAssignedTeamsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "team":
+		return json.Marshal(t.Team)
+	}
+}
+
+type TicketAssignedTeamsItemVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (t *TicketAssignedTeamsItem) Accept(visitor TicketAssignedTeamsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "team":
+		return visitor.VisitTeam(t.Team)
+	}
 }
 
 type TicketAssigneesItem struct {
@@ -5972,15 +6189,18 @@ func (t *TicketPriority) Accept(visitor TicketPriorityVisitor) error {
 //
 // ### Description
 //
-// The `Ticket` object is used to represent a ticket or a task within a system.
+// The `Ticket` object is used to represent a ticket, issue, task or case.
 //
 // ### Usage Example
 //
 // TODO
 type TicketRequest struct {
 	// The ticket's name.
-	Name      *string                       `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
+	// The individual `Users` who are assigned to this ticket. This does not include `Users` who just have view access to this ticket.
 	Assignees []*TicketRequestAssigneesItem `json:"assignees,omitempty"`
+	// The `Teams` that are assigned to this ticket. This does not include `Teams` who just have view access to this ticket.
+	AssignedTeams []*TicketRequestAssignedTeamsItem `json:"assigned_teams,omitempty"`
 	// The user who created this ticket.
 	Creator *TicketRequestCreator `json:"creator,omitempty"`
 	// The ticket's due date.
@@ -5993,7 +6213,8 @@ type TicketRequest struct {
 	// - `ON_HOLD` - ON_HOLD
 	Status *TicketRequestStatus `json:"status,omitempty"`
 	// The ticket’s description. HTML version of description is mapped if supported by the third-party platform.
-	Description *string                         `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
+	// The `Collections` that this `Ticket` is included in.
 	Collections []*TicketRequestCollectionsItem `json:"collections,omitempty"`
 	// The sub category of the ticket within the 3rd party system. Examples include incident, task, subtask or to-do.
 	TicketType *string `json:"ticket_type,omitempty"`
@@ -6005,6 +6226,7 @@ type TicketRequest struct {
 	ParentTicket *TicketRequestParentTicket      `json:"parent_ticket,omitempty"`
 	Attachments  []*TicketRequestAttachmentsItem `json:"attachments,omitempty"`
 	Tags         []*string                       `json:"tags,omitempty"`
+	Roles        []*string                       `json:"roles,omitempty"`
 	// When the ticket was completed.
 	CompletedAt *time.Time `json:"completed_at,omitempty"`
 	// The 3rd party url of the Ticket.
@@ -6101,6 +6323,63 @@ func (t *TicketRequestAccount) Accept(visitor TicketRequestAccountVisitor) error
 		return visitor.VisitString(t.String)
 	case "account":
 		return visitor.VisitAccount(t.Account)
+	}
+}
+
+type TicketRequestAssignedTeamsItem struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewTicketRequestAssignedTeamsItemFromString(value string) *TicketRequestAssignedTeamsItem {
+	return &TicketRequestAssignedTeamsItem{typeName: "string", String: value}
+}
+
+func NewTicketRequestAssignedTeamsItemFromTeam(value *Team) *TicketRequestAssignedTeamsItem {
+	return &TicketRequestAssignedTeamsItem{typeName: "team", Team: value}
+}
+
+func (t *TicketRequestAssignedTeamsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		t.typeName = "team"
+		t.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TicketRequestAssignedTeamsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "team":
+		return json.Marshal(t.Team)
+	}
+}
+
+type TicketRequestAssignedTeamsItemVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (t *TicketRequestAssignedTeamsItem) Accept(visitor TicketRequestAssignedTeamsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "team":
+		return visitor.VisitTeam(t.Team)
 	}
 }
 
@@ -6770,7 +7049,8 @@ func (t *TicketingContactResponse) String() string {
 //
 // ### Description
 //
-// The `User` object is used to represent an employee within a company.
+// The `User` object is used to represent a user with a login to the ticketing system.
+// Users are either assignees who are directly responsible or a viewer on a `Ticket`/ `Collection`.
 //
 // ### Usage Example
 //
@@ -6793,7 +7073,7 @@ type User struct {
 	Roles    []*UserRolesItem `json:"roles,omitempty"`
 	// The user's avatar picture.
 	Avatar *string `json:"avatar,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -6965,6 +7245,170 @@ func (v *ValidationProblemSource) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", v)
+}
+
+// # The Viewer Object
+//
+// ### Description
+//
+// The `Viewer` object is used to represent a User or Team within a company.
+//
+// ### Usage Example
+//
+// TODO
+type Viewer struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The Team this Viewer belongs to.
+	Team *ViewerTeam `json:"team,omitempty"`
+	// The User this Viewer belongs to.
+	User *ViewerUser `json:"user,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *Viewer) UnmarshalJSON(data []byte) error {
+	type unmarshaler Viewer
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = Viewer(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *Viewer) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
+}
+
+// The Team this Viewer belongs to.
+type ViewerTeam struct {
+	typeName string
+	String   string
+	Team     *Team
+}
+
+func NewViewerTeamFromString(value string) *ViewerTeam {
+	return &ViewerTeam{typeName: "string", String: value}
+}
+
+func NewViewerTeamFromTeam(value *Team) *ViewerTeam {
+	return &ViewerTeam{typeName: "team", Team: value}
+}
+
+func (v *ViewerTeam) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueTeam := new(Team)
+	if err := json.Unmarshal(data, &valueTeam); err == nil {
+		v.typeName = "team"
+		v.Team = valueTeam
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v ViewerTeam) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "team":
+		return json.Marshal(v.Team)
+	}
+}
+
+type ViewerTeamVisitor interface {
+	VisitString(string) error
+	VisitTeam(*Team) error
+}
+
+func (v *ViewerTeam) Accept(visitor ViewerTeamVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "team":
+		return visitor.VisitTeam(v.Team)
+	}
+}
+
+// The User this Viewer belongs to.
+type ViewerUser struct {
+	typeName string
+	String   string
+	User     *User
+}
+
+func NewViewerUserFromString(value string) *ViewerUser {
+	return &ViewerUser{typeName: "string", String: value}
+}
+
+func NewViewerUserFromUser(value *User) *ViewerUser {
+	return &ViewerUser{typeName: "user", User: value}
+}
+
+func (v *ViewerUser) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueUser := new(User)
+	if err := json.Unmarshal(data, &valueUser); err == nil {
+		v.typeName = "user"
+		v.User = valueUser
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v ViewerUser) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "user":
+		return json.Marshal(v.User)
+	}
+}
+
+type ViewerUserVisitor interface {
+	VisitString(string) error
+	VisitUser(*User) error
+}
+
+func (v *ViewerUser) Accept(visitor ViewerUserVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "user":
+		return visitor.VisitUser(v.User)
+	}
 }
 
 type WarningValidationProblem struct {

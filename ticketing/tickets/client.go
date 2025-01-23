@@ -84,6 +84,9 @@ func (c *Client) List(ctx context.Context, request *ticketing.TicketsListRequest
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}
@@ -264,13 +267,13 @@ func (c *Client) PartialUpdate(ctx context.Context, id string, request *ticketin
 	return response, nil
 }
 
-// Returns a list of `User` objects.
-func (c *Client) CollaboratorsList(ctx context.Context, parentId string, request *ticketing.TicketsCollaboratorsListRequest) (*ticketing.PaginatedUserList, error) {
+// Returns a list of `Viewer` objects.
+func (c *Client) ViewersList(ctx context.Context, ticketId string, request *ticketing.TicketsViewersListRequest) (*ticketing.PaginatedViewerList, error) {
 	baseURL := "https://api.merge.dev/api"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tickets/%v/collaborators", parentId)
+	endpointURL := fmt.Sprintf(baseURL+"/"+"ticketing/v1/tickets/%v/viewers", ticketId)
 
 	queryParams := make(url.Values)
 	if request.Cursor != nil {
@@ -285,6 +288,9 @@ func (c *Client) CollaboratorsList(ctx context.Context, parentId string, request
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
 	}
@@ -292,7 +298,7 @@ func (c *Client) CollaboratorsList(ctx context.Context, parentId string, request
 		endpointURL += "?" + queryParams.Encode()
 	}
 
-	var response *ticketing.PaginatedUserList
+	var response *ticketing.PaginatedViewerList
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{
@@ -370,6 +376,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *ticketing.
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.IsCommonModelField != nil {
 		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))

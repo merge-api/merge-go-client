@@ -23,8 +23,13 @@ type EndUserDetailsRequest struct {
 	CommonModels []*CommonModelScopesBodyRequest `json:"common_models,omitempty"`
 	// When creating a Link Token, you can set permissions for Common Models that will apply to the account that is going to be linked. Any model or field not specified in link token payload will default to existing settings.
 	CategoryCommonModelScopes map[string][]*IndividualCommonModelScopeDeserializerRequest `json:"category_common_model_scopes,omitempty"`
-	// The language code for the language to localize Merge Link to.
-	Language *string `json:"language,omitempty"`
+	// The following subset of IETF language tags can be used to configure localization.
+	//
+	// * `en` - en
+	// * `de` - de
+	Language *LanguageEnum `json:"language,omitempty"`
+	// The boolean that indicates whether initial, periodic, and force syncs will be disabled.
+	AreSyncsDisabled *bool `json:"are_syncs_disabled,omitempty"`
 	// A JSON object containing integration-specific configuration options.
 	IntegrationSpecificConfig map[string]interface{} `json:"integration_specific_config,omitempty"`
 }

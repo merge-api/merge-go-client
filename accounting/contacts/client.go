@@ -51,6 +51,9 @@ func (c *Client) List(ctx context.Context, request *accounting.ContactsListReque
 	if request.Cursor != nil {
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
+	if request.EmailAddress != nil {
+		queryParams.Add("email_address", fmt.Sprintf("%v", *request.EmailAddress))
+	}
 	if request.Expand != nil {
 		queryParams.Add("expand", fmt.Sprintf("%v", *request.Expand))
 	}
@@ -59,6 +62,12 @@ func (c *Client) List(ctx context.Context, request *accounting.ContactsListReque
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeRemoteFields != nil {
+		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.IsCustomer != nil {
 		queryParams.Add("is_customer", fmt.Sprintf("%v", *request.IsCustomer))
@@ -71,6 +80,9 @@ func (c *Client) List(ctx context.Context, request *accounting.ContactsListReque
 	}
 	if request.ModifiedBefore != nil {
 		queryParams.Add("modified_before", fmt.Sprintf("%v", request.ModifiedBefore.Format(time.RFC3339)))
+	}
+	if request.Name != nil {
+		queryParams.Add("name", fmt.Sprintf("%v", *request.Name))
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
@@ -153,6 +165,9 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Co
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeRemoteFields != nil {
+		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
 	if request.RemoteFields != nil {
 		queryParams.Add("remote_fields", fmt.Sprintf("%v", request.RemoteFields))
 	}
@@ -187,6 +202,52 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	endpointURL := baseURL + "/" + "accounting/v1/contacts/meta/post"
 
 	var response *accounting.MetaResponse
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns a list of `RemoteFieldClass` objects.
+func (c *Client) RemoteFieldClassesList(ctx context.Context, request *accounting.ContactsRemoteFieldClassesListRequest) (*accounting.PaginatedRemoteFieldClassList, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "accounting/v1/contacts/remote-field-classes"
+
+	queryParams := make(url.Values)
+	if request.Cursor != nil {
+		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
+	}
+	if request.IncludeDeletedData != nil {
+		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
+	}
+	if request.IncludeRemoteData != nil {
+		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
+	}
+	if request.PageSize != nil {
+		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *accounting.PaginatedRemoteFieldClassList
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{

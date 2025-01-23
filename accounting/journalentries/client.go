@@ -60,6 +60,12 @@ func (c *Client) List(ctx context.Context, request *accounting.JournalEntriesLis
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeRemoteFields != nil {
+		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}
@@ -147,11 +153,60 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *accounting.Jo
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeRemoteFields != nil {
+		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
 	}
 
 	var response *accounting.JournalEntry
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns a list of `RemoteFieldClass` objects.
+func (c *Client) LinesRemoteFieldClassesList(ctx context.Context, request *accounting.JournalEntriesLinesRemoteFieldClassesListRequest) (*accounting.PaginatedRemoteFieldClassList, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "accounting/v1/journal-entries/lines/remote-field-classes"
+
+	queryParams := make(url.Values)
+	if request.Cursor != nil {
+		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
+	}
+	if request.IncludeDeletedData != nil {
+		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
+	}
+	if request.IncludeRemoteData != nil {
+		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
+	}
+	if request.PageSize != nil {
+		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *accounting.PaginatedRemoteFieldClassList
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{
@@ -175,6 +230,52 @@ func (c *Client) MetaPostRetrieve(ctx context.Context) (*accounting.MetaResponse
 	endpointURL := baseURL + "/" + "accounting/v1/journal-entries/meta/post"
 
 	var response *accounting.MetaResponse
+	if err := c.caller.Call(
+		ctx,
+		&core.CallParams{
+			URL:      endpointURL,
+			Method:   http.MethodGet,
+			Headers:  c.header,
+			Response: &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Returns a list of `RemoteFieldClass` objects.
+func (c *Client) RemoteFieldClassesList(ctx context.Context, request *accounting.JournalEntriesRemoteFieldClassesListRequest) (*accounting.PaginatedRemoteFieldClassList, error) {
+	baseURL := "https://api.merge.dev/api"
+	if c.baseURL != "" {
+		baseURL = c.baseURL
+	}
+	endpointURL := baseURL + "/" + "accounting/v1/journal-entries/remote-field-classes"
+
+	queryParams := make(url.Values)
+	if request.Cursor != nil {
+		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
+	}
+	if request.IncludeDeletedData != nil {
+		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
+	}
+	if request.IncludeRemoteData != nil {
+		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
+	if request.IsCommonModelField != nil {
+		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))
+	}
+	if request.PageSize != nil {
+		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+
+	var response *accounting.PaginatedRemoteFieldClassList
 	if err := c.caller.Call(
 		ctx,
 		&core.CallParams{

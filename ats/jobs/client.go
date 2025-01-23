@@ -60,6 +60,9 @@ func (c *Client) List(ctx context.Context, request *ats.JobsListRequest) (*ats.P
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}
@@ -163,6 +166,9 @@ func (c *Client) ScreeningQuestionsList(ctx context.Context, jobId string, reque
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.PageSize != nil {
 		queryParams.Add("page_size", fmt.Sprintf("%v", *request.PageSize))

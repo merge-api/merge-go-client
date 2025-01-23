@@ -57,6 +57,9 @@ func (c *Client) List(ctx context.Context, request *crm.StagesListRequest) (*crm
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
 	}
@@ -142,6 +145,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *crm.Stages
 	}
 	if request.IncludeRemoteFields != nil {
 		queryParams.Add("include_remote_fields", fmt.Sprintf("%v", *request.IncludeRemoteFields))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.IsCommonModelField != nil {
 		queryParams.Add("is_common_model_field", fmt.Sprintf("%v", *request.IsCommonModelField))

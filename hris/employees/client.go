@@ -81,6 +81,9 @@ func (c *Client) List(ctx context.Context, request *hris.EmployeesListRequest) (
 	if request.IncludeSensitiveFields != nil {
 		queryParams.Add("include_sensitive_fields", fmt.Sprintf("%v", *request.IncludeSensitiveFields))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.JobTitle != nil {
 		queryParams.Add("job_title", fmt.Sprintf("%v", *request.JobTitle))
 	}

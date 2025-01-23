@@ -48,6 +48,22 @@ type Account struct {
 	Classification *AccountClassification `json:"classification,omitempty"`
 	// The account's type is a narrower and more specific grouping within the account's classification.
 	Type *string `json:"type,omitempty"`
+	// Normalized account type- which is a narrower and more specific grouping within the account's classification.
+	//
+	// - `BANK` - BANK
+	// - `CREDIT_CARD` - CREDIT_CARD
+	// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+	// - `FIXED_ASSET` - FIXED_ASSET
+	// - `OTHER_ASSET` - OTHER_ASSET
+	// - `OTHER_CURRENT_ASSET` - OTHER_CURRENT_ASSET
+	// - `OTHER_EXPENSE` - OTHER_EXPENSE
+	// - `OTHER_INCOME` - OTHER_INCOME
+	// - `COST_OF_GOODS_SOLD` - COST_OF_GOODS_SOLD
+	// - `OTHER_CURRENT_LIABILITY` - OTHER_CURRENT_LIABILITY
+	// - `LONG_TERM_LIABILITY` - LONG_TERM_LIABILITY
+	// - `NON_POSTING` - NON_POSTING
+	AccountType *AccountAccountType `json:"account_type,omitempty"`
 	// The account's status.
 	//
 	// - `ACTIVE` - ACTIVE
@@ -371,7 +387,7 @@ type Account struct {
 	ParentAccount *string `json:"parent_account,omitempty"`
 	// The company the account belongs to.
 	Company *string `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -400,6 +416,146 @@ func (a *Account) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", a)
+}
+
+// Normalized account type- which is a narrower and more specific grouping within the account's classification.
+//
+// - `BANK` - BANK
+// - `CREDIT_CARD` - CREDIT_CARD
+// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+// - `FIXED_ASSET` - FIXED_ASSET
+// - `OTHER_ASSET` - OTHER_ASSET
+// - `OTHER_CURRENT_ASSET` - OTHER_CURRENT_ASSET
+// - `OTHER_EXPENSE` - OTHER_EXPENSE
+// - `OTHER_INCOME` - OTHER_INCOME
+// - `COST_OF_GOODS_SOLD` - COST_OF_GOODS_SOLD
+// - `OTHER_CURRENT_LIABILITY` - OTHER_CURRENT_LIABILITY
+// - `LONG_TERM_LIABILITY` - LONG_TERM_LIABILITY
+// - `NON_POSTING` - NON_POSTING
+type AccountAccountType struct {
+	typeName               string
+	AccountAccountTypeEnum AccountAccountTypeEnum
+	String                 string
+}
+
+func NewAccountAccountTypeFromAccountAccountTypeEnum(value AccountAccountTypeEnum) *AccountAccountType {
+	return &AccountAccountType{typeName: "accountAccountTypeEnum", AccountAccountTypeEnum: value}
+}
+
+func NewAccountAccountTypeFromString(value string) *AccountAccountType {
+	return &AccountAccountType{typeName: "string", String: value}
+}
+
+func (a *AccountAccountType) UnmarshalJSON(data []byte) error {
+	var valueAccountAccountTypeEnum AccountAccountTypeEnum
+	if err := json.Unmarshal(data, &valueAccountAccountTypeEnum); err == nil {
+		a.typeName = "accountAccountTypeEnum"
+		a.AccountAccountTypeEnum = valueAccountAccountTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountAccountType) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "accountAccountTypeEnum":
+		return json.Marshal(a.AccountAccountTypeEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AccountAccountTypeVisitor interface {
+	VisitAccountAccountTypeEnum(AccountAccountTypeEnum) error
+	VisitString(string) error
+}
+
+func (a *AccountAccountType) Accept(visitor AccountAccountTypeVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "accountAccountTypeEnum":
+		return visitor.VisitAccountAccountTypeEnum(a.AccountAccountTypeEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
+}
+
+// - `BANK` - BANK
+// - `CREDIT_CARD` - CREDIT_CARD
+// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+// - `FIXED_ASSET` - FIXED_ASSET
+// - `OTHER_ASSET` - OTHER_ASSET
+// - `OTHER_CURRENT_ASSET` - OTHER_CURRENT_ASSET
+// - `OTHER_EXPENSE` - OTHER_EXPENSE
+// - `OTHER_INCOME` - OTHER_INCOME
+// - `COST_OF_GOODS_SOLD` - COST_OF_GOODS_SOLD
+// - `OTHER_CURRENT_LIABILITY` - OTHER_CURRENT_LIABILITY
+// - `LONG_TERM_LIABILITY` - LONG_TERM_LIABILITY
+// - `NON_POSTING` - NON_POSTING
+type AccountAccountTypeEnum string
+
+const (
+	AccountAccountTypeEnumBank                  AccountAccountTypeEnum = "BANK"
+	AccountAccountTypeEnumCreditCard            AccountAccountTypeEnum = "CREDIT_CARD"
+	AccountAccountTypeEnumAccountsPayable       AccountAccountTypeEnum = "ACCOUNTS_PAYABLE"
+	AccountAccountTypeEnumAccountsReceivable    AccountAccountTypeEnum = "ACCOUNTS_RECEIVABLE"
+	AccountAccountTypeEnumFixedAsset            AccountAccountTypeEnum = "FIXED_ASSET"
+	AccountAccountTypeEnumOtherAsset            AccountAccountTypeEnum = "OTHER_ASSET"
+	AccountAccountTypeEnumOtherCurrentAsset     AccountAccountTypeEnum = "OTHER_CURRENT_ASSET"
+	AccountAccountTypeEnumOtherExpense          AccountAccountTypeEnum = "OTHER_EXPENSE"
+	AccountAccountTypeEnumOtherIncome           AccountAccountTypeEnum = "OTHER_INCOME"
+	AccountAccountTypeEnumCostOfGoodsSold       AccountAccountTypeEnum = "COST_OF_GOODS_SOLD"
+	AccountAccountTypeEnumOtherCurrentLiability AccountAccountTypeEnum = "OTHER_CURRENT_LIABILITY"
+	AccountAccountTypeEnumLongTermLiability     AccountAccountTypeEnum = "LONG_TERM_LIABILITY"
+	AccountAccountTypeEnumNonPosting            AccountAccountTypeEnum = "NON_POSTING"
+)
+
+func NewAccountAccountTypeEnumFromString(s string) (AccountAccountTypeEnum, error) {
+	switch s {
+	case "BANK":
+		return AccountAccountTypeEnumBank, nil
+	case "CREDIT_CARD":
+		return AccountAccountTypeEnumCreditCard, nil
+	case "ACCOUNTS_PAYABLE":
+		return AccountAccountTypeEnumAccountsPayable, nil
+	case "ACCOUNTS_RECEIVABLE":
+		return AccountAccountTypeEnumAccountsReceivable, nil
+	case "FIXED_ASSET":
+		return AccountAccountTypeEnumFixedAsset, nil
+	case "OTHER_ASSET":
+		return AccountAccountTypeEnumOtherAsset, nil
+	case "OTHER_CURRENT_ASSET":
+		return AccountAccountTypeEnumOtherCurrentAsset, nil
+	case "OTHER_EXPENSE":
+		return AccountAccountTypeEnumOtherExpense, nil
+	case "OTHER_INCOME":
+		return AccountAccountTypeEnumOtherIncome, nil
+	case "COST_OF_GOODS_SOLD":
+		return AccountAccountTypeEnumCostOfGoodsSold, nil
+	case "OTHER_CURRENT_LIABILITY":
+		return AccountAccountTypeEnumOtherCurrentLiability, nil
+	case "LONG_TERM_LIABILITY":
+		return AccountAccountTypeEnumLongTermLiability, nil
+	case "NON_POSTING":
+		return AccountAccountTypeEnumNonPosting, nil
+	}
+	var t AccountAccountTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AccountAccountTypeEnum) Ptr() *AccountAccountTypeEnum {
+	return &a
 }
 
 // The account's broadest grouping.
@@ -775,13 +931,13 @@ func (a *AccountClassification) Accept(visitor AccountClassificationVisitor) err
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type AccountCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewAccountCurrencyFromCurrencyEnum(value CurrencyEnum) *AccountCurrency {
-	return &AccountCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewAccountCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *AccountCurrency {
+	return &AccountCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewAccountCurrencyFromString(value string) *AccountCurrency {
@@ -789,10 +945,10 @@ func NewAccountCurrencyFromString(value string) *AccountCurrency {
 }
 
 func (a *AccountCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		a.typeName = "currencyEnum"
-		a.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		a.typeName = "transactionCurrencyEnum"
+		a.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -808,15 +964,15 @@ func (a AccountCurrency) MarshalJSON() ([]byte, error) {
 	switch a.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
-	case "currencyEnum":
-		return json.Marshal(a.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(a.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(a.String)
 	}
 }
 
 type AccountCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -824,8 +980,8 @@ func (a *AccountCurrency) Accept(visitor AccountCurrencyVisitor) error {
 	switch a.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(a.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(a.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(a.String)
 	}
@@ -844,6 +1000,8 @@ type AccountDetails struct {
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty"`
+	// The time at which account completes the linking flow.
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -895,6 +1053,7 @@ type AccountDetailsAndActions struct {
 	IsDuplicate *bool                                `json:"is_duplicate,omitempty"`
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty"`
 	AccountType string                               `json:"account_type"`
+	CompletedAt time.Time                            `json:"completed_at"`
 
 	_rawJSON json.RawMessage
 }
@@ -961,12 +1120,14 @@ func (a *AccountDetailsAndActionsIntegration) String() string {
 // - `COMPLETE` - COMPLETE
 // - `INCOMPLETE` - INCOMPLETE
 // - `RELINK_NEEDED` - RELINK_NEEDED
+// - `IDLE` - IDLE
 type AccountDetailsAndActionsStatusEnum string
 
 const (
 	AccountDetailsAndActionsStatusEnumComplete     AccountDetailsAndActionsStatusEnum = "COMPLETE"
 	AccountDetailsAndActionsStatusEnumIncomplete   AccountDetailsAndActionsStatusEnum = "INCOMPLETE"
 	AccountDetailsAndActionsStatusEnumRelinkNeeded AccountDetailsAndActionsStatusEnum = "RELINK_NEEDED"
+	AccountDetailsAndActionsStatusEnumIdle         AccountDetailsAndActionsStatusEnum = "IDLE"
 )
 
 func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAndActionsStatusEnum, error) {
@@ -977,6 +1138,8 @@ func NewAccountDetailsAndActionsStatusEnumFromString(s string) (AccountDetailsAn
 		return AccountDetailsAndActionsStatusEnumIncomplete, nil
 	case "RELINK_NEEDED":
 		return AccountDetailsAndActionsStatusEnumRelinkNeeded, nil
+	case "IDLE":
+		return AccountDetailsAndActionsStatusEnumIdle, nil
 	}
 	var t AccountDetailsAndActionsStatusEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -989,11 +1152,13 @@ func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatu
 type AccountIntegration struct {
 	// Company name.
 	Name string `json:"name"`
+	// Optional. This shortened name appears in places with limited space, usually in conjunction with the platform's logo (e.g., Merge Link menu).<br><br>Example: <i>Workforce Now (in lieu of ADP Workforce Now), SuccessFactors (in lieu of SAP SuccessFactors)</i>
+	AbbreviatedName *string `json:"abbreviated_name,omitempty"`
 	// Category or categories this integration belongs to. Multiple categories should be comma separated, i.e. [ats, hris].
 	Categories []CategoriesEnum `json:"categories,omitempty"`
-	// Company logo in rectangular shape. <b>Upload an image with a clear background.</b>
+	// Company logo in rectangular shape.
 	Image *string `json:"image,omitempty"`
-	// Company logo in square shape. <b>Upload an image with a white background.</b>
+	// Company logo in square shape.
 	SquareImage *string `json:"square_image,omitempty"`
 	// The color of this integration used for buttons and text throughout the app and landing pages. <b>Choose a darker, saturated color.</b>
 	Color *string `json:"color,omitempty"`
@@ -1063,6 +1228,22 @@ type AccountRequest struct {
 	Classification *AccountRequestClassification `json:"classification,omitempty"`
 	// The account's type is a narrower and more specific grouping within the account's classification.
 	Type *string `json:"type,omitempty"`
+	// Normalized account type- which is a narrower and more specific grouping within the account's classification.
+	//
+	// - `BANK` - BANK
+	// - `CREDIT_CARD` - CREDIT_CARD
+	// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+	// - `FIXED_ASSET` - FIXED_ASSET
+	// - `OTHER_ASSET` - OTHER_ASSET
+	// - `OTHER_CURRENT_ASSET` - OTHER_CURRENT_ASSET
+	// - `OTHER_EXPENSE` - OTHER_EXPENSE
+	// - `OTHER_INCOME` - OTHER_INCOME
+	// - `COST_OF_GOODS_SOLD` - COST_OF_GOODS_SOLD
+	// - `OTHER_CURRENT_LIABILITY` - OTHER_CURRENT_LIABILITY
+	// - `LONG_TERM_LIABILITY` - LONG_TERM_LIABILITY
+	// - `NON_POSTING` - NON_POSTING
+	AccountType *AccountRequestAccountType `json:"account_type,omitempty"`
 	// The account's status.
 	//
 	// - `ACTIVE` - ACTIVE
@@ -1413,6 +1594,78 @@ func (a *AccountRequest) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", a)
+}
+
+// Normalized account type- which is a narrower and more specific grouping within the account's classification.
+//
+// - `BANK` - BANK
+// - `CREDIT_CARD` - CREDIT_CARD
+// - `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+// - `FIXED_ASSET` - FIXED_ASSET
+// - `OTHER_ASSET` - OTHER_ASSET
+// - `OTHER_CURRENT_ASSET` - OTHER_CURRENT_ASSET
+// - `OTHER_EXPENSE` - OTHER_EXPENSE
+// - `OTHER_INCOME` - OTHER_INCOME
+// - `COST_OF_GOODS_SOLD` - COST_OF_GOODS_SOLD
+// - `OTHER_CURRENT_LIABILITY` - OTHER_CURRENT_LIABILITY
+// - `LONG_TERM_LIABILITY` - LONG_TERM_LIABILITY
+// - `NON_POSTING` - NON_POSTING
+type AccountRequestAccountType struct {
+	typeName               string
+	AccountAccountTypeEnum AccountAccountTypeEnum
+	String                 string
+}
+
+func NewAccountRequestAccountTypeFromAccountAccountTypeEnum(value AccountAccountTypeEnum) *AccountRequestAccountType {
+	return &AccountRequestAccountType{typeName: "accountAccountTypeEnum", AccountAccountTypeEnum: value}
+}
+
+func NewAccountRequestAccountTypeFromString(value string) *AccountRequestAccountType {
+	return &AccountRequestAccountType{typeName: "string", String: value}
+}
+
+func (a *AccountRequestAccountType) UnmarshalJSON(data []byte) error {
+	var valueAccountAccountTypeEnum AccountAccountTypeEnum
+	if err := json.Unmarshal(data, &valueAccountAccountTypeEnum); err == nil {
+		a.typeName = "accountAccountTypeEnum"
+		a.AccountAccountTypeEnum = valueAccountAccountTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountRequestAccountType) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "accountAccountTypeEnum":
+		return json.Marshal(a.AccountAccountTypeEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AccountRequestAccountTypeVisitor interface {
+	VisitAccountAccountTypeEnum(AccountAccountTypeEnum) error
+	VisitString(string) error
+}
+
+func (a *AccountRequestAccountType) Accept(visitor AccountRequestAccountTypeVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "accountAccountTypeEnum":
+		return visitor.VisitAccountAccountTypeEnum(a.AccountAccountTypeEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
 }
 
 // The account's broadest grouping.
@@ -1788,13 +2041,13 @@ func (a *AccountRequestClassification) Accept(visitor AccountRequestClassificati
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type AccountRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewAccountRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *AccountRequestCurrency {
-	return &AccountRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewAccountRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *AccountRequestCurrency {
+	return &AccountRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewAccountRequestCurrencyFromString(value string) *AccountRequestCurrency {
@@ -1802,10 +2055,10 @@ func NewAccountRequestCurrencyFromString(value string) *AccountRequestCurrency {
 }
 
 func (a *AccountRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		a.typeName = "currencyEnum"
-		a.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		a.typeName = "transactionCurrencyEnum"
+		a.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -1821,15 +2074,15 @@ func (a AccountRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch a.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
-	case "currencyEnum":
-		return json.Marshal(a.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(a.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(a.String)
 	}
 }
 
 type AccountRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -1837,8 +2090,8 @@ func (a *AccountRequestCurrency) Accept(visitor AccountRequestCurrencyVisitor) e
 	switch a.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(a.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(a.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(a.String)
 	}
@@ -2081,7 +2334,7 @@ type AccountingAttachment struct {
 	FileUrl *string `json:"file_url,omitempty"`
 	// The company the accounting attachment belongs to.
 	Company *string `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -2200,17 +2453,21 @@ func (a *AccountingAttachmentResponse) String() string {
 // Common models like `Invoice` and `Transaction` will have `AccountingPeriod` objects which will denote when they occurred.
 type AccountingPeriod struct {
 	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// Name of the accounting period.
+	Name   *string                 `json:"name,omitempty"`
+	Status *AccountingPeriodStatus `json:"status,omitempty"`
 	// Beginning date of the period
 	StartDate *time.Time `json:"start_date,omitempty"`
 	// End date of the period
-	EndDate *time.Time              `json:"end_date,omitempty"`
-	Status  *AccountingPeriodStatus `json:"status,omitempty"`
-	// Name of the accounting period.
-	Name *string `json:"name,omitempty"`
+	EndDate       *time.Time             `json:"end_date,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData    []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -2239,13 +2496,13 @@ func (a *AccountingPeriod) String() string {
 }
 
 type AccountingPeriodStatus struct {
-	typeName                   string
-	AccountingPeriodStatusEnum AccountingPeriodStatusEnum
-	String                     string
+	typeName      string
+	Status895Enum Status895Enum
+	String        string
 }
 
-func NewAccountingPeriodStatusFromAccountingPeriodStatusEnum(value AccountingPeriodStatusEnum) *AccountingPeriodStatus {
-	return &AccountingPeriodStatus{typeName: "accountingPeriodStatusEnum", AccountingPeriodStatusEnum: value}
+func NewAccountingPeriodStatusFromStatus895Enum(value Status895Enum) *AccountingPeriodStatus {
+	return &AccountingPeriodStatus{typeName: "status895Enum", Status895Enum: value}
 }
 
 func NewAccountingPeriodStatusFromString(value string) *AccountingPeriodStatus {
@@ -2253,10 +2510,10 @@ func NewAccountingPeriodStatusFromString(value string) *AccountingPeriodStatus {
 }
 
 func (a *AccountingPeriodStatus) UnmarshalJSON(data []byte) error {
-	var valueAccountingPeriodStatusEnum AccountingPeriodStatusEnum
-	if err := json.Unmarshal(data, &valueAccountingPeriodStatusEnum); err == nil {
-		a.typeName = "accountingPeriodStatusEnum"
-		a.AccountingPeriodStatusEnum = valueAccountingPeriodStatusEnum
+	var valueStatus895Enum Status895Enum
+	if err := json.Unmarshal(data, &valueStatus895Enum); err == nil {
+		a.typeName = "status895Enum"
+		a.Status895Enum = valueStatus895Enum
 		return nil
 	}
 	var valueString string
@@ -2272,15 +2529,15 @@ func (a AccountingPeriodStatus) MarshalJSON() ([]byte, error) {
 	switch a.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
-	case "accountingPeriodStatusEnum":
-		return json.Marshal(a.AccountingPeriodStatusEnum)
+	case "status895Enum":
+		return json.Marshal(a.Status895Enum)
 	case "string":
 		return json.Marshal(a.String)
 	}
 }
 
 type AccountingPeriodStatusVisitor interface {
-	VisitAccountingPeriodStatusEnum(AccountingPeriodStatusEnum) error
+	VisitStatus895Enum(Status895Enum) error
 	VisitString(string) error
 }
 
@@ -2288,35 +2545,11 @@ func (a *AccountingPeriodStatus) Accept(visitor AccountingPeriodStatusVisitor) e
 	switch a.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
-	case "accountingPeriodStatusEnum":
-		return visitor.VisitAccountingPeriodStatusEnum(a.AccountingPeriodStatusEnum)
+	case "status895Enum":
+		return visitor.VisitStatus895Enum(a.Status895Enum)
 	case "string":
 		return visitor.VisitString(a.String)
 	}
-}
-
-// - `ACTIVE` - ACTIVE
-// - `INACTIVE` - INACTIVE
-type AccountingPeriodStatusEnum string
-
-const (
-	AccountingPeriodStatusEnumActive   AccountingPeriodStatusEnum = "ACTIVE"
-	AccountingPeriodStatusEnumInactive AccountingPeriodStatusEnum = "INACTIVE"
-)
-
-func NewAccountingPeriodStatusEnumFromString(s string) (AccountingPeriodStatusEnum, error) {
-	switch s {
-	case "ACTIVE":
-		return AccountingPeriodStatusEnumActive, nil
-	case "INACTIVE":
-		return AccountingPeriodStatusEnumInactive, nil
-	}
-	var t AccountingPeriodStatusEnum
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (a AccountingPeriodStatusEnum) Ptr() *AccountingPeriodStatusEnum {
-	return &a
 }
 
 // # The AccountingPhoneNumber Object
@@ -3847,6 +4080,155 @@ func (a *AsyncPassthroughReciept) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+type AsyncPostTask struct {
+	Status *AsyncPostTaskStatus `json:"status,omitempty"`
+	Result *AsyncPostTaskResult `json:"result,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AsyncPostTask) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncPostTask
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncPostTask(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncPostTask) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+type AsyncPostTaskResult struct {
+	StatusCode *int                   `json:"status_code,omitempty"`
+	Response   map[string]interface{} `json:"response,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (a *AsyncPostTaskResult) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncPostTaskResult
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncPostTaskResult(value)
+	a._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncPostTaskResult) String() string {
+	if len(a._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(a._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+type AsyncPostTaskStatus struct {
+	typeName                string
+	AsyncPostTaskStatusEnum AsyncPostTaskStatusEnum
+	String                  string
+}
+
+func NewAsyncPostTaskStatusFromAsyncPostTaskStatusEnum(value AsyncPostTaskStatusEnum) *AsyncPostTaskStatus {
+	return &AsyncPostTaskStatus{typeName: "asyncPostTaskStatusEnum", AsyncPostTaskStatusEnum: value}
+}
+
+func NewAsyncPostTaskStatusFromString(value string) *AsyncPostTaskStatus {
+	return &AsyncPostTaskStatus{typeName: "string", String: value}
+}
+
+func (a *AsyncPostTaskStatus) UnmarshalJSON(data []byte) error {
+	var valueAsyncPostTaskStatusEnum AsyncPostTaskStatusEnum
+	if err := json.Unmarshal(data, &valueAsyncPostTaskStatusEnum); err == nil {
+		a.typeName = "asyncPostTaskStatusEnum"
+		a.AsyncPostTaskStatusEnum = valueAsyncPostTaskStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typeName = "string"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AsyncPostTaskStatus) MarshalJSON() ([]byte, error) {
+	switch a.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "asyncPostTaskStatusEnum":
+		return json.Marshal(a.AsyncPostTaskStatusEnum)
+	case "string":
+		return json.Marshal(a.String)
+	}
+}
+
+type AsyncPostTaskStatusVisitor interface {
+	VisitAsyncPostTaskStatusEnum(AsyncPostTaskStatusEnum) error
+	VisitString(string) error
+}
+
+func (a *AsyncPostTaskStatus) Accept(visitor AsyncPostTaskStatusVisitor) error {
+	switch a.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", a.typeName, a)
+	case "asyncPostTaskStatusEnum":
+		return visitor.VisitAsyncPostTaskStatusEnum(a.AsyncPostTaskStatusEnum)
+	case "string":
+		return visitor.VisitString(a.String)
+	}
+}
+
+// - `QUEUED` - QUEUED
+// - `IN_PROGRESS` - IN_PROGRESS
+// - `COMPLETED` - COMPLETED
+// - `FAILURE` - FAILURE
+type AsyncPostTaskStatusEnum string
+
+const (
+	AsyncPostTaskStatusEnumQueued     AsyncPostTaskStatusEnum = "QUEUED"
+	AsyncPostTaskStatusEnumInProgress AsyncPostTaskStatusEnum = "IN_PROGRESS"
+	AsyncPostTaskStatusEnumCompleted  AsyncPostTaskStatusEnum = "COMPLETED"
+	AsyncPostTaskStatusEnumFailure    AsyncPostTaskStatusEnum = "FAILURE"
+)
+
+func NewAsyncPostTaskStatusEnumFromString(s string) (AsyncPostTaskStatusEnum, error) {
+	switch s {
+	case "QUEUED":
+		return AsyncPostTaskStatusEnumQueued, nil
+	case "IN_PROGRESS":
+		return AsyncPostTaskStatusEnumInProgress, nil
+	case "COMPLETED":
+		return AsyncPostTaskStatusEnumCompleted, nil
+	case "FAILURE":
+		return AsyncPostTaskStatusEnumFailure, nil
+	}
+	var t AsyncPostTaskStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a AsyncPostTaskStatusEnum) Ptr() *AsyncPostTaskStatusEnum {
+	return &a
+}
+
 type AuditLogEvent struct {
 	Id *string `json:"id,omitempty"`
 	// The User's full name at the time of this Event occurring.
@@ -3896,12 +4278,16 @@ type AuditLogEvent struct {
 	// - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 	// - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 	// - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+	// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+	// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 	// - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 	// - `MUTED_ISSUE` - MUTED_ISSUE
 	// - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 	// - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 	// - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 	// - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+	// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 	EventType        *AuditLogEventEventType `json:"event_type,omitempty"`
 	EventDescription string                  `json:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty"`
@@ -3965,12 +4351,16 @@ func (a *AuditLogEvent) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type AuditLogEventEventType struct {
 	typeName      string
 	EventTypeEnum EventTypeEnum
@@ -4472,7 +4862,7 @@ type BalanceSheet struct {
 	Equity      []*ReportItem `json:"equity,omitempty"`
 	// The time that balance sheet was generated by the accounting system.
 	RemoteGeneratedAt *time.Time `json:"remote_generated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -4870,13 +5260,13 @@ func (b *BalanceSheetCompany) Accept(visitor BalanceSheetCompanyVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type BalanceSheetCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewBalanceSheetCurrencyFromCurrencyEnum(value CurrencyEnum) *BalanceSheetCurrency {
-	return &BalanceSheetCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewBalanceSheetCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *BalanceSheetCurrency {
+	return &BalanceSheetCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewBalanceSheetCurrencyFromString(value string) *BalanceSheetCurrency {
@@ -4884,10 +5274,10 @@ func NewBalanceSheetCurrencyFromString(value string) *BalanceSheetCurrency {
 }
 
 func (b *BalanceSheetCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		b.typeName = "currencyEnum"
-		b.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		b.typeName = "transactionCurrencyEnum"
+		b.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -4903,15 +5293,15 @@ func (b BalanceSheetCurrency) MarshalJSON() ([]byte, error) {
 	switch b.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
-	case "currencyEnum":
-		return json.Marshal(b.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(b.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(b.String)
 	}
 }
 
 type BalanceSheetCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -4919,11 +5309,2193 @@ func (b *BalanceSheetCurrency) Accept(visitor BalanceSheetCurrencyVisitor) error
 	switch b.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(b.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(b.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(b.String)
 	}
+}
+
+// # The BankFeedAccount Object
+//
+// ### Description
+//
+// The `BankFeedAccount` object represents a bank feed account, detailing various attributes including account identifiers, names, currency, and balance information. This object is central to managing and tracking bank feed accounts within the system.
+//
+// ### Usage Example
+//
+// Fetch from the `GET BankFeedAccount` endpoint to view details of a bank feed account.
+type BankFeedAccount struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The unique identifier of the source account from our customer’s platform.
+	SourceAccountId *string `json:"source_account_id,omitempty"`
+	// The unique identifier of the target account from the third party software.
+	TargetAccountId *string `json:"target_account_id,omitempty"`
+	// The name of the source account as stored in our customer’s platform.
+	SourceAccountName *string `json:"source_account_name,omitempty"`
+	// The human-readable account number of the source account as stored in our customer’s platform.
+	SourceAccountNumber *string `json:"source_account_number,omitempty"`
+	// The name of the target account from the third party software.
+	TargetAccountName *string `json:"target_account_name,omitempty"`
+	// The currency code of the bank feed.
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	Currency *BankFeedAccountCurrency `json:"currency,omitempty"`
+	// The status of the bank feed.
+	//
+	// - `ACTIVE` - ACTIVE
+	// - `INACTIVE` - INACTIVE
+	FeedStatus *BankFeedAccountFeedStatus `json:"feed_status,omitempty"`
+	// The start date of the bank feed’s transactions.
+	FeedStartDate *time.Time `json:"feed_start_date,omitempty"`
+	// The current balance of funds in the source account.
+	SourceAccountBalance *float64 `json:"source_account_balance,omitempty"`
+	// The type of the account.
+	//
+	// - `BANK` - BANK
+	// - `CREDIT_CARD` - CREDIT_CARD
+	AccountType *BankFeedAccountAccountType `json:"account_type,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
+	RemoteData       []map[string]interface{} `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankFeedAccount) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankFeedAccount
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankFeedAccount(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankFeedAccount) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// The type of the account.
+//
+// - `BANK` - BANK
+// - `CREDIT_CARD` - CREDIT_CARD
+type BankFeedAccountAccountType struct {
+	typeName                       string
+	BankFeedAccountAccountTypeEnum BankFeedAccountAccountTypeEnum
+	String                         string
+}
+
+func NewBankFeedAccountAccountTypeFromBankFeedAccountAccountTypeEnum(value BankFeedAccountAccountTypeEnum) *BankFeedAccountAccountType {
+	return &BankFeedAccountAccountType{typeName: "bankFeedAccountAccountTypeEnum", BankFeedAccountAccountTypeEnum: value}
+}
+
+func NewBankFeedAccountAccountTypeFromString(value string) *BankFeedAccountAccountType {
+	return &BankFeedAccountAccountType{typeName: "string", String: value}
+}
+
+func (b *BankFeedAccountAccountType) UnmarshalJSON(data []byte) error {
+	var valueBankFeedAccountAccountTypeEnum BankFeedAccountAccountTypeEnum
+	if err := json.Unmarshal(data, &valueBankFeedAccountAccountTypeEnum); err == nil {
+		b.typeName = "bankFeedAccountAccountTypeEnum"
+		b.BankFeedAccountAccountTypeEnum = valueBankFeedAccountAccountTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedAccountAccountType) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "bankFeedAccountAccountTypeEnum":
+		return json.Marshal(b.BankFeedAccountAccountTypeEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedAccountAccountTypeVisitor interface {
+	VisitBankFeedAccountAccountTypeEnum(BankFeedAccountAccountTypeEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedAccountAccountType) Accept(visitor BankFeedAccountAccountTypeVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "bankFeedAccountAccountTypeEnum":
+		return visitor.VisitBankFeedAccountAccountTypeEnum(b.BankFeedAccountAccountTypeEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+// - `BANK` - BANK
+// - `CREDIT_CARD` - CREDIT_CARD
+type BankFeedAccountAccountTypeEnum string
+
+const (
+	BankFeedAccountAccountTypeEnumBank       BankFeedAccountAccountTypeEnum = "BANK"
+	BankFeedAccountAccountTypeEnumCreditCard BankFeedAccountAccountTypeEnum = "CREDIT_CARD"
+)
+
+func NewBankFeedAccountAccountTypeEnumFromString(s string) (BankFeedAccountAccountTypeEnum, error) {
+	switch s {
+	case "BANK":
+		return BankFeedAccountAccountTypeEnumBank, nil
+	case "CREDIT_CARD":
+		return BankFeedAccountAccountTypeEnumCreditCard, nil
+	}
+	var t BankFeedAccountAccountTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (b BankFeedAccountAccountTypeEnum) Ptr() *BankFeedAccountAccountTypeEnum {
+	return &b
+}
+
+// The currency code of the bank feed.
+//
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type BankFeedAccountCurrency struct {
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+}
+
+func NewBankFeedAccountCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *BankFeedAccountCurrency {
+	return &BankFeedAccountCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
+}
+
+func NewBankFeedAccountCurrencyFromString(value string) *BankFeedAccountCurrency {
+	return &BankFeedAccountCurrency{typeName: "string", String: value}
+}
+
+func (b *BankFeedAccountCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		b.typeName = "transactionCurrencyEnum"
+		b.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedAccountCurrency) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "transactionCurrencyEnum":
+		return json.Marshal(b.TransactionCurrencyEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedAccountCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedAccountCurrency) Accept(visitor BankFeedAccountCurrencyVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(b.TransactionCurrencyEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+// The status of the bank feed.
+//
+// - `ACTIVE` - ACTIVE
+// - `INACTIVE` - INACTIVE
+type BankFeedAccountFeedStatus struct {
+	typeName       string
+	FeedStatusEnum FeedStatusEnum
+	String         string
+}
+
+func NewBankFeedAccountFeedStatusFromFeedStatusEnum(value FeedStatusEnum) *BankFeedAccountFeedStatus {
+	return &BankFeedAccountFeedStatus{typeName: "feedStatusEnum", FeedStatusEnum: value}
+}
+
+func NewBankFeedAccountFeedStatusFromString(value string) *BankFeedAccountFeedStatus {
+	return &BankFeedAccountFeedStatus{typeName: "string", String: value}
+}
+
+func (b *BankFeedAccountFeedStatus) UnmarshalJSON(data []byte) error {
+	var valueFeedStatusEnum FeedStatusEnum
+	if err := json.Unmarshal(data, &valueFeedStatusEnum); err == nil {
+		b.typeName = "feedStatusEnum"
+		b.FeedStatusEnum = valueFeedStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedAccountFeedStatus) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "feedStatusEnum":
+		return json.Marshal(b.FeedStatusEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedAccountFeedStatusVisitor interface {
+	VisitFeedStatusEnum(FeedStatusEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedAccountFeedStatus) Accept(visitor BankFeedAccountFeedStatusVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "feedStatusEnum":
+		return visitor.VisitFeedStatusEnum(b.FeedStatusEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+// # The BankFeedAccount Object
+//
+// ### Description
+//
+// The `BankFeedAccount` object represents a bank feed account, detailing various attributes including account identifiers, names, currency, and balance information. This object is central to managing and tracking bank feed accounts within the system.
+//
+// ### Usage Example
+//
+// Fetch from the `GET BankFeedAccount` endpoint to view details of a bank feed account.
+type BankFeedAccountRequest struct {
+	// The unique identifier of the source account from our customer’s platform.
+	SourceAccountId *string `json:"source_account_id,omitempty"`
+	// The unique identifier of the target account from the third party software.
+	TargetAccountId *string `json:"target_account_id,omitempty"`
+	// The name of the source account as stored in our customer’s platform.
+	SourceAccountName *string `json:"source_account_name,omitempty"`
+	// The human-readable account number of the source account as stored in our customer’s platform.
+	SourceAccountNumber *string `json:"source_account_number,omitempty"`
+	// The name of the target account from the third party software.
+	TargetAccountName *string `json:"target_account_name,omitempty"`
+	// The currency code of the bank feed.
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	Currency *BankFeedAccountRequestCurrency `json:"currency,omitempty"`
+	// The status of the bank feed.
+	//
+	// - `ACTIVE` - ACTIVE
+	// - `INACTIVE` - INACTIVE
+	FeedStatus *BankFeedAccountRequestFeedStatus `json:"feed_status,omitempty"`
+	// The start date of the bank feed’s transactions.
+	FeedStartDate *time.Time `json:"feed_start_date,omitempty"`
+	// The current balance of funds in the source account.
+	SourceAccountBalance *float64 `json:"source_account_balance,omitempty"`
+	// The type of the account.
+	//
+	// - `BANK` - BANK
+	// - `CREDIT_CARD` - CREDIT_CARD
+	AccountType         *BankFeedAccountRequestAccountType `json:"account_type,omitempty"`
+	IntegrationParams   map[string]interface{}             `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}             `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankFeedAccountRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankFeedAccountRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankFeedAccountRequest(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankFeedAccountRequest) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// The type of the account.
+//
+// - `BANK` - BANK
+// - `CREDIT_CARD` - CREDIT_CARD
+type BankFeedAccountRequestAccountType struct {
+	typeName                       string
+	BankFeedAccountAccountTypeEnum BankFeedAccountAccountTypeEnum
+	String                         string
+}
+
+func NewBankFeedAccountRequestAccountTypeFromBankFeedAccountAccountTypeEnum(value BankFeedAccountAccountTypeEnum) *BankFeedAccountRequestAccountType {
+	return &BankFeedAccountRequestAccountType{typeName: "bankFeedAccountAccountTypeEnum", BankFeedAccountAccountTypeEnum: value}
+}
+
+func NewBankFeedAccountRequestAccountTypeFromString(value string) *BankFeedAccountRequestAccountType {
+	return &BankFeedAccountRequestAccountType{typeName: "string", String: value}
+}
+
+func (b *BankFeedAccountRequestAccountType) UnmarshalJSON(data []byte) error {
+	var valueBankFeedAccountAccountTypeEnum BankFeedAccountAccountTypeEnum
+	if err := json.Unmarshal(data, &valueBankFeedAccountAccountTypeEnum); err == nil {
+		b.typeName = "bankFeedAccountAccountTypeEnum"
+		b.BankFeedAccountAccountTypeEnum = valueBankFeedAccountAccountTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedAccountRequestAccountType) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "bankFeedAccountAccountTypeEnum":
+		return json.Marshal(b.BankFeedAccountAccountTypeEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedAccountRequestAccountTypeVisitor interface {
+	VisitBankFeedAccountAccountTypeEnum(BankFeedAccountAccountTypeEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedAccountRequestAccountType) Accept(visitor BankFeedAccountRequestAccountTypeVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "bankFeedAccountAccountTypeEnum":
+		return visitor.VisitBankFeedAccountAccountTypeEnum(b.BankFeedAccountAccountTypeEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+// The currency code of the bank feed.
+//
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type BankFeedAccountRequestCurrency struct {
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+}
+
+func NewBankFeedAccountRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *BankFeedAccountRequestCurrency {
+	return &BankFeedAccountRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
+}
+
+func NewBankFeedAccountRequestCurrencyFromString(value string) *BankFeedAccountRequestCurrency {
+	return &BankFeedAccountRequestCurrency{typeName: "string", String: value}
+}
+
+func (b *BankFeedAccountRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		b.typeName = "transactionCurrencyEnum"
+		b.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedAccountRequestCurrency) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "transactionCurrencyEnum":
+		return json.Marshal(b.TransactionCurrencyEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedAccountRequestCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedAccountRequestCurrency) Accept(visitor BankFeedAccountRequestCurrencyVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(b.TransactionCurrencyEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+// The status of the bank feed.
+//
+// - `ACTIVE` - ACTIVE
+// - `INACTIVE` - INACTIVE
+type BankFeedAccountRequestFeedStatus struct {
+	typeName       string
+	FeedStatusEnum FeedStatusEnum
+	String         string
+}
+
+func NewBankFeedAccountRequestFeedStatusFromFeedStatusEnum(value FeedStatusEnum) *BankFeedAccountRequestFeedStatus {
+	return &BankFeedAccountRequestFeedStatus{typeName: "feedStatusEnum", FeedStatusEnum: value}
+}
+
+func NewBankFeedAccountRequestFeedStatusFromString(value string) *BankFeedAccountRequestFeedStatus {
+	return &BankFeedAccountRequestFeedStatus{typeName: "string", String: value}
+}
+
+func (b *BankFeedAccountRequestFeedStatus) UnmarshalJSON(data []byte) error {
+	var valueFeedStatusEnum FeedStatusEnum
+	if err := json.Unmarshal(data, &valueFeedStatusEnum); err == nil {
+		b.typeName = "feedStatusEnum"
+		b.FeedStatusEnum = valueFeedStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedAccountRequestFeedStatus) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "feedStatusEnum":
+		return json.Marshal(b.FeedStatusEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedAccountRequestFeedStatusVisitor interface {
+	VisitFeedStatusEnum(FeedStatusEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedAccountRequestFeedStatus) Accept(visitor BankFeedAccountRequestFeedStatusVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "feedStatusEnum":
+		return visitor.VisitFeedStatusEnum(b.FeedStatusEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+type BankFeedAccountResponse struct {
+	Model    *BankFeedAccount            `json:"model,omitempty"`
+	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
+	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
+	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankFeedAccountResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankFeedAccountResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankFeedAccountResponse(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankFeedAccountResponse) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// # The BankFeedTransaction Object
+//
+// ### Description
+//
+// The `BankFeedTransaction` object is used to represent transactions linked to a bank feed account. This includes details about the transaction such as the date, amount, description, and type.
+//
+// ### Usage Example
+//
+// Fetch from the `GET BankFeedTransaction` endpoint to view details of a transaction associated with a bank feed account.
+type BankFeedTransaction struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The bank feed account associated with the transaction.
+	BankFeedAccount *BankFeedTransactionBankFeedAccount `json:"bank_feed_account,omitempty"`
+	// The date that the transaction occurred.
+	TransactionDate *time.Time `json:"transaction_date,omitempty"`
+	// The date the transaction was posted to the bank account.
+	PostedDate *time.Time `json:"posted_date,omitempty"`
+	// The amount of the transaction.
+	Amount *float64 `json:"amount,omitempty"`
+	// The description of the transaction.
+	Description *string `json:"description,omitempty"`
+	// The underlying type of the transaction.
+	TransactionType *string `json:"transaction_type,omitempty"`
+	// The person or merchant who initiated the transaction, or alternatively, to whom the transaction was paid.
+	Payee *string `json:"payee,omitempty"`
+	// If the transaction is of type debit or credit.
+	//
+	// - `CREDIT` - CREDIT
+	// - `DEBIT` - DEBIT
+	CreditOrDebit *BankFeedTransactionCreditOrDebit `json:"credit_or_debit,omitempty"`
+	// The customer’s identifier for the transaction.
+	SourceTransactionId *string `json:"source_transaction_id,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Whether or not this transaction has been processed by the external system. For example, NetSuite writes this field as True when the SuiteApp has processed the transaction.
+	IsProcessed *bool `json:"is_processed,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankFeedTransaction) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankFeedTransaction
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankFeedTransaction(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankFeedTransaction) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// The bank feed account associated with the transaction.
+type BankFeedTransactionBankFeedAccount struct {
+	typeName        string
+	String          string
+	BankFeedAccount *BankFeedAccount
+}
+
+func NewBankFeedTransactionBankFeedAccountFromString(value string) *BankFeedTransactionBankFeedAccount {
+	return &BankFeedTransactionBankFeedAccount{typeName: "string", String: value}
+}
+
+func NewBankFeedTransactionBankFeedAccountFromBankFeedAccount(value *BankFeedAccount) *BankFeedTransactionBankFeedAccount {
+	return &BankFeedTransactionBankFeedAccount{typeName: "bankFeedAccount", BankFeedAccount: value}
+}
+
+func (b *BankFeedTransactionBankFeedAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	valueBankFeedAccount := new(BankFeedAccount)
+	if err := json.Unmarshal(data, &valueBankFeedAccount); err == nil {
+		b.typeName = "bankFeedAccount"
+		b.BankFeedAccount = valueBankFeedAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedTransactionBankFeedAccount) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return json.Marshal(b.String)
+	case "bankFeedAccount":
+		return json.Marshal(b.BankFeedAccount)
+	}
+}
+
+type BankFeedTransactionBankFeedAccountVisitor interface {
+	VisitString(string) error
+	VisitBankFeedAccount(*BankFeedAccount) error
+}
+
+func (b *BankFeedTransactionBankFeedAccount) Accept(visitor BankFeedTransactionBankFeedAccountVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return visitor.VisitString(b.String)
+	case "bankFeedAccount":
+		return visitor.VisitBankFeedAccount(b.BankFeedAccount)
+	}
+}
+
+// If the transaction is of type debit or credit.
+//
+// - `CREDIT` - CREDIT
+// - `DEBIT` - DEBIT
+type BankFeedTransactionCreditOrDebit struct {
+	typeName          string
+	CreditOrDebitEnum CreditOrDebitEnum
+	String            string
+}
+
+func NewBankFeedTransactionCreditOrDebitFromCreditOrDebitEnum(value CreditOrDebitEnum) *BankFeedTransactionCreditOrDebit {
+	return &BankFeedTransactionCreditOrDebit{typeName: "creditOrDebitEnum", CreditOrDebitEnum: value}
+}
+
+func NewBankFeedTransactionCreditOrDebitFromString(value string) *BankFeedTransactionCreditOrDebit {
+	return &BankFeedTransactionCreditOrDebit{typeName: "string", String: value}
+}
+
+func (b *BankFeedTransactionCreditOrDebit) UnmarshalJSON(data []byte) error {
+	var valueCreditOrDebitEnum CreditOrDebitEnum
+	if err := json.Unmarshal(data, &valueCreditOrDebitEnum); err == nil {
+		b.typeName = "creditOrDebitEnum"
+		b.CreditOrDebitEnum = valueCreditOrDebitEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedTransactionCreditOrDebit) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "creditOrDebitEnum":
+		return json.Marshal(b.CreditOrDebitEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedTransactionCreditOrDebitVisitor interface {
+	VisitCreditOrDebitEnum(CreditOrDebitEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedTransactionCreditOrDebit) Accept(visitor BankFeedTransactionCreditOrDebitVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "creditOrDebitEnum":
+		return visitor.VisitCreditOrDebitEnum(b.CreditOrDebitEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+// # The BankFeedTransaction Object
+//
+// ### Description
+//
+// The `BankFeedTransaction` object is used to represent transactions linked to a bank feed account. This includes details about the transaction such as the date, amount, description, and type.
+//
+// ### Usage Example
+//
+// Fetch from the `GET BankFeedTransaction` endpoint to view details of a transaction associated with a bank feed account.
+type BankFeedTransactionRequestRequest struct {
+	// The bank feed account associated with the transaction.
+	BankFeedAccount *BankFeedTransactionRequestRequestBankFeedAccount `json:"bank_feed_account,omitempty"`
+	// The date that the transaction occurred.
+	TransactionDate *time.Time `json:"transaction_date,omitempty"`
+	// The date the transaction was posted to the bank account.
+	PostedDate *time.Time `json:"posted_date,omitempty"`
+	// The amount of the transaction.
+	Amount *float64 `json:"amount,omitempty"`
+	// The description of the transaction.
+	Description *string `json:"description,omitempty"`
+	// The underlying type of the transaction.
+	TransactionType *string `json:"transaction_type,omitempty"`
+	// The person or merchant who initiated the transaction, or alternatively, to whom the transaction was paid.
+	Payee *string `json:"payee,omitempty"`
+	// If the transaction is of type debit or credit.
+	//
+	// - `CREDIT` - CREDIT
+	// - `DEBIT` - DEBIT
+	CreditOrDebit *BankFeedTransactionRequestRequestCreditOrDebit `json:"credit_or_debit,omitempty"`
+	// The customer’s identifier for the transaction.
+	SourceTransactionId *string                `json:"source_transaction_id,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankFeedTransactionRequestRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankFeedTransactionRequestRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankFeedTransactionRequestRequest(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankFeedTransactionRequestRequest) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// The bank feed account associated with the transaction.
+type BankFeedTransactionRequestRequestBankFeedAccount struct {
+	typeName        string
+	String          string
+	BankFeedAccount *BankFeedAccount
+}
+
+func NewBankFeedTransactionRequestRequestBankFeedAccountFromString(value string) *BankFeedTransactionRequestRequestBankFeedAccount {
+	return &BankFeedTransactionRequestRequestBankFeedAccount{typeName: "string", String: value}
+}
+
+func NewBankFeedTransactionRequestRequestBankFeedAccountFromBankFeedAccount(value *BankFeedAccount) *BankFeedTransactionRequestRequestBankFeedAccount {
+	return &BankFeedTransactionRequestRequestBankFeedAccount{typeName: "bankFeedAccount", BankFeedAccount: value}
+}
+
+func (b *BankFeedTransactionRequestRequestBankFeedAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	valueBankFeedAccount := new(BankFeedAccount)
+	if err := json.Unmarshal(data, &valueBankFeedAccount); err == nil {
+		b.typeName = "bankFeedAccount"
+		b.BankFeedAccount = valueBankFeedAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedTransactionRequestRequestBankFeedAccount) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return json.Marshal(b.String)
+	case "bankFeedAccount":
+		return json.Marshal(b.BankFeedAccount)
+	}
+}
+
+type BankFeedTransactionRequestRequestBankFeedAccountVisitor interface {
+	VisitString(string) error
+	VisitBankFeedAccount(*BankFeedAccount) error
+}
+
+func (b *BankFeedTransactionRequestRequestBankFeedAccount) Accept(visitor BankFeedTransactionRequestRequestBankFeedAccountVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "string":
+		return visitor.VisitString(b.String)
+	case "bankFeedAccount":
+		return visitor.VisitBankFeedAccount(b.BankFeedAccount)
+	}
+}
+
+// If the transaction is of type debit or credit.
+//
+// - `CREDIT` - CREDIT
+// - `DEBIT` - DEBIT
+type BankFeedTransactionRequestRequestCreditOrDebit struct {
+	typeName          string
+	CreditOrDebitEnum CreditOrDebitEnum
+	String            string
+}
+
+func NewBankFeedTransactionRequestRequestCreditOrDebitFromCreditOrDebitEnum(value CreditOrDebitEnum) *BankFeedTransactionRequestRequestCreditOrDebit {
+	return &BankFeedTransactionRequestRequestCreditOrDebit{typeName: "creditOrDebitEnum", CreditOrDebitEnum: value}
+}
+
+func NewBankFeedTransactionRequestRequestCreditOrDebitFromString(value string) *BankFeedTransactionRequestRequestCreditOrDebit {
+	return &BankFeedTransactionRequestRequestCreditOrDebit{typeName: "string", String: value}
+}
+
+func (b *BankFeedTransactionRequestRequestCreditOrDebit) UnmarshalJSON(data []byte) error {
+	var valueCreditOrDebitEnum CreditOrDebitEnum
+	if err := json.Unmarshal(data, &valueCreditOrDebitEnum); err == nil {
+		b.typeName = "creditOrDebitEnum"
+		b.CreditOrDebitEnum = valueCreditOrDebitEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typeName = "string"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BankFeedTransactionRequestRequestCreditOrDebit) MarshalJSON() ([]byte, error) {
+	switch b.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "creditOrDebitEnum":
+		return json.Marshal(b.CreditOrDebitEnum)
+	case "string":
+		return json.Marshal(b.String)
+	}
+}
+
+type BankFeedTransactionRequestRequestCreditOrDebitVisitor interface {
+	VisitCreditOrDebitEnum(CreditOrDebitEnum) error
+	VisitString(string) error
+}
+
+func (b *BankFeedTransactionRequestRequestCreditOrDebit) Accept(visitor BankFeedTransactionRequestRequestCreditOrDebitVisitor) error {
+	switch b.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", b.typeName, b)
+	case "creditOrDebitEnum":
+		return visitor.VisitCreditOrDebitEnum(b.CreditOrDebitEnum)
+	case "string":
+		return visitor.VisitString(b.String)
+	}
+}
+
+type BankFeedTransactionResponse struct {
+	Model    *BankFeedTransaction        `json:"model,omitempty"`
+	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
+	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
+	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (b *BankFeedTransactionResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler BankFeedTransactionResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BankFeedTransactionResponse(value)
+	b._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BankFeedTransactionResponse) String() string {
+	if len(b._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(b._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
 }
 
 // # The CashFlowStatement Object
@@ -5269,7 +7841,7 @@ type CashFlowStatement struct {
 	FinancingActivities []*ReportItem `json:"financing_activities,omitempty"`
 	// The time that cash flow statement was generated by the accounting system.
 	RemoteGeneratedAt *time.Time `json:"remote_generated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -5667,13 +8239,13 @@ func (c *CashFlowStatementCompany) Accept(visitor CashFlowStatementCompanyVisito
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type CashFlowStatementCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewCashFlowStatementCurrencyFromCurrencyEnum(value CurrencyEnum) *CashFlowStatementCurrency {
-	return &CashFlowStatementCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewCashFlowStatementCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *CashFlowStatementCurrency {
+	return &CashFlowStatementCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewCashFlowStatementCurrencyFromString(value string) *CashFlowStatementCurrency {
@@ -5681,10 +8253,10 @@ func NewCashFlowStatementCurrencyFromString(value string) *CashFlowStatementCurr
 }
 
 func (c *CashFlowStatementCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		c.typeName = "currencyEnum"
-		c.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		c.typeName = "transactionCurrencyEnum"
+		c.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -5700,15 +8272,15 @@ func (c CashFlowStatementCurrency) MarshalJSON() ([]byte, error) {
 	switch c.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "currencyEnum":
-		return json.Marshal(c.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(c.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(c.String)
 	}
 }
 
 type CashFlowStatementCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -5716,8 +8288,8 @@ func (c *CashFlowStatementCurrency) Accept(visitor CashFlowStatementCurrencyVisi
 	switch c.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(c.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(c.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(c.String)
 	}
@@ -6274,7 +8846,7 @@ type CompanyInfo struct {
 	Urls         []*string                `json:"urls,omitempty"`
 	Addresses    []*Address               `json:"addresses,omitempty"`
 	PhoneNumbers []*AccountingPhoneNumber `json:"phone_numbers,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -6614,13 +9186,13 @@ func (c *CompanyInfo) String() string {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type CompanyInfoCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewCompanyInfoCurrencyFromCurrencyEnum(value CurrencyEnum) *CompanyInfoCurrency {
-	return &CompanyInfoCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewCompanyInfoCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *CompanyInfoCurrency {
+	return &CompanyInfoCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewCompanyInfoCurrencyFromString(value string) *CompanyInfoCurrency {
@@ -6628,10 +9200,10 @@ func NewCompanyInfoCurrencyFromString(value string) *CompanyInfoCurrency {
 }
 
 func (c *CompanyInfoCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		c.typeName = "currencyEnum"
-		c.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		c.typeName = "transactionCurrencyEnum"
+		c.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -6647,15 +9219,15 @@ func (c CompanyInfoCurrency) MarshalJSON() ([]byte, error) {
 	switch c.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "currencyEnum":
-		return json.Marshal(c.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(c.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(c.String)
 	}
 }
 
 type CompanyInfoCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -6663,11 +9235,35 @@ func (c *CompanyInfoCurrency) Accept(visitor CompanyInfoCurrencyVisitor) error {
 	switch c.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(c.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(c.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(c.String)
 	}
+}
+
+// - `SALES` - SALES
+// - `PURCHASE` - PURCHASE
+type ComponentTypeEnum string
+
+const (
+	ComponentTypeEnumSales    ComponentTypeEnum = "SALES"
+	ComponentTypeEnumPurchase ComponentTypeEnum = "PURCHASE"
+)
+
+func NewComponentTypeEnumFromString(s string) (ComponentTypeEnum, error) {
+	switch s {
+	case "SALES":
+		return ComponentTypeEnumSales, nil
+	case "PURCHASE":
+		return ComponentTypeEnumPurchase, nil
+	}
+	var t ComponentTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c ComponentTypeEnum) Ptr() *ComponentTypeEnum {
+	return &c
 }
 
 // # The Contact Object
@@ -6715,10 +9311,11 @@ type Contact struct {
 	Addresses []*ContactAddressesItem `json:"addresses,omitempty"`
 	// `AccountingPhoneNumber` object for the given `Contacts` object.
 	PhoneNumbers []*AccountingPhoneNumber `json:"phone_numbers,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -6841,6 +9438,7 @@ type ContactRequest struct {
 	PhoneNumbers        []*AccountingPhoneNumberRequest `json:"phone_numbers,omitempty"`
 	IntegrationParams   map[string]interface{}          `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}          `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest           `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8127,7 +10725,9 @@ type CreditNote struct {
 	// The credit note's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The amount of value remaining in the credit note that the customer can use.
-	RemainingCredit    *float64                            `json:"remaining_credit,omitempty"`
+	RemainingCredit *float64 `json:"remaining_credit,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax     *bool                               `json:"inclusive_of_tax,omitempty"`
 	LineItems          []*CreditNoteLineItem               `json:"line_items,omitempty"`
 	TrackingCategories []*CreditNoteTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The credit note's currency.
@@ -8447,12 +11047,14 @@ type CreditNote struct {
 	Payments []*CreditNotePaymentsItem `json:"payments,omitempty"`
 	// A list of the Payment Applied to Lines common models related to a given Invoice, Credit Note, or Journal Entry.
 	AppliedPayments []*CreditNoteAppliedPaymentsItem `json:"applied_payments,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the CreditNote was generated in.
 	AccountingPeriod *CreditNoteAccountingPeriod `json:"accounting_period,omitempty"`
-	FieldMappings    map[string]interface{}      `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData               `json:"remote_data,omitempty"`
+	// A list of the CreditNote Applied to Lines common models related to a given Credit Note
+	AppliedToLines []*CreditNoteApplyLineForCreditNote `json:"applied_to_lines,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -8592,6 +11194,323 @@ func (c *CreditNoteAppliedPaymentsItem) Accept(visitor CreditNoteAppliedPayments
 		return visitor.VisitString(c.String)
 	case "paymentLineItem":
 		return visitor.VisitPaymentLineItem(c.PaymentLineItem)
+	}
+}
+
+// # The CreditNoteApplyLine Object
+//
+// ### Description
+//
+// The `CreditNoteApplyLine` is attached to the CreditNote model.
+//
+// ### Usage Example
+//
+// Fetch from the `GET CreditNote` endpoint and view the invoice's applied to lines.
+type CreditNoteApplyLineForCreditNote struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time                               `json:"modified_at,omitempty"`
+	Invoice    *CreditNoteApplyLineForCreditNoteInvoice `json:"invoice,omitempty"`
+	// Date that the credit note is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the Credit Note applied to the invoice.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CreditNoteApplyLineForCreditNote) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteApplyLineForCreditNote
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CreditNoteApplyLineForCreditNote(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteApplyLineForCreditNote) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+type CreditNoteApplyLineForCreditNoteInvoice struct {
+	typeName string
+	String   string
+	Invoice  *Invoice
+}
+
+func NewCreditNoteApplyLineForCreditNoteInvoiceFromString(value string) *CreditNoteApplyLineForCreditNoteInvoice {
+	return &CreditNoteApplyLineForCreditNoteInvoice{typeName: "string", String: value}
+}
+
+func NewCreditNoteApplyLineForCreditNoteInvoiceFromInvoice(value *Invoice) *CreditNoteApplyLineForCreditNoteInvoice {
+	return &CreditNoteApplyLineForCreditNoteInvoice{typeName: "invoice", Invoice: value}
+}
+
+func (c *CreditNoteApplyLineForCreditNoteInvoice) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueInvoice := new(Invoice)
+	if err := json.Unmarshal(data, &valueInvoice); err == nil {
+		c.typeName = "invoice"
+		c.Invoice = valueInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteApplyLineForCreditNoteInvoice) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "invoice":
+		return json.Marshal(c.Invoice)
+	}
+}
+
+type CreditNoteApplyLineForCreditNoteInvoiceVisitor interface {
+	VisitString(string) error
+	VisitInvoice(*Invoice) error
+}
+
+func (c *CreditNoteApplyLineForCreditNoteInvoice) Accept(visitor CreditNoteApplyLineForCreditNoteInvoiceVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "invoice":
+		return visitor.VisitInvoice(c.Invoice)
+	}
+}
+
+// # The CreditNoteApplyLine Object
+//
+// ### Description
+//
+// The `CreditNoteApplyLine` is attached to the CreditNote model.
+//
+// ### Usage Example
+//
+// Fetch from the `GET CreditNote` endpoint and view the invoice's applied to lines.
+type CreditNoteApplyLineForCreditNoteRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string                                         `json:"remote_id,omitempty"`
+	Invoice  *CreditNoteApplyLineForCreditNoteRequestInvoice `json:"invoice,omitempty"`
+	// Date that the credit note is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the Credit Note applied to the invoice.
+	AppliedAmount       *string                `json:"applied_amount,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CreditNoteApplyLineForCreditNoteRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteApplyLineForCreditNoteRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CreditNoteApplyLineForCreditNoteRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteApplyLineForCreditNoteRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+type CreditNoteApplyLineForCreditNoteRequestInvoice struct {
+	typeName string
+	String   string
+	Invoice  *Invoice
+}
+
+func NewCreditNoteApplyLineForCreditNoteRequestInvoiceFromString(value string) *CreditNoteApplyLineForCreditNoteRequestInvoice {
+	return &CreditNoteApplyLineForCreditNoteRequestInvoice{typeName: "string", String: value}
+}
+
+func NewCreditNoteApplyLineForCreditNoteRequestInvoiceFromInvoice(value *Invoice) *CreditNoteApplyLineForCreditNoteRequestInvoice {
+	return &CreditNoteApplyLineForCreditNoteRequestInvoice{typeName: "invoice", Invoice: value}
+}
+
+func (c *CreditNoteApplyLineForCreditNoteRequestInvoice) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueInvoice := new(Invoice)
+	if err := json.Unmarshal(data, &valueInvoice); err == nil {
+		c.typeName = "invoice"
+		c.Invoice = valueInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteApplyLineForCreditNoteRequestInvoice) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "invoice":
+		return json.Marshal(c.Invoice)
+	}
+}
+
+type CreditNoteApplyLineForCreditNoteRequestInvoiceVisitor interface {
+	VisitString(string) error
+	VisitInvoice(*Invoice) error
+}
+
+func (c *CreditNoteApplyLineForCreditNoteRequestInvoice) Accept(visitor CreditNoteApplyLineForCreditNoteRequestInvoiceVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "invoice":
+		return visitor.VisitInvoice(c.Invoice)
+	}
+}
+
+// # The CreditNoteApplyLine Object
+//
+// ### Description
+//
+// The `CreditNoteApplyLine` is attached to the CreditNote model.
+//
+// ### Usage Example
+//
+// Fetch from the `GET CreditNote` endpoint and view the invoice's applied to lines.
+type CreditNoteApplyLineForInvoice struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time                               `json:"modified_at,omitempty"`
+	CreditNote *CreditNoteApplyLineForInvoiceCreditNote `json:"credit_note,omitempty"`
+	// Date that the credit note is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the Credit Note applied to the invoice.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CreditNoteApplyLineForInvoice) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteApplyLineForInvoice
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CreditNoteApplyLineForInvoice(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteApplyLineForInvoice) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+type CreditNoteApplyLineForInvoiceCreditNote struct {
+	typeName   string
+	String     string
+	CreditNote *CreditNote
+}
+
+func NewCreditNoteApplyLineForInvoiceCreditNoteFromString(value string) *CreditNoteApplyLineForInvoiceCreditNote {
+	return &CreditNoteApplyLineForInvoiceCreditNote{typeName: "string", String: value}
+}
+
+func NewCreditNoteApplyLineForInvoiceCreditNoteFromCreditNote(value *CreditNote) *CreditNoteApplyLineForInvoiceCreditNote {
+	return &CreditNoteApplyLineForInvoiceCreditNote{typeName: "creditNote", CreditNote: value}
+}
+
+func (c *CreditNoteApplyLineForInvoiceCreditNote) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCreditNote := new(CreditNote)
+	if err := json.Unmarshal(data, &valueCreditNote); err == nil {
+		c.typeName = "creditNote"
+		c.CreditNote = valueCreditNote
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteApplyLineForInvoiceCreditNote) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "creditNote":
+		return json.Marshal(c.CreditNote)
+	}
+}
+
+type CreditNoteApplyLineForInvoiceCreditNoteVisitor interface {
+	VisitString(string) error
+	VisitCreditNote(*CreditNote) error
+}
+
+func (c *CreditNoteApplyLineForInvoiceCreditNote) Accept(visitor CreditNoteApplyLineForInvoiceCreditNoteVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "creditNote":
+		return visitor.VisitCreditNote(c.CreditNote)
 	}
 }
 
@@ -9020,13 +11939,13 @@ func (c *CreditNoteContact) Accept(visitor CreditNoteContactVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type CreditNoteCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewCreditNoteCurrencyFromCurrencyEnum(value CurrencyEnum) *CreditNoteCurrency {
-	return &CreditNoteCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewCreditNoteCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *CreditNoteCurrency {
+	return &CreditNoteCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewCreditNoteCurrencyFromString(value string) *CreditNoteCurrency {
@@ -9034,10 +11953,10 @@ func NewCreditNoteCurrencyFromString(value string) *CreditNoteCurrency {
 }
 
 func (c *CreditNoteCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		c.typeName = "currencyEnum"
-		c.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		c.typeName = "transactionCurrencyEnum"
+		c.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -9053,15 +11972,15 @@ func (c CreditNoteCurrency) MarshalJSON() ([]byte, error) {
 	switch c.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "currencyEnum":
-		return json.Marshal(c.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(c.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(c.String)
 	}
 }
 
 type CreditNoteCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -9069,13 +11988,22 @@ func (c *CreditNoteCurrency) Accept(visitor CreditNoteCurrencyVisitor) error {
 	switch c.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(c.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(c.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(c.String)
 	}
 }
 
+// # The CreditNoteLineItem Object
+//
+// ### Description
+//
+// The `CreditNoteLineItem` object is used to represent a credit note's line items.
+//
+// ### Usage Example
+//
+// Fetch from the `GET CreditNote` endpoint and view the credit note's line items.
 type CreditNoteLineItem struct {
 	Id *string `json:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -9095,17 +12023,19 @@ type CreditNoteLineItem struct {
 	Memo *string `json:"memo,omitempty"`
 	// The credit note line item's unit price.
 	UnitPrice *string `json:"unit_price,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The credit note line item's total.
 	TotalLineAmount *string `json:"total_line_amount,omitempty"`
 	// The credit note line item's associated tracking category.
 	TrackingCategory *string `json:"tracking_category,omitempty"`
 	// The credit note line item's associated tracking categories.
-	TrackingCategories []string `json:"tracking_categories,omitempty"`
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
 	// The credit note line item's account.
 	Account *string `json:"account,omitempty"`
 	// The company the credit note belongs to.
 	Company *CreditNoteLineItemCompany `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -9249,6 +12179,185 @@ func (c *CreditNoteLineItemItem) Accept(visitor CreditNoteLineItemItemVisitor) e
 	}
 }
 
+// # The CreditNoteLineItem Object
+//
+// ### Description
+//
+// The `CreditNoteLineItem` object is used to represent a credit note's line items.
+//
+// ### Usage Example
+//
+// Fetch from the `GET CreditNote` endpoint and view the credit note's line items.
+type CreditNoteLineItemRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string                        `json:"remote_id,omitempty"`
+	Item     *CreditNoteLineItemRequestItem `json:"item,omitempty"`
+	// The credit note line item's name.
+	Name *string `json:"name,omitempty"`
+	// The description of the item that is owed.
+	Description *string `json:"description,omitempty"`
+	// The credit note line item's quantity.
+	Quantity *string `json:"quantity,omitempty"`
+	// The credit note line item's memo.
+	Memo *string `json:"memo,omitempty"`
+	// The credit note line item's unit price.
+	UnitPrice *string `json:"unit_price,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
+	// The credit note line item's total.
+	TotalLineAmount *string `json:"total_line_amount,omitempty"`
+	// The credit note line item's associated tracking category.
+	TrackingCategory *string `json:"tracking_category,omitempty"`
+	// The credit note line item's associated tracking categories.
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	// The credit note line item's account.
+	Account *string `json:"account,omitempty"`
+	// The company the credit note belongs to.
+	Company             *CreditNoteLineItemRequestCompany `json:"company,omitempty"`
+	IntegrationParams   map[string]interface{}            `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CreditNoteLineItemRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteLineItemRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CreditNoteLineItemRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteLineItemRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+// The company the credit note belongs to.
+type CreditNoteLineItemRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewCreditNoteLineItemRequestCompanyFromString(value string) *CreditNoteLineItemRequestCompany {
+	return &CreditNoteLineItemRequestCompany{typeName: "string", String: value}
+}
+
+func NewCreditNoteLineItemRequestCompanyFromCompanyInfo(value *CompanyInfo) *CreditNoteLineItemRequestCompany {
+	return &CreditNoteLineItemRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (c *CreditNoteLineItemRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typeName = "companyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemRequestCompany) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "companyInfo":
+		return json.Marshal(c.CompanyInfo)
+	}
+}
+
+type CreditNoteLineItemRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *CreditNoteLineItemRequestCompany) Accept(visitor CreditNoteLineItemRequestCompanyVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
+}
+
+type CreditNoteLineItemRequestItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewCreditNoteLineItemRequestItemFromString(value string) *CreditNoteLineItemRequestItem {
+	return &CreditNoteLineItemRequestItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteLineItemRequestItemFromItem(value *Item) *CreditNoteLineItemRequestItem {
+	return &CreditNoteLineItemRequestItem{typeName: "item", Item: value}
+}
+
+func (c *CreditNoteLineItemRequestItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		c.typeName = "item"
+		c.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemRequestItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "item":
+		return json.Marshal(c.Item)
+	}
+}
+
+type CreditNoteLineItemRequestItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (c *CreditNoteLineItemRequestItem) Accept(visitor CreditNoteLineItemRequestItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "item":
+		return visitor.VisitItem(c.Item)
+	}
+}
+
 type CreditNotePaymentsItem struct {
 	typeName string
 	String   string
@@ -9306,153 +12415,619 @@ func (c *CreditNotePaymentsItem) Accept(visitor CreditNotePaymentsItemVisitor) e
 	}
 }
 
-// The credit note's status.
+// # The CreditNote Object
 //
-// - `SUBMITTED` - SUBMITTED
-// - `AUTHORIZED` - AUTHORIZED
-// - `PAID` - PAID
-type CreditNoteStatus struct {
-	typeName             string
-	CreditNoteStatusEnum CreditNoteStatusEnum
-	String               string
+// ### Description
+//
+// A `CreditNote` is transaction issued to a customer, indicating a reduction or cancellation of the amount owed by the customer. It is most generally used as an adjustment note used to rectify errors, returns, or overpayments related to a sales transaction. A `CreditNote` can be applied to _Accounts Receivable_ Invoices to decrease the overall amount of the Invoice.
+//
+// ### Usage Example
+//
+// Fetch from the `LIST CreditNotes` endpoint and view a company's credit notes.
+type CreditNoteRequest struct {
+	// The credit note's transaction date.
+	TransactionDate *time.Time `json:"transaction_date,omitempty"`
+	// The credit note's status.
+	//
+	// - `SUBMITTED` - SUBMITTED
+	// - `AUTHORIZED` - AUTHORIZED
+	// - `PAID` - PAID
+	Status *CreditNoteRequestStatus `json:"status,omitempty"`
+	// The credit note's number.
+	Number *string `json:"number,omitempty"`
+	// The credit note's contact.
+	Contact *CreditNoteRequestContact `json:"contact,omitempty"`
+	// The company the credit note belongs to.
+	Company *CreditNoteRequestCompany `json:"company,omitempty"`
+	// The credit note's exchange rate.
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// The credit note's total amount.
+	TotalAmount *float64 `json:"total_amount,omitempty"`
+	// The amount of value remaining in the credit note that the customer can use.
+	RemainingCredit *float64 `json:"remaining_credit,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax     *bool                                      `json:"inclusive_of_tax,omitempty"`
+	LineItems          []*CreditNoteRequestLineItemsItem          `json:"line_items,omitempty"`
+	TrackingCategories []*CreditNoteRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	// The credit note's currency.
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	Currency *CreditNoteRequestCurrency `json:"currency,omitempty"`
+	// Array of `Payment` object IDs
+	Payments []*CreditNoteRequestPaymentsItem `json:"payments,omitempty"`
+	// A list of the Payment Applied to Lines common models related to a given Invoice, Credit Note, or Journal Entry.
+	AppliedPayments []*CreditNoteRequestAppliedPaymentsItem `json:"applied_payments,omitempty"`
+	// The accounting period that the CreditNote was generated in.
+	AccountingPeriod *CreditNoteRequestAccountingPeriod `json:"accounting_period,omitempty"`
+	// A list of the CreditNote Applied to Lines common models related to a given Credit Note
+	AppliedToLines      []*CreditNoteApplyLineForCreditNoteRequest `json:"applied_to_lines,omitempty"`
+	IntegrationParams   map[string]interface{}                     `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}                     `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
 }
 
-func NewCreditNoteStatusFromCreditNoteStatusEnum(value CreditNoteStatusEnum) *CreditNoteStatus {
-	return &CreditNoteStatus{typeName: "creditNoteStatusEnum", CreditNoteStatusEnum: value}
-}
-
-func NewCreditNoteStatusFromString(value string) *CreditNoteStatus {
-	return &CreditNoteStatus{typeName: "string", String: value}
-}
-
-func (c *CreditNoteStatus) UnmarshalJSON(data []byte) error {
-	var valueCreditNoteStatusEnum CreditNoteStatusEnum
-	if err := json.Unmarshal(data, &valueCreditNoteStatusEnum); err == nil {
-		c.typeName = "creditNoteStatusEnum"
-		c.CreditNoteStatusEnum = valueCreditNoteStatusEnum
-		return nil
+func (c *CreditNoteRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
 	}
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		c.typeName = "string"
-		c.String = valueString
-		return nil
+	*c = CreditNoteRequest(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteRequest) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
 	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
-}
-
-func (c CreditNoteStatus) MarshalJSON() ([]byte, error) {
-	switch c.typeName {
-	default:
-		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "creditNoteStatusEnum":
-		return json.Marshal(c.CreditNoteStatusEnum)
-	case "string":
-		return json.Marshal(c.String)
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
 	}
+	return fmt.Sprintf("%#v", c)
 }
 
-type CreditNoteStatusVisitor interface {
-	VisitCreditNoteStatusEnum(CreditNoteStatusEnum) error
-	VisitString(string) error
-}
-
-func (c *CreditNoteStatus) Accept(visitor CreditNoteStatusVisitor) error {
-	switch c.typeName {
-	default:
-		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
-	case "creditNoteStatusEnum":
-		return visitor.VisitCreditNoteStatusEnum(c.CreditNoteStatusEnum)
-	case "string":
-		return visitor.VisitString(c.String)
-	}
-}
-
-// - `SUBMITTED` - SUBMITTED
-// - `AUTHORIZED` - AUTHORIZED
-// - `PAID` - PAID
-type CreditNoteStatusEnum string
-
-const (
-	CreditNoteStatusEnumSubmitted  CreditNoteStatusEnum = "SUBMITTED"
-	CreditNoteStatusEnumAuthorized CreditNoteStatusEnum = "AUTHORIZED"
-	CreditNoteStatusEnumPaid       CreditNoteStatusEnum = "PAID"
-)
-
-func NewCreditNoteStatusEnumFromString(s string) (CreditNoteStatusEnum, error) {
-	switch s {
-	case "SUBMITTED":
-		return CreditNoteStatusEnumSubmitted, nil
-	case "AUTHORIZED":
-		return CreditNoteStatusEnumAuthorized, nil
-	case "PAID":
-		return CreditNoteStatusEnumPaid, nil
-	}
-	var t CreditNoteStatusEnum
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (c CreditNoteStatusEnum) Ptr() *CreditNoteStatusEnum {
-	return &c
-}
-
-type CreditNoteTrackingCategoriesItem struct {
+// The accounting period that the CreditNote was generated in.
+type CreditNoteRequestAccountingPeriod struct {
 	typeName         string
 	String           string
-	TrackingCategory *TrackingCategory
+	AccountingPeriod *AccountingPeriod
 }
 
-func NewCreditNoteTrackingCategoriesItemFromString(value string) *CreditNoteTrackingCategoriesItem {
-	return &CreditNoteTrackingCategoriesItem{typeName: "string", String: value}
+func NewCreditNoteRequestAccountingPeriodFromString(value string) *CreditNoteRequestAccountingPeriod {
+	return &CreditNoteRequestAccountingPeriod{typeName: "string", String: value}
 }
 
-func NewCreditNoteTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *CreditNoteTrackingCategoriesItem {
-	return &CreditNoteTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+func NewCreditNoteRequestAccountingPeriodFromAccountingPeriod(value *AccountingPeriod) *CreditNoteRequestAccountingPeriod {
+	return &CreditNoteRequestAccountingPeriod{typeName: "accountingPeriod", AccountingPeriod: value}
 }
 
-func (c *CreditNoteTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+func (c *CreditNoteRequestAccountingPeriod) UnmarshalJSON(data []byte) error {
 	var valueString string
 	if err := json.Unmarshal(data, &valueString); err == nil {
 		c.typeName = "string"
 		c.String = valueString
 		return nil
 	}
-	valueTrackingCategory := new(TrackingCategory)
-	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
-		c.typeName = "trackingCategory"
-		c.TrackingCategory = valueTrackingCategory
+	valueAccountingPeriod := new(AccountingPeriod)
+	if err := json.Unmarshal(data, &valueAccountingPeriod); err == nil {
+		c.typeName = "accountingPeriod"
+		c.AccountingPeriod = valueAccountingPeriod
 		return nil
 	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
 }
 
-func (c CreditNoteTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+func (c CreditNoteRequestAccountingPeriod) MarshalJSON() ([]byte, error) {
 	switch c.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
 	case "string":
 		return json.Marshal(c.String)
-	case "trackingCategory":
-		return json.Marshal(c.TrackingCategory)
+	case "accountingPeriod":
+		return json.Marshal(c.AccountingPeriod)
 	}
 }
 
-type CreditNoteTrackingCategoriesItemVisitor interface {
+type CreditNoteRequestAccountingPeriodVisitor interface {
 	VisitString(string) error
-	VisitTrackingCategory(*TrackingCategory) error
+	VisitAccountingPeriod(*AccountingPeriod) error
 }
 
-func (c *CreditNoteTrackingCategoriesItem) Accept(visitor CreditNoteTrackingCategoriesItemVisitor) error {
+func (c *CreditNoteRequestAccountingPeriod) Accept(visitor CreditNoteRequestAccountingPeriodVisitor) error {
 	switch c.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
 	case "string":
 		return visitor.VisitString(c.String)
-	case "trackingCategory":
-		return visitor.VisitTrackingCategory(c.TrackingCategory)
+	case "accountingPeriod":
+		return visitor.VisitAccountingPeriod(c.AccountingPeriod)
 	}
 }
 
+type CreditNoteRequestAppliedPaymentsItem struct {
+	typeName        string
+	String          string
+	PaymentLineItem *PaymentLineItem
+}
+
+func NewCreditNoteRequestAppliedPaymentsItemFromString(value string) *CreditNoteRequestAppliedPaymentsItem {
+	return &CreditNoteRequestAppliedPaymentsItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteRequestAppliedPaymentsItemFromPaymentLineItem(value *PaymentLineItem) *CreditNoteRequestAppliedPaymentsItem {
+	return &CreditNoteRequestAppliedPaymentsItem{typeName: "paymentLineItem", PaymentLineItem: value}
+}
+
+func (c *CreditNoteRequestAppliedPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		c.typeName = "paymentLineItem"
+		c.PaymentLineItem = valuePaymentLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestAppliedPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "paymentLineItem":
+		return json.Marshal(c.PaymentLineItem)
+	}
+}
+
+type CreditNoteRequestAppliedPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPaymentLineItem(*PaymentLineItem) error
+}
+
+func (c *CreditNoteRequestAppliedPaymentsItem) Accept(visitor CreditNoteRequestAppliedPaymentsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "paymentLineItem":
+		return visitor.VisitPaymentLineItem(c.PaymentLineItem)
+	}
+}
+
+// The company the credit note belongs to.
+type CreditNoteRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewCreditNoteRequestCompanyFromString(value string) *CreditNoteRequestCompany {
+	return &CreditNoteRequestCompany{typeName: "string", String: value}
+}
+
+func NewCreditNoteRequestCompanyFromCompanyInfo(value *CompanyInfo) *CreditNoteRequestCompany {
+	return &CreditNoteRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (c *CreditNoteRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typeName = "companyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestCompany) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "companyInfo":
+		return json.Marshal(c.CompanyInfo)
+	}
+}
+
+type CreditNoteRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *CreditNoteRequestCompany) Accept(visitor CreditNoteRequestCompanyVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
+}
+
+// The credit note's contact.
+type CreditNoteRequestContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewCreditNoteRequestContactFromString(value string) *CreditNoteRequestContact {
+	return &CreditNoteRequestContact{typeName: "string", String: value}
+}
+
+func NewCreditNoteRequestContactFromContact(value *Contact) *CreditNoteRequestContact {
+	return &CreditNoteRequestContact{typeName: "contact", Contact: value}
+}
+
+func (c *CreditNoteRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		c.typeName = "contact"
+		c.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestContact) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "contact":
+		return json.Marshal(c.Contact)
+	}
+}
+
+type CreditNoteRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (c *CreditNoteRequestContact) Accept(visitor CreditNoteRequestContactVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "contact":
+		return visitor.VisitContact(c.Contact)
+	}
+}
+
+// The credit note's currency.
+//
 // - `XUA` - ADB Unit of Account
 // - `AFN` - Afghan Afghani
 // - `AFA` - Afghan Afghani (1927–2002)
@@ -9759,937 +13334,496 @@ func (c *CreditNoteTrackingCategoriesItem) Accept(visitor CreditNoteTrackingCate
 // - `ZWD` - Zimbabwean Dollar (1980–2008)
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
-type CurrencyEnum string
+type CreditNoteRequestCurrency struct {
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+}
+
+func NewCreditNoteRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *CreditNoteRequestCurrency {
+	return &CreditNoteRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
+}
+
+func NewCreditNoteRequestCurrencyFromString(value string) *CreditNoteRequestCurrency {
+	return &CreditNoteRequestCurrency{typeName: "string", String: value}
+}
+
+func (c *CreditNoteRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		c.typeName = "transactionCurrencyEnum"
+		c.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestCurrency) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "transactionCurrencyEnum":
+		return json.Marshal(c.TransactionCurrencyEnum)
+	case "string":
+		return json.Marshal(c.String)
+	}
+}
+
+type CreditNoteRequestCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (c *CreditNoteRequestCurrency) Accept(visitor CreditNoteRequestCurrencyVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(c.TransactionCurrencyEnum)
+	case "string":
+		return visitor.VisitString(c.String)
+	}
+}
+
+type CreditNoteRequestLineItemsItem struct {
+	typeName                  string
+	String                    string
+	CreditNoteLineItemRequest *CreditNoteLineItemRequest
+}
+
+func NewCreditNoteRequestLineItemsItemFromString(value string) *CreditNoteRequestLineItemsItem {
+	return &CreditNoteRequestLineItemsItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteRequestLineItemsItemFromCreditNoteLineItemRequest(value *CreditNoteLineItemRequest) *CreditNoteRequestLineItemsItem {
+	return &CreditNoteRequestLineItemsItem{typeName: "creditNoteLineItemRequest", CreditNoteLineItemRequest: value}
+}
+
+func (c *CreditNoteRequestLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueCreditNoteLineItemRequest := new(CreditNoteLineItemRequest)
+	if err := json.Unmarshal(data, &valueCreditNoteLineItemRequest); err == nil {
+		c.typeName = "creditNoteLineItemRequest"
+		c.CreditNoteLineItemRequest = valueCreditNoteLineItemRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestLineItemsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "creditNoteLineItemRequest":
+		return json.Marshal(c.CreditNoteLineItemRequest)
+	}
+}
+
+type CreditNoteRequestLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitCreditNoteLineItemRequest(*CreditNoteLineItemRequest) error
+}
+
+func (c *CreditNoteRequestLineItemsItem) Accept(visitor CreditNoteRequestLineItemsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "creditNoteLineItemRequest":
+		return visitor.VisitCreditNoteLineItemRequest(c.CreditNoteLineItemRequest)
+	}
+}
+
+type CreditNoteRequestPaymentsItem struct {
+	typeName string
+	String   string
+	Payment  *Payment
+}
+
+func NewCreditNoteRequestPaymentsItemFromString(value string) *CreditNoteRequestPaymentsItem {
+	return &CreditNoteRequestPaymentsItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteRequestPaymentsItemFromPayment(value *Payment) *CreditNoteRequestPaymentsItem {
+	return &CreditNoteRequestPaymentsItem{typeName: "payment", Payment: value}
+}
+
+func (c *CreditNoteRequestPaymentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valuePayment := new(Payment)
+	if err := json.Unmarshal(data, &valuePayment); err == nil {
+		c.typeName = "payment"
+		c.Payment = valuePayment
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestPaymentsItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "payment":
+		return json.Marshal(c.Payment)
+	}
+}
+
+type CreditNoteRequestPaymentsItemVisitor interface {
+	VisitString(string) error
+	VisitPayment(*Payment) error
+}
+
+func (c *CreditNoteRequestPaymentsItem) Accept(visitor CreditNoteRequestPaymentsItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "payment":
+		return visitor.VisitPayment(c.Payment)
+	}
+}
+
+// The credit note's status.
+//
+// - `SUBMITTED` - SUBMITTED
+// - `AUTHORIZED` - AUTHORIZED
+// - `PAID` - PAID
+type CreditNoteRequestStatus struct {
+	typeName             string
+	CreditNoteStatusEnum CreditNoteStatusEnum
+	String               string
+}
+
+func NewCreditNoteRequestStatusFromCreditNoteStatusEnum(value CreditNoteStatusEnum) *CreditNoteRequestStatus {
+	return &CreditNoteRequestStatus{typeName: "creditNoteStatusEnum", CreditNoteStatusEnum: value}
+}
+
+func NewCreditNoteRequestStatusFromString(value string) *CreditNoteRequestStatus {
+	return &CreditNoteRequestStatus{typeName: "string", String: value}
+}
+
+func (c *CreditNoteRequestStatus) UnmarshalJSON(data []byte) error {
+	var valueCreditNoteStatusEnum CreditNoteStatusEnum
+	if err := json.Unmarshal(data, &valueCreditNoteStatusEnum); err == nil {
+		c.typeName = "creditNoteStatusEnum"
+		c.CreditNoteStatusEnum = valueCreditNoteStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestStatus) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "creditNoteStatusEnum":
+		return json.Marshal(c.CreditNoteStatusEnum)
+	case "string":
+		return json.Marshal(c.String)
+	}
+}
+
+type CreditNoteRequestStatusVisitor interface {
+	VisitCreditNoteStatusEnum(CreditNoteStatusEnum) error
+	VisitString(string) error
+}
+
+func (c *CreditNoteRequestStatus) Accept(visitor CreditNoteRequestStatusVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "creditNoteStatusEnum":
+		return visitor.VisitCreditNoteStatusEnum(c.CreditNoteStatusEnum)
+	case "string":
+		return visitor.VisitString(c.String)
+	}
+}
+
+type CreditNoteRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewCreditNoteRequestTrackingCategoriesItemFromString(value string) *CreditNoteRequestTrackingCategoriesItem {
+	return &CreditNoteRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *CreditNoteRequestTrackingCategoriesItem {
+	return &CreditNoteRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (c *CreditNoteRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		c.typeName = "trackingCategory"
+		c.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "trackingCategory":
+		return json.Marshal(c.TrackingCategory)
+	}
+}
+
+type CreditNoteRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (c *CreditNoteRequestTrackingCategoriesItem) Accept(visitor CreditNoteRequestTrackingCategoriesItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(c.TrackingCategory)
+	}
+}
+
+type CreditNoteResponse struct {
+	Model    *CreditNote                 `json:"model,omitempty"`
+	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
+	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
+	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (c *CreditNoteResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CreditNoteResponse(value)
+	c._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteResponse) String() string {
+	if len(c._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(c._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+// The credit note's status.
+//
+// - `SUBMITTED` - SUBMITTED
+// - `AUTHORIZED` - AUTHORIZED
+// - `PAID` - PAID
+type CreditNoteStatus struct {
+	typeName             string
+	CreditNoteStatusEnum CreditNoteStatusEnum
+	String               string
+}
+
+func NewCreditNoteStatusFromCreditNoteStatusEnum(value CreditNoteStatusEnum) *CreditNoteStatus {
+	return &CreditNoteStatus{typeName: "creditNoteStatusEnum", CreditNoteStatusEnum: value}
+}
+
+func NewCreditNoteStatusFromString(value string) *CreditNoteStatus {
+	return &CreditNoteStatus{typeName: "string", String: value}
+}
+
+func (c *CreditNoteStatus) UnmarshalJSON(data []byte) error {
+	var valueCreditNoteStatusEnum CreditNoteStatusEnum
+	if err := json.Unmarshal(data, &valueCreditNoteStatusEnum); err == nil {
+		c.typeName = "creditNoteStatusEnum"
+		c.CreditNoteStatusEnum = valueCreditNoteStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteStatus) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "creditNoteStatusEnum":
+		return json.Marshal(c.CreditNoteStatusEnum)
+	case "string":
+		return json.Marshal(c.String)
+	}
+}
+
+type CreditNoteStatusVisitor interface {
+	VisitCreditNoteStatusEnum(CreditNoteStatusEnum) error
+	VisitString(string) error
+}
+
+func (c *CreditNoteStatus) Accept(visitor CreditNoteStatusVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "creditNoteStatusEnum":
+		return visitor.VisitCreditNoteStatusEnum(c.CreditNoteStatusEnum)
+	case "string":
+		return visitor.VisitString(c.String)
+	}
+}
+
+// - `SUBMITTED` - SUBMITTED
+// - `AUTHORIZED` - AUTHORIZED
+// - `PAID` - PAID
+type CreditNoteStatusEnum string
 
 const (
-	CurrencyEnumXua CurrencyEnum = "XUA"
-	CurrencyEnumAfn CurrencyEnum = "AFN"
-	CurrencyEnumAfa CurrencyEnum = "AFA"
-	CurrencyEnumAll CurrencyEnum = "ALL"
-	CurrencyEnumAlk CurrencyEnum = "ALK"
-	CurrencyEnumDzd CurrencyEnum = "DZD"
-	CurrencyEnumAdp CurrencyEnum = "ADP"
-	CurrencyEnumAoa CurrencyEnum = "AOA"
-	CurrencyEnumAok CurrencyEnum = "AOK"
-	CurrencyEnumAon CurrencyEnum = "AON"
-	CurrencyEnumAor CurrencyEnum = "AOR"
-	CurrencyEnumAra CurrencyEnum = "ARA"
-	CurrencyEnumArs CurrencyEnum = "ARS"
-	CurrencyEnumArm CurrencyEnum = "ARM"
-	CurrencyEnumArp CurrencyEnum = "ARP"
-	CurrencyEnumArl CurrencyEnum = "ARL"
-	CurrencyEnumAmd CurrencyEnum = "AMD"
-	CurrencyEnumAwg CurrencyEnum = "AWG"
-	CurrencyEnumAud CurrencyEnum = "AUD"
-	CurrencyEnumAts CurrencyEnum = "ATS"
-	CurrencyEnumAzn CurrencyEnum = "AZN"
-	CurrencyEnumAzm CurrencyEnum = "AZM"
-	CurrencyEnumBsd CurrencyEnum = "BSD"
-	CurrencyEnumBhd CurrencyEnum = "BHD"
-	CurrencyEnumBdt CurrencyEnum = "BDT"
-	CurrencyEnumBbd CurrencyEnum = "BBD"
-	CurrencyEnumByn CurrencyEnum = "BYN"
-	CurrencyEnumByb CurrencyEnum = "BYB"
-	CurrencyEnumByr CurrencyEnum = "BYR"
-	CurrencyEnumBef CurrencyEnum = "BEF"
-	CurrencyEnumBec CurrencyEnum = "BEC"
-	CurrencyEnumBel CurrencyEnum = "BEL"
-	CurrencyEnumBzd CurrencyEnum = "BZD"
-	CurrencyEnumBmd CurrencyEnum = "BMD"
-	CurrencyEnumBtn CurrencyEnum = "BTN"
-	CurrencyEnumBob CurrencyEnum = "BOB"
-	CurrencyEnumBol CurrencyEnum = "BOL"
-	CurrencyEnumBov CurrencyEnum = "BOV"
-	CurrencyEnumBop CurrencyEnum = "BOP"
-	CurrencyEnumBam CurrencyEnum = "BAM"
-	CurrencyEnumBad CurrencyEnum = "BAD"
-	CurrencyEnumBan CurrencyEnum = "BAN"
-	CurrencyEnumBwp CurrencyEnum = "BWP"
-	CurrencyEnumBrc CurrencyEnum = "BRC"
-	CurrencyEnumBrz CurrencyEnum = "BRZ"
-	CurrencyEnumBre CurrencyEnum = "BRE"
-	CurrencyEnumBrr CurrencyEnum = "BRR"
-	CurrencyEnumBrn CurrencyEnum = "BRN"
-	CurrencyEnumBrb CurrencyEnum = "BRB"
-	CurrencyEnumBrl CurrencyEnum = "BRL"
-	CurrencyEnumGbp CurrencyEnum = "GBP"
-	CurrencyEnumBnd CurrencyEnum = "BND"
-	CurrencyEnumBgl CurrencyEnum = "BGL"
-	CurrencyEnumBgn CurrencyEnum = "BGN"
-	CurrencyEnumBgo CurrencyEnum = "BGO"
-	CurrencyEnumBgm CurrencyEnum = "BGM"
-	CurrencyEnumBuk CurrencyEnum = "BUK"
-	CurrencyEnumBif CurrencyEnum = "BIF"
-	CurrencyEnumXpf CurrencyEnum = "XPF"
-	CurrencyEnumKhr CurrencyEnum = "KHR"
-	CurrencyEnumCad CurrencyEnum = "CAD"
-	CurrencyEnumCve CurrencyEnum = "CVE"
-	CurrencyEnumKyd CurrencyEnum = "KYD"
-	CurrencyEnumXaf CurrencyEnum = "XAF"
-	CurrencyEnumCle CurrencyEnum = "CLE"
-	CurrencyEnumClp CurrencyEnum = "CLP"
-	CurrencyEnumClf CurrencyEnum = "CLF"
-	CurrencyEnumCnx CurrencyEnum = "CNX"
-	CurrencyEnumCny CurrencyEnum = "CNY"
-	CurrencyEnumCnh CurrencyEnum = "CNH"
-	CurrencyEnumCop CurrencyEnum = "COP"
-	CurrencyEnumCou CurrencyEnum = "COU"
-	CurrencyEnumKmf CurrencyEnum = "KMF"
-	CurrencyEnumCdf CurrencyEnum = "CDF"
-	CurrencyEnumCrc CurrencyEnum = "CRC"
-	CurrencyEnumHrd CurrencyEnum = "HRD"
-	CurrencyEnumHrk CurrencyEnum = "HRK"
-	CurrencyEnumCuc CurrencyEnum = "CUC"
-	CurrencyEnumCup CurrencyEnum = "CUP"
-	CurrencyEnumCyp CurrencyEnum = "CYP"
-	CurrencyEnumCzk CurrencyEnum = "CZK"
-	CurrencyEnumCsk CurrencyEnum = "CSK"
-	CurrencyEnumDkk CurrencyEnum = "DKK"
-	CurrencyEnumDjf CurrencyEnum = "DJF"
-	CurrencyEnumDop CurrencyEnum = "DOP"
-	CurrencyEnumNlg CurrencyEnum = "NLG"
-	CurrencyEnumXcd CurrencyEnum = "XCD"
-	CurrencyEnumDdm CurrencyEnum = "DDM"
-	CurrencyEnumEcs CurrencyEnum = "ECS"
-	CurrencyEnumEcv CurrencyEnum = "ECV"
-	CurrencyEnumEgp CurrencyEnum = "EGP"
-	CurrencyEnumGqe CurrencyEnum = "GQE"
-	CurrencyEnumErn CurrencyEnum = "ERN"
-	CurrencyEnumEek CurrencyEnum = "EEK"
-	CurrencyEnumEtb CurrencyEnum = "ETB"
-	CurrencyEnumEur CurrencyEnum = "EUR"
-	CurrencyEnumXba CurrencyEnum = "XBA"
-	CurrencyEnumXeu CurrencyEnum = "XEU"
-	CurrencyEnumXbb CurrencyEnum = "XBB"
-	CurrencyEnumXbc CurrencyEnum = "XBC"
-	CurrencyEnumXbd CurrencyEnum = "XBD"
-	CurrencyEnumFkp CurrencyEnum = "FKP"
-	CurrencyEnumFjd CurrencyEnum = "FJD"
-	CurrencyEnumFim CurrencyEnum = "FIM"
-	CurrencyEnumFrf CurrencyEnum = "FRF"
-	CurrencyEnumXfo CurrencyEnum = "XFO"
-	CurrencyEnumXfu CurrencyEnum = "XFU"
-	CurrencyEnumGmd CurrencyEnum = "GMD"
-	CurrencyEnumGek CurrencyEnum = "GEK"
-	CurrencyEnumGel CurrencyEnum = "GEL"
-	CurrencyEnumDem CurrencyEnum = "DEM"
-	CurrencyEnumGhs CurrencyEnum = "GHS"
-	CurrencyEnumGhc CurrencyEnum = "GHC"
-	CurrencyEnumGip CurrencyEnum = "GIP"
-	CurrencyEnumXau CurrencyEnum = "XAU"
-	CurrencyEnumGrd CurrencyEnum = "GRD"
-	CurrencyEnumGtq CurrencyEnum = "GTQ"
-	CurrencyEnumGwp CurrencyEnum = "GWP"
-	CurrencyEnumGnf CurrencyEnum = "GNF"
-	CurrencyEnumGns CurrencyEnum = "GNS"
-	CurrencyEnumGyd CurrencyEnum = "GYD"
-	CurrencyEnumHtg CurrencyEnum = "HTG"
-	CurrencyEnumHnl CurrencyEnum = "HNL"
-	CurrencyEnumHkd CurrencyEnum = "HKD"
-	CurrencyEnumHuf CurrencyEnum = "HUF"
-	CurrencyEnumImp CurrencyEnum = "IMP"
-	CurrencyEnumIsk CurrencyEnum = "ISK"
-	CurrencyEnumIsj CurrencyEnum = "ISJ"
-	CurrencyEnumInr CurrencyEnum = "INR"
-	CurrencyEnumIdr CurrencyEnum = "IDR"
-	CurrencyEnumIrr CurrencyEnum = "IRR"
-	CurrencyEnumIqd CurrencyEnum = "IQD"
-	CurrencyEnumIep CurrencyEnum = "IEP"
-	CurrencyEnumIls CurrencyEnum = "ILS"
-	CurrencyEnumIlp CurrencyEnum = "ILP"
-	CurrencyEnumIlr CurrencyEnum = "ILR"
-	CurrencyEnumItl CurrencyEnum = "ITL"
-	CurrencyEnumJmd CurrencyEnum = "JMD"
-	CurrencyEnumJpy CurrencyEnum = "JPY"
-	CurrencyEnumJod CurrencyEnum = "JOD"
-	CurrencyEnumKzt CurrencyEnum = "KZT"
-	CurrencyEnumKes CurrencyEnum = "KES"
-	CurrencyEnumKwd CurrencyEnum = "KWD"
-	CurrencyEnumKgs CurrencyEnum = "KGS"
-	CurrencyEnumLak CurrencyEnum = "LAK"
-	CurrencyEnumLvl CurrencyEnum = "LVL"
-	CurrencyEnumLvr CurrencyEnum = "LVR"
-	CurrencyEnumLbp CurrencyEnum = "LBP"
-	CurrencyEnumLsl CurrencyEnum = "LSL"
-	CurrencyEnumLrd CurrencyEnum = "LRD"
-	CurrencyEnumLyd CurrencyEnum = "LYD"
-	CurrencyEnumLtl CurrencyEnum = "LTL"
-	CurrencyEnumLtt CurrencyEnum = "LTT"
-	CurrencyEnumLul CurrencyEnum = "LUL"
-	CurrencyEnumLuc CurrencyEnum = "LUC"
-	CurrencyEnumLuf CurrencyEnum = "LUF"
-	CurrencyEnumMop CurrencyEnum = "MOP"
-	CurrencyEnumMkd CurrencyEnum = "MKD"
-	CurrencyEnumMkn CurrencyEnum = "MKN"
-	CurrencyEnumMga CurrencyEnum = "MGA"
-	CurrencyEnumMgf CurrencyEnum = "MGF"
-	CurrencyEnumMwk CurrencyEnum = "MWK"
-	CurrencyEnumMyr CurrencyEnum = "MYR"
-	CurrencyEnumMvr CurrencyEnum = "MVR"
-	CurrencyEnumMvp CurrencyEnum = "MVP"
-	CurrencyEnumMlf CurrencyEnum = "MLF"
-	CurrencyEnumMtl CurrencyEnum = "MTL"
-	CurrencyEnumMtp CurrencyEnum = "MTP"
-	CurrencyEnumMru CurrencyEnum = "MRU"
-	CurrencyEnumMro CurrencyEnum = "MRO"
-	CurrencyEnumMur CurrencyEnum = "MUR"
-	CurrencyEnumMxv CurrencyEnum = "MXV"
-	CurrencyEnumMxn CurrencyEnum = "MXN"
-	CurrencyEnumMxp CurrencyEnum = "MXP"
-	CurrencyEnumMdc CurrencyEnum = "MDC"
-	CurrencyEnumMdl CurrencyEnum = "MDL"
-	CurrencyEnumMcf CurrencyEnum = "MCF"
-	CurrencyEnumMnt CurrencyEnum = "MNT"
-	CurrencyEnumMad CurrencyEnum = "MAD"
-	CurrencyEnumMaf CurrencyEnum = "MAF"
-	CurrencyEnumMze CurrencyEnum = "MZE"
-	CurrencyEnumMzn CurrencyEnum = "MZN"
-	CurrencyEnumMzm CurrencyEnum = "MZM"
-	CurrencyEnumMmk CurrencyEnum = "MMK"
-	CurrencyEnumNad CurrencyEnum = "NAD"
-	CurrencyEnumNpr CurrencyEnum = "NPR"
-	CurrencyEnumAng CurrencyEnum = "ANG"
-	CurrencyEnumTwd CurrencyEnum = "TWD"
-	CurrencyEnumNzd CurrencyEnum = "NZD"
-	CurrencyEnumNio CurrencyEnum = "NIO"
-	CurrencyEnumNic CurrencyEnum = "NIC"
-	CurrencyEnumNgn CurrencyEnum = "NGN"
-	CurrencyEnumKpw CurrencyEnum = "KPW"
-	CurrencyEnumNok CurrencyEnum = "NOK"
-	CurrencyEnumOmr CurrencyEnum = "OMR"
-	CurrencyEnumPkr CurrencyEnum = "PKR"
-	CurrencyEnumXpd CurrencyEnum = "XPD"
-	CurrencyEnumPab CurrencyEnum = "PAB"
-	CurrencyEnumPgk CurrencyEnum = "PGK"
-	CurrencyEnumPyg CurrencyEnum = "PYG"
-	CurrencyEnumPei CurrencyEnum = "PEI"
-	CurrencyEnumPen CurrencyEnum = "PEN"
-	CurrencyEnumPes CurrencyEnum = "PES"
-	CurrencyEnumPhp CurrencyEnum = "PHP"
-	CurrencyEnumXpt CurrencyEnum = "XPT"
-	CurrencyEnumPln CurrencyEnum = "PLN"
-	CurrencyEnumPlz CurrencyEnum = "PLZ"
-	CurrencyEnumPte CurrencyEnum = "PTE"
-	CurrencyEnumGwe CurrencyEnum = "GWE"
-	CurrencyEnumQar CurrencyEnum = "QAR"
-	CurrencyEnumXre CurrencyEnum = "XRE"
-	CurrencyEnumRhd CurrencyEnum = "RHD"
-	CurrencyEnumRon CurrencyEnum = "RON"
-	CurrencyEnumRol CurrencyEnum = "ROL"
-	CurrencyEnumRub CurrencyEnum = "RUB"
-	CurrencyEnumRur CurrencyEnum = "RUR"
-	CurrencyEnumRwf CurrencyEnum = "RWF"
-	CurrencyEnumSvc CurrencyEnum = "SVC"
-	CurrencyEnumWst CurrencyEnum = "WST"
-	CurrencyEnumSar CurrencyEnum = "SAR"
-	CurrencyEnumRsd CurrencyEnum = "RSD"
-	CurrencyEnumCsd CurrencyEnum = "CSD"
-	CurrencyEnumScr CurrencyEnum = "SCR"
-	CurrencyEnumSll CurrencyEnum = "SLL"
-	CurrencyEnumXag CurrencyEnum = "XAG"
-	CurrencyEnumSgd CurrencyEnum = "SGD"
-	CurrencyEnumSkk CurrencyEnum = "SKK"
-	CurrencyEnumSit CurrencyEnum = "SIT"
-	CurrencyEnumSbd CurrencyEnum = "SBD"
-	CurrencyEnumSos CurrencyEnum = "SOS"
-	CurrencyEnumZar CurrencyEnum = "ZAR"
-	CurrencyEnumZal CurrencyEnum = "ZAL"
-	CurrencyEnumKrh CurrencyEnum = "KRH"
-	CurrencyEnumKrw CurrencyEnum = "KRW"
-	CurrencyEnumKro CurrencyEnum = "KRO"
-	CurrencyEnumSsp CurrencyEnum = "SSP"
-	CurrencyEnumSur CurrencyEnum = "SUR"
-	CurrencyEnumEsp CurrencyEnum = "ESP"
-	CurrencyEnumEsa CurrencyEnum = "ESA"
-	CurrencyEnumEsb CurrencyEnum = "ESB"
-	CurrencyEnumXdr CurrencyEnum = "XDR"
-	CurrencyEnumLkr CurrencyEnum = "LKR"
-	CurrencyEnumShp CurrencyEnum = "SHP"
-	CurrencyEnumXsu CurrencyEnum = "XSU"
-	CurrencyEnumSdd CurrencyEnum = "SDD"
-	CurrencyEnumSdg CurrencyEnum = "SDG"
-	CurrencyEnumSdp CurrencyEnum = "SDP"
-	CurrencyEnumSrd CurrencyEnum = "SRD"
-	CurrencyEnumSrg CurrencyEnum = "SRG"
-	CurrencyEnumSzl CurrencyEnum = "SZL"
-	CurrencyEnumSek CurrencyEnum = "SEK"
-	CurrencyEnumChf CurrencyEnum = "CHF"
-	CurrencyEnumSyp CurrencyEnum = "SYP"
-	CurrencyEnumStn CurrencyEnum = "STN"
-	CurrencyEnumStd CurrencyEnum = "STD"
-	CurrencyEnumTvd CurrencyEnum = "TVD"
-	CurrencyEnumTjr CurrencyEnum = "TJR"
-	CurrencyEnumTjs CurrencyEnum = "TJS"
-	CurrencyEnumTzs CurrencyEnum = "TZS"
-	CurrencyEnumXts CurrencyEnum = "XTS"
-	CurrencyEnumThb CurrencyEnum = "THB"
-	CurrencyEnumXxx CurrencyEnum = "XXX"
-	CurrencyEnumTpe CurrencyEnum = "TPE"
-	CurrencyEnumTop CurrencyEnum = "TOP"
-	CurrencyEnumTtd CurrencyEnum = "TTD"
-	CurrencyEnumTnd CurrencyEnum = "TND"
-	CurrencyEnumTry CurrencyEnum = "TRY"
-	CurrencyEnumTrl CurrencyEnum = "TRL"
-	CurrencyEnumTmt CurrencyEnum = "TMT"
-	CurrencyEnumTmm CurrencyEnum = "TMM"
-	CurrencyEnumUsd CurrencyEnum = "USD"
-	CurrencyEnumUsn CurrencyEnum = "USN"
-	CurrencyEnumUss CurrencyEnum = "USS"
-	CurrencyEnumUgx CurrencyEnum = "UGX"
-	CurrencyEnumUgs CurrencyEnum = "UGS"
-	CurrencyEnumUah CurrencyEnum = "UAH"
-	CurrencyEnumUak CurrencyEnum = "UAK"
-	CurrencyEnumAed CurrencyEnum = "AED"
-	CurrencyEnumUyw CurrencyEnum = "UYW"
-	CurrencyEnumUyu CurrencyEnum = "UYU"
-	CurrencyEnumUyp CurrencyEnum = "UYP"
-	CurrencyEnumUyi CurrencyEnum = "UYI"
-	CurrencyEnumUzs CurrencyEnum = "UZS"
-	CurrencyEnumVuv CurrencyEnum = "VUV"
-	CurrencyEnumVes CurrencyEnum = "VES"
-	CurrencyEnumVeb CurrencyEnum = "VEB"
-	CurrencyEnumVef CurrencyEnum = "VEF"
-	CurrencyEnumVnd CurrencyEnum = "VND"
-	CurrencyEnumVnn CurrencyEnum = "VNN"
-	CurrencyEnumChe CurrencyEnum = "CHE"
-	CurrencyEnumChw CurrencyEnum = "CHW"
-	CurrencyEnumXof CurrencyEnum = "XOF"
-	CurrencyEnumYdd CurrencyEnum = "YDD"
-	CurrencyEnumYer CurrencyEnum = "YER"
-	CurrencyEnumYun CurrencyEnum = "YUN"
-	CurrencyEnumYud CurrencyEnum = "YUD"
-	CurrencyEnumYum CurrencyEnum = "YUM"
-	CurrencyEnumYur CurrencyEnum = "YUR"
-	CurrencyEnumZwn CurrencyEnum = "ZWN"
-	CurrencyEnumZrn CurrencyEnum = "ZRN"
-	CurrencyEnumZrz CurrencyEnum = "ZRZ"
-	CurrencyEnumZmw CurrencyEnum = "ZMW"
-	CurrencyEnumZmk CurrencyEnum = "ZMK"
-	CurrencyEnumZwd CurrencyEnum = "ZWD"
-	CurrencyEnumZwr CurrencyEnum = "ZWR"
-	CurrencyEnumZwl CurrencyEnum = "ZWL"
+	CreditNoteStatusEnumSubmitted  CreditNoteStatusEnum = "SUBMITTED"
+	CreditNoteStatusEnumAuthorized CreditNoteStatusEnum = "AUTHORIZED"
+	CreditNoteStatusEnumPaid       CreditNoteStatusEnum = "PAID"
 )
 
-func NewCurrencyEnumFromString(s string) (CurrencyEnum, error) {
+func NewCreditNoteStatusEnumFromString(s string) (CreditNoteStatusEnum, error) {
 	switch s {
-	case "XUA":
-		return CurrencyEnumXua, nil
-	case "AFN":
-		return CurrencyEnumAfn, nil
-	case "AFA":
-		return CurrencyEnumAfa, nil
-	case "ALL":
-		return CurrencyEnumAll, nil
-	case "ALK":
-		return CurrencyEnumAlk, nil
-	case "DZD":
-		return CurrencyEnumDzd, nil
-	case "ADP":
-		return CurrencyEnumAdp, nil
-	case "AOA":
-		return CurrencyEnumAoa, nil
-	case "AOK":
-		return CurrencyEnumAok, nil
-	case "AON":
-		return CurrencyEnumAon, nil
-	case "AOR":
-		return CurrencyEnumAor, nil
-	case "ARA":
-		return CurrencyEnumAra, nil
-	case "ARS":
-		return CurrencyEnumArs, nil
-	case "ARM":
-		return CurrencyEnumArm, nil
-	case "ARP":
-		return CurrencyEnumArp, nil
-	case "ARL":
-		return CurrencyEnumArl, nil
-	case "AMD":
-		return CurrencyEnumAmd, nil
-	case "AWG":
-		return CurrencyEnumAwg, nil
-	case "AUD":
-		return CurrencyEnumAud, nil
-	case "ATS":
-		return CurrencyEnumAts, nil
-	case "AZN":
-		return CurrencyEnumAzn, nil
-	case "AZM":
-		return CurrencyEnumAzm, nil
-	case "BSD":
-		return CurrencyEnumBsd, nil
-	case "BHD":
-		return CurrencyEnumBhd, nil
-	case "BDT":
-		return CurrencyEnumBdt, nil
-	case "BBD":
-		return CurrencyEnumBbd, nil
-	case "BYN":
-		return CurrencyEnumByn, nil
-	case "BYB":
-		return CurrencyEnumByb, nil
-	case "BYR":
-		return CurrencyEnumByr, nil
-	case "BEF":
-		return CurrencyEnumBef, nil
-	case "BEC":
-		return CurrencyEnumBec, nil
-	case "BEL":
-		return CurrencyEnumBel, nil
-	case "BZD":
-		return CurrencyEnumBzd, nil
-	case "BMD":
-		return CurrencyEnumBmd, nil
-	case "BTN":
-		return CurrencyEnumBtn, nil
-	case "BOB":
-		return CurrencyEnumBob, nil
-	case "BOL":
-		return CurrencyEnumBol, nil
-	case "BOV":
-		return CurrencyEnumBov, nil
-	case "BOP":
-		return CurrencyEnumBop, nil
-	case "BAM":
-		return CurrencyEnumBam, nil
-	case "BAD":
-		return CurrencyEnumBad, nil
-	case "BAN":
-		return CurrencyEnumBan, nil
-	case "BWP":
-		return CurrencyEnumBwp, nil
-	case "BRC":
-		return CurrencyEnumBrc, nil
-	case "BRZ":
-		return CurrencyEnumBrz, nil
-	case "BRE":
-		return CurrencyEnumBre, nil
-	case "BRR":
-		return CurrencyEnumBrr, nil
-	case "BRN":
-		return CurrencyEnumBrn, nil
-	case "BRB":
-		return CurrencyEnumBrb, nil
-	case "BRL":
-		return CurrencyEnumBrl, nil
-	case "GBP":
-		return CurrencyEnumGbp, nil
-	case "BND":
-		return CurrencyEnumBnd, nil
-	case "BGL":
-		return CurrencyEnumBgl, nil
-	case "BGN":
-		return CurrencyEnumBgn, nil
-	case "BGO":
-		return CurrencyEnumBgo, nil
-	case "BGM":
-		return CurrencyEnumBgm, nil
-	case "BUK":
-		return CurrencyEnumBuk, nil
-	case "BIF":
-		return CurrencyEnumBif, nil
-	case "XPF":
-		return CurrencyEnumXpf, nil
-	case "KHR":
-		return CurrencyEnumKhr, nil
-	case "CAD":
-		return CurrencyEnumCad, nil
-	case "CVE":
-		return CurrencyEnumCve, nil
-	case "KYD":
-		return CurrencyEnumKyd, nil
-	case "XAF":
-		return CurrencyEnumXaf, nil
-	case "CLE":
-		return CurrencyEnumCle, nil
-	case "CLP":
-		return CurrencyEnumClp, nil
-	case "CLF":
-		return CurrencyEnumClf, nil
-	case "CNX":
-		return CurrencyEnumCnx, nil
-	case "CNY":
-		return CurrencyEnumCny, nil
-	case "CNH":
-		return CurrencyEnumCnh, nil
-	case "COP":
-		return CurrencyEnumCop, nil
-	case "COU":
-		return CurrencyEnumCou, nil
-	case "KMF":
-		return CurrencyEnumKmf, nil
-	case "CDF":
-		return CurrencyEnumCdf, nil
-	case "CRC":
-		return CurrencyEnumCrc, nil
-	case "HRD":
-		return CurrencyEnumHrd, nil
-	case "HRK":
-		return CurrencyEnumHrk, nil
-	case "CUC":
-		return CurrencyEnumCuc, nil
-	case "CUP":
-		return CurrencyEnumCup, nil
-	case "CYP":
-		return CurrencyEnumCyp, nil
-	case "CZK":
-		return CurrencyEnumCzk, nil
-	case "CSK":
-		return CurrencyEnumCsk, nil
-	case "DKK":
-		return CurrencyEnumDkk, nil
-	case "DJF":
-		return CurrencyEnumDjf, nil
-	case "DOP":
-		return CurrencyEnumDop, nil
-	case "NLG":
-		return CurrencyEnumNlg, nil
-	case "XCD":
-		return CurrencyEnumXcd, nil
-	case "DDM":
-		return CurrencyEnumDdm, nil
-	case "ECS":
-		return CurrencyEnumEcs, nil
-	case "ECV":
-		return CurrencyEnumEcv, nil
-	case "EGP":
-		return CurrencyEnumEgp, nil
-	case "GQE":
-		return CurrencyEnumGqe, nil
-	case "ERN":
-		return CurrencyEnumErn, nil
-	case "EEK":
-		return CurrencyEnumEek, nil
-	case "ETB":
-		return CurrencyEnumEtb, nil
-	case "EUR":
-		return CurrencyEnumEur, nil
-	case "XBA":
-		return CurrencyEnumXba, nil
-	case "XEU":
-		return CurrencyEnumXeu, nil
-	case "XBB":
-		return CurrencyEnumXbb, nil
-	case "XBC":
-		return CurrencyEnumXbc, nil
-	case "XBD":
-		return CurrencyEnumXbd, nil
-	case "FKP":
-		return CurrencyEnumFkp, nil
-	case "FJD":
-		return CurrencyEnumFjd, nil
-	case "FIM":
-		return CurrencyEnumFim, nil
-	case "FRF":
-		return CurrencyEnumFrf, nil
-	case "XFO":
-		return CurrencyEnumXfo, nil
-	case "XFU":
-		return CurrencyEnumXfu, nil
-	case "GMD":
-		return CurrencyEnumGmd, nil
-	case "GEK":
-		return CurrencyEnumGek, nil
-	case "GEL":
-		return CurrencyEnumGel, nil
-	case "DEM":
-		return CurrencyEnumDem, nil
-	case "GHS":
-		return CurrencyEnumGhs, nil
-	case "GHC":
-		return CurrencyEnumGhc, nil
-	case "GIP":
-		return CurrencyEnumGip, nil
-	case "XAU":
-		return CurrencyEnumXau, nil
-	case "GRD":
-		return CurrencyEnumGrd, nil
-	case "GTQ":
-		return CurrencyEnumGtq, nil
-	case "GWP":
-		return CurrencyEnumGwp, nil
-	case "GNF":
-		return CurrencyEnumGnf, nil
-	case "GNS":
-		return CurrencyEnumGns, nil
-	case "GYD":
-		return CurrencyEnumGyd, nil
-	case "HTG":
-		return CurrencyEnumHtg, nil
-	case "HNL":
-		return CurrencyEnumHnl, nil
-	case "HKD":
-		return CurrencyEnumHkd, nil
-	case "HUF":
-		return CurrencyEnumHuf, nil
-	case "IMP":
-		return CurrencyEnumImp, nil
-	case "ISK":
-		return CurrencyEnumIsk, nil
-	case "ISJ":
-		return CurrencyEnumIsj, nil
-	case "INR":
-		return CurrencyEnumInr, nil
-	case "IDR":
-		return CurrencyEnumIdr, nil
-	case "IRR":
-		return CurrencyEnumIrr, nil
-	case "IQD":
-		return CurrencyEnumIqd, nil
-	case "IEP":
-		return CurrencyEnumIep, nil
-	case "ILS":
-		return CurrencyEnumIls, nil
-	case "ILP":
-		return CurrencyEnumIlp, nil
-	case "ILR":
-		return CurrencyEnumIlr, nil
-	case "ITL":
-		return CurrencyEnumItl, nil
-	case "JMD":
-		return CurrencyEnumJmd, nil
-	case "JPY":
-		return CurrencyEnumJpy, nil
-	case "JOD":
-		return CurrencyEnumJod, nil
-	case "KZT":
-		return CurrencyEnumKzt, nil
-	case "KES":
-		return CurrencyEnumKes, nil
-	case "KWD":
-		return CurrencyEnumKwd, nil
-	case "KGS":
-		return CurrencyEnumKgs, nil
-	case "LAK":
-		return CurrencyEnumLak, nil
-	case "LVL":
-		return CurrencyEnumLvl, nil
-	case "LVR":
-		return CurrencyEnumLvr, nil
-	case "LBP":
-		return CurrencyEnumLbp, nil
-	case "LSL":
-		return CurrencyEnumLsl, nil
-	case "LRD":
-		return CurrencyEnumLrd, nil
-	case "LYD":
-		return CurrencyEnumLyd, nil
-	case "LTL":
-		return CurrencyEnumLtl, nil
-	case "LTT":
-		return CurrencyEnumLtt, nil
-	case "LUL":
-		return CurrencyEnumLul, nil
-	case "LUC":
-		return CurrencyEnumLuc, nil
-	case "LUF":
-		return CurrencyEnumLuf, nil
-	case "MOP":
-		return CurrencyEnumMop, nil
-	case "MKD":
-		return CurrencyEnumMkd, nil
-	case "MKN":
-		return CurrencyEnumMkn, nil
-	case "MGA":
-		return CurrencyEnumMga, nil
-	case "MGF":
-		return CurrencyEnumMgf, nil
-	case "MWK":
-		return CurrencyEnumMwk, nil
-	case "MYR":
-		return CurrencyEnumMyr, nil
-	case "MVR":
-		return CurrencyEnumMvr, nil
-	case "MVP":
-		return CurrencyEnumMvp, nil
-	case "MLF":
-		return CurrencyEnumMlf, nil
-	case "MTL":
-		return CurrencyEnumMtl, nil
-	case "MTP":
-		return CurrencyEnumMtp, nil
-	case "MRU":
-		return CurrencyEnumMru, nil
-	case "MRO":
-		return CurrencyEnumMro, nil
-	case "MUR":
-		return CurrencyEnumMur, nil
-	case "MXV":
-		return CurrencyEnumMxv, nil
-	case "MXN":
-		return CurrencyEnumMxn, nil
-	case "MXP":
-		return CurrencyEnumMxp, nil
-	case "MDC":
-		return CurrencyEnumMdc, nil
-	case "MDL":
-		return CurrencyEnumMdl, nil
-	case "MCF":
-		return CurrencyEnumMcf, nil
-	case "MNT":
-		return CurrencyEnumMnt, nil
-	case "MAD":
-		return CurrencyEnumMad, nil
-	case "MAF":
-		return CurrencyEnumMaf, nil
-	case "MZE":
-		return CurrencyEnumMze, nil
-	case "MZN":
-		return CurrencyEnumMzn, nil
-	case "MZM":
-		return CurrencyEnumMzm, nil
-	case "MMK":
-		return CurrencyEnumMmk, nil
-	case "NAD":
-		return CurrencyEnumNad, nil
-	case "NPR":
-		return CurrencyEnumNpr, nil
-	case "ANG":
-		return CurrencyEnumAng, nil
-	case "TWD":
-		return CurrencyEnumTwd, nil
-	case "NZD":
-		return CurrencyEnumNzd, nil
-	case "NIO":
-		return CurrencyEnumNio, nil
-	case "NIC":
-		return CurrencyEnumNic, nil
-	case "NGN":
-		return CurrencyEnumNgn, nil
-	case "KPW":
-		return CurrencyEnumKpw, nil
-	case "NOK":
-		return CurrencyEnumNok, nil
-	case "OMR":
-		return CurrencyEnumOmr, nil
-	case "PKR":
-		return CurrencyEnumPkr, nil
-	case "XPD":
-		return CurrencyEnumXpd, nil
-	case "PAB":
-		return CurrencyEnumPab, nil
-	case "PGK":
-		return CurrencyEnumPgk, nil
-	case "PYG":
-		return CurrencyEnumPyg, nil
-	case "PEI":
-		return CurrencyEnumPei, nil
-	case "PEN":
-		return CurrencyEnumPen, nil
-	case "PES":
-		return CurrencyEnumPes, nil
-	case "PHP":
-		return CurrencyEnumPhp, nil
-	case "XPT":
-		return CurrencyEnumXpt, nil
-	case "PLN":
-		return CurrencyEnumPln, nil
-	case "PLZ":
-		return CurrencyEnumPlz, nil
-	case "PTE":
-		return CurrencyEnumPte, nil
-	case "GWE":
-		return CurrencyEnumGwe, nil
-	case "QAR":
-		return CurrencyEnumQar, nil
-	case "XRE":
-		return CurrencyEnumXre, nil
-	case "RHD":
-		return CurrencyEnumRhd, nil
-	case "RON":
-		return CurrencyEnumRon, nil
-	case "ROL":
-		return CurrencyEnumRol, nil
-	case "RUB":
-		return CurrencyEnumRub, nil
-	case "RUR":
-		return CurrencyEnumRur, nil
-	case "RWF":
-		return CurrencyEnumRwf, nil
-	case "SVC":
-		return CurrencyEnumSvc, nil
-	case "WST":
-		return CurrencyEnumWst, nil
-	case "SAR":
-		return CurrencyEnumSar, nil
-	case "RSD":
-		return CurrencyEnumRsd, nil
-	case "CSD":
-		return CurrencyEnumCsd, nil
-	case "SCR":
-		return CurrencyEnumScr, nil
-	case "SLL":
-		return CurrencyEnumSll, nil
-	case "XAG":
-		return CurrencyEnumXag, nil
-	case "SGD":
-		return CurrencyEnumSgd, nil
-	case "SKK":
-		return CurrencyEnumSkk, nil
-	case "SIT":
-		return CurrencyEnumSit, nil
-	case "SBD":
-		return CurrencyEnumSbd, nil
-	case "SOS":
-		return CurrencyEnumSos, nil
-	case "ZAR":
-		return CurrencyEnumZar, nil
-	case "ZAL":
-		return CurrencyEnumZal, nil
-	case "KRH":
-		return CurrencyEnumKrh, nil
-	case "KRW":
-		return CurrencyEnumKrw, nil
-	case "KRO":
-		return CurrencyEnumKro, nil
-	case "SSP":
-		return CurrencyEnumSsp, nil
-	case "SUR":
-		return CurrencyEnumSur, nil
-	case "ESP":
-		return CurrencyEnumEsp, nil
-	case "ESA":
-		return CurrencyEnumEsa, nil
-	case "ESB":
-		return CurrencyEnumEsb, nil
-	case "XDR":
-		return CurrencyEnumXdr, nil
-	case "LKR":
-		return CurrencyEnumLkr, nil
-	case "SHP":
-		return CurrencyEnumShp, nil
-	case "XSU":
-		return CurrencyEnumXsu, nil
-	case "SDD":
-		return CurrencyEnumSdd, nil
-	case "SDG":
-		return CurrencyEnumSdg, nil
-	case "SDP":
-		return CurrencyEnumSdp, nil
-	case "SRD":
-		return CurrencyEnumSrd, nil
-	case "SRG":
-		return CurrencyEnumSrg, nil
-	case "SZL":
-		return CurrencyEnumSzl, nil
-	case "SEK":
-		return CurrencyEnumSek, nil
-	case "CHF":
-		return CurrencyEnumChf, nil
-	case "SYP":
-		return CurrencyEnumSyp, nil
-	case "STN":
-		return CurrencyEnumStn, nil
-	case "STD":
-		return CurrencyEnumStd, nil
-	case "TVD":
-		return CurrencyEnumTvd, nil
-	case "TJR":
-		return CurrencyEnumTjr, nil
-	case "TJS":
-		return CurrencyEnumTjs, nil
-	case "TZS":
-		return CurrencyEnumTzs, nil
-	case "XTS":
-		return CurrencyEnumXts, nil
-	case "THB":
-		return CurrencyEnumThb, nil
-	case "XXX":
-		return CurrencyEnumXxx, nil
-	case "TPE":
-		return CurrencyEnumTpe, nil
-	case "TOP":
-		return CurrencyEnumTop, nil
-	case "TTD":
-		return CurrencyEnumTtd, nil
-	case "TND":
-		return CurrencyEnumTnd, nil
-	case "TRY":
-		return CurrencyEnumTry, nil
-	case "TRL":
-		return CurrencyEnumTrl, nil
-	case "TMT":
-		return CurrencyEnumTmt, nil
-	case "TMM":
-		return CurrencyEnumTmm, nil
-	case "USD":
-		return CurrencyEnumUsd, nil
-	case "USN":
-		return CurrencyEnumUsn, nil
-	case "USS":
-		return CurrencyEnumUss, nil
-	case "UGX":
-		return CurrencyEnumUgx, nil
-	case "UGS":
-		return CurrencyEnumUgs, nil
-	case "UAH":
-		return CurrencyEnumUah, nil
-	case "UAK":
-		return CurrencyEnumUak, nil
-	case "AED":
-		return CurrencyEnumAed, nil
-	case "UYW":
-		return CurrencyEnumUyw, nil
-	case "UYU":
-		return CurrencyEnumUyu, nil
-	case "UYP":
-		return CurrencyEnumUyp, nil
-	case "UYI":
-		return CurrencyEnumUyi, nil
-	case "UZS":
-		return CurrencyEnumUzs, nil
-	case "VUV":
-		return CurrencyEnumVuv, nil
-	case "VES":
-		return CurrencyEnumVes, nil
-	case "VEB":
-		return CurrencyEnumVeb, nil
-	case "VEF":
-		return CurrencyEnumVef, nil
-	case "VND":
-		return CurrencyEnumVnd, nil
-	case "VNN":
-		return CurrencyEnumVnn, nil
-	case "CHE":
-		return CurrencyEnumChe, nil
-	case "CHW":
-		return CurrencyEnumChw, nil
-	case "XOF":
-		return CurrencyEnumXof, nil
-	case "YDD":
-		return CurrencyEnumYdd, nil
-	case "YER":
-		return CurrencyEnumYer, nil
-	case "YUN":
-		return CurrencyEnumYun, nil
-	case "YUD":
-		return CurrencyEnumYud, nil
-	case "YUM":
-		return CurrencyEnumYum, nil
-	case "YUR":
-		return CurrencyEnumYur, nil
-	case "ZWN":
-		return CurrencyEnumZwn, nil
-	case "ZRN":
-		return CurrencyEnumZrn, nil
-	case "ZRZ":
-		return CurrencyEnumZrz, nil
-	case "ZMW":
-		return CurrencyEnumZmw, nil
-	case "ZMK":
-		return CurrencyEnumZmk, nil
-	case "ZWD":
-		return CurrencyEnumZwd, nil
-	case "ZWR":
-		return CurrencyEnumZwr, nil
-	case "ZWL":
-		return CurrencyEnumZwl, nil
+	case "SUBMITTED":
+		return CreditNoteStatusEnumSubmitted, nil
+	case "AUTHORIZED":
+		return CreditNoteStatusEnumAuthorized, nil
+	case "PAID":
+		return CreditNoteStatusEnumPaid, nil
 	}
-	var t CurrencyEnum
+	var t CreditNoteStatusEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-func (c CurrencyEnum) Ptr() *CurrencyEnum {
+func (c CreditNoteStatusEnum) Ptr() *CreditNoteStatusEnum {
+	return &c
+}
+
+type CreditNoteTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewCreditNoteTrackingCategoriesItemFromString(value string) *CreditNoteTrackingCategoriesItem {
+	return &CreditNoteTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewCreditNoteTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *CreditNoteTrackingCategoriesItem {
+	return &CreditNoteTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (c *CreditNoteTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typeName = "string"
+		c.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		c.typeName = "trackingCategory"
+		c.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch c.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return json.Marshal(c.String)
+	case "trackingCategory":
+		return json.Marshal(c.TrackingCategory)
+	}
+}
+
+type CreditNoteTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (c *CreditNoteTrackingCategoriesItem) Accept(visitor CreditNoteTrackingCategoriesItemVisitor) error {
+	switch c.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", c.typeName, c)
+	case "string":
+		return visitor.VisitString(c.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(c.TrackingCategory)
+	}
+}
+
+// - `CREDIT` - CREDIT
+// - `DEBIT` - DEBIT
+type CreditOrDebitEnum string
+
+const (
+	CreditOrDebitEnumCredit CreditOrDebitEnum = "CREDIT"
+	CreditOrDebitEnumDebit  CreditOrDebitEnum = "DEBIT"
+)
+
+func NewCreditOrDebitEnumFromString(s string) (CreditOrDebitEnum, error) {
+	switch s {
+	case "CREDIT":
+		return CreditOrDebitEnumCredit, nil
+	case "DEBIT":
+		return CreditOrDebitEnumDebit, nil
+	}
+	var t CreditOrDebitEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CreditOrDebitEnum) Ptr() *CreditOrDebitEnum {
 	return &c
 }
 
@@ -10804,6 +13938,193 @@ func (d *DebugModelLogSummary) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", d)
+}
+
+// # The Employee Object
+//
+// ### Description
+//
+// An `Employee` is an individual who works for the company of the linked account. The `Employee` model contains both contractors and full time employees.
+//
+// - An `Employee` is a contractor if `is_contractor` property is `True`
+// - An `Employee` is a full time employee if `is_contractor` property is `False`
+//
+// ### Usage Example
+//
+// Fetch from the `LIST Employees` endpoint and view a company's employees.
+type Employee struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The employee's first name.
+	FirstName *string `json:"first_name,omitempty"`
+	// The employee's last name.
+	LastName *string `json:"last_name,omitempty"`
+	// `True` if the employee is a contractor, `False` if not.
+	IsContractor *bool `json:"is_contractor,omitempty"`
+	// The employee's internal identification number.
+	EmployeeNumber *string `json:"employee_number,omitempty"`
+	// The employee's email address.
+	EmailAddress *string `json:"email_address,omitempty"`
+	// The subsidiary that the employee belongs to.
+	Company *EmployeeCompany `json:"company,omitempty"`
+	// The employee's status in the accounting system.
+	//
+	// - `ACTIVE` - ACTIVE
+	// - `INACTIVE` - INACTIVE
+	Status *EmployeeStatus `json:"status,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (e *Employee) UnmarshalJSON(data []byte) error {
+	type unmarshaler Employee
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*e = Employee(value)
+	e._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *Employee) String() string {
+	if len(e._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(e._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+// The subsidiary that the employee belongs to.
+type EmployeeCompany struct {
+	typeName string
+	String   string
+	Unknown  interface{}
+}
+
+func NewEmployeeCompanyFromString(value string) *EmployeeCompany {
+	return &EmployeeCompany{typeName: "string", String: value}
+}
+
+func NewEmployeeCompanyFromUnknown(value interface{}) *EmployeeCompany {
+	return &EmployeeCompany{typeName: "unknown", Unknown: value}
+}
+
+func (e *EmployeeCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	var valueUnknown interface{}
+	if err := json.Unmarshal(data, &valueUnknown); err == nil {
+		e.typeName = "unknown"
+		e.Unknown = valueUnknown
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeCompany) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "unknown":
+		return json.Marshal(e.Unknown)
+	}
+}
+
+type EmployeeCompanyVisitor interface {
+	VisitString(string) error
+	VisitUnknown(interface{}) error
+}
+
+func (e *EmployeeCompany) Accept(visitor EmployeeCompanyVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "unknown":
+		return visitor.VisitUnknown(e.Unknown)
+	}
+}
+
+// The employee's status in the accounting system.
+//
+// - `ACTIVE` - ACTIVE
+// - `INACTIVE` - INACTIVE
+type EmployeeStatus struct {
+	typeName      string
+	Status895Enum Status895Enum
+	String        string
+}
+
+func NewEmployeeStatusFromStatus895Enum(value Status895Enum) *EmployeeStatus {
+	return &EmployeeStatus{typeName: "status895Enum", Status895Enum: value}
+}
+
+func NewEmployeeStatusFromString(value string) *EmployeeStatus {
+	return &EmployeeStatus{typeName: "string", String: value}
+}
+
+func (e *EmployeeStatus) UnmarshalJSON(data []byte) error {
+	var valueStatus895Enum Status895Enum
+	if err := json.Unmarshal(data, &valueStatus895Enum); err == nil {
+		e.typeName = "status895Enum"
+		e.Status895Enum = valueStatus895Enum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EmployeeStatus) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "status895Enum":
+		return json.Marshal(e.Status895Enum)
+	case "string":
+		return json.Marshal(e.String)
+	}
+}
+
+type EmployeeStatusVisitor interface {
+	VisitStatus895Enum(Status895Enum) error
+	VisitString(string) error
+}
+
+func (e *EmployeeStatus) Accept(visitor EmployeeStatusVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "status895Enum":
+		return visitor.VisitStatus895Enum(e.Status895Enum)
+	case "string":
+		return visitor.VisitString(e.String)
+	}
 }
 
 // - `READ` - READ
@@ -10921,12 +14242,16 @@ func (e *ErrorValidationProblem) String() string {
 // - `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING` - CHANGED_LINKED_ACCOUNT_FIELD_MAPPING
 // - `DELETED_INTEGRATION_WIDE_FIELD_MAPPING` - DELETED_INTEGRATION_WIDE_FIELD_MAPPING
 // - `DELETED_LINKED_ACCOUNT_FIELD_MAPPING` - DELETED_LINKED_ACCOUNT_FIELD_MAPPING
+// - `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
+// - `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE` - DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE
 // - `FORCED_LINKED_ACCOUNT_RESYNC` - FORCED_LINKED_ACCOUNT_RESYNC
 // - `MUTED_ISSUE` - MUTED_ISSUE
 // - `GENERATED_MAGIC_LINK` - GENERATED_MAGIC_LINK
 // - `ENABLED_MERGE_WEBHOOK` - ENABLED_MERGE_WEBHOOK
 // - `DISABLED_MERGE_WEBHOOK` - DISABLED_MERGE_WEBHOOK
 // - `MERGE_WEBHOOK_TARGET_CHANGED` - MERGE_WEBHOOK_TARGET_CHANGED
+// - `END_USER_CREDENTIALS_ACCESSED` - END_USER_CREDENTIALS_ACCESSED
 type EventTypeEnum string
 
 const (
@@ -10961,12 +14286,16 @@ const (
 	EventTypeEnumChangedLinkedAccountFieldMapping           EventTypeEnum = "CHANGED_LINKED_ACCOUNT_FIELD_MAPPING"
 	EventTypeEnumDeletedIntegrationWideFieldMapping         EventTypeEnum = "DELETED_INTEGRATION_WIDE_FIELD_MAPPING"
 	EventTypeEnumDeletedLinkedAccountFieldMapping           EventTypeEnum = "DELETED_LINKED_ACCOUNT_FIELD_MAPPING"
+	EventTypeEnumCreatedLinkedAccountCommonModelOverride    EventTypeEnum = "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumChangedLinkedAccountCommonModelOverride    EventTypeEnum = "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
+	EventTypeEnumDeletedLinkedAccountCommonModelOverride    EventTypeEnum = "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE"
 	EventTypeEnumForcedLinkedAccountResync                  EventTypeEnum = "FORCED_LINKED_ACCOUNT_RESYNC"
 	EventTypeEnumMutedIssue                                 EventTypeEnum = "MUTED_ISSUE"
 	EventTypeEnumGeneratedMagicLink                         EventTypeEnum = "GENERATED_MAGIC_LINK"
 	EventTypeEnumEnabledMergeWebhook                        EventTypeEnum = "ENABLED_MERGE_WEBHOOK"
 	EventTypeEnumDisabledMergeWebhook                       EventTypeEnum = "DISABLED_MERGE_WEBHOOK"
 	EventTypeEnumMergeWebhookTargetChanged                  EventTypeEnum = "MERGE_WEBHOOK_TARGET_CHANGED"
+	EventTypeEnumEndUserCredentialsAccessed                 EventTypeEnum = "END_USER_CREDENTIALS_ACCESSED"
 )
 
 func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
@@ -11033,6 +14362,12 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDeletedIntegrationWideFieldMapping, nil
 	case "DELETED_LINKED_ACCOUNT_FIELD_MAPPING":
 		return EventTypeEnumDeletedLinkedAccountFieldMapping, nil
+	case "CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumCreatedLinkedAccountCommonModelOverride, nil
+	case "CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumChangedLinkedAccountCommonModelOverride, nil
+	case "DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE":
+		return EventTypeEnumDeletedLinkedAccountCommonModelOverride, nil
 	case "FORCED_LINKED_ACCOUNT_RESYNC":
 		return EventTypeEnumForcedLinkedAccountResync, nil
 	case "MUTED_ISSUE":
@@ -11045,6 +14380,8 @@ func NewEventTypeEnumFromString(s string) (EventTypeEnum, error) {
 		return EventTypeEnumDisabledMergeWebhook, nil
 	case "MERGE_WEBHOOK_TARGET_CHANGED":
 		return EventTypeEnumMergeWebhookTargetChanged, nil
+	case "END_USER_CREDENTIALS_ACCESSED":
+		return EventTypeEnumEndUserCredentialsAccessed, nil
 	}
 	var t EventTypeEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -11398,18 +14735,23 @@ type Expense struct {
 	Currency *ExpenseCurrency `json:"currency,omitempty"`
 	// The expense's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
 	// The company the expense belongs to.
 	Company *ExpenseCompany `json:"company,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *ExpenseEmployee `json:"employee,omitempty"`
 	// The expense's private note.
 	Memo               *string                          `json:"memo,omitempty"`
 	Lines              []*ExpenseLine                   `json:"lines,omitempty"`
 	TrackingCategories []*ExpenseTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Expense was generated in.
 	AccountingPeriod *ExpenseAccountingPeriod `json:"accounting_period,omitempty"`
 	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData            `json:"remote_data,omitempty"`
+	RemoteFields     []*RemoteField           `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -11978,13 +15320,13 @@ func (e *ExpenseContact) Accept(visitor ExpenseContactVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type ExpenseCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewExpenseCurrencyFromCurrencyEnum(value CurrencyEnum) *ExpenseCurrency {
-	return &ExpenseCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewExpenseCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *ExpenseCurrency {
+	return &ExpenseCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewExpenseCurrencyFromString(value string) *ExpenseCurrency {
@@ -11992,10 +15334,10 @@ func NewExpenseCurrencyFromString(value string) *ExpenseCurrency {
 }
 
 func (e *ExpenseCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		e.typeName = "currencyEnum"
-		e.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		e.typeName = "transactionCurrencyEnum"
+		e.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -12011,15 +15353,15 @@ func (e ExpenseCurrency) MarshalJSON() ([]byte, error) {
 	switch e.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return json.Marshal(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(e.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(e.String)
 	}
 }
 
 type ExpenseCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -12027,10 +15369,68 @@ func (e *ExpenseCurrency) Accept(visitor ExpenseCurrencyVisitor) error {
 	switch e.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(e.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type ExpenseEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewExpenseEmployeeFromString(value string) *ExpenseEmployee {
+	return &ExpenseEmployee{typeName: "string", String: value}
+}
+
+func NewExpenseEmployeeFromEmployee(value *Employee) *ExpenseEmployee {
+	return &ExpenseEmployee{typeName: "employee", Employee: value}
+}
+
+func (e *ExpenseEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseEmployee) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type ExpenseEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *ExpenseEmployee) Accept(visitor ExpenseEmployeeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
 	}
 }
 
@@ -12054,11 +15454,14 @@ type ExpenseLine struct {
 	// The line's item.
 	Item *ExpenseLineItem `json:"item,omitempty"`
 	// The line's net amount.
-	NetAmount          *float64                             `json:"net_amount,omitempty"`
-	TrackingCategory   *ExpenseLineTrackingCategory         `json:"tracking_category,omitempty"`
+	NetAmount        *float64                     `json:"net_amount,omitempty"`
+	TrackingCategory *ExpenseLineTrackingCategory `json:"tracking_category,omitempty"`
+	// The expense line item's associated tracking categories.
 	TrackingCategories []*ExpenseLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// The company the line belongs to.
+	// The company the expense belongs to.
 	Company *string `json:"company,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *ExpenseLineEmployee `json:"employee,omitempty"`
 	// The expense line item's currency.
 	//
 	// - `XUA` - ADB Unit of Account
@@ -12376,7 +15779,9 @@ type ExpenseLine struct {
 	Description *string `json:"description,omitempty"`
 	// The expense line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -12830,13 +16235,13 @@ func (e *ExpenseLineContact) Accept(visitor ExpenseLineContactVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type ExpenseLineCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewExpenseLineCurrencyFromCurrencyEnum(value CurrencyEnum) *ExpenseLineCurrency {
-	return &ExpenseLineCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewExpenseLineCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *ExpenseLineCurrency {
+	return &ExpenseLineCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewExpenseLineCurrencyFromString(value string) *ExpenseLineCurrency {
@@ -12844,10 +16249,10 @@ func NewExpenseLineCurrencyFromString(value string) *ExpenseLineCurrency {
 }
 
 func (e *ExpenseLineCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		e.typeName = "currencyEnum"
-		e.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		e.typeName = "transactionCurrencyEnum"
+		e.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -12863,15 +16268,15 @@ func (e ExpenseLineCurrency) MarshalJSON() ([]byte, error) {
 	switch e.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return json.Marshal(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(e.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(e.String)
 	}
 }
 
 type ExpenseLineCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -12879,10 +16284,68 @@ func (e *ExpenseLineCurrency) Accept(visitor ExpenseLineCurrencyVisitor) error {
 	switch e.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(e.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type ExpenseLineEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewExpenseLineEmployeeFromString(value string) *ExpenseLineEmployee {
+	return &ExpenseLineEmployee{typeName: "string", String: value}
+}
+
+func NewExpenseLineEmployeeFromEmployee(value *Employee) *ExpenseLineEmployee {
+	return &ExpenseLineEmployee{typeName: "employee", Employee: value}
+}
+
+func (e *ExpenseLineEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineEmployee) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type ExpenseLineEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *ExpenseLineEmployee) Accept(visitor ExpenseLineEmployeeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
 	}
 }
 
@@ -12959,11 +16422,14 @@ type ExpenseLineRequest struct {
 	// The line's item.
 	Item *ExpenseLineRequestItem `json:"item,omitempty"`
 	// The line's net amount.
-	NetAmount          *float64                                    `json:"net_amount,omitempty"`
-	TrackingCategory   *ExpenseLineRequestTrackingCategory         `json:"tracking_category,omitempty"`
+	NetAmount        *float64                            `json:"net_amount,omitempty"`
+	TrackingCategory *ExpenseLineRequestTrackingCategory `json:"tracking_category,omitempty"`
+	// The expense line item's associated tracking categories.
 	TrackingCategories []*ExpenseLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// The company the line belongs to.
+	// The company the expense belongs to.
 	Company *string `json:"company,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *ExpenseLineRequestEmployee `json:"employee,omitempty"`
 	// The expense line item's currency.
 	//
 	// - `XUA` - ADB Unit of Account
@@ -13280,9 +16746,12 @@ type ExpenseLineRequest struct {
 	// The description of the item that was purchased by the company.
 	Description *string `json:"description,omitempty"`
 	// The expense line item's exchange rate.
-	ExchangeRate        *string                `json:"exchange_rate,omitempty"`
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate             *string                `json:"tax_rate,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -13735,13 +17204,13 @@ func (e *ExpenseLineRequestContact) Accept(visitor ExpenseLineRequestContactVisi
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type ExpenseLineRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewExpenseLineRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *ExpenseLineRequestCurrency {
-	return &ExpenseLineRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewExpenseLineRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *ExpenseLineRequestCurrency {
+	return &ExpenseLineRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewExpenseLineRequestCurrencyFromString(value string) *ExpenseLineRequestCurrency {
@@ -13749,10 +17218,10 @@ func NewExpenseLineRequestCurrencyFromString(value string) *ExpenseLineRequestCu
 }
 
 func (e *ExpenseLineRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		e.typeName = "currencyEnum"
-		e.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		e.typeName = "transactionCurrencyEnum"
+		e.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -13768,15 +17237,15 @@ func (e ExpenseLineRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch e.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return json.Marshal(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(e.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(e.String)
 	}
 }
 
 type ExpenseLineRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -13784,10 +17253,68 @@ func (e *ExpenseLineRequestCurrency) Accept(visitor ExpenseLineRequestCurrencyVi
 	switch e.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(e.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type ExpenseLineRequestEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewExpenseLineRequestEmployeeFromString(value string) *ExpenseLineRequestEmployee {
+	return &ExpenseLineRequestEmployee{typeName: "string", String: value}
+}
+
+func NewExpenseLineRequestEmployeeFromEmployee(value *Employee) *ExpenseLineRequestEmployee {
+	return &ExpenseLineRequestEmployee{typeName: "employee", Employee: value}
+}
+
+func (e *ExpenseLineRequestEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseLineRequestEmployee) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type ExpenseLineRequestEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *ExpenseLineRequestEmployee) Accept(visitor ExpenseLineRequestEmployeeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
 	}
 }
 
@@ -14412,8 +17939,12 @@ type ExpenseRequest struct {
 	Currency *ExpenseRequestCurrency `json:"currency,omitempty"`
 	// The expense's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
 	// The company the expense belongs to.
 	Company *ExpenseRequestCompany `json:"company,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *ExpenseRequestEmployee `json:"employee,omitempty"`
 	// The expense's private note.
 	Memo               *string                                 `json:"memo,omitempty"`
 	Lines              []*ExpenseLineRequest                   `json:"lines,omitempty"`
@@ -14422,6 +17953,7 @@ type ExpenseRequest struct {
 	AccountingPeriod    *ExpenseRequestAccountingPeriod `json:"accounting_period,omitempty"`
 	IntegrationParams   map[string]interface{}          `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}          `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest           `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -14990,13 +18522,13 @@ func (e *ExpenseRequestContact) Accept(visitor ExpenseRequestContactVisitor) err
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type ExpenseRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewExpenseRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *ExpenseRequestCurrency {
-	return &ExpenseRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewExpenseRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *ExpenseRequestCurrency {
+	return &ExpenseRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewExpenseRequestCurrencyFromString(value string) *ExpenseRequestCurrency {
@@ -15004,10 +18536,10 @@ func NewExpenseRequestCurrencyFromString(value string) *ExpenseRequestCurrency {
 }
 
 func (e *ExpenseRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		e.typeName = "currencyEnum"
-		e.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		e.typeName = "transactionCurrencyEnum"
+		e.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -15023,15 +18555,15 @@ func (e ExpenseRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch e.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return json.Marshal(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(e.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(e.String)
 	}
 }
 
 type ExpenseRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -15039,10 +18571,68 @@ func (e *ExpenseRequestCurrency) Accept(visitor ExpenseRequestCurrencyVisitor) e
 	switch e.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(e.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(e.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(e.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type ExpenseRequestEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewExpenseRequestEmployeeFromString(value string) *ExpenseRequestEmployee {
+	return &ExpenseRequestEmployee{typeName: "string", String: value}
+}
+
+func NewExpenseRequestEmployeeFromEmployee(value *Employee) *ExpenseRequestEmployee {
+	return &ExpenseRequestEmployee{typeName: "employee", Employee: value}
+}
+
+func (e *ExpenseRequestEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typeName = "string"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typeName = "employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseRequestEmployee) MarshalJSON() ([]byte, error) {
+	switch e.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return json.Marshal(e.String)
+	case "employee":
+		return json.Marshal(e.Employee)
+	}
+}
+
+type ExpenseRequestEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *ExpenseRequestEmployee) Accept(visitor ExpenseRequestEmployeeVisitor) error {
+	switch e.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", e.typeName, e)
+	case "string":
+		return visitor.VisitString(e.String)
+	case "employee":
+		return visitor.VisitEmployee(e.Employee)
 	}
 }
 
@@ -15242,7 +18832,10 @@ type ExternalTargetFieldApiResponse struct {
 	Expense                  []*ExternalTargetFieldApi `json:"Expense,omitempty"`
 	VendorCredit             []*ExternalTargetFieldApi `json:"VendorCredit,omitempty"`
 	Transaction              []*ExternalTargetFieldApi `json:"Transaction,omitempty"`
+	AccountingPeriod         []*ExternalTargetFieldApi `json:"AccountingPeriod,omitempty"`
 	GeneralLedgerTransaction []*ExternalTargetFieldApi `json:"GeneralLedgerTransaction,omitempty"`
+	BankFeedAccount          []*ExternalTargetFieldApi `json:"BankFeedAccount,omitempty"`
+	Employee                 []*ExternalTargetFieldApi `json:"Employee,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -15268,6 +18861,70 @@ func (e *ExternalTargetFieldApiResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", e)
+}
+
+// - `ACTIVE` - ACTIVE
+// - `INACTIVE` - INACTIVE
+type FeedStatusEnum string
+
+const (
+	FeedStatusEnumActive   FeedStatusEnum = "ACTIVE"
+	FeedStatusEnumInactive FeedStatusEnum = "INACTIVE"
+)
+
+func NewFeedStatusEnumFromString(s string) (FeedStatusEnum, error) {
+	switch s {
+	case "ACTIVE":
+		return FeedStatusEnumActive, nil
+	case "INACTIVE":
+		return FeedStatusEnumInactive, nil
+	}
+	var t FeedStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FeedStatusEnum) Ptr() *FeedStatusEnum {
+	return &f
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type FieldFormatEnum string
+
+const (
+	FieldFormatEnumString   FieldFormatEnum = "string"
+	FieldFormatEnumNumber   FieldFormatEnum = "number"
+	FieldFormatEnumDate     FieldFormatEnum = "date"
+	FieldFormatEnumDatetime FieldFormatEnum = "datetime"
+	FieldFormatEnumBool     FieldFormatEnum = "bool"
+	FieldFormatEnumList     FieldFormatEnum = "list"
+)
+
+func NewFieldFormatEnumFromString(s string) (FieldFormatEnum, error) {
+	switch s {
+	case "string":
+		return FieldFormatEnumString, nil
+	case "number":
+		return FieldFormatEnumNumber, nil
+	case "date":
+		return FieldFormatEnumDate, nil
+	case "datetime":
+		return FieldFormatEnumDatetime, nil
+	case "bool":
+		return FieldFormatEnumBool, nil
+	case "list":
+		return FieldFormatEnumList, nil
+	}
+	var t FieldFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FieldFormatEnum) Ptr() *FieldFormatEnum {
+	return &f
 }
 
 type FieldMappingApiInstance struct {
@@ -15303,7 +18960,7 @@ func (f *FieldMappingApiInstance) String() string {
 }
 
 type FieldMappingApiInstanceRemoteField struct {
-	RemoteKeyName      string                                                `json:"remote_key_name"`
+	RemoteKeyName      *string                                               `json:"remote_key_name,omitempty"`
 	Schema             map[string]interface{}                                `json:"schema,omitempty"`
 	RemoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo `json:"remote_endpoint_info,omitempty"`
 
@@ -15383,7 +19040,10 @@ type FieldMappingApiInstanceResponse struct {
 	Expense                  []*FieldMappingApiInstance `json:"Expense,omitempty"`
 	VendorCredit             []*FieldMappingApiInstance `json:"VendorCredit,omitempty"`
 	Transaction              []*FieldMappingApiInstance `json:"Transaction,omitempty"`
+	AccountingPeriod         []*FieldMappingApiInstance `json:"AccountingPeriod,omitempty"`
 	GeneralLedgerTransaction []*FieldMappingApiInstance `json:"GeneralLedgerTransaction,omitempty"`
+	BankFeedAccount          []*FieldMappingApiInstance `json:"BankFeedAccount,omitempty"`
+	Employee                 []*FieldMappingApiInstance `json:"Employee,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -15475,8 +19135,8 @@ func (f *FieldMappingInstanceResponse) String() string {
 }
 
 type FieldPermissionDeserializer struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -15505,8 +19165,8 @@ func (f *FieldPermissionDeserializer) String() string {
 }
 
 type FieldPermissionDeserializerRequest struct {
-	Enabled  []interface{} `json:"enabled,omitempty"`
-	Disabled []interface{} `json:"disabled,omitempty"`
+	EnabledFields  []interface{} `json:"enabled_fields,omitempty"`
+	DisabledFields []interface{} `json:"disabled_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -15532,6 +19192,2115 @@ func (f *FieldPermissionDeserializerRequest) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", f)
+}
+
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type FieldTypeEnum string
+
+const (
+	FieldTypeEnumString   FieldTypeEnum = "string"
+	FieldTypeEnumNumber   FieldTypeEnum = "number"
+	FieldTypeEnumDate     FieldTypeEnum = "date"
+	FieldTypeEnumDatetime FieldTypeEnum = "datetime"
+	FieldTypeEnumBool     FieldTypeEnum = "bool"
+	FieldTypeEnumList     FieldTypeEnum = "list"
+)
+
+func NewFieldTypeEnumFromString(s string) (FieldTypeEnum, error) {
+	switch s {
+	case "string":
+		return FieldTypeEnumString, nil
+	case "number":
+		return FieldTypeEnumNumber, nil
+	case "date":
+		return FieldTypeEnumDate, nil
+	case "datetime":
+		return FieldTypeEnumDatetime, nil
+	case "bool":
+		return FieldTypeEnumBool, nil
+	case "list":
+		return FieldTypeEnumList, nil
+	}
+	var t FieldTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (f FieldTypeEnum) Ptr() *FieldTypeEnum {
+	return &f
+}
+
+// # The GeneralLedgerTransaction Object
+//
+// ### Description
+//
+// A General Ledger Entry is a record of a financial transaction that is posted to the general ledger, the central repository of a company’s financial data.
+//
+// The `GeneralLedgerTransaction` object is a singular endpoint to pull all transactions posted to a company’s general ledger. The transaction that generated the `GeneralLedgerTransaction` can be found by referencing the `underlying_transaction_type` and `underlying_transaction_remote_id` fields.
+//
+// The lines of a `GeneralLedgerTransaction` object will always have equal amounts of debits and credits.
+//
+// ### Usage Example
+//
+// Fetch from the `GET GeneralLedgerTransaction` endpoint and view a general ledger transaction.
+type GeneralLedgerTransaction struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The third party remote ID of the underlying transaction.
+	UnderlyingTransactionRemoteId *string `json:"underlying_transaction_remote_id,omitempty"`
+	// The type of the underlying transaction.
+	//
+	// - `INVOICE` - INVOICE
+	// - `EXPENSE` - EXPENSE
+	// - `TRANSACTION` - TRANSACTION
+	// - `JOURNAL_ENTRY` - JOURNAL_ENTRY
+	// - `PAYMENT` - PAYMENT
+	// - `VENDOR_CREDIT` - VENDOR_CREDIT
+	// - `CREDIT_NOTE` - CREDIT_NOTE
+	UnderlyingTransactionType *GeneralLedgerTransactionUnderlyingTransactionType `json:"underlying_transaction_type,omitempty"`
+	// The accounting period that the GeneralLedgerTransaction was generated in.
+	AccountingPeriod *GeneralLedgerTransactionAccountingPeriod `json:"accounting_period,omitempty"`
+	// The company the GeneralLedgerTransaction belongs to.
+	Company *GeneralLedgerTransactionCompany `json:"company,omitempty"`
+	// When the third party's GeneralLedgerTransaction entry was updated.
+	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
+	// When the third party's GeneralLedgerTransaction entry was created.
+	RemoteCreatedAt    *time.Time                                        `json:"remote_created_at,omitempty"`
+	TrackingCategories []*GeneralLedgerTransactionTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	// The date that the transaction was posted to the general ledger.
+	PostingDate *time.Time `json:"posting_date,omitempty"`
+	// A list of “General Ledger Transaction Applied to Lines” objects.
+	GeneralLedgerTransactionLines []*GeneralLedgerTransactionGeneralLedgerTransactionLinesItem `json:"general_ledger_transaction_lines,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (g *GeneralLedgerTransaction) UnmarshalJSON(data []byte) error {
+	type unmarshaler GeneralLedgerTransaction
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GeneralLedgerTransaction(value)
+	g._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GeneralLedgerTransaction) String() string {
+	if len(g._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(g._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+// The accounting period that the GeneralLedgerTransaction was generated in.
+type GeneralLedgerTransactionAccountingPeriod struct {
+	typeName         string
+	String           string
+	AccountingPeriod *AccountingPeriod
+}
+
+func NewGeneralLedgerTransactionAccountingPeriodFromString(value string) *GeneralLedgerTransactionAccountingPeriod {
+	return &GeneralLedgerTransactionAccountingPeriod{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionAccountingPeriodFromAccountingPeriod(value *AccountingPeriod) *GeneralLedgerTransactionAccountingPeriod {
+	return &GeneralLedgerTransactionAccountingPeriod{typeName: "accountingPeriod", AccountingPeriod: value}
+}
+
+func (g *GeneralLedgerTransactionAccountingPeriod) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueAccountingPeriod := new(AccountingPeriod)
+	if err := json.Unmarshal(data, &valueAccountingPeriod); err == nil {
+		g.typeName = "accountingPeriod"
+		g.AccountingPeriod = valueAccountingPeriod
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionAccountingPeriod) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "accountingPeriod":
+		return json.Marshal(g.AccountingPeriod)
+	}
+}
+
+type GeneralLedgerTransactionAccountingPeriodVisitor interface {
+	VisitString(string) error
+	VisitAccountingPeriod(*AccountingPeriod) error
+}
+
+func (g *GeneralLedgerTransactionAccountingPeriod) Accept(visitor GeneralLedgerTransactionAccountingPeriodVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "accountingPeriod":
+		return visitor.VisitAccountingPeriod(g.AccountingPeriod)
+	}
+}
+
+// The company the GeneralLedgerTransaction belongs to.
+type GeneralLedgerTransactionCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewGeneralLedgerTransactionCompanyFromString(value string) *GeneralLedgerTransactionCompany {
+	return &GeneralLedgerTransactionCompany{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionCompanyFromCompanyInfo(value *CompanyInfo) *GeneralLedgerTransactionCompany {
+	return &GeneralLedgerTransactionCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (g *GeneralLedgerTransactionCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		g.typeName = "companyInfo"
+		g.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionCompany) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "companyInfo":
+		return json.Marshal(g.CompanyInfo)
+	}
+}
+
+type GeneralLedgerTransactionCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (g *GeneralLedgerTransactionCompany) Accept(visitor GeneralLedgerTransactionCompanyVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(g.CompanyInfo)
+	}
+}
+
+type GeneralLedgerTransactionGeneralLedgerTransactionLinesItem struct {
+	typeName                     string
+	String                       string
+	GeneralLedgerTransactionLine *GeneralLedgerTransactionLine
+}
+
+func NewGeneralLedgerTransactionGeneralLedgerTransactionLinesItemFromString(value string) *GeneralLedgerTransactionGeneralLedgerTransactionLinesItem {
+	return &GeneralLedgerTransactionGeneralLedgerTransactionLinesItem{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionGeneralLedgerTransactionLinesItemFromGeneralLedgerTransactionLine(value *GeneralLedgerTransactionLine) *GeneralLedgerTransactionGeneralLedgerTransactionLinesItem {
+	return &GeneralLedgerTransactionGeneralLedgerTransactionLinesItem{typeName: "generalLedgerTransactionLine", GeneralLedgerTransactionLine: value}
+}
+
+func (g *GeneralLedgerTransactionGeneralLedgerTransactionLinesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueGeneralLedgerTransactionLine := new(GeneralLedgerTransactionLine)
+	if err := json.Unmarshal(data, &valueGeneralLedgerTransactionLine); err == nil {
+		g.typeName = "generalLedgerTransactionLine"
+		g.GeneralLedgerTransactionLine = valueGeneralLedgerTransactionLine
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionGeneralLedgerTransactionLinesItem) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "generalLedgerTransactionLine":
+		return json.Marshal(g.GeneralLedgerTransactionLine)
+	}
+}
+
+type GeneralLedgerTransactionGeneralLedgerTransactionLinesItemVisitor interface {
+	VisitString(string) error
+	VisitGeneralLedgerTransactionLine(*GeneralLedgerTransactionLine) error
+}
+
+func (g *GeneralLedgerTransactionGeneralLedgerTransactionLinesItem) Accept(visitor GeneralLedgerTransactionGeneralLedgerTransactionLinesItemVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "generalLedgerTransactionLine":
+		return visitor.VisitGeneralLedgerTransactionLine(g.GeneralLedgerTransactionLine)
+	}
+}
+
+// # The GeneralLedgerTransactionLineSerializer Object
+//
+// ### Description
+//
+// The `GeneralLedgerTransactionLineSerializer` object represents general ledger transaction line item.
+//
+// ### Usage Example Fetch from the `GET GeneralLedgerTransactionLineSerializer` endpoint and view an
+//
+// `GeneralLedgerTransaction` line item.
+type GeneralLedgerTransactionLine struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time                           `json:"modified_at,omitempty"`
+	Account    *GeneralLedgerTransactionLineAccount `json:"account,omitempty"`
+	// The company the GeneralLedgerTransaction belongs to.
+	Company  *GeneralLedgerTransactionLineCompany  `json:"company,omitempty"`
+	Employee *GeneralLedgerTransactionLineEmployee `json:"employee,omitempty"`
+	Contact  *GeneralLedgerTransactionLineContact  `json:"contact,omitempty"`
+	// The base currency of the transaction
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	BaseCurrency *GeneralLedgerTransactionLineBaseCurrency `json:"base_currency,omitempty"`
+	// The transaction currency that the transaction is made in.
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	TransactionCurrency *GeneralLedgerTransactionLineTransactionCurrency `json:"transaction_currency,omitempty"`
+	// The exchange rate between the base currency and the transaction currency.
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// A description of the line item.
+	Description         *string                           `json:"description,omitempty"`
+	TrackingCategories  []*TrackingCategory               `json:"tracking_categories,omitempty"`
+	DebitAmount         string                            `json:"debit_amount"`
+	CreditAmount        string                            `json:"credit_amount"`
+	Item                *GeneralLedgerTransactionLineItem `json:"item,omitempty"`
+	ForeignDebitAmount  string                            `json:"foreign_debit_amount"`
+	ForeignCreditAmount string                            `json:"foreign_credit_amount"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (g *GeneralLedgerTransactionLine) UnmarshalJSON(data []byte) error {
+	type unmarshaler GeneralLedgerTransactionLine
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GeneralLedgerTransactionLine(value)
+	g._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GeneralLedgerTransactionLine) String() string {
+	if len(g._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(g._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GeneralLedgerTransactionLineAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewGeneralLedgerTransactionLineAccountFromString(value string) *GeneralLedgerTransactionLineAccount {
+	return &GeneralLedgerTransactionLineAccount{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionLineAccountFromAccount(value *Account) *GeneralLedgerTransactionLineAccount {
+	return &GeneralLedgerTransactionLineAccount{typeName: "account", Account: value}
+}
+
+func (g *GeneralLedgerTransactionLineAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		g.typeName = "account"
+		g.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineAccount) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "account":
+		return json.Marshal(g.Account)
+	}
+}
+
+type GeneralLedgerTransactionLineAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (g *GeneralLedgerTransactionLineAccount) Accept(visitor GeneralLedgerTransactionLineAccountVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "account":
+		return visitor.VisitAccount(g.Account)
+	}
+}
+
+// The base currency of the transaction
+//
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type GeneralLedgerTransactionLineBaseCurrency struct {
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+}
+
+func NewGeneralLedgerTransactionLineBaseCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *GeneralLedgerTransactionLineBaseCurrency {
+	return &GeneralLedgerTransactionLineBaseCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
+}
+
+func NewGeneralLedgerTransactionLineBaseCurrencyFromString(value string) *GeneralLedgerTransactionLineBaseCurrency {
+	return &GeneralLedgerTransactionLineBaseCurrency{typeName: "string", String: value}
+}
+
+func (g *GeneralLedgerTransactionLineBaseCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		g.typeName = "transactionCurrencyEnum"
+		g.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineBaseCurrency) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "transactionCurrencyEnum":
+		return json.Marshal(g.TransactionCurrencyEnum)
+	case "string":
+		return json.Marshal(g.String)
+	}
+}
+
+type GeneralLedgerTransactionLineBaseCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (g *GeneralLedgerTransactionLineBaseCurrency) Accept(visitor GeneralLedgerTransactionLineBaseCurrencyVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(g.TransactionCurrencyEnum)
+	case "string":
+		return visitor.VisitString(g.String)
+	}
+}
+
+// The company the GeneralLedgerTransaction belongs to.
+type GeneralLedgerTransactionLineCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewGeneralLedgerTransactionLineCompanyFromString(value string) *GeneralLedgerTransactionLineCompany {
+	return &GeneralLedgerTransactionLineCompany{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionLineCompanyFromCompanyInfo(value *CompanyInfo) *GeneralLedgerTransactionLineCompany {
+	return &GeneralLedgerTransactionLineCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (g *GeneralLedgerTransactionLineCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		g.typeName = "companyInfo"
+		g.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineCompany) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "companyInfo":
+		return json.Marshal(g.CompanyInfo)
+	}
+}
+
+type GeneralLedgerTransactionLineCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (g *GeneralLedgerTransactionLineCompany) Accept(visitor GeneralLedgerTransactionLineCompanyVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(g.CompanyInfo)
+	}
+}
+
+type GeneralLedgerTransactionLineContact struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewGeneralLedgerTransactionLineContactFromString(value string) *GeneralLedgerTransactionLineContact {
+	return &GeneralLedgerTransactionLineContact{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionLineContactFromContact(value *Contact) *GeneralLedgerTransactionLineContact {
+	return &GeneralLedgerTransactionLineContact{typeName: "contact", Contact: value}
+}
+
+func (g *GeneralLedgerTransactionLineContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		g.typeName = "contact"
+		g.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineContact) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "contact":
+		return json.Marshal(g.Contact)
+	}
+}
+
+type GeneralLedgerTransactionLineContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (g *GeneralLedgerTransactionLineContact) Accept(visitor GeneralLedgerTransactionLineContactVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "contact":
+		return visitor.VisitContact(g.Contact)
+	}
+}
+
+type GeneralLedgerTransactionLineEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewGeneralLedgerTransactionLineEmployeeFromString(value string) *GeneralLedgerTransactionLineEmployee {
+	return &GeneralLedgerTransactionLineEmployee{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionLineEmployeeFromEmployee(value *Employee) *GeneralLedgerTransactionLineEmployee {
+	return &GeneralLedgerTransactionLineEmployee{typeName: "employee", Employee: value}
+}
+
+func (g *GeneralLedgerTransactionLineEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		g.typeName = "employee"
+		g.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineEmployee) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "employee":
+		return json.Marshal(g.Employee)
+	}
+}
+
+type GeneralLedgerTransactionLineEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (g *GeneralLedgerTransactionLineEmployee) Accept(visitor GeneralLedgerTransactionLineEmployeeVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "employee":
+		return visitor.VisitEmployee(g.Employee)
+	}
+}
+
+type GeneralLedgerTransactionLineItem struct {
+	typeName string
+	String   string
+	Item     *Item
+}
+
+func NewGeneralLedgerTransactionLineItemFromString(value string) *GeneralLedgerTransactionLineItem {
+	return &GeneralLedgerTransactionLineItem{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionLineItemFromItem(value *Item) *GeneralLedgerTransactionLineItem {
+	return &GeneralLedgerTransactionLineItem{typeName: "item", Item: value}
+}
+
+func (g *GeneralLedgerTransactionLineItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		g.typeName = "item"
+		g.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineItem) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "item":
+		return json.Marshal(g.Item)
+	}
+}
+
+type GeneralLedgerTransactionLineItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (g *GeneralLedgerTransactionLineItem) Accept(visitor GeneralLedgerTransactionLineItemVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "item":
+		return visitor.VisitItem(g.Item)
+	}
+}
+
+// The transaction currency that the transaction is made in.
+//
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type GeneralLedgerTransactionLineTransactionCurrency struct {
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+}
+
+func NewGeneralLedgerTransactionLineTransactionCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *GeneralLedgerTransactionLineTransactionCurrency {
+	return &GeneralLedgerTransactionLineTransactionCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
+}
+
+func NewGeneralLedgerTransactionLineTransactionCurrencyFromString(value string) *GeneralLedgerTransactionLineTransactionCurrency {
+	return &GeneralLedgerTransactionLineTransactionCurrency{typeName: "string", String: value}
+}
+
+func (g *GeneralLedgerTransactionLineTransactionCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		g.typeName = "transactionCurrencyEnum"
+		g.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineTransactionCurrency) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "transactionCurrencyEnum":
+		return json.Marshal(g.TransactionCurrencyEnum)
+	case "string":
+		return json.Marshal(g.String)
+	}
+}
+
+type GeneralLedgerTransactionLineTransactionCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (g *GeneralLedgerTransactionLineTransactionCurrency) Accept(visitor GeneralLedgerTransactionLineTransactionCurrencyVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(g.TransactionCurrencyEnum)
+	case "string":
+		return visitor.VisitString(g.String)
+	}
+}
+
+type GeneralLedgerTransactionTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewGeneralLedgerTransactionTrackingCategoriesItemFromString(value string) *GeneralLedgerTransactionTrackingCategoriesItem {
+	return &GeneralLedgerTransactionTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *GeneralLedgerTransactionTrackingCategoriesItem {
+	return &GeneralLedgerTransactionTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (g *GeneralLedgerTransactionTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		g.typeName = "trackingCategory"
+		g.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "trackingCategory":
+		return json.Marshal(g.TrackingCategory)
+	}
+}
+
+type GeneralLedgerTransactionTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (g *GeneralLedgerTransactionTrackingCategoriesItem) Accept(visitor GeneralLedgerTransactionTrackingCategoriesItemVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(g.TrackingCategory)
+	}
+}
+
+// The type of the underlying transaction.
+//
+// - `INVOICE` - INVOICE
+// - `EXPENSE` - EXPENSE
+// - `TRANSACTION` - TRANSACTION
+// - `JOURNAL_ENTRY` - JOURNAL_ENTRY
+// - `PAYMENT` - PAYMENT
+// - `VENDOR_CREDIT` - VENDOR_CREDIT
+// - `CREDIT_NOTE` - CREDIT_NOTE
+type GeneralLedgerTransactionUnderlyingTransactionType struct {
+	typeName                      string
+	UnderlyingTransactionTypeEnum UnderlyingTransactionTypeEnum
+	String                        string
+}
+
+func NewGeneralLedgerTransactionUnderlyingTransactionTypeFromUnderlyingTransactionTypeEnum(value UnderlyingTransactionTypeEnum) *GeneralLedgerTransactionUnderlyingTransactionType {
+	return &GeneralLedgerTransactionUnderlyingTransactionType{typeName: "underlyingTransactionTypeEnum", UnderlyingTransactionTypeEnum: value}
+}
+
+func NewGeneralLedgerTransactionUnderlyingTransactionTypeFromString(value string) *GeneralLedgerTransactionUnderlyingTransactionType {
+	return &GeneralLedgerTransactionUnderlyingTransactionType{typeName: "string", String: value}
+}
+
+func (g *GeneralLedgerTransactionUnderlyingTransactionType) UnmarshalJSON(data []byte) error {
+	var valueUnderlyingTransactionTypeEnum UnderlyingTransactionTypeEnum
+	if err := json.Unmarshal(data, &valueUnderlyingTransactionTypeEnum); err == nil {
+		g.typeName = "underlyingTransactionTypeEnum"
+		g.UnderlyingTransactionTypeEnum = valueUnderlyingTransactionTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionUnderlyingTransactionType) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "underlyingTransactionTypeEnum":
+		return json.Marshal(g.UnderlyingTransactionTypeEnum)
+	case "string":
+		return json.Marshal(g.String)
+	}
+}
+
+type GeneralLedgerTransactionUnderlyingTransactionTypeVisitor interface {
+	VisitUnderlyingTransactionTypeEnum(UnderlyingTransactionTypeEnum) error
+	VisitString(string) error
+}
+
+func (g *GeneralLedgerTransactionUnderlyingTransactionType) Accept(visitor GeneralLedgerTransactionUnderlyingTransactionTypeVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "underlyingTransactionTypeEnum":
+		return visitor.VisitUnderlyingTransactionTypeEnum(g.UnderlyingTransactionTypeEnum)
+	case "string":
+		return visitor.VisitString(g.String)
+	}
 }
 
 // # The IncomeStatement Object
@@ -15878,7 +21647,7 @@ type IncomeStatement struct {
 	NonOperatingExpenses []*ReportItem `json:"non_operating_expenses,omitempty"`
 	// The gross profit minus the total expenses.
 	NetIncome *float64 `json:"net_income,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -16276,13 +22045,13 @@ func (i *IncomeStatementCompany) Accept(visitor IncomeStatementCompanyVisitor) e
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type IncomeStatementCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewIncomeStatementCurrencyFromCurrencyEnum(value CurrencyEnum) *IncomeStatementCurrency {
-	return &IncomeStatementCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewIncomeStatementCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *IncomeStatementCurrency {
+	return &IncomeStatementCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewIncomeStatementCurrencyFromString(value string) *IncomeStatementCurrency {
@@ -16290,10 +22059,10 @@ func NewIncomeStatementCurrencyFromString(value string) *IncomeStatementCurrency
 }
 
 func (i *IncomeStatementCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		i.typeName = "currencyEnum"
-		i.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		i.typeName = "transactionCurrencyEnum"
+		i.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -16309,15 +22078,15 @@ func (i IncomeStatementCurrency) MarshalJSON() ([]byte, error) {
 	switch i.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return json.Marshal(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(i.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(i.String)
 	}
 }
 
 type IncomeStatementCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -16325,8 +22094,8 @@ func (i *IncomeStatementCurrency) Accept(visitor IncomeStatementCurrencyVisitor)
 	switch i.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(i.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(i.String)
 	}
@@ -16398,7 +22167,9 @@ func (i *IndividualCommonModelScopeDeserializerRequest) String() string {
 //
 // ### Description
 //
-// The `Invoice` object represents an itemized record of goods and/or services sold to a customer.
+// The `Invoice` object represents an itemized record of goods and/or services sold to a customer or bought from a vendor.
+//
+// Represents a Bill when the `Invoice` type is `ACCOUNTS_PAYABLE`. References an Invoice when the `Invoice` type is `ACCOUNTS_RECEIVABLE`.
 //
 // ### Usage Example
 //
@@ -16430,6 +22201,8 @@ type Invoice struct {
 	Memo *string `json:"memo,omitempty"`
 	// The company the invoice belongs to.
 	Company *InvoiceCompany `json:"company,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *InvoiceEmployee `json:"employee,omitempty"`
 	// The invoice's currency.
 	//
 	// - `XUA` - ADB Unit of Account
@@ -16763,17 +22536,25 @@ type Invoice struct {
 	// When the third party's invoice entry was updated.
 	RemoteUpdatedAt    *time.Time                       `json:"remote_updated_at,omitempty"`
 	TrackingCategories []*InvoiceTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// Array of `Payment` object IDs.
-	Payments []*InvoicePaymentsItem `json:"payments,omitempty"`
-	// A list of the Payment Applied to Lines common models related to a given Invoice, Credit Note, or Journal Entry.
-	AppliedPayments  []*InvoiceAppliedPaymentsItem `json:"applied_payments,omitempty"`
-	LineItems        []*InvoiceLineItem            `json:"line_items,omitempty"`
-	RemoteWasDeleted *bool                         `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Invoice was generated in.
 	AccountingPeriod *InvoiceAccountingPeriod     `json:"accounting_period,omitempty"`
 	PurchaseOrders   []*InvoicePurchaseOrdersItem `json:"purchase_orders,omitempty"`
-	FieldMappings    map[string]interface{}       `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData                `json:"remote_data,omitempty"`
+	// Array of `Payment` object IDs.
+	Payments []*InvoicePaymentsItem `json:"payments,omitempty"`
+	// A list of the Payment Applied to Lines common models related to a given Invoice, Credit Note, or Journal Entry.
+	AppliedPayments []*InvoiceAppliedPaymentsItem `json:"applied_payments,omitempty"`
+	LineItems       []*InvoiceLineItem            `json:"line_items,omitempty"`
+	// `CreditNoteApplyLines` applied to the Invoice.
+	AppliedCreditNotes []*InvoiceAppliedCreditNotesItem `json:"applied_credit_notes,omitempty"`
+	// `VendorCreditApplyLines` applied to the Invoice.
+	AppliedVendorCredits []*InvoiceAppliedVendorCreditsItem `json:"applied_vendor_credits,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -16859,6 +22640,63 @@ func (i *InvoiceAccountingPeriod) Accept(visitor InvoiceAccountingPeriodVisitor)
 	}
 }
 
+type InvoiceAppliedCreditNotesItem struct {
+	typeName                      string
+	String                        string
+	CreditNoteApplyLineForInvoice *CreditNoteApplyLineForInvoice
+}
+
+func NewInvoiceAppliedCreditNotesItemFromString(value string) *InvoiceAppliedCreditNotesItem {
+	return &InvoiceAppliedCreditNotesItem{typeName: "string", String: value}
+}
+
+func NewInvoiceAppliedCreditNotesItemFromCreditNoteApplyLineForInvoice(value *CreditNoteApplyLineForInvoice) *InvoiceAppliedCreditNotesItem {
+	return &InvoiceAppliedCreditNotesItem{typeName: "creditNoteApplyLineForInvoice", CreditNoteApplyLineForInvoice: value}
+}
+
+func (i *InvoiceAppliedCreditNotesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueCreditNoteApplyLineForInvoice := new(CreditNoteApplyLineForInvoice)
+	if err := json.Unmarshal(data, &valueCreditNoteApplyLineForInvoice); err == nil {
+		i.typeName = "creditNoteApplyLineForInvoice"
+		i.CreditNoteApplyLineForInvoice = valueCreditNoteApplyLineForInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceAppliedCreditNotesItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "creditNoteApplyLineForInvoice":
+		return json.Marshal(i.CreditNoteApplyLineForInvoice)
+	}
+}
+
+type InvoiceAppliedCreditNotesItemVisitor interface {
+	VisitString(string) error
+	VisitCreditNoteApplyLineForInvoice(*CreditNoteApplyLineForInvoice) error
+}
+
+func (i *InvoiceAppliedCreditNotesItem) Accept(visitor InvoiceAppliedCreditNotesItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "creditNoteApplyLineForInvoice":
+		return visitor.VisitCreditNoteApplyLineForInvoice(i.CreditNoteApplyLineForInvoice)
+	}
+}
+
 type InvoiceAppliedPaymentsItem struct {
 	typeName        string
 	String          string
@@ -16913,6 +22751,63 @@ func (i *InvoiceAppliedPaymentsItem) Accept(visitor InvoiceAppliedPaymentsItemVi
 		return visitor.VisitString(i.String)
 	case "paymentLineItem":
 		return visitor.VisitPaymentLineItem(i.PaymentLineItem)
+	}
+}
+
+type InvoiceAppliedVendorCreditsItem struct {
+	typeName                        string
+	String                          string
+	VendorCreditApplyLineForInvoice *VendorCreditApplyLineForInvoice
+}
+
+func NewInvoiceAppliedVendorCreditsItemFromString(value string) *InvoiceAppliedVendorCreditsItem {
+	return &InvoiceAppliedVendorCreditsItem{typeName: "string", String: value}
+}
+
+func NewInvoiceAppliedVendorCreditsItemFromVendorCreditApplyLineForInvoice(value *VendorCreditApplyLineForInvoice) *InvoiceAppliedVendorCreditsItem {
+	return &InvoiceAppliedVendorCreditsItem{typeName: "vendorCreditApplyLineForInvoice", VendorCreditApplyLineForInvoice: value}
+}
+
+func (i *InvoiceAppliedVendorCreditsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueVendorCreditApplyLineForInvoice := new(VendorCreditApplyLineForInvoice)
+	if err := json.Unmarshal(data, &valueVendorCreditApplyLineForInvoice); err == nil {
+		i.typeName = "vendorCreditApplyLineForInvoice"
+		i.VendorCreditApplyLineForInvoice = valueVendorCreditApplyLineForInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceAppliedVendorCreditsItem) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "vendorCreditApplyLineForInvoice":
+		return json.Marshal(i.VendorCreditApplyLineForInvoice)
+	}
+}
+
+type InvoiceAppliedVendorCreditsItemVisitor interface {
+	VisitString(string) error
+	VisitVendorCreditApplyLineForInvoice(*VendorCreditApplyLineForInvoice) error
+}
+
+func (i *InvoiceAppliedVendorCreditsItem) Accept(visitor InvoiceAppliedVendorCreditsItemVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "vendorCreditApplyLineForInvoice":
+		return visitor.VisitVendorCreditApplyLineForInvoice(i.VendorCreditApplyLineForInvoice)
 	}
 }
 
@@ -17341,13 +23236,13 @@ func (i *InvoiceContact) Accept(visitor InvoiceContactVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type InvoiceCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewInvoiceCurrencyFromCurrencyEnum(value CurrencyEnum) *InvoiceCurrency {
-	return &InvoiceCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewInvoiceCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *InvoiceCurrency {
+	return &InvoiceCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewInvoiceCurrencyFromString(value string) *InvoiceCurrency {
@@ -17355,10 +23250,10 @@ func NewInvoiceCurrencyFromString(value string) *InvoiceCurrency {
 }
 
 func (i *InvoiceCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		i.typeName = "currencyEnum"
-		i.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		i.typeName = "transactionCurrencyEnum"
+		i.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -17374,15 +23269,15 @@ func (i InvoiceCurrency) MarshalJSON() ([]byte, error) {
 	switch i.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return json.Marshal(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(i.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(i.String)
 	}
 }
 
 type InvoiceCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -17390,10 +23285,68 @@ func (i *InvoiceCurrency) Accept(visitor InvoiceCurrencyVisitor) error {
 	switch i.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(i.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(i.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type InvoiceEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewInvoiceEmployeeFromString(value string) *InvoiceEmployee {
+	return &InvoiceEmployee{typeName: "string", String: value}
+}
+
+func NewInvoiceEmployeeFromEmployee(value *Employee) *InvoiceEmployee {
+	return &InvoiceEmployee{typeName: "employee", Employee: value}
+}
+
+func (i *InvoiceEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		i.typeName = "employee"
+		i.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceEmployee) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "employee":
+		return json.Marshal(i.Employee)
+	}
+}
+
+type InvoiceEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (i *InvoiceEmployee) Accept(visitor InvoiceEmployeeVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "employee":
+		return visitor.VisitEmployee(i.Employee)
 	}
 }
 
@@ -17422,6 +23375,8 @@ type InvoiceLineItem struct {
 	Quantity *float64 `json:"quantity,omitempty"`
 	// The line item's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *InvoiceLineItemEmployee `json:"employee,omitempty"`
 	// The line item's currency.
 	//
 	// - `XUA` - ADB Unit of Account
@@ -17732,16 +23687,20 @@ type InvoiceLineItem struct {
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *InvoiceLineItemCurrency `json:"currency,omitempty"`
 	// The line item's exchange rate.
-	ExchangeRate       *string                                  `json:"exchange_rate,omitempty"`
-	Item               *InvoiceLineItemItem                     `json:"item,omitempty"`
-	Account            *InvoiceLineItemAccount                  `json:"account,omitempty"`
-	TrackingCategory   *InvoiceLineItemTrackingCategory         `json:"tracking_category,omitempty"`
+	ExchangeRate *string                 `json:"exchange_rate,omitempty"`
+	Item         *InvoiceLineItemItem    `json:"item,omitempty"`
+	Account      *InvoiceLineItemAccount `json:"account,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate          *string                          `json:"tax_rate,omitempty"`
+	TrackingCategory *InvoiceLineItemTrackingCategory `json:"tracking_category,omitempty"`
+	// The invoice line item's associated tracking categories.
 	TrackingCategories []*InvoiceLineItemTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// The company the line item belongs to.
+	// The company the invoice belongs to.
 	Company *string `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -18135,13 +24094,13 @@ func (i *InvoiceLineItemAccount) Accept(visitor InvoiceLineItemAccountVisitor) e
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type InvoiceLineItemCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewInvoiceLineItemCurrencyFromCurrencyEnum(value CurrencyEnum) *InvoiceLineItemCurrency {
-	return &InvoiceLineItemCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewInvoiceLineItemCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *InvoiceLineItemCurrency {
+	return &InvoiceLineItemCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewInvoiceLineItemCurrencyFromString(value string) *InvoiceLineItemCurrency {
@@ -18149,10 +24108,10 @@ func NewInvoiceLineItemCurrencyFromString(value string) *InvoiceLineItemCurrency
 }
 
 func (i *InvoiceLineItemCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		i.typeName = "currencyEnum"
-		i.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		i.typeName = "transactionCurrencyEnum"
+		i.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -18168,15 +24127,15 @@ func (i InvoiceLineItemCurrency) MarshalJSON() ([]byte, error) {
 	switch i.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return json.Marshal(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(i.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(i.String)
 	}
 }
 
 type InvoiceLineItemCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -18184,10 +24143,68 @@ func (i *InvoiceLineItemCurrency) Accept(visitor InvoiceLineItemCurrencyVisitor)
 	switch i.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(i.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(i.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type InvoiceLineItemEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewInvoiceLineItemEmployeeFromString(value string) *InvoiceLineItemEmployee {
+	return &InvoiceLineItemEmployee{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemEmployeeFromEmployee(value *Employee) *InvoiceLineItemEmployee {
+	return &InvoiceLineItemEmployee{typeName: "employee", Employee: value}
+}
+
+func (i *InvoiceLineItemEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		i.typeName = "employee"
+		i.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemEmployee) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "employee":
+		return json.Marshal(i.Employee)
+	}
+}
+
+type InvoiceLineItemEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (i *InvoiceLineItemEmployee) Accept(visitor InvoiceLineItemEmployeeVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "employee":
+		return visitor.VisitEmployee(i.Employee)
 	}
 }
 
@@ -18268,6 +24285,8 @@ type InvoiceLineItemRequest struct {
 	Quantity *float64 `json:"quantity,omitempty"`
 	// The line item's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *InvoiceLineItemRequestEmployee `json:"employee,omitempty"`
 	// The line item's currency.
 	//
 	// - `XUA` - ADB Unit of Account
@@ -18578,15 +24597,19 @@ type InvoiceLineItemRequest struct {
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *InvoiceLineItemRequestCurrency `json:"currency,omitempty"`
 	// The line item's exchange rate.
-	ExchangeRate       *string                                         `json:"exchange_rate,omitempty"`
-	Item               *InvoiceLineItemRequestItem                     `json:"item,omitempty"`
-	Account            *InvoiceLineItemRequestAccount                  `json:"account,omitempty"`
-	TrackingCategory   *InvoiceLineItemRequestTrackingCategory         `json:"tracking_category,omitempty"`
+	ExchangeRate *string                        `json:"exchange_rate,omitempty"`
+	Item         *InvoiceLineItemRequestItem    `json:"item,omitempty"`
+	Account      *InvoiceLineItemRequestAccount `json:"account,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate          *string                                 `json:"tax_rate,omitempty"`
+	TrackingCategory *InvoiceLineItemRequestTrackingCategory `json:"tracking_category,omitempty"`
+	// The invoice line item's associated tracking categories.
 	TrackingCategories []*InvoiceLineItemRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// The company the line item belongs to.
+	// The company the invoice belongs to.
 	Company             *string                `json:"company,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -18980,13 +25003,13 @@ func (i *InvoiceLineItemRequestAccount) Accept(visitor InvoiceLineItemRequestAcc
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type InvoiceLineItemRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewInvoiceLineItemRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *InvoiceLineItemRequestCurrency {
-	return &InvoiceLineItemRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewInvoiceLineItemRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *InvoiceLineItemRequestCurrency {
+	return &InvoiceLineItemRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewInvoiceLineItemRequestCurrencyFromString(value string) *InvoiceLineItemRequestCurrency {
@@ -18994,10 +25017,10 @@ func NewInvoiceLineItemRequestCurrencyFromString(value string) *InvoiceLineItemR
 }
 
 func (i *InvoiceLineItemRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		i.typeName = "currencyEnum"
-		i.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		i.typeName = "transactionCurrencyEnum"
+		i.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -19013,15 +25036,15 @@ func (i InvoiceLineItemRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch i.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return json.Marshal(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(i.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(i.String)
 	}
 }
 
 type InvoiceLineItemRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -19029,10 +25052,68 @@ func (i *InvoiceLineItemRequestCurrency) Accept(visitor InvoiceLineItemRequestCu
 	switch i.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(i.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(i.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type InvoiceLineItemRequestEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewInvoiceLineItemRequestEmployeeFromString(value string) *InvoiceLineItemRequestEmployee {
+	return &InvoiceLineItemRequestEmployee{typeName: "string", String: value}
+}
+
+func NewInvoiceLineItemRequestEmployeeFromEmployee(value *Employee) *InvoiceLineItemRequestEmployee {
+	return &InvoiceLineItemRequestEmployee{typeName: "employee", Employee: value}
+}
+
+func (i *InvoiceLineItemRequestEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		i.typeName = "employee"
+		i.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemRequestEmployee) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "employee":
+		return json.Marshal(i.Employee)
+	}
+}
+
+type InvoiceLineItemRequestEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (i *InvoiceLineItemRequestEmployee) Accept(visitor InvoiceLineItemRequestEmployeeVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "employee":
+		return visitor.VisitEmployee(i.Employee)
 	}
 }
 
@@ -19437,13 +25518,15 @@ func (i *InvoicePurchaseOrdersItem) Accept(visitor InvoicePurchaseOrdersItemVisi
 
 // # The Invoice Object
 //
-//	### Description
-//	The `Invoice` object represents an itemized record of goods and/or services sold to a customer.
+// ### Description
 //
-// If type = accounts_payable `Invoice` is a bill, if type = accounts_receivable it's an invoice.
+// The `Invoice` object represents an itemized record of goods and/or services sold to a customer or bought from a vendor.
 //
-//	### Usage Example
-//	Fetch from the `LIST Invoices` endpoint and view a company's invoices.
+// Represents a Bill when the `Invoice` type is `ACCOUNTS_PAYABLE`. References an Invoice when the `Invoice` type is `ACCOUNTS_RECEIVABLE`.
+//
+// ### Usage Example
+//
+// Fetch from the `LIST Invoices` endpoint and view a company's invoices.
 type InvoiceRequest struct {
 	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 	//
@@ -19460,6 +25543,8 @@ type InvoiceRequest struct {
 	DueDate *time.Time `json:"due_date,omitempty"`
 	// The invoice's paid date.
 	PaidOnDate *time.Time `json:"paid_on_date,omitempty"`
+	// The employee this overall transaction relates to.
+	Employee *InvoiceRequestEmployee `json:"employee,omitempty"`
 	// The invoice's private note.
 	Memo *string `json:"memo,omitempty"`
 	// The status of the invoice.
@@ -19790,6 +25875,8 @@ type InvoiceRequest struct {
 	SubTotal *float64 `json:"sub_total,omitempty"`
 	// The total amount being paid in taxes.
 	TotalTaxAmount *float64 `json:"total_tax_amount,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
 	// The invoice's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	// The invoice's remaining balance.
@@ -19801,6 +25888,7 @@ type InvoiceRequest struct {
 	PurchaseOrders      []*InvoiceRequestPurchaseOrdersItem     `json:"purchase_orders,omitempty"`
 	IntegrationParams   map[string]interface{}                  `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}                  `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest                   `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -20253,13 +26341,13 @@ func (i *InvoiceRequestContact) Accept(visitor InvoiceRequestContactVisitor) err
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type InvoiceRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewInvoiceRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *InvoiceRequestCurrency {
-	return &InvoiceRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewInvoiceRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *InvoiceRequestCurrency {
+	return &InvoiceRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewInvoiceRequestCurrencyFromString(value string) *InvoiceRequestCurrency {
@@ -20267,10 +26355,10 @@ func NewInvoiceRequestCurrencyFromString(value string) *InvoiceRequestCurrency {
 }
 
 func (i *InvoiceRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		i.typeName = "currencyEnum"
-		i.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		i.typeName = "transactionCurrencyEnum"
+		i.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -20286,15 +26374,15 @@ func (i InvoiceRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch i.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return json.Marshal(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(i.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(i.String)
 	}
 }
 
 type InvoiceRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -20302,10 +26390,68 @@ func (i *InvoiceRequestCurrency) Accept(visitor InvoiceRequestCurrencyVisitor) e
 	switch i.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(i.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(i.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(i.String)
+	}
+}
+
+// The employee this overall transaction relates to.
+type InvoiceRequestEmployee struct {
+	typeName string
+	String   string
+	Employee *Employee
+}
+
+func NewInvoiceRequestEmployeeFromString(value string) *InvoiceRequestEmployee {
+	return &InvoiceRequestEmployee{typeName: "string", String: value}
+}
+
+func NewInvoiceRequestEmployeeFromEmployee(value *Employee) *InvoiceRequestEmployee {
+	return &InvoiceRequestEmployee{typeName: "employee", Employee: value}
+}
+
+func (i *InvoiceRequestEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		i.typeName = "employee"
+		i.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestEmployee) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "employee":
+		return json.Marshal(i.Employee)
+	}
+}
+
+type InvoiceRequestEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (i *InvoiceRequestEmployee) Accept(visitor InvoiceRequestEmployeeVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "employee":
+		return visitor.VisitEmployee(i.Employee)
 	}
 }
 
@@ -21044,9 +27190,13 @@ type Item struct {
 	SalesAccount *ItemSalesAccount `json:"sales_account,omitempty"`
 	// The company the item belongs to.
 	Company *ItemCompany `json:"company,omitempty"`
+	// The default purchase tax rate for this item.
+	PurchaseTaxRate *ItemPurchaseTaxRate `json:"purchase_tax_rate,omitempty"`
+	// The default sales tax rate for this item.
+	SalesTaxRate *ItemSalesTaxRate `json:"sales_tax_rate,omitempty"`
 	// When the third party's item note was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -21135,6 +27285,46 @@ func (i *ItemCompany) Accept(visitor ItemCompanyVisitor) error {
 	}
 }
 
+// - `string` - uuid
+// - `number` - url
+// - `date` - email
+// - `datetime` - phone
+// - `bool` - currency
+// - `list` - decimal
+type ItemFormatEnum string
+
+const (
+	ItemFormatEnumString   ItemFormatEnum = "string"
+	ItemFormatEnumNumber   ItemFormatEnum = "number"
+	ItemFormatEnumDate     ItemFormatEnum = "date"
+	ItemFormatEnumDatetime ItemFormatEnum = "datetime"
+	ItemFormatEnumBool     ItemFormatEnum = "bool"
+	ItemFormatEnumList     ItemFormatEnum = "list"
+)
+
+func NewItemFormatEnumFromString(s string) (ItemFormatEnum, error) {
+	switch s {
+	case "string":
+		return ItemFormatEnumString, nil
+	case "number":
+		return ItemFormatEnumNumber, nil
+	case "date":
+		return ItemFormatEnumDate, nil
+	case "datetime":
+		return ItemFormatEnumDatetime, nil
+	case "bool":
+		return ItemFormatEnumBool, nil
+	case "list":
+		return ItemFormatEnumList, nil
+	}
+	var t ItemFormatEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemFormatEnum) Ptr() *ItemFormatEnum {
+	return &i
+}
+
 // References the default account used to record a purchase of the item.
 type ItemPurchaseAccount struct {
 	typeName string
@@ -21190,6 +27380,64 @@ func (i *ItemPurchaseAccount) Accept(visitor ItemPurchaseAccountVisitor) error {
 		return visitor.VisitString(i.String)
 	case "account":
 		return visitor.VisitAccount(i.Account)
+	}
+}
+
+// The default purchase tax rate for this item.
+type ItemPurchaseTaxRate struct {
+	typeName string
+	String   string
+	TaxRate  *TaxRate
+}
+
+func NewItemPurchaseTaxRateFromString(value string) *ItemPurchaseTaxRate {
+	return &ItemPurchaseTaxRate{typeName: "string", String: value}
+}
+
+func NewItemPurchaseTaxRateFromTaxRate(value *TaxRate) *ItemPurchaseTaxRate {
+	return &ItemPurchaseTaxRate{typeName: "taxRate", TaxRate: value}
+}
+
+func (i *ItemPurchaseTaxRate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTaxRate := new(TaxRate)
+	if err := json.Unmarshal(data, &valueTaxRate); err == nil {
+		i.typeName = "taxRate"
+		i.TaxRate = valueTaxRate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i ItemPurchaseTaxRate) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "taxRate":
+		return json.Marshal(i.TaxRate)
+	}
+}
+
+type ItemPurchaseTaxRateVisitor interface {
+	VisitString(string) error
+	VisitTaxRate(*TaxRate) error
+}
+
+func (i *ItemPurchaseTaxRate) Accept(visitor ItemPurchaseTaxRateVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "taxRate":
+		return visitor.VisitTaxRate(i.TaxRate)
 	}
 }
 
@@ -21249,6 +27497,95 @@ func (i *ItemSalesAccount) Accept(visitor ItemSalesAccountVisitor) error {
 	case "account":
 		return visitor.VisitAccount(i.Account)
 	}
+}
+
+// The default sales tax rate for this item.
+type ItemSalesTaxRate struct {
+	typeName string
+	String   string
+	TaxRate  *TaxRate
+}
+
+func NewItemSalesTaxRateFromString(value string) *ItemSalesTaxRate {
+	return &ItemSalesTaxRate{typeName: "string", String: value}
+}
+
+func NewItemSalesTaxRateFromTaxRate(value *TaxRate) *ItemSalesTaxRate {
+	return &ItemSalesTaxRate{typeName: "taxRate", TaxRate: value}
+}
+
+func (i *ItemSalesTaxRate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typeName = "string"
+		i.String = valueString
+		return nil
+	}
+	valueTaxRate := new(TaxRate)
+	if err := json.Unmarshal(data, &valueTaxRate); err == nil {
+		i.typeName = "taxRate"
+		i.TaxRate = valueTaxRate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i ItemSalesTaxRate) MarshalJSON() ([]byte, error) {
+	switch i.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return json.Marshal(i.String)
+	case "taxRate":
+		return json.Marshal(i.TaxRate)
+	}
+}
+
+type ItemSalesTaxRateVisitor interface {
+	VisitString(string) error
+	VisitTaxRate(*TaxRate) error
+}
+
+func (i *ItemSalesTaxRate) Accept(visitor ItemSalesTaxRateVisitor) error {
+	switch i.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", i.typeName, i)
+	case "string":
+		return visitor.VisitString(i.String)
+	case "taxRate":
+		return visitor.VisitTaxRate(i.TaxRate)
+	}
+}
+
+type ItemSchema struct {
+	ItemType    *ItemTypeEnum   `json:"item_type,omitempty"`
+	ItemFormat  *ItemFormatEnum `json:"item_format,omitempty"`
+	ItemChoices []string        `json:"item_choices,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (i *ItemSchema) UnmarshalJSON(data []byte) error {
+	type unmarshaler ItemSchema
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = ItemSchema(value)
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *ItemSchema) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 // The item's status.
@@ -21312,6 +27649,46 @@ func (i *ItemStatus) Accept(visitor ItemStatusVisitor) error {
 	}
 }
 
+// - `string` - string
+// - `number` - number
+// - `date` - date
+// - `datetime` - datetime
+// - `bool` - bool
+// - `list` - list
+type ItemTypeEnum string
+
+const (
+	ItemTypeEnumString   ItemTypeEnum = "string"
+	ItemTypeEnumNumber   ItemTypeEnum = "number"
+	ItemTypeEnumDate     ItemTypeEnum = "date"
+	ItemTypeEnumDatetime ItemTypeEnum = "datetime"
+	ItemTypeEnumBool     ItemTypeEnum = "bool"
+	ItemTypeEnumList     ItemTypeEnum = "list"
+)
+
+func NewItemTypeEnumFromString(s string) (ItemTypeEnum, error) {
+	switch s {
+	case "string":
+		return ItemTypeEnumString, nil
+	case "number":
+		return ItemTypeEnumNumber, nil
+	case "date":
+		return ItemTypeEnumDate, nil
+	case "datetime":
+		return ItemTypeEnumDatetime, nil
+	case "bool":
+		return ItemTypeEnumBool, nil
+	case "list":
+		return ItemTypeEnumList, nil
+	}
+	var t ItemTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i ItemTypeEnum) Ptr() *ItemTypeEnum {
+	return &i
+}
+
 // # The JournalEntry Object
 //
 // ### Description
@@ -21335,10 +27712,6 @@ type JournalEntry struct {
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
 	// The journal entry's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty"`
-	// When the third party's journal entry was created.
-	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
-	// When the third party's journal entry was updated.
-	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
 	// Array of `Payment` object IDs.
 	Payments []*JournalEntryPaymentsItem `json:"payments,omitempty"`
 	// A list of the Payment Applied to Lines common models related to a given Invoice, Credit Note, or Journal Entry.
@@ -21658,11 +28031,14 @@ type JournalEntry struct {
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the journal entry belongs to.
 	Company *JournalEntryCompany `json:"company,omitempty"`
-	Lines   []*JournalLine       `json:"lines,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool          `json:"inclusive_of_tax,omitempty"`
+	Lines          []*JournalLine `json:"lines,omitempty"`
 	// Reference number for identifying journal entries.
 	JournalNumber      *string                               `json:"journal_number,omitempty"`
 	TrackingCategories []*JournalEntryTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	RemoteWasDeleted   *bool                                 `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The journal's posting status.
 	//
 	// - `UNPOSTED` - UNPOSTED
@@ -21670,8 +28046,13 @@ type JournalEntry struct {
 	PostingStatus *JournalEntryPostingStatus `json:"posting_status,omitempty"`
 	// The accounting period that the JournalEntry was generated in.
 	AccountingPeriod *JournalEntryAccountingPeriod `json:"accounting_period,omitempty"`
-	FieldMappings    map[string]interface{}        `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData                 `json:"remote_data,omitempty"`
+	// When the third party's journal entry was created.
+	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
+	// When the third party's journal entry was updated.
+	RemoteUpdatedAt *time.Time             `json:"remote_updated_at,omitempty"`
+	FieldMappings   map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData      []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields    []*RemoteField         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -22181,13 +28562,13 @@ func (j *JournalEntryCompany) Accept(visitor JournalEntryCompanyVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type JournalEntryCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewJournalEntryCurrencyFromCurrencyEnum(value CurrencyEnum) *JournalEntryCurrency {
-	return &JournalEntryCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewJournalEntryCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *JournalEntryCurrency {
+	return &JournalEntryCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewJournalEntryCurrencyFromString(value string) *JournalEntryCurrency {
@@ -22195,10 +28576,10 @@ func NewJournalEntryCurrencyFromString(value string) *JournalEntryCurrency {
 }
 
 func (j *JournalEntryCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		j.typeName = "currencyEnum"
-		j.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		j.typeName = "transactionCurrencyEnum"
+		j.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -22214,15 +28595,15 @@ func (j JournalEntryCurrency) MarshalJSON() ([]byte, error) {
 	switch j.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return json.Marshal(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(j.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(j.String)
 	}
 }
 
 type JournalEntryCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -22230,8 +28611,8 @@ func (j *JournalEntryCurrency) Accept(visitor JournalEntryCurrencyVisitor) error
 	switch j.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(j.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(j.String)
 	}
@@ -22685,7 +29066,9 @@ type JournalEntryRequest struct {
 	// The company the journal entry belongs to.
 	Company            *JournalEntryRequestCompany                  `json:"company,omitempty"`
 	TrackingCategories []*JournalEntryRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	Lines              []*JournalLineRequest                        `json:"lines,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool                 `json:"inclusive_of_tax,omitempty"`
+	Lines          []*JournalLineRequest `json:"lines,omitempty"`
 	// Reference number for identifying journal entries.
 	JournalNumber *string `json:"journal_number,omitempty"`
 	// The journal's posting status.
@@ -22695,6 +29078,7 @@ type JournalEntryRequest struct {
 	PostingStatus       *JournalEntryRequestPostingStatus `json:"posting_status,omitempty"`
 	IntegrationParams   map[string]interface{}            `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest             `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -23089,13 +29473,13 @@ func (j *JournalEntryRequestCompany) Accept(visitor JournalEntryRequestCompanyVi
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type JournalEntryRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewJournalEntryRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *JournalEntryRequestCurrency {
-	return &JournalEntryRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewJournalEntryRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *JournalEntryRequestCurrency {
+	return &JournalEntryRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewJournalEntryRequestCurrencyFromString(value string) *JournalEntryRequestCurrency {
@@ -23103,10 +29487,10 @@ func NewJournalEntryRequestCurrencyFromString(value string) *JournalEntryRequest
 }
 
 func (j *JournalEntryRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		j.typeName = "currencyEnum"
-		j.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		j.typeName = "transactionCurrencyEnum"
+		j.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -23122,15 +29506,15 @@ func (j JournalEntryRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch j.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return json.Marshal(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(j.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(j.String)
 	}
 }
 
 type JournalEntryRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -23138,8 +29522,8 @@ func (j *JournalEntryRequestCurrency) Accept(visitor JournalEntryRequestCurrency
 	switch j.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(j.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(j.String)
 	}
@@ -23428,8 +29812,9 @@ type JournalLine struct {
 	ModifiedAt *time.Time          `json:"modified_at,omitempty"`
 	Account    *JournalLineAccount `json:"account,omitempty"`
 	// The value of the line item including taxes and other fees.
-	NetAmount          *float64                             `json:"net_amount,omitempty"`
-	TrackingCategory   *JournalLineTrackingCategory         `json:"tracking_category,omitempty"`
+	NetAmount        *float64                     `json:"net_amount,omitempty"`
+	TrackingCategory *JournalLineTrackingCategory `json:"tracking_category,omitempty"`
+	// The journal line item's associated tracking categories.
 	TrackingCategories []*JournalLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The journal line item's currency.
 	//
@@ -23741,14 +30126,18 @@ type JournalLine struct {
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *JournalLineCurrency `json:"currency,omitempty"`
 	// The company the journal entry belongs to.
-	Company *string `json:"company,omitempty"`
-	Contact *string `json:"contact,omitempty"`
+	Company  *string `json:"company,omitempty"`
+	Employee *string `json:"employee,omitempty"`
+	Contact  *string `json:"contact,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool          `json:"remote_was_deleted,omitempty"`
+	RemoteFields     []*RemoteField `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -24142,13 +30531,13 @@ func (j *JournalLineAccount) Accept(visitor JournalLineAccountVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type JournalLineCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewJournalLineCurrencyFromCurrencyEnum(value CurrencyEnum) *JournalLineCurrency {
-	return &JournalLineCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewJournalLineCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *JournalLineCurrency {
+	return &JournalLineCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewJournalLineCurrencyFromString(value string) *JournalLineCurrency {
@@ -24156,10 +30545,10 @@ func NewJournalLineCurrencyFromString(value string) *JournalLineCurrency {
 }
 
 func (j *JournalLineCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		j.typeName = "currencyEnum"
-		j.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		j.typeName = "transactionCurrencyEnum"
+		j.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -24175,15 +30564,15 @@ func (j JournalLineCurrency) MarshalJSON() ([]byte, error) {
 	switch j.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return json.Marshal(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(j.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(j.String)
 	}
 }
 
 type JournalLineCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -24191,8 +30580,8 @@ func (j *JournalLineCurrency) Accept(visitor JournalLineCurrencyVisitor) error {
 	switch j.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(j.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(j.String)
 	}
@@ -24212,8 +30601,9 @@ type JournalLineRequest struct {
 	RemoteId *string                    `json:"remote_id,omitempty"`
 	Account  *JournalLineRequestAccount `json:"account,omitempty"`
 	// The value of the line item including taxes and other fees.
-	NetAmount          *float64                                    `json:"net_amount,omitempty"`
-	TrackingCategory   *JournalLineRequestTrackingCategory         `json:"tracking_category,omitempty"`
+	NetAmount        *float64                            `json:"net_amount,omitempty"`
+	TrackingCategory *JournalLineRequestTrackingCategory `json:"tracking_category,omitempty"`
+	// The journal line item's associated tracking categories.
 	TrackingCategories []*JournalLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	// The journal line item's currency.
 	//
@@ -24525,14 +30915,18 @@ type JournalLineRequest struct {
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *JournalLineRequestCurrency `json:"currency,omitempty"`
 	// The company the journal entry belongs to.
-	Company *string `json:"company,omitempty"`
-	Contact *string `json:"contact,omitempty"`
+	Company  *string `json:"company,omitempty"`
+	Employee *string `json:"employee,omitempty"`
+	Contact  *string `json:"contact,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The journal line item's exchange rate.
 	ExchangeRate        *string                `json:"exchange_rate,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -24926,13 +31320,13 @@ func (j *JournalLineRequestAccount) Accept(visitor JournalLineRequestAccountVisi
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type JournalLineRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewJournalLineRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *JournalLineRequestCurrency {
-	return &JournalLineRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewJournalLineRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *JournalLineRequestCurrency {
+	return &JournalLineRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewJournalLineRequestCurrencyFromString(value string) *JournalLineRequestCurrency {
@@ -24940,10 +31334,10 @@ func NewJournalLineRequestCurrencyFromString(value string) *JournalLineRequestCu
 }
 
 func (j *JournalLineRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		j.typeName = "currencyEnum"
-		j.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		j.typeName = "transactionCurrencyEnum"
+		j.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -24959,15 +31353,15 @@ func (j JournalLineRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch j.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return json.Marshal(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(j.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(j.String)
 	}
 }
 
 type JournalLineRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -24975,8 +31369,8 @@ func (j *JournalLineRequestCurrency) Accept(visitor JournalLineRequestCurrencyVi
 	switch j.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", j.typeName, j)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(j.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(j.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(j.String)
 	}
@@ -25208,6 +31602,30 @@ func (j *JournalLineTrackingCategory) Accept(visitor JournalLineTrackingCategory
 	case "trackingCategory":
 		return visitor.VisitTrackingCategory(j.TrackingCategory)
 	}
+}
+
+// - `en` - en
+// - `de` - de
+type LanguageEnum string
+
+const (
+	LanguageEnumEn LanguageEnum = "en"
+	LanguageEnumDe LanguageEnum = "de"
+)
+
+func NewLanguageEnumFromString(s string) (LanguageEnum, error) {
+	switch s {
+	case "en":
+		return LanguageEnumEn, nil
+	case "de":
+		return LanguageEnumDe, nil
+	}
+	var t LanguageEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LanguageEnum) Ptr() *LanguageEnum {
+	return &l
 }
 
 type LinkToken struct {
@@ -25746,6 +32164,68 @@ func (p *PaginatedBalanceSheetList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+type PaginatedBankFeedAccountList struct {
+	Next     *string            `json:"next,omitempty"`
+	Previous *string            `json:"previous,omitempty"`
+	Results  []*BankFeedAccount `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedBankFeedAccountList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedBankFeedAccountList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedBankFeedAccountList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedBankFeedAccountList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+type PaginatedBankFeedTransactionList struct {
+	Next     *string                `json:"next,omitempty"`
+	Previous *string                `json:"previous,omitempty"`
+	Results  []*BankFeedTransaction `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedBankFeedTransactionList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedBankFeedTransactionList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedBankFeedTransactionList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedBankFeedTransactionList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
 type PaginatedCashFlowStatementList struct {
 	Next     *string              `json:"next,omitempty"`
 	Previous *string              `json:"previous,omitempty"`
@@ -25870,6 +32350,37 @@ func (p *PaginatedCreditNoteList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+type PaginatedEmployeeList struct {
+	Next     *string     `json:"next,omitempty"`
+	Previous *string     `json:"previous,omitempty"`
+	Results  []*Employee `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedEmployeeList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedEmployeeList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedEmployeeList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedEmployeeList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
 type PaginatedExpenseList struct {
 	Next     *string    `json:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty"`
@@ -25890,6 +32401,37 @@ func (p *PaginatedExpenseList) UnmarshalJSON(data []byte) error {
 }
 
 func (p *PaginatedExpenseList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+type PaginatedGeneralLedgerTransactionList struct {
+	Next     *string                     `json:"next,omitempty"`
+	Previous *string                     `json:"previous,omitempty"`
+	Results  []*GeneralLedgerTransaction `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedGeneralLedgerTransactionList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedGeneralLedgerTransactionList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedGeneralLedgerTransactionList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedGeneralLedgerTransactionList) String() string {
 	if len(p._rawJSON) > 0 {
 		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
 			return value
@@ -26107,6 +32649,37 @@ func (p *PaginatedPurchaseOrderList) UnmarshalJSON(data []byte) error {
 }
 
 func (p *PaginatedPurchaseOrderList) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+type PaginatedRemoteFieldClassList struct {
+	Next     *string             `json:"next,omitempty"`
+	Previous *string             `json:"previous,omitempty"`
+	Results  []*RemoteFieldClass `json:"results,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (p *PaginatedRemoteFieldClassList) UnmarshalJSON(data []byte) error {
+	type unmarshaler PaginatedRemoteFieldClassList
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PaginatedRemoteFieldClassList(value)
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PaginatedRemoteFieldClassList) String() string {
 	if len(p._rawJSON) > 0 {
 		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
 			return value
@@ -26616,6 +33189,7 @@ type PatchedPaymentRequest struct {
 	AppliedToLines      []*PatchedPaymentRequestAppliedToLinesItem `json:"applied_to_lines,omitempty"`
 	IntegrationParams   map[string]interface{}                     `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}                     `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest                      `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -26760,17 +33334,17 @@ func (p *PatchedPaymentRequestAccountingPeriod) Accept(visitor PatchedPaymentReq
 }
 
 type PatchedPaymentRequestAppliedToLinesItem struct {
-	typeName        string
-	String          string
-	PaymentLineItem *PaymentLineItem
+	typeName               string
+	String                 string
+	PaymentLineItemRequest *PaymentLineItemRequest
 }
 
 func NewPatchedPaymentRequestAppliedToLinesItemFromString(value string) *PatchedPaymentRequestAppliedToLinesItem {
 	return &PatchedPaymentRequestAppliedToLinesItem{typeName: "string", String: value}
 }
 
-func NewPatchedPaymentRequestAppliedToLinesItemFromPaymentLineItem(value *PaymentLineItem) *PatchedPaymentRequestAppliedToLinesItem {
-	return &PatchedPaymentRequestAppliedToLinesItem{typeName: "paymentLineItem", PaymentLineItem: value}
+func NewPatchedPaymentRequestAppliedToLinesItemFromPaymentLineItemRequest(value *PaymentLineItemRequest) *PatchedPaymentRequestAppliedToLinesItem {
+	return &PatchedPaymentRequestAppliedToLinesItem{typeName: "paymentLineItemRequest", PaymentLineItemRequest: value}
 }
 
 func (p *PatchedPaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) error {
@@ -26780,10 +33354,10 @@ func (p *PatchedPaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) err
 		p.String = valueString
 		return nil
 	}
-	valuePaymentLineItem := new(PaymentLineItem)
-	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
-		p.typeName = "paymentLineItem"
-		p.PaymentLineItem = valuePaymentLineItem
+	valuePaymentLineItemRequest := new(PaymentLineItemRequest)
+	if err := json.Unmarshal(data, &valuePaymentLineItemRequest); err == nil {
+		p.typeName = "paymentLineItemRequest"
+		p.PaymentLineItemRequest = valuePaymentLineItemRequest
 		return nil
 	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
@@ -26795,14 +33369,14 @@ func (p PatchedPaymentRequestAppliedToLinesItem) MarshalJSON() ([]byte, error) {
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
 	case "string":
 		return json.Marshal(p.String)
-	case "paymentLineItem":
-		return json.Marshal(p.PaymentLineItem)
+	case "paymentLineItemRequest":
+		return json.Marshal(p.PaymentLineItemRequest)
 	}
 }
 
 type PatchedPaymentRequestAppliedToLinesItemVisitor interface {
 	VisitString(string) error
-	VisitPaymentLineItem(*PaymentLineItem) error
+	VisitPaymentLineItemRequest(*PaymentLineItemRequest) error
 }
 
 func (p *PatchedPaymentRequestAppliedToLinesItem) Accept(visitor PatchedPaymentRequestAppliedToLinesItemVisitor) error {
@@ -26811,8 +33385,8 @@ func (p *PatchedPaymentRequestAppliedToLinesItem) Accept(visitor PatchedPaymentR
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
 	case "string":
 		return visitor.VisitString(p.String)
-	case "paymentLineItem":
-		return visitor.VisitPaymentLineItem(p.PaymentLineItem)
+	case "paymentLineItemRequest":
+		return visitor.VisitPaymentLineItemRequest(p.PaymentLineItemRequest)
 	}
 }
 
@@ -27241,13 +33815,13 @@ func (p *PatchedPaymentRequestContact) Accept(visitor PatchedPaymentRequestConta
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PatchedPaymentRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPatchedPaymentRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *PatchedPaymentRequestCurrency {
-	return &PatchedPaymentRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPatchedPaymentRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PatchedPaymentRequestCurrency {
+	return &PatchedPaymentRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPatchedPaymentRequestCurrencyFromString(value string) *PatchedPaymentRequestCurrency {
@@ -27255,10 +33829,10 @@ func NewPatchedPaymentRequestCurrencyFromString(value string) *PatchedPaymentReq
 }
 
 func (p *PatchedPaymentRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -27274,15 +33848,15 @@ func (p PatchedPaymentRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PatchedPaymentRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -27290,8 +33864,8 @@ func (p *PatchedPaymentRequestCurrency) Accept(visitor PatchedPaymentRequestCurr
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -27759,16 +34333,17 @@ type Payment struct {
 	// - `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 	Type               *PaymentType                     `json:"type,omitempty"`
 	TrackingCategories []*PaymentTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// When the third party's payment entry was updated.
-	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Payment was generated in.
 	AccountingPeriod *PaymentAccountingPeriod `json:"accounting_period,omitempty"`
 	// A list of “Payment Applied to Lines” objects.
 	AppliedToLines []*PaymentAppliedToLinesItem `json:"applied_to_lines,omitempty"`
-	FieldMappings  map[string]interface{}       `json:"field_mappings,omitempty"`
-	RemoteData     []*RemoteData                `json:"remote_data,omitempty"`
+	// When the third party's payment entry was updated.
+	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -28394,13 +34969,13 @@ func (p *PaymentContact) Accept(visitor PaymentContactVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PaymentCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPaymentCurrencyFromCurrencyEnum(value CurrencyEnum) *PaymentCurrency {
-	return &PaymentCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPaymentCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PaymentCurrency {
+	return &PaymentCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPaymentCurrencyFromString(value string) *PaymentCurrency {
@@ -28408,10 +34983,10 @@ func NewPaymentCurrencyFromString(value string) *PaymentCurrency {
 }
 
 func (p *PaymentCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -28427,15 +35002,15 @@ func (p PaymentCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PaymentCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -28443,8 +35018,8 @@ func (p *PaymentCurrency) Accept(visitor PaymentCurrencyVisitor) error {
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -28524,6 +35099,7 @@ type PaymentLineItemRequest struct {
 	RelatedObjectType   *string                `json:"related_object_type,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -28894,6 +35470,7 @@ type PaymentRequest struct {
 	AppliedToLines      []*PaymentRequestAppliedToLinesItem `json:"applied_to_lines,omitempty"`
 	IntegrationParams   map[string]interface{}              `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}              `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest               `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -29519,13 +36096,13 @@ func (p *PaymentRequestContact) Accept(visitor PaymentRequestContactVisitor) err
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PaymentRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPaymentRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *PaymentRequestCurrency {
-	return &PaymentRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPaymentRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PaymentRequestCurrency {
+	return &PaymentRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPaymentRequestCurrencyFromString(value string) *PaymentRequestCurrency {
@@ -29533,10 +36110,10 @@ func NewPaymentRequestCurrencyFromString(value string) *PaymentRequestCurrency {
 }
 
 func (p *PaymentRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -29552,15 +36129,15 @@ func (p PaymentRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PaymentRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -29568,8 +36145,8 @@ func (p *PaymentRequestCurrency) Accept(visitor PaymentRequestCurrencyVisitor) e
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -29897,7 +36474,7 @@ func (p PostingStatusEnum) Ptr() *PostingStatusEnum {
 //
 // A `PurchaseOrder` represents a request to purchase goods or services from a vendor. It outlines the details of the purchase, such as the items or services requested, quantities, prices, and delivery details.
 //
-// A `PurchaseOrder` is a crucial component of the procurement process, but does not typically result in any impact on the company’s general ledger. The general ledger is typically only affected when the `PurchaseOrder` is fulfilled as an _Accounts Payable_ Invoice object.
+// A `PurchaseOrder` is a crucial component of the procurement process, but does not typically result in any impact on the company’s general ledger. The general ledger is typically only affected when the `PurchaseOrder` is fulfilled as an _Accounts Payable_ `Invoice` object (also known as a Bill).
 //
 // ### Usage Example
 //
@@ -30246,19 +36823,22 @@ type PurchaseOrder struct {
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *PurchaseOrderCurrency `json:"currency,omitempty"`
 	// The purchase order's exchange rate.
-	ExchangeRate       *string                                `json:"exchange_rate,omitempty"`
-	LineItems          []*PurchaseOrderLineItem               `json:"line_items,omitempty"`
+	ExchangeRate *string                  `json:"exchange_rate,omitempty"`
+	LineItems    []*PurchaseOrderLineItem `json:"line_items,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax     *bool                                  `json:"inclusive_of_tax,omitempty"`
 	TrackingCategories []*PurchaseOrderTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	// The accounting period that the PurchaseOrder was generated in.
+	AccountingPeriod *PurchaseOrderAccountingPeriod `json:"accounting_period,omitempty"`
 	// When the third party's purchase order note was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty"`
 	// When the third party's purchase order note was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
-	// The accounting period that the PurchaseOrder was generated in.
-	AccountingPeriod *PurchaseOrderAccountingPeriod `json:"accounting_period,omitempty"`
-	FieldMappings    map[string]interface{}         `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData                  `json:"remote_data,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
+	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -30711,13 +37291,13 @@ func (p *PurchaseOrderCompany) Accept(visitor PurchaseOrderCompanyVisitor) error
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PurchaseOrderCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPurchaseOrderCurrencyFromCurrencyEnum(value CurrencyEnum) *PurchaseOrderCurrency {
-	return &PurchaseOrderCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPurchaseOrderCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PurchaseOrderCurrency {
+	return &PurchaseOrderCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPurchaseOrderCurrencyFromString(value string) *PurchaseOrderCurrency {
@@ -30725,10 +37305,10 @@ func NewPurchaseOrderCurrencyFromString(value string) *PurchaseOrderCurrency {
 }
 
 func (p *PurchaseOrderCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -30744,15 +37324,15 @@ func (p PurchaseOrderCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PurchaseOrderCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -30760,8 +37340,8 @@ func (p *PurchaseOrderCurrency) Accept(visitor PurchaseOrderCurrencyVisitor) err
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -30854,7 +37434,7 @@ type PurchaseOrderLineItem struct {
 	// The purchase order line item's associated tracking category.
 	TrackingCategory *string `json:"tracking_category,omitempty"`
 	// The purchase order line item's associated tracking categories.
-	TrackingCategories []string `json:"tracking_categories,omitempty"`
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
 	// The purchase order line item's tax amount.
 	TaxAmount *string `json:"tax_amount,omitempty"`
 	// The purchase order line item's total amount.
@@ -31168,12 +37748,15 @@ type PurchaseOrderLineItem struct {
 	// - `ZWR` - Zimbabwean Dollar (2008)
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *PurchaseOrderLineItemCurrency `json:"currency,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The purchase order line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the purchase order line item belongs to.
 	Company *string `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool          `json:"remote_was_deleted,omitempty"`
+	RemoteFields     []*RemoteField `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -31510,13 +38093,13 @@ func (p *PurchaseOrderLineItem) String() string {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PurchaseOrderLineItemCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPurchaseOrderLineItemCurrencyFromCurrencyEnum(value CurrencyEnum) *PurchaseOrderLineItemCurrency {
-	return &PurchaseOrderLineItemCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPurchaseOrderLineItemCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PurchaseOrderLineItemCurrency {
+	return &PurchaseOrderLineItemCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPurchaseOrderLineItemCurrencyFromString(value string) *PurchaseOrderLineItemCurrency {
@@ -31524,10 +38107,10 @@ func NewPurchaseOrderLineItemCurrencyFromString(value string) *PurchaseOrderLine
 }
 
 func (p *PurchaseOrderLineItemCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -31543,15 +38126,15 @@ func (p PurchaseOrderLineItemCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PurchaseOrderLineItemCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -31559,8 +38142,8 @@ func (p *PurchaseOrderLineItemCurrency) Accept(visitor PurchaseOrderLineItemCurr
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -31647,7 +38230,7 @@ type PurchaseOrderLineItemRequest struct {
 	// The purchase order line item's associated tracking category.
 	TrackingCategory *string `json:"tracking_category,omitempty"`
 	// The purchase order line item's associated tracking categories.
-	TrackingCategories []string `json:"tracking_categories,omitempty"`
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
 	// The purchase order line item's tax amount.
 	TaxAmount *string `json:"tax_amount,omitempty"`
 	// The purchase order line item's total amount.
@@ -31961,12 +38544,15 @@ type PurchaseOrderLineItemRequest struct {
 	// - `ZWR` - Zimbabwean Dollar (2008)
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *PurchaseOrderLineItemRequestCurrency `json:"currency,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The purchase order line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the purchase order line item belongs to.
 	Company             *string                `json:"company,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -32303,13 +38889,13 @@ func (p *PurchaseOrderLineItemRequest) String() string {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PurchaseOrderLineItemRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPurchaseOrderLineItemRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *PurchaseOrderLineItemRequestCurrency {
-	return &PurchaseOrderLineItemRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPurchaseOrderLineItemRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PurchaseOrderLineItemRequestCurrency {
+	return &PurchaseOrderLineItemRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPurchaseOrderLineItemRequestCurrencyFromString(value string) *PurchaseOrderLineItemRequestCurrency {
@@ -32317,10 +38903,10 @@ func NewPurchaseOrderLineItemRequestCurrencyFromString(value string) *PurchaseOr
 }
 
 func (p *PurchaseOrderLineItemRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -32336,15 +38922,15 @@ func (p PurchaseOrderLineItemRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PurchaseOrderLineItemRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -32352,8 +38938,8 @@ func (p *PurchaseOrderLineItemRequestCurrency) Accept(visitor PurchaseOrderLineI
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -32759,12 +39345,15 @@ type PurchaseOrderRequest struct {
 	// - `ZWR` - Zimbabwean Dollar (2008)
 	// - `ZWL` - Zimbabwean Dollar (2009)
 	Currency *PurchaseOrderRequestCurrency `json:"currency,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
 	// The purchase order's exchange rate.
 	ExchangeRate        *string                                       `json:"exchange_rate,omitempty"`
 	TrackingCategories  []*PurchaseOrderRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	LineItems           []*PurchaseOrderLineItemRequest               `json:"line_items,omitempty"`
 	IntegrationParams   map[string]interface{}                        `json:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}                        `json:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest                         `json:"remote_fields,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -33159,13 +39748,13 @@ func (p *PurchaseOrderRequestCompany) Accept(visitor PurchaseOrderRequestCompany
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type PurchaseOrderRequestCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewPurchaseOrderRequestCurrencyFromCurrencyEnum(value CurrencyEnum) *PurchaseOrderRequestCurrency {
-	return &PurchaseOrderRequestCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewPurchaseOrderRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *PurchaseOrderRequestCurrency {
+	return &PurchaseOrderRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewPurchaseOrderRequestCurrencyFromString(value string) *PurchaseOrderRequestCurrency {
@@ -33173,10 +39762,10 @@ func NewPurchaseOrderRequestCurrencyFromString(value string) *PurchaseOrderReque
 }
 
 func (p *PurchaseOrderRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		p.typeName = "currencyEnum"
-		p.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typeName = "transactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -33192,15 +39781,15 @@ func (p PurchaseOrderRequestCurrency) MarshalJSON() ([]byte, error) {
 	switch p.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return json.Marshal(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(p.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(p.String)
 	}
 }
 
 type PurchaseOrderRequestCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -33208,8 +39797,8 @@ func (p *PurchaseOrderRequestCurrency) Accept(visitor PurchaseOrderRequestCurren
 	switch p.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", p.typeName, p)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(p.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(p.String)
 	}
@@ -33699,7 +40288,17 @@ func (p *PurchaseOrderVendor) Accept(visitor PurchaseOrderVendorVisitor) error {
 	}
 }
 
+// # The RemoteData Object
+//
+// ### Description
+//
+// The `RemoteData` object is used to represent the full data pulled from the third-party API for an object.
+//
+// ### Usage Example
+//
+// TODO
 type RemoteData struct {
+	// The third-party API path that is being called.
 	Path string      `json:"path"`
 	Data interface{} `json:"data,omitempty"`
 
@@ -33749,6 +40348,36 @@ func (r *RemoteEndpointInfo) UnmarshalJSON(data []byte) error {
 }
 
 func (r *RemoteEndpointInfo) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteField struct {
+	RemoteFieldClass *RemoteFieldClass      `json:"remote_field_class,omitempty"`
+	Value            map[string]interface{} `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteField) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteField
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteField(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteField) String() string {
 	if len(r._rawJSON) > 0 {
 		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
 			return value
@@ -33870,7 +40499,10 @@ type RemoteFieldApiResponse struct {
 	Expense                  []*RemoteFieldApi `json:"Expense,omitempty"`
 	VendorCredit             []*RemoteFieldApi `json:"VendorCredit,omitempty"`
 	Transaction              []*RemoteFieldApi `json:"Transaction,omitempty"`
+	AccountingPeriod         []*RemoteFieldApi `json:"AccountingPeriod,omitempty"`
 	GeneralLedgerTransaction []*RemoteFieldApi `json:"GeneralLedgerTransaction,omitempty"`
+	BankFeedAccount          []*RemoteFieldApi `json:"BankFeedAccount,omitempty"`
+	Employee                 []*RemoteFieldApi `json:"Employee,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -33896,6 +40528,131 @@ func (r *RemoteFieldApiResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldClass struct {
+	Id            *string          `json:"id,omitempty"`
+	DisplayName   *string          `json:"display_name,omitempty"`
+	RemoteKeyName *string          `json:"remote_key_name,omitempty"`
+	Description   *string          `json:"description,omitempty"`
+	IsCustom      *bool            `json:"is_custom,omitempty"`
+	IsRequired    *bool            `json:"is_required,omitempty"`
+	FieldType     *FieldTypeEnum   `json:"field_type,omitempty"`
+	FieldFormat   *FieldFormatEnum `json:"field_format,omitempty"`
+	FieldChoices  []string         `json:"field_choices,omitempty"`
+	ItemSchema    *ItemSchema      `json:"item_schema,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldClass) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldClass
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldClass(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldClass) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldRequest struct {
+	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
+	Value            interface{}                         `json:"value,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (r *RemoteFieldRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler RemoteFieldRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RemoteFieldRequest(value)
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RemoteFieldRequest) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldRequestRemoteFieldClass struct {
+	typeName         string
+	String           string
+	RemoteFieldClass *RemoteFieldClass
+}
+
+func NewRemoteFieldRequestRemoteFieldClassFromString(value string) *RemoteFieldRequestRemoteFieldClass {
+	return &RemoteFieldRequestRemoteFieldClass{typeName: "string", String: value}
+}
+
+func NewRemoteFieldRequestRemoteFieldClassFromRemoteFieldClass(value *RemoteFieldClass) *RemoteFieldRequestRemoteFieldClass {
+	return &RemoteFieldRequestRemoteFieldClass{typeName: "remoteFieldClass", RemoteFieldClass: value}
+}
+
+func (r *RemoteFieldRequestRemoteFieldClass) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	valueRemoteFieldClass := new(RemoteFieldClass)
+	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
+		r.typeName = "remoteFieldClass"
+		r.RemoteFieldClass = valueRemoteFieldClass
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldRequestRemoteFieldClass) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "remoteFieldClass":
+		return json.Marshal(r.RemoteFieldClass)
+	}
+}
+
+type RemoteFieldRequestRemoteFieldClassVisitor interface {
+	VisitString(string) error
+	VisitRemoteFieldClass(*RemoteFieldClass) error
+}
+
+func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRemoteFieldClassVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "remoteFieldClass":
+		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
+	}
 }
 
 // # The RemoteKey Object
@@ -34004,6 +40761,8 @@ type ReportItem struct {
 	SubItems []map[string]interface{} `json:"sub_items,omitempty"`
 	// The company the report item belongs to.
 	Company *string `json:"company,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -34171,6 +40930,30 @@ func (s Status7D1Enum) Ptr() *Status7D1Enum {
 	return &s
 }
 
+// - `ACTIVE` - ACTIVE
+// - `INACTIVE` - INACTIVE
+type Status895Enum string
+
+const (
+	Status895EnumActive   Status895Enum = "ACTIVE"
+	Status895EnumInactive Status895Enum = "INACTIVE"
+)
+
+func NewStatus895EnumFromString(s string) (Status895Enum, error) {
+	switch s {
+	case "ACTIVE":
+		return Status895EnumActive, nil
+	case "INACTIVE":
+		return Status895EnumInactive, nil
+	}
+	var t Status895Enum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s Status895Enum) Ptr() *Status895Enum {
+	return &s
+}
+
 // # The SyncStatus Object
 //
 // ### Description
@@ -34259,6 +41042,124 @@ func (s SyncStatusStatusEnum) Ptr() *SyncStatusStatusEnum {
 //
 // ### Description
 //
+// The `TaxComponent` object is used to represent any sub-taxes that make up the `TaxRate`.
+//
+// ### Usage Example
+//
+// Fetch from the `LIST TaxRates` endpoint and view tax components relevant to a tax rate.
+type TaxComponent struct {
+	Id *string `json:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The tax rate’s name.
+	Name *string `json:"name,omitempty"`
+	// The tax component’s rate.
+	Rate *string `json:"rate,omitempty"`
+	// Returns True if the tax component is compound, False if not.
+	IsCompound *bool `json:"is_compound,omitempty"`
+	// Returns PURCHASE if the tax component corresponds to a purchase tax or SALES if the tax component corresponds to a sales tax.
+	//
+	// - `SALES` - SALES
+	// - `PURCHASE` - PURCHASE
+	ComponentType *TaxComponentComponentType `json:"component_type,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (t *TaxComponent) UnmarshalJSON(data []byte) error {
+	type unmarshaler TaxComponent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*t = TaxComponent(value)
+	t._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TaxComponent) String() string {
+	if len(t._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(t._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
+}
+
+// Returns PURCHASE if the tax component corresponds to a purchase tax or SALES if the tax component corresponds to a sales tax.
+//
+// - `SALES` - SALES
+// - `PURCHASE` - PURCHASE
+type TaxComponentComponentType struct {
+	typeName          string
+	ComponentTypeEnum ComponentTypeEnum
+	String            string
+}
+
+func NewTaxComponentComponentTypeFromComponentTypeEnum(value ComponentTypeEnum) *TaxComponentComponentType {
+	return &TaxComponentComponentType{typeName: "componentTypeEnum", ComponentTypeEnum: value}
+}
+
+func NewTaxComponentComponentTypeFromString(value string) *TaxComponentComponentType {
+	return &TaxComponentComponentType{typeName: "string", String: value}
+}
+
+func (t *TaxComponentComponentType) UnmarshalJSON(data []byte) error {
+	var valueComponentTypeEnum ComponentTypeEnum
+	if err := json.Unmarshal(data, &valueComponentTypeEnum); err == nil {
+		t.typeName = "componentTypeEnum"
+		t.ComponentTypeEnum = valueComponentTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaxComponentComponentType) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "componentTypeEnum":
+		return json.Marshal(t.ComponentTypeEnum)
+	case "string":
+		return json.Marshal(t.String)
+	}
+}
+
+type TaxComponentComponentTypeVisitor interface {
+	VisitComponentTypeEnum(ComponentTypeEnum) error
+	VisitString(string) error
+}
+
+func (t *TaxComponentComponentType) Accept(visitor TaxComponentComponentTypeVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "componentTypeEnum":
+		return visitor.VisitComponentTypeEnum(t.ComponentTypeEnum)
+	case "string":
+		return visitor.VisitString(t.String)
+	}
+}
+
+// # The TaxRate Object
+//
+// ### Description
+//
 // The `TaxRate` object is used to represent a tax rate.
 //
 // ### Usage Example
@@ -34272,15 +41173,28 @@ type TaxRate struct {
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// The datetime that this object was modified by Merge.
 	ModifiedAt *time.Time `json:"modified_at,omitempty"`
+	// The subsidiary that the tax rate belongs to (in the case of multi-entity systems).
+	Company *TaxRateCompany `json:"company,omitempty"`
+	// The tax code associated with this tax rate or group of tax rates from the third-party platform.
+	Code *string `json:"code,omitempty"`
+	// The tax rate’s name.
+	Name *string `json:"name,omitempty"`
 	// The tax rate's description.
 	Description *string `json:"description,omitempty"`
+	// The tax rate’s status - `ACTIVE` if an active tax rate, `ARCHIVED` if not active.
+	//
+	// - `ACTIVE` - ACTIVE
+	// - `ARCHIVED` - ARCHIVED
+	Status *TaxRateStatus `json:"status,omitempty"`
+	// The country the tax rate is associated with.
+	Country *string `json:"country,omitempty"`
 	// The tax’s total tax rate - sum of the tax components (not compounded).
 	TotalTaxRate *float64 `json:"total_tax_rate,omitempty"`
 	// The tax rate’s effective tax rate - total amount of tax with compounding.
 	EffectiveTaxRate *float64 `json:"effective_tax_rate,omitempty"`
-	// The subsidiary that the tax rate belongs to (in the case of multi-entity systems).
-	Company *TaxRateCompany `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// The related tax components of the tax rate.
+	TaxComponents []*TaxRateTaxComponentsItem `json:"tax_components,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
@@ -34369,6 +41283,124 @@ func (t *TaxRateCompany) Accept(visitor TaxRateCompanyVisitor) error {
 	}
 }
 
+// The tax rate’s status - `ACTIVE` if an active tax rate, `ARCHIVED` if not active.
+//
+// - `ACTIVE` - ACTIVE
+// - `ARCHIVED` - ARCHIVED
+type TaxRateStatus struct {
+	typeName      string
+	Status7D1Enum Status7D1Enum
+	String        string
+}
+
+func NewTaxRateStatusFromStatus7D1Enum(value Status7D1Enum) *TaxRateStatus {
+	return &TaxRateStatus{typeName: "status7D1Enum", Status7D1Enum: value}
+}
+
+func NewTaxRateStatusFromString(value string) *TaxRateStatus {
+	return &TaxRateStatus{typeName: "string", String: value}
+}
+
+func (t *TaxRateStatus) UnmarshalJSON(data []byte) error {
+	var valueStatus7D1Enum Status7D1Enum
+	if err := json.Unmarshal(data, &valueStatus7D1Enum); err == nil {
+		t.typeName = "status7D1Enum"
+		t.Status7D1Enum = valueStatus7D1Enum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaxRateStatus) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "status7D1Enum":
+		return json.Marshal(t.Status7D1Enum)
+	case "string":
+		return json.Marshal(t.String)
+	}
+}
+
+type TaxRateStatusVisitor interface {
+	VisitStatus7D1Enum(Status7D1Enum) error
+	VisitString(string) error
+}
+
+func (t *TaxRateStatus) Accept(visitor TaxRateStatusVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "status7D1Enum":
+		return visitor.VisitStatus7D1Enum(t.Status7D1Enum)
+	case "string":
+		return visitor.VisitString(t.String)
+	}
+}
+
+type TaxRateTaxComponentsItem struct {
+	typeName     string
+	String       string
+	TaxComponent *TaxComponent
+}
+
+func NewTaxRateTaxComponentsItemFromString(value string) *TaxRateTaxComponentsItem {
+	return &TaxRateTaxComponentsItem{typeName: "string", String: value}
+}
+
+func NewTaxRateTaxComponentsItemFromTaxComponent(value *TaxComponent) *TaxRateTaxComponentsItem {
+	return &TaxRateTaxComponentsItem{typeName: "taxComponent", TaxComponent: value}
+}
+
+func (t *TaxRateTaxComponentsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typeName = "string"
+		t.String = valueString
+		return nil
+	}
+	valueTaxComponent := new(TaxComponent)
+	if err := json.Unmarshal(data, &valueTaxComponent); err == nil {
+		t.typeName = "taxComponent"
+		t.TaxComponent = valueTaxComponent
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaxRateTaxComponentsItem) MarshalJSON() ([]byte, error) {
+	switch t.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return json.Marshal(t.String)
+	case "taxComponent":
+		return json.Marshal(t.TaxComponent)
+	}
+}
+
+type TaxRateTaxComponentsItemVisitor interface {
+	VisitString(string) error
+	VisitTaxComponent(*TaxComponent) error
+}
+
+func (t *TaxRateTaxComponentsItem) Accept(visitor TaxRateTaxComponentsItemVisitor) error {
+	switch t.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
+	case "string":
+		return visitor.VisitString(t.String)
+	case "taxComponent":
+		return visitor.VisitTaxComponent(t.TaxComponent)
+	}
+}
+
 // # The TrackingCategory Object
 //
 // ### Description
@@ -34397,15 +41429,13 @@ type TrackingCategory struct {
 	//
 	// - `CLASS` - CLASS
 	// - `DEPARTMENT` - DEPARTMENT
-	CategoryType *TrackingCategoryCategoryType `json:"category_type,omitempty"`
-	// ID of the parent tracking category.
-	ParentCategory *string `json:"parent_category,omitempty"`
-	// The company the tracking category belongs to.
+	CategoryType   *TrackingCategoryCategoryType `json:"category_type,omitempty"`
+	ParentCategory *string                       `json:"parent_category,omitempty"`
+	// The company the GeneralLedgerTransaction belongs to.
 	Company *TrackingCategoryCompany `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
-	RemoteData       []*RemoteData          `json:"remote_data,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -34494,7 +41524,7 @@ func (t *TrackingCategoryCategoryType) Accept(visitor TrackingCategoryCategoryTy
 	}
 }
 
-// The company the tracking category belongs to.
+// The company the GeneralLedgerTransaction belongs to.
 type TrackingCategoryCompany struct {
 	typeName    string
 	String      string
@@ -34648,6 +41678,8 @@ type Transaction struct {
 	Account *TransactionAccount `json:"account,omitempty"`
 	// The contact to whom the transaction relates to.
 	Contact *TransactionContact `json:"contact,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
 	// The total amount being paid after taxes.
 	TotalAmount *string `json:"total_amount,omitempty"`
 	// The transaction's currency.
@@ -34965,7 +41997,7 @@ type Transaction struct {
 	Company            *string                              `json:"company,omitempty"`
 	TrackingCategories []*TransactionTrackingCategoriesItem `json:"tracking_categories,omitempty"`
 	LineItems          []*TransactionLineItem               `json:"line_items,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the Transaction was generated in.
 	AccountingPeriod *TransactionAccountingPeriod `json:"accounting_period,omitempty"`
@@ -35481,13 +42513,13 @@ func (t *TransactionContact) Accept(visitor TransactionContactVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type TransactionCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewTransactionCurrencyFromCurrencyEnum(value CurrencyEnum) *TransactionCurrency {
-	return &TransactionCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewTransactionCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *TransactionCurrency {
+	return &TransactionCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewTransactionCurrencyFromString(value string) *TransactionCurrency {
@@ -35495,10 +42527,10 @@ func NewTransactionCurrencyFromString(value string) *TransactionCurrency {
 }
 
 func (t *TransactionCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		t.typeName = "currencyEnum"
-		t.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		t.typeName = "transactionCurrencyEnum"
+		t.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -35514,15 +42546,15 @@ func (t TransactionCurrency) MarshalJSON() ([]byte, error) {
 	switch t.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
-	case "currencyEnum":
-		return json.Marshal(t.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(t.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(t.String)
 	}
 }
 
 type TransactionCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -35530,11 +42562,1251 @@ func (t *TransactionCurrency) Accept(visitor TransactionCurrencyVisitor) error {
 	switch t.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(t.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(t.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(t.String)
 	}
+}
+
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type TransactionCurrencyEnum string
+
+const (
+	TransactionCurrencyEnumXua TransactionCurrencyEnum = "XUA"
+	TransactionCurrencyEnumAfn TransactionCurrencyEnum = "AFN"
+	TransactionCurrencyEnumAfa TransactionCurrencyEnum = "AFA"
+	TransactionCurrencyEnumAll TransactionCurrencyEnum = "ALL"
+	TransactionCurrencyEnumAlk TransactionCurrencyEnum = "ALK"
+	TransactionCurrencyEnumDzd TransactionCurrencyEnum = "DZD"
+	TransactionCurrencyEnumAdp TransactionCurrencyEnum = "ADP"
+	TransactionCurrencyEnumAoa TransactionCurrencyEnum = "AOA"
+	TransactionCurrencyEnumAok TransactionCurrencyEnum = "AOK"
+	TransactionCurrencyEnumAon TransactionCurrencyEnum = "AON"
+	TransactionCurrencyEnumAor TransactionCurrencyEnum = "AOR"
+	TransactionCurrencyEnumAra TransactionCurrencyEnum = "ARA"
+	TransactionCurrencyEnumArs TransactionCurrencyEnum = "ARS"
+	TransactionCurrencyEnumArm TransactionCurrencyEnum = "ARM"
+	TransactionCurrencyEnumArp TransactionCurrencyEnum = "ARP"
+	TransactionCurrencyEnumArl TransactionCurrencyEnum = "ARL"
+	TransactionCurrencyEnumAmd TransactionCurrencyEnum = "AMD"
+	TransactionCurrencyEnumAwg TransactionCurrencyEnum = "AWG"
+	TransactionCurrencyEnumAud TransactionCurrencyEnum = "AUD"
+	TransactionCurrencyEnumAts TransactionCurrencyEnum = "ATS"
+	TransactionCurrencyEnumAzn TransactionCurrencyEnum = "AZN"
+	TransactionCurrencyEnumAzm TransactionCurrencyEnum = "AZM"
+	TransactionCurrencyEnumBsd TransactionCurrencyEnum = "BSD"
+	TransactionCurrencyEnumBhd TransactionCurrencyEnum = "BHD"
+	TransactionCurrencyEnumBdt TransactionCurrencyEnum = "BDT"
+	TransactionCurrencyEnumBbd TransactionCurrencyEnum = "BBD"
+	TransactionCurrencyEnumByn TransactionCurrencyEnum = "BYN"
+	TransactionCurrencyEnumByb TransactionCurrencyEnum = "BYB"
+	TransactionCurrencyEnumByr TransactionCurrencyEnum = "BYR"
+	TransactionCurrencyEnumBef TransactionCurrencyEnum = "BEF"
+	TransactionCurrencyEnumBec TransactionCurrencyEnum = "BEC"
+	TransactionCurrencyEnumBel TransactionCurrencyEnum = "BEL"
+	TransactionCurrencyEnumBzd TransactionCurrencyEnum = "BZD"
+	TransactionCurrencyEnumBmd TransactionCurrencyEnum = "BMD"
+	TransactionCurrencyEnumBtn TransactionCurrencyEnum = "BTN"
+	TransactionCurrencyEnumBob TransactionCurrencyEnum = "BOB"
+	TransactionCurrencyEnumBol TransactionCurrencyEnum = "BOL"
+	TransactionCurrencyEnumBov TransactionCurrencyEnum = "BOV"
+	TransactionCurrencyEnumBop TransactionCurrencyEnum = "BOP"
+	TransactionCurrencyEnumBam TransactionCurrencyEnum = "BAM"
+	TransactionCurrencyEnumBad TransactionCurrencyEnum = "BAD"
+	TransactionCurrencyEnumBan TransactionCurrencyEnum = "BAN"
+	TransactionCurrencyEnumBwp TransactionCurrencyEnum = "BWP"
+	TransactionCurrencyEnumBrc TransactionCurrencyEnum = "BRC"
+	TransactionCurrencyEnumBrz TransactionCurrencyEnum = "BRZ"
+	TransactionCurrencyEnumBre TransactionCurrencyEnum = "BRE"
+	TransactionCurrencyEnumBrr TransactionCurrencyEnum = "BRR"
+	TransactionCurrencyEnumBrn TransactionCurrencyEnum = "BRN"
+	TransactionCurrencyEnumBrb TransactionCurrencyEnum = "BRB"
+	TransactionCurrencyEnumBrl TransactionCurrencyEnum = "BRL"
+	TransactionCurrencyEnumGbp TransactionCurrencyEnum = "GBP"
+	TransactionCurrencyEnumBnd TransactionCurrencyEnum = "BND"
+	TransactionCurrencyEnumBgl TransactionCurrencyEnum = "BGL"
+	TransactionCurrencyEnumBgn TransactionCurrencyEnum = "BGN"
+	TransactionCurrencyEnumBgo TransactionCurrencyEnum = "BGO"
+	TransactionCurrencyEnumBgm TransactionCurrencyEnum = "BGM"
+	TransactionCurrencyEnumBuk TransactionCurrencyEnum = "BUK"
+	TransactionCurrencyEnumBif TransactionCurrencyEnum = "BIF"
+	TransactionCurrencyEnumXpf TransactionCurrencyEnum = "XPF"
+	TransactionCurrencyEnumKhr TransactionCurrencyEnum = "KHR"
+	TransactionCurrencyEnumCad TransactionCurrencyEnum = "CAD"
+	TransactionCurrencyEnumCve TransactionCurrencyEnum = "CVE"
+	TransactionCurrencyEnumKyd TransactionCurrencyEnum = "KYD"
+	TransactionCurrencyEnumXaf TransactionCurrencyEnum = "XAF"
+	TransactionCurrencyEnumCle TransactionCurrencyEnum = "CLE"
+	TransactionCurrencyEnumClp TransactionCurrencyEnum = "CLP"
+	TransactionCurrencyEnumClf TransactionCurrencyEnum = "CLF"
+	TransactionCurrencyEnumCnx TransactionCurrencyEnum = "CNX"
+	TransactionCurrencyEnumCny TransactionCurrencyEnum = "CNY"
+	TransactionCurrencyEnumCnh TransactionCurrencyEnum = "CNH"
+	TransactionCurrencyEnumCop TransactionCurrencyEnum = "COP"
+	TransactionCurrencyEnumCou TransactionCurrencyEnum = "COU"
+	TransactionCurrencyEnumKmf TransactionCurrencyEnum = "KMF"
+	TransactionCurrencyEnumCdf TransactionCurrencyEnum = "CDF"
+	TransactionCurrencyEnumCrc TransactionCurrencyEnum = "CRC"
+	TransactionCurrencyEnumHrd TransactionCurrencyEnum = "HRD"
+	TransactionCurrencyEnumHrk TransactionCurrencyEnum = "HRK"
+	TransactionCurrencyEnumCuc TransactionCurrencyEnum = "CUC"
+	TransactionCurrencyEnumCup TransactionCurrencyEnum = "CUP"
+	TransactionCurrencyEnumCyp TransactionCurrencyEnum = "CYP"
+	TransactionCurrencyEnumCzk TransactionCurrencyEnum = "CZK"
+	TransactionCurrencyEnumCsk TransactionCurrencyEnum = "CSK"
+	TransactionCurrencyEnumDkk TransactionCurrencyEnum = "DKK"
+	TransactionCurrencyEnumDjf TransactionCurrencyEnum = "DJF"
+	TransactionCurrencyEnumDop TransactionCurrencyEnum = "DOP"
+	TransactionCurrencyEnumNlg TransactionCurrencyEnum = "NLG"
+	TransactionCurrencyEnumXcd TransactionCurrencyEnum = "XCD"
+	TransactionCurrencyEnumDdm TransactionCurrencyEnum = "DDM"
+	TransactionCurrencyEnumEcs TransactionCurrencyEnum = "ECS"
+	TransactionCurrencyEnumEcv TransactionCurrencyEnum = "ECV"
+	TransactionCurrencyEnumEgp TransactionCurrencyEnum = "EGP"
+	TransactionCurrencyEnumGqe TransactionCurrencyEnum = "GQE"
+	TransactionCurrencyEnumErn TransactionCurrencyEnum = "ERN"
+	TransactionCurrencyEnumEek TransactionCurrencyEnum = "EEK"
+	TransactionCurrencyEnumEtb TransactionCurrencyEnum = "ETB"
+	TransactionCurrencyEnumEur TransactionCurrencyEnum = "EUR"
+	TransactionCurrencyEnumXba TransactionCurrencyEnum = "XBA"
+	TransactionCurrencyEnumXeu TransactionCurrencyEnum = "XEU"
+	TransactionCurrencyEnumXbb TransactionCurrencyEnum = "XBB"
+	TransactionCurrencyEnumXbc TransactionCurrencyEnum = "XBC"
+	TransactionCurrencyEnumXbd TransactionCurrencyEnum = "XBD"
+	TransactionCurrencyEnumFkp TransactionCurrencyEnum = "FKP"
+	TransactionCurrencyEnumFjd TransactionCurrencyEnum = "FJD"
+	TransactionCurrencyEnumFim TransactionCurrencyEnum = "FIM"
+	TransactionCurrencyEnumFrf TransactionCurrencyEnum = "FRF"
+	TransactionCurrencyEnumXfo TransactionCurrencyEnum = "XFO"
+	TransactionCurrencyEnumXfu TransactionCurrencyEnum = "XFU"
+	TransactionCurrencyEnumGmd TransactionCurrencyEnum = "GMD"
+	TransactionCurrencyEnumGek TransactionCurrencyEnum = "GEK"
+	TransactionCurrencyEnumGel TransactionCurrencyEnum = "GEL"
+	TransactionCurrencyEnumDem TransactionCurrencyEnum = "DEM"
+	TransactionCurrencyEnumGhs TransactionCurrencyEnum = "GHS"
+	TransactionCurrencyEnumGhc TransactionCurrencyEnum = "GHC"
+	TransactionCurrencyEnumGip TransactionCurrencyEnum = "GIP"
+	TransactionCurrencyEnumXau TransactionCurrencyEnum = "XAU"
+	TransactionCurrencyEnumGrd TransactionCurrencyEnum = "GRD"
+	TransactionCurrencyEnumGtq TransactionCurrencyEnum = "GTQ"
+	TransactionCurrencyEnumGwp TransactionCurrencyEnum = "GWP"
+	TransactionCurrencyEnumGnf TransactionCurrencyEnum = "GNF"
+	TransactionCurrencyEnumGns TransactionCurrencyEnum = "GNS"
+	TransactionCurrencyEnumGyd TransactionCurrencyEnum = "GYD"
+	TransactionCurrencyEnumHtg TransactionCurrencyEnum = "HTG"
+	TransactionCurrencyEnumHnl TransactionCurrencyEnum = "HNL"
+	TransactionCurrencyEnumHkd TransactionCurrencyEnum = "HKD"
+	TransactionCurrencyEnumHuf TransactionCurrencyEnum = "HUF"
+	TransactionCurrencyEnumImp TransactionCurrencyEnum = "IMP"
+	TransactionCurrencyEnumIsk TransactionCurrencyEnum = "ISK"
+	TransactionCurrencyEnumIsj TransactionCurrencyEnum = "ISJ"
+	TransactionCurrencyEnumInr TransactionCurrencyEnum = "INR"
+	TransactionCurrencyEnumIdr TransactionCurrencyEnum = "IDR"
+	TransactionCurrencyEnumIrr TransactionCurrencyEnum = "IRR"
+	TransactionCurrencyEnumIqd TransactionCurrencyEnum = "IQD"
+	TransactionCurrencyEnumIep TransactionCurrencyEnum = "IEP"
+	TransactionCurrencyEnumIls TransactionCurrencyEnum = "ILS"
+	TransactionCurrencyEnumIlp TransactionCurrencyEnum = "ILP"
+	TransactionCurrencyEnumIlr TransactionCurrencyEnum = "ILR"
+	TransactionCurrencyEnumItl TransactionCurrencyEnum = "ITL"
+	TransactionCurrencyEnumJmd TransactionCurrencyEnum = "JMD"
+	TransactionCurrencyEnumJpy TransactionCurrencyEnum = "JPY"
+	TransactionCurrencyEnumJod TransactionCurrencyEnum = "JOD"
+	TransactionCurrencyEnumKzt TransactionCurrencyEnum = "KZT"
+	TransactionCurrencyEnumKes TransactionCurrencyEnum = "KES"
+	TransactionCurrencyEnumKwd TransactionCurrencyEnum = "KWD"
+	TransactionCurrencyEnumKgs TransactionCurrencyEnum = "KGS"
+	TransactionCurrencyEnumLak TransactionCurrencyEnum = "LAK"
+	TransactionCurrencyEnumLvl TransactionCurrencyEnum = "LVL"
+	TransactionCurrencyEnumLvr TransactionCurrencyEnum = "LVR"
+	TransactionCurrencyEnumLbp TransactionCurrencyEnum = "LBP"
+	TransactionCurrencyEnumLsl TransactionCurrencyEnum = "LSL"
+	TransactionCurrencyEnumLrd TransactionCurrencyEnum = "LRD"
+	TransactionCurrencyEnumLyd TransactionCurrencyEnum = "LYD"
+	TransactionCurrencyEnumLtl TransactionCurrencyEnum = "LTL"
+	TransactionCurrencyEnumLtt TransactionCurrencyEnum = "LTT"
+	TransactionCurrencyEnumLul TransactionCurrencyEnum = "LUL"
+	TransactionCurrencyEnumLuc TransactionCurrencyEnum = "LUC"
+	TransactionCurrencyEnumLuf TransactionCurrencyEnum = "LUF"
+	TransactionCurrencyEnumMop TransactionCurrencyEnum = "MOP"
+	TransactionCurrencyEnumMkd TransactionCurrencyEnum = "MKD"
+	TransactionCurrencyEnumMkn TransactionCurrencyEnum = "MKN"
+	TransactionCurrencyEnumMga TransactionCurrencyEnum = "MGA"
+	TransactionCurrencyEnumMgf TransactionCurrencyEnum = "MGF"
+	TransactionCurrencyEnumMwk TransactionCurrencyEnum = "MWK"
+	TransactionCurrencyEnumMyr TransactionCurrencyEnum = "MYR"
+	TransactionCurrencyEnumMvr TransactionCurrencyEnum = "MVR"
+	TransactionCurrencyEnumMvp TransactionCurrencyEnum = "MVP"
+	TransactionCurrencyEnumMlf TransactionCurrencyEnum = "MLF"
+	TransactionCurrencyEnumMtl TransactionCurrencyEnum = "MTL"
+	TransactionCurrencyEnumMtp TransactionCurrencyEnum = "MTP"
+	TransactionCurrencyEnumMru TransactionCurrencyEnum = "MRU"
+	TransactionCurrencyEnumMro TransactionCurrencyEnum = "MRO"
+	TransactionCurrencyEnumMur TransactionCurrencyEnum = "MUR"
+	TransactionCurrencyEnumMxv TransactionCurrencyEnum = "MXV"
+	TransactionCurrencyEnumMxn TransactionCurrencyEnum = "MXN"
+	TransactionCurrencyEnumMxp TransactionCurrencyEnum = "MXP"
+	TransactionCurrencyEnumMdc TransactionCurrencyEnum = "MDC"
+	TransactionCurrencyEnumMdl TransactionCurrencyEnum = "MDL"
+	TransactionCurrencyEnumMcf TransactionCurrencyEnum = "MCF"
+	TransactionCurrencyEnumMnt TransactionCurrencyEnum = "MNT"
+	TransactionCurrencyEnumMad TransactionCurrencyEnum = "MAD"
+	TransactionCurrencyEnumMaf TransactionCurrencyEnum = "MAF"
+	TransactionCurrencyEnumMze TransactionCurrencyEnum = "MZE"
+	TransactionCurrencyEnumMzn TransactionCurrencyEnum = "MZN"
+	TransactionCurrencyEnumMzm TransactionCurrencyEnum = "MZM"
+	TransactionCurrencyEnumMmk TransactionCurrencyEnum = "MMK"
+	TransactionCurrencyEnumNad TransactionCurrencyEnum = "NAD"
+	TransactionCurrencyEnumNpr TransactionCurrencyEnum = "NPR"
+	TransactionCurrencyEnumAng TransactionCurrencyEnum = "ANG"
+	TransactionCurrencyEnumTwd TransactionCurrencyEnum = "TWD"
+	TransactionCurrencyEnumNzd TransactionCurrencyEnum = "NZD"
+	TransactionCurrencyEnumNio TransactionCurrencyEnum = "NIO"
+	TransactionCurrencyEnumNic TransactionCurrencyEnum = "NIC"
+	TransactionCurrencyEnumNgn TransactionCurrencyEnum = "NGN"
+	TransactionCurrencyEnumKpw TransactionCurrencyEnum = "KPW"
+	TransactionCurrencyEnumNok TransactionCurrencyEnum = "NOK"
+	TransactionCurrencyEnumOmr TransactionCurrencyEnum = "OMR"
+	TransactionCurrencyEnumPkr TransactionCurrencyEnum = "PKR"
+	TransactionCurrencyEnumXpd TransactionCurrencyEnum = "XPD"
+	TransactionCurrencyEnumPab TransactionCurrencyEnum = "PAB"
+	TransactionCurrencyEnumPgk TransactionCurrencyEnum = "PGK"
+	TransactionCurrencyEnumPyg TransactionCurrencyEnum = "PYG"
+	TransactionCurrencyEnumPei TransactionCurrencyEnum = "PEI"
+	TransactionCurrencyEnumPen TransactionCurrencyEnum = "PEN"
+	TransactionCurrencyEnumPes TransactionCurrencyEnum = "PES"
+	TransactionCurrencyEnumPhp TransactionCurrencyEnum = "PHP"
+	TransactionCurrencyEnumXpt TransactionCurrencyEnum = "XPT"
+	TransactionCurrencyEnumPln TransactionCurrencyEnum = "PLN"
+	TransactionCurrencyEnumPlz TransactionCurrencyEnum = "PLZ"
+	TransactionCurrencyEnumPte TransactionCurrencyEnum = "PTE"
+	TransactionCurrencyEnumGwe TransactionCurrencyEnum = "GWE"
+	TransactionCurrencyEnumQar TransactionCurrencyEnum = "QAR"
+	TransactionCurrencyEnumXre TransactionCurrencyEnum = "XRE"
+	TransactionCurrencyEnumRhd TransactionCurrencyEnum = "RHD"
+	TransactionCurrencyEnumRon TransactionCurrencyEnum = "RON"
+	TransactionCurrencyEnumRol TransactionCurrencyEnum = "ROL"
+	TransactionCurrencyEnumRub TransactionCurrencyEnum = "RUB"
+	TransactionCurrencyEnumRur TransactionCurrencyEnum = "RUR"
+	TransactionCurrencyEnumRwf TransactionCurrencyEnum = "RWF"
+	TransactionCurrencyEnumSvc TransactionCurrencyEnum = "SVC"
+	TransactionCurrencyEnumWst TransactionCurrencyEnum = "WST"
+	TransactionCurrencyEnumSar TransactionCurrencyEnum = "SAR"
+	TransactionCurrencyEnumRsd TransactionCurrencyEnum = "RSD"
+	TransactionCurrencyEnumCsd TransactionCurrencyEnum = "CSD"
+	TransactionCurrencyEnumScr TransactionCurrencyEnum = "SCR"
+	TransactionCurrencyEnumSll TransactionCurrencyEnum = "SLL"
+	TransactionCurrencyEnumXag TransactionCurrencyEnum = "XAG"
+	TransactionCurrencyEnumSgd TransactionCurrencyEnum = "SGD"
+	TransactionCurrencyEnumSkk TransactionCurrencyEnum = "SKK"
+	TransactionCurrencyEnumSit TransactionCurrencyEnum = "SIT"
+	TransactionCurrencyEnumSbd TransactionCurrencyEnum = "SBD"
+	TransactionCurrencyEnumSos TransactionCurrencyEnum = "SOS"
+	TransactionCurrencyEnumZar TransactionCurrencyEnum = "ZAR"
+	TransactionCurrencyEnumZal TransactionCurrencyEnum = "ZAL"
+	TransactionCurrencyEnumKrh TransactionCurrencyEnum = "KRH"
+	TransactionCurrencyEnumKrw TransactionCurrencyEnum = "KRW"
+	TransactionCurrencyEnumKro TransactionCurrencyEnum = "KRO"
+	TransactionCurrencyEnumSsp TransactionCurrencyEnum = "SSP"
+	TransactionCurrencyEnumSur TransactionCurrencyEnum = "SUR"
+	TransactionCurrencyEnumEsp TransactionCurrencyEnum = "ESP"
+	TransactionCurrencyEnumEsa TransactionCurrencyEnum = "ESA"
+	TransactionCurrencyEnumEsb TransactionCurrencyEnum = "ESB"
+	TransactionCurrencyEnumXdr TransactionCurrencyEnum = "XDR"
+	TransactionCurrencyEnumLkr TransactionCurrencyEnum = "LKR"
+	TransactionCurrencyEnumShp TransactionCurrencyEnum = "SHP"
+	TransactionCurrencyEnumXsu TransactionCurrencyEnum = "XSU"
+	TransactionCurrencyEnumSdd TransactionCurrencyEnum = "SDD"
+	TransactionCurrencyEnumSdg TransactionCurrencyEnum = "SDG"
+	TransactionCurrencyEnumSdp TransactionCurrencyEnum = "SDP"
+	TransactionCurrencyEnumSrd TransactionCurrencyEnum = "SRD"
+	TransactionCurrencyEnumSrg TransactionCurrencyEnum = "SRG"
+	TransactionCurrencyEnumSzl TransactionCurrencyEnum = "SZL"
+	TransactionCurrencyEnumSek TransactionCurrencyEnum = "SEK"
+	TransactionCurrencyEnumChf TransactionCurrencyEnum = "CHF"
+	TransactionCurrencyEnumSyp TransactionCurrencyEnum = "SYP"
+	TransactionCurrencyEnumStn TransactionCurrencyEnum = "STN"
+	TransactionCurrencyEnumStd TransactionCurrencyEnum = "STD"
+	TransactionCurrencyEnumTvd TransactionCurrencyEnum = "TVD"
+	TransactionCurrencyEnumTjr TransactionCurrencyEnum = "TJR"
+	TransactionCurrencyEnumTjs TransactionCurrencyEnum = "TJS"
+	TransactionCurrencyEnumTzs TransactionCurrencyEnum = "TZS"
+	TransactionCurrencyEnumXts TransactionCurrencyEnum = "XTS"
+	TransactionCurrencyEnumThb TransactionCurrencyEnum = "THB"
+	TransactionCurrencyEnumXxx TransactionCurrencyEnum = "XXX"
+	TransactionCurrencyEnumTpe TransactionCurrencyEnum = "TPE"
+	TransactionCurrencyEnumTop TransactionCurrencyEnum = "TOP"
+	TransactionCurrencyEnumTtd TransactionCurrencyEnum = "TTD"
+	TransactionCurrencyEnumTnd TransactionCurrencyEnum = "TND"
+	TransactionCurrencyEnumTry TransactionCurrencyEnum = "TRY"
+	TransactionCurrencyEnumTrl TransactionCurrencyEnum = "TRL"
+	TransactionCurrencyEnumTmt TransactionCurrencyEnum = "TMT"
+	TransactionCurrencyEnumTmm TransactionCurrencyEnum = "TMM"
+	TransactionCurrencyEnumUsd TransactionCurrencyEnum = "USD"
+	TransactionCurrencyEnumUsn TransactionCurrencyEnum = "USN"
+	TransactionCurrencyEnumUss TransactionCurrencyEnum = "USS"
+	TransactionCurrencyEnumUgx TransactionCurrencyEnum = "UGX"
+	TransactionCurrencyEnumUgs TransactionCurrencyEnum = "UGS"
+	TransactionCurrencyEnumUah TransactionCurrencyEnum = "UAH"
+	TransactionCurrencyEnumUak TransactionCurrencyEnum = "UAK"
+	TransactionCurrencyEnumAed TransactionCurrencyEnum = "AED"
+	TransactionCurrencyEnumUyw TransactionCurrencyEnum = "UYW"
+	TransactionCurrencyEnumUyu TransactionCurrencyEnum = "UYU"
+	TransactionCurrencyEnumUyp TransactionCurrencyEnum = "UYP"
+	TransactionCurrencyEnumUyi TransactionCurrencyEnum = "UYI"
+	TransactionCurrencyEnumUzs TransactionCurrencyEnum = "UZS"
+	TransactionCurrencyEnumVuv TransactionCurrencyEnum = "VUV"
+	TransactionCurrencyEnumVes TransactionCurrencyEnum = "VES"
+	TransactionCurrencyEnumVeb TransactionCurrencyEnum = "VEB"
+	TransactionCurrencyEnumVef TransactionCurrencyEnum = "VEF"
+	TransactionCurrencyEnumVnd TransactionCurrencyEnum = "VND"
+	TransactionCurrencyEnumVnn TransactionCurrencyEnum = "VNN"
+	TransactionCurrencyEnumChe TransactionCurrencyEnum = "CHE"
+	TransactionCurrencyEnumChw TransactionCurrencyEnum = "CHW"
+	TransactionCurrencyEnumXof TransactionCurrencyEnum = "XOF"
+	TransactionCurrencyEnumYdd TransactionCurrencyEnum = "YDD"
+	TransactionCurrencyEnumYer TransactionCurrencyEnum = "YER"
+	TransactionCurrencyEnumYun TransactionCurrencyEnum = "YUN"
+	TransactionCurrencyEnumYud TransactionCurrencyEnum = "YUD"
+	TransactionCurrencyEnumYum TransactionCurrencyEnum = "YUM"
+	TransactionCurrencyEnumYur TransactionCurrencyEnum = "YUR"
+	TransactionCurrencyEnumZwn TransactionCurrencyEnum = "ZWN"
+	TransactionCurrencyEnumZrn TransactionCurrencyEnum = "ZRN"
+	TransactionCurrencyEnumZrz TransactionCurrencyEnum = "ZRZ"
+	TransactionCurrencyEnumZmw TransactionCurrencyEnum = "ZMW"
+	TransactionCurrencyEnumZmk TransactionCurrencyEnum = "ZMK"
+	TransactionCurrencyEnumZwd TransactionCurrencyEnum = "ZWD"
+	TransactionCurrencyEnumZwr TransactionCurrencyEnum = "ZWR"
+	TransactionCurrencyEnumZwl TransactionCurrencyEnum = "ZWL"
+)
+
+func NewTransactionCurrencyEnumFromString(s string) (TransactionCurrencyEnum, error) {
+	switch s {
+	case "XUA":
+		return TransactionCurrencyEnumXua, nil
+	case "AFN":
+		return TransactionCurrencyEnumAfn, nil
+	case "AFA":
+		return TransactionCurrencyEnumAfa, nil
+	case "ALL":
+		return TransactionCurrencyEnumAll, nil
+	case "ALK":
+		return TransactionCurrencyEnumAlk, nil
+	case "DZD":
+		return TransactionCurrencyEnumDzd, nil
+	case "ADP":
+		return TransactionCurrencyEnumAdp, nil
+	case "AOA":
+		return TransactionCurrencyEnumAoa, nil
+	case "AOK":
+		return TransactionCurrencyEnumAok, nil
+	case "AON":
+		return TransactionCurrencyEnumAon, nil
+	case "AOR":
+		return TransactionCurrencyEnumAor, nil
+	case "ARA":
+		return TransactionCurrencyEnumAra, nil
+	case "ARS":
+		return TransactionCurrencyEnumArs, nil
+	case "ARM":
+		return TransactionCurrencyEnumArm, nil
+	case "ARP":
+		return TransactionCurrencyEnumArp, nil
+	case "ARL":
+		return TransactionCurrencyEnumArl, nil
+	case "AMD":
+		return TransactionCurrencyEnumAmd, nil
+	case "AWG":
+		return TransactionCurrencyEnumAwg, nil
+	case "AUD":
+		return TransactionCurrencyEnumAud, nil
+	case "ATS":
+		return TransactionCurrencyEnumAts, nil
+	case "AZN":
+		return TransactionCurrencyEnumAzn, nil
+	case "AZM":
+		return TransactionCurrencyEnumAzm, nil
+	case "BSD":
+		return TransactionCurrencyEnumBsd, nil
+	case "BHD":
+		return TransactionCurrencyEnumBhd, nil
+	case "BDT":
+		return TransactionCurrencyEnumBdt, nil
+	case "BBD":
+		return TransactionCurrencyEnumBbd, nil
+	case "BYN":
+		return TransactionCurrencyEnumByn, nil
+	case "BYB":
+		return TransactionCurrencyEnumByb, nil
+	case "BYR":
+		return TransactionCurrencyEnumByr, nil
+	case "BEF":
+		return TransactionCurrencyEnumBef, nil
+	case "BEC":
+		return TransactionCurrencyEnumBec, nil
+	case "BEL":
+		return TransactionCurrencyEnumBel, nil
+	case "BZD":
+		return TransactionCurrencyEnumBzd, nil
+	case "BMD":
+		return TransactionCurrencyEnumBmd, nil
+	case "BTN":
+		return TransactionCurrencyEnumBtn, nil
+	case "BOB":
+		return TransactionCurrencyEnumBob, nil
+	case "BOL":
+		return TransactionCurrencyEnumBol, nil
+	case "BOV":
+		return TransactionCurrencyEnumBov, nil
+	case "BOP":
+		return TransactionCurrencyEnumBop, nil
+	case "BAM":
+		return TransactionCurrencyEnumBam, nil
+	case "BAD":
+		return TransactionCurrencyEnumBad, nil
+	case "BAN":
+		return TransactionCurrencyEnumBan, nil
+	case "BWP":
+		return TransactionCurrencyEnumBwp, nil
+	case "BRC":
+		return TransactionCurrencyEnumBrc, nil
+	case "BRZ":
+		return TransactionCurrencyEnumBrz, nil
+	case "BRE":
+		return TransactionCurrencyEnumBre, nil
+	case "BRR":
+		return TransactionCurrencyEnumBrr, nil
+	case "BRN":
+		return TransactionCurrencyEnumBrn, nil
+	case "BRB":
+		return TransactionCurrencyEnumBrb, nil
+	case "BRL":
+		return TransactionCurrencyEnumBrl, nil
+	case "GBP":
+		return TransactionCurrencyEnumGbp, nil
+	case "BND":
+		return TransactionCurrencyEnumBnd, nil
+	case "BGL":
+		return TransactionCurrencyEnumBgl, nil
+	case "BGN":
+		return TransactionCurrencyEnumBgn, nil
+	case "BGO":
+		return TransactionCurrencyEnumBgo, nil
+	case "BGM":
+		return TransactionCurrencyEnumBgm, nil
+	case "BUK":
+		return TransactionCurrencyEnumBuk, nil
+	case "BIF":
+		return TransactionCurrencyEnumBif, nil
+	case "XPF":
+		return TransactionCurrencyEnumXpf, nil
+	case "KHR":
+		return TransactionCurrencyEnumKhr, nil
+	case "CAD":
+		return TransactionCurrencyEnumCad, nil
+	case "CVE":
+		return TransactionCurrencyEnumCve, nil
+	case "KYD":
+		return TransactionCurrencyEnumKyd, nil
+	case "XAF":
+		return TransactionCurrencyEnumXaf, nil
+	case "CLE":
+		return TransactionCurrencyEnumCle, nil
+	case "CLP":
+		return TransactionCurrencyEnumClp, nil
+	case "CLF":
+		return TransactionCurrencyEnumClf, nil
+	case "CNX":
+		return TransactionCurrencyEnumCnx, nil
+	case "CNY":
+		return TransactionCurrencyEnumCny, nil
+	case "CNH":
+		return TransactionCurrencyEnumCnh, nil
+	case "COP":
+		return TransactionCurrencyEnumCop, nil
+	case "COU":
+		return TransactionCurrencyEnumCou, nil
+	case "KMF":
+		return TransactionCurrencyEnumKmf, nil
+	case "CDF":
+		return TransactionCurrencyEnumCdf, nil
+	case "CRC":
+		return TransactionCurrencyEnumCrc, nil
+	case "HRD":
+		return TransactionCurrencyEnumHrd, nil
+	case "HRK":
+		return TransactionCurrencyEnumHrk, nil
+	case "CUC":
+		return TransactionCurrencyEnumCuc, nil
+	case "CUP":
+		return TransactionCurrencyEnumCup, nil
+	case "CYP":
+		return TransactionCurrencyEnumCyp, nil
+	case "CZK":
+		return TransactionCurrencyEnumCzk, nil
+	case "CSK":
+		return TransactionCurrencyEnumCsk, nil
+	case "DKK":
+		return TransactionCurrencyEnumDkk, nil
+	case "DJF":
+		return TransactionCurrencyEnumDjf, nil
+	case "DOP":
+		return TransactionCurrencyEnumDop, nil
+	case "NLG":
+		return TransactionCurrencyEnumNlg, nil
+	case "XCD":
+		return TransactionCurrencyEnumXcd, nil
+	case "DDM":
+		return TransactionCurrencyEnumDdm, nil
+	case "ECS":
+		return TransactionCurrencyEnumEcs, nil
+	case "ECV":
+		return TransactionCurrencyEnumEcv, nil
+	case "EGP":
+		return TransactionCurrencyEnumEgp, nil
+	case "GQE":
+		return TransactionCurrencyEnumGqe, nil
+	case "ERN":
+		return TransactionCurrencyEnumErn, nil
+	case "EEK":
+		return TransactionCurrencyEnumEek, nil
+	case "ETB":
+		return TransactionCurrencyEnumEtb, nil
+	case "EUR":
+		return TransactionCurrencyEnumEur, nil
+	case "XBA":
+		return TransactionCurrencyEnumXba, nil
+	case "XEU":
+		return TransactionCurrencyEnumXeu, nil
+	case "XBB":
+		return TransactionCurrencyEnumXbb, nil
+	case "XBC":
+		return TransactionCurrencyEnumXbc, nil
+	case "XBD":
+		return TransactionCurrencyEnumXbd, nil
+	case "FKP":
+		return TransactionCurrencyEnumFkp, nil
+	case "FJD":
+		return TransactionCurrencyEnumFjd, nil
+	case "FIM":
+		return TransactionCurrencyEnumFim, nil
+	case "FRF":
+		return TransactionCurrencyEnumFrf, nil
+	case "XFO":
+		return TransactionCurrencyEnumXfo, nil
+	case "XFU":
+		return TransactionCurrencyEnumXfu, nil
+	case "GMD":
+		return TransactionCurrencyEnumGmd, nil
+	case "GEK":
+		return TransactionCurrencyEnumGek, nil
+	case "GEL":
+		return TransactionCurrencyEnumGel, nil
+	case "DEM":
+		return TransactionCurrencyEnumDem, nil
+	case "GHS":
+		return TransactionCurrencyEnumGhs, nil
+	case "GHC":
+		return TransactionCurrencyEnumGhc, nil
+	case "GIP":
+		return TransactionCurrencyEnumGip, nil
+	case "XAU":
+		return TransactionCurrencyEnumXau, nil
+	case "GRD":
+		return TransactionCurrencyEnumGrd, nil
+	case "GTQ":
+		return TransactionCurrencyEnumGtq, nil
+	case "GWP":
+		return TransactionCurrencyEnumGwp, nil
+	case "GNF":
+		return TransactionCurrencyEnumGnf, nil
+	case "GNS":
+		return TransactionCurrencyEnumGns, nil
+	case "GYD":
+		return TransactionCurrencyEnumGyd, nil
+	case "HTG":
+		return TransactionCurrencyEnumHtg, nil
+	case "HNL":
+		return TransactionCurrencyEnumHnl, nil
+	case "HKD":
+		return TransactionCurrencyEnumHkd, nil
+	case "HUF":
+		return TransactionCurrencyEnumHuf, nil
+	case "IMP":
+		return TransactionCurrencyEnumImp, nil
+	case "ISK":
+		return TransactionCurrencyEnumIsk, nil
+	case "ISJ":
+		return TransactionCurrencyEnumIsj, nil
+	case "INR":
+		return TransactionCurrencyEnumInr, nil
+	case "IDR":
+		return TransactionCurrencyEnumIdr, nil
+	case "IRR":
+		return TransactionCurrencyEnumIrr, nil
+	case "IQD":
+		return TransactionCurrencyEnumIqd, nil
+	case "IEP":
+		return TransactionCurrencyEnumIep, nil
+	case "ILS":
+		return TransactionCurrencyEnumIls, nil
+	case "ILP":
+		return TransactionCurrencyEnumIlp, nil
+	case "ILR":
+		return TransactionCurrencyEnumIlr, nil
+	case "ITL":
+		return TransactionCurrencyEnumItl, nil
+	case "JMD":
+		return TransactionCurrencyEnumJmd, nil
+	case "JPY":
+		return TransactionCurrencyEnumJpy, nil
+	case "JOD":
+		return TransactionCurrencyEnumJod, nil
+	case "KZT":
+		return TransactionCurrencyEnumKzt, nil
+	case "KES":
+		return TransactionCurrencyEnumKes, nil
+	case "KWD":
+		return TransactionCurrencyEnumKwd, nil
+	case "KGS":
+		return TransactionCurrencyEnumKgs, nil
+	case "LAK":
+		return TransactionCurrencyEnumLak, nil
+	case "LVL":
+		return TransactionCurrencyEnumLvl, nil
+	case "LVR":
+		return TransactionCurrencyEnumLvr, nil
+	case "LBP":
+		return TransactionCurrencyEnumLbp, nil
+	case "LSL":
+		return TransactionCurrencyEnumLsl, nil
+	case "LRD":
+		return TransactionCurrencyEnumLrd, nil
+	case "LYD":
+		return TransactionCurrencyEnumLyd, nil
+	case "LTL":
+		return TransactionCurrencyEnumLtl, nil
+	case "LTT":
+		return TransactionCurrencyEnumLtt, nil
+	case "LUL":
+		return TransactionCurrencyEnumLul, nil
+	case "LUC":
+		return TransactionCurrencyEnumLuc, nil
+	case "LUF":
+		return TransactionCurrencyEnumLuf, nil
+	case "MOP":
+		return TransactionCurrencyEnumMop, nil
+	case "MKD":
+		return TransactionCurrencyEnumMkd, nil
+	case "MKN":
+		return TransactionCurrencyEnumMkn, nil
+	case "MGA":
+		return TransactionCurrencyEnumMga, nil
+	case "MGF":
+		return TransactionCurrencyEnumMgf, nil
+	case "MWK":
+		return TransactionCurrencyEnumMwk, nil
+	case "MYR":
+		return TransactionCurrencyEnumMyr, nil
+	case "MVR":
+		return TransactionCurrencyEnumMvr, nil
+	case "MVP":
+		return TransactionCurrencyEnumMvp, nil
+	case "MLF":
+		return TransactionCurrencyEnumMlf, nil
+	case "MTL":
+		return TransactionCurrencyEnumMtl, nil
+	case "MTP":
+		return TransactionCurrencyEnumMtp, nil
+	case "MRU":
+		return TransactionCurrencyEnumMru, nil
+	case "MRO":
+		return TransactionCurrencyEnumMro, nil
+	case "MUR":
+		return TransactionCurrencyEnumMur, nil
+	case "MXV":
+		return TransactionCurrencyEnumMxv, nil
+	case "MXN":
+		return TransactionCurrencyEnumMxn, nil
+	case "MXP":
+		return TransactionCurrencyEnumMxp, nil
+	case "MDC":
+		return TransactionCurrencyEnumMdc, nil
+	case "MDL":
+		return TransactionCurrencyEnumMdl, nil
+	case "MCF":
+		return TransactionCurrencyEnumMcf, nil
+	case "MNT":
+		return TransactionCurrencyEnumMnt, nil
+	case "MAD":
+		return TransactionCurrencyEnumMad, nil
+	case "MAF":
+		return TransactionCurrencyEnumMaf, nil
+	case "MZE":
+		return TransactionCurrencyEnumMze, nil
+	case "MZN":
+		return TransactionCurrencyEnumMzn, nil
+	case "MZM":
+		return TransactionCurrencyEnumMzm, nil
+	case "MMK":
+		return TransactionCurrencyEnumMmk, nil
+	case "NAD":
+		return TransactionCurrencyEnumNad, nil
+	case "NPR":
+		return TransactionCurrencyEnumNpr, nil
+	case "ANG":
+		return TransactionCurrencyEnumAng, nil
+	case "TWD":
+		return TransactionCurrencyEnumTwd, nil
+	case "NZD":
+		return TransactionCurrencyEnumNzd, nil
+	case "NIO":
+		return TransactionCurrencyEnumNio, nil
+	case "NIC":
+		return TransactionCurrencyEnumNic, nil
+	case "NGN":
+		return TransactionCurrencyEnumNgn, nil
+	case "KPW":
+		return TransactionCurrencyEnumKpw, nil
+	case "NOK":
+		return TransactionCurrencyEnumNok, nil
+	case "OMR":
+		return TransactionCurrencyEnumOmr, nil
+	case "PKR":
+		return TransactionCurrencyEnumPkr, nil
+	case "XPD":
+		return TransactionCurrencyEnumXpd, nil
+	case "PAB":
+		return TransactionCurrencyEnumPab, nil
+	case "PGK":
+		return TransactionCurrencyEnumPgk, nil
+	case "PYG":
+		return TransactionCurrencyEnumPyg, nil
+	case "PEI":
+		return TransactionCurrencyEnumPei, nil
+	case "PEN":
+		return TransactionCurrencyEnumPen, nil
+	case "PES":
+		return TransactionCurrencyEnumPes, nil
+	case "PHP":
+		return TransactionCurrencyEnumPhp, nil
+	case "XPT":
+		return TransactionCurrencyEnumXpt, nil
+	case "PLN":
+		return TransactionCurrencyEnumPln, nil
+	case "PLZ":
+		return TransactionCurrencyEnumPlz, nil
+	case "PTE":
+		return TransactionCurrencyEnumPte, nil
+	case "GWE":
+		return TransactionCurrencyEnumGwe, nil
+	case "QAR":
+		return TransactionCurrencyEnumQar, nil
+	case "XRE":
+		return TransactionCurrencyEnumXre, nil
+	case "RHD":
+		return TransactionCurrencyEnumRhd, nil
+	case "RON":
+		return TransactionCurrencyEnumRon, nil
+	case "ROL":
+		return TransactionCurrencyEnumRol, nil
+	case "RUB":
+		return TransactionCurrencyEnumRub, nil
+	case "RUR":
+		return TransactionCurrencyEnumRur, nil
+	case "RWF":
+		return TransactionCurrencyEnumRwf, nil
+	case "SVC":
+		return TransactionCurrencyEnumSvc, nil
+	case "WST":
+		return TransactionCurrencyEnumWst, nil
+	case "SAR":
+		return TransactionCurrencyEnumSar, nil
+	case "RSD":
+		return TransactionCurrencyEnumRsd, nil
+	case "CSD":
+		return TransactionCurrencyEnumCsd, nil
+	case "SCR":
+		return TransactionCurrencyEnumScr, nil
+	case "SLL":
+		return TransactionCurrencyEnumSll, nil
+	case "XAG":
+		return TransactionCurrencyEnumXag, nil
+	case "SGD":
+		return TransactionCurrencyEnumSgd, nil
+	case "SKK":
+		return TransactionCurrencyEnumSkk, nil
+	case "SIT":
+		return TransactionCurrencyEnumSit, nil
+	case "SBD":
+		return TransactionCurrencyEnumSbd, nil
+	case "SOS":
+		return TransactionCurrencyEnumSos, nil
+	case "ZAR":
+		return TransactionCurrencyEnumZar, nil
+	case "ZAL":
+		return TransactionCurrencyEnumZal, nil
+	case "KRH":
+		return TransactionCurrencyEnumKrh, nil
+	case "KRW":
+		return TransactionCurrencyEnumKrw, nil
+	case "KRO":
+		return TransactionCurrencyEnumKro, nil
+	case "SSP":
+		return TransactionCurrencyEnumSsp, nil
+	case "SUR":
+		return TransactionCurrencyEnumSur, nil
+	case "ESP":
+		return TransactionCurrencyEnumEsp, nil
+	case "ESA":
+		return TransactionCurrencyEnumEsa, nil
+	case "ESB":
+		return TransactionCurrencyEnumEsb, nil
+	case "XDR":
+		return TransactionCurrencyEnumXdr, nil
+	case "LKR":
+		return TransactionCurrencyEnumLkr, nil
+	case "SHP":
+		return TransactionCurrencyEnumShp, nil
+	case "XSU":
+		return TransactionCurrencyEnumXsu, nil
+	case "SDD":
+		return TransactionCurrencyEnumSdd, nil
+	case "SDG":
+		return TransactionCurrencyEnumSdg, nil
+	case "SDP":
+		return TransactionCurrencyEnumSdp, nil
+	case "SRD":
+		return TransactionCurrencyEnumSrd, nil
+	case "SRG":
+		return TransactionCurrencyEnumSrg, nil
+	case "SZL":
+		return TransactionCurrencyEnumSzl, nil
+	case "SEK":
+		return TransactionCurrencyEnumSek, nil
+	case "CHF":
+		return TransactionCurrencyEnumChf, nil
+	case "SYP":
+		return TransactionCurrencyEnumSyp, nil
+	case "STN":
+		return TransactionCurrencyEnumStn, nil
+	case "STD":
+		return TransactionCurrencyEnumStd, nil
+	case "TVD":
+		return TransactionCurrencyEnumTvd, nil
+	case "TJR":
+		return TransactionCurrencyEnumTjr, nil
+	case "TJS":
+		return TransactionCurrencyEnumTjs, nil
+	case "TZS":
+		return TransactionCurrencyEnumTzs, nil
+	case "XTS":
+		return TransactionCurrencyEnumXts, nil
+	case "THB":
+		return TransactionCurrencyEnumThb, nil
+	case "XXX":
+		return TransactionCurrencyEnumXxx, nil
+	case "TPE":
+		return TransactionCurrencyEnumTpe, nil
+	case "TOP":
+		return TransactionCurrencyEnumTop, nil
+	case "TTD":
+		return TransactionCurrencyEnumTtd, nil
+	case "TND":
+		return TransactionCurrencyEnumTnd, nil
+	case "TRY":
+		return TransactionCurrencyEnumTry, nil
+	case "TRL":
+		return TransactionCurrencyEnumTrl, nil
+	case "TMT":
+		return TransactionCurrencyEnumTmt, nil
+	case "TMM":
+		return TransactionCurrencyEnumTmm, nil
+	case "USD":
+		return TransactionCurrencyEnumUsd, nil
+	case "USN":
+		return TransactionCurrencyEnumUsn, nil
+	case "USS":
+		return TransactionCurrencyEnumUss, nil
+	case "UGX":
+		return TransactionCurrencyEnumUgx, nil
+	case "UGS":
+		return TransactionCurrencyEnumUgs, nil
+	case "UAH":
+		return TransactionCurrencyEnumUah, nil
+	case "UAK":
+		return TransactionCurrencyEnumUak, nil
+	case "AED":
+		return TransactionCurrencyEnumAed, nil
+	case "UYW":
+		return TransactionCurrencyEnumUyw, nil
+	case "UYU":
+		return TransactionCurrencyEnumUyu, nil
+	case "UYP":
+		return TransactionCurrencyEnumUyp, nil
+	case "UYI":
+		return TransactionCurrencyEnumUyi, nil
+	case "UZS":
+		return TransactionCurrencyEnumUzs, nil
+	case "VUV":
+		return TransactionCurrencyEnumVuv, nil
+	case "VES":
+		return TransactionCurrencyEnumVes, nil
+	case "VEB":
+		return TransactionCurrencyEnumVeb, nil
+	case "VEF":
+		return TransactionCurrencyEnumVef, nil
+	case "VND":
+		return TransactionCurrencyEnumVnd, nil
+	case "VNN":
+		return TransactionCurrencyEnumVnn, nil
+	case "CHE":
+		return TransactionCurrencyEnumChe, nil
+	case "CHW":
+		return TransactionCurrencyEnumChw, nil
+	case "XOF":
+		return TransactionCurrencyEnumXof, nil
+	case "YDD":
+		return TransactionCurrencyEnumYdd, nil
+	case "YER":
+		return TransactionCurrencyEnumYer, nil
+	case "YUN":
+		return TransactionCurrencyEnumYun, nil
+	case "YUD":
+		return TransactionCurrencyEnumYud, nil
+	case "YUM":
+		return TransactionCurrencyEnumYum, nil
+	case "YUR":
+		return TransactionCurrencyEnumYur, nil
+	case "ZWN":
+		return TransactionCurrencyEnumZwn, nil
+	case "ZRN":
+		return TransactionCurrencyEnumZrn, nil
+	case "ZRZ":
+		return TransactionCurrencyEnumZrz, nil
+	case "ZMW":
+		return TransactionCurrencyEnumZmw, nil
+	case "ZMK":
+		return TransactionCurrencyEnumZmk, nil
+	case "ZWD":
+		return TransactionCurrencyEnumZwd, nil
+	case "ZWR":
+		return TransactionCurrencyEnumZwr, nil
+	case "ZWL":
+		return TransactionCurrencyEnumZwl, nil
+	}
+	var t TransactionCurrencyEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TransactionCurrencyEnum) Ptr() *TransactionCurrencyEnum {
+	return &t
 }
 
 // # The TransactionLineItem Object
@@ -35565,11 +43837,12 @@ type TransactionLineItem struct {
 	Account *string `json:"account,omitempty"`
 	// The line's associated tracking category.
 	TrackingCategory *string `json:"tracking_category,omitempty"`
-	// The line's associated tracking categories.
-	TrackingCategories []string `json:"tracking_categories,omitempty"`
+	// The transaction line item's associated tracking categories.
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
 	// The line item's total.
 	TotalLineAmount *string `json:"total_line_amount,omitempty"`
-	TaxRate         *string `json:"tax_rate,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The line item's currency.
 	//
 	// - `XUA` - ADB Unit of Account
@@ -35883,7 +44156,7 @@ type TransactionLineItem struct {
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -36221,13 +44494,13 @@ func (t *TransactionLineItem) String() string {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type TransactionLineItemCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewTransactionLineItemCurrencyFromCurrencyEnum(value CurrencyEnum) *TransactionLineItemCurrency {
-	return &TransactionLineItemCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewTransactionLineItemCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *TransactionLineItemCurrency {
+	return &TransactionLineItemCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewTransactionLineItemCurrencyFromString(value string) *TransactionLineItemCurrency {
@@ -36235,10 +44508,10 @@ func NewTransactionLineItemCurrencyFromString(value string) *TransactionLineItem
 }
 
 func (t *TransactionLineItemCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		t.typeName = "currencyEnum"
-		t.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		t.typeName = "transactionCurrencyEnum"
+		t.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -36254,15 +44527,15 @@ func (t TransactionLineItemCurrency) MarshalJSON() ([]byte, error) {
 	switch t.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", t.typeName, t)
-	case "currencyEnum":
-		return json.Marshal(t.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(t.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(t.String)
 	}
 }
 
 type TransactionLineItemCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -36270,8 +44543,8 @@ func (t *TransactionLineItemCurrency) Accept(visitor TransactionLineItemCurrency
 	switch t.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", t.typeName, t)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(t.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(t.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(t.String)
 	}
@@ -36391,6 +44664,50 @@ func (t *TransactionTrackingCategoriesItem) Accept(visitor TransactionTrackingCa
 	}
 }
 
+// - `INVOICE` - INVOICE
+// - `EXPENSE` - EXPENSE
+// - `TRANSACTION` - TRANSACTION
+// - `JOURNAL_ENTRY` - JOURNAL_ENTRY
+// - `PAYMENT` - PAYMENT
+// - `VENDOR_CREDIT` - VENDOR_CREDIT
+// - `CREDIT_NOTE` - CREDIT_NOTE
+type UnderlyingTransactionTypeEnum string
+
+const (
+	UnderlyingTransactionTypeEnumInvoice      UnderlyingTransactionTypeEnum = "INVOICE"
+	UnderlyingTransactionTypeEnumExpense      UnderlyingTransactionTypeEnum = "EXPENSE"
+	UnderlyingTransactionTypeEnumTransaction  UnderlyingTransactionTypeEnum = "TRANSACTION"
+	UnderlyingTransactionTypeEnumJournalEntry UnderlyingTransactionTypeEnum = "JOURNAL_ENTRY"
+	UnderlyingTransactionTypeEnumPayment      UnderlyingTransactionTypeEnum = "PAYMENT"
+	UnderlyingTransactionTypeEnumVendorCredit UnderlyingTransactionTypeEnum = "VENDOR_CREDIT"
+	UnderlyingTransactionTypeEnumCreditNote   UnderlyingTransactionTypeEnum = "CREDIT_NOTE"
+)
+
+func NewUnderlyingTransactionTypeEnumFromString(s string) (UnderlyingTransactionTypeEnum, error) {
+	switch s {
+	case "INVOICE":
+		return UnderlyingTransactionTypeEnumInvoice, nil
+	case "EXPENSE":
+		return UnderlyingTransactionTypeEnumExpense, nil
+	case "TRANSACTION":
+		return UnderlyingTransactionTypeEnumTransaction, nil
+	case "JOURNAL_ENTRY":
+		return UnderlyingTransactionTypeEnumJournalEntry, nil
+	case "PAYMENT":
+		return UnderlyingTransactionTypeEnumPayment, nil
+	case "VENDOR_CREDIT":
+		return UnderlyingTransactionTypeEnumVendorCredit, nil
+	case "CREDIT_NOTE":
+		return UnderlyingTransactionTypeEnumCreditNote, nil
+	}
+	var t UnderlyingTransactionTypeEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (u UnderlyingTransactionTypeEnum) Ptr() *UnderlyingTransactionTypeEnum {
+	return &u
+}
+
 type ValidationProblemSource struct {
 	Pointer string `json:"pointer"`
 
@@ -36424,7 +44741,7 @@ func (v *ValidationProblemSource) String() string {
 //
 // ### Description
 //
-// A `VendorCredit` is transaction issued by a vendor to the accounting company, indicating a reduction or cancellation of the amount owed to the vendor. It is most generally used as an adjustment note used to rectify errors, returns, or overpayments related to a purchasing transaction. A `VendorCredit` can be applied to _Accounts Payable_ Invoices to decrease the overall amount of the Invoice.
+// A `VendorCredit` is transaction issued by a vendor to the accounting company, indicating a reduction or cancellation of the amount owed to the vendor. It is most generally used as an adjustment note used to rectify errors, returns, or overpayments related to a purchasing transaction. A `VendorCredit` can be applied to `Accounts Payable` Invoices to decrease the overall amount of the `Invoice`.
 //
 // ### Usage Example
 //
@@ -36756,11 +45073,15 @@ type VendorCredit struct {
 	Currency *VendorCreditCurrency `json:"currency,omitempty"`
 	// The vendor credit's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
 	// The company the vendor credit belongs to.
 	Company            *VendorCreditCompany                  `json:"company,omitempty"`
 	Lines              []*VendorCreditLine                   `json:"lines,omitempty"`
 	TrackingCategories []*VendorCreditTrackingCategoriesItem `json:"tracking_categories,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// A list of VendorCredit Applied to Lines objects.
+	AppliedToLines []*VendorCreditApplyLineForVendorCredit `json:"applied_to_lines,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 	// The accounting period that the VendorCredit was generated in.
 	AccountingPeriod *VendorCreditAccountingPeriod `json:"accounting_period,omitempty"`
@@ -36848,6 +45169,323 @@ func (v *VendorCreditAccountingPeriod) Accept(visitor VendorCreditAccountingPeri
 		return visitor.VisitString(v.String)
 	case "accountingPeriod":
 		return visitor.VisitAccountingPeriod(v.AccountingPeriod)
+	}
+}
+
+// # The VendorCreditApplyLine Object
+//
+// ### Description
+//
+// The `VendorCreditApplyLine` object is used to represent a applied vendor credit.
+//
+// ### Usage Example
+//
+// Fetch from the `GET VendorCredit` endpoint and view the vendor credit's applied to lines.
+type VendorCreditApplyLineForInvoice struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt   *time.Time                                   `json:"modified_at,omitempty"`
+	VendorCredit *VendorCreditApplyLineForInvoiceVendorCredit `json:"vendor_credit,omitempty"`
+	// Date that the vendor credit is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the VendorCredit applied to the invoice.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *VendorCreditApplyLineForInvoice) UnmarshalJSON(data []byte) error {
+	type unmarshaler VendorCreditApplyLineForInvoice
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = VendorCreditApplyLineForInvoice(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *VendorCreditApplyLineForInvoice) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
+}
+
+type VendorCreditApplyLineForInvoiceVendorCredit struct {
+	typeName     string
+	String       string
+	VendorCredit *VendorCredit
+}
+
+func NewVendorCreditApplyLineForInvoiceVendorCreditFromString(value string) *VendorCreditApplyLineForInvoiceVendorCredit {
+	return &VendorCreditApplyLineForInvoiceVendorCredit{typeName: "string", String: value}
+}
+
+func NewVendorCreditApplyLineForInvoiceVendorCreditFromVendorCredit(value *VendorCredit) *VendorCreditApplyLineForInvoiceVendorCredit {
+	return &VendorCreditApplyLineForInvoiceVendorCredit{typeName: "vendorCredit", VendorCredit: value}
+}
+
+func (v *VendorCreditApplyLineForInvoiceVendorCredit) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueVendorCredit := new(VendorCredit)
+	if err := json.Unmarshal(data, &valueVendorCredit); err == nil {
+		v.typeName = "vendorCredit"
+		v.VendorCredit = valueVendorCredit
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditApplyLineForInvoiceVendorCredit) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "vendorCredit":
+		return json.Marshal(v.VendorCredit)
+	}
+}
+
+type VendorCreditApplyLineForInvoiceVendorCreditVisitor interface {
+	VisitString(string) error
+	VisitVendorCredit(*VendorCredit) error
+}
+
+func (v *VendorCreditApplyLineForInvoiceVendorCredit) Accept(visitor VendorCreditApplyLineForInvoiceVendorCreditVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "vendorCredit":
+		return visitor.VisitVendorCredit(v.VendorCredit)
+	}
+}
+
+// # The VendorCreditApplyLine Object
+//
+// ### Description
+//
+// The `VendorCreditApplyLine` object is used to represent a applied vendor credit.
+//
+// ### Usage Example
+//
+// Fetch from the `GET VendorCredit` endpoint and view the vendor credit's applied to lines.
+type VendorCreditApplyLineForVendorCredit struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time                                   `json:"modified_at,omitempty"`
+	Invoice    *VendorCreditApplyLineForVendorCreditInvoice `json:"invoice,omitempty"`
+	// Date that the vendor credit is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the VendorCredit applied to the invoice.
+	AppliedAmount *string `json:"applied_amount,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *VendorCreditApplyLineForVendorCredit) UnmarshalJSON(data []byte) error {
+	type unmarshaler VendorCreditApplyLineForVendorCredit
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = VendorCreditApplyLineForVendorCredit(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *VendorCreditApplyLineForVendorCredit) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
+}
+
+type VendorCreditApplyLineForVendorCreditInvoice struct {
+	typeName string
+	String   string
+	Invoice  *Invoice
+}
+
+func NewVendorCreditApplyLineForVendorCreditInvoiceFromString(value string) *VendorCreditApplyLineForVendorCreditInvoice {
+	return &VendorCreditApplyLineForVendorCreditInvoice{typeName: "string", String: value}
+}
+
+func NewVendorCreditApplyLineForVendorCreditInvoiceFromInvoice(value *Invoice) *VendorCreditApplyLineForVendorCreditInvoice {
+	return &VendorCreditApplyLineForVendorCreditInvoice{typeName: "invoice", Invoice: value}
+}
+
+func (v *VendorCreditApplyLineForVendorCreditInvoice) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueInvoice := new(Invoice)
+	if err := json.Unmarshal(data, &valueInvoice); err == nil {
+		v.typeName = "invoice"
+		v.Invoice = valueInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditApplyLineForVendorCreditInvoice) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "invoice":
+		return json.Marshal(v.Invoice)
+	}
+}
+
+type VendorCreditApplyLineForVendorCreditInvoiceVisitor interface {
+	VisitString(string) error
+	VisitInvoice(*Invoice) error
+}
+
+func (v *VendorCreditApplyLineForVendorCreditInvoice) Accept(visitor VendorCreditApplyLineForVendorCreditInvoiceVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "invoice":
+		return visitor.VisitInvoice(v.Invoice)
+	}
+}
+
+// # The VendorCreditApplyLine Object
+//
+// ### Description
+//
+// The `VendorCreditApplyLine` object is used to represent a applied vendor credit.
+//
+// ### Usage Example
+//
+// Fetch from the `GET VendorCredit` endpoint and view the vendor credit's applied to lines.
+type VendorCreditApplyLineForVendorCreditRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string                                             `json:"remote_id,omitempty"`
+	Invoice  *VendorCreditApplyLineForVendorCreditRequestInvoice `json:"invoice,omitempty"`
+	// Date that the vendor credit is applied to the invoice.
+	AppliedDate *time.Time `json:"applied_date,omitempty"`
+	// The amount of the VendorCredit applied to the invoice.
+	AppliedAmount       *string                `json:"applied_amount,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *VendorCreditApplyLineForVendorCreditRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler VendorCreditApplyLineForVendorCreditRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = VendorCreditApplyLineForVendorCreditRequest(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *VendorCreditApplyLineForVendorCreditRequest) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
+}
+
+type VendorCreditApplyLineForVendorCreditRequestInvoice struct {
+	typeName string
+	String   string
+	Invoice  *Invoice
+}
+
+func NewVendorCreditApplyLineForVendorCreditRequestInvoiceFromString(value string) *VendorCreditApplyLineForVendorCreditRequestInvoice {
+	return &VendorCreditApplyLineForVendorCreditRequestInvoice{typeName: "string", String: value}
+}
+
+func NewVendorCreditApplyLineForVendorCreditRequestInvoiceFromInvoice(value *Invoice) *VendorCreditApplyLineForVendorCreditRequestInvoice {
+	return &VendorCreditApplyLineForVendorCreditRequestInvoice{typeName: "invoice", Invoice: value}
+}
+
+func (v *VendorCreditApplyLineForVendorCreditRequestInvoice) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueInvoice := new(Invoice)
+	if err := json.Unmarshal(data, &valueInvoice); err == nil {
+		v.typeName = "invoice"
+		v.Invoice = valueInvoice
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditApplyLineForVendorCreditRequestInvoice) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "invoice":
+		return json.Marshal(v.Invoice)
+	}
+}
+
+type VendorCreditApplyLineForVendorCreditRequestInvoiceVisitor interface {
+	VisitString(string) error
+	VisitInvoice(*Invoice) error
+}
+
+func (v *VendorCreditApplyLineForVendorCreditRequestInvoice) Accept(visitor VendorCreditApplyLineForVendorCreditRequestInvoiceVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "invoice":
+		return visitor.VisitInvoice(v.Invoice)
 	}
 }
 
@@ -37218,13 +45856,13 @@ func (v *VendorCreditCompany) Accept(visitor VendorCreditCompanyVisitor) error {
 // - `ZWR` - Zimbabwean Dollar (2008)
 // - `ZWL` - Zimbabwean Dollar (2009)
 type VendorCreditCurrency struct {
-	typeName     string
-	CurrencyEnum CurrencyEnum
-	String       string
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
 }
 
-func NewVendorCreditCurrencyFromCurrencyEnum(value CurrencyEnum) *VendorCreditCurrency {
-	return &VendorCreditCurrency{typeName: "currencyEnum", CurrencyEnum: value}
+func NewVendorCreditCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *VendorCreditCurrency {
+	return &VendorCreditCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
 }
 
 func NewVendorCreditCurrencyFromString(value string) *VendorCreditCurrency {
@@ -37232,10 +45870,10 @@ func NewVendorCreditCurrencyFromString(value string) *VendorCreditCurrency {
 }
 
 func (v *VendorCreditCurrency) UnmarshalJSON(data []byte) error {
-	var valueCurrencyEnum CurrencyEnum
-	if err := json.Unmarshal(data, &valueCurrencyEnum); err == nil {
-		v.typeName = "currencyEnum"
-		v.CurrencyEnum = valueCurrencyEnum
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		v.typeName = "transactionCurrencyEnum"
+		v.TransactionCurrencyEnum = valueTransactionCurrencyEnum
 		return nil
 	}
 	var valueString string
@@ -37251,15 +45889,15 @@ func (v VendorCreditCurrency) MarshalJSON() ([]byte, error) {
 	switch v.typeName {
 	default:
 		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
-	case "currencyEnum":
-		return json.Marshal(v.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return json.Marshal(v.TransactionCurrencyEnum)
 	case "string":
 		return json.Marshal(v.String)
 	}
 }
 
 type VendorCreditCurrencyVisitor interface {
-	VisitCurrencyEnum(CurrencyEnum) error
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
 	VisitString(string) error
 }
 
@@ -37267,8 +45905,8 @@ func (v *VendorCreditCurrency) Accept(visitor VendorCreditCurrencyVisitor) error
 	switch v.typeName {
 	default:
 		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
-	case "currencyEnum":
-		return visitor.VisitCurrencyEnum(v.CurrencyEnum)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(v.TransactionCurrencyEnum)
 	case "string":
 		return visitor.VisitString(v.String)
 	}
@@ -37295,17 +45933,19 @@ type VendorCreditLine struct {
 	NetAmount *float64 `json:"net_amount,omitempty"`
 	// The line's associated tracking category.
 	TrackingCategory *string `json:"tracking_category,omitempty"`
-	// The line's associated tracking categories.
-	TrackingCategories []string `json:"tracking_categories,omitempty"`
+	// The vendor credit line item's associated tracking categories.
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
 	// The line's description.
 	Description *string `json:"description,omitempty"`
 	// The line's account.
 	Account *VendorCreditLineAccount `json:"account,omitempty"`
 	// The company the line belongs to.
 	Company *string `json:"company,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
 	// The vendor credit line item's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty"`
 
 	_rawJSON json.RawMessage
@@ -37390,6 +46030,1116 @@ func (v *VendorCreditLineAccount) Accept(visitor VendorCreditLineAccountVisitor)
 	case "account":
 		return visitor.VisitAccount(v.Account)
 	}
+}
+
+// # The VendorCreditLine Object
+//
+// ### Description
+//
+// The `VendorCreditLine` object is used to represent a vendor credit's line items.
+//
+// ### Usage Example
+//
+// Fetch from the `GET VendorCredit` endpoint and view the vendor credit's line items.
+type VendorCreditLineRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty"`
+	// The full value of the credit.
+	NetAmount *float64 `json:"net_amount,omitempty"`
+	// The line's associated tracking category.
+	TrackingCategory *string `json:"tracking_category,omitempty"`
+	// The vendor credit line item's associated tracking categories.
+	TrackingCategories []*string `json:"tracking_categories,omitempty"`
+	// The line's description.
+	Description *string `json:"description,omitempty"`
+	// The line's account.
+	Account *VendorCreditLineRequestAccount `json:"account,omitempty"`
+	// The company the line belongs to.
+	Company *string `json:"company,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty"`
+	// The vendor credit line item's exchange rate.
+	ExchangeRate        *string                `json:"exchange_rate,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *VendorCreditLineRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler VendorCreditLineRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = VendorCreditLineRequest(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *VendorCreditLineRequest) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
+}
+
+// The line's account.
+type VendorCreditLineRequestAccount struct {
+	typeName string
+	String   string
+	Account  *Account
+}
+
+func NewVendorCreditLineRequestAccountFromString(value string) *VendorCreditLineRequestAccount {
+	return &VendorCreditLineRequestAccount{typeName: "string", String: value}
+}
+
+func NewVendorCreditLineRequestAccountFromAccount(value *Account) *VendorCreditLineRequestAccount {
+	return &VendorCreditLineRequestAccount{typeName: "account", Account: value}
+}
+
+func (v *VendorCreditLineRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		v.typeName = "account"
+		v.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditLineRequestAccount) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "account":
+		return json.Marshal(v.Account)
+	}
+}
+
+type VendorCreditLineRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (v *VendorCreditLineRequestAccount) Accept(visitor VendorCreditLineRequestAccountVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "account":
+		return visitor.VisitAccount(v.Account)
+	}
+}
+
+// # The VendorCredit Object
+//
+// ### Description
+//
+// A `VendorCredit` is transaction issued by a vendor to the accounting company, indicating a reduction or cancellation of the amount owed to the vendor. It is most generally used as an adjustment note used to rectify errors, returns, or overpayments related to a purchasing transaction. A `VendorCredit` can be applied to `Accounts Payable` Invoices to decrease the overall amount of the `Invoice`.
+//
+// ### Usage Example
+//
+// Fetch from the `GET VendorCredit` endpoint and view a company's vendor credits.
+type VendorCreditRequest struct {
+	// The vendor credit's number.
+	Number *string `json:"number,omitempty"`
+	// The vendor credit's transaction date.
+	TransactionDate *time.Time `json:"transaction_date,omitempty"`
+	// The vendor that owes the gift or refund.
+	Vendor *VendorCreditRequestVendor `json:"vendor,omitempty"`
+	// The vendor credit's total amount.
+	TotalAmount *float64 `json:"total_amount,omitempty"`
+	// The vendor credit's currency.
+	//
+	// - `XUA` - ADB Unit of Account
+	// - `AFN` - Afghan Afghani
+	// - `AFA` - Afghan Afghani (1927–2002)
+	// - `ALL` - Albanian Lek
+	// - `ALK` - Albanian Lek (1946–1965)
+	// - `DZD` - Algerian Dinar
+	// - `ADP` - Andorran Peseta
+	// - `AOA` - Angolan Kwanza
+	// - `AOK` - Angolan Kwanza (1977–1991)
+	// - `AON` - Angolan New Kwanza (1990–2000)
+	// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// - `ARA` - Argentine Austral
+	// - `ARS` - Argentine Peso
+	// - `ARM` - Argentine Peso (1881–1970)
+	// - `ARP` - Argentine Peso (1983–1985)
+	// - `ARL` - Argentine Peso Ley (1970–1983)
+	// - `AMD` - Armenian Dram
+	// - `AWG` - Aruban Florin
+	// - `AUD` - Australian Dollar
+	// - `ATS` - Austrian Schilling
+	// - `AZN` - Azerbaijani Manat
+	// - `AZM` - Azerbaijani Manat (1993–2006)
+	// - `BSD` - Bahamian Dollar
+	// - `BHD` - Bahraini Dinar
+	// - `BDT` - Bangladeshi Taka
+	// - `BBD` - Barbadian Dollar
+	// - `BYN` - Belarusian Ruble
+	// - `BYB` - Belarusian Ruble (1994–1999)
+	// - `BYR` - Belarusian Ruble (2000–2016)
+	// - `BEF` - Belgian Franc
+	// - `BEC` - Belgian Franc (convertible)
+	// - `BEL` - Belgian Franc (financial)
+	// - `BZD` - Belize Dollar
+	// - `BMD` - Bermudan Dollar
+	// - `BTN` - Bhutanese Ngultrum
+	// - `BOB` - Bolivian Boliviano
+	// - `BOL` - Bolivian Boliviano (1863–1963)
+	// - `BOV` - Bolivian Mvdol
+	// - `BOP` - Bolivian Peso
+	// - `BAM` - Bosnia-Herzegovina Convertible Mark
+	// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// - `BWP` - Botswanan Pula
+	// - `BRC` - Brazilian Cruzado (1986–1989)
+	// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// - `BRE` - Brazilian Cruzeiro (1990–1993)
+	// - `BRR` - Brazilian Cruzeiro (1993–1994)
+	// - `BRN` - Brazilian New Cruzado (1989–1990)
+	// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// - `BRL` - Brazilian Real
+	// - `GBP` - British Pound
+	// - `BND` - Brunei Dollar
+	// - `BGL` - Bulgarian Hard Lev
+	// - `BGN` - Bulgarian Lev
+	// - `BGO` - Bulgarian Lev (1879–1952)
+	// - `BGM` - Bulgarian Socialist Lev
+	// - `BUK` - Burmese Kyat
+	// - `BIF` - Burundian Franc
+	// - `XPF` - CFP Franc
+	// - `KHR` - Cambodian Riel
+	// - `CAD` - Canadian Dollar
+	// - `CVE` - Cape Verdean Escudo
+	// - `KYD` - Cayman Islands Dollar
+	// - `XAF` - Central African CFA Franc
+	// - `CLE` - Chilean Escudo
+	// - `CLP` - Chilean Peso
+	// - `CLF` - Chilean Unit of Account (UF)
+	// - `CNX` - Chinese People’s Bank Dollar
+	// - `CNY` - Chinese Yuan
+	// - `CNH` - Chinese Yuan (offshore)
+	// - `COP` - Colombian Peso
+	// - `COU` - Colombian Real Value Unit
+	// - `KMF` - Comorian Franc
+	// - `CDF` - Congolese Franc
+	// - `CRC` - Costa Rican Colón
+	// - `HRD` - Croatian Dinar
+	// - `HRK` - Croatian Kuna
+	// - `CUC` - Cuban Convertible Peso
+	// - `CUP` - Cuban Peso
+	// - `CYP` - Cypriot Pound
+	// - `CZK` - Czech Koruna
+	// - `CSK` - Czechoslovak Hard Koruna
+	// - `DKK` - Danish Krone
+	// - `DJF` - Djiboutian Franc
+	// - `DOP` - Dominican Peso
+	// - `NLG` - Dutch Guilder
+	// - `XCD` - East Caribbean Dollar
+	// - `DDM` - East German Mark
+	// - `ECS` - Ecuadorian Sucre
+	// - `ECV` - Ecuadorian Unit of Constant Value
+	// - `EGP` - Egyptian Pound
+	// - `GQE` - Equatorial Guinean Ekwele
+	// - `ERN` - Eritrean Nakfa
+	// - `EEK` - Estonian Kroon
+	// - `ETB` - Ethiopian Birr
+	// - `EUR` - Euro
+	// - `XBA` - European Composite Unit
+	// - `XEU` - European Currency Unit
+	// - `XBB` - European Monetary Unit
+	// - `XBC` - European Unit of Account (XBC)
+	// - `XBD` - European Unit of Account (XBD)
+	// - `FKP` - Falkland Islands Pound
+	// - `FJD` - Fijian Dollar
+	// - `FIM` - Finnish Markka
+	// - `FRF` - French Franc
+	// - `XFO` - French Gold Franc
+	// - `XFU` - French UIC-Franc
+	// - `GMD` - Gambian Dalasi
+	// - `GEK` - Georgian Kupon Larit
+	// - `GEL` - Georgian Lari
+	// - `DEM` - German Mark
+	// - `GHS` - Ghanaian Cedi
+	// - `GHC` - Ghanaian Cedi (1979–2007)
+	// - `GIP` - Gibraltar Pound
+	// - `XAU` - Gold
+	// - `GRD` - Greek Drachma
+	// - `GTQ` - Guatemalan Quetzal
+	// - `GWP` - Guinea-Bissau Peso
+	// - `GNF` - Guinean Franc
+	// - `GNS` - Guinean Syli
+	// - `GYD` - Guyanaese Dollar
+	// - `HTG` - Haitian Gourde
+	// - `HNL` - Honduran Lempira
+	// - `HKD` - Hong Kong Dollar
+	// - `HUF` - Hungarian Forint
+	// - `IMP` - IMP
+	// - `ISK` - Icelandic Króna
+	// - `ISJ` - Icelandic Króna (1918–1981)
+	// - `INR` - Indian Rupee
+	// - `IDR` - Indonesian Rupiah
+	// - `IRR` - Iranian Rial
+	// - `IQD` - Iraqi Dinar
+	// - `IEP` - Irish Pound
+	// - `ILS` - Israeli New Shekel
+	// - `ILP` - Israeli Pound
+	// - `ILR` - Israeli Shekel (1980–1985)
+	// - `ITL` - Italian Lira
+	// - `JMD` - Jamaican Dollar
+	// - `JPY` - Japanese Yen
+	// - `JOD` - Jordanian Dinar
+	// - `KZT` - Kazakhstani Tenge
+	// - `KES` - Kenyan Shilling
+	// - `KWD` - Kuwaiti Dinar
+	// - `KGS` - Kyrgystani Som
+	// - `LAK` - Laotian Kip
+	// - `LVL` - Latvian Lats
+	// - `LVR` - Latvian Ruble
+	// - `LBP` - Lebanese Pound
+	// - `LSL` - Lesotho Loti
+	// - `LRD` - Liberian Dollar
+	// - `LYD` - Libyan Dinar
+	// - `LTL` - Lithuanian Litas
+	// - `LTT` - Lithuanian Talonas
+	// - `LUL` - Luxembourg Financial Franc
+	// - `LUC` - Luxembourgian Convertible Franc
+	// - `LUF` - Luxembourgian Franc
+	// - `MOP` - Macanese Pataca
+	// - `MKD` - Macedonian Denar
+	// - `MKN` - Macedonian Denar (1992–1993)
+	// - `MGA` - Malagasy Ariary
+	// - `MGF` - Malagasy Franc
+	// - `MWK` - Malawian Kwacha
+	// - `MYR` - Malaysian Ringgit
+	// - `MVR` - Maldivian Rufiyaa
+	// - `MVP` - Maldivian Rupee (1947–1981)
+	// - `MLF` - Malian Franc
+	// - `MTL` - Maltese Lira
+	// - `MTP` - Maltese Pound
+	// - `MRU` - Mauritanian Ouguiya
+	// - `MRO` - Mauritanian Ouguiya (1973–2017)
+	// - `MUR` - Mauritian Rupee
+	// - `MXV` - Mexican Investment Unit
+	// - `MXN` - Mexican Peso
+	// - `MXP` - Mexican Silver Peso (1861–1992)
+	// - `MDC` - Moldovan Cupon
+	// - `MDL` - Moldovan Leu
+	// - `MCF` - Monegasque Franc
+	// - `MNT` - Mongolian Tugrik
+	// - `MAD` - Moroccan Dirham
+	// - `MAF` - Moroccan Franc
+	// - `MZE` - Mozambican Escudo
+	// - `MZN` - Mozambican Metical
+	// - `MZM` - Mozambican Metical (1980–2006)
+	// - `MMK` - Myanmar Kyat
+	// - `NAD` - Namibian Dollar
+	// - `NPR` - Nepalese Rupee
+	// - `ANG` - Netherlands Antillean Guilder
+	// - `TWD` - New Taiwan Dollar
+	// - `NZD` - New Zealand Dollar
+	// - `NIO` - Nicaraguan Córdoba
+	// - `NIC` - Nicaraguan Córdoba (1988–1991)
+	// - `NGN` - Nigerian Naira
+	// - `KPW` - North Korean Won
+	// - `NOK` - Norwegian Krone
+	// - `OMR` - Omani Rial
+	// - `PKR` - Pakistani Rupee
+	// - `XPD` - Palladium
+	// - `PAB` - Panamanian Balboa
+	// - `PGK` - Papua New Guinean Kina
+	// - `PYG` - Paraguayan Guarani
+	// - `PEI` - Peruvian Inti
+	// - `PEN` - Peruvian Sol
+	// - `PES` - Peruvian Sol (1863–1965)
+	// - `PHP` - Philippine Peso
+	// - `XPT` - Platinum
+	// - `PLN` - Polish Zloty
+	// - `PLZ` - Polish Zloty (1950–1995)
+	// - `PTE` - Portuguese Escudo
+	// - `GWE` - Portuguese Guinea Escudo
+	// - `QAR` - Qatari Rial
+	// - `XRE` - RINET Funds
+	// - `RHD` - Rhodesian Dollar
+	// - `RON` - Romanian Leu
+	// - `ROL` - Romanian Leu (1952–2006)
+	// - `RUB` - Russian Ruble
+	// - `RUR` - Russian Ruble (1991–1998)
+	// - `RWF` - Rwandan Franc
+	// - `SVC` - Salvadoran Colón
+	// - `WST` - Samoan Tala
+	// - `SAR` - Saudi Riyal
+	// - `RSD` - Serbian Dinar
+	// - `CSD` - Serbian Dinar (2002–2006)
+	// - `SCR` - Seychellois Rupee
+	// - `SLL` - Sierra Leonean Leone
+	// - `XAG` - Silver
+	// - `SGD` - Singapore Dollar
+	// - `SKK` - Slovak Koruna
+	// - `SIT` - Slovenian Tolar
+	// - `SBD` - Solomon Islands Dollar
+	// - `SOS` - Somali Shilling
+	// - `ZAR` - South African Rand
+	// - `ZAL` - South African Rand (financial)
+	// - `KRH` - South Korean Hwan (1953–1962)
+	// - `KRW` - South Korean Won
+	// - `KRO` - South Korean Won (1945–1953)
+	// - `SSP` - South Sudanese Pound
+	// - `SUR` - Soviet Rouble
+	// - `ESP` - Spanish Peseta
+	// - `ESA` - Spanish Peseta (A account)
+	// - `ESB` - Spanish Peseta (convertible account)
+	// - `XDR` - Special Drawing Rights
+	// - `LKR` - Sri Lankan Rupee
+	// - `SHP` - St. Helena Pound
+	// - `XSU` - Sucre
+	// - `SDD` - Sudanese Dinar (1992–2007)
+	// - `SDG` - Sudanese Pound
+	// - `SDP` - Sudanese Pound (1957–1998)
+	// - `SRD` - Surinamese Dollar
+	// - `SRG` - Surinamese Guilder
+	// - `SZL` - Swazi Lilangeni
+	// - `SEK` - Swedish Krona
+	// - `CHF` - Swiss Franc
+	// - `SYP` - Syrian Pound
+	// - `STN` - São Tomé & Príncipe Dobra
+	// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// - `TVD` - TVD
+	// - `TJR` - Tajikistani Ruble
+	// - `TJS` - Tajikistani Somoni
+	// - `TZS` - Tanzanian Shilling
+	// - `XTS` - Testing Currency Code
+	// - `THB` - Thai Baht
+	// - `XXX` - The codes assigned for transactions where no currency is involved
+	// - `TPE` - Timorese Escudo
+	// - `TOP` - Tongan Paʻanga
+	// - `TTD` - Trinidad & Tobago Dollar
+	// - `TND` - Tunisian Dinar
+	// - `TRY` - Turkish Lira
+	// - `TRL` - Turkish Lira (1922–2005)
+	// - `TMT` - Turkmenistani Manat
+	// - `TMM` - Turkmenistani Manat (1993–2009)
+	// - `USD` - US Dollar
+	// - `USN` - US Dollar (Next day)
+	// - `USS` - US Dollar (Same day)
+	// - `UGX` - Ugandan Shilling
+	// - `UGS` - Ugandan Shilling (1966–1987)
+	// - `UAH` - Ukrainian Hryvnia
+	// - `UAK` - Ukrainian Karbovanets
+	// - `AED` - United Arab Emirates Dirham
+	// - `UYW` - Uruguayan Nominal Wage Index Unit
+	// - `UYU` - Uruguayan Peso
+	// - `UYP` - Uruguayan Peso (1975–1993)
+	// - `UYI` - Uruguayan Peso (Indexed Units)
+	// - `UZS` - Uzbekistani Som
+	// - `VUV` - Vanuatu Vatu
+	// - `VES` - Venezuelan Bolívar
+	// - `VEB` - Venezuelan Bolívar (1871–2008)
+	// - `VEF` - Venezuelan Bolívar (2008–2018)
+	// - `VND` - Vietnamese Dong
+	// - `VNN` - Vietnamese Dong (1978–1985)
+	// - `CHE` - WIR Euro
+	// - `CHW` - WIR Franc
+	// - `XOF` - West African CFA Franc
+	// - `YDD` - Yemeni Dinar
+	// - `YER` - Yemeni Rial
+	// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// - `YUM` - Yugoslavian New Dinar (1994–2002)
+	// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// - `ZWN` - ZWN
+	// - `ZRN` - Zairean New Zaire (1993–1998)
+	// - `ZRZ` - Zairean Zaire (1971–1993)
+	// - `ZMW` - Zambian Kwacha
+	// - `ZMK` - Zambian Kwacha (1968–2012)
+	// - `ZWD` - Zimbabwean Dollar (1980–2008)
+	// - `ZWR` - Zimbabwean Dollar (2008)
+	// - `ZWL` - Zimbabwean Dollar (2009)
+	Currency *VendorCreditRequestCurrency `json:"currency,omitempty"`
+	// The vendor credit's exchange rate.
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
+	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty"`
+	// The company the vendor credit belongs to.
+	Company            *VendorCreditRequestCompany                  `json:"company,omitempty"`
+	TrackingCategories []*VendorCreditRequestTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	// A list of VendorCredit Applied to Lines objects.
+	AppliedToLines []*VendorCreditApplyLineForVendorCreditRequest `json:"applied_to_lines,omitempty"`
+	// The accounting period that the VendorCredit was generated in.
+	AccountingPeriod    *VendorCreditRequestAccountingPeriod `json:"accounting_period,omitempty"`
+	IntegrationParams   map[string]interface{}               `json:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}               `json:"linked_account_params,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *VendorCreditRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler VendorCreditRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = VendorCreditRequest(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *VendorCreditRequest) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
+}
+
+// The accounting period that the VendorCredit was generated in.
+type VendorCreditRequestAccountingPeriod struct {
+	typeName         string
+	String           string
+	AccountingPeriod *AccountingPeriod
+}
+
+func NewVendorCreditRequestAccountingPeriodFromString(value string) *VendorCreditRequestAccountingPeriod {
+	return &VendorCreditRequestAccountingPeriod{typeName: "string", String: value}
+}
+
+func NewVendorCreditRequestAccountingPeriodFromAccountingPeriod(value *AccountingPeriod) *VendorCreditRequestAccountingPeriod {
+	return &VendorCreditRequestAccountingPeriod{typeName: "accountingPeriod", AccountingPeriod: value}
+}
+
+func (v *VendorCreditRequestAccountingPeriod) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueAccountingPeriod := new(AccountingPeriod)
+	if err := json.Unmarshal(data, &valueAccountingPeriod); err == nil {
+		v.typeName = "accountingPeriod"
+		v.AccountingPeriod = valueAccountingPeriod
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditRequestAccountingPeriod) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "accountingPeriod":
+		return json.Marshal(v.AccountingPeriod)
+	}
+}
+
+type VendorCreditRequestAccountingPeriodVisitor interface {
+	VisitString(string) error
+	VisitAccountingPeriod(*AccountingPeriod) error
+}
+
+func (v *VendorCreditRequestAccountingPeriod) Accept(visitor VendorCreditRequestAccountingPeriodVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "accountingPeriod":
+		return visitor.VisitAccountingPeriod(v.AccountingPeriod)
+	}
+}
+
+// The company the vendor credit belongs to.
+type VendorCreditRequestCompany struct {
+	typeName    string
+	String      string
+	CompanyInfo *CompanyInfo
+}
+
+func NewVendorCreditRequestCompanyFromString(value string) *VendorCreditRequestCompany {
+	return &VendorCreditRequestCompany{typeName: "string", String: value}
+}
+
+func NewVendorCreditRequestCompanyFromCompanyInfo(value *CompanyInfo) *VendorCreditRequestCompany {
+	return &VendorCreditRequestCompany{typeName: "companyInfo", CompanyInfo: value}
+}
+
+func (v *VendorCreditRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		v.typeName = "companyInfo"
+		v.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditRequestCompany) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "companyInfo":
+		return json.Marshal(v.CompanyInfo)
+	}
+}
+
+type VendorCreditRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (v *VendorCreditRequestCompany) Accept(visitor VendorCreditRequestCompanyVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "companyInfo":
+		return visitor.VisitCompanyInfo(v.CompanyInfo)
+	}
+}
+
+// The vendor credit's currency.
+//
+// - `XUA` - ADB Unit of Account
+// - `AFN` - Afghan Afghani
+// - `AFA` - Afghan Afghani (1927–2002)
+// - `ALL` - Albanian Lek
+// - `ALK` - Albanian Lek (1946–1965)
+// - `DZD` - Algerian Dinar
+// - `ADP` - Andorran Peseta
+// - `AOA` - Angolan Kwanza
+// - `AOK` - Angolan Kwanza (1977–1991)
+// - `AON` - Angolan New Kwanza (1990–2000)
+// - `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// - `ARA` - Argentine Austral
+// - `ARS` - Argentine Peso
+// - `ARM` - Argentine Peso (1881–1970)
+// - `ARP` - Argentine Peso (1983–1985)
+// - `ARL` - Argentine Peso Ley (1970–1983)
+// - `AMD` - Armenian Dram
+// - `AWG` - Aruban Florin
+// - `AUD` - Australian Dollar
+// - `ATS` - Austrian Schilling
+// - `AZN` - Azerbaijani Manat
+// - `AZM` - Azerbaijani Manat (1993–2006)
+// - `BSD` - Bahamian Dollar
+// - `BHD` - Bahraini Dinar
+// - `BDT` - Bangladeshi Taka
+// - `BBD` - Barbadian Dollar
+// - `BYN` - Belarusian Ruble
+// - `BYB` - Belarusian Ruble (1994–1999)
+// - `BYR` - Belarusian Ruble (2000–2016)
+// - `BEF` - Belgian Franc
+// - `BEC` - Belgian Franc (convertible)
+// - `BEL` - Belgian Franc (financial)
+// - `BZD` - Belize Dollar
+// - `BMD` - Bermudan Dollar
+// - `BTN` - Bhutanese Ngultrum
+// - `BOB` - Bolivian Boliviano
+// - `BOL` - Bolivian Boliviano (1863–1963)
+// - `BOV` - Bolivian Mvdol
+// - `BOP` - Bolivian Peso
+// - `BAM` - Bosnia-Herzegovina Convertible Mark
+// - `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// - `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// - `BWP` - Botswanan Pula
+// - `BRC` - Brazilian Cruzado (1986–1989)
+// - `BRZ` - Brazilian Cruzeiro (1942–1967)
+// - `BRE` - Brazilian Cruzeiro (1990–1993)
+// - `BRR` - Brazilian Cruzeiro (1993–1994)
+// - `BRN` - Brazilian New Cruzado (1989–1990)
+// - `BRB` - Brazilian New Cruzeiro (1967–1986)
+// - `BRL` - Brazilian Real
+// - `GBP` - British Pound
+// - `BND` - Brunei Dollar
+// - `BGL` - Bulgarian Hard Lev
+// - `BGN` - Bulgarian Lev
+// - `BGO` - Bulgarian Lev (1879–1952)
+// - `BGM` - Bulgarian Socialist Lev
+// - `BUK` - Burmese Kyat
+// - `BIF` - Burundian Franc
+// - `XPF` - CFP Franc
+// - `KHR` - Cambodian Riel
+// - `CAD` - Canadian Dollar
+// - `CVE` - Cape Verdean Escudo
+// - `KYD` - Cayman Islands Dollar
+// - `XAF` - Central African CFA Franc
+// - `CLE` - Chilean Escudo
+// - `CLP` - Chilean Peso
+// - `CLF` - Chilean Unit of Account (UF)
+// - `CNX` - Chinese People’s Bank Dollar
+// - `CNY` - Chinese Yuan
+// - `CNH` - Chinese Yuan (offshore)
+// - `COP` - Colombian Peso
+// - `COU` - Colombian Real Value Unit
+// - `KMF` - Comorian Franc
+// - `CDF` - Congolese Franc
+// - `CRC` - Costa Rican Colón
+// - `HRD` - Croatian Dinar
+// - `HRK` - Croatian Kuna
+// - `CUC` - Cuban Convertible Peso
+// - `CUP` - Cuban Peso
+// - `CYP` - Cypriot Pound
+// - `CZK` - Czech Koruna
+// - `CSK` - Czechoslovak Hard Koruna
+// - `DKK` - Danish Krone
+// - `DJF` - Djiboutian Franc
+// - `DOP` - Dominican Peso
+// - `NLG` - Dutch Guilder
+// - `XCD` - East Caribbean Dollar
+// - `DDM` - East German Mark
+// - `ECS` - Ecuadorian Sucre
+// - `ECV` - Ecuadorian Unit of Constant Value
+// - `EGP` - Egyptian Pound
+// - `GQE` - Equatorial Guinean Ekwele
+// - `ERN` - Eritrean Nakfa
+// - `EEK` - Estonian Kroon
+// - `ETB` - Ethiopian Birr
+// - `EUR` - Euro
+// - `XBA` - European Composite Unit
+// - `XEU` - European Currency Unit
+// - `XBB` - European Monetary Unit
+// - `XBC` - European Unit of Account (XBC)
+// - `XBD` - European Unit of Account (XBD)
+// - `FKP` - Falkland Islands Pound
+// - `FJD` - Fijian Dollar
+// - `FIM` - Finnish Markka
+// - `FRF` - French Franc
+// - `XFO` - French Gold Franc
+// - `XFU` - French UIC-Franc
+// - `GMD` - Gambian Dalasi
+// - `GEK` - Georgian Kupon Larit
+// - `GEL` - Georgian Lari
+// - `DEM` - German Mark
+// - `GHS` - Ghanaian Cedi
+// - `GHC` - Ghanaian Cedi (1979–2007)
+// - `GIP` - Gibraltar Pound
+// - `XAU` - Gold
+// - `GRD` - Greek Drachma
+// - `GTQ` - Guatemalan Quetzal
+// - `GWP` - Guinea-Bissau Peso
+// - `GNF` - Guinean Franc
+// - `GNS` - Guinean Syli
+// - `GYD` - Guyanaese Dollar
+// - `HTG` - Haitian Gourde
+// - `HNL` - Honduran Lempira
+// - `HKD` - Hong Kong Dollar
+// - `HUF` - Hungarian Forint
+// - `IMP` - IMP
+// - `ISK` - Icelandic Króna
+// - `ISJ` - Icelandic Króna (1918–1981)
+// - `INR` - Indian Rupee
+// - `IDR` - Indonesian Rupiah
+// - `IRR` - Iranian Rial
+// - `IQD` - Iraqi Dinar
+// - `IEP` - Irish Pound
+// - `ILS` - Israeli New Shekel
+// - `ILP` - Israeli Pound
+// - `ILR` - Israeli Shekel (1980–1985)
+// - `ITL` - Italian Lira
+// - `JMD` - Jamaican Dollar
+// - `JPY` - Japanese Yen
+// - `JOD` - Jordanian Dinar
+// - `KZT` - Kazakhstani Tenge
+// - `KES` - Kenyan Shilling
+// - `KWD` - Kuwaiti Dinar
+// - `KGS` - Kyrgystani Som
+// - `LAK` - Laotian Kip
+// - `LVL` - Latvian Lats
+// - `LVR` - Latvian Ruble
+// - `LBP` - Lebanese Pound
+// - `LSL` - Lesotho Loti
+// - `LRD` - Liberian Dollar
+// - `LYD` - Libyan Dinar
+// - `LTL` - Lithuanian Litas
+// - `LTT` - Lithuanian Talonas
+// - `LUL` - Luxembourg Financial Franc
+// - `LUC` - Luxembourgian Convertible Franc
+// - `LUF` - Luxembourgian Franc
+// - `MOP` - Macanese Pataca
+// - `MKD` - Macedonian Denar
+// - `MKN` - Macedonian Denar (1992–1993)
+// - `MGA` - Malagasy Ariary
+// - `MGF` - Malagasy Franc
+// - `MWK` - Malawian Kwacha
+// - `MYR` - Malaysian Ringgit
+// - `MVR` - Maldivian Rufiyaa
+// - `MVP` - Maldivian Rupee (1947–1981)
+// - `MLF` - Malian Franc
+// - `MTL` - Maltese Lira
+// - `MTP` - Maltese Pound
+// - `MRU` - Mauritanian Ouguiya
+// - `MRO` - Mauritanian Ouguiya (1973–2017)
+// - `MUR` - Mauritian Rupee
+// - `MXV` - Mexican Investment Unit
+// - `MXN` - Mexican Peso
+// - `MXP` - Mexican Silver Peso (1861–1992)
+// - `MDC` - Moldovan Cupon
+// - `MDL` - Moldovan Leu
+// - `MCF` - Monegasque Franc
+// - `MNT` - Mongolian Tugrik
+// - `MAD` - Moroccan Dirham
+// - `MAF` - Moroccan Franc
+// - `MZE` - Mozambican Escudo
+// - `MZN` - Mozambican Metical
+// - `MZM` - Mozambican Metical (1980–2006)
+// - `MMK` - Myanmar Kyat
+// - `NAD` - Namibian Dollar
+// - `NPR` - Nepalese Rupee
+// - `ANG` - Netherlands Antillean Guilder
+// - `TWD` - New Taiwan Dollar
+// - `NZD` - New Zealand Dollar
+// - `NIO` - Nicaraguan Córdoba
+// - `NIC` - Nicaraguan Córdoba (1988–1991)
+// - `NGN` - Nigerian Naira
+// - `KPW` - North Korean Won
+// - `NOK` - Norwegian Krone
+// - `OMR` - Omani Rial
+// - `PKR` - Pakistani Rupee
+// - `XPD` - Palladium
+// - `PAB` - Panamanian Balboa
+// - `PGK` - Papua New Guinean Kina
+// - `PYG` - Paraguayan Guarani
+// - `PEI` - Peruvian Inti
+// - `PEN` - Peruvian Sol
+// - `PES` - Peruvian Sol (1863–1965)
+// - `PHP` - Philippine Peso
+// - `XPT` - Platinum
+// - `PLN` - Polish Zloty
+// - `PLZ` - Polish Zloty (1950–1995)
+// - `PTE` - Portuguese Escudo
+// - `GWE` - Portuguese Guinea Escudo
+// - `QAR` - Qatari Rial
+// - `XRE` - RINET Funds
+// - `RHD` - Rhodesian Dollar
+// - `RON` - Romanian Leu
+// - `ROL` - Romanian Leu (1952–2006)
+// - `RUB` - Russian Ruble
+// - `RUR` - Russian Ruble (1991–1998)
+// - `RWF` - Rwandan Franc
+// - `SVC` - Salvadoran Colón
+// - `WST` - Samoan Tala
+// - `SAR` - Saudi Riyal
+// - `RSD` - Serbian Dinar
+// - `CSD` - Serbian Dinar (2002–2006)
+// - `SCR` - Seychellois Rupee
+// - `SLL` - Sierra Leonean Leone
+// - `XAG` - Silver
+// - `SGD` - Singapore Dollar
+// - `SKK` - Slovak Koruna
+// - `SIT` - Slovenian Tolar
+// - `SBD` - Solomon Islands Dollar
+// - `SOS` - Somali Shilling
+// - `ZAR` - South African Rand
+// - `ZAL` - South African Rand (financial)
+// - `KRH` - South Korean Hwan (1953–1962)
+// - `KRW` - South Korean Won
+// - `KRO` - South Korean Won (1945–1953)
+// - `SSP` - South Sudanese Pound
+// - `SUR` - Soviet Rouble
+// - `ESP` - Spanish Peseta
+// - `ESA` - Spanish Peseta (A account)
+// - `ESB` - Spanish Peseta (convertible account)
+// - `XDR` - Special Drawing Rights
+// - `LKR` - Sri Lankan Rupee
+// - `SHP` - St. Helena Pound
+// - `XSU` - Sucre
+// - `SDD` - Sudanese Dinar (1992–2007)
+// - `SDG` - Sudanese Pound
+// - `SDP` - Sudanese Pound (1957–1998)
+// - `SRD` - Surinamese Dollar
+// - `SRG` - Surinamese Guilder
+// - `SZL` - Swazi Lilangeni
+// - `SEK` - Swedish Krona
+// - `CHF` - Swiss Franc
+// - `SYP` - Syrian Pound
+// - `STN` - São Tomé & Príncipe Dobra
+// - `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// - `TVD` - TVD
+// - `TJR` - Tajikistani Ruble
+// - `TJS` - Tajikistani Somoni
+// - `TZS` - Tanzanian Shilling
+// - `XTS` - Testing Currency Code
+// - `THB` - Thai Baht
+// - `XXX` - The codes assigned for transactions where no currency is involved
+// - `TPE` - Timorese Escudo
+// - `TOP` - Tongan Paʻanga
+// - `TTD` - Trinidad & Tobago Dollar
+// - `TND` - Tunisian Dinar
+// - `TRY` - Turkish Lira
+// - `TRL` - Turkish Lira (1922–2005)
+// - `TMT` - Turkmenistani Manat
+// - `TMM` - Turkmenistani Manat (1993–2009)
+// - `USD` - US Dollar
+// - `USN` - US Dollar (Next day)
+// - `USS` - US Dollar (Same day)
+// - `UGX` - Ugandan Shilling
+// - `UGS` - Ugandan Shilling (1966–1987)
+// - `UAH` - Ukrainian Hryvnia
+// - `UAK` - Ukrainian Karbovanets
+// - `AED` - United Arab Emirates Dirham
+// - `UYW` - Uruguayan Nominal Wage Index Unit
+// - `UYU` - Uruguayan Peso
+// - `UYP` - Uruguayan Peso (1975–1993)
+// - `UYI` - Uruguayan Peso (Indexed Units)
+// - `UZS` - Uzbekistani Som
+// - `VUV` - Vanuatu Vatu
+// - `VES` - Venezuelan Bolívar
+// - `VEB` - Venezuelan Bolívar (1871–2008)
+// - `VEF` - Venezuelan Bolívar (2008–2018)
+// - `VND` - Vietnamese Dong
+// - `VNN` - Vietnamese Dong (1978–1985)
+// - `CHE` - WIR Euro
+// - `CHW` - WIR Franc
+// - `XOF` - West African CFA Franc
+// - `YDD` - Yemeni Dinar
+// - `YER` - Yemeni Rial
+// - `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// - `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// - `YUM` - Yugoslavian New Dinar (1994–2002)
+// - `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// - `ZWN` - ZWN
+// - `ZRN` - Zairean New Zaire (1993–1998)
+// - `ZRZ` - Zairean Zaire (1971–1993)
+// - `ZMW` - Zambian Kwacha
+// - `ZMK` - Zambian Kwacha (1968–2012)
+// - `ZWD` - Zimbabwean Dollar (1980–2008)
+// - `ZWR` - Zimbabwean Dollar (2008)
+// - `ZWL` - Zimbabwean Dollar (2009)
+type VendorCreditRequestCurrency struct {
+	typeName                string
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+}
+
+func NewVendorCreditRequestCurrencyFromTransactionCurrencyEnum(value TransactionCurrencyEnum) *VendorCreditRequestCurrency {
+	return &VendorCreditRequestCurrency{typeName: "transactionCurrencyEnum", TransactionCurrencyEnum: value}
+}
+
+func NewVendorCreditRequestCurrencyFromString(value string) *VendorCreditRequestCurrency {
+	return &VendorCreditRequestCurrency{typeName: "string", String: value}
+}
+
+func (v *VendorCreditRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		v.typeName = "transactionCurrencyEnum"
+		v.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditRequestCurrency) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "transactionCurrencyEnum":
+		return json.Marshal(v.TransactionCurrencyEnum)
+	case "string":
+		return json.Marshal(v.String)
+	}
+}
+
+type VendorCreditRequestCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (v *VendorCreditRequestCurrency) Accept(visitor VendorCreditRequestCurrencyVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "transactionCurrencyEnum":
+		return visitor.VisitTransactionCurrencyEnum(v.TransactionCurrencyEnum)
+	case "string":
+		return visitor.VisitString(v.String)
+	}
+}
+
+type VendorCreditRequestTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewVendorCreditRequestTrackingCategoriesItemFromString(value string) *VendorCreditRequestTrackingCategoriesItem {
+	return &VendorCreditRequestTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewVendorCreditRequestTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *VendorCreditRequestTrackingCategoriesItem {
+	return &VendorCreditRequestTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (v *VendorCreditRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		v.typeName = "trackingCategory"
+		v.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "trackingCategory":
+		return json.Marshal(v.TrackingCategory)
+	}
+}
+
+type VendorCreditRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (v *VendorCreditRequestTrackingCategoriesItem) Accept(visitor VendorCreditRequestTrackingCategoriesItemVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(v.TrackingCategory)
+	}
+}
+
+// The vendor that owes the gift or refund.
+type VendorCreditRequestVendor struct {
+	typeName string
+	String   string
+	Contact  *Contact
+}
+
+func NewVendorCreditRequestVendorFromString(value string) *VendorCreditRequestVendor {
+	return &VendorCreditRequestVendor{typeName: "string", String: value}
+}
+
+func NewVendorCreditRequestVendorFromContact(value *Contact) *VendorCreditRequestVendor {
+	return &VendorCreditRequestVendor{typeName: "contact", Contact: value}
+}
+
+func (v *VendorCreditRequestVendor) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typeName = "string"
+		v.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		v.typeName = "contact"
+		v.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditRequestVendor) MarshalJSON() ([]byte, error) {
+	switch v.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return json.Marshal(v.String)
+	case "contact":
+		return json.Marshal(v.Contact)
+	}
+}
+
+type VendorCreditRequestVendorVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (v *VendorCreditRequestVendor) Accept(visitor VendorCreditRequestVendorVisitor) error {
+	switch v.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", v.typeName, v)
+	case "string":
+		return visitor.VisitString(v.String)
+	case "contact":
+		return visitor.VisitContact(v.Contact)
+	}
+}
+
+type VendorCreditResponse struct {
+	Model    *VendorCredit               `json:"model,omitempty"`
+	Warnings []*WarningValidationProblem `json:"warnings,omitempty"`
+	Errors   []*ErrorValidationProblem   `json:"errors,omitempty"`
+	Logs     []*DebugModeLog             `json:"logs,omitempty"`
+
+	_rawJSON json.RawMessage
+}
+
+func (v *VendorCreditResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler VendorCreditResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*v = VendorCreditResponse(value)
+	v._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (v *VendorCreditResponse) String() string {
+	if len(v._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(v._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(v); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", v)
 }
 
 type VendorCreditTrackingCategoriesItem struct {

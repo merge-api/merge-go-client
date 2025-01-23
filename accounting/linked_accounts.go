@@ -38,7 +38,7 @@ type LinkedAccountsListRequest struct {
 	IsTestAccount *string `json:"-"`
 	// Number of results to return per page.
 	PageSize *int `json:"-"`
-	// Filter by status. Options: `COMPLETE`, `INCOMPLETE`, `RELINK_NEEDED`
+	// Filter by status. Options: `COMPLETE`, `IDLE`, `INCOMPLETE`, `RELINK_NEEDED`
 	Status *string `json:"-"`
 }
 

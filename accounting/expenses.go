@@ -15,6 +15,21 @@ type ExpenseEndpointRequest struct {
 	Model    *ExpenseRequest `json:"model,omitempty"`
 }
 
+type ExpensesLinesRemoteFieldClassesListRequest struct {
+	// The pagination cursor value.
+	Cursor *string `json:"-"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	IncludeDeletedData *bool `json:"-"`
+	// Whether to include the original data Merge fetched from the third-party to produce these models.
+	IncludeRemoteData *bool `json:"-"`
+	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+	IncludeShellData *bool `json:"-"`
+	// If provided, will only return remote field classes with this is_common_model_field value
+	IsCommonModelField *bool `json:"-"`
+	// Number of results to return per page.
+	PageSize *int `json:"-"`
+}
+
 type ExpensesListRequest struct {
 	// If provided, will only return expenses for this company.
 	CompanyId *string `json:"-"`
@@ -26,10 +41,14 @@ type ExpensesListRequest struct {
 	Cursor *string `json:"-"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *ExpensesListRequestExpand `json:"-"`
-	// Whether to include data that was marked as deleted by third party webhooks.
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+	IncludeRemoteFields *bool `json:"-"`
+	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+	IncludeShellData *bool `json:"-"`
 	// If provided, only objects synced by Merge after this date time will be returned.
 	ModifiedAfter *time.Time `json:"-"`
 	// If provided, only objects synced by Merge before this date time will be returned.
@@ -44,47 +63,96 @@ type ExpensesListRequest struct {
 	TransactionDateBefore *time.Time `json:"-"`
 }
 
+type ExpensesRemoteFieldClassesListRequest struct {
+	// The pagination cursor value.
+	Cursor *string `json:"-"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	IncludeDeletedData *bool `json:"-"`
+	// Whether to include the original data Merge fetched from the third-party to produce these models.
+	IncludeRemoteData *bool `json:"-"`
+	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+	IncludeShellData *bool `json:"-"`
+	// If provided, will only return remote field classes with this is_common_model_field value
+	IsCommonModelField *bool `json:"-"`
+	// Number of results to return per page.
+	PageSize *int `json:"-"`
+}
+
 type ExpensesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand *ExpensesRetrieveRequestExpand `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-"`
+	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+	IncludeRemoteFields *bool `json:"-"`
 }
 
 type ExpensesListRequestExpand string
 
 const (
-	ExpensesListRequestExpandAccount                                                 ExpensesListRequestExpand = "account"
-	ExpensesListRequestExpandAccountAccountingPeriod                                 ExpensesListRequestExpand = "account,accounting_period"
-	ExpensesListRequestExpandAccountCompany                                          ExpensesListRequestExpand = "account,company"
-	ExpensesListRequestExpandAccountCompanyAccountingPeriod                          ExpensesListRequestExpand = "account,company,accounting_period"
-	ExpensesListRequestExpandAccountContact                                          ExpensesListRequestExpand = "account,contact"
-	ExpensesListRequestExpandAccountContactAccountingPeriod                          ExpensesListRequestExpand = "account,contact,accounting_period"
-	ExpensesListRequestExpandAccountContactCompany                                   ExpensesListRequestExpand = "account,contact,company"
-	ExpensesListRequestExpandAccountContactCompanyAccountingPeriod                   ExpensesListRequestExpand = "account,contact,company,accounting_period"
-	ExpensesListRequestExpandAccountingPeriod                                        ExpensesListRequestExpand = "accounting_period"
-	ExpensesListRequestExpandCompany                                                 ExpensesListRequestExpand = "company"
-	ExpensesListRequestExpandCompanyAccountingPeriod                                 ExpensesListRequestExpand = "company,accounting_period"
-	ExpensesListRequestExpandContact                                                 ExpensesListRequestExpand = "contact"
-	ExpensesListRequestExpandContactAccountingPeriod                                 ExpensesListRequestExpand = "contact,accounting_period"
-	ExpensesListRequestExpandContactCompany                                          ExpensesListRequestExpand = "contact,company"
-	ExpensesListRequestExpandContactCompanyAccountingPeriod                          ExpensesListRequestExpand = "contact,company,accounting_period"
-	ExpensesListRequestExpandTrackingCategories                                      ExpensesListRequestExpand = "tracking_categories"
-	ExpensesListRequestExpandTrackingCategoriesAccount                               ExpensesListRequestExpand = "tracking_categories,account"
-	ExpensesListRequestExpandTrackingCategoriesAccountAccountingPeriod               ExpensesListRequestExpand = "tracking_categories,account,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesAccountCompany                        ExpensesListRequestExpand = "tracking_categories,account,company"
-	ExpensesListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod        ExpensesListRequestExpand = "tracking_categories,account,company,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesAccountContact                        ExpensesListRequestExpand = "tracking_categories,account,contact"
-	ExpensesListRequestExpandTrackingCategoriesAccountContactAccountingPeriod        ExpensesListRequestExpand = "tracking_categories,account,contact,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesAccountContactCompany                 ExpensesListRequestExpand = "tracking_categories,account,contact,company"
-	ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod ExpensesListRequestExpand = "tracking_categories,account,contact,company,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesAccountingPeriod                      ExpensesListRequestExpand = "tracking_categories,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesCompany                               ExpensesListRequestExpand = "tracking_categories,company"
-	ExpensesListRequestExpandTrackingCategoriesCompanyAccountingPeriod               ExpensesListRequestExpand = "tracking_categories,company,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesContact                               ExpensesListRequestExpand = "tracking_categories,contact"
-	ExpensesListRequestExpandTrackingCategoriesContactAccountingPeriod               ExpensesListRequestExpand = "tracking_categories,contact,accounting_period"
-	ExpensesListRequestExpandTrackingCategoriesContactCompany                        ExpensesListRequestExpand = "tracking_categories,contact,company"
-	ExpensesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod        ExpensesListRequestExpand = "tracking_categories,contact,company,accounting_period"
+	ExpensesListRequestExpandAccount                                                         ExpensesListRequestExpand = "account"
+	ExpensesListRequestExpandAccountAccountingPeriod                                         ExpensesListRequestExpand = "account,accounting_period"
+	ExpensesListRequestExpandAccountCompany                                                  ExpensesListRequestExpand = "account,company"
+	ExpensesListRequestExpandAccountCompanyAccountingPeriod                                  ExpensesListRequestExpand = "account,company,accounting_period"
+	ExpensesListRequestExpandAccountCompanyEmployee                                          ExpensesListRequestExpand = "account,company,employee"
+	ExpensesListRequestExpandAccountCompanyEmployeeAccountingPeriod                          ExpensesListRequestExpand = "account,company,employee,accounting_period"
+	ExpensesListRequestExpandAccountContact                                                  ExpensesListRequestExpand = "account,contact"
+	ExpensesListRequestExpandAccountContactAccountingPeriod                                  ExpensesListRequestExpand = "account,contact,accounting_period"
+	ExpensesListRequestExpandAccountContactCompany                                           ExpensesListRequestExpand = "account,contact,company"
+	ExpensesListRequestExpandAccountContactCompanyAccountingPeriod                           ExpensesListRequestExpand = "account,contact,company,accounting_period"
+	ExpensesListRequestExpandAccountContactCompanyEmployee                                   ExpensesListRequestExpand = "account,contact,company,employee"
+	ExpensesListRequestExpandAccountContactCompanyEmployeeAccountingPeriod                   ExpensesListRequestExpand = "account,contact,company,employee,accounting_period"
+	ExpensesListRequestExpandAccountContactEmployee                                          ExpensesListRequestExpand = "account,contact,employee"
+	ExpensesListRequestExpandAccountContactEmployeeAccountingPeriod                          ExpensesListRequestExpand = "account,contact,employee,accounting_period"
+	ExpensesListRequestExpandAccountEmployee                                                 ExpensesListRequestExpand = "account,employee"
+	ExpensesListRequestExpandAccountEmployeeAccountingPeriod                                 ExpensesListRequestExpand = "account,employee,accounting_period"
+	ExpensesListRequestExpandAccountingPeriod                                                ExpensesListRequestExpand = "accounting_period"
+	ExpensesListRequestExpandCompany                                                         ExpensesListRequestExpand = "company"
+	ExpensesListRequestExpandCompanyAccountingPeriod                                         ExpensesListRequestExpand = "company,accounting_period"
+	ExpensesListRequestExpandCompanyEmployee                                                 ExpensesListRequestExpand = "company,employee"
+	ExpensesListRequestExpandCompanyEmployeeAccountingPeriod                                 ExpensesListRequestExpand = "company,employee,accounting_period"
+	ExpensesListRequestExpandContact                                                         ExpensesListRequestExpand = "contact"
+	ExpensesListRequestExpandContactAccountingPeriod                                         ExpensesListRequestExpand = "contact,accounting_period"
+	ExpensesListRequestExpandContactCompany                                                  ExpensesListRequestExpand = "contact,company"
+	ExpensesListRequestExpandContactCompanyAccountingPeriod                                  ExpensesListRequestExpand = "contact,company,accounting_period"
+	ExpensesListRequestExpandContactCompanyEmployee                                          ExpensesListRequestExpand = "contact,company,employee"
+	ExpensesListRequestExpandContactCompanyEmployeeAccountingPeriod                          ExpensesListRequestExpand = "contact,company,employee,accounting_period"
+	ExpensesListRequestExpandContactEmployee                                                 ExpensesListRequestExpand = "contact,employee"
+	ExpensesListRequestExpandContactEmployeeAccountingPeriod                                 ExpensesListRequestExpand = "contact,employee,accounting_period"
+	ExpensesListRequestExpandEmployee                                                        ExpensesListRequestExpand = "employee"
+	ExpensesListRequestExpandEmployeeAccountingPeriod                                        ExpensesListRequestExpand = "employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategories                                              ExpensesListRequestExpand = "tracking_categories"
+	ExpensesListRequestExpandTrackingCategoriesAccount                                       ExpensesListRequestExpand = "tracking_categories,account"
+	ExpensesListRequestExpandTrackingCategoriesAccountAccountingPeriod                       ExpensesListRequestExpand = "tracking_categories,account,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountCompany                                ExpensesListRequestExpand = "tracking_categories,account,company"
+	ExpensesListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod                ExpensesListRequestExpand = "tracking_categories,account,company,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountCompanyEmployee                        ExpensesListRequestExpand = "tracking_categories,account,company,employee"
+	ExpensesListRequestExpandTrackingCategoriesAccountCompanyEmployeeAccountingPeriod        ExpensesListRequestExpand = "tracking_categories,account,company,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountContact                                ExpensesListRequestExpand = "tracking_categories,account,contact"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactAccountingPeriod                ExpensesListRequestExpand = "tracking_categories,account,contact,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactCompany                         ExpensesListRequestExpand = "tracking_categories,account,contact,company"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod         ExpensesListRequestExpand = "tracking_categories,account,contact,company,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyEmployee                 ExpensesListRequestExpand = "tracking_categories,account,contact,company,employee"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyEmployeeAccountingPeriod ExpensesListRequestExpand = "tracking_categories,account,contact,company,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactEmployee                        ExpensesListRequestExpand = "tracking_categories,account,contact,employee"
+	ExpensesListRequestExpandTrackingCategoriesAccountContactEmployeeAccountingPeriod        ExpensesListRequestExpand = "tracking_categories,account,contact,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountEmployee                               ExpensesListRequestExpand = "tracking_categories,account,employee"
+	ExpensesListRequestExpandTrackingCategoriesAccountEmployeeAccountingPeriod               ExpensesListRequestExpand = "tracking_categories,account,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesAccountingPeriod                              ExpensesListRequestExpand = "tracking_categories,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesCompany                                       ExpensesListRequestExpand = "tracking_categories,company"
+	ExpensesListRequestExpandTrackingCategoriesCompanyAccountingPeriod                       ExpensesListRequestExpand = "tracking_categories,company,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesCompanyEmployee                               ExpensesListRequestExpand = "tracking_categories,company,employee"
+	ExpensesListRequestExpandTrackingCategoriesCompanyEmployeeAccountingPeriod               ExpensesListRequestExpand = "tracking_categories,company,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesContact                                       ExpensesListRequestExpand = "tracking_categories,contact"
+	ExpensesListRequestExpandTrackingCategoriesContactAccountingPeriod                       ExpensesListRequestExpand = "tracking_categories,contact,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesContactCompany                                ExpensesListRequestExpand = "tracking_categories,contact,company"
+	ExpensesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                ExpensesListRequestExpand = "tracking_categories,contact,company,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesContactCompanyEmployee                        ExpensesListRequestExpand = "tracking_categories,contact,company,employee"
+	ExpensesListRequestExpandTrackingCategoriesContactCompanyEmployeeAccountingPeriod        ExpensesListRequestExpand = "tracking_categories,contact,company,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesContactEmployee                               ExpensesListRequestExpand = "tracking_categories,contact,employee"
+	ExpensesListRequestExpandTrackingCategoriesContactEmployeeAccountingPeriod               ExpensesListRequestExpand = "tracking_categories,contact,employee,accounting_period"
+	ExpensesListRequestExpandTrackingCategoriesEmployee                                      ExpensesListRequestExpand = "tracking_categories,employee"
+	ExpensesListRequestExpandTrackingCategoriesEmployeeAccountingPeriod                      ExpensesListRequestExpand = "tracking_categories,employee,accounting_period"
 )
 
 func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand, error) {
@@ -97,6 +165,10 @@ func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand
 		return ExpensesListRequestExpandAccountCompany, nil
 	case "account,company,accounting_period":
 		return ExpensesListRequestExpandAccountCompanyAccountingPeriod, nil
+	case "account,company,employee":
+		return ExpensesListRequestExpandAccountCompanyEmployee, nil
+	case "account,company,employee,accounting_period":
+		return ExpensesListRequestExpandAccountCompanyEmployeeAccountingPeriod, nil
 	case "account,contact":
 		return ExpensesListRequestExpandAccountContact, nil
 	case "account,contact,accounting_period":
@@ -105,12 +177,28 @@ func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand
 		return ExpensesListRequestExpandAccountContactCompany, nil
 	case "account,contact,company,accounting_period":
 		return ExpensesListRequestExpandAccountContactCompanyAccountingPeriod, nil
+	case "account,contact,company,employee":
+		return ExpensesListRequestExpandAccountContactCompanyEmployee, nil
+	case "account,contact,company,employee,accounting_period":
+		return ExpensesListRequestExpandAccountContactCompanyEmployeeAccountingPeriod, nil
+	case "account,contact,employee":
+		return ExpensesListRequestExpandAccountContactEmployee, nil
+	case "account,contact,employee,accounting_period":
+		return ExpensesListRequestExpandAccountContactEmployeeAccountingPeriod, nil
+	case "account,employee":
+		return ExpensesListRequestExpandAccountEmployee, nil
+	case "account,employee,accounting_period":
+		return ExpensesListRequestExpandAccountEmployeeAccountingPeriod, nil
 	case "accounting_period":
 		return ExpensesListRequestExpandAccountingPeriod, nil
 	case "company":
 		return ExpensesListRequestExpandCompany, nil
 	case "company,accounting_period":
 		return ExpensesListRequestExpandCompanyAccountingPeriod, nil
+	case "company,employee":
+		return ExpensesListRequestExpandCompanyEmployee, nil
+	case "company,employee,accounting_period":
+		return ExpensesListRequestExpandCompanyEmployeeAccountingPeriod, nil
 	case "contact":
 		return ExpensesListRequestExpandContact, nil
 	case "contact,accounting_period":
@@ -119,6 +207,18 @@ func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand
 		return ExpensesListRequestExpandContactCompany, nil
 	case "contact,company,accounting_period":
 		return ExpensesListRequestExpandContactCompanyAccountingPeriod, nil
+	case "contact,company,employee":
+		return ExpensesListRequestExpandContactCompanyEmployee, nil
+	case "contact,company,employee,accounting_period":
+		return ExpensesListRequestExpandContactCompanyEmployeeAccountingPeriod, nil
+	case "contact,employee":
+		return ExpensesListRequestExpandContactEmployee, nil
+	case "contact,employee,accounting_period":
+		return ExpensesListRequestExpandContactEmployeeAccountingPeriod, nil
+	case "employee":
+		return ExpensesListRequestExpandEmployee, nil
+	case "employee,accounting_period":
+		return ExpensesListRequestExpandEmployeeAccountingPeriod, nil
 	case "tracking_categories":
 		return ExpensesListRequestExpandTrackingCategories, nil
 	case "tracking_categories,account":
@@ -129,6 +229,10 @@ func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand
 		return ExpensesListRequestExpandTrackingCategoriesAccountCompany, nil
 	case "tracking_categories,account,company,accounting_period":
 		return ExpensesListRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,account,company,employee":
+		return ExpensesListRequestExpandTrackingCategoriesAccountCompanyEmployee, nil
+	case "tracking_categories,account,company,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesAccountCompanyEmployeeAccountingPeriod, nil
 	case "tracking_categories,account,contact":
 		return ExpensesListRequestExpandTrackingCategoriesAccountContact, nil
 	case "tracking_categories,account,contact,accounting_period":
@@ -137,12 +241,28 @@ func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand
 		return ExpensesListRequestExpandTrackingCategoriesAccountContactCompany, nil
 	case "tracking_categories,account,contact,company,accounting_period":
 		return ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod, nil
+	case "tracking_categories,account,contact,company,employee":
+		return ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyEmployee, nil
+	case "tracking_categories,account,contact,company,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesAccountContactCompanyEmployeeAccountingPeriod, nil
+	case "tracking_categories,account,contact,employee":
+		return ExpensesListRequestExpandTrackingCategoriesAccountContactEmployee, nil
+	case "tracking_categories,account,contact,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesAccountContactEmployeeAccountingPeriod, nil
+	case "tracking_categories,account,employee":
+		return ExpensesListRequestExpandTrackingCategoriesAccountEmployee, nil
+	case "tracking_categories,account,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesAccountEmployeeAccountingPeriod, nil
 	case "tracking_categories,accounting_period":
 		return ExpensesListRequestExpandTrackingCategoriesAccountingPeriod, nil
 	case "tracking_categories,company":
 		return ExpensesListRequestExpandTrackingCategoriesCompany, nil
 	case "tracking_categories,company,accounting_period":
 		return ExpensesListRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,company,employee":
+		return ExpensesListRequestExpandTrackingCategoriesCompanyEmployee, nil
+	case "tracking_categories,company,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesCompanyEmployeeAccountingPeriod, nil
 	case "tracking_categories,contact":
 		return ExpensesListRequestExpandTrackingCategoriesContact, nil
 	case "tracking_categories,contact,accounting_period":
@@ -151,6 +271,18 @@ func NewExpensesListRequestExpandFromString(s string) (ExpensesListRequestExpand
 		return ExpensesListRequestExpandTrackingCategoriesContactCompany, nil
 	case "tracking_categories,contact,company,accounting_period":
 		return ExpensesListRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "tracking_categories,contact,company,employee":
+		return ExpensesListRequestExpandTrackingCategoriesContactCompanyEmployee, nil
+	case "tracking_categories,contact,company,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesContactCompanyEmployeeAccountingPeriod, nil
+	case "tracking_categories,contact,employee":
+		return ExpensesListRequestExpandTrackingCategoriesContactEmployee, nil
+	case "tracking_categories,contact,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesContactEmployeeAccountingPeriod, nil
+	case "tracking_categories,employee":
+		return ExpensesListRequestExpandTrackingCategoriesEmployee, nil
+	case "tracking_categories,employee,accounting_period":
+		return ExpensesListRequestExpandTrackingCategoriesEmployeeAccountingPeriod, nil
 	}
 	var t ExpensesListRequestExpand
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -163,37 +295,69 @@ func (e ExpensesListRequestExpand) Ptr() *ExpensesListRequestExpand {
 type ExpensesRetrieveRequestExpand string
 
 const (
-	ExpensesRetrieveRequestExpandAccount                                                 ExpensesRetrieveRequestExpand = "account"
-	ExpensesRetrieveRequestExpandAccountAccountingPeriod                                 ExpensesRetrieveRequestExpand = "account,accounting_period"
-	ExpensesRetrieveRequestExpandAccountCompany                                          ExpensesRetrieveRequestExpand = "account,company"
-	ExpensesRetrieveRequestExpandAccountCompanyAccountingPeriod                          ExpensesRetrieveRequestExpand = "account,company,accounting_period"
-	ExpensesRetrieveRequestExpandAccountContact                                          ExpensesRetrieveRequestExpand = "account,contact"
-	ExpensesRetrieveRequestExpandAccountContactAccountingPeriod                          ExpensesRetrieveRequestExpand = "account,contact,accounting_period"
-	ExpensesRetrieveRequestExpandAccountContactCompany                                   ExpensesRetrieveRequestExpand = "account,contact,company"
-	ExpensesRetrieveRequestExpandAccountContactCompanyAccountingPeriod                   ExpensesRetrieveRequestExpand = "account,contact,company,accounting_period"
-	ExpensesRetrieveRequestExpandAccountingPeriod                                        ExpensesRetrieveRequestExpand = "accounting_period"
-	ExpensesRetrieveRequestExpandCompany                                                 ExpensesRetrieveRequestExpand = "company"
-	ExpensesRetrieveRequestExpandCompanyAccountingPeriod                                 ExpensesRetrieveRequestExpand = "company,accounting_period"
-	ExpensesRetrieveRequestExpandContact                                                 ExpensesRetrieveRequestExpand = "contact"
-	ExpensesRetrieveRequestExpandContactAccountingPeriod                                 ExpensesRetrieveRequestExpand = "contact,accounting_period"
-	ExpensesRetrieveRequestExpandContactCompany                                          ExpensesRetrieveRequestExpand = "contact,company"
-	ExpensesRetrieveRequestExpandContactCompanyAccountingPeriod                          ExpensesRetrieveRequestExpand = "contact,company,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategories                                      ExpensesRetrieveRequestExpand = "tracking_categories"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccount                               ExpensesRetrieveRequestExpand = "tracking_categories,account"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod               ExpensesRetrieveRequestExpand = "tracking_categories,account,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompany                        ExpensesRetrieveRequestExpand = "tracking_categories,account,company"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod        ExpensesRetrieveRequestExpand = "tracking_categories,account,company,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContact                        ExpensesRetrieveRequestExpand = "tracking_categories,account,contact"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactAccountingPeriod        ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompany                 ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,company"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,company,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesAccountingPeriod                      ExpensesRetrieveRequestExpand = "tracking_categories,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesCompany                               ExpensesRetrieveRequestExpand = "tracking_categories,company"
-	ExpensesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod               ExpensesRetrieveRequestExpand = "tracking_categories,company,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesContact                               ExpensesRetrieveRequestExpand = "tracking_categories,contact"
-	ExpensesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod               ExpensesRetrieveRequestExpand = "tracking_categories,contact,accounting_period"
-	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompany                        ExpensesRetrieveRequestExpand = "tracking_categories,contact,company"
-	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod        ExpensesRetrieveRequestExpand = "tracking_categories,contact,company,accounting_period"
+	ExpensesRetrieveRequestExpandAccount                                                         ExpensesRetrieveRequestExpand = "account"
+	ExpensesRetrieveRequestExpandAccountAccountingPeriod                                         ExpensesRetrieveRequestExpand = "account,accounting_period"
+	ExpensesRetrieveRequestExpandAccountCompany                                                  ExpensesRetrieveRequestExpand = "account,company"
+	ExpensesRetrieveRequestExpandAccountCompanyAccountingPeriod                                  ExpensesRetrieveRequestExpand = "account,company,accounting_period"
+	ExpensesRetrieveRequestExpandAccountCompanyEmployee                                          ExpensesRetrieveRequestExpand = "account,company,employee"
+	ExpensesRetrieveRequestExpandAccountCompanyEmployeeAccountingPeriod                          ExpensesRetrieveRequestExpand = "account,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandAccountContact                                                  ExpensesRetrieveRequestExpand = "account,contact"
+	ExpensesRetrieveRequestExpandAccountContactAccountingPeriod                                  ExpensesRetrieveRequestExpand = "account,contact,accounting_period"
+	ExpensesRetrieveRequestExpandAccountContactCompany                                           ExpensesRetrieveRequestExpand = "account,contact,company"
+	ExpensesRetrieveRequestExpandAccountContactCompanyAccountingPeriod                           ExpensesRetrieveRequestExpand = "account,contact,company,accounting_period"
+	ExpensesRetrieveRequestExpandAccountContactCompanyEmployee                                   ExpensesRetrieveRequestExpand = "account,contact,company,employee"
+	ExpensesRetrieveRequestExpandAccountContactCompanyEmployeeAccountingPeriod                   ExpensesRetrieveRequestExpand = "account,contact,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandAccountContactEmployee                                          ExpensesRetrieveRequestExpand = "account,contact,employee"
+	ExpensesRetrieveRequestExpandAccountContactEmployeeAccountingPeriod                          ExpensesRetrieveRequestExpand = "account,contact,employee,accounting_period"
+	ExpensesRetrieveRequestExpandAccountEmployee                                                 ExpensesRetrieveRequestExpand = "account,employee"
+	ExpensesRetrieveRequestExpandAccountEmployeeAccountingPeriod                                 ExpensesRetrieveRequestExpand = "account,employee,accounting_period"
+	ExpensesRetrieveRequestExpandAccountingPeriod                                                ExpensesRetrieveRequestExpand = "accounting_period"
+	ExpensesRetrieveRequestExpandCompany                                                         ExpensesRetrieveRequestExpand = "company"
+	ExpensesRetrieveRequestExpandCompanyAccountingPeriod                                         ExpensesRetrieveRequestExpand = "company,accounting_period"
+	ExpensesRetrieveRequestExpandCompanyEmployee                                                 ExpensesRetrieveRequestExpand = "company,employee"
+	ExpensesRetrieveRequestExpandCompanyEmployeeAccountingPeriod                                 ExpensesRetrieveRequestExpand = "company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandContact                                                         ExpensesRetrieveRequestExpand = "contact"
+	ExpensesRetrieveRequestExpandContactAccountingPeriod                                         ExpensesRetrieveRequestExpand = "contact,accounting_period"
+	ExpensesRetrieveRequestExpandContactCompany                                                  ExpensesRetrieveRequestExpand = "contact,company"
+	ExpensesRetrieveRequestExpandContactCompanyAccountingPeriod                                  ExpensesRetrieveRequestExpand = "contact,company,accounting_period"
+	ExpensesRetrieveRequestExpandContactCompanyEmployee                                          ExpensesRetrieveRequestExpand = "contact,company,employee"
+	ExpensesRetrieveRequestExpandContactCompanyEmployeeAccountingPeriod                          ExpensesRetrieveRequestExpand = "contact,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandContactEmployee                                                 ExpensesRetrieveRequestExpand = "contact,employee"
+	ExpensesRetrieveRequestExpandContactEmployeeAccountingPeriod                                 ExpensesRetrieveRequestExpand = "contact,employee,accounting_period"
+	ExpensesRetrieveRequestExpandEmployee                                                        ExpensesRetrieveRequestExpand = "employee"
+	ExpensesRetrieveRequestExpandEmployeeAccountingPeriod                                        ExpensesRetrieveRequestExpand = "employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategories                                              ExpensesRetrieveRequestExpand = "tracking_categories"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccount                                       ExpensesRetrieveRequestExpand = "tracking_categories,account"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountAccountingPeriod                       ExpensesRetrieveRequestExpand = "tracking_categories,account,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompany                                ExpensesRetrieveRequestExpand = "tracking_categories,account,company"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod                ExpensesRetrieveRequestExpand = "tracking_categories,account,company,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyEmployee                        ExpensesRetrieveRequestExpand = "tracking_categories,account,company,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyEmployeeAccountingPeriod        ExpensesRetrieveRequestExpand = "tracking_categories,account,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContact                                ExpensesRetrieveRequestExpand = "tracking_categories,account,contact"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactAccountingPeriod                ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompany                         ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,company"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod         ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,company,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyEmployee                 ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,company,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyEmployeeAccountingPeriod ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactEmployee                        ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactEmployeeAccountingPeriod        ExpensesRetrieveRequestExpand = "tracking_categories,account,contact,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountEmployee                               ExpensesRetrieveRequestExpand = "tracking_categories,account,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountEmployeeAccountingPeriod               ExpensesRetrieveRequestExpand = "tracking_categories,account,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesAccountingPeriod                              ExpensesRetrieveRequestExpand = "tracking_categories,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesCompany                                       ExpensesRetrieveRequestExpand = "tracking_categories,company"
+	ExpensesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod                       ExpensesRetrieveRequestExpand = "tracking_categories,company,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesCompanyEmployee                               ExpensesRetrieveRequestExpand = "tracking_categories,company,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesCompanyEmployeeAccountingPeriod               ExpensesRetrieveRequestExpand = "tracking_categories,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContact                                       ExpensesRetrieveRequestExpand = "tracking_categories,contact"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactAccountingPeriod                       ExpensesRetrieveRequestExpand = "tracking_categories,contact,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompany                                ExpensesRetrieveRequestExpand = "tracking_categories,contact,company"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod                ExpensesRetrieveRequestExpand = "tracking_categories,contact,company,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyEmployee                        ExpensesRetrieveRequestExpand = "tracking_categories,contact,company,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyEmployeeAccountingPeriod        ExpensesRetrieveRequestExpand = "tracking_categories,contact,company,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactEmployee                               ExpensesRetrieveRequestExpand = "tracking_categories,contact,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesContactEmployeeAccountingPeriod               ExpensesRetrieveRequestExpand = "tracking_categories,contact,employee,accounting_period"
+	ExpensesRetrieveRequestExpandTrackingCategoriesEmployee                                      ExpensesRetrieveRequestExpand = "tracking_categories,employee"
+	ExpensesRetrieveRequestExpandTrackingCategoriesEmployeeAccountingPeriod                      ExpensesRetrieveRequestExpand = "tracking_categories,employee,accounting_period"
 )
 
 func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveRequestExpand, error) {
@@ -206,6 +370,10 @@ func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveReque
 		return ExpensesRetrieveRequestExpandAccountCompany, nil
 	case "account,company,accounting_period":
 		return ExpensesRetrieveRequestExpandAccountCompanyAccountingPeriod, nil
+	case "account,company,employee":
+		return ExpensesRetrieveRequestExpandAccountCompanyEmployee, nil
+	case "account,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandAccountCompanyEmployeeAccountingPeriod, nil
 	case "account,contact":
 		return ExpensesRetrieveRequestExpandAccountContact, nil
 	case "account,contact,accounting_period":
@@ -214,12 +382,28 @@ func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveReque
 		return ExpensesRetrieveRequestExpandAccountContactCompany, nil
 	case "account,contact,company,accounting_period":
 		return ExpensesRetrieveRequestExpandAccountContactCompanyAccountingPeriod, nil
+	case "account,contact,company,employee":
+		return ExpensesRetrieveRequestExpandAccountContactCompanyEmployee, nil
+	case "account,contact,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandAccountContactCompanyEmployeeAccountingPeriod, nil
+	case "account,contact,employee":
+		return ExpensesRetrieveRequestExpandAccountContactEmployee, nil
+	case "account,contact,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandAccountContactEmployeeAccountingPeriod, nil
+	case "account,employee":
+		return ExpensesRetrieveRequestExpandAccountEmployee, nil
+	case "account,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandAccountEmployeeAccountingPeriod, nil
 	case "accounting_period":
 		return ExpensesRetrieveRequestExpandAccountingPeriod, nil
 	case "company":
 		return ExpensesRetrieveRequestExpandCompany, nil
 	case "company,accounting_period":
 		return ExpensesRetrieveRequestExpandCompanyAccountingPeriod, nil
+	case "company,employee":
+		return ExpensesRetrieveRequestExpandCompanyEmployee, nil
+	case "company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandCompanyEmployeeAccountingPeriod, nil
 	case "contact":
 		return ExpensesRetrieveRequestExpandContact, nil
 	case "contact,accounting_period":
@@ -228,6 +412,18 @@ func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveReque
 		return ExpensesRetrieveRequestExpandContactCompany, nil
 	case "contact,company,accounting_period":
 		return ExpensesRetrieveRequestExpandContactCompanyAccountingPeriod, nil
+	case "contact,company,employee":
+		return ExpensesRetrieveRequestExpandContactCompanyEmployee, nil
+	case "contact,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandContactCompanyEmployeeAccountingPeriod, nil
+	case "contact,employee":
+		return ExpensesRetrieveRequestExpandContactEmployee, nil
+	case "contact,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandContactEmployeeAccountingPeriod, nil
+	case "employee":
+		return ExpensesRetrieveRequestExpandEmployee, nil
+	case "employee,accounting_period":
+		return ExpensesRetrieveRequestExpandEmployeeAccountingPeriod, nil
 	case "tracking_categories":
 		return ExpensesRetrieveRequestExpandTrackingCategories, nil
 	case "tracking_categories,account":
@@ -238,6 +434,10 @@ func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveReque
 		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompany, nil
 	case "tracking_categories,account,company,accounting_period":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyAccountingPeriod, nil
+	case "tracking_categories,account,company,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyEmployee, nil
+	case "tracking_categories,account,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountCompanyEmployeeAccountingPeriod, nil
 	case "tracking_categories,account,contact":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContact, nil
 	case "tracking_categories,account,contact,accounting_period":
@@ -246,12 +446,28 @@ func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveReque
 		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompany, nil
 	case "tracking_categories,account,contact,company,accounting_period":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyAccountingPeriod, nil
+	case "tracking_categories,account,contact,company,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyEmployee, nil
+	case "tracking_categories,account,contact,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactCompanyEmployeeAccountingPeriod, nil
+	case "tracking_categories,account,contact,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactEmployee, nil
+	case "tracking_categories,account,contact,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountContactEmployeeAccountingPeriod, nil
+	case "tracking_categories,account,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountEmployee, nil
+	case "tracking_categories,account,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountEmployeeAccountingPeriod, nil
 	case "tracking_categories,accounting_period":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesAccountingPeriod, nil
 	case "tracking_categories,company":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesCompany, nil
 	case "tracking_categories,company,accounting_period":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesCompanyAccountingPeriod, nil
+	case "tracking_categories,company,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesCompanyEmployee, nil
+	case "tracking_categories,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesCompanyEmployeeAccountingPeriod, nil
 	case "tracking_categories,contact":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesContact, nil
 	case "tracking_categories,contact,accounting_period":
@@ -260,6 +476,18 @@ func NewExpensesRetrieveRequestExpandFromString(s string) (ExpensesRetrieveReque
 		return ExpensesRetrieveRequestExpandTrackingCategoriesContactCompany, nil
 	case "tracking_categories,contact,company,accounting_period":
 		return ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyAccountingPeriod, nil
+	case "tracking_categories,contact,company,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyEmployee, nil
+	case "tracking_categories,contact,company,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesContactCompanyEmployeeAccountingPeriod, nil
+	case "tracking_categories,contact,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesContactEmployee, nil
+	case "tracking_categories,contact,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesContactEmployeeAccountingPeriod, nil
+	case "tracking_categories,employee":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesEmployee, nil
+	case "tracking_categories,employee,accounting_period":
+		return ExpensesRetrieveRequestExpandTrackingCategoriesEmployeeAccountingPeriod, nil
 	}
 	var t ExpensesRetrieveRequestExpand
 	return "", fmt.Errorf("%s is not a valid %T", s, t)

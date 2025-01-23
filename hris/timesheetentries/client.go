@@ -52,16 +52,22 @@ func (c *Client) List(ctx context.Context, request *hris.TimesheetEntriesListReq
 		queryParams.Add("employee_id", fmt.Sprintf("%v", *request.EmployeeId))
 	}
 	if request.EndedAfter != nil {
-		queryParams.Add("ended_after", fmt.Sprintf("%v", *request.EndedAfter))
+		queryParams.Add("ended_after", fmt.Sprintf("%v", request.EndedAfter.Format(time.RFC3339)))
 	}
 	if request.EndedBefore != nil {
-		queryParams.Add("ended_before", fmt.Sprintf("%v", *request.EndedBefore))
+		queryParams.Add("ended_before", fmt.Sprintf("%v", request.EndedBefore.Format(time.RFC3339)))
+	}
+	if request.Expand != nil {
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
 	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
 	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
+	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
 	}
 	if request.ModifiedAfter != nil {
 		queryParams.Add("modified_after", fmt.Sprintf("%v", request.ModifiedAfter.Format(time.RFC3339)))
@@ -79,10 +85,10 @@ func (c *Client) List(ctx context.Context, request *hris.TimesheetEntriesListReq
 		queryParams.Add("remote_id", fmt.Sprintf("%v", *request.RemoteId))
 	}
 	if request.StartedAfter != nil {
-		queryParams.Add("started_after", fmt.Sprintf("%v", *request.StartedAfter))
+		queryParams.Add("started_after", fmt.Sprintf("%v", request.StartedAfter.Format(time.RFC3339)))
 	}
 	if request.StartedBefore != nil {
-		queryParams.Add("started_before", fmt.Sprintf("%v", *request.StartedBefore))
+		queryParams.Add("started_before", fmt.Sprintf("%v", request.StartedBefore.Format(time.RFC3339)))
 	}
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
@@ -147,6 +153,9 @@ func (c *Client) Retrieve(ctx context.Context, id string, request *hris.Timeshee
 	endpointURL := fmt.Sprintf(baseURL+"/"+"hris/v1/timesheet-entries/%v", id)
 
 	queryParams := make(url.Values)
+	if request.Expand != nil {
+		queryParams.Add("expand", fmt.Sprintf("%v", request.Expand))
+	}
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}

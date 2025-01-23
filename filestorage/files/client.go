@@ -65,6 +65,9 @@ func (c *Client) List(ctx context.Context, request *filestorage.FilesListRequest
 	if request.IncludeRemoteData != nil {
 		queryParams.Add("include_remote_data", fmt.Sprintf("%v", *request.IncludeRemoteData))
 	}
+	if request.IncludeShellData != nil {
+		queryParams.Add("include_shell_data", fmt.Sprintf("%v", *request.IncludeShellData))
+	}
 	if request.MimeType != nil {
 		queryParams.Add("mime_type", fmt.Sprintf("%v", *request.MimeType))
 	}

@@ -9,18 +9,23 @@ import (
 	accounttoken "github.com/merge-api/merge-go-client/accounting/accounttoken"
 	addresses "github.com/merge-api/merge-go-client/accounting/addresses"
 	asyncpassthrough "github.com/merge-api/merge-go-client/accounting/asyncpassthrough"
+	asynctasks "github.com/merge-api/merge-go-client/accounting/asynctasks"
 	attachments "github.com/merge-api/merge-go-client/accounting/attachments"
 	audittrail "github.com/merge-api/merge-go-client/accounting/audittrail"
 	availableactions "github.com/merge-api/merge-go-client/accounting/availableactions"
 	balancesheets "github.com/merge-api/merge-go-client/accounting/balancesheets"
+	bankfeedaccounts "github.com/merge-api/merge-go-client/accounting/bankfeedaccounts"
+	bankfeedtransactions "github.com/merge-api/merge-go-client/accounting/bankfeedtransactions"
 	cashflowstatements "github.com/merge-api/merge-go-client/accounting/cashflowstatements"
 	companyinfo "github.com/merge-api/merge-go-client/accounting/companyinfo"
 	contacts "github.com/merge-api/merge-go-client/accounting/contacts"
 	creditnotes "github.com/merge-api/merge-go-client/accounting/creditnotes"
 	deleteaccount "github.com/merge-api/merge-go-client/accounting/deleteaccount"
+	employees "github.com/merge-api/merge-go-client/accounting/employees"
 	expenses "github.com/merge-api/merge-go-client/accounting/expenses"
 	fieldmapping "github.com/merge-api/merge-go-client/accounting/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/accounting/forceresync"
+	generalledgertransactions "github.com/merge-api/merge-go-client/accounting/generalledgertransactions"
 	generatekey "github.com/merge-api/merge-go-client/accounting/generatekey"
 	incomestatements "github.com/merge-api/merge-go-client/accounting/incomestatements"
 	invoices "github.com/merge-api/merge-go-client/accounting/invoices"
@@ -50,44 +55,49 @@ type Client struct {
 	caller  *core.Caller
 	header  http.Header
 
-	AccountDetails     *accountdetails.Client
-	AccountToken       *accounttoken.Client
-	AccountingPeriods  *accountingperiods.Client
-	Accounts           *accounts.Client
-	Addresses          *addresses.Client
-	AsyncPassthrough   *asyncpassthrough.Client
-	Attachments        *attachments.Client
-	AuditTrail         *audittrail.Client
-	AvailableActions   *availableactions.Client
-	BalanceSheets      *balancesheets.Client
-	CashFlowStatements *cashflowstatements.Client
-	CompanyInfo        *companyinfo.Client
-	Contacts           *contacts.Client
-	CreditNotes        *creditnotes.Client
-	Scopes             *scopes.Client
-	DeleteAccount      *deleteaccount.Client
-	Expenses           *expenses.Client
-	FieldMapping       *fieldmapping.Client
-	GenerateKey        *generatekey.Client
-	IncomeStatements   *incomestatements.Client
-	Invoices           *invoices.Client
-	Issues             *issues.Client
-	Items              *items.Client
-	JournalEntries     *journalentries.Client
-	LinkToken          *linktoken.Client
-	LinkedAccounts     *linkedaccounts.Client
-	Passthrough        *passthrough.Client
-	Payments           *payments.Client
-	PhoneNumbers       *phonenumbers.Client
-	PurchaseOrders     *purchaseorders.Client
-	RegenerateKey      *regeneratekey.Client
-	SyncStatus         *syncstatus.Client
-	ForceResync        *forceresync.Client
-	TaxRates           *taxrates.Client
-	TrackingCategories *trackingcategories.Client
-	Transactions       *transactions.Client
-	VendorCredits      *vendorcredits.Client
-	WebhookReceivers   *webhookreceivers.Client
+	AccountDetails            *accountdetails.Client
+	AccountToken              *accounttoken.Client
+	AccountingPeriods         *accountingperiods.Client
+	Accounts                  *accounts.Client
+	Addresses                 *addresses.Client
+	AsyncPassthrough          *asyncpassthrough.Client
+	AsyncTasks                *asynctasks.Client
+	Attachments               *attachments.Client
+	AuditTrail                *audittrail.Client
+	AvailableActions          *availableactions.Client
+	BalanceSheets             *balancesheets.Client
+	BankFeedAccounts          *bankfeedaccounts.Client
+	BankFeedTransactions      *bankfeedtransactions.Client
+	CashFlowStatements        *cashflowstatements.Client
+	CompanyInfo               *companyinfo.Client
+	Contacts                  *contacts.Client
+	CreditNotes               *creditnotes.Client
+	Scopes                    *scopes.Client
+	DeleteAccount             *deleteaccount.Client
+	Employees                 *employees.Client
+	Expenses                  *expenses.Client
+	FieldMapping              *fieldmapping.Client
+	GeneralLedgerTransactions *generalledgertransactions.Client
+	GenerateKey               *generatekey.Client
+	IncomeStatements          *incomestatements.Client
+	Invoices                  *invoices.Client
+	Issues                    *issues.Client
+	Items                     *items.Client
+	JournalEntries            *journalentries.Client
+	LinkToken                 *linktoken.Client
+	LinkedAccounts            *linkedaccounts.Client
+	Passthrough               *passthrough.Client
+	Payments                  *payments.Client
+	PhoneNumbers              *phonenumbers.Client
+	PurchaseOrders            *purchaseorders.Client
+	RegenerateKey             *regeneratekey.Client
+	SyncStatus                *syncstatus.Client
+	ForceResync               *forceresync.Client
+	TaxRates                  *taxrates.Client
+	TrackingCategories        *trackingcategories.Client
+	Transactions              *transactions.Client
+	VendorCredits             *vendorcredits.Client
+	WebhookReceivers          *webhookreceivers.Client
 }
 
 func NewClient(opts ...core.ClientOption) *Client {
@@ -96,46 +106,51 @@ func NewClient(opts ...core.ClientOption) *Client {
 		opt(options)
 	}
 	return &Client{
-		baseURL:            options.BaseURL,
-		caller:             core.NewCaller(options.HTTPClient),
-		header:             options.ToHeader(),
-		AccountDetails:     accountdetails.NewClient(opts...),
-		AccountToken:       accounttoken.NewClient(opts...),
-		AccountingPeriods:  accountingperiods.NewClient(opts...),
-		Accounts:           accounts.NewClient(opts...),
-		Addresses:          addresses.NewClient(opts...),
-		AsyncPassthrough:   asyncpassthrough.NewClient(opts...),
-		Attachments:        attachments.NewClient(opts...),
-		AuditTrail:         audittrail.NewClient(opts...),
-		AvailableActions:   availableactions.NewClient(opts...),
-		BalanceSheets:      balancesheets.NewClient(opts...),
-		CashFlowStatements: cashflowstatements.NewClient(opts...),
-		CompanyInfo:        companyinfo.NewClient(opts...),
-		Contacts:           contacts.NewClient(opts...),
-		CreditNotes:        creditnotes.NewClient(opts...),
-		Scopes:             scopes.NewClient(opts...),
-		DeleteAccount:      deleteaccount.NewClient(opts...),
-		Expenses:           expenses.NewClient(opts...),
-		FieldMapping:       fieldmapping.NewClient(opts...),
-		GenerateKey:        generatekey.NewClient(opts...),
-		IncomeStatements:   incomestatements.NewClient(opts...),
-		Invoices:           invoices.NewClient(opts...),
-		Issues:             issues.NewClient(opts...),
-		Items:              items.NewClient(opts...),
-		JournalEntries:     journalentries.NewClient(opts...),
-		LinkToken:          linktoken.NewClient(opts...),
-		LinkedAccounts:     linkedaccounts.NewClient(opts...),
-		Passthrough:        passthrough.NewClient(opts...),
-		Payments:           payments.NewClient(opts...),
-		PhoneNumbers:       phonenumbers.NewClient(opts...),
-		PurchaseOrders:     purchaseorders.NewClient(opts...),
-		RegenerateKey:      regeneratekey.NewClient(opts...),
-		SyncStatus:         syncstatus.NewClient(opts...),
-		ForceResync:        forceresync.NewClient(opts...),
-		TaxRates:           taxrates.NewClient(opts...),
-		TrackingCategories: trackingcategories.NewClient(opts...),
-		Transactions:       transactions.NewClient(opts...),
-		VendorCredits:      vendorcredits.NewClient(opts...),
-		WebhookReceivers:   webhookreceivers.NewClient(opts...),
+		baseURL:                   options.BaseURL,
+		caller:                    core.NewCaller(options.HTTPClient),
+		header:                    options.ToHeader(),
+		AccountDetails:            accountdetails.NewClient(opts...),
+		AccountToken:              accounttoken.NewClient(opts...),
+		AccountingPeriods:         accountingperiods.NewClient(opts...),
+		Accounts:                  accounts.NewClient(opts...),
+		Addresses:                 addresses.NewClient(opts...),
+		AsyncPassthrough:          asyncpassthrough.NewClient(opts...),
+		AsyncTasks:                asynctasks.NewClient(opts...),
+		Attachments:               attachments.NewClient(opts...),
+		AuditTrail:                audittrail.NewClient(opts...),
+		AvailableActions:          availableactions.NewClient(opts...),
+		BalanceSheets:             balancesheets.NewClient(opts...),
+		BankFeedAccounts:          bankfeedaccounts.NewClient(opts...),
+		BankFeedTransactions:      bankfeedtransactions.NewClient(opts...),
+		CashFlowStatements:        cashflowstatements.NewClient(opts...),
+		CompanyInfo:               companyinfo.NewClient(opts...),
+		Contacts:                  contacts.NewClient(opts...),
+		CreditNotes:               creditnotes.NewClient(opts...),
+		Scopes:                    scopes.NewClient(opts...),
+		DeleteAccount:             deleteaccount.NewClient(opts...),
+		Employees:                 employees.NewClient(opts...),
+		Expenses:                  expenses.NewClient(opts...),
+		FieldMapping:              fieldmapping.NewClient(opts...),
+		GeneralLedgerTransactions: generalledgertransactions.NewClient(opts...),
+		GenerateKey:               generatekey.NewClient(opts...),
+		IncomeStatements:          incomestatements.NewClient(opts...),
+		Invoices:                  invoices.NewClient(opts...),
+		Issues:                    issues.NewClient(opts...),
+		Items:                     items.NewClient(opts...),
+		JournalEntries:            journalentries.NewClient(opts...),
+		LinkToken:                 linktoken.NewClient(opts...),
+		LinkedAccounts:            linkedaccounts.NewClient(opts...),
+		Passthrough:               passthrough.NewClient(opts...),
+		Payments:                  payments.NewClient(opts...),
+		PhoneNumbers:              phonenumbers.NewClient(opts...),
+		PurchaseOrders:            purchaseorders.NewClient(opts...),
+		RegenerateKey:             regeneratekey.NewClient(opts...),
+		SyncStatus:                syncstatus.NewClient(opts...),
+		ForceResync:               forceresync.NewClient(opts...),
+		TaxRates:                  taxrates.NewClient(opts...),
+		TrackingCategories:        trackingcategories.NewClient(opts...),
+		Transactions:              transactions.NewClient(opts...),
+		VendorCredits:             vendorcredits.NewClient(opts...),
+		WebhookReceivers:          webhookreceivers.NewClient(opts...),
 	}
 }
