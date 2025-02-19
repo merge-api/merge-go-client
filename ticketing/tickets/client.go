@@ -371,6 +371,9 @@ func (c *Client) RemoteFieldClassesList(ctx context.Context, request *ticketing.
 	if request.Cursor != nil {
 		queryParams.Add("cursor", fmt.Sprintf("%v", *request.Cursor))
 	}
+	if request.Ids != nil {
+		queryParams.Add("ids", fmt.Sprintf("%v", *request.Ids))
+	}
 	if request.IncludeDeletedData != nil {
 		queryParams.Add("include_deleted_data", fmt.Sprintf("%v", *request.IncludeDeletedData))
 	}

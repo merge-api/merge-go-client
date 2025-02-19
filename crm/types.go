@@ -9938,7 +9938,7 @@ func (r *RemoteEndpointInfo) String() string {
 
 type RemoteField struct {
 	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            interface{}                  `json:"value,omitempty"`
+	Value            map[string]interface{}       `json:"value,omitempty"`
 
 	_rawJSON json.RawMessage
 }
