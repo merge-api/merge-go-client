@@ -98,6 +98,8 @@ type PatchedTicketEndpointRequest struct {
 type TicketsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
 	Cursor *string `json:"-"`
+	// If provided, will only return remote field classes with the `ids` in this list
+	Ids *string `json:"-"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.

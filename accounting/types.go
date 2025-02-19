@@ -20127,13 +20127,13 @@ type GeneralLedgerTransactionLine struct {
 	// The exchange rate between the base currency and the transaction currency.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
 	// A description of the line item.
-	Description         *string                           `json:"description,omitempty"`
-	TrackingCategories  []*TrackingCategory               `json:"tracking_categories,omitempty"`
-	DebitAmount         string                            `json:"debit_amount"`
-	CreditAmount        string                            `json:"credit_amount"`
-	Item                *GeneralLedgerTransactionLineItem `json:"item,omitempty"`
-	ForeignDebitAmount  string                            `json:"foreign_debit_amount"`
-	ForeignCreditAmount string                            `json:"foreign_credit_amount"`
+	Description         *string                                               `json:"description,omitempty"`
+	TrackingCategories  []*GeneralLedgerTransactionLineTrackingCategoriesItem `json:"tracking_categories,omitempty"`
+	DebitAmount         string                                                `json:"debit_amount"`
+	CreditAmount        string                                                `json:"credit_amount"`
+	Item                *GeneralLedgerTransactionLineItem                     `json:"item,omitempty"`
+	ForeignDebitAmount  string                                                `json:"foreign_debit_amount"`
+	ForeignCreditAmount string                                                `json:"foreign_credit_amount"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty"`
@@ -20812,6 +20812,63 @@ func (g *GeneralLedgerTransactionLineItem) Accept(visitor GeneralLedgerTransacti
 		return visitor.VisitString(g.String)
 	case "item":
 		return visitor.VisitItem(g.Item)
+	}
+}
+
+type GeneralLedgerTransactionLineTrackingCategoriesItem struct {
+	typeName         string
+	String           string
+	TrackingCategory *TrackingCategory
+}
+
+func NewGeneralLedgerTransactionLineTrackingCategoriesItemFromString(value string) *GeneralLedgerTransactionLineTrackingCategoriesItem {
+	return &GeneralLedgerTransactionLineTrackingCategoriesItem{typeName: "string", String: value}
+}
+
+func NewGeneralLedgerTransactionLineTrackingCategoriesItemFromTrackingCategory(value *TrackingCategory) *GeneralLedgerTransactionLineTrackingCategoriesItem {
+	return &GeneralLedgerTransactionLineTrackingCategoriesItem{typeName: "trackingCategory", TrackingCategory: value}
+}
+
+func (g *GeneralLedgerTransactionLineTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		g.typeName = "string"
+		g.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		g.typeName = "trackingCategory"
+		g.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, g)
+}
+
+func (g GeneralLedgerTransactionLineTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	switch g.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return json.Marshal(g.String)
+	case "trackingCategory":
+		return json.Marshal(g.TrackingCategory)
+	}
+}
+
+type GeneralLedgerTransactionLineTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (g *GeneralLedgerTransactionLineTrackingCategoriesItem) Accept(visitor GeneralLedgerTransactionLineTrackingCategoriesItemVisitor) error {
+	switch g.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", g.typeName, g)
+	case "string":
+		return visitor.VisitString(g.String)
+	case "trackingCategory":
+		return visitor.VisitTrackingCategory(g.TrackingCategory)
 	}
 }
 
@@ -40360,8 +40417,8 @@ func (r *RemoteEndpointInfo) String() string {
 }
 
 type RemoteField struct {
-	RemoteFieldClass *RemoteFieldClass      `json:"remote_field_class,omitempty"`
-	Value            map[string]interface{} `json:"value,omitempty"`
+	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
+	Value            map[string]interface{}       `json:"value,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -40566,6 +40623,63 @@ func (r *RemoteFieldClass) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", r)
+}
+
+type RemoteFieldRemoteFieldClass struct {
+	typeName         string
+	String           string
+	RemoteFieldClass *RemoteFieldClass
+}
+
+func NewRemoteFieldRemoteFieldClassFromString(value string) *RemoteFieldRemoteFieldClass {
+	return &RemoteFieldRemoteFieldClass{typeName: "string", String: value}
+}
+
+func NewRemoteFieldRemoteFieldClassFromRemoteFieldClass(value *RemoteFieldClass) *RemoteFieldRemoteFieldClass {
+	return &RemoteFieldRemoteFieldClass{typeName: "remoteFieldClass", RemoteFieldClass: value}
+}
+
+func (r *RemoteFieldRemoteFieldClass) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typeName = "string"
+		r.String = valueString
+		return nil
+	}
+	valueRemoteFieldClass := new(RemoteFieldClass)
+	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
+		r.typeName = "remoteFieldClass"
+		r.RemoteFieldClass = valueRemoteFieldClass
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteFieldRemoteFieldClass) MarshalJSON() ([]byte, error) {
+	switch r.typeName {
+	default:
+		return nil, fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return json.Marshal(r.String)
+	case "remoteFieldClass":
+		return json.Marshal(r.RemoteFieldClass)
+	}
+}
+
+type RemoteFieldRemoteFieldClassVisitor interface {
+	VisitString(string) error
+	VisitRemoteFieldClass(*RemoteFieldClass) error
+}
+
+func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClassVisitor) error {
+	switch r.typeName {
+	default:
+		return fmt.Errorf("invalid type %s in %T", r.typeName, r)
+	case "string":
+		return visitor.VisitString(r.String)
+	case "remoteFieldClass":
+		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
+	}
 }
 
 type RemoteFieldRequest struct {

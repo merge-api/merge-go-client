@@ -4452,7 +4452,7 @@ func (r *RemoteEndpointInfo) String() string {
 
 type RemoteField struct {
 	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            interface{}                  `json:"value,omitempty"`
+	Value            map[string]interface{}       `json:"value,omitempty"`
 
 	_rawJSON json.RawMessage
 }
@@ -4851,7 +4851,7 @@ func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClass
 
 type RemoteFieldRequest struct {
 	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class,omitempty"`
-	Value            *string                             `json:"value,omitempty"`
+	Value            interface{}                         `json:"value,omitempty"`
 
 	_rawJSON json.RawMessage
 }
