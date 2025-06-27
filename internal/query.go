@@ -49,6 +49,11 @@ func QueryValues(v interface{}) (url.Values, error) {
 	}
 
 	err := reflectValue(values, val, "")
+
+	if expands, ok := values["expand"]; ok && len(expands) > 1 {
+		values.Set("expand", strings.Join(expands, ","))
+	}
+
 	return values, err
 }
 
