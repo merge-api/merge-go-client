@@ -4,3 +4,4 @@ README.md
 LICENSE
 internal/query.go
 client/client.go
+client/client_test.go
