@@ -3,6 +3,7 @@
 package client
 
 import (
+	merge "github.com/merge-api/merge-go-client/v2"
 	accountingclient "github.com/merge-api/merge-go-client/v2/accounting/client"
 	atsclient "github.com/merge-api/merge-go-client/v2/ats/client"
 	core "github.com/merge-api/merge-go-client/v2/core"
@@ -30,6 +31,10 @@ type Client struct {
 
 func NewClient(opts ...option.RequestOption) *Client {
 	options := core.NewRequestOptions(opts...)
+	if options.BaseURL == "" {
+		options.BaseURL = merge.Environments.Production
+	}
+
 	return &Client{
 		baseURL: options.BaseURL,
 		caller: internal.NewCaller(
