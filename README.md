@@ -23,13 +23,15 @@ import (
   "context"
   "fmt"
 
-  merge "github.com/merge-api/merge-go-client"
-  mergeclient "github.com/merge-api/merge-go-client/client"
+  merge "github.com/merge-api/merge-go-client/v2"
+  mergeclient "github.com/merge-api/merge-go-client/v2/client"
+  "github.com/merge-api/merge-go-client/v2/option"
+
 )
 
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 ```
 
@@ -41,8 +43,8 @@ Each category is namespaced:
 
 ```go
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 
 client.Ats. # APIs specific to the ATS Category
@@ -60,8 +62,8 @@ Each category is namespaced:
 
 ```go
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 
 client.Ats. // APIs specific to the ATS category
@@ -78,14 +80,15 @@ import (
   "context"
   "fmt"
 
-  merge "github.com/fern-api/merge-go"
-  mergeclient "github.com/fern-api/merge-go/client"
-  "github.com/fern-api/merge-go/ats"
+  merge "github.com/merge-api/merge-go-client/v2"
+  mergeclient "github.com/merge-api/merge-go-client/v2/client"
+  "github.com/merge-api/merge-go-client/v2/option"
+  "github.com/merge-api/merge-go-client/v2/ats"
 )
 
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 linkTokenResponse, err := client.Ats.LinkToken.Create(
   context.TODO(),
@@ -110,14 +113,14 @@ import (
   "context"
   "fmt"
 
-  merge "github.com/fern-api/merge-go"
-  mergeclient "github.com/fern-api/merge-go/client"
-  "github.com/fern-api/merge-go/hris"
+  merge "github.com/merge-api/merge-go-client/v2"
+  mergeclient "github.com/merge-api/merge-go-client/v2/client"
+  "github.com/merge-api/merge-go-client/v2/hris"
 )
 
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 employee, err := client.Hris.Employees.Retrieve(
   context.TODO(),
@@ -139,14 +142,14 @@ import (
   "context"
   "fmt"
 
-  merge "github.com/fern-api/merge-go"
-  mergeclient "github.com/fern-api/merge-go/client"
-  "github.com/fern-api/merge-go/ats"
+  merge "github.com/merge-api/merge-go-client/v2"
+  mergeclient "github.com/merge-api/merge-go-client/v2/client"
+  "github.com/merge-api/merge-go-client/v2/ats"
 )
 
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 candidate, err := client.Ats.Candidates.Retrieve(
   context.TODO(),
@@ -169,14 +172,14 @@ import (
   "fmt"
   "time"
 
-  merge "github.com/fern-api/merge-go"
-  mergeclient "github.com/fern-api/merge-go/client"
-  "github.com/fern-api/merge-go/ats"
+  merge "github.com/merge-api/merge-go-client/v2"
+  mergeclient "github.com/merge-api/merge-go-client/v2/client"
+  "github.com/merge-api/merge-go-client/v2/ats"
 )
 
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 candidateList, err := client.Ats.Candidates.List(
   context.TODO(),
@@ -198,14 +201,14 @@ import (
   "fmt"
   "time"
 
-  merge "github.com/fern-api/merge-go"
-  mergeclient "github.com/fern-api/merge-go/client"
-  "github.com/fern-api/merge-go/ticketing"
+  merge "github.com/merge-api/merge-go-client/v2"
+  mergeclient "github.com/merge-api/merge-go-client/v2/client"
+  "github.com/merge-api/merge-go-client/v2/ticketing"
 )
 
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithAccountToken("<YOUR_ACCOUNT_TOKEN>"),
 )
 ticketResponse, err := client.Ticketing.Tickets.Create(
   context.TODO(),
@@ -255,8 +258,8 @@ configuring authorization tokens to be sent on every request, or providing your 
 
 ```go
 client := mergeclient.NewClient(
-  mergeclient.WithApiKey("<YOUR_API_KEY>"),
-  mergeclient.WithHTTPClient(
+  option.WithApiKey("<YOUR_API_KEY>"),
+  option.WithHTTPClient(
     &http.Client{
       Timeout: 5 * time.Second,
     },
