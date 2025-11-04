@@ -2,7 +2,32 @@
 
 package crm
 
+import (
+	big "math/big"
+)
+
+var (
+	generateRemoteKeyRequestFieldName = big.NewInt(1 << 0)
+)
+
 type GenerateRemoteKeyRequest struct {
 	// The name of the remote key
 	Name string `json:"name" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (g *GenerateRemoteKeyRequest) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GenerateRemoteKeyRequest) SetName(name string) {
+	g.Name = name
+	g.require(generateRemoteKeyRequestFieldName)
 }

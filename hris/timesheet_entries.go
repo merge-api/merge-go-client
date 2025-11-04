@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	timesheetEntryEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	timesheetEntryEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	timesheetEntryEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type TimesheetEntryEndpointRequest struct {
@@ -15,7 +22,58 @@ type TimesheetEntryEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                  `json:"-" url:"run_async,omitempty"`
 	Model    *TimesheetEntryRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TimesheetEntryEndpointRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	t.IsDebugMode = isDebugMode
+	t.require(timesheetEntryEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryEndpointRequest) SetRunAsync(runAsync *bool) {
+	t.RunAsync = runAsync
+	t.require(timesheetEntryEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryEndpointRequest) SetModel(model *TimesheetEntryRequest) {
+	t.Model = model
+	t.require(timesheetEntryEndpointRequestFieldModel)
+}
+
+var (
+	timesheetEntriesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	timesheetEntriesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	timesheetEntriesListRequestFieldCursor             = big.NewInt(1 << 2)
+	timesheetEntriesListRequestFieldEmployeeId         = big.NewInt(1 << 3)
+	timesheetEntriesListRequestFieldEndedAfter         = big.NewInt(1 << 4)
+	timesheetEntriesListRequestFieldEndedBefore        = big.NewInt(1 << 5)
+	timesheetEntriesListRequestFieldExpand             = big.NewInt(1 << 6)
+	timesheetEntriesListRequestFieldIncludeDeletedData = big.NewInt(1 << 7)
+	timesheetEntriesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 8)
+	timesheetEntriesListRequestFieldIncludeShellData   = big.NewInt(1 << 9)
+	timesheetEntriesListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
+	timesheetEntriesListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
+	timesheetEntriesListRequestFieldOrderBy            = big.NewInt(1 << 12)
+	timesheetEntriesListRequestFieldPageSize           = big.NewInt(1 << 13)
+	timesheetEntriesListRequestFieldRemoteId           = big.NewInt(1 << 14)
+	timesheetEntriesListRequestFieldStartedAfter       = big.NewInt(1 << 15)
+	timesheetEntriesListRequestFieldStartedBefore      = big.NewInt(1 << 16)
+)
 
 type TimesheetEntriesListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -52,7 +110,142 @@ type TimesheetEntriesListRequest struct {
 	StartedAfter *time.Time `json:"-" url:"started_after,omitempty"`
 	// If provided, will only return timesheet entries started before this datetime.
 	StartedBefore *time.Time `json:"-" url:"started_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TimesheetEntriesListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(timesheetEntriesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(timesheetEntriesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(timesheetEntriesListRequestFieldCursor)
+}
+
+// SetEmployeeId sets the EmployeeId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetEmployeeId(employeeId *string) {
+	t.EmployeeId = employeeId
+	t.require(timesheetEntriesListRequestFieldEmployeeId)
+}
+
+// SetEndedAfter sets the EndedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetEndedAfter(endedAfter *time.Time) {
+	t.EndedAfter = endedAfter
+	t.require(timesheetEntriesListRequestFieldEndedAfter)
+}
+
+// SetEndedBefore sets the EndedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetEndedBefore(endedBefore *time.Time) {
+	t.EndedBefore = endedBefore
+	t.require(timesheetEntriesListRequestFieldEndedBefore)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(timesheetEntriesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(timesheetEntriesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(timesheetEntriesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(timesheetEntriesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(timesheetEntriesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(timesheetEntriesListRequestFieldModifiedBefore)
+}
+
+// SetOrderBy sets the OrderBy field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetOrderBy(orderBy *TimesheetEntriesListRequestOrderBy) {
+	t.OrderBy = orderBy
+	t.require(timesheetEntriesListRequestFieldOrderBy)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(timesheetEntriesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(timesheetEntriesListRequestFieldRemoteId)
+}
+
+// SetStartedAfter sets the StartedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetStartedAfter(startedAfter *time.Time) {
+	t.StartedAfter = startedAfter
+	t.require(timesheetEntriesListRequestFieldStartedAfter)
+}
+
+// SetStartedBefore sets the StartedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesListRequest) SetStartedBefore(startedBefore *time.Time) {
+	t.StartedBefore = startedBefore
+	t.require(timesheetEntriesListRequestFieldStartedBefore)
+}
+
+var (
+	timesheetEntriesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	timesheetEntriesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	timesheetEntriesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type TimesheetEntriesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -61,6 +254,37 @@ type TimesheetEntriesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TimesheetEntriesRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesRetrieveRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(timesheetEntriesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(timesheetEntriesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntriesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(timesheetEntriesRetrieveRequestFieldIncludeShellData)
 }
 
 type TimesheetEntriesListRequestOrderBy string
@@ -85,10 +309,19 @@ func (t TimesheetEntriesListRequestOrderBy) Ptr() *TimesheetEntriesListRequestOr
 	return &t
 }
 
+var (
+	paginatedTimesheetEntryListFieldNext     = big.NewInt(1 << 0)
+	paginatedTimesheetEntryListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTimesheetEntryListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedTimesheetEntryList struct {
 	Next     *string           `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string           `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*TimesheetEntry `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -119,6 +352,34 @@ func (p *PaginatedTimesheetEntryList) GetExtraProperties() map[string]interface{
 	return p.extraProperties
 }
 
+func (p *PaginatedTimesheetEntryList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimesheetEntryList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTimesheetEntryListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimesheetEntryList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTimesheetEntryListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimesheetEntryList) SetResults(results []*TimesheetEntry) {
+	p.Results = results
+	p.require(paginatedTimesheetEntryListFieldResults)
+}
+
 func (p *PaginatedTimesheetEntryList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTimesheetEntryList
 	var value unmarshaler
@@ -133,6 +394,17 @@ func (p *PaginatedTimesheetEntryList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTimesheetEntryList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTimesheetEntryList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTimesheetEntryList) String() string {
@@ -153,6 +425,20 @@ func (p *PaginatedTimesheetEntryList) String() string {
 //
 // ### Usage Example
 // GET and POST Timesheet Entries
+var (
+	timesheetEntryFieldId               = big.NewInt(1 << 0)
+	timesheetEntryFieldRemoteId         = big.NewInt(1 << 1)
+	timesheetEntryFieldCreatedAt        = big.NewInt(1 << 2)
+	timesheetEntryFieldModifiedAt       = big.NewInt(1 << 3)
+	timesheetEntryFieldEmployee         = big.NewInt(1 << 4)
+	timesheetEntryFieldHoursWorked      = big.NewInt(1 << 5)
+	timesheetEntryFieldStartTime        = big.NewInt(1 << 6)
+	timesheetEntryFieldEndTime          = big.NewInt(1 << 7)
+	timesheetEntryFieldRemoteWasDeleted = big.NewInt(1 << 8)
+	timesheetEntryFieldFieldMappings    = big.NewInt(1 << 9)
+	timesheetEntryFieldRemoteData       = big.NewInt(1 << 10)
+)
+
 type TimesheetEntry struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -173,6 +459,9 @@ type TimesheetEntry struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -259,6 +548,90 @@ func (t *TimesheetEntry) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimesheetEntry) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetId(id *string) {
+	t.Id = id
+	t.require(timesheetEntryFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(timesheetEntryFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(timesheetEntryFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(timesheetEntryFieldModifiedAt)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetEmployee(employee *TimesheetEntryEmployee) {
+	t.Employee = employee
+	t.require(timesheetEntryFieldEmployee)
+}
+
+// SetHoursWorked sets the HoursWorked field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetHoursWorked(hoursWorked *float64) {
+	t.HoursWorked = hoursWorked
+	t.require(timesheetEntryFieldHoursWorked)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetStartTime(startTime *time.Time) {
+	t.StartTime = startTime
+	t.require(timesheetEntryFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetEndTime(endTime *time.Time) {
+	t.EndTime = endTime
+	t.require(timesheetEntryFieldEndTime)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(timesheetEntryFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(timesheetEntryFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntry) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(timesheetEntryFieldRemoteData)
+}
+
 func (t *TimesheetEntry) UnmarshalJSON(data []byte) error {
 	type embed TimesheetEntry
 	var unmarshaler = struct {
@@ -302,7 +675,8 @@ func (t *TimesheetEntry) MarshalJSON() ([]byte, error) {
 		StartTime:  internal.NewOptionalDateTime(t.StartTime),
 		EndTime:    internal.NewOptionalDateTime(t.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimesheetEntry) String() string {
@@ -386,6 +760,15 @@ func (t *TimesheetEntryEmployee) Accept(visitor TimesheetEntryEmployeeVisitor) e
 //
 // ### Usage Example
 // GET and POST Timesheet Entries
+var (
+	timesheetEntryRequestFieldEmployee            = big.NewInt(1 << 0)
+	timesheetEntryRequestFieldHoursWorked         = big.NewInt(1 << 1)
+	timesheetEntryRequestFieldStartTime           = big.NewInt(1 << 2)
+	timesheetEntryRequestFieldEndTime             = big.NewInt(1 << 3)
+	timesheetEntryRequestFieldIntegrationParams   = big.NewInt(1 << 4)
+	timesheetEntryRequestFieldLinkedAccountParams = big.NewInt(1 << 5)
+)
+
 type TimesheetEntryRequest struct {
 	// The employee the timesheet entry is for.
 	Employee *TimesheetEntryRequestEmployee `json:"employee,omitempty" url:"employee,omitempty"`
@@ -397,6 +780,9 @@ type TimesheetEntryRequest struct {
 	EndTime             *time.Time             `json:"end_time,omitempty" url:"end_time,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -448,6 +834,55 @@ func (t *TimesheetEntryRequest) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimesheetEntryRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryRequest) SetEmployee(employee *TimesheetEntryRequestEmployee) {
+	t.Employee = employee
+	t.require(timesheetEntryRequestFieldEmployee)
+}
+
+// SetHoursWorked sets the HoursWorked field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryRequest) SetHoursWorked(hoursWorked *float64) {
+	t.HoursWorked = hoursWorked
+	t.require(timesheetEntryRequestFieldHoursWorked)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryRequest) SetStartTime(startTime *time.Time) {
+	t.StartTime = startTime
+	t.require(timesheetEntryRequestFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryRequest) SetEndTime(endTime *time.Time) {
+	t.EndTime = endTime
+	t.require(timesheetEntryRequestFieldEndTime)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	t.IntegrationParams = integrationParams
+	t.require(timesheetEntryRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	t.LinkedAccountParams = linkedAccountParams
+	t.require(timesheetEntryRequestFieldLinkedAccountParams)
+}
+
 func (t *TimesheetEntryRequest) UnmarshalJSON(data []byte) error {
 	type embed TimesheetEntryRequest
 	var unmarshaler = struct {
@@ -483,7 +918,8 @@ func (t *TimesheetEntryRequest) MarshalJSON() ([]byte, error) {
 		StartTime: internal.NewOptionalDateTime(t.StartTime),
 		EndTime:   internal.NewOptionalDateTime(t.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimesheetEntryRequest) String() string {
@@ -561,11 +997,21 @@ func (t *TimesheetEntryRequestEmployee) Accept(visitor TimesheetEntryRequestEmpl
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
 
+var (
+	timesheetEntryResponseFieldModel    = big.NewInt(1 << 0)
+	timesheetEntryResponseFieldWarnings = big.NewInt(1 << 1)
+	timesheetEntryResponseFieldErrors   = big.NewInt(1 << 2)
+	timesheetEntryResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type TimesheetEntryResponse struct {
 	Model    *TimesheetEntry             `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -603,6 +1049,41 @@ func (t *TimesheetEntryResponse) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimesheetEntryResponse) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryResponse) SetModel(model *TimesheetEntry) {
+	t.Model = model
+	t.require(timesheetEntryResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	t.Warnings = warnings
+	t.require(timesheetEntryResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryResponse) SetErrors(errors []*ErrorValidationProblem) {
+	t.Errors = errors
+	t.require(timesheetEntryResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimesheetEntryResponse) SetLogs(logs []*DebugModeLog) {
+	t.Logs = logs
+	t.require(timesheetEntryResponseFieldLogs)
+}
+
 func (t *TimesheetEntryResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler TimesheetEntryResponse
 	var value unmarshaler
@@ -617,6 +1098,17 @@ func (t *TimesheetEntryResponse) UnmarshalJSON(data []byte) error {
 	t.extraProperties = extraProperties
 	t.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (t *TimesheetEntryResponse) MarshalJSON() ([]byte, error) {
+	type embed TimesheetEntryResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*t),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimesheetEntryResponse) String() string {

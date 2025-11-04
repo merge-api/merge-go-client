@@ -6,7 +6,21 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	companiesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	companiesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	companiesListRequestFieldCursor             = big.NewInt(1 << 2)
+	companiesListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	companiesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	companiesListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	companiesListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	companiesListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	companiesListRequestFieldPageSize           = big.NewInt(1 << 8)
+	companiesListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type CompaniesListRequest struct {
@@ -30,19 +44,137 @@ type CompaniesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CompaniesListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(companiesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(companiesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(companiesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(companiesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(companiesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(companiesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(companiesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(companiesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(companiesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(companiesListRequestFieldRemoteId)
+}
+
+var (
+	companiesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	companiesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type CompaniesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CompaniesRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(companiesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompaniesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(companiesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedCompanyListFieldNext     = big.NewInt(1 << 0)
+	paginatedCompanyListFieldPrevious = big.NewInt(1 << 1)
+	paginatedCompanyListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedCompanyList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Company `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedCompanyList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedCompanyList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCompanyList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedCompanyListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCompanyList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedCompanyListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCompanyList) SetResults(results []*Company) {
+	p.Results = results
+	p.require(paginatedCompanyListFieldResults)
+}
+
 func (p *PaginatedCompanyList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedCompanyList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedCompanyList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedCompanyList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedCompanyList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedCompanyList) String() string {

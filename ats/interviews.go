@@ -6,7 +6,15 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	scheduledInterviewEndpointRequestFieldIsDebugMode  = big.NewInt(1 << 0)
+	scheduledInterviewEndpointRequestFieldRunAsync     = big.NewInt(1 << 1)
+	scheduledInterviewEndpointRequestFieldModel        = big.NewInt(1 << 2)
+	scheduledInterviewEndpointRequestFieldRemoteUserId = big.NewInt(1 << 3)
 )
 
 type ScheduledInterviewEndpointRequest struct {
@@ -16,7 +24,65 @@ type ScheduledInterviewEndpointRequest struct {
 	RunAsync     *bool                      `json:"-" url:"run_async,omitempty"`
 	Model        *ScheduledInterviewRequest `json:"model,omitempty" url:"-"`
 	RemoteUserId string                     `json:"remote_user_id" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (s *ScheduledInterviewEndpointRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	s.IsDebugMode = isDebugMode
+	s.require(scheduledInterviewEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewEndpointRequest) SetRunAsync(runAsync *bool) {
+	s.RunAsync = runAsync
+	s.require(scheduledInterviewEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewEndpointRequest) SetModel(model *ScheduledInterviewRequest) {
+	s.Model = model
+	s.require(scheduledInterviewEndpointRequestFieldModel)
+}
+
+// SetRemoteUserId sets the RemoteUserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewEndpointRequest) SetRemoteUserId(remoteUserId string) {
+	s.RemoteUserId = remoteUserId
+	s.require(scheduledInterviewEndpointRequestFieldRemoteUserId)
+}
+
+var (
+	interviewsListRequestFieldApplicationId       = big.NewInt(1 << 0)
+	interviewsListRequestFieldCreatedAfter        = big.NewInt(1 << 1)
+	interviewsListRequestFieldCreatedBefore       = big.NewInt(1 << 2)
+	interviewsListRequestFieldCursor              = big.NewInt(1 << 3)
+	interviewsListRequestFieldExpand              = big.NewInt(1 << 4)
+	interviewsListRequestFieldIncludeDeletedData  = big.NewInt(1 << 5)
+	interviewsListRequestFieldIncludeRemoteData   = big.NewInt(1 << 6)
+	interviewsListRequestFieldIncludeShellData    = big.NewInt(1 << 7)
+	interviewsListRequestFieldJobId               = big.NewInt(1 << 8)
+	interviewsListRequestFieldJobInterviewStageId = big.NewInt(1 << 9)
+	interviewsListRequestFieldModifiedAfter       = big.NewInt(1 << 10)
+	interviewsListRequestFieldModifiedBefore      = big.NewInt(1 << 11)
+	interviewsListRequestFieldOrganizerId         = big.NewInt(1 << 12)
+	interviewsListRequestFieldPageSize            = big.NewInt(1 << 13)
+	interviewsListRequestFieldRemoteFields        = big.NewInt(1 << 14)
+	interviewsListRequestFieldRemoteId            = big.NewInt(1 << 15)
+	interviewsListRequestFieldShowEnumOrigins     = big.NewInt(1 << 16)
+)
 
 type InterviewsListRequest struct {
 	// If provided, will only return interviews for this application.
@@ -53,7 +119,144 @@ type InterviewsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (i *InterviewsListRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetApplicationId sets the ApplicationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetApplicationId(applicationId *string) {
+	i.ApplicationId = applicationId
+	i.require(interviewsListRequestFieldApplicationId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	i.CreatedAfter = createdAfter
+	i.require(interviewsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	i.CreatedBefore = createdBefore
+	i.require(interviewsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetCursor(cursor *string) {
+	i.Cursor = cursor
+	i.require(interviewsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetExpand(expand []*InterviewsListRequestExpandItem) {
+	i.Expand = expand
+	i.require(interviewsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	i.IncludeDeletedData = includeDeletedData
+	i.require(interviewsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(interviewsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(interviewsListRequestFieldIncludeShellData)
+}
+
+// SetJobId sets the JobId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetJobId(jobId *string) {
+	i.JobId = jobId
+	i.require(interviewsListRequestFieldJobId)
+}
+
+// SetJobInterviewStageId sets the JobInterviewStageId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetJobInterviewStageId(jobInterviewStageId *string) {
+	i.JobInterviewStageId = jobInterviewStageId
+	i.require(interviewsListRequestFieldJobInterviewStageId)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	i.ModifiedAfter = modifiedAfter
+	i.require(interviewsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	i.ModifiedBefore = modifiedBefore
+	i.require(interviewsListRequestFieldModifiedBefore)
+}
+
+// SetOrganizerId sets the OrganizerId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetOrganizerId(organizerId *string) {
+	i.OrganizerId = organizerId
+	i.require(interviewsListRequestFieldOrganizerId)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetPageSize(pageSize *int) {
+	i.PageSize = pageSize
+	i.require(interviewsListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetRemoteFields(remoteFields *string) {
+	i.RemoteFields = remoteFields
+	i.require(interviewsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetRemoteId(remoteId *string) {
+	i.RemoteId = remoteId
+	i.require(interviewsListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	i.ShowEnumOrigins = showEnumOrigins
+	i.require(interviewsListRequestFieldShowEnumOrigins)
+}
+
+var (
+	interviewsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	interviewsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	interviewsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	interviewsRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	interviewsRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type InterviewsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -66,6 +269,51 @@ type InterviewsRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (i *InterviewsRetrieveRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsRetrieveRequest) SetExpand(expand []*InterviewsRetrieveRequestExpandItem) {
+	i.Expand = expand
+	i.require(interviewsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(interviewsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(interviewsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	i.RemoteFields = remoteFields
+	i.require(interviewsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InterviewsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	i.ShowEnumOrigins = showEnumOrigins
+	i.require(interviewsRetrieveRequestFieldShowEnumOrigins)
 }
 
 type InterviewsListRequestExpandItem string
@@ -124,10 +372,19 @@ func (i InterviewsRetrieveRequestExpandItem) Ptr() *InterviewsRetrieveRequestExp
 	return &i
 }
 
+var (
+	paginatedScheduledInterviewListFieldNext     = big.NewInt(1 << 0)
+	paginatedScheduledInterviewListFieldPrevious = big.NewInt(1 << 1)
+	paginatedScheduledInterviewListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedScheduledInterviewList struct {
 	Next     *string               `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string               `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*ScheduledInterview `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -158,6 +415,34 @@ func (p *PaginatedScheduledInterviewList) GetExtraProperties() map[string]interf
 	return p.extraProperties
 }
 
+func (p *PaginatedScheduledInterviewList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedScheduledInterviewList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedScheduledInterviewListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedScheduledInterviewList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedScheduledInterviewListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedScheduledInterviewList) SetResults(results []*ScheduledInterview) {
+	p.Results = results
+	p.require(paginatedScheduledInterviewListFieldResults)
+}
+
 func (p *PaginatedScheduledInterviewList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedScheduledInterviewList
 	var value unmarshaler
@@ -172,6 +457,17 @@ func (p *PaginatedScheduledInterviewList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedScheduledInterviewList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedScheduledInterviewList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedScheduledInterviewList) String() string {
@@ -191,6 +487,19 @@ func (p *PaginatedScheduledInterviewList) String() string {
 // The `ScheduledInterview` object is used to represent a scheduled interview for a given candidate’s application to a job. An `Application` can have multiple `ScheduledInterview`s depending on the particular hiring process.
 // ### Usage Example
 // Fetch from the `LIST ScheduledInterviews` endpoint and filter by `interviewers` to show all office locations.
+var (
+	scheduledInterviewRequestFieldApplication         = big.NewInt(1 << 0)
+	scheduledInterviewRequestFieldJobInterviewStage   = big.NewInt(1 << 1)
+	scheduledInterviewRequestFieldOrganizer           = big.NewInt(1 << 2)
+	scheduledInterviewRequestFieldInterviewers        = big.NewInt(1 << 3)
+	scheduledInterviewRequestFieldLocation            = big.NewInt(1 << 4)
+	scheduledInterviewRequestFieldStartAt             = big.NewInt(1 << 5)
+	scheduledInterviewRequestFieldEndAt               = big.NewInt(1 << 6)
+	scheduledInterviewRequestFieldStatus              = big.NewInt(1 << 7)
+	scheduledInterviewRequestFieldIntegrationParams   = big.NewInt(1 << 8)
+	scheduledInterviewRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
+)
+
 type ScheduledInterviewRequest struct {
 	// The application being interviewed.
 	Application *ScheduledInterviewRequestApplication `json:"application,omitempty" url:"application,omitempty"`
@@ -214,6 +523,9 @@ type ScheduledInterviewRequest struct {
 	Status              *ScheduledInterviewRequestStatus `json:"status,omitempty" url:"status,omitempty"`
 	IntegrationParams   map[string]interface{}           `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}           `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -293,6 +605,83 @@ func (s *ScheduledInterviewRequest) GetExtraProperties() map[string]interface{} 
 	return s.extraProperties
 }
 
+func (s *ScheduledInterviewRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetApplication sets the Application field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetApplication(application *ScheduledInterviewRequestApplication) {
+	s.Application = application
+	s.require(scheduledInterviewRequestFieldApplication)
+}
+
+// SetJobInterviewStage sets the JobInterviewStage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetJobInterviewStage(jobInterviewStage *ScheduledInterviewRequestJobInterviewStage) {
+	s.JobInterviewStage = jobInterviewStage
+	s.require(scheduledInterviewRequestFieldJobInterviewStage)
+}
+
+// SetOrganizer sets the Organizer field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetOrganizer(organizer *ScheduledInterviewRequestOrganizer) {
+	s.Organizer = organizer
+	s.require(scheduledInterviewRequestFieldOrganizer)
+}
+
+// SetInterviewers sets the Interviewers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetInterviewers(interviewers []*ScheduledInterviewRequestInterviewersItem) {
+	s.Interviewers = interviewers
+	s.require(scheduledInterviewRequestFieldInterviewers)
+}
+
+// SetLocation sets the Location field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetLocation(location *string) {
+	s.Location = location
+	s.require(scheduledInterviewRequestFieldLocation)
+}
+
+// SetStartAt sets the StartAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetStartAt(startAt *time.Time) {
+	s.StartAt = startAt
+	s.require(scheduledInterviewRequestFieldStartAt)
+}
+
+// SetEndAt sets the EndAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetEndAt(endAt *time.Time) {
+	s.EndAt = endAt
+	s.require(scheduledInterviewRequestFieldEndAt)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetStatus(status *ScheduledInterviewRequestStatus) {
+	s.Status = status
+	s.require(scheduledInterviewRequestFieldStatus)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	s.IntegrationParams = integrationParams
+	s.require(scheduledInterviewRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	s.LinkedAccountParams = linkedAccountParams
+	s.require(scheduledInterviewRequestFieldLinkedAccountParams)
+}
+
 func (s *ScheduledInterviewRequest) UnmarshalJSON(data []byte) error {
 	type embed ScheduledInterviewRequest
 	var unmarshaler = struct {
@@ -328,7 +717,8 @@ func (s *ScheduledInterviewRequest) MarshalJSON() ([]byte, error) {
 		StartAt: internal.NewOptionalDateTime(s.StartAt),
 		EndAt:   internal.NewOptionalDateTime(s.EndAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, s.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (s *ScheduledInterviewRequest) String() string {
@@ -661,11 +1051,21 @@ func (s *ScheduledInterviewRequestStatus) Accept(visitor ScheduledInterviewReque
 	return fmt.Errorf("type %T does not include a non-empty union type", s)
 }
 
+var (
+	scheduledInterviewResponseFieldModel    = big.NewInt(1 << 0)
+	scheduledInterviewResponseFieldWarnings = big.NewInt(1 << 1)
+	scheduledInterviewResponseFieldErrors   = big.NewInt(1 << 2)
+	scheduledInterviewResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type ScheduledInterviewResponse struct {
 	Model    *ScheduledInterview         `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -703,6 +1103,41 @@ func (s *ScheduledInterviewResponse) GetExtraProperties() map[string]interface{}
 	return s.extraProperties
 }
 
+func (s *ScheduledInterviewResponse) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewResponse) SetModel(model *ScheduledInterview) {
+	s.Model = model
+	s.require(scheduledInterviewResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	s.Warnings = warnings
+	s.require(scheduledInterviewResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewResponse) SetErrors(errors []*ErrorValidationProblem) {
+	s.Errors = errors
+	s.require(scheduledInterviewResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScheduledInterviewResponse) SetLogs(logs []*DebugModeLog) {
+	s.Logs = logs
+	s.require(scheduledInterviewResponseFieldLogs)
+}
+
 func (s *ScheduledInterviewResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler ScheduledInterviewResponse
 	var value unmarshaler
@@ -717,6 +1152,17 @@ func (s *ScheduledInterviewResponse) UnmarshalJSON(data []byte) error {
 	s.extraProperties = extraProperties
 	s.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (s *ScheduledInterviewResponse) MarshalJSON() ([]byte, error) {
+	type embed ScheduledInterviewResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*s),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, s.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (s *ScheduledInterviewResponse) String() string {

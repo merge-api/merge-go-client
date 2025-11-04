@@ -27,15 +27,9 @@ import (
 	users "github.com/merge-api/merge-go-client/v2/filestorage/users"
 	webhookreceivers "github.com/merge-api/merge-go-client/v2/filestorage/webhookreceivers"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails   *accountdetails.Client
 	AccountToken     *accounttoken.Client
 	AsyncPassthrough *asyncpassthrough.Client
@@ -58,40 +52,43 @@ type Client struct {
 	ForceResync      *forceresync.Client
 	Users            *users.Client
 	WebhookReceivers *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:   accountdetails.NewClient(options),
+		AccountToken:     accounttoken.NewClient(options),
+		AsyncPassthrough: asyncpassthrough.NewClient(options),
+		AuditTrail:       audittrail.NewClient(options),
+		AvailableActions: availableactions.NewClient(options),
+		Scopes:           scopes.NewClient(options),
+		DeleteAccount:    deleteaccount.NewClient(options),
+		Drives:           drives.NewClient(options),
+		FieldMapping:     fieldmapping.NewClient(options),
+		Files:            files.NewClient(options),
+		Folders:          folders.NewClient(options),
+		GenerateKey:      generatekey.NewClient(options),
+		Groups:           groups.NewClient(options),
+		Issues:           issues.NewClient(options),
+		LinkToken:        linktoken.NewClient(options),
+		LinkedAccounts:   linkedaccounts.NewClient(options),
+		Passthrough:      passthrough.NewClient(options),
+		RegenerateKey:    regeneratekey.NewClient(options),
+		SyncStatus:       syncstatus.NewClient(options),
+		ForceResync:      forceresync.NewClient(options),
+		Users:            users.NewClient(options),
+		WebhookReceivers: webhookreceivers.NewClient(options),
+		options:          options,
+		baseURL:          options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:           options.ToHeader(),
-		AccountDetails:   accountdetails.NewClient(opts...),
-		AccountToken:     accounttoken.NewClient(opts...),
-		AsyncPassthrough: asyncpassthrough.NewClient(opts...),
-		AuditTrail:       audittrail.NewClient(opts...),
-		AvailableActions: availableactions.NewClient(opts...),
-		Scopes:           scopes.NewClient(opts...),
-		DeleteAccount:    deleteaccount.NewClient(opts...),
-		Drives:           drives.NewClient(opts...),
-		FieldMapping:     fieldmapping.NewClient(opts...),
-		Files:            files.NewClient(opts...),
-		Folders:          folders.NewClient(opts...),
-		GenerateKey:      generatekey.NewClient(opts...),
-		Groups:           groups.NewClient(opts...),
-		Issues:           issues.NewClient(opts...),
-		LinkToken:        linktoken.NewClient(opts...),
-		LinkedAccounts:   linkedaccounts.NewClient(opts...),
-		Passthrough:      passthrough.NewClient(opts...),
-		RegenerateKey:    regeneratekey.NewClient(opts...),
-		SyncStatus:       syncstatus.NewClient(opts...),
-		ForceResync:      forceresync.NewClient(opts...),
-		Users:            users.NewClient(opts...),
-		WebhookReceivers: webhookreceivers.NewClient(opts...),
 	}
 }

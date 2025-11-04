@@ -2,7 +2,32 @@
 
 package hris
 
+import (
+	big "math/big"
+)
+
+var (
+	remoteKeyForRegenerationRequestFieldName = big.NewInt(1 << 0)
+)
+
 type RemoteKeyForRegenerationRequest struct {
 	// The name of the remote key
 	Name string `json:"name" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (r *RemoteKeyForRegenerationRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteKeyForRegenerationRequest) SetName(name string) {
+	r.Name = name
+	r.require(remoteKeyForRegenerationRequestFieldName)
 }

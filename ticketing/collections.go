@@ -6,12 +6,32 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	collectionsListRequestFieldCollectionType     = big.NewInt(1 << 0)
+	collectionsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	collectionsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	collectionsListRequestFieldCursor             = big.NewInt(1 << 3)
+	collectionsListRequestFieldExpand             = big.NewInt(1 << 4)
+	collectionsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	collectionsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	collectionsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	collectionsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	collectionsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	collectionsListRequestFieldName               = big.NewInt(1 << 10)
+	collectionsListRequestFieldPageSize           = big.NewInt(1 << 11)
+	collectionsListRequestFieldParentCollectionId = big.NewInt(1 << 12)
+	collectionsListRequestFieldRemoteFields       = big.NewInt(1 << 13)
+	collectionsListRequestFieldRemoteId           = big.NewInt(1 << 14)
+	collectionsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 15)
 )
 
 type CollectionsListRequest struct {
 	// If provided, will only return collections of the given type.
-	CollectionType *string `json:"-" url:"collection_type,omitempty"`
+	CollectionType *CollectionsListRequestCollectionType `json:"-" url:"collection_type,omitempty"`
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-" url:"created_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
@@ -30,6 +50,8 @@ type CollectionsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
+	// If provided, will only return collections with this name.
+	Name *string `json:"-" url:"name,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If provided, will only return collections whose parent collection matches the given id.
@@ -40,7 +62,137 @@ type CollectionsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CollectionsListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCollectionType sets the CollectionType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetCollectionType(collectionType *CollectionsListRequestCollectionType) {
+	c.CollectionType = collectionType
+	c.require(collectionsListRequestFieldCollectionType)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(collectionsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(collectionsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(collectionsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetExpand(expand []*string) {
+	c.Expand = expand
+	c.require(collectionsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(collectionsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(collectionsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(collectionsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(collectionsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(collectionsListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetName(name *string) {
+	c.Name = name
+	c.require(collectionsListRequestFieldName)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(collectionsListRequestFieldPageSize)
+}
+
+// SetParentCollectionId sets the ParentCollectionId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetParentCollectionId(parentCollectionId *string) {
+	c.ParentCollectionId = parentCollectionId
+	c.require(collectionsListRequestFieldParentCollectionId)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetRemoteFields(remoteFields *string) {
+	c.RemoteFields = remoteFields
+	c.require(collectionsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(collectionsListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	c.ShowEnumOrigins = showEnumOrigins
+	c.require(collectionsListRequestFieldShowEnumOrigins)
+}
+
+var (
+	collectionsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	collectionsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	collectionsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	collectionsRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	collectionsRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type CollectionsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -53,6 +205,76 @@ type CollectionsRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (c *CollectionsRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsRetrieveRequest) SetExpand(expand []*string) {
+	c.Expand = expand
+	c.require(collectionsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(collectionsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(collectionsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	c.RemoteFields = remoteFields
+	c.require(collectionsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	c.ShowEnumOrigins = showEnumOrigins
+	c.require(collectionsRetrieveRequestFieldShowEnumOrigins)
+}
+
+type CollectionsListRequestCollectionType string
+
+const (
+	CollectionsListRequestCollectionTypeEmpty   CollectionsListRequestCollectionType = ""
+	CollectionsListRequestCollectionTypeList    CollectionsListRequestCollectionType = "LIST"
+	CollectionsListRequestCollectionTypeProject CollectionsListRequestCollectionType = "PROJECT"
+)
+
+func NewCollectionsListRequestCollectionTypeFromString(s string) (CollectionsListRequestCollectionType, error) {
+	switch s {
+	case "":
+		return CollectionsListRequestCollectionTypeEmpty, nil
+	case "LIST":
+		return CollectionsListRequestCollectionTypeList, nil
+	case "PROJECT":
+		return CollectionsListRequestCollectionTypeProject, nil
+	}
+	var t CollectionsListRequestCollectionType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CollectionsListRequestCollectionType) Ptr() *CollectionsListRequestCollectionType {
+	return &c
 }
 
 type CollectionsViewersListRequestExpandItem string
@@ -77,10 +299,19 @@ func (c CollectionsViewersListRequestExpandItem) Ptr() *CollectionsViewersListRe
 	return &c
 }
 
+var (
+	paginatedCollectionListFieldNext     = big.NewInt(1 << 0)
+	paginatedCollectionListFieldPrevious = big.NewInt(1 << 1)
+	paginatedCollectionListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedCollectionList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Collection `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -111,6 +342,34 @@ func (p *PaginatedCollectionList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedCollectionList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCollectionList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedCollectionListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCollectionList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedCollectionListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCollectionList) SetResults(results []*Collection) {
+	p.Results = results
+	p.require(paginatedCollectionListFieldResults)
+}
+
 func (p *PaginatedCollectionList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedCollectionList
 	var value unmarshaler
@@ -127,6 +386,17 @@ func (p *PaginatedCollectionList) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (p *PaginatedCollectionList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedCollectionList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (p *PaginatedCollectionList) String() string {
 	if len(p.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
@@ -138,6 +408,15 @@ func (p *PaginatedCollectionList) String() string {
 	}
 	return fmt.Sprintf("%#v", p)
 }
+
+var (
+	collectionsViewersListRequestFieldCursor             = big.NewInt(1 << 0)
+	collectionsViewersListRequestFieldExpand             = big.NewInt(1 << 1)
+	collectionsViewersListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
+	collectionsViewersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
+	collectionsViewersListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
+	collectionsViewersListRequestFieldPageSize           = big.NewInt(1 << 5)
+)
 
 type CollectionsViewersListRequest struct {
 	// The pagination cursor value.
@@ -152,4 +431,56 @@ type CollectionsViewersListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (c *CollectionsViewersListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsViewersListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(collectionsViewersListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsViewersListRequest) SetExpand(expand []*CollectionsViewersListRequestExpandItem) {
+	c.Expand = expand
+	c.require(collectionsViewersListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsViewersListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(collectionsViewersListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsViewersListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(collectionsViewersListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsViewersListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(collectionsViewersListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CollectionsViewersListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(collectionsViewersListRequestFieldPageSize)
 }

@@ -4,7 +4,6 @@ package tickets
 
 import (
 	context "context"
-	fmt "fmt"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
@@ -13,22 +12,24 @@ import (
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,7 +38,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ticketing.TicketsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*ticketing.Ticket], error) {
+) (*core.Page[*string, *ticketing.Ticket], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,13 +51,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -73,11 +73,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedTicketList) *internal.PageResponse[*string, *ticketing.Ticket] {
+	readPageResponse := func(response *ticketing.PaginatedTicketList) *core.PageResponse[*string, *ticketing.Ticket] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *ticketing.Ticket]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *ticketing.Ticket]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -97,44 +97,15 @@ func (c *Client) Create(
 	request *ticketing.TicketEndpointRequest,
 	opts ...option.RequestOption,
 ) (*ticketing.TicketResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
+	response, err := c.WithRawResponse.Create(
+		ctx,
+		request,
+		opts...,
 	)
-	endpointURL := baseURL + "/ticketing/v1/tickets"
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *ticketing.TicketResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a `Ticket` object with the given `id`.
@@ -144,45 +115,16 @@ func (c *Client) Retrieve(
 	request *ticketing.TicketsRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*ticketing.Ticket, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/ticketing/v1/tickets/%v",
+	response, err := c.WithRawResponse.Retrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *ticketing.Ticket
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Updates a `Ticket` object with the given `id`.
@@ -192,47 +134,16 @@ func (c *Client) PartialUpdate(
 	request *ticketing.PatchedTicketEndpointRequest,
 	opts ...option.RequestOption,
 ) (*ticketing.TicketResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/ticketing/v1/tickets/%v",
+	response, err := c.WithRawResponse.PartialUpdate(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *ticketing.TicketResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPatch,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a list of `Viewer` objects that point to a User id or Team id that is either an assignee or viewer on a `Ticket` with the given id. [Learn more.](https://help.merge.dev/en/articles/10333658-ticketing-access-control-list-acls)
@@ -241,7 +152,7 @@ func (c *Client) ViewersList(
 	ticketId string,
 	request *ticketing.TicketsViewersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*ticketing.Viewer], error) {
+) (*core.Page[*string, *ticketing.Viewer], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -257,13 +168,12 @@ func (c *Client) ViewersList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -280,11 +190,11 @@ func (c *Client) ViewersList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedViewerList) *internal.PageResponse[*string, *ticketing.Viewer] {
+	readPageResponse := func(response *ticketing.PaginatedViewerList) *core.PageResponse[*string, *ticketing.Viewer] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *ticketing.Viewer]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *ticketing.Viewer]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -304,38 +214,15 @@ func (c *Client) MetaPatchRetrieve(
 	id string,
 	opts ...option.RequestOption,
 ) (*ticketing.MetaResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/ticketing/v1/tickets/meta/patch/%v",
-		id,
-	)
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *ticketing.MetaResponse
-	if err := c.caller.Call(
+	response, err := c.WithRawResponse.MetaPatchRetrieve(
 		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
+		id,
+		opts...,
+	)
+	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns metadata for `Ticket` POSTs.
@@ -344,42 +231,15 @@ func (c *Client) MetaPostRetrieve(
 	request *ticketing.TicketsMetaPostRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*ticketing.MetaResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
+	response, err := c.WithRawResponse.MetaPostRetrieve(
+		ctx,
+		request,
+		opts...,
 	)
-	endpointURL := baseURL + "/ticketing/v1/tickets/meta/post"
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *ticketing.MetaResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
@@ -387,7 +247,7 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *ticketing.TicketsRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*ticketing.RemoteFieldClass], error) {
+) (*core.Page[*string, *ticketing.RemoteFieldClass], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -400,13 +260,12 @@ func (c *Client) RemoteFieldClassesList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -423,11 +282,11 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedRemoteFieldClassList) *internal.PageResponse[*string, *ticketing.RemoteFieldClass] {
+	readPageResponse := func(response *ticketing.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *ticketing.RemoteFieldClass] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *ticketing.RemoteFieldClass]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *ticketing.RemoteFieldClass]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,

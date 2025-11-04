@@ -4,7 +4,6 @@ package jobpostings
 
 import (
 	context "context"
-	fmt "fmt"
 	ats "github.com/merge-api/merge-go-client/v2/ats"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
@@ -13,22 +12,24 @@ import (
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,7 +38,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.JobPostingsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*ats.JobPosting], error) {
+) (*core.Page[*string, *ats.JobPosting], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,13 +51,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -73,11 +73,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedJobPostingList) *internal.PageResponse[*string, *ats.JobPosting] {
+	readPageResponse := func(response *ats.PaginatedJobPostingList) *core.PageResponse[*string, *ats.JobPosting] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *ats.JobPosting]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *ats.JobPosting]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -98,43 +98,14 @@ func (c *Client) Retrieve(
 	request *ats.JobPostingsRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*ats.JobPosting, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/ats/v1/job-postings/%v",
+	response, err := c.WithRawResponse.Retrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *ats.JobPosting
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }

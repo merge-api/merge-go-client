@@ -6,7 +6,23 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	balanceSheetsListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	balanceSheetsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	balanceSheetsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	balanceSheetsListRequestFieldCursor             = big.NewInt(1 << 3)
+	balanceSheetsListRequestFieldExpand             = big.NewInt(1 << 4)
+	balanceSheetsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	balanceSheetsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	balanceSheetsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	balanceSheetsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	balanceSheetsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	balanceSheetsListRequestFieldPageSize           = big.NewInt(1 << 10)
+	balanceSheetsListRequestFieldRemoteId           = big.NewInt(1 << 11)
 )
 
 type BalanceSheetsListRequest struct {
@@ -34,7 +50,107 @@ type BalanceSheetsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (b *BalanceSheetsListRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetCompanyId(companyId *string) {
+	b.CompanyId = companyId
+	b.require(balanceSheetsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	b.CreatedAfter = createdAfter
+	b.require(balanceSheetsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	b.CreatedBefore = createdBefore
+	b.require(balanceSheetsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetCursor(cursor *string) {
+	b.Cursor = cursor
+	b.require(balanceSheetsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetExpand(expand []*string) {
+	b.Expand = expand
+	b.require(balanceSheetsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	b.IncludeDeletedData = includeDeletedData
+	b.require(balanceSheetsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(balanceSheetsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(balanceSheetsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	b.ModifiedAfter = modifiedAfter
+	b.require(balanceSheetsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	b.ModifiedBefore = modifiedBefore
+	b.require(balanceSheetsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetPageSize(pageSize *int) {
+	b.PageSize = pageSize
+	b.require(balanceSheetsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsListRequest) SetRemoteId(remoteId *string) {
+	b.RemoteId = remoteId
+	b.require(balanceSheetsListRequestFieldRemoteId)
+}
+
+var (
+	balanceSheetsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	balanceSheetsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	balanceSheetsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type BalanceSheetsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -43,6 +159,37 @@ type BalanceSheetsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (b *BalanceSheetsRetrieveRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsRetrieveRequest) SetExpand(expand []*string) {
+	b.Expand = expand
+	b.require(balanceSheetsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(balanceSheetsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheetsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(balanceSheetsRetrieveRequestFieldIncludeShellData)
 }
 
 // # The BalanceSheet Object
@@ -51,6 +198,25 @@ type BalanceSheetsRetrieveRequest struct {
 //
 // ### Usage Example
 // Fetch from the `LIST BalanceSheets` endpoint and view a company's balance sheets.
+var (
+	balanceSheetFieldId                = big.NewInt(1 << 0)
+	balanceSheetFieldRemoteId          = big.NewInt(1 << 1)
+	balanceSheetFieldCreatedAt         = big.NewInt(1 << 2)
+	balanceSheetFieldModifiedAt        = big.NewInt(1 << 3)
+	balanceSheetFieldName              = big.NewInt(1 << 4)
+	balanceSheetFieldCurrency          = big.NewInt(1 << 5)
+	balanceSheetFieldCompany           = big.NewInt(1 << 6)
+	balanceSheetFieldDate              = big.NewInt(1 << 7)
+	balanceSheetFieldNetAssets         = big.NewInt(1 << 8)
+	balanceSheetFieldAssets            = big.NewInt(1 << 9)
+	balanceSheetFieldLiabilities       = big.NewInt(1 << 10)
+	balanceSheetFieldEquity            = big.NewInt(1 << 11)
+	balanceSheetFieldRemoteGeneratedAt = big.NewInt(1 << 12)
+	balanceSheetFieldRemoteWasDeleted  = big.NewInt(1 << 13)
+	balanceSheetFieldFieldMappings     = big.NewInt(1 << 14)
+	balanceSheetFieldRemoteData        = big.NewInt(1 << 15)
+)
+
 type BalanceSheet struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -386,6 +552,9 @@ type BalanceSheet struct {
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -506,6 +675,125 @@ func (b *BalanceSheet) GetExtraProperties() map[string]interface{} {
 	return b.extraProperties
 }
 
+func (b *BalanceSheet) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetId(id *string) {
+	b.Id = id
+	b.require(balanceSheetFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetRemoteId(remoteId *string) {
+	b.RemoteId = remoteId
+	b.require(balanceSheetFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetCreatedAt(createdAt *time.Time) {
+	b.CreatedAt = createdAt
+	b.require(balanceSheetFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetModifiedAt(modifiedAt *time.Time) {
+	b.ModifiedAt = modifiedAt
+	b.require(balanceSheetFieldModifiedAt)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetName(name *string) {
+	b.Name = name
+	b.require(balanceSheetFieldName)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetCurrency(currency *BalanceSheetCurrency) {
+	b.Currency = currency
+	b.require(balanceSheetFieldCurrency)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetCompany(company *BalanceSheetCompany) {
+	b.Company = company
+	b.require(balanceSheetFieldCompany)
+}
+
+// SetDate sets the Date field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetDate(date *time.Time) {
+	b.Date = date
+	b.require(balanceSheetFieldDate)
+}
+
+// SetNetAssets sets the NetAssets field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetNetAssets(netAssets *float64) {
+	b.NetAssets = netAssets
+	b.require(balanceSheetFieldNetAssets)
+}
+
+// SetAssets sets the Assets field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetAssets(assets []*ReportItem) {
+	b.Assets = assets
+	b.require(balanceSheetFieldAssets)
+}
+
+// SetLiabilities sets the Liabilities field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetLiabilities(liabilities []*ReportItem) {
+	b.Liabilities = liabilities
+	b.require(balanceSheetFieldLiabilities)
+}
+
+// SetEquity sets the Equity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetEquity(equity []*ReportItem) {
+	b.Equity = equity
+	b.require(balanceSheetFieldEquity)
+}
+
+// SetRemoteGeneratedAt sets the RemoteGeneratedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetRemoteGeneratedAt(remoteGeneratedAt *time.Time) {
+	b.RemoteGeneratedAt = remoteGeneratedAt
+	b.require(balanceSheetFieldRemoteGeneratedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	b.RemoteWasDeleted = remoteWasDeleted
+	b.require(balanceSheetFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetFieldMappings(fieldMappings map[string]interface{}) {
+	b.FieldMappings = fieldMappings
+	b.require(balanceSheetFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BalanceSheet) SetRemoteData(remoteData []*RemoteData) {
+	b.RemoteData = remoteData
+	b.require(balanceSheetFieldRemoteData)
+}
+
 func (b *BalanceSheet) UnmarshalJSON(data []byte) error {
 	type embed BalanceSheet
 	var unmarshaler = struct {
@@ -549,7 +837,8 @@ func (b *BalanceSheet) MarshalJSON() ([]byte, error) {
 		Date:              internal.NewOptionalDateTime(b.Date),
 		RemoteGeneratedAt: internal.NewOptionalDateTime(b.RemoteGeneratedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (b *BalanceSheet) String() string {
@@ -997,10 +1286,19 @@ func (b *BalanceSheetCurrency) Accept(visitor BalanceSheetCurrencyVisitor) error
 	return fmt.Errorf("type %T does not include a non-empty union type", b)
 }
 
+var (
+	paginatedBalanceSheetListFieldNext     = big.NewInt(1 << 0)
+	paginatedBalanceSheetListFieldPrevious = big.NewInt(1 << 1)
+	paginatedBalanceSheetListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedBalanceSheetList struct {
 	Next     *string         `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string         `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*BalanceSheet `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1031,6 +1329,34 @@ func (p *PaginatedBalanceSheetList) GetExtraProperties() map[string]interface{} 
 	return p.extraProperties
 }
 
+func (p *PaginatedBalanceSheetList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBalanceSheetList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedBalanceSheetListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBalanceSheetList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedBalanceSheetListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBalanceSheetList) SetResults(results []*BalanceSheet) {
+	p.Results = results
+	p.require(paginatedBalanceSheetListFieldResults)
+}
+
 func (p *PaginatedBalanceSheetList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedBalanceSheetList
 	var value unmarshaler
@@ -1045,6 +1371,17 @@ func (p *PaginatedBalanceSheetList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedBalanceSheetList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedBalanceSheetList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedBalanceSheetList) String() string {

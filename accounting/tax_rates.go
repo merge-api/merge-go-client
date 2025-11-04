@@ -6,7 +6,24 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	taxRatesListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	taxRatesListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	taxRatesListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	taxRatesListRequestFieldCursor             = big.NewInt(1 << 3)
+	taxRatesListRequestFieldExpand             = big.NewInt(1 << 4)
+	taxRatesListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	taxRatesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	taxRatesListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	taxRatesListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	taxRatesListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	taxRatesListRequestFieldName               = big.NewInt(1 << 10)
+	taxRatesListRequestFieldPageSize           = big.NewInt(1 << 11)
+	taxRatesListRequestFieldRemoteId           = big.NewInt(1 << 12)
 )
 
 type TaxRatesListRequest struct {
@@ -36,7 +53,114 @@ type TaxRatesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TaxRatesListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetCompanyId(companyId *string) {
+	t.CompanyId = companyId
+	t.require(taxRatesListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(taxRatesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(taxRatesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(taxRatesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(taxRatesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(taxRatesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(taxRatesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(taxRatesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(taxRatesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(taxRatesListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetName(name *string) {
+	t.Name = name
+	t.require(taxRatesListRequestFieldName)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(taxRatesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(taxRatesListRequestFieldRemoteId)
+}
+
+var (
+	taxRatesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	taxRatesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	taxRatesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type TaxRatesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -45,12 +169,52 @@ type TaxRatesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TaxRatesRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesRetrieveRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(taxRatesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(taxRatesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaxRatesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(taxRatesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedTaxRateListFieldNext     = big.NewInt(1 << 0)
+	paginatedTaxRateListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTaxRateListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedTaxRateList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*TaxRate `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -81,6 +245,34 @@ func (p *PaginatedTaxRateList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedTaxRateList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTaxRateList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTaxRateListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTaxRateList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTaxRateListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTaxRateList) SetResults(results []*TaxRate) {
+	p.Results = results
+	p.require(paginatedTaxRateListFieldResults)
+}
+
 func (p *PaginatedTaxRateList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTaxRateList
 	var value unmarshaler
@@ -95,6 +287,17 @@ func (p *PaginatedTaxRateList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTaxRateList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTaxRateList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTaxRateList) String() string {

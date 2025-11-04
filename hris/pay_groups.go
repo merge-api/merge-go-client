@@ -6,7 +6,21 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	payGroupsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	payGroupsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	payGroupsListRequestFieldCursor             = big.NewInt(1 << 2)
+	payGroupsListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	payGroupsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	payGroupsListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	payGroupsListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	payGroupsListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	payGroupsListRequestFieldPageSize           = big.NewInt(1 << 8)
+	payGroupsListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type PayGroupsListRequest struct {
@@ -30,19 +44,137 @@ type PayGroupsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PayGroupsListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	p.CreatedAfter = createdAfter
+	p.require(payGroupsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	p.CreatedBefore = createdBefore
+	p.require(payGroupsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(payGroupsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(payGroupsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(payGroupsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(payGroupsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	p.ModifiedAfter = modifiedAfter
+	p.require(payGroupsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	p.ModifiedBefore = modifiedBefore
+	p.require(payGroupsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(payGroupsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsListRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(payGroupsListRequestFieldRemoteId)
+}
+
+var (
+	payGroupsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	payGroupsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type PayGroupsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PayGroupsRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(payGroupsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayGroupsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(payGroupsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedPayGroupListFieldNext     = big.NewInt(1 << 0)
+	paginatedPayGroupListFieldPrevious = big.NewInt(1 << 1)
+	paginatedPayGroupListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedPayGroupList struct {
 	Next     *string     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*PayGroup `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedPayGroupList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedPayGroupList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPayGroupList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedPayGroupListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPayGroupList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedPayGroupListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPayGroupList) SetResults(results []*PayGroup) {
+	p.Results = results
+	p.require(paginatedPayGroupListFieldResults)
+}
+
 func (p *PaginatedPayGroupList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedPayGroupList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedPayGroupList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedPayGroupList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedPayGroupList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedPayGroupList) String() string {

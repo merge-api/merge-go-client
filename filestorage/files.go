@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	fileStorageFileEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	fileStorageFileEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	fileStorageFileEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type FileStorageFileEndpointRequest struct {
@@ -15,7 +22,50 @@ type FileStorageFileEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool        `json:"-" url:"run_async,omitempty"`
 	Model    *FileRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FileStorageFileEndpointRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	f.IsDebugMode = isDebugMode
+	f.require(fileStorageFileEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileEndpointRequest) SetRunAsync(runAsync *bool) {
+	f.RunAsync = runAsync
+	f.require(fileStorageFileEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileEndpointRequest) SetModel(model *FileRequest) {
+	f.Model = model
+	f.require(fileStorageFileEndpointRequestFieldModel)
+}
+
+var (
+	filesDownloadRequestMetaListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	filesDownloadRequestMetaListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	filesDownloadRequestMetaListRequestFieldCursor             = big.NewInt(1 << 2)
+	filesDownloadRequestMetaListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	filesDownloadRequestMetaListRequestFieldMimeTypes          = big.NewInt(1 << 4)
+	filesDownloadRequestMetaListRequestFieldModifiedAfter      = big.NewInt(1 << 5)
+	filesDownloadRequestMetaListRequestFieldModifiedBefore     = big.NewInt(1 << 6)
+	filesDownloadRequestMetaListRequestFieldOrderBy            = big.NewInt(1 << 7)
+	filesDownloadRequestMetaListRequestFieldPageSize           = big.NewInt(1 << 8)
+)
 
 type FilesDownloadRequestMetaListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -36,19 +86,161 @@ type FilesDownloadRequestMetaListRequest struct {
 	OrderBy *FilesDownloadRequestMetaListRequestOrderBy `json:"-" url:"order_by,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FilesDownloadRequestMetaListRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetCreatedAfter(createdAfter *string) {
+	f.CreatedAfter = createdAfter
+	f.require(filesDownloadRequestMetaListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetCreatedBefore(createdBefore *string) {
+	f.CreatedBefore = createdBefore
+	f.require(filesDownloadRequestMetaListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetCursor(cursor *string) {
+	f.Cursor = cursor
+	f.require(filesDownloadRequestMetaListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	f.IncludeDeletedData = includeDeletedData
+	f.require(filesDownloadRequestMetaListRequestFieldIncludeDeletedData)
+}
+
+// SetMimeTypes sets the MimeTypes field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetMimeTypes(mimeTypes *string) {
+	f.MimeTypes = mimeTypes
+	f.require(filesDownloadRequestMetaListRequestFieldMimeTypes)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetModifiedAfter(modifiedAfter *string) {
+	f.ModifiedAfter = modifiedAfter
+	f.require(filesDownloadRequestMetaListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetModifiedBefore(modifiedBefore *string) {
+	f.ModifiedBefore = modifiedBefore
+	f.require(filesDownloadRequestMetaListRequestFieldModifiedBefore)
+}
+
+// SetOrderBy sets the OrderBy field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetOrderBy(orderBy *FilesDownloadRequestMetaListRequestOrderBy) {
+	f.OrderBy = orderBy
+	f.require(filesDownloadRequestMetaListRequestFieldOrderBy)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetPageSize(pageSize *int) {
+	f.PageSize = pageSize
+	f.require(filesDownloadRequestMetaListRequestFieldPageSize)
+}
+
+var (
+	filesDownloadRequestMetaRetrieveRequestFieldMimeType = big.NewInt(1 << 0)
+)
 
 type FilesDownloadRequestMetaRetrieveRequest struct {
 	// If provided, specifies the export format of the file to be downloaded. For information on supported export formats, please refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
 	MimeType *string `json:"-" url:"mime_type,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FilesDownloadRequestMetaRetrieveRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetMimeType sets the MimeType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaRetrieveRequest) SetMimeType(mimeType *string) {
+	f.MimeType = mimeType
+	f.require(filesDownloadRequestMetaRetrieveRequestFieldMimeType)
+}
+
+var (
+	filesDownloadRetrieveRequestFieldIncludeShellData = big.NewInt(1 << 0)
+	filesDownloadRetrieveRequestFieldMimeType         = big.NewInt(1 << 1)
+)
 
 type FilesDownloadRetrieveRequest struct {
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// If provided, specifies the export format of the file to be downloaded. For information on supported export formats, please refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
 	MimeType *string `json:"-" url:"mime_type,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FilesDownloadRetrieveRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	f.IncludeShellData = includeShellData
+	f.require(filesDownloadRetrieveRequestFieldIncludeShellData)
+}
+
+// SetMimeType sets the MimeType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRetrieveRequest) SetMimeType(mimeType *string) {
+	f.MimeType = mimeType
+	f.require(filesDownloadRetrieveRequestFieldMimeType)
+}
+
+var (
+	filesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	filesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	filesListRequestFieldCursor             = big.NewInt(1 << 2)
+	filesListRequestFieldDriveId            = big.NewInt(1 << 3)
+	filesListRequestFieldExpand             = big.NewInt(1 << 4)
+	filesListRequestFieldFolderId           = big.NewInt(1 << 5)
+	filesListRequestFieldIncludeDeletedData = big.NewInt(1 << 6)
+	filesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 7)
+	filesListRequestFieldIncludeShellData   = big.NewInt(1 << 8)
+	filesListRequestFieldMimeType           = big.NewInt(1 << 9)
+	filesListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
+	filesListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
+	filesListRequestFieldName               = big.NewInt(1 << 12)
+	filesListRequestFieldOrderBy            = big.NewInt(1 << 13)
+	filesListRequestFieldPageSize           = big.NewInt(1 << 14)
+	filesListRequestFieldRemoteId           = big.NewInt(1 << 15)
+)
 
 type FilesListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -83,7 +275,135 @@ type FilesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FilesListRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	f.CreatedAfter = createdAfter
+	f.require(filesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	f.CreatedBefore = createdBefore
+	f.require(filesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetCursor(cursor *string) {
+	f.Cursor = cursor
+	f.require(filesListRequestFieldCursor)
+}
+
+// SetDriveId sets the DriveId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetDriveId(driveId *string) {
+	f.DriveId = driveId
+	f.require(filesListRequestFieldDriveId)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetExpand(expand []*FilesListRequestExpandItem) {
+	f.Expand = expand
+	f.require(filesListRequestFieldExpand)
+}
+
+// SetFolderId sets the FolderId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetFolderId(folderId *string) {
+	f.FolderId = folderId
+	f.require(filesListRequestFieldFolderId)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	f.IncludeDeletedData = includeDeletedData
+	f.require(filesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	f.IncludeRemoteData = includeRemoteData
+	f.require(filesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetIncludeShellData(includeShellData *bool) {
+	f.IncludeShellData = includeShellData
+	f.require(filesListRequestFieldIncludeShellData)
+}
+
+// SetMimeType sets the MimeType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetMimeType(mimeType *string) {
+	f.MimeType = mimeType
+	f.require(filesListRequestFieldMimeType)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	f.ModifiedAfter = modifiedAfter
+	f.require(filesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	f.ModifiedBefore = modifiedBefore
+	f.require(filesListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetName(name *string) {
+	f.Name = name
+	f.require(filesListRequestFieldName)
+}
+
+// SetOrderBy sets the OrderBy field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetOrderBy(orderBy *FilesListRequestOrderBy) {
+	f.OrderBy = orderBy
+	f.require(filesListRequestFieldOrderBy)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetPageSize(pageSize *int) {
+	f.PageSize = pageSize
+	f.require(filesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetRemoteId(remoteId *string) {
+	f.RemoteId = remoteId
+	f.require(filesListRequestFieldRemoteId)
+}
+
+var (
+	filesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	filesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	filesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type FilesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -92,6 +412,37 @@ type FilesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (f *FilesRetrieveRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesRetrieveRequest) SetExpand(expand []*FilesRetrieveRequestExpandItem) {
+	f.Expand = expand
+	f.require(filesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	f.IncludeRemoteData = includeRemoteData
+	f.require(filesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	f.IncludeShellData = includeShellData
+	f.require(filesRetrieveRequestFieldIncludeShellData)
 }
 
 type FilesDownloadRequestMetaListRequestOrderBy string
@@ -200,11 +551,21 @@ func (f FilesRetrieveRequestExpandItem) Ptr() *FilesRetrieveRequestExpandItem {
 	return &f
 }
 
+var (
+	downloadRequestMetaFieldId      = big.NewInt(1 << 0)
+	downloadRequestMetaFieldUrl     = big.NewInt(1 << 1)
+	downloadRequestMetaFieldMethod  = big.NewInt(1 << 2)
+	downloadRequestMetaFieldHeaders = big.NewInt(1 << 3)
+)
+
 type DownloadRequestMeta struct {
 	Id      string                 `json:"id" url:"id"`
 	Url     string                 `json:"url" url:"url"`
 	Method  string                 `json:"method" url:"method"`
 	Headers map[string]interface{} `json:"headers" url:"headers"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -242,6 +603,41 @@ func (d *DownloadRequestMeta) GetExtraProperties() map[string]interface{} {
 	return d.extraProperties
 }
 
+func (d *DownloadRequestMeta) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DownloadRequestMeta) SetId(id string) {
+	d.Id = id
+	d.require(downloadRequestMetaFieldId)
+}
+
+// SetUrl sets the Url field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DownloadRequestMeta) SetUrl(url string) {
+	d.Url = url
+	d.require(downloadRequestMetaFieldUrl)
+}
+
+// SetMethod sets the Method field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DownloadRequestMeta) SetMethod(method string) {
+	d.Method = method
+	d.require(downloadRequestMetaFieldMethod)
+}
+
+// SetHeaders sets the Headers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DownloadRequestMeta) SetHeaders(headers map[string]interface{}) {
+	d.Headers = headers
+	d.require(downloadRequestMetaFieldHeaders)
+}
+
 func (d *DownloadRequestMeta) UnmarshalJSON(data []byte) error {
 	type unmarshaler DownloadRequestMeta
 	var value unmarshaler
@@ -256,6 +652,17 @@ func (d *DownloadRequestMeta) UnmarshalJSON(data []byte) error {
 	d.extraProperties = extraProperties
 	d.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (d *DownloadRequestMeta) MarshalJSON() ([]byte, error) {
+	type embed DownloadRequestMeta
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*d),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (d *DownloadRequestMeta) String() string {
@@ -275,6 +682,28 @@ func (d *DownloadRequestMeta) String() string {
 // The `File` object is used to represent a file in the workspace. The Object typically exists under a folder or drive, if it exists.
 // ### Usage Example
 // Fetch from the `GET /api/filestorage/v1/files` endpoint and view their files.
+var (
+	fileFieldId               = big.NewInt(1 << 0)
+	fileFieldRemoteId         = big.NewInt(1 << 1)
+	fileFieldCreatedAt        = big.NewInt(1 << 2)
+	fileFieldModifiedAt       = big.NewInt(1 << 3)
+	fileFieldName             = big.NewInt(1 << 4)
+	fileFieldFileUrl          = big.NewInt(1 << 5)
+	fileFieldFileThumbnailUrl = big.NewInt(1 << 6)
+	fileFieldSize             = big.NewInt(1 << 7)
+	fileFieldMimeType         = big.NewInt(1 << 8)
+	fileFieldDescription      = big.NewInt(1 << 9)
+	fileFieldFolder           = big.NewInt(1 << 10)
+	fileFieldChecksum         = big.NewInt(1 << 11)
+	fileFieldPermissions      = big.NewInt(1 << 12)
+	fileFieldDrive            = big.NewInt(1 << 13)
+	fileFieldRemoteCreatedAt  = big.NewInt(1 << 14)
+	fileFieldRemoteUpdatedAt  = big.NewInt(1 << 15)
+	fileFieldRemoteWasDeleted = big.NewInt(1 << 16)
+	fileFieldFieldMappings    = big.NewInt(1 << 17)
+	fileFieldRemoteData       = big.NewInt(1 << 18)
+)
+
 type File struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -311,6 +740,9 @@ type File struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -453,6 +885,146 @@ func (f *File) GetExtraProperties() map[string]interface{} {
 	return f.extraProperties
 }
 
+func (f *File) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetId(id *string) {
+	f.Id = id
+	f.require(fileFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetRemoteId(remoteId *string) {
+	f.RemoteId = remoteId
+	f.require(fileFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetCreatedAt(createdAt *time.Time) {
+	f.CreatedAt = createdAt
+	f.require(fileFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetModifiedAt(modifiedAt *time.Time) {
+	f.ModifiedAt = modifiedAt
+	f.require(fileFieldModifiedAt)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetName(name *string) {
+	f.Name = name
+	f.require(fileFieldName)
+}
+
+// SetFileUrl sets the FileUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetFileUrl(fileUrl *string) {
+	f.FileUrl = fileUrl
+	f.require(fileFieldFileUrl)
+}
+
+// SetFileThumbnailUrl sets the FileThumbnailUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetFileThumbnailUrl(fileThumbnailUrl *string) {
+	f.FileThumbnailUrl = fileThumbnailUrl
+	f.require(fileFieldFileThumbnailUrl)
+}
+
+// SetSize sets the Size field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetSize(size *int64) {
+	f.Size = size
+	f.require(fileFieldSize)
+}
+
+// SetMimeType sets the MimeType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetMimeType(mimeType *string) {
+	f.MimeType = mimeType
+	f.require(fileFieldMimeType)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetDescription(description *string) {
+	f.Description = description
+	f.require(fileFieldDescription)
+}
+
+// SetFolder sets the Folder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetFolder(folder *FileFolder) {
+	f.Folder = folder
+	f.require(fileFieldFolder)
+}
+
+// SetChecksum sets the Checksum field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetChecksum(checksum map[string]interface{}) {
+	f.Checksum = checksum
+	f.require(fileFieldChecksum)
+}
+
+// SetPermissions sets the Permissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetPermissions(permissions *FilePermissions) {
+	f.Permissions = permissions
+	f.require(fileFieldPermissions)
+}
+
+// SetDrive sets the Drive field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetDrive(drive *FileDrive) {
+	f.Drive = drive
+	f.require(fileFieldDrive)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	f.RemoteCreatedAt = remoteCreatedAt
+	f.require(fileFieldRemoteCreatedAt)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	f.RemoteUpdatedAt = remoteUpdatedAt
+	f.require(fileFieldRemoteUpdatedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	f.RemoteWasDeleted = remoteWasDeleted
+	f.require(fileFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetFieldMappings(fieldMappings map[string]interface{}) {
+	f.FieldMappings = fieldMappings
+	f.require(fileFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *File) SetRemoteData(remoteData []*RemoteData) {
+	f.RemoteData = remoteData
+	f.require(fileFieldRemoteData)
+}
+
 func (f *File) UnmarshalJSON(data []byte) error {
 	type embed File
 	var unmarshaler = struct {
@@ -496,7 +1068,8 @@ func (f *File) MarshalJSON() ([]byte, error) {
 		RemoteCreatedAt: internal.NewOptionalDateTime(f.RemoteCreatedAt),
 		RemoteUpdatedAt: internal.NewOptionalDateTime(f.RemoteUpdatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (f *File) String() string {
@@ -788,6 +1361,21 @@ func (f *FilePermissionsItem) Accept(visitor FilePermissionsItemVisitor) error {
 // The `File` object is used to represent a file in the workspace. The Object typically exists under a folder or drive, if it exists.
 // ### Usage Example
 // Fetch from the `GET /api/filestorage/v1/files` endpoint and view their files.
+var (
+	fileRequestFieldName                = big.NewInt(1 << 0)
+	fileRequestFieldFileUrl             = big.NewInt(1 << 1)
+	fileRequestFieldFileThumbnailUrl    = big.NewInt(1 << 2)
+	fileRequestFieldSize                = big.NewInt(1 << 3)
+	fileRequestFieldMimeType            = big.NewInt(1 << 4)
+	fileRequestFieldDescription         = big.NewInt(1 << 5)
+	fileRequestFieldFolder              = big.NewInt(1 << 6)
+	fileRequestFieldChecksum            = big.NewInt(1 << 7)
+	fileRequestFieldPermissions         = big.NewInt(1 << 8)
+	fileRequestFieldDrive               = big.NewInt(1 << 9)
+	fileRequestFieldIntegrationParams   = big.NewInt(1 << 10)
+	fileRequestFieldLinkedAccountParams = big.NewInt(1 << 11)
+)
+
 type FileRequest struct {
 	// The file's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -811,6 +1399,9 @@ type FileRequest struct {
 	Drive               *FileRequestDrive      `json:"drive,omitempty" url:"drive,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -904,6 +1495,97 @@ func (f *FileRequest) GetExtraProperties() map[string]interface{} {
 	return f.extraProperties
 }
 
+func (f *FileRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetName(name *string) {
+	f.Name = name
+	f.require(fileRequestFieldName)
+}
+
+// SetFileUrl sets the FileUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetFileUrl(fileUrl *string) {
+	f.FileUrl = fileUrl
+	f.require(fileRequestFieldFileUrl)
+}
+
+// SetFileThumbnailUrl sets the FileThumbnailUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetFileThumbnailUrl(fileThumbnailUrl *string) {
+	f.FileThumbnailUrl = fileThumbnailUrl
+	f.require(fileRequestFieldFileThumbnailUrl)
+}
+
+// SetSize sets the Size field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetSize(size *int64) {
+	f.Size = size
+	f.require(fileRequestFieldSize)
+}
+
+// SetMimeType sets the MimeType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetMimeType(mimeType *string) {
+	f.MimeType = mimeType
+	f.require(fileRequestFieldMimeType)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetDescription(description *string) {
+	f.Description = description
+	f.require(fileRequestFieldDescription)
+}
+
+// SetFolder sets the Folder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetFolder(folder *FileRequestFolder) {
+	f.Folder = folder
+	f.require(fileRequestFieldFolder)
+}
+
+// SetChecksum sets the Checksum field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetChecksum(checksum map[string]interface{}) {
+	f.Checksum = checksum
+	f.require(fileRequestFieldChecksum)
+}
+
+// SetPermissions sets the Permissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetPermissions(permissions *FileRequestPermissions) {
+	f.Permissions = permissions
+	f.require(fileRequestFieldPermissions)
+}
+
+// SetDrive sets the Drive field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetDrive(drive *FileRequestDrive) {
+	f.Drive = drive
+	f.require(fileRequestFieldDrive)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	f.IntegrationParams = integrationParams
+	f.require(fileRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	f.LinkedAccountParams = linkedAccountParams
+	f.require(fileRequestFieldLinkedAccountParams)
+}
+
 func (f *FileRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler FileRequest
 	var value unmarshaler
@@ -918,6 +1600,17 @@ func (f *FileRequest) UnmarshalJSON(data []byte) error {
 	f.extraProperties = extraProperties
 	f.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (f *FileRequest) MarshalJSON() ([]byte, error) {
+	type embed FileRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (f *FileRequest) String() string {
@@ -1204,11 +1897,21 @@ func (f *FileRequestPermissionsItem) Accept(visitor FileRequestPermissionsItemVi
 	return fmt.Errorf("type %T does not include a non-empty union type", f)
 }
 
+var (
+	fileStorageFileResponseFieldModel    = big.NewInt(1 << 0)
+	fileStorageFileResponseFieldWarnings = big.NewInt(1 << 1)
+	fileStorageFileResponseFieldErrors   = big.NewInt(1 << 2)
+	fileStorageFileResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type FileStorageFileResponse struct {
 	Model    *File                       `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1246,6 +1949,41 @@ func (f *FileStorageFileResponse) GetExtraProperties() map[string]interface{} {
 	return f.extraProperties
 }
 
+func (f *FileStorageFileResponse) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileResponse) SetModel(model *File) {
+	f.Model = model
+	f.require(fileStorageFileResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	f.Warnings = warnings
+	f.require(fileStorageFileResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileResponse) SetErrors(errors []*ErrorValidationProblem) {
+	f.Errors = errors
+	f.require(fileStorageFileResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFileResponse) SetLogs(logs []*DebugModeLog) {
+	f.Logs = logs
+	f.require(fileStorageFileResponseFieldLogs)
+}
+
 func (f *FileStorageFileResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler FileStorageFileResponse
 	var value unmarshaler
@@ -1262,6 +2000,17 @@ func (f *FileStorageFileResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FileStorageFileResponse) MarshalJSON() ([]byte, error) {
+	type embed FileStorageFileResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FileStorageFileResponse) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -1274,10 +2023,19 @@ func (f *FileStorageFileResponse) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	paginatedDownloadRequestMetaListFieldNext     = big.NewInt(1 << 0)
+	paginatedDownloadRequestMetaListFieldPrevious = big.NewInt(1 << 1)
+	paginatedDownloadRequestMetaListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedDownloadRequestMetaList struct {
 	Next     *string                `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string                `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*DownloadRequestMeta `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1308,6 +2066,34 @@ func (p *PaginatedDownloadRequestMetaList) GetExtraProperties() map[string]inter
 	return p.extraProperties
 }
 
+func (p *PaginatedDownloadRequestMetaList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDownloadRequestMetaList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedDownloadRequestMetaListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDownloadRequestMetaList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedDownloadRequestMetaListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDownloadRequestMetaList) SetResults(results []*DownloadRequestMeta) {
+	p.Results = results
+	p.require(paginatedDownloadRequestMetaListFieldResults)
+}
+
 func (p *PaginatedDownloadRequestMetaList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedDownloadRequestMetaList
 	var value unmarshaler
@@ -1324,6 +2110,17 @@ func (p *PaginatedDownloadRequestMetaList) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (p *PaginatedDownloadRequestMetaList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedDownloadRequestMetaList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (p *PaginatedDownloadRequestMetaList) String() string {
 	if len(p.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
@@ -1336,10 +2133,19 @@ func (p *PaginatedDownloadRequestMetaList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+var (
+	paginatedFileListFieldNext     = big.NewInt(1 << 0)
+	paginatedFileListFieldPrevious = big.NewInt(1 << 1)
+	paginatedFileListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedFileList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*File `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1370,6 +2176,34 @@ func (p *PaginatedFileList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedFileList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedFileList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedFileListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedFileList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedFileListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedFileList) SetResults(results []*File) {
+	p.Results = results
+	p.require(paginatedFileListFieldResults)
+}
+
 func (p *PaginatedFileList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedFileList
 	var value unmarshaler
@@ -1384,6 +2218,17 @@ func (p *PaginatedFileList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedFileList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedFileList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedFileList) String() string {

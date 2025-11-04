@@ -6,6 +6,15 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
+)
+
+var (
+	paymentMethodsListRequestFieldCursor             = big.NewInt(1 << 0)
+	paymentMethodsListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	paymentMethodsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	paymentMethodsListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	paymentMethodsListRequestFieldPageSize           = big.NewInt(1 << 4)
 )
 
 type PaymentMethodsListRequest struct {
@@ -19,19 +28,102 @@ type PaymentMethodsListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PaymentMethodsListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(paymentMethodsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(paymentMethodsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(paymentMethodsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(paymentMethodsListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(paymentMethodsListRequestFieldPageSize)
+}
+
+var (
+	paymentMethodsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	paymentMethodsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type PaymentMethodsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PaymentMethodsRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(paymentMethodsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethodsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(paymentMethodsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedPaymentMethodListFieldNext     = big.NewInt(1 << 0)
+	paginatedPaymentMethodListFieldPrevious = big.NewInt(1 << 1)
+	paginatedPaymentMethodListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedPaymentMethodList struct {
 	Next     *string          `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*PaymentMethod `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -62,6 +154,34 @@ func (p *PaginatedPaymentMethodList) GetExtraProperties() map[string]interface{}
 	return p.extraProperties
 }
 
+func (p *PaginatedPaymentMethodList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPaymentMethodList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedPaymentMethodListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPaymentMethodList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedPaymentMethodListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPaymentMethodList) SetResults(results []*PaymentMethod) {
+	p.Results = results
+	p.require(paginatedPaymentMethodListFieldResults)
+}
+
 func (p *PaginatedPaymentMethodList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedPaymentMethodList
 	var value unmarshaler
@@ -76,6 +196,17 @@ func (p *PaginatedPaymentMethodList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedPaymentMethodList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedPaymentMethodList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedPaymentMethodList) String() string {

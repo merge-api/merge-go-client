@@ -4,7 +4,6 @@ package audittrail
 
 import (
 	context "context"
-	fmt "fmt"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	crm "github.com/merge-api/merge-go-client/v2/crm"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
@@ -13,22 +12,24 @@ import (
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,7 +38,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *crm.AuditTrailListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*crm.AuditLogEvent], error) {
+) (*core.Page[*string, *crm.AuditLogEvent], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,13 +51,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -73,11 +73,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedAuditLogEventList) *internal.PageResponse[*string, *crm.AuditLogEvent] {
+	readPageResponse := func(response *crm.PaginatedAuditLogEventList) *core.PageResponse[*string, *crm.AuditLogEvent] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *crm.AuditLogEvent]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *crm.AuditLogEvent]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,

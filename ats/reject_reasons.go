@@ -6,7 +6,21 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	rejectReasonsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	rejectReasonsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	rejectReasonsListRequestFieldCursor             = big.NewInt(1 << 2)
+	rejectReasonsListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	rejectReasonsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	rejectReasonsListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	rejectReasonsListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	rejectReasonsListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	rejectReasonsListRequestFieldPageSize           = big.NewInt(1 << 8)
+	rejectReasonsListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type RejectReasonsListRequest struct {
@@ -30,19 +44,137 @@ type RejectReasonsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (r *RejectReasonsListRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	r.CreatedAfter = createdAfter
+	r.require(rejectReasonsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	r.CreatedBefore = createdBefore
+	r.require(rejectReasonsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetCursor(cursor *string) {
+	r.Cursor = cursor
+	r.require(rejectReasonsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	r.IncludeDeletedData = includeDeletedData
+	r.require(rejectReasonsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	r.IncludeRemoteData = includeRemoteData
+	r.require(rejectReasonsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetIncludeShellData(includeShellData *bool) {
+	r.IncludeShellData = includeShellData
+	r.require(rejectReasonsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	r.ModifiedAfter = modifiedAfter
+	r.require(rejectReasonsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	r.ModifiedBefore = modifiedBefore
+	r.require(rejectReasonsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetPageSize(pageSize *int) {
+	r.PageSize = pageSize
+	r.require(rejectReasonsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsListRequest) SetRemoteId(remoteId *string) {
+	r.RemoteId = remoteId
+	r.require(rejectReasonsListRequestFieldRemoteId)
+}
+
+var (
+	rejectReasonsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	rejectReasonsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type RejectReasonsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (r *RejectReasonsRetrieveRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	r.IncludeRemoteData = includeRemoteData
+	r.require(rejectReasonsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RejectReasonsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	r.IncludeShellData = includeShellData
+	r.require(rejectReasonsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedRejectReasonListFieldNext     = big.NewInt(1 << 0)
+	paginatedRejectReasonListFieldPrevious = big.NewInt(1 << 1)
+	paginatedRejectReasonListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedRejectReasonList struct {
 	Next     *string         `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string         `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*RejectReason `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedRejectReasonList) GetExtraProperties() map[string]interface{} 
 	return p.extraProperties
 }
 
+func (p *PaginatedRejectReasonList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRejectReasonList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedRejectReasonListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRejectReasonList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedRejectReasonListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRejectReasonList) SetResults(results []*RejectReason) {
+	p.Results = results
+	p.require(paginatedRejectReasonListFieldResults)
+}
+
 func (p *PaginatedRejectReasonList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedRejectReasonList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedRejectReasonList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedRejectReasonList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedRejectReasonList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedRejectReasonList) String() string {
