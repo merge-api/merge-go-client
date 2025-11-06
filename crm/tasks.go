@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	taskEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	taskEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	taskEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type TaskEndpointRequest struct {
@@ -15,7 +22,53 @@ type TaskEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool        `json:"-" url:"run_async,omitempty"`
 	Model    *TaskRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TaskEndpointRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	t.IsDebugMode = isDebugMode
+	t.require(taskEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskEndpointRequest) SetRunAsync(runAsync *bool) {
+	t.RunAsync = runAsync
+	t.require(taskEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskEndpointRequest) SetModel(model *TaskRequest) {
+	t.Model = model
+	t.require(taskEndpointRequestFieldModel)
+}
+
+var (
+	tasksListRequestFieldCreatedAfter        = big.NewInt(1 << 0)
+	tasksListRequestFieldCreatedBefore       = big.NewInt(1 << 1)
+	tasksListRequestFieldCursor              = big.NewInt(1 << 2)
+	tasksListRequestFieldExpand              = big.NewInt(1 << 3)
+	tasksListRequestFieldIncludeDeletedData  = big.NewInt(1 << 4)
+	tasksListRequestFieldIncludeRemoteData   = big.NewInt(1 << 5)
+	tasksListRequestFieldIncludeRemoteFields = big.NewInt(1 << 6)
+	tasksListRequestFieldIncludeShellData    = big.NewInt(1 << 7)
+	tasksListRequestFieldModifiedAfter       = big.NewInt(1 << 8)
+	tasksListRequestFieldModifiedBefore      = big.NewInt(1 << 9)
+	tasksListRequestFieldPageSize            = big.NewInt(1 << 10)
+	tasksListRequestFieldRemoteId            = big.NewInt(1 << 11)
+)
 
 type TasksListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -42,7 +95,107 @@ type TasksListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TasksListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(tasksListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(tasksListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(tasksListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetExpand(expand []*TasksListRequestExpandItem) {
+	t.Expand = expand
+	t.require(tasksListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(tasksListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(tasksListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	t.IncludeRemoteFields = includeRemoteFields
+	t.require(tasksListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(tasksListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(tasksListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(tasksListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(tasksListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(tasksListRequestFieldRemoteId)
+}
+
+var (
+	patchedTaskEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedTaskEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedTaskEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedTaskEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -50,7 +203,49 @@ type PatchedTaskEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool               `json:"-" url:"run_async,omitempty"`
 	Model    *PatchedTaskRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedTaskEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedTaskEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedTaskEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskEndpointRequest) SetModel(model *PatchedTaskRequest) {
+	p.Model = model
+	p.require(patchedTaskEndpointRequestFieldModel)
+}
+
+var (
+	tasksRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	tasksRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	tasksRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	tasksRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	tasksRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	tasksRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	tasksRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	tasksRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type TasksRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -69,7 +264,80 @@ type TasksRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TasksRemoteFieldClassesListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(tasksRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(tasksRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(tasksRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	t.IncludeRemoteFields = includeRemoteFields
+	t.require(tasksRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(tasksRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	t.IsCommonModelField = isCommonModelField
+	t.require(tasksRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	t.IsCustom = isCustom
+	t.require(tasksRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(tasksRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	tasksRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	tasksRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	tasksRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	tasksRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type TasksRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -80,6 +348,44 @@ type TasksRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TasksRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRetrieveRequest) SetExpand(expand []*TasksRetrieveRequestExpandItem) {
+	t.Expand = expand
+	t.require(tasksRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(tasksRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	t.IncludeRemoteFields = includeRemoteFields
+	t.require(tasksRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TasksRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(tasksRetrieveRequestFieldIncludeShellData)
 }
 
 type TasksListRequestExpandItem string
@@ -132,10 +438,19 @@ func (t TasksRetrieveRequestExpandItem) Ptr() *TasksRetrieveRequestExpandItem {
 	return &t
 }
 
+var (
+	paginatedTaskListFieldNext     = big.NewInt(1 << 0)
+	paginatedTaskListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTaskListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedTaskList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Task `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -166,6 +481,34 @@ func (p *PaginatedTaskList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedTaskList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTaskList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTaskListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTaskList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTaskListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTaskList) SetResults(results []*Task) {
+	p.Results = results
+	p.require(paginatedTaskListFieldResults)
+}
+
 func (p *PaginatedTaskList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTaskList
 	var value unmarshaler
@@ -180,6 +523,17 @@ func (p *PaginatedTaskList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTaskList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTaskList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTaskList) String() string {
@@ -199,6 +553,20 @@ func (p *PaginatedTaskList) String() string {
 // The `Task` object is used to represent a task, such as a to-do item.
 // ### Usage Example
 // TODO
+var (
+	patchedTaskRequestFieldSubject             = big.NewInt(1 << 0)
+	patchedTaskRequestFieldContent             = big.NewInt(1 << 1)
+	patchedTaskRequestFieldOwner               = big.NewInt(1 << 2)
+	patchedTaskRequestFieldAccount             = big.NewInt(1 << 3)
+	patchedTaskRequestFieldOpportunity         = big.NewInt(1 << 4)
+	patchedTaskRequestFieldCompletedDate       = big.NewInt(1 << 5)
+	patchedTaskRequestFieldDueDate             = big.NewInt(1 << 6)
+	patchedTaskRequestFieldStatus              = big.NewInt(1 << 7)
+	patchedTaskRequestFieldIntegrationParams   = big.NewInt(1 << 8)
+	patchedTaskRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
+	patchedTaskRequestFieldRemoteFields        = big.NewInt(1 << 10)
+)
+
 type PatchedTaskRequest struct {
 	// The task's subject.
 	Subject *string `json:"subject,omitempty" url:"subject,omitempty"`
@@ -222,6 +590,9 @@ type PatchedTaskRequest struct {
 	IntegrationParams   map[string]interface{}    `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}    `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest     `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -308,6 +679,90 @@ func (p *PatchedTaskRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PatchedTaskRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetSubject(subject *string) {
+	p.Subject = subject
+	p.require(patchedTaskRequestFieldSubject)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetContent(content *string) {
+	p.Content = content
+	p.require(patchedTaskRequestFieldContent)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetOwner(owner *string) {
+	p.Owner = owner
+	p.require(patchedTaskRequestFieldOwner)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(patchedTaskRequestFieldAccount)
+}
+
+// SetOpportunity sets the Opportunity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetOpportunity(opportunity *string) {
+	p.Opportunity = opportunity
+	p.require(patchedTaskRequestFieldOpportunity)
+}
+
+// SetCompletedDate sets the CompletedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetCompletedDate(completedDate *time.Time) {
+	p.CompletedDate = completedDate
+	p.require(patchedTaskRequestFieldCompletedDate)
+}
+
+// SetDueDate sets the DueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetDueDate(dueDate *time.Time) {
+	p.DueDate = dueDate
+	p.require(patchedTaskRequestFieldDueDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetStatus(status *PatchedTaskRequestStatus) {
+	p.Status = status
+	p.require(patchedTaskRequestFieldStatus)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedTaskRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedTaskRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedTaskRequestFieldRemoteFields)
+}
+
 func (p *PatchedTaskRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedTaskRequest
 	var unmarshaler = struct {
@@ -343,7 +798,8 @@ func (p *PatchedTaskRequest) MarshalJSON() ([]byte, error) {
 		CompletedDate: internal.NewOptionalDateTime(p.CompletedDate),
 		DueDate:       internal.NewOptionalDateTime(p.DueDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedTaskRequest) String() string {
@@ -429,6 +885,25 @@ func (p *PatchedTaskRequestStatus) Accept(visitor PatchedTaskRequestStatusVisito
 // The `Task` object is used to represent a task, such as a to-do item.
 // ### Usage Example
 // TODO
+var (
+	taskFieldId               = big.NewInt(1 << 0)
+	taskFieldRemoteId         = big.NewInt(1 << 1)
+	taskFieldCreatedAt        = big.NewInt(1 << 2)
+	taskFieldModifiedAt       = big.NewInt(1 << 3)
+	taskFieldSubject          = big.NewInt(1 << 4)
+	taskFieldContent          = big.NewInt(1 << 5)
+	taskFieldOwner            = big.NewInt(1 << 6)
+	taskFieldAccount          = big.NewInt(1 << 7)
+	taskFieldOpportunity      = big.NewInt(1 << 8)
+	taskFieldCompletedDate    = big.NewInt(1 << 9)
+	taskFieldDueDate          = big.NewInt(1 << 10)
+	taskFieldStatus           = big.NewInt(1 << 11)
+	taskFieldRemoteWasDeleted = big.NewInt(1 << 12)
+	taskFieldFieldMappings    = big.NewInt(1 << 13)
+	taskFieldRemoteData       = big.NewInt(1 << 14)
+	taskFieldRemoteFields     = big.NewInt(1 << 15)
+)
+
 type Task struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -461,6 +936,9 @@ type Task struct {
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -582,6 +1060,125 @@ func (t *Task) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *Task) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetId(id *string) {
+	t.Id = id
+	t.require(taskFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(taskFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(taskFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(taskFieldModifiedAt)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetSubject(subject *string) {
+	t.Subject = subject
+	t.require(taskFieldSubject)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetContent(content *string) {
+	t.Content = content
+	t.require(taskFieldContent)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetOwner(owner *TaskOwner) {
+	t.Owner = owner
+	t.require(taskFieldOwner)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetAccount(account *TaskAccount) {
+	t.Account = account
+	t.require(taskFieldAccount)
+}
+
+// SetOpportunity sets the Opportunity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetOpportunity(opportunity *TaskOpportunity) {
+	t.Opportunity = opportunity
+	t.require(taskFieldOpportunity)
+}
+
+// SetCompletedDate sets the CompletedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetCompletedDate(completedDate *time.Time) {
+	t.CompletedDate = completedDate
+	t.require(taskFieldCompletedDate)
+}
+
+// SetDueDate sets the DueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetDueDate(dueDate *time.Time) {
+	t.DueDate = dueDate
+	t.require(taskFieldDueDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetStatus(status *TaskStatus) {
+	t.Status = status
+	t.require(taskFieldStatus)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(taskFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(taskFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(taskFieldRemoteData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetRemoteFields(remoteFields []*RemoteField) {
+	t.RemoteFields = remoteFields
+	t.require(taskFieldRemoteFields)
+}
+
 func (t *Task) UnmarshalJSON(data []byte) error {
 	type embed Task
 	var unmarshaler = struct {
@@ -625,7 +1222,8 @@ func (t *Task) MarshalJSON() ([]byte, error) {
 		CompletedDate: internal.NewOptionalDateTime(t.CompletedDate),
 		DueDate:       internal.NewOptionalDateTime(t.DueDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *Task) String() string {
@@ -834,6 +1432,20 @@ func (t *TaskOwner) Accept(visitor TaskOwnerVisitor) error {
 // The `Task` object is used to represent a task, such as a to-do item.
 // ### Usage Example
 // TODO
+var (
+	taskRequestFieldSubject             = big.NewInt(1 << 0)
+	taskRequestFieldContent             = big.NewInt(1 << 1)
+	taskRequestFieldOwner               = big.NewInt(1 << 2)
+	taskRequestFieldAccount             = big.NewInt(1 << 3)
+	taskRequestFieldOpportunity         = big.NewInt(1 << 4)
+	taskRequestFieldCompletedDate       = big.NewInt(1 << 5)
+	taskRequestFieldDueDate             = big.NewInt(1 << 6)
+	taskRequestFieldStatus              = big.NewInt(1 << 7)
+	taskRequestFieldIntegrationParams   = big.NewInt(1 << 8)
+	taskRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
+	taskRequestFieldRemoteFields        = big.NewInt(1 << 10)
+)
+
 type TaskRequest struct {
 	// The task's subject.
 	Subject *string `json:"subject,omitempty" url:"subject,omitempty"`
@@ -857,6 +1469,9 @@ type TaskRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -943,6 +1558,90 @@ func (t *TaskRequest) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TaskRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetSubject(subject *string) {
+	t.Subject = subject
+	t.require(taskRequestFieldSubject)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetContent(content *string) {
+	t.Content = content
+	t.require(taskRequestFieldContent)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetOwner(owner *TaskRequestOwner) {
+	t.Owner = owner
+	t.require(taskRequestFieldOwner)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetAccount(account *TaskRequestAccount) {
+	t.Account = account
+	t.require(taskRequestFieldAccount)
+}
+
+// SetOpportunity sets the Opportunity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetOpportunity(opportunity *TaskRequestOpportunity) {
+	t.Opportunity = opportunity
+	t.require(taskRequestFieldOpportunity)
+}
+
+// SetCompletedDate sets the CompletedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetCompletedDate(completedDate *time.Time) {
+	t.CompletedDate = completedDate
+	t.require(taskRequestFieldCompletedDate)
+}
+
+// SetDueDate sets the DueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetDueDate(dueDate *time.Time) {
+	t.DueDate = dueDate
+	t.require(taskRequestFieldDueDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetStatus(status *TaskRequestStatus) {
+	t.Status = status
+	t.require(taskRequestFieldStatus)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	t.IntegrationParams = integrationParams
+	t.require(taskRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	t.LinkedAccountParams = linkedAccountParams
+	t.require(taskRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	t.RemoteFields = remoteFields
+	t.require(taskRequestFieldRemoteFields)
+}
+
 func (t *TaskRequest) UnmarshalJSON(data []byte) error {
 	type embed TaskRequest
 	var unmarshaler = struct {
@@ -978,7 +1677,8 @@ func (t *TaskRequest) MarshalJSON() ([]byte, error) {
 		CompletedDate: internal.NewOptionalDateTime(t.CompletedDate),
 		DueDate:       internal.NewOptionalDateTime(t.DueDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TaskRequest) String() string {
@@ -1248,11 +1948,21 @@ func (t *TaskRequestStatus) Accept(visitor TaskRequestStatusVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
 
+var (
+	taskResponseFieldModel    = big.NewInt(1 << 0)
+	taskResponseFieldWarnings = big.NewInt(1 << 1)
+	taskResponseFieldErrors   = big.NewInt(1 << 2)
+	taskResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type TaskResponse struct {
 	Model    *Task                       `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1290,6 +2000,41 @@ func (t *TaskResponse) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TaskResponse) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskResponse) SetModel(model *Task) {
+	t.Model = model
+	t.require(taskResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	t.Warnings = warnings
+	t.require(taskResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskResponse) SetErrors(errors []*ErrorValidationProblem) {
+	t.Errors = errors
+	t.require(taskResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskResponse) SetLogs(logs []*DebugModeLog) {
+	t.Logs = logs
+	t.require(taskResponseFieldLogs)
+}
+
 func (t *TaskResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler TaskResponse
 	var value unmarshaler
@@ -1304,6 +2049,17 @@ func (t *TaskResponse) UnmarshalJSON(data []byte) error {
 	t.extraProperties = extraProperties
 	t.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (t *TaskResponse) MarshalJSON() ([]byte, error) {
+	type embed TaskResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*t),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TaskResponse) String() string {

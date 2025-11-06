@@ -38,15 +38,9 @@ import (
 	webhookreceivers "github.com/merge-api/merge-go-client/v2/ats/webhookreceivers"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails     *accountdetails.Client
 	AccountToken       *accounttoken.Client
 	Activities         *activities.Client
@@ -80,51 +74,54 @@ type Client struct {
 	Tags               *tags.Client
 	Users              *users.Client
 	WebhookReceivers   *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:     accountdetails.NewClient(options),
+		AccountToken:       accounttoken.NewClient(options),
+		Activities:         activities.NewClient(options),
+		Applications:       applications.NewClient(options),
+		AsyncPassthrough:   asyncpassthrough.NewClient(options),
+		Attachments:        attachments.NewClient(options),
+		AuditTrail:         audittrail.NewClient(options),
+		AvailableActions:   availableactions.NewClient(options),
+		Candidates:         candidates.NewClient(options),
+		Scopes:             scopes.NewClient(options),
+		DeleteAccount:      deleteaccount.NewClient(options),
+		Departments:        departments.NewClient(options),
+		Eeocs:              eeocs.NewClient(options),
+		FieldMapping:       fieldmapping.NewClient(options),
+		GenerateKey:        generatekey.NewClient(options),
+		Interviews:         interviews.NewClient(options),
+		Issues:             issues.NewClient(options),
+		JobInterviewStages: jobinterviewstages.NewClient(options),
+		JobPostings:        jobpostings.NewClient(options),
+		Jobs:               jobs.NewClient(options),
+		LinkToken:          linktoken.NewClient(options),
+		LinkedAccounts:     linkedaccounts.NewClient(options),
+		Offers:             offers.NewClient(options),
+		Offices:            offices.NewClient(options),
+		Passthrough:        passthrough.NewClient(options),
+		RegenerateKey:      regeneratekey.NewClient(options),
+		RejectReasons:      rejectreasons.NewClient(options),
+		Scorecards:         scorecards.NewClient(options),
+		SyncStatus:         syncstatus.NewClient(options),
+		ForceResync:        forceresync.NewClient(options),
+		Tags:               tags.NewClient(options),
+		Users:              users.NewClient(options),
+		WebhookReceivers:   webhookreceivers.NewClient(options),
+		options:            options,
+		baseURL:            options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:             options.ToHeader(),
-		AccountDetails:     accountdetails.NewClient(opts...),
-		AccountToken:       accounttoken.NewClient(opts...),
-		Activities:         activities.NewClient(opts...),
-		Applications:       applications.NewClient(opts...),
-		AsyncPassthrough:   asyncpassthrough.NewClient(opts...),
-		Attachments:        attachments.NewClient(opts...),
-		AuditTrail:         audittrail.NewClient(opts...),
-		AvailableActions:   availableactions.NewClient(opts...),
-		Candidates:         candidates.NewClient(opts...),
-		Scopes:             scopes.NewClient(opts...),
-		DeleteAccount:      deleteaccount.NewClient(opts...),
-		Departments:        departments.NewClient(opts...),
-		Eeocs:              eeocs.NewClient(opts...),
-		FieldMapping:       fieldmapping.NewClient(opts...),
-		GenerateKey:        generatekey.NewClient(opts...),
-		Interviews:         interviews.NewClient(opts...),
-		Issues:             issues.NewClient(opts...),
-		JobInterviewStages: jobinterviewstages.NewClient(opts...),
-		JobPostings:        jobpostings.NewClient(opts...),
-		Jobs:               jobs.NewClient(opts...),
-		LinkToken:          linktoken.NewClient(opts...),
-		LinkedAccounts:     linkedaccounts.NewClient(opts...),
-		Offers:             offers.NewClient(opts...),
-		Offices:            offices.NewClient(opts...),
-		Passthrough:        passthrough.NewClient(opts...),
-		RegenerateKey:      regeneratekey.NewClient(opts...),
-		RejectReasons:      rejectreasons.NewClient(opts...),
-		Scorecards:         scorecards.NewClient(opts...),
-		SyncStatus:         syncstatus.NewClient(opts...),
-		ForceResync:        forceresync.NewClient(opts...),
-		Tags:               tags.NewClient(opts...),
-		Users:              users.NewClient(opts...),
-		WebhookReceivers:   webhookreceivers.NewClient(opts...),
 	}
 }

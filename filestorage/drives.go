@@ -6,7 +6,22 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	drivesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	drivesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	drivesListRequestFieldCursor             = big.NewInt(1 << 2)
+	drivesListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	drivesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	drivesListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	drivesListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	drivesListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	drivesListRequestFieldName               = big.NewInt(1 << 8)
+	drivesListRequestFieldPageSize           = big.NewInt(1 << 9)
+	drivesListRequestFieldRemoteId           = big.NewInt(1 << 10)
 )
 
 type DrivesListRequest struct {
@@ -32,19 +47,144 @@ type DrivesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (d *DrivesListRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	d.CreatedAfter = createdAfter
+	d.require(drivesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	d.CreatedBefore = createdBefore
+	d.require(drivesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetCursor(cursor *string) {
+	d.Cursor = cursor
+	d.require(drivesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	d.IncludeDeletedData = includeDeletedData
+	d.require(drivesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	d.IncludeRemoteData = includeRemoteData
+	d.require(drivesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetIncludeShellData(includeShellData *bool) {
+	d.IncludeShellData = includeShellData
+	d.require(drivesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	d.ModifiedAfter = modifiedAfter
+	d.require(drivesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	d.ModifiedBefore = modifiedBefore
+	d.require(drivesListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetName(name *string) {
+	d.Name = name
+	d.require(drivesListRequestFieldName)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetPageSize(pageSize *int) {
+	d.PageSize = pageSize
+	d.require(drivesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesListRequest) SetRemoteId(remoteId *string) {
+	d.RemoteId = remoteId
+	d.require(drivesListRequestFieldRemoteId)
+}
+
+var (
+	drivesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	drivesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type DrivesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (d *DrivesRetrieveRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	d.IncludeRemoteData = includeRemoteData
+	d.require(drivesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DrivesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	d.IncludeShellData = includeShellData
+	d.require(drivesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedDriveListFieldNext     = big.NewInt(1 << 0)
+	paginatedDriveListFieldPrevious = big.NewInt(1 << 1)
+	paginatedDriveListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedDriveList struct {
 	Next     *string  `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Drive `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -75,6 +215,34 @@ func (p *PaginatedDriveList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedDriveList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDriveList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedDriveListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDriveList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedDriveListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDriveList) SetResults(results []*Drive) {
+	p.Results = results
+	p.require(paginatedDriveListFieldResults)
+}
+
 func (p *PaginatedDriveList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedDriveList
 	var value unmarshaler
@@ -89,6 +257,17 @@ func (p *PaginatedDriveList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedDriveList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedDriveList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedDriveList) String() string {

@@ -4,7 +4,6 @@ package folders
 
 import (
 	context "context"
-	fmt "fmt"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	filestorage "github.com/merge-api/merge-go-client/v2/filestorage"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
@@ -13,22 +12,24 @@ import (
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,7 +38,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.FoldersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*filestorage.Folder], error) {
+) (*core.Page[*string, *filestorage.Folder], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,13 +51,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -73,11 +73,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedFolderList) *internal.PageResponse[*string, *filestorage.Folder] {
+	readPageResponse := func(response *filestorage.PaginatedFolderList) *core.PageResponse[*string, *filestorage.Folder] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *filestorage.Folder]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *filestorage.Folder]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -97,44 +97,15 @@ func (c *Client) Create(
 	request *filestorage.FileStorageFolderEndpointRequest,
 	opts ...option.RequestOption,
 ) (*filestorage.FileStorageFolderResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
+	response, err := c.WithRawResponse.Create(
+		ctx,
+		request,
+		opts...,
 	)
-	endpointURL := baseURL + "/filestorage/v1/folders"
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *filestorage.FileStorageFolderResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a `Folder` object with the given `id`.
@@ -144,45 +115,16 @@ func (c *Client) Retrieve(
 	request *filestorage.FoldersRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*filestorage.Folder, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/filestorage/v1/folders/%v",
+	response, err := c.WithRawResponse.Retrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *filestorage.Folder
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns metadata for `FileStorageFolder` POSTs.
@@ -190,33 +132,12 @@ func (c *Client) MetaPostRetrieve(
 	ctx context.Context,
 	opts ...option.RequestOption,
 ) (*filestorage.MetaResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := baseURL + "/filestorage/v1/folders/meta/post"
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *filestorage.MetaResponse
-	if err := c.caller.Call(
+	response, err := c.WithRawResponse.MetaPostRetrieve(
 		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
+		opts...,
+	)
+	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Body, nil
 }

@@ -2,9 +2,42 @@
 
 package accounting
 
+import (
+	big "math/big"
+)
+
+var (
+	phoneNumbersRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	phoneNumbersRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
+
 type PhoneNumbersRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *PhoneNumbersRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PhoneNumbersRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(phoneNumbersRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PhoneNumbersRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(phoneNumbersRetrieveRequestFieldIncludeShellData)
 }

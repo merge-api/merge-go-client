@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	fileStorageFolderEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	fileStorageFolderEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	fileStorageFolderEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type FileStorageFolderEndpointRequest struct {
@@ -15,7 +22,55 @@ type FileStorageFolderEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool          `json:"-" url:"run_async,omitempty"`
 	Model    *FolderRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FileStorageFolderEndpointRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	f.IsDebugMode = isDebugMode
+	f.require(fileStorageFolderEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderEndpointRequest) SetRunAsync(runAsync *bool) {
+	f.RunAsync = runAsync
+	f.require(fileStorageFolderEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderEndpointRequest) SetModel(model *FolderRequest) {
+	f.Model = model
+	f.require(fileStorageFolderEndpointRequestFieldModel)
+}
+
+var (
+	foldersListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	foldersListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	foldersListRequestFieldCursor             = big.NewInt(1 << 2)
+	foldersListRequestFieldDriveId            = big.NewInt(1 << 3)
+	foldersListRequestFieldExpand             = big.NewInt(1 << 4)
+	foldersListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	foldersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	foldersListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	foldersListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	foldersListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	foldersListRequestFieldName               = big.NewInt(1 << 10)
+	foldersListRequestFieldPageSize           = big.NewInt(1 << 11)
+	foldersListRequestFieldParentFolderId     = big.NewInt(1 << 12)
+	foldersListRequestFieldRemoteId           = big.NewInt(1 << 13)
+)
 
 type FoldersListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -46,7 +101,121 @@ type FoldersListRequest struct {
 	ParentFolderId *string `json:"-" url:"parent_folder_id,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FoldersListRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	f.CreatedAfter = createdAfter
+	f.require(foldersListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	f.CreatedBefore = createdBefore
+	f.require(foldersListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetCursor(cursor *string) {
+	f.Cursor = cursor
+	f.require(foldersListRequestFieldCursor)
+}
+
+// SetDriveId sets the DriveId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetDriveId(driveId *string) {
+	f.DriveId = driveId
+	f.require(foldersListRequestFieldDriveId)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetExpand(expand []*FoldersListRequestExpandItem) {
+	f.Expand = expand
+	f.require(foldersListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	f.IncludeDeletedData = includeDeletedData
+	f.require(foldersListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	f.IncludeRemoteData = includeRemoteData
+	f.require(foldersListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetIncludeShellData(includeShellData *bool) {
+	f.IncludeShellData = includeShellData
+	f.require(foldersListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	f.ModifiedAfter = modifiedAfter
+	f.require(foldersListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	f.ModifiedBefore = modifiedBefore
+	f.require(foldersListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetName(name *string) {
+	f.Name = name
+	f.require(foldersListRequestFieldName)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetPageSize(pageSize *int) {
+	f.PageSize = pageSize
+	f.require(foldersListRequestFieldPageSize)
+}
+
+// SetParentFolderId sets the ParentFolderId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetParentFolderId(parentFolderId *string) {
+	f.ParentFolderId = parentFolderId
+	f.require(foldersListRequestFieldParentFolderId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersListRequest) SetRemoteId(remoteId *string) {
+	f.RemoteId = remoteId
+	f.require(foldersListRequestFieldRemoteId)
+}
+
+var (
+	foldersRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	foldersRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	foldersRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type FoldersRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -55,6 +224,37 @@ type FoldersRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (f *FoldersRetrieveRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersRetrieveRequest) SetExpand(expand []*FoldersRetrieveRequestExpandItem) {
+	f.Expand = expand
+	f.require(foldersRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	f.IncludeRemoteData = includeRemoteData
+	f.require(foldersRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FoldersRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	f.IncludeShellData = includeShellData
+	f.require(foldersRetrieveRequestFieldIncludeShellData)
 }
 
 type FoldersListRequestExpandItem string
@@ -107,11 +307,21 @@ func (f FoldersRetrieveRequestExpandItem) Ptr() *FoldersRetrieveRequestExpandIte
 	return &f
 }
 
+var (
+	fileStorageFolderResponseFieldModel    = big.NewInt(1 << 0)
+	fileStorageFolderResponseFieldWarnings = big.NewInt(1 << 1)
+	fileStorageFolderResponseFieldErrors   = big.NewInt(1 << 2)
+	fileStorageFolderResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type FileStorageFolderResponse struct {
 	Model    *Folder                     `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -149,6 +359,41 @@ func (f *FileStorageFolderResponse) GetExtraProperties() map[string]interface{} 
 	return f.extraProperties
 }
 
+func (f *FileStorageFolderResponse) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderResponse) SetModel(model *Folder) {
+	f.Model = model
+	f.require(fileStorageFolderResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	f.Warnings = warnings
+	f.require(fileStorageFolderResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderResponse) SetErrors(errors []*ErrorValidationProblem) {
+	f.Errors = errors
+	f.require(fileStorageFolderResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FileStorageFolderResponse) SetLogs(logs []*DebugModeLog) {
+	f.Logs = logs
+	f.require(fileStorageFolderResponseFieldLogs)
+}
+
 func (f *FileStorageFolderResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler FileStorageFolderResponse
 	var value unmarshaler
@@ -163,6 +408,17 @@ func (f *FileStorageFolderResponse) UnmarshalJSON(data []byte) error {
 	f.extraProperties = extraProperties
 	f.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (f *FileStorageFolderResponse) MarshalJSON() ([]byte, error) {
+	type embed FileStorageFolderResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (f *FileStorageFolderResponse) String() string {
@@ -182,6 +438,18 @@ func (f *FileStorageFolderResponse) String() string {
 // The `Folder` object is used to represent a collection of files and/or folders in the workspace. Could be within a drive, if it exists.
 // ### Usage Example
 // Fetch from the `GET /api/filestorage/v1/folders` endpoint and view their folders.
+var (
+	folderRequestFieldName                = big.NewInt(1 << 0)
+	folderRequestFieldFolderUrl           = big.NewInt(1 << 1)
+	folderRequestFieldSize                = big.NewInt(1 << 2)
+	folderRequestFieldDescription         = big.NewInt(1 << 3)
+	folderRequestFieldParentFolder        = big.NewInt(1 << 4)
+	folderRequestFieldDrive               = big.NewInt(1 << 5)
+	folderRequestFieldPermissions         = big.NewInt(1 << 6)
+	folderRequestFieldIntegrationParams   = big.NewInt(1 << 7)
+	folderRequestFieldLinkedAccountParams = big.NewInt(1 << 8)
+)
+
 type FolderRequest struct {
 	// The folder's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -199,6 +467,9 @@ type FolderRequest struct {
 	Permissions         *FolderRequestPermissions `json:"permissions,omitempty" url:"permissions,omitempty"`
 	IntegrationParams   map[string]interface{}    `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}    `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -271,6 +542,76 @@ func (f *FolderRequest) GetExtraProperties() map[string]interface{} {
 	return f.extraProperties
 }
 
+func (f *FolderRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetName(name *string) {
+	f.Name = name
+	f.require(folderRequestFieldName)
+}
+
+// SetFolderUrl sets the FolderUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetFolderUrl(folderUrl *string) {
+	f.FolderUrl = folderUrl
+	f.require(folderRequestFieldFolderUrl)
+}
+
+// SetSize sets the Size field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetSize(size *int64) {
+	f.Size = size
+	f.require(folderRequestFieldSize)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetDescription(description *string) {
+	f.Description = description
+	f.require(folderRequestFieldDescription)
+}
+
+// SetParentFolder sets the ParentFolder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetParentFolder(parentFolder *FolderRequestParentFolder) {
+	f.ParentFolder = parentFolder
+	f.require(folderRequestFieldParentFolder)
+}
+
+// SetDrive sets the Drive field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetDrive(drive *FolderRequestDrive) {
+	f.Drive = drive
+	f.require(folderRequestFieldDrive)
+}
+
+// SetPermissions sets the Permissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetPermissions(permissions *FolderRequestPermissions) {
+	f.Permissions = permissions
+	f.require(folderRequestFieldPermissions)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	f.IntegrationParams = integrationParams
+	f.require(folderRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FolderRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	f.LinkedAccountParams = linkedAccountParams
+	f.require(folderRequestFieldLinkedAccountParams)
+}
+
 func (f *FolderRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler FolderRequest
 	var value unmarshaler
@@ -285,6 +626,17 @@ func (f *FolderRequest) UnmarshalJSON(data []byte) error {
 	f.extraProperties = extraProperties
 	f.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (f *FolderRequest) MarshalJSON() ([]byte, error) {
+	type embed FolderRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (f *FolderRequest) String() string {
@@ -571,10 +923,19 @@ func (f *FolderRequestPermissionsItem) Accept(visitor FolderRequestPermissionsIt
 	return fmt.Errorf("type %T does not include a non-empty union type", f)
 }
 
+var (
+	paginatedFolderListFieldNext     = big.NewInt(1 << 0)
+	paginatedFolderListFieldPrevious = big.NewInt(1 << 1)
+	paginatedFolderListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedFolderList struct {
 	Next     *string   `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string   `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Folder `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -605,6 +966,34 @@ func (p *PaginatedFolderList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedFolderList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedFolderList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedFolderListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedFolderList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedFolderListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedFolderList) SetResults(results []*Folder) {
+	p.Results = results
+	p.require(paginatedFolderListFieldResults)
+}
+
 func (p *PaginatedFolderList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedFolderList
 	var value unmarshaler
@@ -619,6 +1008,17 @@ func (p *PaginatedFolderList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedFolderList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedFolderList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedFolderList) String() string {

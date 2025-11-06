@@ -6,7 +6,23 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	incomeStatementsListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	incomeStatementsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	incomeStatementsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	incomeStatementsListRequestFieldCursor             = big.NewInt(1 << 3)
+	incomeStatementsListRequestFieldExpand             = big.NewInt(1 << 4)
+	incomeStatementsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	incomeStatementsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	incomeStatementsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	incomeStatementsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	incomeStatementsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	incomeStatementsListRequestFieldPageSize           = big.NewInt(1 << 10)
+	incomeStatementsListRequestFieldRemoteId           = big.NewInt(1 << 11)
 )
 
 type IncomeStatementsListRequest struct {
@@ -34,7 +50,107 @@ type IncomeStatementsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (i *IncomeStatementsListRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetCompanyId(companyId *string) {
+	i.CompanyId = companyId
+	i.require(incomeStatementsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	i.CreatedAfter = createdAfter
+	i.require(incomeStatementsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	i.CreatedBefore = createdBefore
+	i.require(incomeStatementsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetCursor(cursor *string) {
+	i.Cursor = cursor
+	i.require(incomeStatementsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetExpand(expand []*string) {
+	i.Expand = expand
+	i.require(incomeStatementsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	i.IncludeDeletedData = includeDeletedData
+	i.require(incomeStatementsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(incomeStatementsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(incomeStatementsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	i.ModifiedAfter = modifiedAfter
+	i.require(incomeStatementsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	i.ModifiedBefore = modifiedBefore
+	i.require(incomeStatementsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetPageSize(pageSize *int) {
+	i.PageSize = pageSize
+	i.require(incomeStatementsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsListRequest) SetRemoteId(remoteId *string) {
+	i.RemoteId = remoteId
+	i.require(incomeStatementsListRequestFieldRemoteId)
+}
+
+var (
+	incomeStatementsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	incomeStatementsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	incomeStatementsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type IncomeStatementsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -43,6 +159,37 @@ type IncomeStatementsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (i *IncomeStatementsRetrieveRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsRetrieveRequest) SetExpand(expand []*string) {
+	i.Expand = expand
+	i.require(incomeStatementsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(incomeStatementsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatementsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(incomeStatementsRetrieveRequestFieldIncludeShellData)
 }
 
 // # The IncomeStatement Object
@@ -51,6 +198,28 @@ type IncomeStatementsRetrieveRequest struct {
 //
 // ### Usage Example
 // Fetch from the `GET IncomeStatement` endpoint and view a company's income statement for a given period.
+var (
+	incomeStatementFieldId                   = big.NewInt(1 << 0)
+	incomeStatementFieldRemoteId             = big.NewInt(1 << 1)
+	incomeStatementFieldCreatedAt            = big.NewInt(1 << 2)
+	incomeStatementFieldModifiedAt           = big.NewInt(1 << 3)
+	incomeStatementFieldName                 = big.NewInt(1 << 4)
+	incomeStatementFieldCurrency             = big.NewInt(1 << 5)
+	incomeStatementFieldCompany              = big.NewInt(1 << 6)
+	incomeStatementFieldStartPeriod          = big.NewInt(1 << 7)
+	incomeStatementFieldEndPeriod            = big.NewInt(1 << 8)
+	incomeStatementFieldIncome               = big.NewInt(1 << 9)
+	incomeStatementFieldCostOfSales          = big.NewInt(1 << 10)
+	incomeStatementFieldGrossProfit          = big.NewInt(1 << 11)
+	incomeStatementFieldOperatingExpenses    = big.NewInt(1 << 12)
+	incomeStatementFieldNetOperatingIncome   = big.NewInt(1 << 13)
+	incomeStatementFieldNonOperatingExpenses = big.NewInt(1 << 14)
+	incomeStatementFieldNetIncome            = big.NewInt(1 << 15)
+	incomeStatementFieldRemoteWasDeleted     = big.NewInt(1 << 16)
+	incomeStatementFieldFieldMappings        = big.NewInt(1 << 17)
+	incomeStatementFieldRemoteData           = big.NewInt(1 << 18)
+)
+
 type IncomeStatement struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -391,6 +560,9 @@ type IncomeStatement struct {
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -532,6 +704,146 @@ func (i *IncomeStatement) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *IncomeStatement) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetId(id *string) {
+	i.Id = id
+	i.require(incomeStatementFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetRemoteId(remoteId *string) {
+	i.RemoteId = remoteId
+	i.require(incomeStatementFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetCreatedAt(createdAt *time.Time) {
+	i.CreatedAt = createdAt
+	i.require(incomeStatementFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetModifiedAt(modifiedAt *time.Time) {
+	i.ModifiedAt = modifiedAt
+	i.require(incomeStatementFieldModifiedAt)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetName(name *string) {
+	i.Name = name
+	i.require(incomeStatementFieldName)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetCurrency(currency *IncomeStatementCurrency) {
+	i.Currency = currency
+	i.require(incomeStatementFieldCurrency)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetCompany(company *IncomeStatementCompany) {
+	i.Company = company
+	i.require(incomeStatementFieldCompany)
+}
+
+// SetStartPeriod sets the StartPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetStartPeriod(startPeriod *time.Time) {
+	i.StartPeriod = startPeriod
+	i.require(incomeStatementFieldStartPeriod)
+}
+
+// SetEndPeriod sets the EndPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetEndPeriod(endPeriod *time.Time) {
+	i.EndPeriod = endPeriod
+	i.require(incomeStatementFieldEndPeriod)
+}
+
+// SetIncome sets the Income field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetIncome(income []*ReportItem) {
+	i.Income = income
+	i.require(incomeStatementFieldIncome)
+}
+
+// SetCostOfSales sets the CostOfSales field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetCostOfSales(costOfSales []*ReportItem) {
+	i.CostOfSales = costOfSales
+	i.require(incomeStatementFieldCostOfSales)
+}
+
+// SetGrossProfit sets the GrossProfit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetGrossProfit(grossProfit *float64) {
+	i.GrossProfit = grossProfit
+	i.require(incomeStatementFieldGrossProfit)
+}
+
+// SetOperatingExpenses sets the OperatingExpenses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetOperatingExpenses(operatingExpenses []*ReportItem) {
+	i.OperatingExpenses = operatingExpenses
+	i.require(incomeStatementFieldOperatingExpenses)
+}
+
+// SetNetOperatingIncome sets the NetOperatingIncome field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetNetOperatingIncome(netOperatingIncome *float64) {
+	i.NetOperatingIncome = netOperatingIncome
+	i.require(incomeStatementFieldNetOperatingIncome)
+}
+
+// SetNonOperatingExpenses sets the NonOperatingExpenses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetNonOperatingExpenses(nonOperatingExpenses []*ReportItem) {
+	i.NonOperatingExpenses = nonOperatingExpenses
+	i.require(incomeStatementFieldNonOperatingExpenses)
+}
+
+// SetNetIncome sets the NetIncome field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetNetIncome(netIncome *float64) {
+	i.NetIncome = netIncome
+	i.require(incomeStatementFieldNetIncome)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	i.RemoteWasDeleted = remoteWasDeleted
+	i.require(incomeStatementFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetFieldMappings(fieldMappings map[string]interface{}) {
+	i.FieldMappings = fieldMappings
+	i.require(incomeStatementFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IncomeStatement) SetRemoteData(remoteData []*RemoteData) {
+	i.RemoteData = remoteData
+	i.require(incomeStatementFieldRemoteData)
+}
+
 func (i *IncomeStatement) UnmarshalJSON(data []byte) error {
 	type embed IncomeStatement
 	var unmarshaler = struct {
@@ -575,7 +887,8 @@ func (i *IncomeStatement) MarshalJSON() ([]byte, error) {
 		StartPeriod: internal.NewOptionalDateTime(i.StartPeriod),
 		EndPeriod:   internal.NewOptionalDateTime(i.EndPeriod),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (i *IncomeStatement) String() string {
@@ -1023,10 +1336,19 @@ func (i *IncomeStatementCurrency) Accept(visitor IncomeStatementCurrencyVisitor)
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+var (
+	paginatedIncomeStatementListFieldNext     = big.NewInt(1 << 0)
+	paginatedIncomeStatementListFieldPrevious = big.NewInt(1 << 1)
+	paginatedIncomeStatementListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedIncomeStatementList struct {
 	Next     *string            `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*IncomeStatement `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1057,6 +1379,34 @@ func (p *PaginatedIncomeStatementList) GetExtraProperties() map[string]interface
 	return p.extraProperties
 }
 
+func (p *PaginatedIncomeStatementList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedIncomeStatementList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedIncomeStatementListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedIncomeStatementList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedIncomeStatementListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedIncomeStatementList) SetResults(results []*IncomeStatement) {
+	p.Results = results
+	p.require(paginatedIncomeStatementListFieldResults)
+}
+
 func (p *PaginatedIncomeStatementList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedIncomeStatementList
 	var value unmarshaler
@@ -1071,6 +1421,17 @@ func (p *PaginatedIncomeStatementList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedIncomeStatementList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedIncomeStatementList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedIncomeStatementList) String() string {

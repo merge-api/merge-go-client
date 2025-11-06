@@ -38,15 +38,9 @@ import (
 	timesheetentries "github.com/merge-api/merge-go-client/v2/hris/timesheetentries"
 	webhookreceivers "github.com/merge-api/merge-go-client/v2/hris/webhookreceivers"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails      *accountdetails.Client
 	AccountToken        *accounttoken.Client
 	AsyncPassthrough    *asyncpassthrough.Client
@@ -80,51 +74,54 @@ type Client struct {
 	TimeOffBalances     *timeoffbalances.Client
 	TimesheetEntries    *timesheetentries.Client
 	WebhookReceivers    *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:      accountdetails.NewClient(options),
+		AccountToken:        accounttoken.NewClient(options),
+		AsyncPassthrough:    asyncpassthrough.NewClient(options),
+		AuditTrail:          audittrail.NewClient(options),
+		AvailableActions:    availableactions.NewClient(options),
+		BankInfo:            bankinfo.NewClient(options),
+		Benefits:            benefits.NewClient(options),
+		Companies:           companies.NewClient(options),
+		Scopes:              scopes.NewClient(options),
+		DeleteAccount:       deleteaccount.NewClient(options),
+		Dependents:          dependents.NewClient(options),
+		EmployeePayrollRuns: employeepayrollruns.NewClient(options),
+		Employees:           employees.NewClient(options),
+		EmployerBenefits:    employerbenefits.NewClient(options),
+		Employments:         employments.NewClient(options),
+		FieldMapping:        fieldmapping.NewClient(options),
+		GenerateKey:         generatekey.NewClient(options),
+		Groups:              groups.NewClient(options),
+		Issues:              issues.NewClient(options),
+		LinkToken:           linktoken.NewClient(options),
+		LinkedAccounts:      linkedaccounts.NewClient(options),
+		Locations:           locations.NewClient(options),
+		Passthrough:         passthrough.NewClient(options),
+		PayGroups:           paygroups.NewClient(options),
+		PayrollRuns:         payrollruns.NewClient(options),
+		RegenerateKey:       regeneratekey.NewClient(options),
+		SyncStatus:          syncstatus.NewClient(options),
+		ForceResync:         forceresync.NewClient(options),
+		Teams:               teams.NewClient(options),
+		TimeOff:             timeoff.NewClient(options),
+		TimeOffBalances:     timeoffbalances.NewClient(options),
+		TimesheetEntries:    timesheetentries.NewClient(options),
+		WebhookReceivers:    webhookreceivers.NewClient(options),
+		options:             options,
+		baseURL:             options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:              options.ToHeader(),
-		AccountDetails:      accountdetails.NewClient(opts...),
-		AccountToken:        accounttoken.NewClient(opts...),
-		AsyncPassthrough:    asyncpassthrough.NewClient(opts...),
-		AuditTrail:          audittrail.NewClient(opts...),
-		AvailableActions:    availableactions.NewClient(opts...),
-		BankInfo:            bankinfo.NewClient(opts...),
-		Benefits:            benefits.NewClient(opts...),
-		Companies:           companies.NewClient(opts...),
-		Scopes:              scopes.NewClient(opts...),
-		DeleteAccount:       deleteaccount.NewClient(opts...),
-		Dependents:          dependents.NewClient(opts...),
-		EmployeePayrollRuns: employeepayrollruns.NewClient(opts...),
-		Employees:           employees.NewClient(opts...),
-		EmployerBenefits:    employerbenefits.NewClient(opts...),
-		Employments:         employments.NewClient(opts...),
-		FieldMapping:        fieldmapping.NewClient(opts...),
-		GenerateKey:         generatekey.NewClient(opts...),
-		Groups:              groups.NewClient(opts...),
-		Issues:              issues.NewClient(opts...),
-		LinkToken:           linktoken.NewClient(opts...),
-		LinkedAccounts:      linkedaccounts.NewClient(opts...),
-		Locations:           locations.NewClient(opts...),
-		Passthrough:         passthrough.NewClient(opts...),
-		PayGroups:           paygroups.NewClient(opts...),
-		PayrollRuns:         payrollruns.NewClient(opts...),
-		RegenerateKey:       regeneratekey.NewClient(opts...),
-		SyncStatus:          syncstatus.NewClient(opts...),
-		ForceResync:         forceresync.NewClient(opts...),
-		Teams:               teams.NewClient(opts...),
-		TimeOff:             timeoff.NewClient(opts...),
-		TimeOffBalances:     timeoffbalances.NewClient(opts...),
-		TimesheetEntries:    timesheetentries.NewClient(opts...),
-		WebhookReceivers:    webhookreceivers.NewClient(opts...),
 	}
 }

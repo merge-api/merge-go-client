@@ -6,7 +6,28 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	employeePayrollRunsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	employeePayrollRunsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	employeePayrollRunsListRequestFieldCursor             = big.NewInt(1 << 2)
+	employeePayrollRunsListRequestFieldEmployeeId         = big.NewInt(1 << 3)
+	employeePayrollRunsListRequestFieldEndedAfter         = big.NewInt(1 << 4)
+	employeePayrollRunsListRequestFieldEndedBefore        = big.NewInt(1 << 5)
+	employeePayrollRunsListRequestFieldExpand             = big.NewInt(1 << 6)
+	employeePayrollRunsListRequestFieldIncludeDeletedData = big.NewInt(1 << 7)
+	employeePayrollRunsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 8)
+	employeePayrollRunsListRequestFieldIncludeShellData   = big.NewInt(1 << 9)
+	employeePayrollRunsListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
+	employeePayrollRunsListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
+	employeePayrollRunsListRequestFieldPageSize           = big.NewInt(1 << 12)
+	employeePayrollRunsListRequestFieldPayrollRunId       = big.NewInt(1 << 13)
+	employeePayrollRunsListRequestFieldRemoteId           = big.NewInt(1 << 14)
+	employeePayrollRunsListRequestFieldStartedAfter       = big.NewInt(1 << 15)
+	employeePayrollRunsListRequestFieldStartedBefore      = big.NewInt(1 << 16)
 )
 
 type EmployeePayrollRunsListRequest struct {
@@ -44,7 +65,142 @@ type EmployeePayrollRunsListRequest struct {
 	StartedAfter *time.Time `json:"-" url:"started_after,omitempty"`
 	// If provided, will only return employee payroll runs started before this datetime.
 	StartedBefore *time.Time `json:"-" url:"started_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EmployeePayrollRunsListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(employeePayrollRunsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(employeePayrollRunsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(employeePayrollRunsListRequestFieldCursor)
+}
+
+// SetEmployeeId sets the EmployeeId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetEmployeeId(employeeId *string) {
+	e.EmployeeId = employeeId
+	e.require(employeePayrollRunsListRequestFieldEmployeeId)
+}
+
+// SetEndedAfter sets the EndedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetEndedAfter(endedAfter *time.Time) {
+	e.EndedAfter = endedAfter
+	e.require(employeePayrollRunsListRequestFieldEndedAfter)
+}
+
+// SetEndedBefore sets the EndedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetEndedBefore(endedBefore *time.Time) {
+	e.EndedBefore = endedBefore
+	e.require(employeePayrollRunsListRequestFieldEndedBefore)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetExpand(expand []*EmployeePayrollRunsListRequestExpandItem) {
+	e.Expand = expand
+	e.require(employeePayrollRunsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(employeePayrollRunsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employeePayrollRunsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employeePayrollRunsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(employeePayrollRunsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(employeePayrollRunsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(employeePayrollRunsListRequestFieldPageSize)
+}
+
+// SetPayrollRunId sets the PayrollRunId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetPayrollRunId(payrollRunId *string) {
+	e.PayrollRunId = payrollRunId
+	e.require(employeePayrollRunsListRequestFieldPayrollRunId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(employeePayrollRunsListRequestFieldRemoteId)
+}
+
+// SetStartedAfter sets the StartedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetStartedAfter(startedAfter *time.Time) {
+	e.StartedAfter = startedAfter
+	e.require(employeePayrollRunsListRequestFieldStartedAfter)
+}
+
+// SetStartedBefore sets the StartedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsListRequest) SetStartedBefore(startedBefore *time.Time) {
+	e.StartedBefore = startedBefore
+	e.require(employeePayrollRunsListRequestFieldStartedBefore)
+}
+
+var (
+	employeePayrollRunsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	employeePayrollRunsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	employeePayrollRunsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type EmployeePayrollRunsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -53,6 +209,37 @@ type EmployeePayrollRunsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (e *EmployeePayrollRunsRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsRetrieveRequest) SetExpand(expand []*EmployeePayrollRunsRetrieveRequestExpandItem) {
+	e.Expand = expand
+	e.require(employeePayrollRunsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employeePayrollRunsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRunsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employeePayrollRunsRetrieveRequestFieldIncludeShellData)
 }
 
 type EmployeePayrollRunsListRequestExpandItem string
@@ -105,6 +292,20 @@ func (e EmployeePayrollRunsRetrieveRequestExpandItem) Ptr() *EmployeePayrollRuns
 //
 // ### Usage Example
 // Fetch from the `LIST Deductions` endpoint and filter by `ID` to show all deductions.
+var (
+	deductionFieldId                 = big.NewInt(1 << 0)
+	deductionFieldRemoteId           = big.NewInt(1 << 1)
+	deductionFieldCreatedAt          = big.NewInt(1 << 2)
+	deductionFieldModifiedAt         = big.NewInt(1 << 3)
+	deductionFieldEmployeePayrollRun = big.NewInt(1 << 4)
+	deductionFieldName               = big.NewInt(1 << 5)
+	deductionFieldEmployeeDeduction  = big.NewInt(1 << 6)
+	deductionFieldCompanyDeduction   = big.NewInt(1 << 7)
+	deductionFieldRemoteWasDeleted   = big.NewInt(1 << 8)
+	deductionFieldFieldMappings      = big.NewInt(1 << 9)
+	deductionFieldRemoteData         = big.NewInt(1 << 10)
+)
+
 type Deduction struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -124,6 +325,9 @@ type Deduction struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -210,6 +414,90 @@ func (d *Deduction) GetExtraProperties() map[string]interface{} {
 	return d.extraProperties
 }
 
+func (d *Deduction) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetId(id *string) {
+	d.Id = id
+	d.require(deductionFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetRemoteId(remoteId *string) {
+	d.RemoteId = remoteId
+	d.require(deductionFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetCreatedAt(createdAt *time.Time) {
+	d.CreatedAt = createdAt
+	d.require(deductionFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetModifiedAt(modifiedAt *time.Time) {
+	d.ModifiedAt = modifiedAt
+	d.require(deductionFieldModifiedAt)
+}
+
+// SetEmployeePayrollRun sets the EmployeePayrollRun field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetEmployeePayrollRun(employeePayrollRun *string) {
+	d.EmployeePayrollRun = employeePayrollRun
+	d.require(deductionFieldEmployeePayrollRun)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetName(name *string) {
+	d.Name = name
+	d.require(deductionFieldName)
+}
+
+// SetEmployeeDeduction sets the EmployeeDeduction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetEmployeeDeduction(employeeDeduction *float64) {
+	d.EmployeeDeduction = employeeDeduction
+	d.require(deductionFieldEmployeeDeduction)
+}
+
+// SetCompanyDeduction sets the CompanyDeduction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetCompanyDeduction(companyDeduction *float64) {
+	d.CompanyDeduction = companyDeduction
+	d.require(deductionFieldCompanyDeduction)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	d.RemoteWasDeleted = remoteWasDeleted
+	d.require(deductionFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetFieldMappings(fieldMappings map[string]interface{}) {
+	d.FieldMappings = fieldMappings
+	d.require(deductionFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Deduction) SetRemoteData(remoteData []*RemoteData) {
+	d.RemoteData = remoteData
+	d.require(deductionFieldRemoteData)
+}
+
 func (d *Deduction) UnmarshalJSON(data []byte) error {
 	type embed Deduction
 	var unmarshaler = struct {
@@ -245,7 +533,8 @@ func (d *Deduction) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(d.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(d.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (d *Deduction) String() string {
@@ -266,6 +555,19 @@ func (d *Deduction) String() string {
 //
 // ### Usage Example
 // Fetch from the `LIST Earnings` endpoint and filter by `ID` to show all earnings.
+var (
+	earningFieldId                 = big.NewInt(1 << 0)
+	earningFieldRemoteId           = big.NewInt(1 << 1)
+	earningFieldCreatedAt          = big.NewInt(1 << 2)
+	earningFieldModifiedAt         = big.NewInt(1 << 3)
+	earningFieldEmployeePayrollRun = big.NewInt(1 << 4)
+	earningFieldAmount             = big.NewInt(1 << 5)
+	earningFieldType               = big.NewInt(1 << 6)
+	earningFieldRemoteWasDeleted   = big.NewInt(1 << 7)
+	earningFieldFieldMappings      = big.NewInt(1 << 8)
+	earningFieldRemoteData         = big.NewInt(1 << 9)
+)
+
 type Earning struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -288,6 +590,9 @@ type Earning struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -367,6 +672,83 @@ func (e *Earning) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *Earning) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetId(id *string) {
+	e.Id = id
+	e.require(earningFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(earningFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetCreatedAt(createdAt *time.Time) {
+	e.CreatedAt = createdAt
+	e.require(earningFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetModifiedAt(modifiedAt *time.Time) {
+	e.ModifiedAt = modifiedAt
+	e.require(earningFieldModifiedAt)
+}
+
+// SetEmployeePayrollRun sets the EmployeePayrollRun field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetEmployeePayrollRun(employeePayrollRun *string) {
+	e.EmployeePayrollRun = employeePayrollRun
+	e.require(earningFieldEmployeePayrollRun)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetAmount(amount *float64) {
+	e.Amount = amount
+	e.require(earningFieldAmount)
+}
+
+// SetType sets the Type field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetType(type_ *EarningType) {
+	e.Type = type_
+	e.require(earningFieldType)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	e.RemoteWasDeleted = remoteWasDeleted
+	e.require(earningFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetFieldMappings(fieldMappings map[string]interface{}) {
+	e.FieldMappings = fieldMappings
+	e.require(earningFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Earning) SetRemoteData(remoteData []*RemoteData) {
+	e.RemoteData = remoteData
+	e.require(earningFieldRemoteData)
+}
+
 func (e *Earning) UnmarshalJSON(data []byte) error {
 	type embed Earning
 	var unmarshaler = struct {
@@ -402,7 +784,8 @@ func (e *Earning) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(e.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(e.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *Earning) String() string {
@@ -523,6 +906,26 @@ func (e EarningTypeEnum) Ptr() *EarningTypeEnum {
 //
 // ### Usage Example
 // Fetch from the `LIST EmployeePayrollRun` endpoint and filter by `ID` to show all employee payroll runs.
+var (
+	employeePayrollRunFieldId               = big.NewInt(1 << 0)
+	employeePayrollRunFieldRemoteId         = big.NewInt(1 << 1)
+	employeePayrollRunFieldCreatedAt        = big.NewInt(1 << 2)
+	employeePayrollRunFieldModifiedAt       = big.NewInt(1 << 3)
+	employeePayrollRunFieldEmployee         = big.NewInt(1 << 4)
+	employeePayrollRunFieldPayrollRun       = big.NewInt(1 << 5)
+	employeePayrollRunFieldGrossPay         = big.NewInt(1 << 6)
+	employeePayrollRunFieldNetPay           = big.NewInt(1 << 7)
+	employeePayrollRunFieldStartDate        = big.NewInt(1 << 8)
+	employeePayrollRunFieldEndDate          = big.NewInt(1 << 9)
+	employeePayrollRunFieldCheckDate        = big.NewInt(1 << 10)
+	employeePayrollRunFieldEarnings         = big.NewInt(1 << 11)
+	employeePayrollRunFieldDeductions       = big.NewInt(1 << 12)
+	employeePayrollRunFieldTaxes            = big.NewInt(1 << 13)
+	employeePayrollRunFieldRemoteWasDeleted = big.NewInt(1 << 14)
+	employeePayrollRunFieldFieldMappings    = big.NewInt(1 << 15)
+	employeePayrollRunFieldRemoteData       = big.NewInt(1 << 16)
+)
+
 type EmployeePayrollRun struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -552,6 +955,9 @@ type EmployeePayrollRun struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -680,6 +1086,132 @@ func (e *EmployeePayrollRun) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EmployeePayrollRun) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetId(id *string) {
+	e.Id = id
+	e.require(employeePayrollRunFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(employeePayrollRunFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetCreatedAt(createdAt *time.Time) {
+	e.CreatedAt = createdAt
+	e.require(employeePayrollRunFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetModifiedAt(modifiedAt *time.Time) {
+	e.ModifiedAt = modifiedAt
+	e.require(employeePayrollRunFieldModifiedAt)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetEmployee(employee *EmployeePayrollRunEmployee) {
+	e.Employee = employee
+	e.require(employeePayrollRunFieldEmployee)
+}
+
+// SetPayrollRun sets the PayrollRun field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetPayrollRun(payrollRun *EmployeePayrollRunPayrollRun) {
+	e.PayrollRun = payrollRun
+	e.require(employeePayrollRunFieldPayrollRun)
+}
+
+// SetGrossPay sets the GrossPay field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetGrossPay(grossPay *float64) {
+	e.GrossPay = grossPay
+	e.require(employeePayrollRunFieldGrossPay)
+}
+
+// SetNetPay sets the NetPay field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetNetPay(netPay *float64) {
+	e.NetPay = netPay
+	e.require(employeePayrollRunFieldNetPay)
+}
+
+// SetStartDate sets the StartDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetStartDate(startDate *time.Time) {
+	e.StartDate = startDate
+	e.require(employeePayrollRunFieldStartDate)
+}
+
+// SetEndDate sets the EndDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetEndDate(endDate *time.Time) {
+	e.EndDate = endDate
+	e.require(employeePayrollRunFieldEndDate)
+}
+
+// SetCheckDate sets the CheckDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetCheckDate(checkDate *time.Time) {
+	e.CheckDate = checkDate
+	e.require(employeePayrollRunFieldCheckDate)
+}
+
+// SetEarnings sets the Earnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetEarnings(earnings []*Earning) {
+	e.Earnings = earnings
+	e.require(employeePayrollRunFieldEarnings)
+}
+
+// SetDeductions sets the Deductions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetDeductions(deductions []*Deduction) {
+	e.Deductions = deductions
+	e.require(employeePayrollRunFieldDeductions)
+}
+
+// SetTaxes sets the Taxes field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetTaxes(taxes []*Tax) {
+	e.Taxes = taxes
+	e.require(employeePayrollRunFieldTaxes)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	e.RemoteWasDeleted = remoteWasDeleted
+	e.require(employeePayrollRunFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetFieldMappings(fieldMappings map[string]interface{}) {
+	e.FieldMappings = fieldMappings
+	e.require(employeePayrollRunFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeePayrollRun) SetRemoteData(remoteData []*RemoteData) {
+	e.RemoteData = remoteData
+	e.require(employeePayrollRunFieldRemoteData)
+}
+
 func (e *EmployeePayrollRun) UnmarshalJSON(data []byte) error {
 	type embed EmployeePayrollRun
 	var unmarshaler = struct {
@@ -727,7 +1259,8 @@ func (e *EmployeePayrollRun) MarshalJSON() ([]byte, error) {
 		EndDate:    internal.NewOptionalDateTime(e.EndDate),
 		CheckDate:  internal.NewOptionalDateTime(e.CheckDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *EmployeePayrollRun) String() string {
@@ -868,10 +1401,19 @@ func (e *EmployeePayrollRunPayrollRun) Accept(visitor EmployeePayrollRunPayrollR
 	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
+var (
+	paginatedEmployeePayrollRunListFieldNext     = big.NewInt(1 << 0)
+	paginatedEmployeePayrollRunListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEmployeePayrollRunListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedEmployeePayrollRunList struct {
 	Next     *string               `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string               `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*EmployeePayrollRun `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -902,6 +1444,34 @@ func (p *PaginatedEmployeePayrollRunList) GetExtraProperties() map[string]interf
 	return p.extraProperties
 }
 
+func (p *PaginatedEmployeePayrollRunList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeePayrollRunList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEmployeePayrollRunListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeePayrollRunList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEmployeePayrollRunListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeePayrollRunList) SetResults(results []*EmployeePayrollRun) {
+	p.Results = results
+	p.require(paginatedEmployeePayrollRunListFieldResults)
+}
+
 func (p *PaginatedEmployeePayrollRunList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEmployeePayrollRunList
 	var value unmarshaler
@@ -916,6 +1486,17 @@ func (p *PaginatedEmployeePayrollRunList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEmployeePayrollRunList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEmployeePayrollRunList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEmployeePayrollRunList) String() string {
@@ -936,6 +1517,20 @@ func (p *PaginatedEmployeePayrollRunList) String() string {
 //
 // ### Usage Example
 // Fetch from the `LIST Taxes` endpoint and filter by `ID` to show all taxes.
+var (
+	taxFieldId                 = big.NewInt(1 << 0)
+	taxFieldRemoteId           = big.NewInt(1 << 1)
+	taxFieldCreatedAt          = big.NewInt(1 << 2)
+	taxFieldModifiedAt         = big.NewInt(1 << 3)
+	taxFieldEmployeePayrollRun = big.NewInt(1 << 4)
+	taxFieldName               = big.NewInt(1 << 5)
+	taxFieldAmount             = big.NewInt(1 << 6)
+	taxFieldEmployerTax        = big.NewInt(1 << 7)
+	taxFieldRemoteWasDeleted   = big.NewInt(1 << 8)
+	taxFieldFieldMappings      = big.NewInt(1 << 9)
+	taxFieldRemoteData         = big.NewInt(1 << 10)
+)
+
 type Tax struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -955,6 +1550,9 @@ type Tax struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1041,6 +1639,90 @@ func (t *Tax) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *Tax) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetId(id *string) {
+	t.Id = id
+	t.require(taxFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(taxFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(taxFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(taxFieldModifiedAt)
+}
+
+// SetEmployeePayrollRun sets the EmployeePayrollRun field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetEmployeePayrollRun(employeePayrollRun *string) {
+	t.EmployeePayrollRun = employeePayrollRun
+	t.require(taxFieldEmployeePayrollRun)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetName(name *string) {
+	t.Name = name
+	t.require(taxFieldName)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetAmount(amount *float64) {
+	t.Amount = amount
+	t.require(taxFieldAmount)
+}
+
+// SetEmployerTax sets the EmployerTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetEmployerTax(employerTax *bool) {
+	t.EmployerTax = employerTax
+	t.require(taxFieldEmployerTax)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(taxFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(taxFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tax) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(taxFieldRemoteData)
+}
+
 func (t *Tax) UnmarshalJSON(data []byte) error {
 	type embed Tax
 	var unmarshaler = struct {
@@ -1076,7 +1758,8 @@ func (t *Tax) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(t.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(t.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *Tax) String() string {
