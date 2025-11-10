@@ -3,45 +3,39 @@
 package client
 
 import (
-	core "github.com/merge-api/merge-go-client/v2/core"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	accountdetails "github.com/merge-api/merge-go-client/v2/ticketing/accountdetails"
-	accounts "github.com/merge-api/merge-go-client/v2/ticketing/accounts"
-	accounttoken "github.com/merge-api/merge-go-client/v2/ticketing/accounttoken"
-	asyncpassthrough "github.com/merge-api/merge-go-client/v2/ticketing/asyncpassthrough"
-	attachments "github.com/merge-api/merge-go-client/v2/ticketing/attachments"
-	audittrail "github.com/merge-api/merge-go-client/v2/ticketing/audittrail"
-	availableactions "github.com/merge-api/merge-go-client/v2/ticketing/availableactions"
-	collections "github.com/merge-api/merge-go-client/v2/ticketing/collections"
-	comments "github.com/merge-api/merge-go-client/v2/ticketing/comments"
-	contacts "github.com/merge-api/merge-go-client/v2/ticketing/contacts"
-	deleteaccount "github.com/merge-api/merge-go-client/v2/ticketing/deleteaccount"
-	fieldmapping "github.com/merge-api/merge-go-client/v2/ticketing/fieldmapping"
-	forceresync "github.com/merge-api/merge-go-client/v2/ticketing/forceresync"
-	generatekey "github.com/merge-api/merge-go-client/v2/ticketing/generatekey"
-	issues "github.com/merge-api/merge-go-client/v2/ticketing/issues"
-	linkedaccounts "github.com/merge-api/merge-go-client/v2/ticketing/linkedaccounts"
-	linktoken "github.com/merge-api/merge-go-client/v2/ticketing/linktoken"
-	passthrough "github.com/merge-api/merge-go-client/v2/ticketing/passthrough"
-	projects "github.com/merge-api/merge-go-client/v2/ticketing/projects"
-	regeneratekey "github.com/merge-api/merge-go-client/v2/ticketing/regeneratekey"
-	roles "github.com/merge-api/merge-go-client/v2/ticketing/roles"
-	scopes "github.com/merge-api/merge-go-client/v2/ticketing/scopes"
-	syncstatus "github.com/merge-api/merge-go-client/v2/ticketing/syncstatus"
-	tags "github.com/merge-api/merge-go-client/v2/ticketing/tags"
-	teams "github.com/merge-api/merge-go-client/v2/ticketing/teams"
-	tickets "github.com/merge-api/merge-go-client/v2/ticketing/tickets"
-	users "github.com/merge-api/merge-go-client/v2/ticketing/users"
-	webhookreceivers "github.com/merge-api/merge-go-client/v2/ticketing/webhookreceivers"
-	http "net/http"
+	core "github.com/merge-api/merge-go-client/core"
+	internal "github.com/merge-api/merge-go-client/internal"
+	accountdetails "github.com/merge-api/merge-go-client/ticketing/accountdetails"
+	accounts "github.com/merge-api/merge-go-client/ticketing/accounts"
+	accounttoken "github.com/merge-api/merge-go-client/ticketing/accounttoken"
+	asyncpassthrough "github.com/merge-api/merge-go-client/ticketing/asyncpassthrough"
+	attachments "github.com/merge-api/merge-go-client/ticketing/attachments"
+	audittrail "github.com/merge-api/merge-go-client/ticketing/audittrail"
+	availableactions "github.com/merge-api/merge-go-client/ticketing/availableactions"
+	collections "github.com/merge-api/merge-go-client/ticketing/collections"
+	comments "github.com/merge-api/merge-go-client/ticketing/comments"
+	contacts "github.com/merge-api/merge-go-client/ticketing/contacts"
+	deleteaccount "github.com/merge-api/merge-go-client/ticketing/deleteaccount"
+	fieldmapping "github.com/merge-api/merge-go-client/ticketing/fieldmapping"
+	forceresync "github.com/merge-api/merge-go-client/ticketing/forceresync"
+	generatekey "github.com/merge-api/merge-go-client/ticketing/generatekey"
+	issues "github.com/merge-api/merge-go-client/ticketing/issues"
+	linkedaccounts "github.com/merge-api/merge-go-client/ticketing/linkedaccounts"
+	linktoken "github.com/merge-api/merge-go-client/ticketing/linktoken"
+	passthrough "github.com/merge-api/merge-go-client/ticketing/passthrough"
+	projects "github.com/merge-api/merge-go-client/ticketing/projects"
+	regeneratekey "github.com/merge-api/merge-go-client/ticketing/regeneratekey"
+	roles "github.com/merge-api/merge-go-client/ticketing/roles"
+	scopes "github.com/merge-api/merge-go-client/ticketing/scopes"
+	syncstatus "github.com/merge-api/merge-go-client/ticketing/syncstatus"
+	tags "github.com/merge-api/merge-go-client/ticketing/tags"
+	teams "github.com/merge-api/merge-go-client/ticketing/teams"
+	tickets "github.com/merge-api/merge-go-client/ticketing/tickets"
+	users "github.com/merge-api/merge-go-client/ticketing/users"
+	webhookreceivers "github.com/merge-api/merge-go-client/ticketing/webhookreceivers"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails   *accountdetails.Client
 	AccountToken     *accounttoken.Client
 	Accounts         *accounts.Client
@@ -70,46 +64,49 @@ type Client struct {
 	Tickets          *tickets.Client
 	Users            *users.Client
 	WebhookReceivers *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:   accountdetails.NewClient(options),
+		AccountToken:     accounttoken.NewClient(options),
+		Accounts:         accounts.NewClient(options),
+		AsyncPassthrough: asyncpassthrough.NewClient(options),
+		Attachments:      attachments.NewClient(options),
+		AuditTrail:       audittrail.NewClient(options),
+		AvailableActions: availableactions.NewClient(options),
+		Collections:      collections.NewClient(options),
+		Comments:         comments.NewClient(options),
+		Contacts:         contacts.NewClient(options),
+		Scopes:           scopes.NewClient(options),
+		DeleteAccount:    deleteaccount.NewClient(options),
+		FieldMapping:     fieldmapping.NewClient(options),
+		GenerateKey:      generatekey.NewClient(options),
+		Issues:           issues.NewClient(options),
+		LinkToken:        linktoken.NewClient(options),
+		LinkedAccounts:   linkedaccounts.NewClient(options),
+		Passthrough:      passthrough.NewClient(options),
+		Projects:         projects.NewClient(options),
+		RegenerateKey:    regeneratekey.NewClient(options),
+		Roles:            roles.NewClient(options),
+		SyncStatus:       syncstatus.NewClient(options),
+		ForceResync:      forceresync.NewClient(options),
+		Tags:             tags.NewClient(options),
+		Teams:            teams.NewClient(options),
+		Tickets:          tickets.NewClient(options),
+		Users:            users.NewClient(options),
+		WebhookReceivers: webhookreceivers.NewClient(options),
+		options:          options,
+		baseURL:          options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:           options.ToHeader(),
-		AccountDetails:   accountdetails.NewClient(opts...),
-		AccountToken:     accounttoken.NewClient(opts...),
-		Accounts:         accounts.NewClient(opts...),
-		AsyncPassthrough: asyncpassthrough.NewClient(opts...),
-		Attachments:      attachments.NewClient(opts...),
-		AuditTrail:       audittrail.NewClient(opts...),
-		AvailableActions: availableactions.NewClient(opts...),
-		Collections:      collections.NewClient(opts...),
-		Comments:         comments.NewClient(opts...),
-		Contacts:         contacts.NewClient(opts...),
-		Scopes:           scopes.NewClient(opts...),
-		DeleteAccount:    deleteaccount.NewClient(opts...),
-		FieldMapping:     fieldmapping.NewClient(opts...),
-		GenerateKey:      generatekey.NewClient(opts...),
-		Issues:           issues.NewClient(opts...),
-		LinkToken:        linktoken.NewClient(opts...),
-		LinkedAccounts:   linkedaccounts.NewClient(opts...),
-		Passthrough:      passthrough.NewClient(opts...),
-		Projects:         projects.NewClient(opts...),
-		RegenerateKey:    regeneratekey.NewClient(opts...),
-		Roles:            roles.NewClient(opts...),
-		SyncStatus:       syncstatus.NewClient(opts...),
-		ForceResync:      forceresync.NewClient(opts...),
-		Tags:             tags.NewClient(opts...),
-		Teams:            teams.NewClient(opts...),
-		Tickets:          tickets.NewClient(opts...),
-		Users:            users.NewClient(opts...),
-		WebhookReceivers: webhookreceivers.NewClient(opts...),
 	}
 }

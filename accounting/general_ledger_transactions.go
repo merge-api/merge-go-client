@@ -5,8 +5,26 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	generalLedgerTransactionsListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	generalLedgerTransactionsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	generalLedgerTransactionsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	generalLedgerTransactionsListRequestFieldCursor             = big.NewInt(1 << 3)
+	generalLedgerTransactionsListRequestFieldExpand             = big.NewInt(1 << 4)
+	generalLedgerTransactionsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	generalLedgerTransactionsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	generalLedgerTransactionsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	generalLedgerTransactionsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	generalLedgerTransactionsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	generalLedgerTransactionsListRequestFieldPageSize           = big.NewInt(1 << 10)
+	generalLedgerTransactionsListRequestFieldPostedDateAfter    = big.NewInt(1 << 11)
+	generalLedgerTransactionsListRequestFieldPostedDateBefore   = big.NewInt(1 << 12)
+	generalLedgerTransactionsListRequestFieldRemoteId           = big.NewInt(1 << 13)
 )
 
 type GeneralLedgerTransactionsListRequest struct {
@@ -38,7 +56,121 @@ type GeneralLedgerTransactionsListRequest struct {
 	PostedDateBefore *time.Time `json:"-" url:"posted_date_before,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (g *GeneralLedgerTransactionsListRequest) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetCompanyId(companyId *string) {
+	g.CompanyId = companyId
+	g.require(generalLedgerTransactionsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	g.CreatedAfter = createdAfter
+	g.require(generalLedgerTransactionsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	g.CreatedBefore = createdBefore
+	g.require(generalLedgerTransactionsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetCursor(cursor *string) {
+	g.Cursor = cursor
+	g.require(generalLedgerTransactionsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetExpand(expand []*GeneralLedgerTransactionsListRequestExpandItem) {
+	g.Expand = expand
+	g.require(generalLedgerTransactionsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	g.IncludeDeletedData = includeDeletedData
+	g.require(generalLedgerTransactionsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	g.IncludeRemoteData = includeRemoteData
+	g.require(generalLedgerTransactionsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetIncludeShellData(includeShellData *bool) {
+	g.IncludeShellData = includeShellData
+	g.require(generalLedgerTransactionsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	g.ModifiedAfter = modifiedAfter
+	g.require(generalLedgerTransactionsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	g.ModifiedBefore = modifiedBefore
+	g.require(generalLedgerTransactionsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetPageSize(pageSize *int) {
+	g.PageSize = pageSize
+	g.require(generalLedgerTransactionsListRequestFieldPageSize)
+}
+
+// SetPostedDateAfter sets the PostedDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetPostedDateAfter(postedDateAfter *time.Time) {
+	g.PostedDateAfter = postedDateAfter
+	g.require(generalLedgerTransactionsListRequestFieldPostedDateAfter)
+}
+
+// SetPostedDateBefore sets the PostedDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetPostedDateBefore(postedDateBefore *time.Time) {
+	g.PostedDateBefore = postedDateBefore
+	g.require(generalLedgerTransactionsListRequestFieldPostedDateBefore)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsListRequest) SetRemoteId(remoteId *string) {
+	g.RemoteId = remoteId
+	g.require(generalLedgerTransactionsListRequestFieldRemoteId)
+}
+
+var (
+	generalLedgerTransactionsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	generalLedgerTransactionsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	generalLedgerTransactionsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type GeneralLedgerTransactionsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -47,6 +179,37 @@ type GeneralLedgerTransactionsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (g *GeneralLedgerTransactionsRetrieveRequest) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsRetrieveRequest) SetExpand(expand []*GeneralLedgerTransactionsRetrieveRequestExpandItem) {
+	g.Expand = expand
+	g.require(generalLedgerTransactionsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	g.IncludeRemoteData = includeRemoteData
+	g.require(generalLedgerTransactionsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	g.IncludeShellData = includeShellData
+	g.require(generalLedgerTransactionsRetrieveRequestFieldIncludeShellData)
 }
 
 type GeneralLedgerTransactionsListRequestExpandItem string
@@ -115,6 +278,25 @@ func (g GeneralLedgerTransactionsRetrieveRequestExpandItem) Ptr() *GeneralLedger
 //
 // ### Usage Example
 // Fetch from the `GET GeneralLedgerTransaction` endpoint and view a general ledger transaction.
+var (
+	generalLedgerTransactionFieldId                            = big.NewInt(1 << 0)
+	generalLedgerTransactionFieldRemoteId                      = big.NewInt(1 << 1)
+	generalLedgerTransactionFieldCreatedAt                     = big.NewInt(1 << 2)
+	generalLedgerTransactionFieldModifiedAt                    = big.NewInt(1 << 3)
+	generalLedgerTransactionFieldUnderlyingTransactionRemoteId = big.NewInt(1 << 4)
+	generalLedgerTransactionFieldUnderlyingTransactionType     = big.NewInt(1 << 5)
+	generalLedgerTransactionFieldAccountingPeriod              = big.NewInt(1 << 6)
+	generalLedgerTransactionFieldCompany                       = big.NewInt(1 << 7)
+	generalLedgerTransactionFieldRemoteUpdatedAt               = big.NewInt(1 << 8)
+	generalLedgerTransactionFieldRemoteCreatedAt               = big.NewInt(1 << 9)
+	generalLedgerTransactionFieldTrackingCategories            = big.NewInt(1 << 10)
+	generalLedgerTransactionFieldPostingDate                   = big.NewInt(1 << 11)
+	generalLedgerTransactionFieldGeneralLedgerTransactionLines = big.NewInt(1 << 12)
+	generalLedgerTransactionFieldRemoteWasDeleted              = big.NewInt(1 << 13)
+	generalLedgerTransactionFieldFieldMappings                 = big.NewInt(1 << 14)
+	generalLedgerTransactionFieldRemoteData                    = big.NewInt(1 << 15)
+)
+
 type GeneralLedgerTransaction struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -152,6 +334,9 @@ type GeneralLedgerTransaction struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -273,6 +458,125 @@ func (g *GeneralLedgerTransaction) GetExtraProperties() map[string]interface{} {
 	return g.extraProperties
 }
 
+func (g *GeneralLedgerTransaction) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetId(id *string) {
+	g.Id = id
+	g.require(generalLedgerTransactionFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetRemoteId(remoteId *string) {
+	g.RemoteId = remoteId
+	g.require(generalLedgerTransactionFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetCreatedAt(createdAt *time.Time) {
+	g.CreatedAt = createdAt
+	g.require(generalLedgerTransactionFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetModifiedAt(modifiedAt *time.Time) {
+	g.ModifiedAt = modifiedAt
+	g.require(generalLedgerTransactionFieldModifiedAt)
+}
+
+// SetUnderlyingTransactionRemoteId sets the UnderlyingTransactionRemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetUnderlyingTransactionRemoteId(underlyingTransactionRemoteId *string) {
+	g.UnderlyingTransactionRemoteId = underlyingTransactionRemoteId
+	g.require(generalLedgerTransactionFieldUnderlyingTransactionRemoteId)
+}
+
+// SetUnderlyingTransactionType sets the UnderlyingTransactionType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetUnderlyingTransactionType(underlyingTransactionType *GeneralLedgerTransactionUnderlyingTransactionType) {
+	g.UnderlyingTransactionType = underlyingTransactionType
+	g.require(generalLedgerTransactionFieldUnderlyingTransactionType)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetAccountingPeriod(accountingPeriod *GeneralLedgerTransactionAccountingPeriod) {
+	g.AccountingPeriod = accountingPeriod
+	g.require(generalLedgerTransactionFieldAccountingPeriod)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetCompany(company *GeneralLedgerTransactionCompany) {
+	g.Company = company
+	g.require(generalLedgerTransactionFieldCompany)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	g.RemoteUpdatedAt = remoteUpdatedAt
+	g.require(generalLedgerTransactionFieldRemoteUpdatedAt)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	g.RemoteCreatedAt = remoteCreatedAt
+	g.require(generalLedgerTransactionFieldRemoteCreatedAt)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetTrackingCategories(trackingCategories []*GeneralLedgerTransactionTrackingCategoriesItem) {
+	g.TrackingCategories = trackingCategories
+	g.require(generalLedgerTransactionFieldTrackingCategories)
+}
+
+// SetPostingDate sets the PostingDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetPostingDate(postingDate *time.Time) {
+	g.PostingDate = postingDate
+	g.require(generalLedgerTransactionFieldPostingDate)
+}
+
+// SetGeneralLedgerTransactionLines sets the GeneralLedgerTransactionLines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetGeneralLedgerTransactionLines(generalLedgerTransactionLines []*GeneralLedgerTransactionGeneralLedgerTransactionLinesItem) {
+	g.GeneralLedgerTransactionLines = generalLedgerTransactionLines
+	g.require(generalLedgerTransactionFieldGeneralLedgerTransactionLines)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	g.RemoteWasDeleted = remoteWasDeleted
+	g.require(generalLedgerTransactionFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetFieldMappings(fieldMappings map[string]interface{}) {
+	g.FieldMappings = fieldMappings
+	g.require(generalLedgerTransactionFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransaction) SetRemoteData(remoteData []*RemoteData) {
+	g.RemoteData = remoteData
+	g.require(generalLedgerTransactionFieldRemoteData)
+}
+
 func (g *GeneralLedgerTransaction) UnmarshalJSON(data []byte) error {
 	type embed GeneralLedgerTransaction
 	var unmarshaler = struct {
@@ -320,7 +624,8 @@ func (g *GeneralLedgerTransaction) MarshalJSON() ([]byte, error) {
 		RemoteCreatedAt: internal.NewOptionalDateTime(g.RemoteCreatedAt),
 		PostingDate:     internal.NewOptionalDateTime(g.PostingDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, g.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (g *GeneralLedgerTransaction) String() string {
@@ -529,6 +834,30 @@ func (g *GeneralLedgerTransactionGeneralLedgerTransactionLinesItem) Accept(visit
 //
 // ### Usage Example Fetch from the `GET GeneralLedgerTransactionLineSerializer` endpoint and view an
 // `GeneralLedgerTransaction` line item.
+var (
+	generalLedgerTransactionLineFieldId                  = big.NewInt(1 << 0)
+	generalLedgerTransactionLineFieldRemoteId            = big.NewInt(1 << 1)
+	generalLedgerTransactionLineFieldCreatedAt           = big.NewInt(1 << 2)
+	generalLedgerTransactionLineFieldModifiedAt          = big.NewInt(1 << 3)
+	generalLedgerTransactionLineFieldAccount             = big.NewInt(1 << 4)
+	generalLedgerTransactionLineFieldCompany             = big.NewInt(1 << 5)
+	generalLedgerTransactionLineFieldEmployee            = big.NewInt(1 << 6)
+	generalLedgerTransactionLineFieldContact             = big.NewInt(1 << 7)
+	generalLedgerTransactionLineFieldProject             = big.NewInt(1 << 8)
+	generalLedgerTransactionLineFieldBaseCurrency        = big.NewInt(1 << 9)
+	generalLedgerTransactionLineFieldTransactionCurrency = big.NewInt(1 << 10)
+	generalLedgerTransactionLineFieldExchangeRate        = big.NewInt(1 << 11)
+	generalLedgerTransactionLineFieldDescription         = big.NewInt(1 << 12)
+	generalLedgerTransactionLineFieldTrackingCategories  = big.NewInt(1 << 13)
+	generalLedgerTransactionLineFieldDebitAmount         = big.NewInt(1 << 14)
+	generalLedgerTransactionLineFieldCreditAmount        = big.NewInt(1 << 15)
+	generalLedgerTransactionLineFieldItem                = big.NewInt(1 << 16)
+	generalLedgerTransactionLineFieldForeignDebitAmount  = big.NewInt(1 << 17)
+	generalLedgerTransactionLineFieldForeignCreditAmount = big.NewInt(1 << 18)
+	generalLedgerTransactionLineFieldRemoteWasDeleted    = big.NewInt(1 << 19)
+	generalLedgerTransactionLineFieldFieldMappings       = big.NewInt(1 << 20)
+)
+
 type GeneralLedgerTransactionLine struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -1175,6 +1504,9 @@ type GeneralLedgerTransactionLine struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -1330,6 +1662,160 @@ func (g *GeneralLedgerTransactionLine) GetExtraProperties() map[string]interface
 	return g.extraProperties
 }
 
+func (g *GeneralLedgerTransactionLine) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetId(id *string) {
+	g.Id = id
+	g.require(generalLedgerTransactionLineFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetRemoteId(remoteId *string) {
+	g.RemoteId = remoteId
+	g.require(generalLedgerTransactionLineFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetCreatedAt(createdAt *time.Time) {
+	g.CreatedAt = createdAt
+	g.require(generalLedgerTransactionLineFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetModifiedAt(modifiedAt *time.Time) {
+	g.ModifiedAt = modifiedAt
+	g.require(generalLedgerTransactionLineFieldModifiedAt)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetAccount(account *GeneralLedgerTransactionLineAccount) {
+	g.Account = account
+	g.require(generalLedgerTransactionLineFieldAccount)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetCompany(company *GeneralLedgerTransactionLineCompany) {
+	g.Company = company
+	g.require(generalLedgerTransactionLineFieldCompany)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetEmployee(employee *GeneralLedgerTransactionLineEmployee) {
+	g.Employee = employee
+	g.require(generalLedgerTransactionLineFieldEmployee)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetContact(contact *GeneralLedgerTransactionLineContact) {
+	g.Contact = contact
+	g.require(generalLedgerTransactionLineFieldContact)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetProject(project *GeneralLedgerTransactionLineProject) {
+	g.Project = project
+	g.require(generalLedgerTransactionLineFieldProject)
+}
+
+// SetBaseCurrency sets the BaseCurrency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetBaseCurrency(baseCurrency *TransactionCurrencyEnum) {
+	g.BaseCurrency = baseCurrency
+	g.require(generalLedgerTransactionLineFieldBaseCurrency)
+}
+
+// SetTransactionCurrency sets the TransactionCurrency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetTransactionCurrency(transactionCurrency *GeneralLedgerTransactionLineTransactionCurrency) {
+	g.TransactionCurrency = transactionCurrency
+	g.require(generalLedgerTransactionLineFieldTransactionCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetExchangeRate(exchangeRate *string) {
+	g.ExchangeRate = exchangeRate
+	g.require(generalLedgerTransactionLineFieldExchangeRate)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetDescription(description *string) {
+	g.Description = description
+	g.require(generalLedgerTransactionLineFieldDescription)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetTrackingCategories(trackingCategories []*GeneralLedgerTransactionLineTrackingCategoriesItem) {
+	g.TrackingCategories = trackingCategories
+	g.require(generalLedgerTransactionLineFieldTrackingCategories)
+}
+
+// SetDebitAmount sets the DebitAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetDebitAmount(debitAmount string) {
+	g.DebitAmount = debitAmount
+	g.require(generalLedgerTransactionLineFieldDebitAmount)
+}
+
+// SetCreditAmount sets the CreditAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetCreditAmount(creditAmount string) {
+	g.CreditAmount = creditAmount
+	g.require(generalLedgerTransactionLineFieldCreditAmount)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetItem(item *GeneralLedgerTransactionLineItem) {
+	g.Item = item
+	g.require(generalLedgerTransactionLineFieldItem)
+}
+
+// SetForeignDebitAmount sets the ForeignDebitAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetForeignDebitAmount(foreignDebitAmount string) {
+	g.ForeignDebitAmount = foreignDebitAmount
+	g.require(generalLedgerTransactionLineFieldForeignDebitAmount)
+}
+
+// SetForeignCreditAmount sets the ForeignCreditAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetForeignCreditAmount(foreignCreditAmount string) {
+	g.ForeignCreditAmount = foreignCreditAmount
+	g.require(generalLedgerTransactionLineFieldForeignCreditAmount)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	g.RemoteWasDeleted = remoteWasDeleted
+	g.require(generalLedgerTransactionLineFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GeneralLedgerTransactionLine) SetFieldMappings(fieldMappings map[string]interface{}) {
+	g.FieldMappings = fieldMappings
+	g.require(generalLedgerTransactionLineFieldFieldMappings)
+}
+
 func (g *GeneralLedgerTransactionLine) UnmarshalJSON(data []byte) error {
 	type embed GeneralLedgerTransactionLine
 	var unmarshaler = struct {
@@ -1365,7 +1851,8 @@ func (g *GeneralLedgerTransactionLine) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(g.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(g.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, g.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (g *GeneralLedgerTransactionLine) String() string {
@@ -2318,10 +2805,19 @@ func (g *GeneralLedgerTransactionUnderlyingTransactionType) Accept(visitor Gener
 	return fmt.Errorf("type %T does not include a non-empty union type", g)
 }
 
+var (
+	paginatedGeneralLedgerTransactionListFieldNext     = big.NewInt(1 << 0)
+	paginatedGeneralLedgerTransactionListFieldPrevious = big.NewInt(1 << 1)
+	paginatedGeneralLedgerTransactionListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedGeneralLedgerTransactionList struct {
 	Next     *string                     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string                     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*GeneralLedgerTransaction `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -2352,6 +2848,34 @@ func (p *PaginatedGeneralLedgerTransactionList) GetExtraProperties() map[string]
 	return p.extraProperties
 }
 
+func (p *PaginatedGeneralLedgerTransactionList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedGeneralLedgerTransactionList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedGeneralLedgerTransactionListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedGeneralLedgerTransactionList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedGeneralLedgerTransactionListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedGeneralLedgerTransactionList) SetResults(results []*GeneralLedgerTransaction) {
+	p.Results = results
+	p.require(paginatedGeneralLedgerTransactionListFieldResults)
+}
+
 func (p *PaginatedGeneralLedgerTransactionList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedGeneralLedgerTransactionList
 	var value unmarshaler
@@ -2366,6 +2890,17 @@ func (p *PaginatedGeneralLedgerTransactionList) UnmarshalJSON(data []byte) error
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedGeneralLedgerTransactionList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedGeneralLedgerTransactionList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedGeneralLedgerTransactionList) String() string {

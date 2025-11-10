@@ -3,34 +3,34 @@
 package files
 
 import (
-	bytes "bytes"
 	context "context"
-	fmt "fmt"
-	core "github.com/merge-api/merge-go-client/v2/core"
-	filestorage "github.com/merge-api/merge-go-client/v2/filestorage"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
+	core "github.com/merge-api/merge-go-client/core"
+	filestorage "github.com/merge-api/merge-go-client/filestorage"
+	internal "github.com/merge-api/merge-go-client/internal"
+	option "github.com/merge-api/merge-go-client/option"
 	io "io"
 	http "net/http"
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -39,7 +39,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.FilesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*filestorage.File], error) {
+) (*core.Page[*string, *filestorage.File], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -52,13 +52,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -75,11 +74,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedFileList) *internal.PageResponse[*string, *filestorage.File] {
+	readPageResponse := func(response *filestorage.PaginatedFileList) *core.PageResponse[*string, *filestorage.File] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *filestorage.File]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *filestorage.File]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -99,44 +98,15 @@ func (c *Client) Create(
 	request *filestorage.FileStorageFileEndpointRequest,
 	opts ...option.RequestOption,
 ) (*filestorage.FileStorageFileResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
+	response, err := c.WithRawResponse.Create(
+		ctx,
+		request,
+		opts...,
 	)
-	endpointURL := baseURL + "/filestorage/v1/files"
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *filestorage.FileStorageFileResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a `File` object with the given `id`.
@@ -146,45 +116,16 @@ func (c *Client) Retrieve(
 	request *filestorage.FilesRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*filestorage.File, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/filestorage/v1/files/%v",
+	response, err := c.WithRawResponse.Retrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *filestorage.File
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns the `File` content with the given `id` as a stream of bytes.
@@ -194,45 +135,16 @@ func (c *Client) DownloadRetrieve(
 	request *filestorage.FilesDownloadRetrieveRequest,
 	opts ...option.RequestOption,
 ) (io.Reader, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/filestorage/v1/files/%v/download",
+	response, err := c.WithRawResponse.DownloadRetrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	response := bytes.NewBuffer(nil)
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns metadata to construct an authenticated file download request for a singular file, allowing you to download file directly from the third-party.
@@ -242,45 +154,16 @@ func (c *Client) DownloadRequestMetaRetrieve(
 	request *filestorage.FilesDownloadRequestMetaRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*filestorage.DownloadRequestMeta, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/filestorage/v1/files/%v/download/request-meta",
+	response, err := c.WithRawResponse.DownloadRequestMetaRetrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *filestorage.DownloadRequestMeta
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns metadata to construct authenticated file download requests, allowing you to download files directly from the third-party.
@@ -288,7 +171,7 @@ func (c *Client) DownloadRequestMetaList(
 	ctx context.Context,
 	request *filestorage.FilesDownloadRequestMetaListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*filestorage.DownloadRequestMeta], error) {
+) (*core.Page[*string, *filestorage.DownloadRequestMeta], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -301,13 +184,12 @@ func (c *Client) DownloadRequestMetaList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -324,11 +206,11 @@ func (c *Client) DownloadRequestMetaList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedDownloadRequestMetaList) *internal.PageResponse[*string, *filestorage.DownloadRequestMeta] {
+	readPageResponse := func(response *filestorage.PaginatedDownloadRequestMetaList) *core.PageResponse[*string, *filestorage.DownloadRequestMeta] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *filestorage.DownloadRequestMeta]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *filestorage.DownloadRequestMeta]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -347,33 +229,12 @@ func (c *Client) MetaPostRetrieve(
 	ctx context.Context,
 	opts ...option.RequestOption,
 ) (*filestorage.MetaResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := baseURL + "/filestorage/v1/files/meta/post"
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *filestorage.MetaResponse
-	if err := c.caller.Call(
+	response, err := c.WithRawResponse.MetaPostRetrieve(
 		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
+		opts...,
+	)
+	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Body, nil
 }

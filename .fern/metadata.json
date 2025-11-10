@@ -1,0 +1,8 @@
+{
+  "cliVersion": "0.112.1",
+  "generatorName": "fernapi/fern-go-sdk",
+  "generatorVersion": "1.14.1",
+  "generatorConfig": {
+    "packageName": "merge"
+  }
+}

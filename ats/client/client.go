@@ -3,50 +3,44 @@
 package client
 
 import (
-	accountdetails "github.com/merge-api/merge-go-client/v2/ats/accountdetails"
-	accounttoken "github.com/merge-api/merge-go-client/v2/ats/accounttoken"
-	activities "github.com/merge-api/merge-go-client/v2/ats/activities"
-	applications "github.com/merge-api/merge-go-client/v2/ats/applications"
-	asyncpassthrough "github.com/merge-api/merge-go-client/v2/ats/asyncpassthrough"
-	attachments "github.com/merge-api/merge-go-client/v2/ats/attachments"
-	audittrail "github.com/merge-api/merge-go-client/v2/ats/audittrail"
-	availableactions "github.com/merge-api/merge-go-client/v2/ats/availableactions"
-	candidates "github.com/merge-api/merge-go-client/v2/ats/candidates"
-	deleteaccount "github.com/merge-api/merge-go-client/v2/ats/deleteaccount"
-	departments "github.com/merge-api/merge-go-client/v2/ats/departments"
-	eeocs "github.com/merge-api/merge-go-client/v2/ats/eeocs"
-	fieldmapping "github.com/merge-api/merge-go-client/v2/ats/fieldmapping"
-	forceresync "github.com/merge-api/merge-go-client/v2/ats/forceresync"
-	generatekey "github.com/merge-api/merge-go-client/v2/ats/generatekey"
-	interviews "github.com/merge-api/merge-go-client/v2/ats/interviews"
-	issues "github.com/merge-api/merge-go-client/v2/ats/issues"
-	jobinterviewstages "github.com/merge-api/merge-go-client/v2/ats/jobinterviewstages"
-	jobpostings "github.com/merge-api/merge-go-client/v2/ats/jobpostings"
-	jobs "github.com/merge-api/merge-go-client/v2/ats/jobs"
-	linkedaccounts "github.com/merge-api/merge-go-client/v2/ats/linkedaccounts"
-	linktoken "github.com/merge-api/merge-go-client/v2/ats/linktoken"
-	offers "github.com/merge-api/merge-go-client/v2/ats/offers"
-	offices "github.com/merge-api/merge-go-client/v2/ats/offices"
-	passthrough "github.com/merge-api/merge-go-client/v2/ats/passthrough"
-	regeneratekey "github.com/merge-api/merge-go-client/v2/ats/regeneratekey"
-	rejectreasons "github.com/merge-api/merge-go-client/v2/ats/rejectreasons"
-	scopes "github.com/merge-api/merge-go-client/v2/ats/scopes"
-	scorecards "github.com/merge-api/merge-go-client/v2/ats/scorecards"
-	syncstatus "github.com/merge-api/merge-go-client/v2/ats/syncstatus"
-	tags "github.com/merge-api/merge-go-client/v2/ats/tags"
-	users "github.com/merge-api/merge-go-client/v2/ats/users"
-	webhookreceivers "github.com/merge-api/merge-go-client/v2/ats/webhookreceivers"
-	core "github.com/merge-api/merge-go-client/v2/core"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
+	accountdetails "github.com/merge-api/merge-go-client/ats/accountdetails"
+	accounttoken "github.com/merge-api/merge-go-client/ats/accounttoken"
+	activities "github.com/merge-api/merge-go-client/ats/activities"
+	applications "github.com/merge-api/merge-go-client/ats/applications"
+	asyncpassthrough "github.com/merge-api/merge-go-client/ats/asyncpassthrough"
+	attachments "github.com/merge-api/merge-go-client/ats/attachments"
+	audittrail "github.com/merge-api/merge-go-client/ats/audittrail"
+	availableactions "github.com/merge-api/merge-go-client/ats/availableactions"
+	candidates "github.com/merge-api/merge-go-client/ats/candidates"
+	deleteaccount "github.com/merge-api/merge-go-client/ats/deleteaccount"
+	departments "github.com/merge-api/merge-go-client/ats/departments"
+	eeocs "github.com/merge-api/merge-go-client/ats/eeocs"
+	fieldmapping "github.com/merge-api/merge-go-client/ats/fieldmapping"
+	forceresync "github.com/merge-api/merge-go-client/ats/forceresync"
+	generatekey "github.com/merge-api/merge-go-client/ats/generatekey"
+	interviews "github.com/merge-api/merge-go-client/ats/interviews"
+	issues "github.com/merge-api/merge-go-client/ats/issues"
+	jobinterviewstages "github.com/merge-api/merge-go-client/ats/jobinterviewstages"
+	jobpostings "github.com/merge-api/merge-go-client/ats/jobpostings"
+	jobs "github.com/merge-api/merge-go-client/ats/jobs"
+	linkedaccounts "github.com/merge-api/merge-go-client/ats/linkedaccounts"
+	linktoken "github.com/merge-api/merge-go-client/ats/linktoken"
+	offers "github.com/merge-api/merge-go-client/ats/offers"
+	offices "github.com/merge-api/merge-go-client/ats/offices"
+	passthrough "github.com/merge-api/merge-go-client/ats/passthrough"
+	regeneratekey "github.com/merge-api/merge-go-client/ats/regeneratekey"
+	rejectreasons "github.com/merge-api/merge-go-client/ats/rejectreasons"
+	scopes "github.com/merge-api/merge-go-client/ats/scopes"
+	scorecards "github.com/merge-api/merge-go-client/ats/scorecards"
+	syncstatus "github.com/merge-api/merge-go-client/ats/syncstatus"
+	tags "github.com/merge-api/merge-go-client/ats/tags"
+	users "github.com/merge-api/merge-go-client/ats/users"
+	webhookreceivers "github.com/merge-api/merge-go-client/ats/webhookreceivers"
+	core "github.com/merge-api/merge-go-client/core"
+	internal "github.com/merge-api/merge-go-client/internal"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails     *accountdetails.Client
 	AccountToken       *accounttoken.Client
 	Activities         *activities.Client
@@ -80,51 +74,54 @@ type Client struct {
 	Tags               *tags.Client
 	Users              *users.Client
 	WebhookReceivers   *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:     accountdetails.NewClient(options),
+		AccountToken:       accounttoken.NewClient(options),
+		Activities:         activities.NewClient(options),
+		Applications:       applications.NewClient(options),
+		AsyncPassthrough:   asyncpassthrough.NewClient(options),
+		Attachments:        attachments.NewClient(options),
+		AuditTrail:         audittrail.NewClient(options),
+		AvailableActions:   availableactions.NewClient(options),
+		Candidates:         candidates.NewClient(options),
+		Scopes:             scopes.NewClient(options),
+		DeleteAccount:      deleteaccount.NewClient(options),
+		Departments:        departments.NewClient(options),
+		Eeocs:              eeocs.NewClient(options),
+		FieldMapping:       fieldmapping.NewClient(options),
+		GenerateKey:        generatekey.NewClient(options),
+		Interviews:         interviews.NewClient(options),
+		Issues:             issues.NewClient(options),
+		JobInterviewStages: jobinterviewstages.NewClient(options),
+		JobPostings:        jobpostings.NewClient(options),
+		Jobs:               jobs.NewClient(options),
+		LinkToken:          linktoken.NewClient(options),
+		LinkedAccounts:     linkedaccounts.NewClient(options),
+		Offers:             offers.NewClient(options),
+		Offices:            offices.NewClient(options),
+		Passthrough:        passthrough.NewClient(options),
+		RegenerateKey:      regeneratekey.NewClient(options),
+		RejectReasons:      rejectreasons.NewClient(options),
+		Scorecards:         scorecards.NewClient(options),
+		SyncStatus:         syncstatus.NewClient(options),
+		ForceResync:        forceresync.NewClient(options),
+		Tags:               tags.NewClient(options),
+		Users:              users.NewClient(options),
+		WebhookReceivers:   webhookreceivers.NewClient(options),
+		options:            options,
+		baseURL:            options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:             options.ToHeader(),
-		AccountDetails:     accountdetails.NewClient(opts...),
-		AccountToken:       accounttoken.NewClient(opts...),
-		Activities:         activities.NewClient(opts...),
-		Applications:       applications.NewClient(opts...),
-		AsyncPassthrough:   asyncpassthrough.NewClient(opts...),
-		Attachments:        attachments.NewClient(opts...),
-		AuditTrail:         audittrail.NewClient(opts...),
-		AvailableActions:   availableactions.NewClient(opts...),
-		Candidates:         candidates.NewClient(opts...),
-		Scopes:             scopes.NewClient(opts...),
-		DeleteAccount:      deleteaccount.NewClient(opts...),
-		Departments:        departments.NewClient(opts...),
-		Eeocs:              eeocs.NewClient(opts...),
-		FieldMapping:       fieldmapping.NewClient(opts...),
-		GenerateKey:        generatekey.NewClient(opts...),
-		Interviews:         interviews.NewClient(opts...),
-		Issues:             issues.NewClient(opts...),
-		JobInterviewStages: jobinterviewstages.NewClient(opts...),
-		JobPostings:        jobpostings.NewClient(opts...),
-		Jobs:               jobs.NewClient(opts...),
-		LinkToken:          linktoken.NewClient(opts...),
-		LinkedAccounts:     linkedaccounts.NewClient(opts...),
-		Offers:             offers.NewClient(opts...),
-		Offices:            offices.NewClient(opts...),
-		Passthrough:        passthrough.NewClient(opts...),
-		RegenerateKey:      regeneratekey.NewClient(opts...),
-		RejectReasons:      rejectreasons.NewClient(opts...),
-		Scorecards:         scorecards.NewClient(opts...),
-		SyncStatus:         syncstatus.NewClient(opts...),
-		ForceResync:        forceresync.NewClient(opts...),
-		Tags:               tags.NewClient(opts...),
-		Users:              users.NewClient(opts...),
-		WebhookReceivers:   webhookreceivers.NewClient(opts...),
 	}
 }

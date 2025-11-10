@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	vendorCreditEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	vendorCreditEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	vendorCreditEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type VendorCreditEndpointRequest struct {
@@ -15,7 +22,55 @@ type VendorCreditEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                `json:"-" url:"run_async,omitempty"`
 	Model    *VendorCreditRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (v *VendorCreditEndpointRequest) require(field *big.Int) {
+	if v.explicitFields == nil {
+		v.explicitFields = big.NewInt(0)
+	}
+	v.explicitFields.Or(v.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	v.IsDebugMode = isDebugMode
+	v.require(vendorCreditEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditEndpointRequest) SetRunAsync(runAsync *bool) {
+	v.RunAsync = runAsync
+	v.require(vendorCreditEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditEndpointRequest) SetModel(model *VendorCreditRequest) {
+	v.Model = model
+	v.require(vendorCreditEndpointRequestFieldModel)
+}
+
+var (
+	vendorCreditsListRequestFieldCompanyId             = big.NewInt(1 << 0)
+	vendorCreditsListRequestFieldCreatedAfter          = big.NewInt(1 << 1)
+	vendorCreditsListRequestFieldCreatedBefore         = big.NewInt(1 << 2)
+	vendorCreditsListRequestFieldCursor                = big.NewInt(1 << 3)
+	vendorCreditsListRequestFieldExpand                = big.NewInt(1 << 4)
+	vendorCreditsListRequestFieldIncludeDeletedData    = big.NewInt(1 << 5)
+	vendorCreditsListRequestFieldIncludeRemoteData     = big.NewInt(1 << 6)
+	vendorCreditsListRequestFieldIncludeShellData      = big.NewInt(1 << 7)
+	vendorCreditsListRequestFieldModifiedAfter         = big.NewInt(1 << 8)
+	vendorCreditsListRequestFieldModifiedBefore        = big.NewInt(1 << 9)
+	vendorCreditsListRequestFieldPageSize              = big.NewInt(1 << 10)
+	vendorCreditsListRequestFieldRemoteId              = big.NewInt(1 << 11)
+	vendorCreditsListRequestFieldTransactionDateAfter  = big.NewInt(1 << 12)
+	vendorCreditsListRequestFieldTransactionDateBefore = big.NewInt(1 << 13)
+)
 
 type VendorCreditsListRequest struct {
 	// If provided, will only return vendor credits for this company.
@@ -46,7 +101,121 @@ type VendorCreditsListRequest struct {
 	TransactionDateAfter *time.Time `json:"-" url:"transaction_date_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
 	TransactionDateBefore *time.Time `json:"-" url:"transaction_date_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (v *VendorCreditsListRequest) require(field *big.Int) {
+	if v.explicitFields == nil {
+		v.explicitFields = big.NewInt(0)
+	}
+	v.explicitFields.Or(v.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetCompanyId(companyId *string) {
+	v.CompanyId = companyId
+	v.require(vendorCreditsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	v.CreatedAfter = createdAfter
+	v.require(vendorCreditsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	v.CreatedBefore = createdBefore
+	v.require(vendorCreditsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetCursor(cursor *string) {
+	v.Cursor = cursor
+	v.require(vendorCreditsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetExpand(expand []*VendorCreditsListRequestExpandItem) {
+	v.Expand = expand
+	v.require(vendorCreditsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	v.IncludeDeletedData = includeDeletedData
+	v.require(vendorCreditsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	v.IncludeRemoteData = includeRemoteData
+	v.require(vendorCreditsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetIncludeShellData(includeShellData *bool) {
+	v.IncludeShellData = includeShellData
+	v.require(vendorCreditsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	v.ModifiedAfter = modifiedAfter
+	v.require(vendorCreditsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	v.ModifiedBefore = modifiedBefore
+	v.require(vendorCreditsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetPageSize(pageSize *int) {
+	v.PageSize = pageSize
+	v.require(vendorCreditsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetRemoteId(remoteId *string) {
+	v.RemoteId = remoteId
+	v.require(vendorCreditsListRequestFieldRemoteId)
+}
+
+// SetTransactionDateAfter sets the TransactionDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetTransactionDateAfter(transactionDateAfter *time.Time) {
+	v.TransactionDateAfter = transactionDateAfter
+	v.require(vendorCreditsListRequestFieldTransactionDateAfter)
+}
+
+// SetTransactionDateBefore sets the TransactionDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsListRequest) SetTransactionDateBefore(transactionDateBefore *time.Time) {
+	v.TransactionDateBefore = transactionDateBefore
+	v.require(vendorCreditsListRequestFieldTransactionDateBefore)
+}
+
+var (
+	vendorCreditsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	vendorCreditsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	vendorCreditsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type VendorCreditsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -55,6 +224,37 @@ type VendorCreditsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (v *VendorCreditsRetrieveRequest) require(field *big.Int) {
+	if v.explicitFields == nil {
+		v.explicitFields = big.NewInt(0)
+	}
+	v.explicitFields.Or(v.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsRetrieveRequest) SetExpand(expand []*VendorCreditsRetrieveRequestExpandItem) {
+	v.Expand = expand
+	v.require(vendorCreditsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	v.IncludeRemoteData = includeRemoteData
+	v.require(vendorCreditsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	v.IncludeShellData = includeShellData
+	v.require(vendorCreditsRetrieveRequestFieldIncludeShellData)
 }
 
 type VendorCreditsListRequestExpandItem string
@@ -119,10 +319,19 @@ func (v VendorCreditsRetrieveRequestExpandItem) Ptr() *VendorCreditsRetrieveRequ
 	return &v
 }
 
+var (
+	paginatedVendorCreditListFieldNext     = big.NewInt(1 << 0)
+	paginatedVendorCreditListFieldPrevious = big.NewInt(1 << 1)
+	paginatedVendorCreditListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedVendorCreditList struct {
 	Next     *string         `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string         `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*VendorCredit `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -153,6 +362,34 @@ func (p *PaginatedVendorCreditList) GetExtraProperties() map[string]interface{} 
 	return p.extraProperties
 }
 
+func (p *PaginatedVendorCreditList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedVendorCreditList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedVendorCreditListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedVendorCreditList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedVendorCreditListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedVendorCreditList) SetResults(results []*VendorCredit) {
+	p.Results = results
+	p.require(paginatedVendorCreditListFieldResults)
+}
+
 func (p *PaginatedVendorCreditList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedVendorCreditList
 	var value unmarshaler
@@ -167,6 +404,17 @@ func (p *PaginatedVendorCreditList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedVendorCreditList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedVendorCreditList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedVendorCreditList) String() string {
@@ -187,6 +435,15 @@ func (p *PaginatedVendorCreditList) String() string {
 //
 // ### Usage Example
 // Fetch from the `GET VendorCredit` endpoint and view the vendor credit's applied to lines.
+var (
+	vendorCreditApplyLineForVendorCreditRequestFieldRemoteId            = big.NewInt(1 << 0)
+	vendorCreditApplyLineForVendorCreditRequestFieldInvoice             = big.NewInt(1 << 1)
+	vendorCreditApplyLineForVendorCreditRequestFieldAppliedDate         = big.NewInt(1 << 2)
+	vendorCreditApplyLineForVendorCreditRequestFieldAppliedAmount       = big.NewInt(1 << 3)
+	vendorCreditApplyLineForVendorCreditRequestFieldIntegrationParams   = big.NewInt(1 << 4)
+	vendorCreditApplyLineForVendorCreditRequestFieldLinkedAccountParams = big.NewInt(1 << 5)
+)
+
 type VendorCreditApplyLineForVendorCreditRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string                                             `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -197,6 +454,9 @@ type VendorCreditApplyLineForVendorCreditRequest struct {
 	AppliedAmount       *string                `json:"applied_amount,omitempty" url:"applied_amount,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -248,6 +508,55 @@ func (v *VendorCreditApplyLineForVendorCreditRequest) GetExtraProperties() map[s
 	return v.extraProperties
 }
 
+func (v *VendorCreditApplyLineForVendorCreditRequest) require(field *big.Int) {
+	if v.explicitFields == nil {
+		v.explicitFields = big.NewInt(0)
+	}
+	v.explicitFields.Or(v.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditApplyLineForVendorCreditRequest) SetRemoteId(remoteId *string) {
+	v.RemoteId = remoteId
+	v.require(vendorCreditApplyLineForVendorCreditRequestFieldRemoteId)
+}
+
+// SetInvoice sets the Invoice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditApplyLineForVendorCreditRequest) SetInvoice(invoice *VendorCreditApplyLineForVendorCreditRequestInvoice) {
+	v.Invoice = invoice
+	v.require(vendorCreditApplyLineForVendorCreditRequestFieldInvoice)
+}
+
+// SetAppliedDate sets the AppliedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditApplyLineForVendorCreditRequest) SetAppliedDate(appliedDate *time.Time) {
+	v.AppliedDate = appliedDate
+	v.require(vendorCreditApplyLineForVendorCreditRequestFieldAppliedDate)
+}
+
+// SetAppliedAmount sets the AppliedAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditApplyLineForVendorCreditRequest) SetAppliedAmount(appliedAmount *string) {
+	v.AppliedAmount = appliedAmount
+	v.require(vendorCreditApplyLineForVendorCreditRequestFieldAppliedAmount)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditApplyLineForVendorCreditRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	v.IntegrationParams = integrationParams
+	v.require(vendorCreditApplyLineForVendorCreditRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditApplyLineForVendorCreditRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	v.LinkedAccountParams = linkedAccountParams
+	v.require(vendorCreditApplyLineForVendorCreditRequestFieldLinkedAccountParams)
+}
+
 func (v *VendorCreditApplyLineForVendorCreditRequest) UnmarshalJSON(data []byte) error {
 	type embed VendorCreditApplyLineForVendorCreditRequest
 	var unmarshaler = struct {
@@ -279,7 +588,8 @@ func (v *VendorCreditApplyLineForVendorCreditRequest) MarshalJSON() ([]byte, err
 		embed:       embed(*v),
 		AppliedDate: internal.NewOptionalDateTime(v.AppliedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, v.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (v *VendorCreditApplyLineForVendorCreditRequest) String() string {
@@ -362,6 +672,22 @@ func (v *VendorCreditApplyLineForVendorCreditRequestInvoice) Accept(visitor Vend
 //
 // ### Usage Example
 // Fetch from the `GET VendorCredit` endpoint and view a company's vendor credits.
+var (
+	vendorCreditRequestFieldNumber              = big.NewInt(1 << 0)
+	vendorCreditRequestFieldTransactionDate     = big.NewInt(1 << 1)
+	vendorCreditRequestFieldVendor              = big.NewInt(1 << 2)
+	vendorCreditRequestFieldTotalAmount         = big.NewInt(1 << 3)
+	vendorCreditRequestFieldCurrency            = big.NewInt(1 << 4)
+	vendorCreditRequestFieldExchangeRate        = big.NewInt(1 << 5)
+	vendorCreditRequestFieldInclusiveOfTax      = big.NewInt(1 << 6)
+	vendorCreditRequestFieldCompany             = big.NewInt(1 << 7)
+	vendorCreditRequestFieldTrackingCategories  = big.NewInt(1 << 8)
+	vendorCreditRequestFieldAppliedToLines      = big.NewInt(1 << 9)
+	vendorCreditRequestFieldAccountingPeriod    = big.NewInt(1 << 10)
+	vendorCreditRequestFieldIntegrationParams   = big.NewInt(1 << 11)
+	vendorCreditRequestFieldLinkedAccountParams = big.NewInt(1 << 12)
+)
+
 type VendorCreditRequest struct {
 	// The vendor credit's number.
 	Number *string `json:"number,omitempty" url:"number,omitempty"`
@@ -694,6 +1020,9 @@ type VendorCreditRequest struct {
 	IntegrationParams   map[string]interface{}               `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}               `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -793,6 +1122,104 @@ func (v *VendorCreditRequest) GetExtraProperties() map[string]interface{} {
 	return v.extraProperties
 }
 
+func (v *VendorCreditRequest) require(field *big.Int) {
+	if v.explicitFields == nil {
+		v.explicitFields = big.NewInt(0)
+	}
+	v.explicitFields.Or(v.explicitFields, field)
+}
+
+// SetNumber sets the Number field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetNumber(number *string) {
+	v.Number = number
+	v.require(vendorCreditRequestFieldNumber)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetTransactionDate(transactionDate *time.Time) {
+	v.TransactionDate = transactionDate
+	v.require(vendorCreditRequestFieldTransactionDate)
+}
+
+// SetVendor sets the Vendor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetVendor(vendor_ *VendorCreditRequestVendor) {
+	v.Vendor = vendor_
+	v.require(vendorCreditRequestFieldVendor)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetTotalAmount(totalAmount *float64) {
+	v.TotalAmount = totalAmount
+	v.require(vendorCreditRequestFieldTotalAmount)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetCurrency(currency *VendorCreditRequestCurrency) {
+	v.Currency = currency
+	v.require(vendorCreditRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetExchangeRate(exchangeRate *string) {
+	v.ExchangeRate = exchangeRate
+	v.require(vendorCreditRequestFieldExchangeRate)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	v.InclusiveOfTax = inclusiveOfTax
+	v.require(vendorCreditRequestFieldInclusiveOfTax)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetCompany(company *VendorCreditRequestCompany) {
+	v.Company = company
+	v.require(vendorCreditRequestFieldCompany)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetTrackingCategories(trackingCategories []*VendorCreditRequestTrackingCategoriesItem) {
+	v.TrackingCategories = trackingCategories
+	v.require(vendorCreditRequestFieldTrackingCategories)
+}
+
+// SetAppliedToLines sets the AppliedToLines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetAppliedToLines(appliedToLines []*VendorCreditApplyLineForVendorCreditRequest) {
+	v.AppliedToLines = appliedToLines
+	v.require(vendorCreditRequestFieldAppliedToLines)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetAccountingPeriod(accountingPeriod *VendorCreditRequestAccountingPeriod) {
+	v.AccountingPeriod = accountingPeriod
+	v.require(vendorCreditRequestFieldAccountingPeriod)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	v.IntegrationParams = integrationParams
+	v.require(vendorCreditRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	v.LinkedAccountParams = linkedAccountParams
+	v.require(vendorCreditRequestFieldLinkedAccountParams)
+}
+
 func (v *VendorCreditRequest) UnmarshalJSON(data []byte) error {
 	type embed VendorCreditRequest
 	var unmarshaler = struct {
@@ -824,7 +1251,8 @@ func (v *VendorCreditRequest) MarshalJSON() ([]byte, error) {
 		embed:           embed(*v),
 		TransactionDate: internal.NewOptionalDateTime(v.TransactionDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, v.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (v *VendorCreditRequest) String() string {
@@ -1460,11 +1888,21 @@ func (v *VendorCreditRequestVendor) Accept(visitor VendorCreditRequestVendorVisi
 	return fmt.Errorf("type %T does not include a non-empty union type", v)
 }
 
+var (
+	vendorCreditResponseFieldModel    = big.NewInt(1 << 0)
+	vendorCreditResponseFieldWarnings = big.NewInt(1 << 1)
+	vendorCreditResponseFieldErrors   = big.NewInt(1 << 2)
+	vendorCreditResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type VendorCreditResponse struct {
 	Model    *VendorCredit               `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1502,6 +1940,41 @@ func (v *VendorCreditResponse) GetExtraProperties() map[string]interface{} {
 	return v.extraProperties
 }
 
+func (v *VendorCreditResponse) require(field *big.Int) {
+	if v.explicitFields == nil {
+		v.explicitFields = big.NewInt(0)
+	}
+	v.explicitFields.Or(v.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditResponse) SetModel(model *VendorCredit) {
+	v.Model = model
+	v.require(vendorCreditResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	v.Warnings = warnings
+	v.require(vendorCreditResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditResponse) SetErrors(errors []*ErrorValidationProblem) {
+	v.Errors = errors
+	v.require(vendorCreditResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCreditResponse) SetLogs(logs []*DebugModeLog) {
+	v.Logs = logs
+	v.require(vendorCreditResponseFieldLogs)
+}
+
 func (v *VendorCreditResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler VendorCreditResponse
 	var value unmarshaler
@@ -1516,6 +1989,17 @@ func (v *VendorCreditResponse) UnmarshalJSON(data []byte) error {
 	v.extraProperties = extraProperties
 	v.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (v *VendorCreditResponse) MarshalJSON() ([]byte, error) {
+	type embed VendorCreditResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*v),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, v.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (v *VendorCreditResponse) String() string {

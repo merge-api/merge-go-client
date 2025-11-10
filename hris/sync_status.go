@@ -5,7 +5,13 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	syncStatusListRequestFieldCursor   = big.NewInt(1 << 0)
+	syncStatusListRequestFieldPageSize = big.NewInt(1 << 1)
 )
 
 type SyncStatusListRequest struct {
@@ -13,12 +19,45 @@ type SyncStatusListRequest struct {
 	Cursor *string `json:"-" url:"cursor,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (s *SyncStatusListRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SyncStatusListRequest) SetCursor(cursor *string) {
+	s.Cursor = cursor
+	s.require(syncStatusListRequestFieldCursor)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SyncStatusListRequest) SetPageSize(pageSize *int) {
+	s.PageSize = pageSize
+	s.require(syncStatusListRequestFieldPageSize)
+}
+
+var (
+	paginatedSyncStatusListFieldNext     = big.NewInt(1 << 0)
+	paginatedSyncStatusListFieldPrevious = big.NewInt(1 << 1)
+	paginatedSyncStatusListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedSyncStatusList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*SyncStatus `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -49,6 +88,34 @@ func (p *PaginatedSyncStatusList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedSyncStatusList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedSyncStatusList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedSyncStatusListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedSyncStatusList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedSyncStatusListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedSyncStatusList) SetResults(results []*SyncStatus) {
+	p.Results = results
+	p.require(paginatedSyncStatusListFieldResults)
+}
+
 func (p *PaginatedSyncStatusList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedSyncStatusList
 	var value unmarshaler
@@ -63,6 +130,17 @@ func (p *PaginatedSyncStatusList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedSyncStatusList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedSyncStatusList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedSyncStatusList) String() string {

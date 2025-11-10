@@ -5,7 +5,24 @@ package filestorage
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	endUserDetailsRequestFieldEndUserEmailAddress       = big.NewInt(1 << 0)
+	endUserDetailsRequestFieldEndUserOrganizationName   = big.NewInt(1 << 1)
+	endUserDetailsRequestFieldEndUserOriginId           = big.NewInt(1 << 2)
+	endUserDetailsRequestFieldCategories                = big.NewInt(1 << 3)
+	endUserDetailsRequestFieldIntegration               = big.NewInt(1 << 4)
+	endUserDetailsRequestFieldLinkExpiryMins            = big.NewInt(1 << 5)
+	endUserDetailsRequestFieldShouldCreateMagicLinkUrl  = big.NewInt(1 << 6)
+	endUserDetailsRequestFieldHideAdminMagicLink        = big.NewInt(1 << 7)
+	endUserDetailsRequestFieldCommonModels              = big.NewInt(1 << 8)
+	endUserDetailsRequestFieldCategoryCommonModelScopes = big.NewInt(1 << 9)
+	endUserDetailsRequestFieldLanguage                  = big.NewInt(1 << 10)
+	endUserDetailsRequestFieldAreSyncsDisabled          = big.NewInt(1 << 11)
+	endUserDetailsRequestFieldIntegrationSpecificConfig = big.NewInt(1 << 12)
 )
 
 type EndUserDetailsRequest struct {
@@ -38,6 +55,107 @@ type EndUserDetailsRequest struct {
 	AreSyncsDisabled *bool `json:"are_syncs_disabled,omitempty" url:"-"`
 	// A JSON object containing integration-specific configuration options.
 	IntegrationSpecificConfig map[string]interface{} `json:"integration_specific_config,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (e *EndUserDetailsRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetEndUserEmailAddress sets the EndUserEmailAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetEndUserEmailAddress(endUserEmailAddress string) {
+	e.EndUserEmailAddress = endUserEmailAddress
+	e.require(endUserDetailsRequestFieldEndUserEmailAddress)
+}
+
+// SetEndUserOrganizationName sets the EndUserOrganizationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetEndUserOrganizationName(endUserOrganizationName string) {
+	e.EndUserOrganizationName = endUserOrganizationName
+	e.require(endUserDetailsRequestFieldEndUserOrganizationName)
+}
+
+// SetEndUserOriginId sets the EndUserOriginId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetEndUserOriginId(endUserOriginId string) {
+	e.EndUserOriginId = endUserOriginId
+	e.require(endUserDetailsRequestFieldEndUserOriginId)
+}
+
+// SetCategories sets the Categories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetCategories(categories []CategoriesEnum) {
+	e.Categories = categories
+	e.require(endUserDetailsRequestFieldCategories)
+}
+
+// SetIntegration sets the Integration field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetIntegration(integration *string) {
+	e.Integration = integration
+	e.require(endUserDetailsRequestFieldIntegration)
+}
+
+// SetLinkExpiryMins sets the LinkExpiryMins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetLinkExpiryMins(linkExpiryMins *int) {
+	e.LinkExpiryMins = linkExpiryMins
+	e.require(endUserDetailsRequestFieldLinkExpiryMins)
+}
+
+// SetShouldCreateMagicLinkUrl sets the ShouldCreateMagicLinkUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetShouldCreateMagicLinkUrl(shouldCreateMagicLinkUrl *bool) {
+	e.ShouldCreateMagicLinkUrl = shouldCreateMagicLinkUrl
+	e.require(endUserDetailsRequestFieldShouldCreateMagicLinkUrl)
+}
+
+// SetHideAdminMagicLink sets the HideAdminMagicLink field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetHideAdminMagicLink(hideAdminMagicLink *bool) {
+	e.HideAdminMagicLink = hideAdminMagicLink
+	e.require(endUserDetailsRequestFieldHideAdminMagicLink)
+}
+
+// SetCommonModels sets the CommonModels field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetCommonModels(commonModels []*CommonModelScopesBodyRequest) {
+	e.CommonModels = commonModels
+	e.require(endUserDetailsRequestFieldCommonModels)
+}
+
+// SetCategoryCommonModelScopes sets the CategoryCommonModelScopes field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetCategoryCommonModelScopes(categoryCommonModelScopes map[string][]*IndividualCommonModelScopeDeserializerRequest) {
+	e.CategoryCommonModelScopes = categoryCommonModelScopes
+	e.require(endUserDetailsRequestFieldCategoryCommonModelScopes)
+}
+
+// SetLanguage sets the Language field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetLanguage(language *EndUserDetailsRequestLanguage) {
+	e.Language = language
+	e.require(endUserDetailsRequestFieldLanguage)
+}
+
+// SetAreSyncsDisabled sets the AreSyncsDisabled field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetAreSyncsDisabled(areSyncsDisabled *bool) {
+	e.AreSyncsDisabled = areSyncsDisabled
+	e.require(endUserDetailsRequestFieldAreSyncsDisabled)
+}
+
+// SetIntegrationSpecificConfig sets the IntegrationSpecificConfig field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetIntegrationSpecificConfig(integrationSpecificConfig map[string]interface{}) {
+	e.IntegrationSpecificConfig = integrationSpecificConfig
+	e.require(endUserDetailsRequestFieldIntegrationSpecificConfig)
 }
 
 // The following subset of IETF language tags can be used to configure localization.
@@ -106,10 +224,19 @@ func (e *EndUserDetailsRequestLanguage) Accept(visitor EndUserDetailsRequestLang
 	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
+var (
+	commonModelScopesBodyRequestFieldModelId        = big.NewInt(1 << 0)
+	commonModelScopesBodyRequestFieldEnabledActions = big.NewInt(1 << 1)
+	commonModelScopesBodyRequestFieldDisabledFields = big.NewInt(1 << 2)
+)
+
 type CommonModelScopesBodyRequest struct {
 	ModelId        string               `json:"model_id" url:"model_id"`
 	EnabledActions []EnabledActionsEnum `json:"enabled_actions" url:"enabled_actions"`
 	DisabledFields []string             `json:"disabled_fields" url:"disabled_fields"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -140,6 +267,34 @@ func (c *CommonModelScopesBodyRequest) GetExtraProperties() map[string]interface
 	return c.extraProperties
 }
 
+func (c *CommonModelScopesBodyRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetModelId sets the ModelId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommonModelScopesBodyRequest) SetModelId(modelId string) {
+	c.ModelId = modelId
+	c.require(commonModelScopesBodyRequestFieldModelId)
+}
+
+// SetEnabledActions sets the EnabledActions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommonModelScopesBodyRequest) SetEnabledActions(enabledActions []EnabledActionsEnum) {
+	c.EnabledActions = enabledActions
+	c.require(commonModelScopesBodyRequestFieldEnabledActions)
+}
+
+// SetDisabledFields sets the DisabledFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommonModelScopesBodyRequest) SetDisabledFields(disabledFields []string) {
+	c.DisabledFields = disabledFields
+	c.require(commonModelScopesBodyRequestFieldDisabledFields)
+}
+
 func (c *CommonModelScopesBodyRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler CommonModelScopesBodyRequest
 	var value unmarshaler
@@ -154,6 +309,17 @@ func (c *CommonModelScopesBodyRequest) UnmarshalJSON(data []byte) error {
 	c.extraProperties = extraProperties
 	c.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (c *CommonModelScopesBodyRequest) MarshalJSON() ([]byte, error) {
+	type embed CommonModelScopesBodyRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CommonModelScopesBodyRequest) String() string {
@@ -216,10 +382,19 @@ func (l LanguageEnum) Ptr() *LanguageEnum {
 	return &l
 }
 
+var (
+	linkTokenFieldLinkToken       = big.NewInt(1 << 0)
+	linkTokenFieldIntegrationName = big.NewInt(1 << 1)
+	linkTokenFieldMagicLinkUrl    = big.NewInt(1 << 2)
+)
+
 type LinkToken struct {
 	LinkToken       string  `json:"link_token" url:"link_token"`
 	IntegrationName *string `json:"integration_name,omitempty" url:"integration_name,omitempty"`
 	MagicLinkUrl    *string `json:"magic_link_url,omitempty" url:"magic_link_url,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -250,6 +425,34 @@ func (l *LinkToken) GetExtraProperties() map[string]interface{} {
 	return l.extraProperties
 }
 
+func (l *LinkToken) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetLinkToken sets the LinkToken field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkToken) SetLinkToken(linkToken string) {
+	l.LinkToken = linkToken
+	l.require(linkTokenFieldLinkToken)
+}
+
+// SetIntegrationName sets the IntegrationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkToken) SetIntegrationName(integrationName *string) {
+	l.IntegrationName = integrationName
+	l.require(linkTokenFieldIntegrationName)
+}
+
+// SetMagicLinkUrl sets the MagicLinkUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkToken) SetMagicLinkUrl(magicLinkUrl *string) {
+	l.MagicLinkUrl = magicLinkUrl
+	l.require(linkTokenFieldMagicLinkUrl)
+}
+
 func (l *LinkToken) UnmarshalJSON(data []byte) error {
 	type unmarshaler LinkToken
 	var value unmarshaler
@@ -264,6 +467,17 @@ func (l *LinkToken) UnmarshalJSON(data []byte) error {
 	l.extraProperties = extraProperties
 	l.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (l *LinkToken) MarshalJSON() ([]byte, error) {
+	type embed LinkToken
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*l),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, l.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (l *LinkToken) String() string {

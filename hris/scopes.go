@@ -5,17 +5,46 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	linkedAccountCommonModelScopeDeserializerRequestFieldCommonModels = big.NewInt(1 << 0)
 )
 
 type LinkedAccountCommonModelScopeDeserializerRequest struct {
 	// The common models you want to update the scopes for
 	CommonModels []*IndividualCommonModelScopeDeserializerRequest `json:"common_models,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (l *LinkedAccountCommonModelScopeDeserializerRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetCommonModels sets the CommonModels field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountCommonModelScopeDeserializerRequest) SetCommonModels(commonModels []*IndividualCommonModelScopeDeserializerRequest) {
+	l.CommonModels = commonModels
+	l.require(linkedAccountCommonModelScopeDeserializerRequestFieldCommonModels)
+}
+
+var (
+	commonModelScopeApiFieldCommonModels = big.NewInt(1 << 0)
+)
 
 type CommonModelScopeApi struct {
 	// The common models you want to update the scopes for
 	CommonModels []*IndividualCommonModelScopeDeserializer `json:"common_models" url:"common_models"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -30,6 +59,20 @@ func (c *CommonModelScopeApi) GetCommonModels() []*IndividualCommonModelScopeDes
 
 func (c *CommonModelScopeApi) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
+}
+
+func (c *CommonModelScopeApi) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCommonModels sets the CommonModels field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommonModelScopeApi) SetCommonModels(commonModels []*IndividualCommonModelScopeDeserializer) {
+	c.CommonModels = commonModels
+	c.require(commonModelScopeApiFieldCommonModels)
 }
 
 func (c *CommonModelScopeApi) UnmarshalJSON(data []byte) error {
@@ -48,6 +91,17 @@ func (c *CommonModelScopeApi) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (c *CommonModelScopeApi) MarshalJSON() ([]byte, error) {
+	type embed CommonModelScopeApi
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (c *CommonModelScopeApi) String() string {
 	if len(c.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
@@ -60,9 +114,17 @@ func (c *CommonModelScopeApi) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+var (
+	fieldPermissionDeserializerFieldEnabledFields  = big.NewInt(1 << 0)
+	fieldPermissionDeserializerFieldDisabledFields = big.NewInt(1 << 1)
+)
+
 type FieldPermissionDeserializer struct {
 	EnabledFields  []interface{} `json:"enabled_fields,omitempty" url:"enabled_fields,omitempty"`
 	DisabledFields []interface{} `json:"disabled_fields,omitempty" url:"disabled_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -86,6 +148,27 @@ func (f *FieldPermissionDeserializer) GetExtraProperties() map[string]interface{
 	return f.extraProperties
 }
 
+func (f *FieldPermissionDeserializer) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetEnabledFields sets the EnabledFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldPermissionDeserializer) SetEnabledFields(enabledFields []interface{}) {
+	f.EnabledFields = enabledFields
+	f.require(fieldPermissionDeserializerFieldEnabledFields)
+}
+
+// SetDisabledFields sets the DisabledFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldPermissionDeserializer) SetDisabledFields(disabledFields []interface{}) {
+	f.DisabledFields = disabledFields
+	f.require(fieldPermissionDeserializerFieldDisabledFields)
+}
+
 func (f *FieldPermissionDeserializer) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldPermissionDeserializer
 	var value unmarshaler
@@ -102,6 +185,17 @@ func (f *FieldPermissionDeserializer) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FieldPermissionDeserializer) MarshalJSON() ([]byte, error) {
+	type embed FieldPermissionDeserializer
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldPermissionDeserializer) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -114,10 +208,19 @@ func (f *FieldPermissionDeserializer) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	individualCommonModelScopeDeserializerFieldModelName        = big.NewInt(1 << 0)
+	individualCommonModelScopeDeserializerFieldModelPermissions = big.NewInt(1 << 1)
+	individualCommonModelScopeDeserializerFieldFieldPermissions = big.NewInt(1 << 2)
+)
+
 type IndividualCommonModelScopeDeserializer struct {
 	ModelName        string                                  `json:"model_name" url:"model_name"`
 	ModelPermissions map[string]*ModelPermissionDeserializer `json:"model_permissions,omitempty" url:"model_permissions,omitempty"`
 	FieldPermissions *FieldPermissionDeserializer            `json:"field_permissions,omitempty" url:"field_permissions,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -148,6 +251,34 @@ func (i *IndividualCommonModelScopeDeserializer) GetExtraProperties() map[string
 	return i.extraProperties
 }
 
+func (i *IndividualCommonModelScopeDeserializer) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetModelName sets the ModelName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IndividualCommonModelScopeDeserializer) SetModelName(modelName string) {
+	i.ModelName = modelName
+	i.require(individualCommonModelScopeDeserializerFieldModelName)
+}
+
+// SetModelPermissions sets the ModelPermissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IndividualCommonModelScopeDeserializer) SetModelPermissions(modelPermissions map[string]*ModelPermissionDeserializer) {
+	i.ModelPermissions = modelPermissions
+	i.require(individualCommonModelScopeDeserializerFieldModelPermissions)
+}
+
+// SetFieldPermissions sets the FieldPermissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IndividualCommonModelScopeDeserializer) SetFieldPermissions(fieldPermissions *FieldPermissionDeserializer) {
+	i.FieldPermissions = fieldPermissions
+	i.require(individualCommonModelScopeDeserializerFieldFieldPermissions)
+}
+
 func (i *IndividualCommonModelScopeDeserializer) UnmarshalJSON(data []byte) error {
 	type unmarshaler IndividualCommonModelScopeDeserializer
 	var value unmarshaler
@@ -164,6 +295,17 @@ func (i *IndividualCommonModelScopeDeserializer) UnmarshalJSON(data []byte) erro
 	return nil
 }
 
+func (i *IndividualCommonModelScopeDeserializer) MarshalJSON() ([]byte, error) {
+	type embed IndividualCommonModelScopeDeserializer
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*i),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (i *IndividualCommonModelScopeDeserializer) String() string {
 	if len(i.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
@@ -176,8 +318,15 @@ func (i *IndividualCommonModelScopeDeserializer) String() string {
 	return fmt.Sprintf("%#v", i)
 }
 
+var (
+	modelPermissionDeserializerFieldIsEnabled = big.NewInt(1 << 0)
+)
+
 type ModelPermissionDeserializer struct {
 	IsEnabled *bool `json:"is_enabled,omitempty" url:"is_enabled,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -194,6 +343,20 @@ func (m *ModelPermissionDeserializer) GetExtraProperties() map[string]interface{
 	return m.extraProperties
 }
 
+func (m *ModelPermissionDeserializer) require(field *big.Int) {
+	if m.explicitFields == nil {
+		m.explicitFields = big.NewInt(0)
+	}
+	m.explicitFields.Or(m.explicitFields, field)
+}
+
+// SetIsEnabled sets the IsEnabled field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (m *ModelPermissionDeserializer) SetIsEnabled(isEnabled *bool) {
+	m.IsEnabled = isEnabled
+	m.require(modelPermissionDeserializerFieldIsEnabled)
+}
+
 func (m *ModelPermissionDeserializer) UnmarshalJSON(data []byte) error {
 	type unmarshaler ModelPermissionDeserializer
 	var value unmarshaler
@@ -208,6 +371,17 @@ func (m *ModelPermissionDeserializer) UnmarshalJSON(data []byte) error {
 	m.extraProperties = extraProperties
 	m.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (m *ModelPermissionDeserializer) MarshalJSON() ([]byte, error) {
+	type embed ModelPermissionDeserializer
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*m),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, m.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (m *ModelPermissionDeserializer) String() string {

@@ -5,8 +5,29 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	bankInfoListRequestFieldAccountType        = big.NewInt(1 << 0)
+	bankInfoListRequestFieldBankName           = big.NewInt(1 << 1)
+	bankInfoListRequestFieldCreatedAfter       = big.NewInt(1 << 2)
+	bankInfoListRequestFieldCreatedBefore      = big.NewInt(1 << 3)
+	bankInfoListRequestFieldCursor             = big.NewInt(1 << 4)
+	bankInfoListRequestFieldEmployeeId         = big.NewInt(1 << 5)
+	bankInfoListRequestFieldExpand             = big.NewInt(1 << 6)
+	bankInfoListRequestFieldIncludeDeletedData = big.NewInt(1 << 7)
+	bankInfoListRequestFieldIncludeRemoteData  = big.NewInt(1 << 8)
+	bankInfoListRequestFieldIncludeShellData   = big.NewInt(1 << 9)
+	bankInfoListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
+	bankInfoListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
+	bankInfoListRequestFieldOrderBy            = big.NewInt(1 << 12)
+	bankInfoListRequestFieldPageSize           = big.NewInt(1 << 13)
+	bankInfoListRequestFieldRemoteFields       = big.NewInt(1 << 14)
+	bankInfoListRequestFieldRemoteId           = big.NewInt(1 << 15)
+	bankInfoListRequestFieldShowEnumOrigins    = big.NewInt(1 << 16)
 )
 
 type BankInfoListRequest struct {
@@ -47,7 +68,144 @@ type BankInfoListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (b *BankInfoListRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetAccountType sets the AccountType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetAccountType(accountType *BankInfoListRequestAccountType) {
+	b.AccountType = accountType
+	b.require(bankInfoListRequestFieldAccountType)
+}
+
+// SetBankName sets the BankName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetBankName(bankName *string) {
+	b.BankName = bankName
+	b.require(bankInfoListRequestFieldBankName)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	b.CreatedAfter = createdAfter
+	b.require(bankInfoListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	b.CreatedBefore = createdBefore
+	b.require(bankInfoListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetCursor(cursor *string) {
+	b.Cursor = cursor
+	b.require(bankInfoListRequestFieldCursor)
+}
+
+// SetEmployeeId sets the EmployeeId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetEmployeeId(employeeId *string) {
+	b.EmployeeId = employeeId
+	b.require(bankInfoListRequestFieldEmployeeId)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetExpand(expand []*string) {
+	b.Expand = expand
+	b.require(bankInfoListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	b.IncludeDeletedData = includeDeletedData
+	b.require(bankInfoListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(bankInfoListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(bankInfoListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	b.ModifiedAfter = modifiedAfter
+	b.require(bankInfoListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	b.ModifiedBefore = modifiedBefore
+	b.require(bankInfoListRequestFieldModifiedBefore)
+}
+
+// SetOrderBy sets the OrderBy field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetOrderBy(orderBy *BankInfoListRequestOrderBy) {
+	b.OrderBy = orderBy
+	b.require(bankInfoListRequestFieldOrderBy)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetPageSize(pageSize *int) {
+	b.PageSize = pageSize
+	b.require(bankInfoListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetRemoteFields(remoteFields *string) {
+	b.RemoteFields = remoteFields
+	b.require(bankInfoListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetRemoteId(remoteId *string) {
+	b.RemoteId = remoteId
+	b.require(bankInfoListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	b.ShowEnumOrigins = showEnumOrigins
+	b.require(bankInfoListRequestFieldShowEnumOrigins)
+}
+
+var (
+	bankInfoRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	bankInfoRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	bankInfoRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	bankInfoRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	bankInfoRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type BankInfoRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -60,6 +218,51 @@ type BankInfoRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (b *BankInfoRetrieveRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoRetrieveRequest) SetExpand(expand []*string) {
+	b.Expand = expand
+	b.require(bankInfoRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(bankInfoRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(bankInfoRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	b.RemoteFields = remoteFields
+	b.require(bankInfoRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfoRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	b.ShowEnumOrigins = showEnumOrigins
+	b.require(bankInfoRetrieveRequestFieldShowEnumOrigins)
 }
 
 type BankInfoListRequestAccountType string
@@ -136,6 +339,22 @@ func (a AccountTypeEnum) Ptr() *AccountTypeEnum {
 //
 // ### Usage Example
 // Fetch from the `LIST BankInfo` endpoint and filter by `ID` to show all bank information.
+var (
+	bankInfoFieldId               = big.NewInt(1 << 0)
+	bankInfoFieldRemoteId         = big.NewInt(1 << 1)
+	bankInfoFieldCreatedAt        = big.NewInt(1 << 2)
+	bankInfoFieldModifiedAt       = big.NewInt(1 << 3)
+	bankInfoFieldEmployee         = big.NewInt(1 << 4)
+	bankInfoFieldAccountNumber    = big.NewInt(1 << 5)
+	bankInfoFieldRoutingNumber    = big.NewInt(1 << 6)
+	bankInfoFieldBankName         = big.NewInt(1 << 7)
+	bankInfoFieldAccountType      = big.NewInt(1 << 8)
+	bankInfoFieldRemoteCreatedAt  = big.NewInt(1 << 9)
+	bankInfoFieldRemoteWasDeleted = big.NewInt(1 << 10)
+	bankInfoFieldFieldMappings    = big.NewInt(1 << 11)
+	bankInfoFieldRemoteData       = big.NewInt(1 << 12)
+)
+
 type BankInfo struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -163,6 +382,9 @@ type BankInfo struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -263,6 +485,104 @@ func (b *BankInfo) GetExtraProperties() map[string]interface{} {
 	return b.extraProperties
 }
 
+func (b *BankInfo) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetId(id *string) {
+	b.Id = id
+	b.require(bankInfoFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetRemoteId(remoteId *string) {
+	b.RemoteId = remoteId
+	b.require(bankInfoFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetCreatedAt(createdAt *time.Time) {
+	b.CreatedAt = createdAt
+	b.require(bankInfoFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetModifiedAt(modifiedAt *time.Time) {
+	b.ModifiedAt = modifiedAt
+	b.require(bankInfoFieldModifiedAt)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetEmployee(employee *BankInfoEmployee) {
+	b.Employee = employee
+	b.require(bankInfoFieldEmployee)
+}
+
+// SetAccountNumber sets the AccountNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetAccountNumber(accountNumber *string) {
+	b.AccountNumber = accountNumber
+	b.require(bankInfoFieldAccountNumber)
+}
+
+// SetRoutingNumber sets the RoutingNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetRoutingNumber(routingNumber *string) {
+	b.RoutingNumber = routingNumber
+	b.require(bankInfoFieldRoutingNumber)
+}
+
+// SetBankName sets the BankName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetBankName(bankName *string) {
+	b.BankName = bankName
+	b.require(bankInfoFieldBankName)
+}
+
+// SetAccountType sets the AccountType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetAccountType(accountType *BankInfoAccountType) {
+	b.AccountType = accountType
+	b.require(bankInfoFieldAccountType)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	b.RemoteCreatedAt = remoteCreatedAt
+	b.require(bankInfoFieldRemoteCreatedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	b.RemoteWasDeleted = remoteWasDeleted
+	b.require(bankInfoFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetFieldMappings(fieldMappings map[string]interface{}) {
+	b.FieldMappings = fieldMappings
+	b.require(bankInfoFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankInfo) SetRemoteData(remoteData []*RemoteData) {
+	b.RemoteData = remoteData
+	b.require(bankInfoFieldRemoteData)
+}
+
 func (b *BankInfo) UnmarshalJSON(data []byte) error {
 	type embed BankInfo
 	var unmarshaler = struct {
@@ -302,7 +622,8 @@ func (b *BankInfo) MarshalJSON() ([]byte, error) {
 		ModifiedAt:      internal.NewOptionalDateTime(b.ModifiedAt),
 		RemoteCreatedAt: internal.NewOptionalDateTime(b.RemoteCreatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (b *BankInfo) String() string {
@@ -446,10 +767,19 @@ func (b *BankInfoEmployee) Accept(visitor BankInfoEmployeeVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", b)
 }
 
+var (
+	paginatedBankInfoListFieldNext     = big.NewInt(1 << 0)
+	paginatedBankInfoListFieldPrevious = big.NewInt(1 << 1)
+	paginatedBankInfoListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedBankInfoList struct {
 	Next     *string     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*BankInfo `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -480,6 +810,34 @@ func (p *PaginatedBankInfoList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedBankInfoList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankInfoList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedBankInfoListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankInfoList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedBankInfoListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankInfoList) SetResults(results []*BankInfo) {
+	p.Results = results
+	p.require(paginatedBankInfoListFieldResults)
+}
+
 func (p *PaginatedBankInfoList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedBankInfoList
 	var value unmarshaler
@@ -494,6 +852,17 @@ func (p *PaginatedBankInfoList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedBankInfoList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedBankInfoList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedBankInfoList) String() string {

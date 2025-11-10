@@ -5,7 +5,8 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 )
 
 type AsyncPassthroughRetrieveResponse struct {
@@ -70,8 +71,15 @@ func (a *AsyncPassthroughRetrieveResponse) Accept(visitor AsyncPassthroughRetrie
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
 
+var (
+	asyncPassthroughRecieptFieldAsyncPassthroughReceiptId = big.NewInt(1 << 0)
+)
+
 type AsyncPassthroughReciept struct {
 	AsyncPassthroughReceiptId string `json:"async_passthrough_receipt_id" url:"async_passthrough_receipt_id"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -88,6 +96,20 @@ func (a *AsyncPassthroughReciept) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AsyncPassthroughReciept) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetAsyncPassthroughReceiptId sets the AsyncPassthroughReceiptId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AsyncPassthroughReciept) SetAsyncPassthroughReceiptId(asyncPassthroughReceiptId string) {
+	a.AsyncPassthroughReceiptId = asyncPassthroughReceiptId
+	a.require(asyncPassthroughRecieptFieldAsyncPassthroughReceiptId)
+}
+
 func (a *AsyncPassthroughReciept) UnmarshalJSON(data []byte) error {
 	type unmarshaler AsyncPassthroughReciept
 	var value unmarshaler
@@ -102,6 +124,17 @@ func (a *AsyncPassthroughReciept) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AsyncPassthroughReciept) MarshalJSON() ([]byte, error) {
+	type embed AsyncPassthroughReciept
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AsyncPassthroughReciept) String() string {

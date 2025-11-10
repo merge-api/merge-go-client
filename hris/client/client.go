@@ -3,50 +3,44 @@
 package client
 
 import (
-	core "github.com/merge-api/merge-go-client/v2/core"
-	accountdetails "github.com/merge-api/merge-go-client/v2/hris/accountdetails"
-	accounttoken "github.com/merge-api/merge-go-client/v2/hris/accounttoken"
-	asyncpassthrough "github.com/merge-api/merge-go-client/v2/hris/asyncpassthrough"
-	audittrail "github.com/merge-api/merge-go-client/v2/hris/audittrail"
-	availableactions "github.com/merge-api/merge-go-client/v2/hris/availableactions"
-	bankinfo "github.com/merge-api/merge-go-client/v2/hris/bankinfo"
-	benefits "github.com/merge-api/merge-go-client/v2/hris/benefits"
-	companies "github.com/merge-api/merge-go-client/v2/hris/companies"
-	deleteaccount "github.com/merge-api/merge-go-client/v2/hris/deleteaccount"
-	dependents "github.com/merge-api/merge-go-client/v2/hris/dependents"
-	employeepayrollruns "github.com/merge-api/merge-go-client/v2/hris/employeepayrollruns"
-	employees "github.com/merge-api/merge-go-client/v2/hris/employees"
-	employerbenefits "github.com/merge-api/merge-go-client/v2/hris/employerbenefits"
-	employments "github.com/merge-api/merge-go-client/v2/hris/employments"
-	fieldmapping "github.com/merge-api/merge-go-client/v2/hris/fieldmapping"
-	forceresync "github.com/merge-api/merge-go-client/v2/hris/forceresync"
-	generatekey "github.com/merge-api/merge-go-client/v2/hris/generatekey"
-	groups "github.com/merge-api/merge-go-client/v2/hris/groups"
-	issues "github.com/merge-api/merge-go-client/v2/hris/issues"
-	linkedaccounts "github.com/merge-api/merge-go-client/v2/hris/linkedaccounts"
-	linktoken "github.com/merge-api/merge-go-client/v2/hris/linktoken"
-	locations "github.com/merge-api/merge-go-client/v2/hris/locations"
-	passthrough "github.com/merge-api/merge-go-client/v2/hris/passthrough"
-	paygroups "github.com/merge-api/merge-go-client/v2/hris/paygroups"
-	payrollruns "github.com/merge-api/merge-go-client/v2/hris/payrollruns"
-	regeneratekey "github.com/merge-api/merge-go-client/v2/hris/regeneratekey"
-	scopes "github.com/merge-api/merge-go-client/v2/hris/scopes"
-	syncstatus "github.com/merge-api/merge-go-client/v2/hris/syncstatus"
-	teams "github.com/merge-api/merge-go-client/v2/hris/teams"
-	timeoff "github.com/merge-api/merge-go-client/v2/hris/timeoff"
-	timeoffbalances "github.com/merge-api/merge-go-client/v2/hris/timeoffbalances"
-	timesheetentries "github.com/merge-api/merge-go-client/v2/hris/timesheetentries"
-	webhookreceivers "github.com/merge-api/merge-go-client/v2/hris/webhookreceivers"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
+	core "github.com/merge-api/merge-go-client/core"
+	accountdetails "github.com/merge-api/merge-go-client/hris/accountdetails"
+	accounttoken "github.com/merge-api/merge-go-client/hris/accounttoken"
+	asyncpassthrough "github.com/merge-api/merge-go-client/hris/asyncpassthrough"
+	audittrail "github.com/merge-api/merge-go-client/hris/audittrail"
+	availableactions "github.com/merge-api/merge-go-client/hris/availableactions"
+	bankinfo "github.com/merge-api/merge-go-client/hris/bankinfo"
+	benefits "github.com/merge-api/merge-go-client/hris/benefits"
+	companies "github.com/merge-api/merge-go-client/hris/companies"
+	deleteaccount "github.com/merge-api/merge-go-client/hris/deleteaccount"
+	dependents "github.com/merge-api/merge-go-client/hris/dependents"
+	employeepayrollruns "github.com/merge-api/merge-go-client/hris/employeepayrollruns"
+	employees "github.com/merge-api/merge-go-client/hris/employees"
+	employerbenefits "github.com/merge-api/merge-go-client/hris/employerbenefits"
+	employments "github.com/merge-api/merge-go-client/hris/employments"
+	fieldmapping "github.com/merge-api/merge-go-client/hris/fieldmapping"
+	forceresync "github.com/merge-api/merge-go-client/hris/forceresync"
+	generatekey "github.com/merge-api/merge-go-client/hris/generatekey"
+	groups "github.com/merge-api/merge-go-client/hris/groups"
+	issues "github.com/merge-api/merge-go-client/hris/issues"
+	linkedaccounts "github.com/merge-api/merge-go-client/hris/linkedaccounts"
+	linktoken "github.com/merge-api/merge-go-client/hris/linktoken"
+	locations "github.com/merge-api/merge-go-client/hris/locations"
+	passthrough "github.com/merge-api/merge-go-client/hris/passthrough"
+	paygroups "github.com/merge-api/merge-go-client/hris/paygroups"
+	payrollruns "github.com/merge-api/merge-go-client/hris/payrollruns"
+	regeneratekey "github.com/merge-api/merge-go-client/hris/regeneratekey"
+	scopes "github.com/merge-api/merge-go-client/hris/scopes"
+	syncstatus "github.com/merge-api/merge-go-client/hris/syncstatus"
+	teams "github.com/merge-api/merge-go-client/hris/teams"
+	timeoff "github.com/merge-api/merge-go-client/hris/timeoff"
+	timeoffbalances "github.com/merge-api/merge-go-client/hris/timeoffbalances"
+	timesheetentries "github.com/merge-api/merge-go-client/hris/timesheetentries"
+	webhookreceivers "github.com/merge-api/merge-go-client/hris/webhookreceivers"
+	internal "github.com/merge-api/merge-go-client/internal"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails      *accountdetails.Client
 	AccountToken        *accounttoken.Client
 	AsyncPassthrough    *asyncpassthrough.Client
@@ -80,51 +74,54 @@ type Client struct {
 	TimeOffBalances     *timeoffbalances.Client
 	TimesheetEntries    *timesheetentries.Client
 	WebhookReceivers    *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:      accountdetails.NewClient(options),
+		AccountToken:        accounttoken.NewClient(options),
+		AsyncPassthrough:    asyncpassthrough.NewClient(options),
+		AuditTrail:          audittrail.NewClient(options),
+		AvailableActions:    availableactions.NewClient(options),
+		BankInfo:            bankinfo.NewClient(options),
+		Benefits:            benefits.NewClient(options),
+		Companies:           companies.NewClient(options),
+		Scopes:              scopes.NewClient(options),
+		DeleteAccount:       deleteaccount.NewClient(options),
+		Dependents:          dependents.NewClient(options),
+		EmployeePayrollRuns: employeepayrollruns.NewClient(options),
+		Employees:           employees.NewClient(options),
+		EmployerBenefits:    employerbenefits.NewClient(options),
+		Employments:         employments.NewClient(options),
+		FieldMapping:        fieldmapping.NewClient(options),
+		GenerateKey:         generatekey.NewClient(options),
+		Groups:              groups.NewClient(options),
+		Issues:              issues.NewClient(options),
+		LinkToken:           linktoken.NewClient(options),
+		LinkedAccounts:      linkedaccounts.NewClient(options),
+		Locations:           locations.NewClient(options),
+		Passthrough:         passthrough.NewClient(options),
+		PayGroups:           paygroups.NewClient(options),
+		PayrollRuns:         payrollruns.NewClient(options),
+		RegenerateKey:       regeneratekey.NewClient(options),
+		SyncStatus:          syncstatus.NewClient(options),
+		ForceResync:         forceresync.NewClient(options),
+		Teams:               teams.NewClient(options),
+		TimeOff:             timeoff.NewClient(options),
+		TimeOffBalances:     timeoffbalances.NewClient(options),
+		TimesheetEntries:    timesheetentries.NewClient(options),
+		WebhookReceivers:    webhookreceivers.NewClient(options),
+		options:             options,
+		baseURL:             options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:              options.ToHeader(),
-		AccountDetails:      accountdetails.NewClient(opts...),
-		AccountToken:        accounttoken.NewClient(opts...),
-		AsyncPassthrough:    asyncpassthrough.NewClient(opts...),
-		AuditTrail:          audittrail.NewClient(opts...),
-		AvailableActions:    availableactions.NewClient(opts...),
-		BankInfo:            bankinfo.NewClient(opts...),
-		Benefits:            benefits.NewClient(opts...),
-		Companies:           companies.NewClient(opts...),
-		Scopes:              scopes.NewClient(opts...),
-		DeleteAccount:       deleteaccount.NewClient(opts...),
-		Dependents:          dependents.NewClient(opts...),
-		EmployeePayrollRuns: employeepayrollruns.NewClient(opts...),
-		Employees:           employees.NewClient(opts...),
-		EmployerBenefits:    employerbenefits.NewClient(opts...),
-		Employments:         employments.NewClient(opts...),
-		FieldMapping:        fieldmapping.NewClient(opts...),
-		GenerateKey:         generatekey.NewClient(opts...),
-		Groups:              groups.NewClient(opts...),
-		Issues:              issues.NewClient(opts...),
-		LinkToken:           linktoken.NewClient(opts...),
-		LinkedAccounts:      linkedaccounts.NewClient(opts...),
-		Locations:           locations.NewClient(opts...),
-		Passthrough:         passthrough.NewClient(opts...),
-		PayGroups:           paygroups.NewClient(opts...),
-		PayrollRuns:         payrollruns.NewClient(opts...),
-		RegenerateKey:       regeneratekey.NewClient(opts...),
-		SyncStatus:          syncstatus.NewClient(opts...),
-		ForceResync:         forceresync.NewClient(opts...),
-		Teams:               teams.NewClient(opts...),
-		TimeOff:             timeoff.NewClient(opts...),
-		TimeOffBalances:     timeoffbalances.NewClient(opts...),
-		TimesheetEntries:    timesheetentries.NewClient(opts...),
-		WebhookReceivers:    webhookreceivers.NewClient(opts...),
 	}
 }

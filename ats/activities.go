@@ -5,8 +5,16 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	activityEndpointRequestFieldIsDebugMode  = big.NewInt(1 << 0)
+	activityEndpointRequestFieldRunAsync     = big.NewInt(1 << 1)
+	activityEndpointRequestFieldModel        = big.NewInt(1 << 2)
+	activityEndpointRequestFieldRemoteUserId = big.NewInt(1 << 3)
 )
 
 type ActivityEndpointRequest struct {
@@ -16,7 +24,62 @@ type ActivityEndpointRequest struct {
 	RunAsync     *bool            `json:"-" url:"run_async,omitempty"`
 	Model        *ActivityRequest `json:"model,omitempty" url:"-"`
 	RemoteUserId string           `json:"remote_user_id" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *ActivityEndpointRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	a.IsDebugMode = isDebugMode
+	a.require(activityEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityEndpointRequest) SetRunAsync(runAsync *bool) {
+	a.RunAsync = runAsync
+	a.require(activityEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityEndpointRequest) SetModel(model *ActivityRequest) {
+	a.Model = model
+	a.require(activityEndpointRequestFieldModel)
+}
+
+// SetRemoteUserId sets the RemoteUserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityEndpointRequest) SetRemoteUserId(remoteUserId string) {
+	a.RemoteUserId = remoteUserId
+	a.require(activityEndpointRequestFieldRemoteUserId)
+}
+
+var (
+	activitiesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	activitiesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	activitiesListRequestFieldCursor             = big.NewInt(1 << 2)
+	activitiesListRequestFieldExpand             = big.NewInt(1 << 3)
+	activitiesListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	activitiesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	activitiesListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	activitiesListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	activitiesListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	activitiesListRequestFieldPageSize           = big.NewInt(1 << 9)
+	activitiesListRequestFieldRemoteFields       = big.NewInt(1 << 10)
+	activitiesListRequestFieldRemoteId           = big.NewInt(1 << 11)
+	activitiesListRequestFieldShowEnumOrigins    = big.NewInt(1 << 12)
+	activitiesListRequestFieldUserId             = big.NewInt(1 << 13)
+)
 
 type ActivitiesListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -47,7 +110,123 @@ type ActivitiesListRequest struct {
 	ShowEnumOrigins *ActivitiesListRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
 	// If provided, will only return activities done by this user.
 	UserId *string `json:"-" url:"user_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *ActivitiesListRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	a.CreatedAfter = createdAfter
+	a.require(activitiesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	a.CreatedBefore = createdBefore
+	a.require(activitiesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetCursor(cursor *string) {
+	a.Cursor = cursor
+	a.require(activitiesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetExpand(expand []*string) {
+	a.Expand = expand
+	a.require(activitiesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	a.IncludeDeletedData = includeDeletedData
+	a.require(activitiesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(activitiesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(activitiesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	a.ModifiedAfter = modifiedAfter
+	a.require(activitiesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	a.ModifiedBefore = modifiedBefore
+	a.require(activitiesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetPageSize(pageSize *int) {
+	a.PageSize = pageSize
+	a.require(activitiesListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetRemoteFields(remoteFields *ActivitiesListRequestRemoteFields) {
+	a.RemoteFields = remoteFields
+	a.require(activitiesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetRemoteId(remoteId *string) {
+	a.RemoteId = remoteId
+	a.require(activitiesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetShowEnumOrigins(showEnumOrigins *ActivitiesListRequestShowEnumOrigins) {
+	a.ShowEnumOrigins = showEnumOrigins
+	a.require(activitiesListRequestFieldShowEnumOrigins)
+}
+
+// SetUserId sets the UserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesListRequest) SetUserId(userId *string) {
+	a.UserId = userId
+	a.require(activitiesListRequestFieldUserId)
+}
+
+var (
+	activitiesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	activitiesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	activitiesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	activitiesRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	activitiesRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type ActivitiesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -60,6 +239,51 @@ type ActivitiesRetrieveRequest struct {
 	RemoteFields *ActivitiesRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *ActivitiesRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (a *ActivitiesRetrieveRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesRetrieveRequest) SetExpand(expand []*string) {
+	a.Expand = expand
+	a.require(activitiesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(activitiesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(activitiesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesRetrieveRequest) SetRemoteFields(remoteFields *ActivitiesRetrieveRequestRemoteFields) {
+	a.RemoteFields = remoteFields
+	a.require(activitiesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivitiesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *ActivitiesRetrieveRequestShowEnumOrigins) {
+	a.ShowEnumOrigins = showEnumOrigins
+	a.require(activitiesRetrieveRequestFieldShowEnumOrigins)
 }
 
 type ActivitiesListRequestRemoteFields string
@@ -167,6 +391,23 @@ func (a ActivitiesRetrieveRequestShowEnumOrigins) Ptr() *ActivitiesRetrieveReque
 // The `Activity` object is used to represent an activity for a candidate performed by a user.
 // ### Usage Example
 // Fetch from the `LIST Activities` endpoint and filter by `ID` to show all activities.
+var (
+	activityFieldId               = big.NewInt(1 << 0)
+	activityFieldRemoteId         = big.NewInt(1 << 1)
+	activityFieldCreatedAt        = big.NewInt(1 << 2)
+	activityFieldModifiedAt       = big.NewInt(1 << 3)
+	activityFieldUser             = big.NewInt(1 << 4)
+	activityFieldRemoteCreatedAt  = big.NewInt(1 << 5)
+	activityFieldActivityType     = big.NewInt(1 << 6)
+	activityFieldSubject          = big.NewInt(1 << 7)
+	activityFieldBody             = big.NewInt(1 << 8)
+	activityFieldVisibility       = big.NewInt(1 << 9)
+	activityFieldCandidate        = big.NewInt(1 << 10)
+	activityFieldRemoteWasDeleted = big.NewInt(1 << 11)
+	activityFieldFieldMappings    = big.NewInt(1 << 12)
+	activityFieldRemoteData       = big.NewInt(1 << 13)
+)
+
 type Activity struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -200,6 +441,9 @@ type Activity struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -307,6 +551,111 @@ func (a *Activity) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *Activity) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetId(id *string) {
+	a.Id = id
+	a.require(activityFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetRemoteId(remoteId *string) {
+	a.RemoteId = remoteId
+	a.require(activityFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetCreatedAt(createdAt *time.Time) {
+	a.CreatedAt = createdAt
+	a.require(activityFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetModifiedAt(modifiedAt *time.Time) {
+	a.ModifiedAt = modifiedAt
+	a.require(activityFieldModifiedAt)
+}
+
+// SetUser sets the User field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetUser(user *ActivityUser) {
+	a.User = user
+	a.require(activityFieldUser)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	a.RemoteCreatedAt = remoteCreatedAt
+	a.require(activityFieldRemoteCreatedAt)
+}
+
+// SetActivityType sets the ActivityType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetActivityType(activityType *ActivityActivityType) {
+	a.ActivityType = activityType
+	a.require(activityFieldActivityType)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetSubject(subject *string) {
+	a.Subject = subject
+	a.require(activityFieldSubject)
+}
+
+// SetBody sets the Body field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetBody(body *string) {
+	a.Body = body
+	a.require(activityFieldBody)
+}
+
+// SetVisibility sets the Visibility field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetVisibility(visibility *ActivityVisibility) {
+	a.Visibility = visibility
+	a.require(activityFieldVisibility)
+}
+
+// SetCandidate sets the Candidate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetCandidate(candidate *string) {
+	a.Candidate = candidate
+	a.require(activityFieldCandidate)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	a.RemoteWasDeleted = remoteWasDeleted
+	a.require(activityFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetFieldMappings(fieldMappings map[string]interface{}) {
+	a.FieldMappings = fieldMappings
+	a.require(activityFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Activity) SetRemoteData(remoteData []*RemoteData) {
+	a.RemoteData = remoteData
+	a.require(activityFieldRemoteData)
+}
+
 func (a *Activity) UnmarshalJSON(data []byte) error {
 	type embed Activity
 	var unmarshaler = struct {
@@ -346,7 +695,8 @@ func (a *Activity) MarshalJSON() ([]byte, error) {
 		ModifiedAt:      internal.NewOptionalDateTime(a.ModifiedAt),
 		RemoteCreatedAt: internal.NewOptionalDateTime(a.RemoteCreatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *Activity) String() string {
@@ -433,6 +783,17 @@ func (a *ActivityActivityType) Accept(visitor ActivityActivityTypeVisitor) error
 // The `Activity` object is used to represent an activity for a candidate performed by a user.
 // ### Usage Example
 // Fetch from the `LIST Activities` endpoint and filter by `ID` to show all activities.
+var (
+	activityRequestFieldUser                = big.NewInt(1 << 0)
+	activityRequestFieldActivityType        = big.NewInt(1 << 1)
+	activityRequestFieldSubject             = big.NewInt(1 << 2)
+	activityRequestFieldBody                = big.NewInt(1 << 3)
+	activityRequestFieldVisibility          = big.NewInt(1 << 4)
+	activityRequestFieldCandidate           = big.NewInt(1 << 5)
+	activityRequestFieldIntegrationParams   = big.NewInt(1 << 6)
+	activityRequestFieldLinkedAccountParams = big.NewInt(1 << 7)
+)
+
 type ActivityRequest struct {
 	// The user that performed the action.
 	User *ActivityRequestUser `json:"user,omitempty" url:"user,omitempty"`
@@ -455,6 +816,9 @@ type ActivityRequest struct {
 	Candidate           *string                    `json:"candidate,omitempty" url:"candidate,omitempty"`
 	IntegrationParams   map[string]interface{}     `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}     `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -520,6 +884,69 @@ func (a *ActivityRequest) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *ActivityRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetUser sets the User field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetUser(user *ActivityRequestUser) {
+	a.User = user
+	a.require(activityRequestFieldUser)
+}
+
+// SetActivityType sets the ActivityType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetActivityType(activityType *ActivityTypeEnum) {
+	a.ActivityType = activityType
+	a.require(activityRequestFieldActivityType)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetSubject(subject *string) {
+	a.Subject = subject
+	a.require(activityRequestFieldSubject)
+}
+
+// SetBody sets the Body field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetBody(body *string) {
+	a.Body = body
+	a.require(activityRequestFieldBody)
+}
+
+// SetVisibility sets the Visibility field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetVisibility(visibility *ActivityRequestVisibility) {
+	a.Visibility = visibility
+	a.require(activityRequestFieldVisibility)
+}
+
+// SetCandidate sets the Candidate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetCandidate(candidate *string) {
+	a.Candidate = candidate
+	a.require(activityRequestFieldCandidate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	a.IntegrationParams = integrationParams
+	a.require(activityRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	a.LinkedAccountParams = linkedAccountParams
+	a.require(activityRequestFieldLinkedAccountParams)
+}
+
 func (a *ActivityRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler ActivityRequest
 	var value unmarshaler
@@ -534,6 +961,17 @@ func (a *ActivityRequest) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *ActivityRequest) MarshalJSON() ([]byte, error) {
+	type embed ActivityRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *ActivityRequest) String() string {
@@ -678,11 +1116,21 @@ func (a *ActivityRequestVisibility) Accept(visitor ActivityRequestVisibilityVisi
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
 
+var (
+	activityResponseFieldModel    = big.NewInt(1 << 0)
+	activityResponseFieldWarnings = big.NewInt(1 << 1)
+	activityResponseFieldErrors   = big.NewInt(1 << 2)
+	activityResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type ActivityResponse struct {
 	Model    *Activity                   `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -720,6 +1168,41 @@ func (a *ActivityResponse) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *ActivityResponse) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityResponse) SetModel(model *Activity) {
+	a.Model = model
+	a.require(activityResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	a.Warnings = warnings
+	a.require(activityResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityResponse) SetErrors(errors []*ErrorValidationProblem) {
+	a.Errors = errors
+	a.require(activityResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ActivityResponse) SetLogs(logs []*DebugModeLog) {
+	a.Logs = logs
+	a.require(activityResponseFieldLogs)
+}
+
 func (a *ActivityResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler ActivityResponse
 	var value unmarshaler
@@ -734,6 +1217,17 @@ func (a *ActivityResponse) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *ActivityResponse) MarshalJSON() ([]byte, error) {
+	type embed ActivityResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *ActivityResponse) String() string {
@@ -906,10 +1400,19 @@ func (a *ActivityVisibility) Accept(visitor ActivityVisibilityVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
 
+var (
+	paginatedActivityListFieldNext     = big.NewInt(1 << 0)
+	paginatedActivityListFieldPrevious = big.NewInt(1 << 1)
+	paginatedActivityListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedActivityList struct {
 	Next     *string     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Activity `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -940,6 +1443,34 @@ func (p *PaginatedActivityList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedActivityList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedActivityList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedActivityListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedActivityList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedActivityListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedActivityList) SetResults(results []*Activity) {
+	p.Results = results
+	p.require(paginatedActivityListFieldResults)
+}
+
 func (p *PaginatedActivityList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedActivityList
 	var value unmarshaler
@@ -954,6 +1485,17 @@ func (p *PaginatedActivityList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedActivityList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedActivityList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedActivityList) String() string {

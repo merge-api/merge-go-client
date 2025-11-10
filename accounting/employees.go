@@ -5,7 +5,17 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	employeesListRequestFieldCursor             = big.NewInt(1 << 0)
+	employeesListRequestFieldExpand             = big.NewInt(1 << 1)
+	employeesListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
+	employeesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
+	employeesListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
+	employeesListRequestFieldPageSize           = big.NewInt(1 << 5)
 )
 
 type EmployeesListRequest struct {
@@ -21,7 +31,65 @@ type EmployeesListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EmployeesListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(employeesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetExpand(expand []*string) {
+	e.Expand = expand
+	e.require(employeesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(employeesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employeesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employeesListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(employeesListRequestFieldPageSize)
+}
+
+var (
+	employeesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	employeesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	employeesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type EmployeesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -30,12 +98,52 @@ type EmployeesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EmployeesRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetExpand(expand []*string) {
+	e.Expand = expand
+	e.require(employeesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employeesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employeesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedEmployeeListFieldNext     = big.NewInt(1 << 0)
+	paginatedEmployeeListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEmployeeListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedEmployeeList struct {
 	Next     *string     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Employee `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -66,6 +174,34 @@ func (p *PaginatedEmployeeList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedEmployeeList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeeList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEmployeeListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeeList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEmployeeListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeeList) SetResults(results []*Employee) {
+	p.Results = results
+	p.require(paginatedEmployeeListFieldResults)
+}
+
 func (p *PaginatedEmployeeList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEmployeeList
 	var value unmarshaler
@@ -80,6 +216,17 @@ func (p *PaginatedEmployeeList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEmployeeList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEmployeeList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEmployeeList) String() string {

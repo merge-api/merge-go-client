@@ -5,8 +5,15 @@ package ticketing
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	ticketEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	ticketEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	ticketEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type TicketEndpointRequest struct {
@@ -15,7 +22,74 @@ type TicketEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool          `json:"-" url:"run_async,omitempty"`
 	Model    *TicketRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TicketEndpointRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	t.IsDebugMode = isDebugMode
+	t.require(ticketEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketEndpointRequest) SetRunAsync(runAsync *bool) {
+	t.RunAsync = runAsync
+	t.require(ticketEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketEndpointRequest) SetModel(model *TicketRequest) {
+	t.Model = model
+	t.require(ticketEndpointRequestFieldModel)
+}
+
+var (
+	ticketsListRequestFieldAccountId           = big.NewInt(1 << 0)
+	ticketsListRequestFieldAssigneeIds         = big.NewInt(1 << 1)
+	ticketsListRequestFieldCollectionIds       = big.NewInt(1 << 2)
+	ticketsListRequestFieldCompletedAfter      = big.NewInt(1 << 3)
+	ticketsListRequestFieldCompletedBefore     = big.NewInt(1 << 4)
+	ticketsListRequestFieldContactId           = big.NewInt(1 << 5)
+	ticketsListRequestFieldCreatedAfter        = big.NewInt(1 << 6)
+	ticketsListRequestFieldCreatedBefore       = big.NewInt(1 << 7)
+	ticketsListRequestFieldCreatorId           = big.NewInt(1 << 8)
+	ticketsListRequestFieldCursor              = big.NewInt(1 << 9)
+	ticketsListRequestFieldDueAfter            = big.NewInt(1 << 10)
+	ticketsListRequestFieldDueBefore           = big.NewInt(1 << 11)
+	ticketsListRequestFieldExpand              = big.NewInt(1 << 12)
+	ticketsListRequestFieldIncludeDeletedData  = big.NewInt(1 << 13)
+	ticketsListRequestFieldIncludeRemoteData   = big.NewInt(1 << 14)
+	ticketsListRequestFieldIncludeRemoteFields = big.NewInt(1 << 15)
+	ticketsListRequestFieldIncludeShellData    = big.NewInt(1 << 16)
+	ticketsListRequestFieldModifiedAfter       = big.NewInt(1 << 17)
+	ticketsListRequestFieldModifiedBefore      = big.NewInt(1 << 18)
+	ticketsListRequestFieldPageSize            = big.NewInt(1 << 19)
+	ticketsListRequestFieldParentTicketId      = big.NewInt(1 << 20)
+	ticketsListRequestFieldPriority            = big.NewInt(1 << 21)
+	ticketsListRequestFieldRemoteCreatedAfter  = big.NewInt(1 << 22)
+	ticketsListRequestFieldRemoteCreatedBefore = big.NewInt(1 << 23)
+	ticketsListRequestFieldRemoteFields        = big.NewInt(1 << 24)
+	ticketsListRequestFieldRemoteId            = big.NewInt(1 << 25)
+	ticketsListRequestFieldRemoteUpdatedAfter  = big.NewInt(1 << 26)
+	ticketsListRequestFieldRemoteUpdatedBefore = big.NewInt(1 << 27)
+	ticketsListRequestFieldShowEnumOrigins     = big.NewInt(1 << 28)
+	ticketsListRequestFieldStatus              = big.NewInt(1 << 29)
+	ticketsListRequestFieldTags                = big.NewInt(1 << 30)
+	ticketsListRequestFieldTicketType          = big.NewInt(1 << 31)
+	ticketsListRequestFieldTicketUrl           = big.NewInt(1 << 32)
+)
 
 type TicketsListRequest struct {
 	// If provided, will only return tickets for this account.
@@ -82,21 +156,297 @@ type TicketsListRequest struct {
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *TicketsListRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
 	// If provided, will only return tickets of this status.
-	Status *string `json:"-" url:"status,omitempty"`
+	Status *TicketsListRequestStatus `json:"-" url:"status,omitempty"`
 	// If provided, will only return tickets matching the tags; multiple tags can be separated by commas.
 	Tags *string `json:"-" url:"tags,omitempty"`
 	// If provided, will only return tickets of this type.
 	TicketType *string `json:"-" url:"ticket_type,omitempty"`
 	// If provided, will only return tickets where the URL matches or contains the substring
 	TicketUrl *string `json:"-" url:"ticket_url,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TicketsListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetAccountId sets the AccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetAccountId(accountId *string) {
+	t.AccountId = accountId
+	t.require(ticketsListRequestFieldAccountId)
+}
+
+// SetAssigneeIds sets the AssigneeIds field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetAssigneeIds(assigneeIds *string) {
+	t.AssigneeIds = assigneeIds
+	t.require(ticketsListRequestFieldAssigneeIds)
+}
+
+// SetCollectionIds sets the CollectionIds field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCollectionIds(collectionIds *string) {
+	t.CollectionIds = collectionIds
+	t.require(ticketsListRequestFieldCollectionIds)
+}
+
+// SetCompletedAfter sets the CompletedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCompletedAfter(completedAfter *time.Time) {
+	t.CompletedAfter = completedAfter
+	t.require(ticketsListRequestFieldCompletedAfter)
+}
+
+// SetCompletedBefore sets the CompletedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCompletedBefore(completedBefore *time.Time) {
+	t.CompletedBefore = completedBefore
+	t.require(ticketsListRequestFieldCompletedBefore)
+}
+
+// SetContactId sets the ContactId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetContactId(contactId *string) {
+	t.ContactId = contactId
+	t.require(ticketsListRequestFieldContactId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(ticketsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(ticketsListRequestFieldCreatedBefore)
+}
+
+// SetCreatorId sets the CreatorId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCreatorId(creatorId *string) {
+	t.CreatorId = creatorId
+	t.require(ticketsListRequestFieldCreatorId)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(ticketsListRequestFieldCursor)
+}
+
+// SetDueAfter sets the DueAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetDueAfter(dueAfter *time.Time) {
+	t.DueAfter = dueAfter
+	t.require(ticketsListRequestFieldDueAfter)
+}
+
+// SetDueBefore sets the DueBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetDueBefore(dueBefore *time.Time) {
+	t.DueBefore = dueBefore
+	t.require(ticketsListRequestFieldDueBefore)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetExpand(expand []*TicketsListRequestExpandItem) {
+	t.Expand = expand
+	t.require(ticketsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(ticketsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(ticketsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	t.IncludeRemoteFields = includeRemoteFields
+	t.require(ticketsListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(ticketsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(ticketsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(ticketsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(ticketsListRequestFieldPageSize)
+}
+
+// SetParentTicketId sets the ParentTicketId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetParentTicketId(parentTicketId *string) {
+	t.ParentTicketId = parentTicketId
+	t.require(ticketsListRequestFieldParentTicketId)
+}
+
+// SetPriority sets the Priority field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetPriority(priority *TicketsListRequestPriority) {
+	t.Priority = priority
+	t.require(ticketsListRequestFieldPriority)
+}
+
+// SetRemoteCreatedAfter sets the RemoteCreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteCreatedAfter(remoteCreatedAfter *time.Time) {
+	t.RemoteCreatedAfter = remoteCreatedAfter
+	t.require(ticketsListRequestFieldRemoteCreatedAfter)
+}
+
+// SetRemoteCreatedBefore sets the RemoteCreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteCreatedBefore(remoteCreatedBefore *time.Time) {
+	t.RemoteCreatedBefore = remoteCreatedBefore
+	t.require(ticketsListRequestFieldRemoteCreatedBefore)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteFields(remoteFields *TicketsListRequestRemoteFields) {
+	t.RemoteFields = remoteFields
+	t.require(ticketsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(ticketsListRequestFieldRemoteId)
+}
+
+// SetRemoteUpdatedAfter sets the RemoteUpdatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteUpdatedAfter(remoteUpdatedAfter *time.Time) {
+	t.RemoteUpdatedAfter = remoteUpdatedAfter
+	t.require(ticketsListRequestFieldRemoteUpdatedAfter)
+}
+
+// SetRemoteUpdatedBefore sets the RemoteUpdatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteUpdatedBefore(remoteUpdatedBefore *time.Time) {
+	t.RemoteUpdatedBefore = remoteUpdatedBefore
+	t.require(ticketsListRequestFieldRemoteUpdatedBefore)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetShowEnumOrigins(showEnumOrigins *TicketsListRequestShowEnumOrigins) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(ticketsListRequestFieldShowEnumOrigins)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetStatus(status *TicketsListRequestStatus) {
+	t.Status = status
+	t.require(ticketsListRequestFieldStatus)
+}
+
+// SetTags sets the Tags field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetTags(tags *string) {
+	t.Tags = tags
+	t.require(ticketsListRequestFieldTags)
+}
+
+// SetTicketType sets the TicketType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetTicketType(ticketType *string) {
+	t.TicketType = ticketType
+	t.require(ticketsListRequestFieldTicketType)
+}
+
+// SetTicketUrl sets the TicketUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetTicketUrl(ticketUrl *string) {
+	t.TicketUrl = ticketUrl
+	t.require(ticketsListRequestFieldTicketUrl)
+}
+
+var (
+	ticketsMetaPostRetrieveRequestFieldCollectionId = big.NewInt(1 << 0)
+	ticketsMetaPostRetrieveRequestFieldTicketType   = big.NewInt(1 << 1)
+)
 
 type TicketsMetaPostRetrieveRequest struct {
 	// If provided, will only return tickets for this collection.
 	CollectionId *string `json:"-" url:"collection_id,omitempty"`
 	// If provided, will only return tickets for this ticket type.
 	TicketType *string `json:"-" url:"ticket_type,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TicketsMetaPostRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCollectionId sets the CollectionId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsMetaPostRetrieveRequest) SetCollectionId(collectionId *string) {
+	t.CollectionId = collectionId
+	t.require(ticketsMetaPostRetrieveRequestFieldCollectionId)
+}
+
+// SetTicketType sets the TicketType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsMetaPostRetrieveRequest) SetTicketType(ticketType *string) {
+	t.TicketType = ticketType
+	t.require(ticketsMetaPostRetrieveRequestFieldTicketType)
+}
+
+var (
+	patchedTicketEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedTicketEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedTicketEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedTicketEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -104,7 +454,49 @@ type PatchedTicketEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                 `json:"-" url:"run_async,omitempty"`
 	Model    *PatchedTicketRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedTicketEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedTicketEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedTicketEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketEndpointRequest) SetModel(model *PatchedTicketRequest) {
+	p.Model = model
+	p.require(patchedTicketEndpointRequestFieldModel)
+}
+
+var (
+	ticketsRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	ticketsRemoteFieldClassesListRequestFieldIds                = big.NewInt(1 << 1)
+	ticketsRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
+	ticketsRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
+	ticketsRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
+	ticketsRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 5)
+	ticketsRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 6)
+	ticketsRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 7)
+)
 
 type TicketsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -123,7 +515,82 @@ type TicketsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TicketsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(ticketsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIds sets the Ids field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetIds(ids *string) {
+	t.Ids = ids
+	t.require(ticketsRemoteFieldClassesListRequestFieldIds)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(ticketsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(ticketsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(ticketsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	t.IsCommonModelField = isCommonModelField
+	t.require(ticketsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	t.IsCustom = isCustom
+	t.require(ticketsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(ticketsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	ticketsRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	ticketsRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	ticketsRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	ticketsRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+	ticketsRetrieveRequestFieldRemoteFields        = big.NewInt(1 << 4)
+	ticketsRetrieveRequestFieldShowEnumOrigins     = big.NewInt(1 << 5)
+)
 
 type TicketsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -138,6 +605,58 @@ type TicketsRetrieveRequest struct {
 	RemoteFields *TicketsRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *TicketsRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TicketsRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRetrieveRequest) SetExpand(expand []*TicketsRetrieveRequestExpandItem) {
+	t.Expand = expand
+	t.require(ticketsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(ticketsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	t.IncludeRemoteFields = includeRemoteFields
+	t.require(ticketsRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(ticketsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRetrieveRequest) SetRemoteFields(remoteFields *TicketsRetrieveRequestRemoteFields) {
+	t.RemoteFields = remoteFields
+	t.require(ticketsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *TicketsRetrieveRequestShowEnumOrigins) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(ticketsRetrieveRequestFieldShowEnumOrigins)
 }
 
 type TicketsListRequestExpandItem string
@@ -282,6 +801,37 @@ func (t TicketsListRequestShowEnumOrigins) Ptr() *TicketsListRequestShowEnumOrig
 	return &t
 }
 
+type TicketsListRequestStatus string
+
+const (
+	TicketsListRequestStatusEmpty      TicketsListRequestStatus = ""
+	TicketsListRequestStatusClosed     TicketsListRequestStatus = "CLOSED"
+	TicketsListRequestStatusInProgress TicketsListRequestStatus = "IN_PROGRESS"
+	TicketsListRequestStatusOnHold     TicketsListRequestStatus = "ON_HOLD"
+	TicketsListRequestStatusOpen       TicketsListRequestStatus = "OPEN"
+)
+
+func NewTicketsListRequestStatusFromString(s string) (TicketsListRequestStatus, error) {
+	switch s {
+	case "":
+		return TicketsListRequestStatusEmpty, nil
+	case "CLOSED":
+		return TicketsListRequestStatusClosed, nil
+	case "IN_PROGRESS":
+		return TicketsListRequestStatusInProgress, nil
+	case "ON_HOLD":
+		return TicketsListRequestStatusOnHold, nil
+	case "OPEN":
+		return TicketsListRequestStatusOpen, nil
+	}
+	var t TicketsListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsListRequestStatus) Ptr() *TicketsListRequestStatus {
+	return &t
+}
+
 type TicketsRetrieveRequestExpandItem string
 
 const (
@@ -418,10 +968,19 @@ func (t TicketsViewersListRequestExpandItem) Ptr() *TicketsViewersListRequestExp
 	return &t
 }
 
+var (
+	paginatedRemoteFieldClassListFieldNext     = big.NewInt(1 << 0)
+	paginatedRemoteFieldClassListFieldPrevious = big.NewInt(1 << 1)
+	paginatedRemoteFieldClassListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedRemoteFieldClassList struct {
 	Next     *string             `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string             `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*RemoteFieldClass `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -452,6 +1011,34 @@ func (p *PaginatedRemoteFieldClassList) GetExtraProperties() map[string]interfac
 	return p.extraProperties
 }
 
+func (p *PaginatedRemoteFieldClassList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRemoteFieldClassList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedRemoteFieldClassListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRemoteFieldClassList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedRemoteFieldClassListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRemoteFieldClassList) SetResults(results []*RemoteFieldClass) {
+	p.Results = results
+	p.require(paginatedRemoteFieldClassListFieldResults)
+}
+
 func (p *PaginatedRemoteFieldClassList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedRemoteFieldClassList
 	var value unmarshaler
@@ -468,6 +1055,17 @@ func (p *PaginatedRemoteFieldClassList) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (p *PaginatedRemoteFieldClassList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedRemoteFieldClassList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (p *PaginatedRemoteFieldClassList) String() string {
 	if len(p.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
@@ -480,10 +1078,19 @@ func (p *PaginatedRemoteFieldClassList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+var (
+	paginatedTicketListFieldNext     = big.NewInt(1 << 0)
+	paginatedTicketListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTicketListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedTicketList struct {
 	Next     *string   `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string   `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Ticket `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -514,6 +1121,34 @@ func (p *PaginatedTicketList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedTicketList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTicketList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTicketListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTicketList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTicketListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTicketList) SetResults(results []*Ticket) {
+	p.Results = results
+	p.require(paginatedTicketListFieldResults)
+}
+
 func (p *PaginatedTicketList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTicketList
 	var value unmarshaler
@@ -528,6 +1163,17 @@ func (p *PaginatedTicketList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTicketList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTicketList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTicketList) String() string {
@@ -547,6 +1193,30 @@ func (p *PaginatedTicketList) String() string {
 // The `Ticket` object is used to represent a ticket, issue, task or case.
 // ### Usage Example
 // TODO
+var (
+	patchedTicketRequestFieldName                = big.NewInt(1 << 0)
+	patchedTicketRequestFieldAssignees           = big.NewInt(1 << 1)
+	patchedTicketRequestFieldAssignedTeams       = big.NewInt(1 << 2)
+	patchedTicketRequestFieldCreator             = big.NewInt(1 << 3)
+	patchedTicketRequestFieldDueDate             = big.NewInt(1 << 4)
+	patchedTicketRequestFieldStatus              = big.NewInt(1 << 5)
+	patchedTicketRequestFieldDescription         = big.NewInt(1 << 6)
+	patchedTicketRequestFieldCollections         = big.NewInt(1 << 7)
+	patchedTicketRequestFieldTicketType          = big.NewInt(1 << 8)
+	patchedTicketRequestFieldAccount             = big.NewInt(1 << 9)
+	patchedTicketRequestFieldContact             = big.NewInt(1 << 10)
+	patchedTicketRequestFieldParentTicket        = big.NewInt(1 << 11)
+	patchedTicketRequestFieldAccessLevel         = big.NewInt(1 << 12)
+	patchedTicketRequestFieldTags                = big.NewInt(1 << 13)
+	patchedTicketRequestFieldRoles               = big.NewInt(1 << 14)
+	patchedTicketRequestFieldCompletedAt         = big.NewInt(1 << 15)
+	patchedTicketRequestFieldTicketUrl           = big.NewInt(1 << 16)
+	patchedTicketRequestFieldPriority            = big.NewInt(1 << 17)
+	patchedTicketRequestFieldIntegrationParams   = big.NewInt(1 << 18)
+	patchedTicketRequestFieldLinkedAccountParams = big.NewInt(1 << 19)
+	patchedTicketRequestFieldRemoteFields        = big.NewInt(1 << 20)
+)
+
 type PatchedTicketRequest struct {
 	// The ticket's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -600,6 +1270,9 @@ type PatchedTicketRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -756,6 +1429,160 @@ func (p *PatchedTicketRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PatchedTicketRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetName(name *string) {
+	p.Name = name
+	p.require(patchedTicketRequestFieldName)
+}
+
+// SetAssignees sets the Assignees field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetAssignees(assignees []*string) {
+	p.Assignees = assignees
+	p.require(patchedTicketRequestFieldAssignees)
+}
+
+// SetAssignedTeams sets the AssignedTeams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetAssignedTeams(assignedTeams []*string) {
+	p.AssignedTeams = assignedTeams
+	p.require(patchedTicketRequestFieldAssignedTeams)
+}
+
+// SetCreator sets the Creator field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetCreator(creator *string) {
+	p.Creator = creator
+	p.require(patchedTicketRequestFieldCreator)
+}
+
+// SetDueDate sets the DueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetDueDate(dueDate *time.Time) {
+	p.DueDate = dueDate
+	p.require(patchedTicketRequestFieldDueDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetStatus(status *PatchedTicketRequestStatus) {
+	p.Status = status
+	p.require(patchedTicketRequestFieldStatus)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetDescription(description *string) {
+	p.Description = description
+	p.require(patchedTicketRequestFieldDescription)
+}
+
+// SetCollections sets the Collections field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetCollections(collections []*string) {
+	p.Collections = collections
+	p.require(patchedTicketRequestFieldCollections)
+}
+
+// SetTicketType sets the TicketType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetTicketType(ticketType *string) {
+	p.TicketType = ticketType
+	p.require(patchedTicketRequestFieldTicketType)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(patchedTicketRequestFieldAccount)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetContact(contact *string) {
+	p.Contact = contact
+	p.require(patchedTicketRequestFieldContact)
+}
+
+// SetParentTicket sets the ParentTicket field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetParentTicket(parentTicket *string) {
+	p.ParentTicket = parentTicket
+	p.require(patchedTicketRequestFieldParentTicket)
+}
+
+// SetAccessLevel sets the AccessLevel field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetAccessLevel(accessLevel *PatchedTicketRequestAccessLevel) {
+	p.AccessLevel = accessLevel
+	p.require(patchedTicketRequestFieldAccessLevel)
+}
+
+// SetTags sets the Tags field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetTags(tags []*string) {
+	p.Tags = tags
+	p.require(patchedTicketRequestFieldTags)
+}
+
+// SetRoles sets the Roles field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetRoles(roles []*string) {
+	p.Roles = roles
+	p.require(patchedTicketRequestFieldRoles)
+}
+
+// SetCompletedAt sets the CompletedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetCompletedAt(completedAt *time.Time) {
+	p.CompletedAt = completedAt
+	p.require(patchedTicketRequestFieldCompletedAt)
+}
+
+// SetTicketUrl sets the TicketUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetTicketUrl(ticketUrl *string) {
+	p.TicketUrl = ticketUrl
+	p.require(patchedTicketRequestFieldTicketUrl)
+}
+
+// SetPriority sets the Priority field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetPriority(priority *PriorityEnum) {
+	p.Priority = priority
+	p.require(patchedTicketRequestFieldPriority)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedTicketRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedTicketRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTicketRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedTicketRequestFieldRemoteFields)
+}
+
 func (p *PatchedTicketRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedTicketRequest
 	var unmarshaler = struct {
@@ -791,7 +1618,8 @@ func (p *PatchedTicketRequest) MarshalJSON() ([]byte, error) {
 		DueDate:     internal.NewOptionalDateTime(p.DueDate),
 		CompletedAt: internal.NewOptionalDateTime(p.CompletedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedTicketRequest) String() string {
@@ -942,9 +1770,17 @@ func (p *PatchedTicketRequestStatus) Accept(visitor PatchedTicketRequestStatusVi
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
+var (
+	remoteFieldRequestFieldRemoteFieldClass = big.NewInt(1 << 0)
+	remoteFieldRequestFieldValue            = big.NewInt(1 << 1)
+)
+
 type RemoteFieldRequest struct {
 	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class" url:"remote_field_class"`
 	Value            interface{}                         `json:"value,omitempty" url:"value,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -968,6 +1804,27 @@ func (r *RemoteFieldRequest) GetExtraProperties() map[string]interface{} {
 	return r.extraProperties
 }
 
+func (r *RemoteFieldRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetRemoteFieldClass sets the RemoteFieldClass field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldRequest) SetRemoteFieldClass(remoteFieldClass *RemoteFieldRequestRemoteFieldClass) {
+	r.RemoteFieldClass = remoteFieldClass
+	r.require(remoteFieldRequestFieldRemoteFieldClass)
+}
+
+// SetValue sets the Value field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldRequest) SetValue(value interface{}) {
+	r.Value = value
+	r.require(remoteFieldRequestFieldValue)
+}
+
 func (r *RemoteFieldRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler RemoteFieldRequest
 	var value unmarshaler
@@ -982,6 +1839,17 @@ func (r *RemoteFieldRequest) UnmarshalJSON(data []byte) error {
 	r.extraProperties = extraProperties
 	r.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (r *RemoteFieldRequest) MarshalJSON() ([]byte, error) {
+	type embed RemoteFieldRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*r),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, r.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (r *RemoteFieldRequest) String() string {
@@ -1063,6 +1931,31 @@ func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRe
 // The `Ticket` object is used to represent a ticket, issue, task or case.
 // ### Usage Example
 // TODO
+var (
+	ticketRequestFieldName                = big.NewInt(1 << 0)
+	ticketRequestFieldAssignees           = big.NewInt(1 << 1)
+	ticketRequestFieldAssignedTeams       = big.NewInt(1 << 2)
+	ticketRequestFieldCreator             = big.NewInt(1 << 3)
+	ticketRequestFieldDueDate             = big.NewInt(1 << 4)
+	ticketRequestFieldStatus              = big.NewInt(1 << 5)
+	ticketRequestFieldDescription         = big.NewInt(1 << 6)
+	ticketRequestFieldCollections         = big.NewInt(1 << 7)
+	ticketRequestFieldTicketType          = big.NewInt(1 << 8)
+	ticketRequestFieldAccount             = big.NewInt(1 << 9)
+	ticketRequestFieldContact             = big.NewInt(1 << 10)
+	ticketRequestFieldParentTicket        = big.NewInt(1 << 11)
+	ticketRequestFieldAttachments         = big.NewInt(1 << 12)
+	ticketRequestFieldAccessLevel         = big.NewInt(1 << 13)
+	ticketRequestFieldTags                = big.NewInt(1 << 14)
+	ticketRequestFieldRoles               = big.NewInt(1 << 15)
+	ticketRequestFieldCompletedAt         = big.NewInt(1 << 16)
+	ticketRequestFieldTicketUrl           = big.NewInt(1 << 17)
+	ticketRequestFieldPriority            = big.NewInt(1 << 18)
+	ticketRequestFieldIntegrationParams   = big.NewInt(1 << 19)
+	ticketRequestFieldLinkedAccountParams = big.NewInt(1 << 20)
+	ticketRequestFieldRemoteFields        = big.NewInt(1 << 21)
+)
+
 type TicketRequest struct {
 	// The ticket's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -1117,6 +2010,9 @@ type TicketRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1280,6 +2176,167 @@ func (t *TicketRequest) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TicketRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetName(name *string) {
+	t.Name = name
+	t.require(ticketRequestFieldName)
+}
+
+// SetAssignees sets the Assignees field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetAssignees(assignees []*TicketRequestAssigneesItem) {
+	t.Assignees = assignees
+	t.require(ticketRequestFieldAssignees)
+}
+
+// SetAssignedTeams sets the AssignedTeams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetAssignedTeams(assignedTeams []*TicketRequestAssignedTeamsItem) {
+	t.AssignedTeams = assignedTeams
+	t.require(ticketRequestFieldAssignedTeams)
+}
+
+// SetCreator sets the Creator field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetCreator(creator *TicketRequestCreator) {
+	t.Creator = creator
+	t.require(ticketRequestFieldCreator)
+}
+
+// SetDueDate sets the DueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetDueDate(dueDate *time.Time) {
+	t.DueDate = dueDate
+	t.require(ticketRequestFieldDueDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetStatus(status *TicketRequestStatus) {
+	t.Status = status
+	t.require(ticketRequestFieldStatus)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetDescription(description *string) {
+	t.Description = description
+	t.require(ticketRequestFieldDescription)
+}
+
+// SetCollections sets the Collections field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetCollections(collections []*TicketRequestCollectionsItem) {
+	t.Collections = collections
+	t.require(ticketRequestFieldCollections)
+}
+
+// SetTicketType sets the TicketType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetTicketType(ticketType *string) {
+	t.TicketType = ticketType
+	t.require(ticketRequestFieldTicketType)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetAccount(account *TicketRequestAccount) {
+	t.Account = account
+	t.require(ticketRequestFieldAccount)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetContact(contact *TicketRequestContact) {
+	t.Contact = contact
+	t.require(ticketRequestFieldContact)
+}
+
+// SetParentTicket sets the ParentTicket field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetParentTicket(parentTicket *TicketRequestParentTicket) {
+	t.ParentTicket = parentTicket
+	t.require(ticketRequestFieldParentTicket)
+}
+
+// SetAttachments sets the Attachments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetAttachments(attachments []*TicketRequestAttachmentsItem) {
+	t.Attachments = attachments
+	t.require(ticketRequestFieldAttachments)
+}
+
+// SetAccessLevel sets the AccessLevel field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetAccessLevel(accessLevel *TicketRequestAccessLevel) {
+	t.AccessLevel = accessLevel
+	t.require(ticketRequestFieldAccessLevel)
+}
+
+// SetTags sets the Tags field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetTags(tags []*string) {
+	t.Tags = tags
+	t.require(ticketRequestFieldTags)
+}
+
+// SetRoles sets the Roles field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetRoles(roles []*string) {
+	t.Roles = roles
+	t.require(ticketRequestFieldRoles)
+}
+
+// SetCompletedAt sets the CompletedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetCompletedAt(completedAt *time.Time) {
+	t.CompletedAt = completedAt
+	t.require(ticketRequestFieldCompletedAt)
+}
+
+// SetTicketUrl sets the TicketUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetTicketUrl(ticketUrl *string) {
+	t.TicketUrl = ticketUrl
+	t.require(ticketRequestFieldTicketUrl)
+}
+
+// SetPriority sets the Priority field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetPriority(priority *TicketRequestPriority) {
+	t.Priority = priority
+	t.require(ticketRequestFieldPriority)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	t.IntegrationParams = integrationParams
+	t.require(ticketRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	t.LinkedAccountParams = linkedAccountParams
+	t.require(ticketRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	t.RemoteFields = remoteFields
+	t.require(ticketRequestFieldRemoteFields)
+}
+
 func (t *TicketRequest) UnmarshalJSON(data []byte) error {
 	type embed TicketRequest
 	var unmarshaler = struct {
@@ -1315,7 +2372,8 @@ func (t *TicketRequest) MarshalJSON() ([]byte, error) {
 		DueDate:     internal.NewOptionalDateTime(t.DueDate),
 		CompletedAt: internal.NewOptionalDateTime(t.CompletedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TicketRequest) String() string {
@@ -2034,11 +3092,21 @@ func (t *TicketRequestStatus) Accept(visitor TicketRequestStatusVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
 
+var (
+	ticketResponseFieldModel    = big.NewInt(1 << 0)
+	ticketResponseFieldWarnings = big.NewInt(1 << 1)
+	ticketResponseFieldErrors   = big.NewInt(1 << 2)
+	ticketResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type TicketResponse struct {
 	Model    *Ticket                     `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -2076,6 +3144,41 @@ func (t *TicketResponse) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TicketResponse) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketResponse) SetModel(model *Ticket) {
+	t.Model = model
+	t.require(ticketResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	t.Warnings = warnings
+	t.require(ticketResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketResponse) SetErrors(errors []*ErrorValidationProblem) {
+	t.Errors = errors
+	t.require(ticketResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketResponse) SetLogs(logs []*DebugModeLog) {
+	t.Logs = logs
+	t.require(ticketResponseFieldLogs)
+}
+
 func (t *TicketResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler TicketResponse
 	var value unmarshaler
@@ -2092,6 +3195,17 @@ func (t *TicketResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (t *TicketResponse) MarshalJSON() ([]byte, error) {
+	type embed TicketResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*t),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (t *TicketResponse) String() string {
 	if len(t.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(t.rawJSON); err == nil {
@@ -2103,6 +3217,15 @@ func (t *TicketResponse) String() string {
 	}
 	return fmt.Sprintf("%#v", t)
 }
+
+var (
+	ticketsViewersListRequestFieldCursor             = big.NewInt(1 << 0)
+	ticketsViewersListRequestFieldExpand             = big.NewInt(1 << 1)
+	ticketsViewersListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
+	ticketsViewersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
+	ticketsViewersListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
+	ticketsViewersListRequestFieldPageSize           = big.NewInt(1 << 5)
+)
 
 type TicketsViewersListRequest struct {
 	// The pagination cursor value.
@@ -2117,4 +3240,56 @@ type TicketsViewersListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TicketsViewersListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsViewersListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(ticketsViewersListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsViewersListRequest) SetExpand(expand []*TicketsViewersListRequestExpandItem) {
+	t.Expand = expand
+	t.require(ticketsViewersListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsViewersListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(ticketsViewersListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsViewersListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(ticketsViewersListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsViewersListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(ticketsViewersListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsViewersListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(ticketsViewersListRequestFieldPageSize)
 }

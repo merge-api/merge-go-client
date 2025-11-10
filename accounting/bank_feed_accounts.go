@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	bankFeedAccountEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	bankFeedAccountEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	bankFeedAccountEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type BankFeedAccountEndpointRequest struct {
@@ -15,7 +22,46 @@ type BankFeedAccountEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                   `json:"-" url:"run_async,omitempty"`
 	Model    *BankFeedAccountRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (b *BankFeedAccountEndpointRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	b.IsDebugMode = isDebugMode
+	b.require(bankFeedAccountEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountEndpointRequest) SetRunAsync(runAsync *bool) {
+	b.RunAsync = runAsync
+	b.require(bankFeedAccountEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountEndpointRequest) SetModel(model *BankFeedAccountRequest) {
+	b.Model = model
+	b.require(bankFeedAccountEndpointRequestFieldModel)
+}
+
+var (
+	bankFeedAccountsListRequestFieldCursor             = big.NewInt(1 << 0)
+	bankFeedAccountsListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	bankFeedAccountsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	bankFeedAccountsListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	bankFeedAccountsListRequestFieldPageSize           = big.NewInt(1 << 4)
+)
 
 type BankFeedAccountsListRequest struct {
 	// The pagination cursor value.
@@ -28,13 +74,87 @@ type BankFeedAccountsListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (b *BankFeedAccountsListRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsListRequest) SetCursor(cursor *string) {
+	b.Cursor = cursor
+	b.require(bankFeedAccountsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	b.IncludeDeletedData = includeDeletedData
+	b.require(bankFeedAccountsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(bankFeedAccountsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsListRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(bankFeedAccountsListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsListRequest) SetPageSize(pageSize *int) {
+	b.PageSize = pageSize
+	b.require(bankFeedAccountsListRequestFieldPageSize)
+}
+
+var (
+	bankFeedAccountsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	bankFeedAccountsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type BankFeedAccountsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (b *BankFeedAccountsRetrieveRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(bankFeedAccountsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(bankFeedAccountsRetrieveRequestFieldIncludeShellData)
 }
 
 // # The BankFeedAccount Object
@@ -43,6 +163,21 @@ type BankFeedAccountsRetrieveRequest struct {
 //
 // ### Usage Example
 // Fetch from the `GET BankFeedAccount` endpoint to view details of a bank feed account.
+var (
+	bankFeedAccountRequestFieldSourceAccountId      = big.NewInt(1 << 0)
+	bankFeedAccountRequestFieldTargetAccountId      = big.NewInt(1 << 1)
+	bankFeedAccountRequestFieldSourceAccountName    = big.NewInt(1 << 2)
+	bankFeedAccountRequestFieldSourceAccountNumber  = big.NewInt(1 << 3)
+	bankFeedAccountRequestFieldTargetAccountName    = big.NewInt(1 << 4)
+	bankFeedAccountRequestFieldCurrency             = big.NewInt(1 << 5)
+	bankFeedAccountRequestFieldFeedStatus           = big.NewInt(1 << 6)
+	bankFeedAccountRequestFieldFeedStartDate        = big.NewInt(1 << 7)
+	bankFeedAccountRequestFieldSourceAccountBalance = big.NewInt(1 << 8)
+	bankFeedAccountRequestFieldAccountType          = big.NewInt(1 << 9)
+	bankFeedAccountRequestFieldIntegrationParams    = big.NewInt(1 << 10)
+	bankFeedAccountRequestFieldLinkedAccountParams  = big.NewInt(1 << 11)
+)
+
 type BankFeedAccountRequest struct {
 	// The unique identifier of the source account from our customer’s platform.
 	SourceAccountId *string `json:"source_account_id,omitempty" url:"source_account_id,omitempty"`
@@ -380,6 +515,9 @@ type BankFeedAccountRequest struct {
 	IntegrationParams   map[string]interface{}             `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}             `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -472,6 +610,97 @@ func (b *BankFeedAccountRequest) GetExtraProperties() map[string]interface{} {
 	return b.extraProperties
 }
 
+func (b *BankFeedAccountRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetSourceAccountId sets the SourceAccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetSourceAccountId(sourceAccountId *string) {
+	b.SourceAccountId = sourceAccountId
+	b.require(bankFeedAccountRequestFieldSourceAccountId)
+}
+
+// SetTargetAccountId sets the TargetAccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetTargetAccountId(targetAccountId *string) {
+	b.TargetAccountId = targetAccountId
+	b.require(bankFeedAccountRequestFieldTargetAccountId)
+}
+
+// SetSourceAccountName sets the SourceAccountName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetSourceAccountName(sourceAccountName *string) {
+	b.SourceAccountName = sourceAccountName
+	b.require(bankFeedAccountRequestFieldSourceAccountName)
+}
+
+// SetSourceAccountNumber sets the SourceAccountNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetSourceAccountNumber(sourceAccountNumber *string) {
+	b.SourceAccountNumber = sourceAccountNumber
+	b.require(bankFeedAccountRequestFieldSourceAccountNumber)
+}
+
+// SetTargetAccountName sets the TargetAccountName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetTargetAccountName(targetAccountName *string) {
+	b.TargetAccountName = targetAccountName
+	b.require(bankFeedAccountRequestFieldTargetAccountName)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetCurrency(currency *BankFeedAccountRequestCurrency) {
+	b.Currency = currency
+	b.require(bankFeedAccountRequestFieldCurrency)
+}
+
+// SetFeedStatus sets the FeedStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetFeedStatus(feedStatus *BankFeedAccountRequestFeedStatus) {
+	b.FeedStatus = feedStatus
+	b.require(bankFeedAccountRequestFieldFeedStatus)
+}
+
+// SetFeedStartDate sets the FeedStartDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetFeedStartDate(feedStartDate *time.Time) {
+	b.FeedStartDate = feedStartDate
+	b.require(bankFeedAccountRequestFieldFeedStartDate)
+}
+
+// SetSourceAccountBalance sets the SourceAccountBalance field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetSourceAccountBalance(sourceAccountBalance *float64) {
+	b.SourceAccountBalance = sourceAccountBalance
+	b.require(bankFeedAccountRequestFieldSourceAccountBalance)
+}
+
+// SetAccountType sets the AccountType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetAccountType(accountType *BankFeedAccountRequestAccountType) {
+	b.AccountType = accountType
+	b.require(bankFeedAccountRequestFieldAccountType)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	b.IntegrationParams = integrationParams
+	b.require(bankFeedAccountRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	b.LinkedAccountParams = linkedAccountParams
+	b.require(bankFeedAccountRequestFieldLinkedAccountParams)
+}
+
 func (b *BankFeedAccountRequest) UnmarshalJSON(data []byte) error {
 	type embed BankFeedAccountRequest
 	var unmarshaler = struct {
@@ -503,7 +732,8 @@ func (b *BankFeedAccountRequest) MarshalJSON() ([]byte, error) {
 		embed:         embed(*b),
 		FeedStartDate: internal.NewOptionalDateTime(b.FeedStartDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (b *BankFeedAccountRequest) String() string {
@@ -1020,11 +1250,21 @@ func (b *BankFeedAccountRequestFeedStatus) Accept(visitor BankFeedAccountRequest
 	return fmt.Errorf("type %T does not include a non-empty union type", b)
 }
 
+var (
+	bankFeedAccountResponseFieldModel    = big.NewInt(1 << 0)
+	bankFeedAccountResponseFieldWarnings = big.NewInt(1 << 1)
+	bankFeedAccountResponseFieldErrors   = big.NewInt(1 << 2)
+	bankFeedAccountResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type BankFeedAccountResponse struct {
 	Model    *BankFeedAccount            `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1062,6 +1302,41 @@ func (b *BankFeedAccountResponse) GetExtraProperties() map[string]interface{} {
 	return b.extraProperties
 }
 
+func (b *BankFeedAccountResponse) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountResponse) SetModel(model *BankFeedAccount) {
+	b.Model = model
+	b.require(bankFeedAccountResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	b.Warnings = warnings
+	b.require(bankFeedAccountResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountResponse) SetErrors(errors []*ErrorValidationProblem) {
+	b.Errors = errors
+	b.require(bankFeedAccountResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountResponse) SetLogs(logs []*DebugModeLog) {
+	b.Logs = logs
+	b.require(bankFeedAccountResponseFieldLogs)
+}
+
 func (b *BankFeedAccountResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler BankFeedAccountResponse
 	var value unmarshaler
@@ -1078,6 +1353,17 @@ func (b *BankFeedAccountResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (b *BankFeedAccountResponse) MarshalJSON() ([]byte, error) {
+	type embed BankFeedAccountResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*b),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (b *BankFeedAccountResponse) String() string {
 	if len(b.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(b.rawJSON); err == nil {
@@ -1090,10 +1376,19 @@ func (b *BankFeedAccountResponse) String() string {
 	return fmt.Sprintf("%#v", b)
 }
 
+var (
+	paginatedBankFeedAccountListFieldNext     = big.NewInt(1 << 0)
+	paginatedBankFeedAccountListFieldPrevious = big.NewInt(1 << 1)
+	paginatedBankFeedAccountListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedBankFeedAccountList struct {
 	Next     *string            `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*BankFeedAccount `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1124,6 +1419,34 @@ func (p *PaginatedBankFeedAccountList) GetExtraProperties() map[string]interface
 	return p.extraProperties
 }
 
+func (p *PaginatedBankFeedAccountList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankFeedAccountList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedBankFeedAccountListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankFeedAccountList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedBankFeedAccountListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankFeedAccountList) SetResults(results []*BankFeedAccount) {
+	p.Results = results
+	p.require(paginatedBankFeedAccountListFieldResults)
+}
+
 func (p *PaginatedBankFeedAccountList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedBankFeedAccountList
 	var value unmarshaler
@@ -1138,6 +1461,17 @@ func (p *PaginatedBankFeedAccountList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedBankFeedAccountList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedBankFeedAccountList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedBankFeedAccountList) String() string {

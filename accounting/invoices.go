@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	invoiceEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	invoiceEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	invoiceEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type InvoiceEndpointRequest struct {
@@ -15,7 +22,48 @@ type InvoiceEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool           `json:"-" url:"run_async,omitempty"`
 	Model    *InvoiceRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (i *InvoiceEndpointRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	i.IsDebugMode = isDebugMode
+	i.require(invoiceEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceEndpointRequest) SetRunAsync(runAsync *bool) {
+	i.RunAsync = runAsync
+	i.require(invoiceEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceEndpointRequest) SetModel(model *InvoiceRequest) {
+	i.Model = model
+	i.require(invoiceEndpointRequestFieldModel)
+}
+
+var (
+	invoicesLineItemsRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	invoicesLineItemsRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	invoicesLineItemsRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	invoicesLineItemsRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	invoicesLineItemsRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	invoicesLineItemsRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	invoicesLineItemsRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type InvoicesLineItemsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -32,7 +80,90 @@ type InvoicesLineItemsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	i.Cursor = cursor
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	i.IncludeDeletedData = includeDeletedData
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	i.IsCommonModelField = isCommonModelField
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	i.IsCustom = isCustom
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesLineItemsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	i.PageSize = pageSize
+	i.require(invoicesLineItemsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	invoicesListRequestFieldCompanyId           = big.NewInt(1 << 0)
+	invoicesListRequestFieldContactId           = big.NewInt(1 << 1)
+	invoicesListRequestFieldCreatedAfter        = big.NewInt(1 << 2)
+	invoicesListRequestFieldCreatedBefore       = big.NewInt(1 << 3)
+	invoicesListRequestFieldCursor              = big.NewInt(1 << 4)
+	invoicesListRequestFieldExpand              = big.NewInt(1 << 5)
+	invoicesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 6)
+	invoicesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 7)
+	invoicesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 8)
+	invoicesListRequestFieldIncludeShellData    = big.NewInt(1 << 9)
+	invoicesListRequestFieldIssueDateAfter      = big.NewInt(1 << 10)
+	invoicesListRequestFieldIssueDateBefore     = big.NewInt(1 << 11)
+	invoicesListRequestFieldModifiedAfter       = big.NewInt(1 << 12)
+	invoicesListRequestFieldModifiedBefore      = big.NewInt(1 << 13)
+	invoicesListRequestFieldNumber              = big.NewInt(1 << 14)
+	invoicesListRequestFieldPageSize            = big.NewInt(1 << 15)
+	invoicesListRequestFieldRemoteFields        = big.NewInt(1 << 16)
+	invoicesListRequestFieldRemoteId            = big.NewInt(1 << 17)
+	invoicesListRequestFieldShowEnumOrigins     = big.NewInt(1 << 18)
+	invoicesListRequestFieldStatus              = big.NewInt(1 << 19)
+	invoicesListRequestFieldType                = big.NewInt(1 << 20)
+)
 
 type InvoicesListRequest struct {
 	// If provided, will only return invoices for this company.
@@ -87,7 +218,170 @@ type InvoicesListRequest struct {
 	// * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 	// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
 	Type *InvoicesListRequestType `json:"-" url:"type,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (i *InvoicesListRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetCompanyId(companyId *string) {
+	i.CompanyId = companyId
+	i.require(invoicesListRequestFieldCompanyId)
+}
+
+// SetContactId sets the ContactId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetContactId(contactId *string) {
+	i.ContactId = contactId
+	i.require(invoicesListRequestFieldContactId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	i.CreatedAfter = createdAfter
+	i.require(invoicesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	i.CreatedBefore = createdBefore
+	i.require(invoicesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetCursor(cursor *string) {
+	i.Cursor = cursor
+	i.require(invoicesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetExpand(expand []*InvoicesListRequestExpandItem) {
+	i.Expand = expand
+	i.require(invoicesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	i.IncludeDeletedData = includeDeletedData
+	i.require(invoicesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(invoicesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	i.IncludeRemoteFields = includeRemoteFields
+	i.require(invoicesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(invoicesListRequestFieldIncludeShellData)
+}
+
+// SetIssueDateAfter sets the IssueDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetIssueDateAfter(issueDateAfter *time.Time) {
+	i.IssueDateAfter = issueDateAfter
+	i.require(invoicesListRequestFieldIssueDateAfter)
+}
+
+// SetIssueDateBefore sets the IssueDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetIssueDateBefore(issueDateBefore *time.Time) {
+	i.IssueDateBefore = issueDateBefore
+	i.require(invoicesListRequestFieldIssueDateBefore)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	i.ModifiedAfter = modifiedAfter
+	i.require(invoicesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	i.ModifiedBefore = modifiedBefore
+	i.require(invoicesListRequestFieldModifiedBefore)
+}
+
+// SetNumber sets the Number field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetNumber(number *string) {
+	i.Number = number
+	i.require(invoicesListRequestFieldNumber)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetPageSize(pageSize *int) {
+	i.PageSize = pageSize
+	i.require(invoicesListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetRemoteFields(remoteFields *string) {
+	i.RemoteFields = remoteFields
+	i.require(invoicesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetRemoteId(remoteId *string) {
+	i.RemoteId = remoteId
+	i.require(invoicesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	i.ShowEnumOrigins = showEnumOrigins
+	i.require(invoicesListRequestFieldShowEnumOrigins)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetStatus(status *InvoicesListRequestStatus) {
+	i.Status = status
+	i.require(invoicesListRequestFieldStatus)
+}
+
+// SetType sets the Type field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesListRequest) SetType(type_ *InvoicesListRequestType) {
+	i.Type = type_
+	i.require(invoicesListRequestFieldType)
+}
+
+var (
+	patchedInvoiceEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedInvoiceEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedInvoiceEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedInvoiceEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -95,7 +389,48 @@ type PatchedInvoiceEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool           `json:"-" url:"run_async,omitempty"`
 	Model    *InvoiceRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedInvoiceEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedInvoiceEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedInvoiceEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedInvoiceEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedInvoiceEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedInvoiceEndpointRequest) SetModel(model *InvoiceRequest) {
+	p.Model = model
+	p.require(patchedInvoiceEndpointRequestFieldModel)
+}
+
+var (
+	invoicesRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	invoicesRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	invoicesRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	invoicesRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	invoicesRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	invoicesRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	invoicesRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type InvoicesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -112,7 +447,75 @@ type InvoicesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (i *InvoicesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	i.Cursor = cursor
+	i.require(invoicesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	i.IncludeDeletedData = includeDeletedData
+	i.require(invoicesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(invoicesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(invoicesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	i.IsCommonModelField = isCommonModelField
+	i.require(invoicesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	i.IsCustom = isCustom
+	i.require(invoicesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	i.PageSize = pageSize
+	i.require(invoicesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	invoicesRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	invoicesRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	invoicesRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	invoicesRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+	invoicesRetrieveRequestFieldRemoteFields        = big.NewInt(1 << 4)
+	invoicesRetrieveRequestFieldShowEnumOrigins     = big.NewInt(1 << 5)
+)
 
 type InvoicesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -127,6 +530,58 @@ type InvoicesRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (i *InvoicesRetrieveRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRetrieveRequest) SetExpand(expand []*InvoicesRetrieveRequestExpandItem) {
+	i.Expand = expand
+	i.require(invoicesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	i.IncludeRemoteData = includeRemoteData
+	i.require(invoicesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	i.IncludeRemoteFields = includeRemoteFields
+	i.require(invoicesRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	i.IncludeShellData = includeShellData
+	i.require(invoicesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	i.RemoteFields = remoteFields
+	i.require(invoicesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoicesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	i.ShowEnumOrigins = showEnumOrigins
+	i.require(invoicesRetrieveRequestFieldShowEnumOrigins)
 }
 
 type InvoicesListRequestExpandItem string
@@ -295,6 +750,28 @@ func (i InvoicesRetrieveRequestExpandItem) Ptr() *InvoicesRetrieveRequestExpandI
 //
 // ### Usage Example
 // Fetch from the `GET Invoice` endpoint and view the invoice's line items.
+var (
+	invoiceLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
+	invoiceLineItemRequestFieldDescription         = big.NewInt(1 << 1)
+	invoiceLineItemRequestFieldUnitPrice           = big.NewInt(1 << 2)
+	invoiceLineItemRequestFieldQuantity            = big.NewInt(1 << 3)
+	invoiceLineItemRequestFieldTotalAmount         = big.NewInt(1 << 4)
+	invoiceLineItemRequestFieldEmployee            = big.NewInt(1 << 5)
+	invoiceLineItemRequestFieldProject             = big.NewInt(1 << 6)
+	invoiceLineItemRequestFieldContact             = big.NewInt(1 << 7)
+	invoiceLineItemRequestFieldCurrency            = big.NewInt(1 << 8)
+	invoiceLineItemRequestFieldExchangeRate        = big.NewInt(1 << 9)
+	invoiceLineItemRequestFieldItem                = big.NewInt(1 << 10)
+	invoiceLineItemRequestFieldAccount             = big.NewInt(1 << 11)
+	invoiceLineItemRequestFieldTaxRate             = big.NewInt(1 << 12)
+	invoiceLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 13)
+	invoiceLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 14)
+	invoiceLineItemRequestFieldCompany             = big.NewInt(1 << 15)
+	invoiceLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 16)
+	invoiceLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 17)
+	invoiceLineItemRequestFieldRemoteFields        = big.NewInt(1 << 18)
+)
+
 type InvoiceLineItemRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -635,6 +1112,9 @@ type InvoiceLineItemRequest struct {
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -776,6 +1256,146 @@ func (i *InvoiceLineItemRequest) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *InvoiceLineItemRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetRemoteId(remoteId *string) {
+	i.RemoteId = remoteId
+	i.require(invoiceLineItemRequestFieldRemoteId)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetDescription(description *string) {
+	i.Description = description
+	i.require(invoiceLineItemRequestFieldDescription)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetUnitPrice(unitPrice *float64) {
+	i.UnitPrice = unitPrice
+	i.require(invoiceLineItemRequestFieldUnitPrice)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetQuantity(quantity *float64) {
+	i.Quantity = quantity
+	i.require(invoiceLineItemRequestFieldQuantity)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetTotalAmount(totalAmount *float64) {
+	i.TotalAmount = totalAmount
+	i.require(invoiceLineItemRequestFieldTotalAmount)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetEmployee(employee *InvoiceLineItemRequestEmployee) {
+	i.Employee = employee
+	i.require(invoiceLineItemRequestFieldEmployee)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetProject(project *InvoiceLineItemRequestProject) {
+	i.Project = project
+	i.require(invoiceLineItemRequestFieldProject)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetContact(contact *InvoiceLineItemRequestContact) {
+	i.Contact = contact
+	i.require(invoiceLineItemRequestFieldContact)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetCurrency(currency *InvoiceLineItemRequestCurrency) {
+	i.Currency = currency
+	i.require(invoiceLineItemRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetExchangeRate(exchangeRate *string) {
+	i.ExchangeRate = exchangeRate
+	i.require(invoiceLineItemRequestFieldExchangeRate)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetItem(item *InvoiceLineItemRequestItem) {
+	i.Item = item
+	i.require(invoiceLineItemRequestFieldItem)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetAccount(account *InvoiceLineItemRequestAccount) {
+	i.Account = account
+	i.require(invoiceLineItemRequestFieldAccount)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetTaxRate(taxRate *string) {
+	i.TaxRate = taxRate
+	i.require(invoiceLineItemRequestFieldTaxRate)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetTrackingCategory(trackingCategory *InvoiceLineItemRequestTrackingCategory) {
+	i.TrackingCategory = trackingCategory
+	i.require(invoiceLineItemRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetTrackingCategories(trackingCategories []*InvoiceLineItemRequestTrackingCategoriesItem) {
+	i.TrackingCategories = trackingCategories
+	i.require(invoiceLineItemRequestFieldTrackingCategories)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetCompany(company *string) {
+	i.Company = company
+	i.require(invoiceLineItemRequestFieldCompany)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	i.IntegrationParams = integrationParams
+	i.require(invoiceLineItemRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	i.LinkedAccountParams = linkedAccountParams
+	i.require(invoiceLineItemRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	i.RemoteFields = remoteFields
+	i.require(invoiceLineItemRequestFieldRemoteFields)
+}
+
 func (i *InvoiceLineItemRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler InvoiceLineItemRequest
 	var value unmarshaler
@@ -790,6 +1410,17 @@ func (i *InvoiceLineItemRequest) UnmarshalJSON(data []byte) error {
 	i.extraProperties = extraProperties
 	i.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (i *InvoiceLineItemRequest) MarshalJSON() ([]byte, error) {
+	type embed InvoiceLineItemRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*i),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (i *InvoiceLineItemRequest) String() string {
@@ -1618,6 +2249,35 @@ func (i *InvoiceLineItemRequestTrackingCategory) Accept(visitor InvoiceLineItemR
 //
 // ### Usage Example
 // Fetch from the `LIST Invoices` endpoint and view a company's invoices.
+var (
+	invoiceRequestFieldType                = big.NewInt(1 << 0)
+	invoiceRequestFieldContact             = big.NewInt(1 << 1)
+	invoiceRequestFieldNumber              = big.NewInt(1 << 2)
+	invoiceRequestFieldIssueDate           = big.NewInt(1 << 3)
+	invoiceRequestFieldDueDate             = big.NewInt(1 << 4)
+	invoiceRequestFieldPaidOnDate          = big.NewInt(1 << 5)
+	invoiceRequestFieldEmployee            = big.NewInt(1 << 6)
+	invoiceRequestFieldMemo                = big.NewInt(1 << 7)
+	invoiceRequestFieldStatus              = big.NewInt(1 << 8)
+	invoiceRequestFieldCompany             = big.NewInt(1 << 9)
+	invoiceRequestFieldCurrency            = big.NewInt(1 << 10)
+	invoiceRequestFieldExchangeRate        = big.NewInt(1 << 11)
+	invoiceRequestFieldTotalDiscount       = big.NewInt(1 << 12)
+	invoiceRequestFieldSubTotal            = big.NewInt(1 << 13)
+	invoiceRequestFieldPaymentTerm         = big.NewInt(1 << 14)
+	invoiceRequestFieldTotalTaxAmount      = big.NewInt(1 << 15)
+	invoiceRequestFieldInclusiveOfTax      = big.NewInt(1 << 16)
+	invoiceRequestFieldTotalAmount         = big.NewInt(1 << 17)
+	invoiceRequestFieldBalance             = big.NewInt(1 << 18)
+	invoiceRequestFieldPayments            = big.NewInt(1 << 19)
+	invoiceRequestFieldTrackingCategories  = big.NewInt(1 << 20)
+	invoiceRequestFieldLineItems           = big.NewInt(1 << 21)
+	invoiceRequestFieldPurchaseOrders      = big.NewInt(1 << 22)
+	invoiceRequestFieldIntegrationParams   = big.NewInt(1 << 23)
+	invoiceRequestFieldLinkedAccountParams = big.NewInt(1 << 24)
+	invoiceRequestFieldRemoteFields        = big.NewInt(1 << 25)
+)
+
 type InvoiceRequest struct {
 	// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
 	//
@@ -1983,6 +2643,9 @@ type InvoiceRequest struct {
 	LinkedAccountParams map[string]interface{}                  `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest                   `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -2173,6 +2836,195 @@ func (i *InvoiceRequest) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *InvoiceRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetType sets the Type field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetType(type_ *InvoiceRequestType) {
+	i.Type = type_
+	i.require(invoiceRequestFieldType)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetContact(contact *InvoiceRequestContact) {
+	i.Contact = contact
+	i.require(invoiceRequestFieldContact)
+}
+
+// SetNumber sets the Number field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetNumber(number *string) {
+	i.Number = number
+	i.require(invoiceRequestFieldNumber)
+}
+
+// SetIssueDate sets the IssueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetIssueDate(issueDate *time.Time) {
+	i.IssueDate = issueDate
+	i.require(invoiceRequestFieldIssueDate)
+}
+
+// SetDueDate sets the DueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetDueDate(dueDate *time.Time) {
+	i.DueDate = dueDate
+	i.require(invoiceRequestFieldDueDate)
+}
+
+// SetPaidOnDate sets the PaidOnDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetPaidOnDate(paidOnDate *time.Time) {
+	i.PaidOnDate = paidOnDate
+	i.require(invoiceRequestFieldPaidOnDate)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetEmployee(employee *InvoiceRequestEmployee) {
+	i.Employee = employee
+	i.require(invoiceRequestFieldEmployee)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetMemo(memo *string) {
+	i.Memo = memo
+	i.require(invoiceRequestFieldMemo)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetStatus(status *InvoiceRequestStatus) {
+	i.Status = status
+	i.require(invoiceRequestFieldStatus)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetCompany(company *InvoiceRequestCompany) {
+	i.Company = company
+	i.require(invoiceRequestFieldCompany)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetCurrency(currency *InvoiceRequestCurrency) {
+	i.Currency = currency
+	i.require(invoiceRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetExchangeRate(exchangeRate *string) {
+	i.ExchangeRate = exchangeRate
+	i.require(invoiceRequestFieldExchangeRate)
+}
+
+// SetTotalDiscount sets the TotalDiscount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetTotalDiscount(totalDiscount *float64) {
+	i.TotalDiscount = totalDiscount
+	i.require(invoiceRequestFieldTotalDiscount)
+}
+
+// SetSubTotal sets the SubTotal field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetSubTotal(subTotal *float64) {
+	i.SubTotal = subTotal
+	i.require(invoiceRequestFieldSubTotal)
+}
+
+// SetPaymentTerm sets the PaymentTerm field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetPaymentTerm(paymentTerm *InvoiceRequestPaymentTerm) {
+	i.PaymentTerm = paymentTerm
+	i.require(invoiceRequestFieldPaymentTerm)
+}
+
+// SetTotalTaxAmount sets the TotalTaxAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetTotalTaxAmount(totalTaxAmount *float64) {
+	i.TotalTaxAmount = totalTaxAmount
+	i.require(invoiceRequestFieldTotalTaxAmount)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	i.InclusiveOfTax = inclusiveOfTax
+	i.require(invoiceRequestFieldInclusiveOfTax)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetTotalAmount(totalAmount *float64) {
+	i.TotalAmount = totalAmount
+	i.require(invoiceRequestFieldTotalAmount)
+}
+
+// SetBalance sets the Balance field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetBalance(balance *float64) {
+	i.Balance = balance
+	i.require(invoiceRequestFieldBalance)
+}
+
+// SetPayments sets the Payments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetPayments(payments []*InvoiceRequestPaymentsItem) {
+	i.Payments = payments
+	i.require(invoiceRequestFieldPayments)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetTrackingCategories(trackingCategories []*InvoiceRequestTrackingCategoriesItem) {
+	i.TrackingCategories = trackingCategories
+	i.require(invoiceRequestFieldTrackingCategories)
+}
+
+// SetLineItems sets the LineItems field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetLineItems(lineItems []*InvoiceLineItemRequest) {
+	i.LineItems = lineItems
+	i.require(invoiceRequestFieldLineItems)
+}
+
+// SetPurchaseOrders sets the PurchaseOrders field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetPurchaseOrders(purchaseOrders []*InvoiceRequestPurchaseOrdersItem) {
+	i.PurchaseOrders = purchaseOrders
+	i.require(invoiceRequestFieldPurchaseOrders)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	i.IntegrationParams = integrationParams
+	i.require(invoiceRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	i.LinkedAccountParams = linkedAccountParams
+	i.require(invoiceRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	i.RemoteFields = remoteFields
+	i.require(invoiceRequestFieldRemoteFields)
+}
+
 func (i *InvoiceRequest) UnmarshalJSON(data []byte) error {
 	type embed InvoiceRequest
 	var unmarshaler = struct {
@@ -2212,7 +3064,8 @@ func (i *InvoiceRequest) MarshalJSON() ([]byte, error) {
 		DueDate:    internal.NewOptionalDateTime(i.DueDate),
 		PaidOnDate: internal.NewOptionalDateTime(i.PaidOnDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (i *InvoiceRequest) String() string {
@@ -3171,11 +4024,21 @@ func (i *InvoiceRequestType) Accept(visitor InvoiceRequestTypeVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+var (
+	invoiceResponseFieldModel    = big.NewInt(1 << 0)
+	invoiceResponseFieldWarnings = big.NewInt(1 << 1)
+	invoiceResponseFieldErrors   = big.NewInt(1 << 2)
+	invoiceResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type InvoiceResponse struct {
 	Model    *Invoice                    `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -3213,6 +4076,41 @@ func (i *InvoiceResponse) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *InvoiceResponse) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceResponse) SetModel(model *Invoice) {
+	i.Model = model
+	i.require(invoiceResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	i.Warnings = warnings
+	i.require(invoiceResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceResponse) SetErrors(errors []*ErrorValidationProblem) {
+	i.Errors = errors
+	i.require(invoiceResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceResponse) SetLogs(logs []*DebugModeLog) {
+	i.Logs = logs
+	i.require(invoiceResponseFieldLogs)
+}
+
 func (i *InvoiceResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler InvoiceResponse
 	var value unmarshaler
@@ -3229,6 +4127,17 @@ func (i *InvoiceResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (i *InvoiceResponse) MarshalJSON() ([]byte, error) {
+	type embed InvoiceResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*i),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (i *InvoiceResponse) String() string {
 	if len(i.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
@@ -3241,10 +4150,19 @@ func (i *InvoiceResponse) String() string {
 	return fmt.Sprintf("%#v", i)
 }
 
+var (
+	paginatedInvoiceListFieldNext     = big.NewInt(1 << 0)
+	paginatedInvoiceListFieldPrevious = big.NewInt(1 << 1)
+	paginatedInvoiceListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedInvoiceList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Invoice `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -3275,6 +4193,34 @@ func (p *PaginatedInvoiceList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedInvoiceList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedInvoiceList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedInvoiceListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedInvoiceList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedInvoiceListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedInvoiceList) SetResults(results []*Invoice) {
+	p.Results = results
+	p.require(paginatedInvoiceListFieldResults)
+}
+
 func (p *PaginatedInvoiceList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedInvoiceList
 	var value unmarshaler
@@ -3289,6 +4235,17 @@ func (p *PaginatedInvoiceList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedInvoiceList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedInvoiceList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedInvoiceList) String() string {

@@ -5,8 +5,25 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	linkedAccountsListRequestFieldCategory                = big.NewInt(1 << 0)
+	linkedAccountsListRequestFieldCursor                  = big.NewInt(1 << 1)
+	linkedAccountsListRequestFieldEndUserEmailAddress     = big.NewInt(1 << 2)
+	linkedAccountsListRequestFieldEndUserOrganizationName = big.NewInt(1 << 3)
+	linkedAccountsListRequestFieldEndUserOriginId         = big.NewInt(1 << 4)
+	linkedAccountsListRequestFieldEndUserOriginIds        = big.NewInt(1 << 5)
+	linkedAccountsListRequestFieldId                      = big.NewInt(1 << 6)
+	linkedAccountsListRequestFieldIds                     = big.NewInt(1 << 7)
+	linkedAccountsListRequestFieldIncludeDuplicates       = big.NewInt(1 << 8)
+	linkedAccountsListRequestFieldIntegrationName         = big.NewInt(1 << 9)
+	linkedAccountsListRequestFieldIsTestAccount           = big.NewInt(1 << 10)
+	linkedAccountsListRequestFieldPageSize                = big.NewInt(1 << 11)
+	linkedAccountsListRequestFieldStatus                  = big.NewInt(1 << 12)
 )
 
 type LinkedAccountsListRequest struct {
@@ -43,6 +60,107 @@ type LinkedAccountsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Filter by status. Options: `COMPLETE`, `IDLE`, `INCOMPLETE`, `RELINK_NEEDED`
 	Status *string `json:"-" url:"status,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (l *LinkedAccountsListRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetCategory sets the Category field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetCategory(category *LinkedAccountsListRequestCategory) {
+	l.Category = category
+	l.require(linkedAccountsListRequestFieldCategory)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetCursor(cursor *string) {
+	l.Cursor = cursor
+	l.require(linkedAccountsListRequestFieldCursor)
+}
+
+// SetEndUserEmailAddress sets the EndUserEmailAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetEndUserEmailAddress(endUserEmailAddress *string) {
+	l.EndUserEmailAddress = endUserEmailAddress
+	l.require(linkedAccountsListRequestFieldEndUserEmailAddress)
+}
+
+// SetEndUserOrganizationName sets the EndUserOrganizationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetEndUserOrganizationName(endUserOrganizationName *string) {
+	l.EndUserOrganizationName = endUserOrganizationName
+	l.require(linkedAccountsListRequestFieldEndUserOrganizationName)
+}
+
+// SetEndUserOriginId sets the EndUserOriginId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetEndUserOriginId(endUserOriginId *string) {
+	l.EndUserOriginId = endUserOriginId
+	l.require(linkedAccountsListRequestFieldEndUserOriginId)
+}
+
+// SetEndUserOriginIds sets the EndUserOriginIds field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetEndUserOriginIds(endUserOriginIds *string) {
+	l.EndUserOriginIds = endUserOriginIds
+	l.require(linkedAccountsListRequestFieldEndUserOriginIds)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetId(id *string) {
+	l.Id = id
+	l.require(linkedAccountsListRequestFieldId)
+}
+
+// SetIds sets the Ids field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetIds(ids *string) {
+	l.Ids = ids
+	l.require(linkedAccountsListRequestFieldIds)
+}
+
+// SetIncludeDuplicates sets the IncludeDuplicates field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetIncludeDuplicates(includeDuplicates *bool) {
+	l.IncludeDuplicates = includeDuplicates
+	l.require(linkedAccountsListRequestFieldIncludeDuplicates)
+}
+
+// SetIntegrationName sets the IntegrationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetIntegrationName(integrationName *string) {
+	l.IntegrationName = integrationName
+	l.require(linkedAccountsListRequestFieldIntegrationName)
+}
+
+// SetIsTestAccount sets the IsTestAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetIsTestAccount(isTestAccount *string) {
+	l.IsTestAccount = isTestAccount
+	l.require(linkedAccountsListRequestFieldIsTestAccount)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetPageSize(pageSize *int) {
+	l.PageSize = pageSize
+	l.require(linkedAccountsListRequestFieldPageSize)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LinkedAccountsListRequest) SetStatus(status *string) {
+	l.Status = status
+	l.require(linkedAccountsListRequestFieldStatus)
 }
 
 type LinkedAccountsListRequestCategory string
@@ -88,6 +206,22 @@ func (l LinkedAccountsListRequestCategory) Ptr() *LinkedAccountsListRequestCateg
 //
 // ### Usage Example
 // View a list of your organization's `LinkedAccount` objects.
+var (
+	accountDetailsAndActionsFieldId                      = big.NewInt(1 << 0)
+	accountDetailsAndActionsFieldCategory                = big.NewInt(1 << 1)
+	accountDetailsAndActionsFieldStatus                  = big.NewInt(1 << 2)
+	accountDetailsAndActionsFieldStatusDetail            = big.NewInt(1 << 3)
+	accountDetailsAndActionsFieldEndUserOriginId         = big.NewInt(1 << 4)
+	accountDetailsAndActionsFieldEndUserOrganizationName = big.NewInt(1 << 5)
+	accountDetailsAndActionsFieldEndUserEmailAddress     = big.NewInt(1 << 6)
+	accountDetailsAndActionsFieldSubdomain               = big.NewInt(1 << 7)
+	accountDetailsAndActionsFieldWebhookListenerUrl      = big.NewInt(1 << 8)
+	accountDetailsAndActionsFieldIsDuplicate             = big.NewInt(1 << 9)
+	accountDetailsAndActionsFieldIntegration             = big.NewInt(1 << 10)
+	accountDetailsAndActionsFieldAccountType             = big.NewInt(1 << 11)
+	accountDetailsAndActionsFieldCompletedAt             = big.NewInt(1 << 12)
+)
+
 type AccountDetailsAndActions struct {
 	Id                      string                            `json:"id" url:"id"`
 	Category                *AccountDetailsAndActionsCategory `json:"category,omitempty" url:"category,omitempty"`
@@ -104,6 +238,9 @@ type AccountDetailsAndActions struct {
 	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty" url:"integration,omitempty"`
 	AccountType string                               `json:"account_type" url:"account_type"`
 	CompletedAt time.Time                            `json:"completed_at" url:"completed_at"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -204,6 +341,104 @@ func (a *AccountDetailsAndActions) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AccountDetailsAndActions) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetId(id string) {
+	a.Id = id
+	a.require(accountDetailsAndActionsFieldId)
+}
+
+// SetCategory sets the Category field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetCategory(category *AccountDetailsAndActionsCategory) {
+	a.Category = category
+	a.require(accountDetailsAndActionsFieldCategory)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetStatus(status *AccountDetailsAndActionsStatus) {
+	a.Status = status
+	a.require(accountDetailsAndActionsFieldStatus)
+}
+
+// SetStatusDetail sets the StatusDetail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetStatusDetail(statusDetail *string) {
+	a.StatusDetail = statusDetail
+	a.require(accountDetailsAndActionsFieldStatusDetail)
+}
+
+// SetEndUserOriginId sets the EndUserOriginId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetEndUserOriginId(endUserOriginId *string) {
+	a.EndUserOriginId = endUserOriginId
+	a.require(accountDetailsAndActionsFieldEndUserOriginId)
+}
+
+// SetEndUserOrganizationName sets the EndUserOrganizationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetEndUserOrganizationName(endUserOrganizationName string) {
+	a.EndUserOrganizationName = endUserOrganizationName
+	a.require(accountDetailsAndActionsFieldEndUserOrganizationName)
+}
+
+// SetEndUserEmailAddress sets the EndUserEmailAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetEndUserEmailAddress(endUserEmailAddress string) {
+	a.EndUserEmailAddress = endUserEmailAddress
+	a.require(accountDetailsAndActionsFieldEndUserEmailAddress)
+}
+
+// SetSubdomain sets the Subdomain field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetSubdomain(subdomain *string) {
+	a.Subdomain = subdomain
+	a.require(accountDetailsAndActionsFieldSubdomain)
+}
+
+// SetWebhookListenerUrl sets the WebhookListenerUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetWebhookListenerUrl(webhookListenerUrl string) {
+	a.WebhookListenerUrl = webhookListenerUrl
+	a.require(accountDetailsAndActionsFieldWebhookListenerUrl)
+}
+
+// SetIsDuplicate sets the IsDuplicate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetIsDuplicate(isDuplicate *bool) {
+	a.IsDuplicate = isDuplicate
+	a.require(accountDetailsAndActionsFieldIsDuplicate)
+}
+
+// SetIntegration sets the Integration field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetIntegration(integration *AccountDetailsAndActionsIntegration) {
+	a.Integration = integration
+	a.require(accountDetailsAndActionsFieldIntegration)
+}
+
+// SetAccountType sets the AccountType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetAccountType(accountType string) {
+	a.AccountType = accountType
+	a.require(accountDetailsAndActionsFieldAccountType)
+}
+
+// SetCompletedAt sets the CompletedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetCompletedAt(completedAt time.Time) {
+	a.CompletedAt = completedAt
+	a.require(accountDetailsAndActionsFieldCompletedAt)
+}
+
 func (a *AccountDetailsAndActions) UnmarshalJSON(data []byte) error {
 	type embed AccountDetailsAndActions
 	var unmarshaler = struct {
@@ -235,7 +470,8 @@ func (a *AccountDetailsAndActions) MarshalJSON() ([]byte, error) {
 		embed:       embed(*a),
 		CompletedAt: internal.NewDateTime(a.CompletedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AccountDetailsAndActions) String() string {
@@ -312,6 +548,17 @@ func (a *AccountDetailsAndActionsCategory) Accept(visitor AccountDetailsAndActio
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
 
+var (
+	accountDetailsAndActionsIntegrationFieldName                     = big.NewInt(1 << 0)
+	accountDetailsAndActionsIntegrationFieldCategories               = big.NewInt(1 << 1)
+	accountDetailsAndActionsIntegrationFieldImage                    = big.NewInt(1 << 2)
+	accountDetailsAndActionsIntegrationFieldSquareImage              = big.NewInt(1 << 3)
+	accountDetailsAndActionsIntegrationFieldColor                    = big.NewInt(1 << 4)
+	accountDetailsAndActionsIntegrationFieldSlug                     = big.NewInt(1 << 5)
+	accountDetailsAndActionsIntegrationFieldPassthroughAvailable     = big.NewInt(1 << 6)
+	accountDetailsAndActionsIntegrationFieldAvailableModelOperations = big.NewInt(1 << 7)
+)
+
 type AccountDetailsAndActionsIntegration struct {
 	Name                     string            `json:"name" url:"name"`
 	Categories               []CategoriesEnum  `json:"categories" url:"categories"`
@@ -321,6 +568,9 @@ type AccountDetailsAndActionsIntegration struct {
 	Slug                     string            `json:"slug" url:"slug"`
 	PassthroughAvailable     bool              `json:"passthrough_available" url:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation `json:"available_model_operations,omitempty" url:"available_model_operations,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -386,6 +636,69 @@ func (a *AccountDetailsAndActionsIntegration) GetExtraProperties() map[string]in
 	return a.extraProperties
 }
 
+func (a *AccountDetailsAndActionsIntegration) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetName(name string) {
+	a.Name = name
+	a.require(accountDetailsAndActionsIntegrationFieldName)
+}
+
+// SetCategories sets the Categories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetCategories(categories []CategoriesEnum) {
+	a.Categories = categories
+	a.require(accountDetailsAndActionsIntegrationFieldCategories)
+}
+
+// SetImage sets the Image field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetImage(image *string) {
+	a.Image = image
+	a.require(accountDetailsAndActionsIntegrationFieldImage)
+}
+
+// SetSquareImage sets the SquareImage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetSquareImage(squareImage *string) {
+	a.SquareImage = squareImage
+	a.require(accountDetailsAndActionsIntegrationFieldSquareImage)
+}
+
+// SetColor sets the Color field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetColor(color string) {
+	a.Color = color
+	a.require(accountDetailsAndActionsIntegrationFieldColor)
+}
+
+// SetSlug sets the Slug field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetSlug(slug string) {
+	a.Slug = slug
+	a.require(accountDetailsAndActionsIntegrationFieldSlug)
+}
+
+// SetPassthroughAvailable sets the PassthroughAvailable field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetPassthroughAvailable(passthroughAvailable bool) {
+	a.PassthroughAvailable = passthroughAvailable
+	a.require(accountDetailsAndActionsIntegrationFieldPassthroughAvailable)
+}
+
+// SetAvailableModelOperations sets the AvailableModelOperations field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActionsIntegration) SetAvailableModelOperations(availableModelOperations []*ModelOperation) {
+	a.AvailableModelOperations = availableModelOperations
+	a.require(accountDetailsAndActionsIntegrationFieldAvailableModelOperations)
+}
+
 func (a *AccountDetailsAndActionsIntegration) UnmarshalJSON(data []byte) error {
 	type unmarshaler AccountDetailsAndActionsIntegration
 	var value unmarshaler
@@ -400,6 +713,17 @@ func (a *AccountDetailsAndActionsIntegration) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountDetailsAndActionsIntegration) MarshalJSON() ([]byte, error) {
+	type embed AccountDetailsAndActionsIntegration
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AccountDetailsAndActionsIntegration) String() string {
@@ -508,10 +832,19 @@ func (a AccountDetailsAndActionsStatusEnum) Ptr() *AccountDetailsAndActionsStatu
 	return &a
 }
 
+var (
+	paginatedAccountDetailsAndActionsListFieldNext     = big.NewInt(1 << 0)
+	paginatedAccountDetailsAndActionsListFieldPrevious = big.NewInt(1 << 1)
+	paginatedAccountDetailsAndActionsListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedAccountDetailsAndActionsList struct {
 	Next     *string                     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string                     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*AccountDetailsAndActions `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -542,6 +875,34 @@ func (p *PaginatedAccountDetailsAndActionsList) GetExtraProperties() map[string]
 	return p.extraProperties
 }
 
+func (p *PaginatedAccountDetailsAndActionsList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountDetailsAndActionsList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedAccountDetailsAndActionsListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountDetailsAndActionsList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedAccountDetailsAndActionsListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountDetailsAndActionsList) SetResults(results []*AccountDetailsAndActions) {
+	p.Results = results
+	p.require(paginatedAccountDetailsAndActionsListFieldResults)
+}
+
 func (p *PaginatedAccountDetailsAndActionsList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedAccountDetailsAndActionsList
 	var value unmarshaler
@@ -556,6 +917,17 @@ func (p *PaginatedAccountDetailsAndActionsList) UnmarshalJSON(data []byte) error
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedAccountDetailsAndActionsList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedAccountDetailsAndActionsList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedAccountDetailsAndActionsList) String() string {

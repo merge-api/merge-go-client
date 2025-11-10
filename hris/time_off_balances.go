@@ -5,8 +5,27 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	timeOffBalancesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	timeOffBalancesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	timeOffBalancesListRequestFieldCursor             = big.NewInt(1 << 2)
+	timeOffBalancesListRequestFieldEmployeeId         = big.NewInt(1 << 3)
+	timeOffBalancesListRequestFieldExpand             = big.NewInt(1 << 4)
+	timeOffBalancesListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	timeOffBalancesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	timeOffBalancesListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	timeOffBalancesListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	timeOffBalancesListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	timeOffBalancesListRequestFieldPageSize           = big.NewInt(1 << 10)
+	timeOffBalancesListRequestFieldPolicyType         = big.NewInt(1 << 11)
+	timeOffBalancesListRequestFieldRemoteFields       = big.NewInt(1 << 12)
+	timeOffBalancesListRequestFieldRemoteId           = big.NewInt(1 << 13)
+	timeOffBalancesListRequestFieldShowEnumOrigins    = big.NewInt(1 << 14)
 )
 
 type TimeOffBalancesListRequest struct {
@@ -47,7 +66,130 @@ type TimeOffBalancesListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TimeOffBalancesListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(timeOffBalancesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(timeOffBalancesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(timeOffBalancesListRequestFieldCursor)
+}
+
+// SetEmployeeId sets the EmployeeId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetEmployeeId(employeeId *string) {
+	t.EmployeeId = employeeId
+	t.require(timeOffBalancesListRequestFieldEmployeeId)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(timeOffBalancesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(timeOffBalancesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(timeOffBalancesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(timeOffBalancesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(timeOffBalancesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(timeOffBalancesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(timeOffBalancesListRequestFieldPageSize)
+}
+
+// SetPolicyType sets the PolicyType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetPolicyType(policyType *TimeOffBalancesListRequestPolicyType) {
+	t.PolicyType = policyType
+	t.require(timeOffBalancesListRequestFieldPolicyType)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetRemoteFields(remoteFields *string) {
+	t.RemoteFields = remoteFields
+	t.require(timeOffBalancesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(timeOffBalancesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(timeOffBalancesListRequestFieldShowEnumOrigins)
+}
+
+var (
+	timeOffBalancesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	timeOffBalancesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	timeOffBalancesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	timeOffBalancesRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	timeOffBalancesRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type TimeOffBalancesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -60,6 +202,51 @@ type TimeOffBalancesRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TimeOffBalancesRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesRetrieveRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(timeOffBalancesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(timeOffBalancesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(timeOffBalancesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	t.RemoteFields = remoteFields
+	t.require(timeOffBalancesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalancesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(timeOffBalancesRetrieveRequestFieldShowEnumOrigins)
 }
 
 type TimeOffBalancesListRequestPolicyType string
@@ -96,10 +283,19 @@ func (t TimeOffBalancesListRequestPolicyType) Ptr() *TimeOffBalancesListRequestP
 	return &t
 }
 
+var (
+	paginatedTimeOffBalanceListFieldNext     = big.NewInt(1 << 0)
+	paginatedTimeOffBalanceListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTimeOffBalanceListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedTimeOffBalanceList struct {
 	Next     *string           `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string           `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*TimeOffBalance `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -130,6 +326,34 @@ func (p *PaginatedTimeOffBalanceList) GetExtraProperties() map[string]interface{
 	return p.extraProperties
 }
 
+func (p *PaginatedTimeOffBalanceList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimeOffBalanceList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTimeOffBalanceListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimeOffBalanceList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTimeOffBalanceListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimeOffBalanceList) SetResults(results []*TimeOffBalance) {
+	p.Results = results
+	p.require(paginatedTimeOffBalanceListFieldResults)
+}
+
 func (p *PaginatedTimeOffBalanceList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTimeOffBalanceList
 	var value unmarshaler
@@ -144,6 +368,17 @@ func (p *PaginatedTimeOffBalanceList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTimeOffBalanceList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTimeOffBalanceList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTimeOffBalanceList) String() string {
@@ -204,6 +439,20 @@ func (p PolicyTypeEnum) Ptr() *PolicyTypeEnum {
 //
 // ### Usage Example
 // Fetch from the `LIST TimeOffBalances` endpoint and filter by `ID` to show all time off balances.
+var (
+	timeOffBalanceFieldId               = big.NewInt(1 << 0)
+	timeOffBalanceFieldRemoteId         = big.NewInt(1 << 1)
+	timeOffBalanceFieldCreatedAt        = big.NewInt(1 << 2)
+	timeOffBalanceFieldModifiedAt       = big.NewInt(1 << 3)
+	timeOffBalanceFieldEmployee         = big.NewInt(1 << 4)
+	timeOffBalanceFieldBalance          = big.NewInt(1 << 5)
+	timeOffBalanceFieldUsed             = big.NewInt(1 << 6)
+	timeOffBalanceFieldPolicyType       = big.NewInt(1 << 7)
+	timeOffBalanceFieldRemoteWasDeleted = big.NewInt(1 << 8)
+	timeOffBalanceFieldFieldMappings    = big.NewInt(1 << 9)
+	timeOffBalanceFieldRemoteData       = big.NewInt(1 << 10)
+)
+
 type TimeOffBalance struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -231,6 +480,9 @@ type TimeOffBalance struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -317,6 +569,90 @@ func (t *TimeOffBalance) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimeOffBalance) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetId(id *string) {
+	t.Id = id
+	t.require(timeOffBalanceFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(timeOffBalanceFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(timeOffBalanceFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(timeOffBalanceFieldModifiedAt)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetEmployee(employee *TimeOffBalanceEmployee) {
+	t.Employee = employee
+	t.require(timeOffBalanceFieldEmployee)
+}
+
+// SetBalance sets the Balance field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetBalance(balance *float64) {
+	t.Balance = balance
+	t.require(timeOffBalanceFieldBalance)
+}
+
+// SetUsed sets the Used field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetUsed(used *float64) {
+	t.Used = used
+	t.require(timeOffBalanceFieldUsed)
+}
+
+// SetPolicyType sets the PolicyType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetPolicyType(policyType *TimeOffBalancePolicyType) {
+	t.PolicyType = policyType
+	t.require(timeOffBalanceFieldPolicyType)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(timeOffBalanceFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(timeOffBalanceFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffBalance) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(timeOffBalanceFieldRemoteData)
+}
+
 func (t *TimeOffBalance) UnmarshalJSON(data []byte) error {
 	type embed TimeOffBalance
 	var unmarshaler = struct {
@@ -352,7 +688,8 @@ func (t *TimeOffBalance) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(t.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(t.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimeOffBalance) String() string {

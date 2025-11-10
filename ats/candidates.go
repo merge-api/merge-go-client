@@ -5,8 +5,16 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	candidateEndpointRequestFieldIsDebugMode  = big.NewInt(1 << 0)
+	candidateEndpointRequestFieldRunAsync     = big.NewInt(1 << 1)
+	candidateEndpointRequestFieldModel        = big.NewInt(1 << 2)
+	candidateEndpointRequestFieldRemoteUserId = big.NewInt(1 << 3)
 )
 
 type CandidateEndpointRequest struct {
@@ -16,7 +24,63 @@ type CandidateEndpointRequest struct {
 	RunAsync     *bool             `json:"-" url:"run_async,omitempty"`
 	Model        *CandidateRequest `json:"model,omitempty" url:"-"`
 	RemoteUserId string            `json:"remote_user_id" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CandidateEndpointRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	c.IsDebugMode = isDebugMode
+	c.require(candidateEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateEndpointRequest) SetRunAsync(runAsync *bool) {
+	c.RunAsync = runAsync
+	c.require(candidateEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateEndpointRequest) SetModel(model *CandidateRequest) {
+	c.Model = model
+	c.require(candidateEndpointRequestFieldModel)
+}
+
+// SetRemoteUserId sets the RemoteUserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateEndpointRequest) SetRemoteUserId(remoteUserId string) {
+	c.RemoteUserId = remoteUserId
+	c.require(candidateEndpointRequestFieldRemoteUserId)
+}
+
+var (
+	candidatesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	candidatesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	candidatesListRequestFieldCursor             = big.NewInt(1 << 2)
+	candidatesListRequestFieldEmailAddresses     = big.NewInt(1 << 3)
+	candidatesListRequestFieldExpand             = big.NewInt(1 << 4)
+	candidatesListRequestFieldFirstName          = big.NewInt(1 << 5)
+	candidatesListRequestFieldIncludeDeletedData = big.NewInt(1 << 6)
+	candidatesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 7)
+	candidatesListRequestFieldIncludeShellData   = big.NewInt(1 << 8)
+	candidatesListRequestFieldLastName           = big.NewInt(1 << 9)
+	candidatesListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
+	candidatesListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
+	candidatesListRequestFieldPageSize           = big.NewInt(1 << 12)
+	candidatesListRequestFieldRemoteId           = big.NewInt(1 << 13)
+	candidatesListRequestFieldTags               = big.NewInt(1 << 14)
+)
 
 type CandidatesListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -49,7 +113,129 @@ type CandidatesListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// If provided, will only return candidates with these tags; multiple tags can be separated by commas.
 	Tags *string `json:"-" url:"tags,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CandidatesListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(candidatesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(candidatesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(candidatesListRequestFieldCursor)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetEmailAddresses(emailAddresses *string) {
+	c.EmailAddresses = emailAddresses
+	c.require(candidatesListRequestFieldEmailAddresses)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetExpand(expand []*CandidatesListRequestExpandItem) {
+	c.Expand = expand
+	c.require(candidatesListRequestFieldExpand)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetFirstName(firstName *string) {
+	c.FirstName = firstName
+	c.require(candidatesListRequestFieldFirstName)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(candidatesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(candidatesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(candidatesListRequestFieldIncludeShellData)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetLastName(lastName *string) {
+	c.LastName = lastName
+	c.require(candidatesListRequestFieldLastName)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(candidatesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(candidatesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(candidatesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(candidatesListRequestFieldRemoteId)
+}
+
+// SetTags sets the Tags field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesListRequest) SetTags(tags *string) {
+	c.Tags = tags
+	c.require(candidatesListRequestFieldTags)
+}
+
+var (
+	patchedCandidateEndpointRequestFieldIsDebugMode  = big.NewInt(1 << 0)
+	patchedCandidateEndpointRequestFieldRunAsync     = big.NewInt(1 << 1)
+	patchedCandidateEndpointRequestFieldModel        = big.NewInt(1 << 2)
+	patchedCandidateEndpointRequestFieldRemoteUserId = big.NewInt(1 << 3)
+)
 
 type PatchedCandidateEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -58,7 +244,51 @@ type PatchedCandidateEndpointRequest struct {
 	RunAsync     *bool                    `json:"-" url:"run_async,omitempty"`
 	Model        *PatchedCandidateRequest `json:"model,omitempty" url:"-"`
 	RemoteUserId string                   `json:"remote_user_id" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedCandidateEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedCandidateEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedCandidateEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateEndpointRequest) SetModel(model *PatchedCandidateRequest) {
+	p.Model = model
+	p.require(patchedCandidateEndpointRequestFieldModel)
+}
+
+// SetRemoteUserId sets the RemoteUserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateEndpointRequest) SetRemoteUserId(remoteUserId string) {
+	p.RemoteUserId = remoteUserId
+	p.require(patchedCandidateEndpointRequestFieldRemoteUserId)
+}
+
+var (
+	candidatesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	candidatesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	candidatesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type CandidatesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -67,6 +297,37 @@ type CandidatesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (c *CandidatesRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesRetrieveRequest) SetExpand(expand []*CandidatesRetrieveRequestExpandItem) {
+	c.Expand = expand
+	c.require(candidatesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(candidatesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidatesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(candidatesRetrieveRequestFieldIncludeShellData)
 }
 
 type CandidatesListRequestExpandItem string
@@ -118,6 +379,26 @@ func (c CandidatesRetrieveRequestExpandItem) Ptr() *CandidatesRetrieveRequestExp
 // The `Candidate` object is used to represent profile information about a given Candidate. Because it is specific to a Candidate, this information stays constant across applications.
 // ### Usage Example
 // Fetch from the `LIST Candidates` endpoint and filter by `ID` to show all candidates.
+var (
+	candidateRequestFieldFirstName           = big.NewInt(1 << 0)
+	candidateRequestFieldLastName            = big.NewInt(1 << 1)
+	candidateRequestFieldCompany             = big.NewInt(1 << 2)
+	candidateRequestFieldTitle               = big.NewInt(1 << 3)
+	candidateRequestFieldLastInteractionAt   = big.NewInt(1 << 4)
+	candidateRequestFieldIsPrivate           = big.NewInt(1 << 5)
+	candidateRequestFieldCanEmail            = big.NewInt(1 << 6)
+	candidateRequestFieldLocations           = big.NewInt(1 << 7)
+	candidateRequestFieldPhoneNumbers        = big.NewInt(1 << 8)
+	candidateRequestFieldEmailAddresses      = big.NewInt(1 << 9)
+	candidateRequestFieldUrls                = big.NewInt(1 << 10)
+	candidateRequestFieldTags                = big.NewInt(1 << 11)
+	candidateRequestFieldApplications        = big.NewInt(1 << 12)
+	candidateRequestFieldAttachments         = big.NewInt(1 << 13)
+	candidateRequestFieldRemoteTemplateId    = big.NewInt(1 << 14)
+	candidateRequestFieldIntegrationParams   = big.NewInt(1 << 15)
+	candidateRequestFieldLinkedAccountParams = big.NewInt(1 << 16)
+)
+
 type CandidateRequest struct {
 	// The candidate's first name.
 	FirstName *string `json:"first_name,omitempty" url:"first_name,omitempty"`
@@ -147,6 +428,9 @@ type CandidateRequest struct {
 	RemoteTemplateId    *string                            `json:"remote_template_id,omitempty" url:"remote_template_id,omitempty"`
 	IntegrationParams   map[string]interface{}             `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}             `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -275,6 +559,132 @@ func (c *CandidateRequest) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CandidateRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetFirstName(firstName *string) {
+	c.FirstName = firstName
+	c.require(candidateRequestFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetLastName(lastName *string) {
+	c.LastName = lastName
+	c.require(candidateRequestFieldLastName)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetCompany(company *string) {
+	c.Company = company
+	c.require(candidateRequestFieldCompany)
+}
+
+// SetTitle sets the Title field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetTitle(title *string) {
+	c.Title = title
+	c.require(candidateRequestFieldTitle)
+}
+
+// SetLastInteractionAt sets the LastInteractionAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetLastInteractionAt(lastInteractionAt *time.Time) {
+	c.LastInteractionAt = lastInteractionAt
+	c.require(candidateRequestFieldLastInteractionAt)
+}
+
+// SetIsPrivate sets the IsPrivate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetIsPrivate(isPrivate *bool) {
+	c.IsPrivate = isPrivate
+	c.require(candidateRequestFieldIsPrivate)
+}
+
+// SetCanEmail sets the CanEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetCanEmail(canEmail *bool) {
+	c.CanEmail = canEmail
+	c.require(candidateRequestFieldCanEmail)
+}
+
+// SetLocations sets the Locations field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetLocations(locations []*string) {
+	c.Locations = locations
+	c.require(candidateRequestFieldLocations)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetPhoneNumbers(phoneNumbers []*PhoneNumberRequest) {
+	c.PhoneNumbers = phoneNumbers
+	c.require(candidateRequestFieldPhoneNumbers)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetEmailAddresses(emailAddresses []*EmailAddressRequest) {
+	c.EmailAddresses = emailAddresses
+	c.require(candidateRequestFieldEmailAddresses)
+}
+
+// SetUrls sets the Urls field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetUrls(urls []*UrlRequest) {
+	c.Urls = urls
+	c.require(candidateRequestFieldUrls)
+}
+
+// SetTags sets the Tags field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetTags(tags []*string) {
+	c.Tags = tags
+	c.require(candidateRequestFieldTags)
+}
+
+// SetApplications sets the Applications field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetApplications(applications []*CandidateRequestApplicationsItem) {
+	c.Applications = applications
+	c.require(candidateRequestFieldApplications)
+}
+
+// SetAttachments sets the Attachments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetAttachments(attachments []*CandidateRequestAttachmentsItem) {
+	c.Attachments = attachments
+	c.require(candidateRequestFieldAttachments)
+}
+
+// SetRemoteTemplateId sets the RemoteTemplateId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetRemoteTemplateId(remoteTemplateId *string) {
+	c.RemoteTemplateId = remoteTemplateId
+	c.require(candidateRequestFieldRemoteTemplateId)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(candidateRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(candidateRequestFieldLinkedAccountParams)
+}
+
 func (c *CandidateRequest) UnmarshalJSON(data []byte) error {
 	type embed CandidateRequest
 	var unmarshaler = struct {
@@ -306,7 +716,8 @@ func (c *CandidateRequest) MarshalJSON() ([]byte, error) {
 		embed:             embed(*c),
 		LastInteractionAt: internal.NewOptionalDateTime(c.LastInteractionAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CandidateRequest) String() string {
@@ -445,11 +856,21 @@ func (c *CandidateRequestAttachmentsItem) Accept(visitor CandidateRequestAttachm
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+var (
+	candidateResponseFieldModel    = big.NewInt(1 << 0)
+	candidateResponseFieldWarnings = big.NewInt(1 << 1)
+	candidateResponseFieldErrors   = big.NewInt(1 << 2)
+	candidateResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type CandidateResponse struct {
 	Model    *Candidate                  `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -487,6 +908,41 @@ func (c *CandidateResponse) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CandidateResponse) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateResponse) SetModel(model *Candidate) {
+	c.Model = model
+	c.require(candidateResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	c.Warnings = warnings
+	c.require(candidateResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateResponse) SetErrors(errors []*ErrorValidationProblem) {
+	c.Errors = errors
+	c.require(candidateResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CandidateResponse) SetLogs(logs []*DebugModeLog) {
+	c.Logs = logs
+	c.require(candidateResponseFieldLogs)
+}
+
 func (c *CandidateResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler CandidateResponse
 	var value unmarshaler
@@ -501,6 +957,17 @@ func (c *CandidateResponse) UnmarshalJSON(data []byte) error {
 	c.extraProperties = extraProperties
 	c.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (c *CandidateResponse) MarshalJSON() ([]byte, error) {
+	type embed CandidateResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CandidateResponse) String() string {
@@ -520,6 +987,13 @@ func (c *CandidateResponse) String() string {
 // The `EmailAddress` object is used to represent a candidate's email address.
 // ### Usage Example
 // Fetch from the `GET Candidate` endpoint and view their email addresses.
+var (
+	emailAddressRequestFieldValue               = big.NewInt(1 << 0)
+	emailAddressRequestFieldEmailAddressType    = big.NewInt(1 << 1)
+	emailAddressRequestFieldIntegrationParams   = big.NewInt(1 << 2)
+	emailAddressRequestFieldLinkedAccountParams = big.NewInt(1 << 3)
+)
+
 type EmailAddressRequest struct {
 	// The email address.
 	Value *string `json:"value,omitempty" url:"value,omitempty"`
@@ -531,6 +1005,9 @@ type EmailAddressRequest struct {
 	EmailAddressType    *EmailAddressRequestEmailAddressType `json:"email_address_type,omitempty" url:"email_address_type,omitempty"`
 	IntegrationParams   map[string]interface{}               `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}               `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -568,6 +1045,41 @@ func (e *EmailAddressRequest) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EmailAddressRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetValue sets the Value field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmailAddressRequest) SetValue(value *string) {
+	e.Value = value
+	e.require(emailAddressRequestFieldValue)
+}
+
+// SetEmailAddressType sets the EmailAddressType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmailAddressRequest) SetEmailAddressType(emailAddressType *EmailAddressRequestEmailAddressType) {
+	e.EmailAddressType = emailAddressType
+	e.require(emailAddressRequestFieldEmailAddressType)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmailAddressRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	e.IntegrationParams = integrationParams
+	e.require(emailAddressRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmailAddressRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	e.LinkedAccountParams = linkedAccountParams
+	e.require(emailAddressRequestFieldLinkedAccountParams)
+}
+
 func (e *EmailAddressRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler EmailAddressRequest
 	var value unmarshaler
@@ -582,6 +1094,17 @@ func (e *EmailAddressRequest) UnmarshalJSON(data []byte) error {
 	e.extraProperties = extraProperties
 	e.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (e *EmailAddressRequest) MarshalJSON() ([]byte, error) {
+	type embed EmailAddressRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *EmailAddressRequest) String() string {
@@ -663,9 +1186,17 @@ func (e *EmailAddressRequestEmailAddressType) Accept(visitor EmailAddressRequest
 	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
+var (
+	ignoreCommonModelRequestFieldReason  = big.NewInt(1 << 0)
+	ignoreCommonModelRequestFieldMessage = big.NewInt(1 << 1)
+)
+
 type IgnoreCommonModelRequest struct {
 	Reason  *IgnoreCommonModelRequestReason `json:"reason" url:"reason"`
 	Message *string                         `json:"message,omitempty" url:"message,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -689,6 +1220,27 @@ func (i *IgnoreCommonModelRequest) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *IgnoreCommonModelRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetReason sets the Reason field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IgnoreCommonModelRequest) SetReason(reason *IgnoreCommonModelRequestReason) {
+	i.Reason = reason
+	i.require(ignoreCommonModelRequestFieldReason)
+}
+
+// SetMessage sets the Message field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IgnoreCommonModelRequest) SetMessage(message *string) {
+	i.Message = message
+	i.require(ignoreCommonModelRequestFieldMessage)
+}
+
 func (i *IgnoreCommonModelRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler IgnoreCommonModelRequest
 	var value unmarshaler
@@ -703,6 +1255,17 @@ func (i *IgnoreCommonModelRequest) UnmarshalJSON(data []byte) error {
 	i.extraProperties = extraProperties
 	i.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (i *IgnoreCommonModelRequest) MarshalJSON() ([]byte, error) {
+	type embed IgnoreCommonModelRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*i),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (i *IgnoreCommonModelRequest) String() string {
@@ -779,10 +1342,19 @@ func (i *IgnoreCommonModelRequestReason) Accept(visitor IgnoreCommonModelRequest
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+var (
+	paginatedCandidateListFieldNext     = big.NewInt(1 << 0)
+	paginatedCandidateListFieldPrevious = big.NewInt(1 << 1)
+	paginatedCandidateListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedCandidateList struct {
 	Next     *string      `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string      `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Candidate `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -813,6 +1385,34 @@ func (p *PaginatedCandidateList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedCandidateList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCandidateList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedCandidateListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCandidateList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedCandidateListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCandidateList) SetResults(results []*Candidate) {
+	p.Results = results
+	p.require(paginatedCandidateListFieldResults)
+}
+
 func (p *PaginatedCandidateList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedCandidateList
 	var value unmarshaler
@@ -827,6 +1427,17 @@ func (p *PaginatedCandidateList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedCandidateList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedCandidateList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedCandidateList) String() string {
@@ -846,6 +1457,26 @@ func (p *PaginatedCandidateList) String() string {
 // The `Candidate` object is used to represent profile information about a given Candidate. Because it is specific to a Candidate, this information stays constant across applications.
 // ### Usage Example
 // Fetch from the `LIST Candidates` endpoint and filter by `ID` to show all candidates.
+var (
+	patchedCandidateRequestFieldFirstName           = big.NewInt(1 << 0)
+	patchedCandidateRequestFieldLastName            = big.NewInt(1 << 1)
+	patchedCandidateRequestFieldCompany             = big.NewInt(1 << 2)
+	patchedCandidateRequestFieldTitle               = big.NewInt(1 << 3)
+	patchedCandidateRequestFieldLastInteractionAt   = big.NewInt(1 << 4)
+	patchedCandidateRequestFieldIsPrivate           = big.NewInt(1 << 5)
+	patchedCandidateRequestFieldCanEmail            = big.NewInt(1 << 6)
+	patchedCandidateRequestFieldLocations           = big.NewInt(1 << 7)
+	patchedCandidateRequestFieldPhoneNumbers        = big.NewInt(1 << 8)
+	patchedCandidateRequestFieldEmailAddresses      = big.NewInt(1 << 9)
+	patchedCandidateRequestFieldUrls                = big.NewInt(1 << 10)
+	patchedCandidateRequestFieldTags                = big.NewInt(1 << 11)
+	patchedCandidateRequestFieldApplications        = big.NewInt(1 << 12)
+	patchedCandidateRequestFieldAttachments         = big.NewInt(1 << 13)
+	patchedCandidateRequestFieldRemoteTemplateId    = big.NewInt(1 << 14)
+	patchedCandidateRequestFieldIntegrationParams   = big.NewInt(1 << 15)
+	patchedCandidateRequestFieldLinkedAccountParams = big.NewInt(1 << 16)
+)
+
 type PatchedCandidateRequest struct {
 	// The candidate's first name.
 	FirstName *string `json:"first_name,omitempty" url:"first_name,omitempty"`
@@ -875,6 +1506,9 @@ type PatchedCandidateRequest struct {
 	RemoteTemplateId    *string                `json:"remote_template_id,omitempty" url:"remote_template_id,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1003,6 +1637,132 @@ func (p *PatchedCandidateRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PatchedCandidateRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetFirstName(firstName *string) {
+	p.FirstName = firstName
+	p.require(patchedCandidateRequestFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetLastName(lastName *string) {
+	p.LastName = lastName
+	p.require(patchedCandidateRequestFieldLastName)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetCompany(company *string) {
+	p.Company = company
+	p.require(patchedCandidateRequestFieldCompany)
+}
+
+// SetTitle sets the Title field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetTitle(title *string) {
+	p.Title = title
+	p.require(patchedCandidateRequestFieldTitle)
+}
+
+// SetLastInteractionAt sets the LastInteractionAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetLastInteractionAt(lastInteractionAt *time.Time) {
+	p.LastInteractionAt = lastInteractionAt
+	p.require(patchedCandidateRequestFieldLastInteractionAt)
+}
+
+// SetIsPrivate sets the IsPrivate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetIsPrivate(isPrivate *bool) {
+	p.IsPrivate = isPrivate
+	p.require(patchedCandidateRequestFieldIsPrivate)
+}
+
+// SetCanEmail sets the CanEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetCanEmail(canEmail *bool) {
+	p.CanEmail = canEmail
+	p.require(patchedCandidateRequestFieldCanEmail)
+}
+
+// SetLocations sets the Locations field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetLocations(locations []*string) {
+	p.Locations = locations
+	p.require(patchedCandidateRequestFieldLocations)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetPhoneNumbers(phoneNumbers []*PhoneNumberRequest) {
+	p.PhoneNumbers = phoneNumbers
+	p.require(patchedCandidateRequestFieldPhoneNumbers)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetEmailAddresses(emailAddresses []*EmailAddressRequest) {
+	p.EmailAddresses = emailAddresses
+	p.require(patchedCandidateRequestFieldEmailAddresses)
+}
+
+// SetUrls sets the Urls field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetUrls(urls []*UrlRequest) {
+	p.Urls = urls
+	p.require(patchedCandidateRequestFieldUrls)
+}
+
+// SetTags sets the Tags field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetTags(tags []*string) {
+	p.Tags = tags
+	p.require(patchedCandidateRequestFieldTags)
+}
+
+// SetApplications sets the Applications field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetApplications(applications []*string) {
+	p.Applications = applications
+	p.require(patchedCandidateRequestFieldApplications)
+}
+
+// SetAttachments sets the Attachments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetAttachments(attachments []*string) {
+	p.Attachments = attachments
+	p.require(patchedCandidateRequestFieldAttachments)
+}
+
+// SetRemoteTemplateId sets the RemoteTemplateId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetRemoteTemplateId(remoteTemplateId *string) {
+	p.RemoteTemplateId = remoteTemplateId
+	p.require(patchedCandidateRequestFieldRemoteTemplateId)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedCandidateRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCandidateRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedCandidateRequestFieldLinkedAccountParams)
+}
+
 func (p *PatchedCandidateRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedCandidateRequest
 	var unmarshaler = struct {
@@ -1034,7 +1794,8 @@ func (p *PatchedCandidateRequest) MarshalJSON() ([]byte, error) {
 		embed:             embed(*p),
 		LastInteractionAt: internal.NewOptionalDateTime(p.LastInteractionAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedCandidateRequest) String() string {
@@ -1054,6 +1815,13 @@ func (p *PatchedCandidateRequest) String() string {
 // The `PhoneNumber` object is used to represent a candidate's phone number.
 // ### Usage Example
 // Fetch from the `GET Candidate` endpoint and view their phone numbers.
+var (
+	phoneNumberRequestFieldValue               = big.NewInt(1 << 0)
+	phoneNumberRequestFieldPhoneNumberType     = big.NewInt(1 << 1)
+	phoneNumberRequestFieldIntegrationParams   = big.NewInt(1 << 2)
+	phoneNumberRequestFieldLinkedAccountParams = big.NewInt(1 << 3)
+)
+
 type PhoneNumberRequest struct {
 	// The phone number.
 	Value *string `json:"value,omitempty" url:"value,omitempty"`
@@ -1067,6 +1835,9 @@ type PhoneNumberRequest struct {
 	PhoneNumberType     *PhoneNumberRequestPhoneNumberType `json:"phone_number_type,omitempty" url:"phone_number_type,omitempty"`
 	IntegrationParams   map[string]interface{}             `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}             `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1104,6 +1875,41 @@ func (p *PhoneNumberRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PhoneNumberRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetValue sets the Value field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PhoneNumberRequest) SetValue(value *string) {
+	p.Value = value
+	p.require(phoneNumberRequestFieldValue)
+}
+
+// SetPhoneNumberType sets the PhoneNumberType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PhoneNumberRequest) SetPhoneNumberType(phoneNumberType *PhoneNumberRequestPhoneNumberType) {
+	p.PhoneNumberType = phoneNumberType
+	p.require(phoneNumberRequestFieldPhoneNumberType)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PhoneNumberRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(phoneNumberRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PhoneNumberRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(phoneNumberRequestFieldLinkedAccountParams)
+}
+
 func (p *PhoneNumberRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler PhoneNumberRequest
 	var value unmarshaler
@@ -1118,6 +1924,17 @@ func (p *PhoneNumberRequest) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PhoneNumberRequest) MarshalJSON() ([]byte, error) {
+	type embed PhoneNumberRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PhoneNumberRequest) String() string {
@@ -1234,6 +2051,13 @@ func (r ReasonEnum) Ptr() *ReasonEnum {
 // The `Url` object is used to represent hyperlinks associated with the parent model.
 // ### Usage Example
 // Fetch from the `GET Candidate` endpoint and view their website urls.
+var (
+	urlRequestFieldValue               = big.NewInt(1 << 0)
+	urlRequestFieldUrlType             = big.NewInt(1 << 1)
+	urlRequestFieldIntegrationParams   = big.NewInt(1 << 2)
+	urlRequestFieldLinkedAccountParams = big.NewInt(1 << 3)
+)
+
 type UrlRequest struct {
 	// The site's url.
 	Value *string `json:"value,omitempty" url:"value,omitempty"`
@@ -1249,6 +2073,9 @@ type UrlRequest struct {
 	UrlType             *UrlRequestUrlType     `json:"url_type,omitempty" url:"url_type,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1286,6 +2113,41 @@ func (u *UrlRequest) GetExtraProperties() map[string]interface{} {
 	return u.extraProperties
 }
 
+func (u *UrlRequest) require(field *big.Int) {
+	if u.explicitFields == nil {
+		u.explicitFields = big.NewInt(0)
+	}
+	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetValue sets the Value field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UrlRequest) SetValue(value *string) {
+	u.Value = value
+	u.require(urlRequestFieldValue)
+}
+
+// SetUrlType sets the UrlType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UrlRequest) SetUrlType(urlType *UrlRequestUrlType) {
+	u.UrlType = urlType
+	u.require(urlRequestFieldUrlType)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UrlRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	u.IntegrationParams = integrationParams
+	u.require(urlRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UrlRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	u.LinkedAccountParams = linkedAccountParams
+	u.require(urlRequestFieldLinkedAccountParams)
+}
+
 func (u *UrlRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler UrlRequest
 	var value unmarshaler
@@ -1300,6 +2162,17 @@ func (u *UrlRequest) UnmarshalJSON(data []byte) error {
 	u.extraProperties = extraProperties
 	u.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (u *UrlRequest) MarshalJSON() ([]byte, error) {
+	type embed UrlRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*u),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, u.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (u *UrlRequest) String() string {

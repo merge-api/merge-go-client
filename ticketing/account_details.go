@@ -5,8 +5,24 @@ package ticketing
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	accountDetailsFieldId                      = big.NewInt(1 << 0)
+	accountDetailsFieldIntegration             = big.NewInt(1 << 1)
+	accountDetailsFieldIntegrationSlug         = big.NewInt(1 << 2)
+	accountDetailsFieldCategory                = big.NewInt(1 << 3)
+	accountDetailsFieldEndUserOriginId         = big.NewInt(1 << 4)
+	accountDetailsFieldEndUserOrganizationName = big.NewInt(1 << 5)
+	accountDetailsFieldEndUserEmailAddress     = big.NewInt(1 << 6)
+	accountDetailsFieldStatus                  = big.NewInt(1 << 7)
+	accountDetailsFieldWebhookListenerUrl      = big.NewInt(1 << 8)
+	accountDetailsFieldIsDuplicate             = big.NewInt(1 << 9)
+	accountDetailsFieldAccountType             = big.NewInt(1 << 10)
+	accountDetailsFieldCompletedAt             = big.NewInt(1 << 11)
 )
 
 type AccountDetails struct {
@@ -24,6 +40,9 @@ type AccountDetails struct {
 	AccountType *string `json:"account_type,omitempty" url:"account_type,omitempty"`
 	// The time at which account completes the linking flow.
 	CompletedAt *time.Time `json:"completed_at,omitempty" url:"completed_at,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -117,6 +136,97 @@ func (a *AccountDetails) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AccountDetails) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetId(id *string) {
+	a.Id = id
+	a.require(accountDetailsFieldId)
+}
+
+// SetIntegration sets the Integration field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetIntegration(integration *string) {
+	a.Integration = integration
+	a.require(accountDetailsFieldIntegration)
+}
+
+// SetIntegrationSlug sets the IntegrationSlug field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetIntegrationSlug(integrationSlug *string) {
+	a.IntegrationSlug = integrationSlug
+	a.require(accountDetailsFieldIntegrationSlug)
+}
+
+// SetCategory sets the Category field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetCategory(category *AccountDetailsCategory) {
+	a.Category = category
+	a.require(accountDetailsFieldCategory)
+}
+
+// SetEndUserOriginId sets the EndUserOriginId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetEndUserOriginId(endUserOriginId *string) {
+	a.EndUserOriginId = endUserOriginId
+	a.require(accountDetailsFieldEndUserOriginId)
+}
+
+// SetEndUserOrganizationName sets the EndUserOrganizationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetEndUserOrganizationName(endUserOrganizationName *string) {
+	a.EndUserOrganizationName = endUserOrganizationName
+	a.require(accountDetailsFieldEndUserOrganizationName)
+}
+
+// SetEndUserEmailAddress sets the EndUserEmailAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetEndUserEmailAddress(endUserEmailAddress *string) {
+	a.EndUserEmailAddress = endUserEmailAddress
+	a.require(accountDetailsFieldEndUserEmailAddress)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetStatus(status *string) {
+	a.Status = status
+	a.require(accountDetailsFieldStatus)
+}
+
+// SetWebhookListenerUrl sets the WebhookListenerUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetWebhookListenerUrl(webhookListenerUrl *string) {
+	a.WebhookListenerUrl = webhookListenerUrl
+	a.require(accountDetailsFieldWebhookListenerUrl)
+}
+
+// SetIsDuplicate sets the IsDuplicate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetIsDuplicate(isDuplicate *bool) {
+	a.IsDuplicate = isDuplicate
+	a.require(accountDetailsFieldIsDuplicate)
+}
+
+// SetAccountType sets the AccountType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetAccountType(accountType *string) {
+	a.AccountType = accountType
+	a.require(accountDetailsFieldAccountType)
+}
+
+// SetCompletedAt sets the CompletedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetCompletedAt(completedAt *time.Time) {
+	a.CompletedAt = completedAt
+	a.require(accountDetailsFieldCompletedAt)
+}
+
 func (a *AccountDetails) UnmarshalJSON(data []byte) error {
 	type embed AccountDetails
 	var unmarshaler = struct {
@@ -148,7 +258,8 @@ func (a *AccountDetails) MarshalJSON() ([]byte, error) {
 		embed:       embed(*a),
 		CompletedAt: internal.NewOptionalDateTime(a.CompletedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AccountDetails) String() string {

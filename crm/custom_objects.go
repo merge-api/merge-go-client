@@ -5,8 +5,15 @@ package crm
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	crmCustomObjectEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	crmCustomObjectEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	crmCustomObjectEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type CrmCustomObjectEndpointRequest struct {
@@ -15,7 +22,52 @@ type CrmCustomObjectEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                `json:"-" url:"run_async,omitempty"`
 	Model    *CustomObjectRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CrmCustomObjectEndpointRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	c.IsDebugMode = isDebugMode
+	c.require(crmCustomObjectEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectEndpointRequest) SetRunAsync(runAsync *bool) {
+	c.RunAsync = runAsync
+	c.require(crmCustomObjectEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectEndpointRequest) SetModel(model *CustomObjectRequest) {
+	c.Model = model
+	c.require(crmCustomObjectEndpointRequestFieldModel)
+}
+
+var (
+	customObjectClassesCustomObjectsListRequestFieldCreatedAfter        = big.NewInt(1 << 0)
+	customObjectClassesCustomObjectsListRequestFieldCreatedBefore       = big.NewInt(1 << 1)
+	customObjectClassesCustomObjectsListRequestFieldCursor              = big.NewInt(1 << 2)
+	customObjectClassesCustomObjectsListRequestFieldIncludeDeletedData  = big.NewInt(1 << 3)
+	customObjectClassesCustomObjectsListRequestFieldIncludeRemoteData   = big.NewInt(1 << 4)
+	customObjectClassesCustomObjectsListRequestFieldIncludeRemoteFields = big.NewInt(1 << 5)
+	customObjectClassesCustomObjectsListRequestFieldIncludeShellData    = big.NewInt(1 << 6)
+	customObjectClassesCustomObjectsListRequestFieldModifiedAfter       = big.NewInt(1 << 7)
+	customObjectClassesCustomObjectsListRequestFieldModifiedBefore      = big.NewInt(1 << 8)
+	customObjectClassesCustomObjectsListRequestFieldPageSize            = big.NewInt(1 << 9)
+	customObjectClassesCustomObjectsListRequestFieldRemoteId            = big.NewInt(1 << 10)
+)
 
 type CustomObjectClassesCustomObjectsListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -40,7 +92,105 @@ type CustomObjectClassesCustomObjectsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CustomObjectClassesCustomObjectsListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(customObjectClassesCustomObjectsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(customObjectClassesCustomObjectsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(customObjectClassesCustomObjectsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(customObjectClassesCustomObjectsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(customObjectClassesCustomObjectsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	c.IncludeRemoteFields = includeRemoteFields
+	c.require(customObjectClassesCustomObjectsListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(customObjectClassesCustomObjectsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(customObjectClassesCustomObjectsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(customObjectClassesCustomObjectsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(customObjectClassesCustomObjectsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(customObjectClassesCustomObjectsListRequestFieldRemoteId)
+}
+
+var (
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -59,7 +209,79 @@ type CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	c.IncludeRemoteFields = includeRemoteFields
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	c.IsCommonModelField = isCommonModelField
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	c.IsCustom = isCustom
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(customObjectClassesCustomObjectsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	customObjectClassesCustomObjectsRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 0)
+	customObjectClassesCustomObjectsRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 1)
+	customObjectClassesCustomObjectsRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 2)
+)
 
 type CustomObjectClassesCustomObjectsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -68,13 +290,54 @@ type CustomObjectClassesCustomObjectsRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CustomObjectClassesCustomObjectsRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(customObjectClassesCustomObjectsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	c.IncludeRemoteFields = includeRemoteFields
+	c.require(customObjectClassesCustomObjectsRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectClassesCustomObjectsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(customObjectClassesCustomObjectsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	crmCustomObjectResponseFieldModel    = big.NewInt(1 << 0)
+	crmCustomObjectResponseFieldWarnings = big.NewInt(1 << 1)
+	crmCustomObjectResponseFieldErrors   = big.NewInt(1 << 2)
+	crmCustomObjectResponseFieldLogs     = big.NewInt(1 << 3)
+)
 
 type CrmCustomObjectResponse struct {
 	Model    *CustomObject               `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -112,6 +375,41 @@ func (c *CrmCustomObjectResponse) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CrmCustomObjectResponse) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectResponse) SetModel(model *CustomObject) {
+	c.Model = model
+	c.require(crmCustomObjectResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	c.Warnings = warnings
+	c.require(crmCustomObjectResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectResponse) SetErrors(errors []*ErrorValidationProblem) {
+	c.Errors = errors
+	c.require(crmCustomObjectResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmCustomObjectResponse) SetLogs(logs []*DebugModeLog) {
+	c.Logs = logs
+	c.require(crmCustomObjectResponseFieldLogs)
+}
+
 func (c *CrmCustomObjectResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler CrmCustomObjectResponse
 	var value unmarshaler
@@ -126,6 +424,17 @@ func (c *CrmCustomObjectResponse) UnmarshalJSON(data []byte) error {
 	c.extraProperties = extraProperties
 	c.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (c *CrmCustomObjectResponse) MarshalJSON() ([]byte, error) {
+	type embed CrmCustomObjectResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CrmCustomObjectResponse) String() string {
@@ -145,6 +454,16 @@ func (c *CrmCustomObjectResponse) String() string {
 // The `Custom Object` record refers to an instance of a Custom Object Class.
 // ### Usage Example
 // TODO
+var (
+	customObjectFieldId           = big.NewInt(1 << 0)
+	customObjectFieldRemoteId     = big.NewInt(1 << 1)
+	customObjectFieldCreatedAt    = big.NewInt(1 << 2)
+	customObjectFieldModifiedAt   = big.NewInt(1 << 3)
+	customObjectFieldObjectClass  = big.NewInt(1 << 4)
+	customObjectFieldFields       = big.NewInt(1 << 5)
+	customObjectFieldRemoteFields = big.NewInt(1 << 6)
+)
+
 type CustomObject struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -158,6 +477,9 @@ type CustomObject struct {
 	// The fields and values contained within the custom object record.
 	Fields       map[string]interface{} `json:"fields,omitempty" url:"fields,omitempty"`
 	RemoteFields []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -216,6 +538,62 @@ func (c *CustomObject) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CustomObject) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetId(id *string) {
+	c.Id = id
+	c.require(customObjectFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(customObjectFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetCreatedAt(createdAt *time.Time) {
+	c.CreatedAt = createdAt
+	c.require(customObjectFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetModifiedAt(modifiedAt *time.Time) {
+	c.ModifiedAt = modifiedAt
+	c.require(customObjectFieldModifiedAt)
+}
+
+// SetObjectClass sets the ObjectClass field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetObjectClass(objectClass *string) {
+	c.ObjectClass = objectClass
+	c.require(customObjectFieldObjectClass)
+}
+
+// SetFields sets the Fields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetFields(fields map[string]interface{}) {
+	c.Fields = fields
+	c.require(customObjectFieldFields)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObject) SetRemoteFields(remoteFields []*RemoteField) {
+	c.RemoteFields = remoteFields
+	c.require(customObjectFieldRemoteFields)
+}
+
 func (c *CustomObject) UnmarshalJSON(data []byte) error {
 	type embed CustomObject
 	var unmarshaler = struct {
@@ -251,7 +629,8 @@ func (c *CustomObject) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(c.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(c.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CustomObject) String() string {
@@ -266,10 +645,19 @@ func (c *CustomObject) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+var (
+	customObjectRequestFieldFields              = big.NewInt(1 << 0)
+	customObjectRequestFieldIntegrationParams   = big.NewInt(1 << 1)
+	customObjectRequestFieldLinkedAccountParams = big.NewInt(1 << 2)
+)
+
 type CustomObjectRequest struct {
 	Fields              map[string]interface{} `json:"fields" url:"fields"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -300,6 +688,34 @@ func (c *CustomObjectRequest) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CustomObjectRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetFields sets the Fields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectRequest) SetFields(fields map[string]interface{}) {
+	c.Fields = fields
+	c.require(customObjectRequestFieldFields)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(customObjectRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CustomObjectRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(customObjectRequestFieldLinkedAccountParams)
+}
+
 func (c *CustomObjectRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler CustomObjectRequest
 	var value unmarshaler
@@ -316,6 +732,17 @@ func (c *CustomObjectRequest) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (c *CustomObjectRequest) MarshalJSON() ([]byte, error) {
+	type embed CustomObjectRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (c *CustomObjectRequest) String() string {
 	if len(c.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
@@ -328,10 +755,19 @@ func (c *CustomObjectRequest) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+var (
+	paginatedCustomObjectListFieldNext     = big.NewInt(1 << 0)
+	paginatedCustomObjectListFieldPrevious = big.NewInt(1 << 1)
+	paginatedCustomObjectListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedCustomObjectList struct {
 	Next     *string         `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string         `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*CustomObject `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -362,6 +798,34 @@ func (p *PaginatedCustomObjectList) GetExtraProperties() map[string]interface{} 
 	return p.extraProperties
 }
 
+func (p *PaginatedCustomObjectList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCustomObjectList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedCustomObjectListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCustomObjectList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedCustomObjectListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCustomObjectList) SetResults(results []*CustomObject) {
+	p.Results = results
+	p.require(paginatedCustomObjectListFieldResults)
+}
+
 func (p *PaginatedCustomObjectList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedCustomObjectList
 	var value unmarshaler
@@ -376,6 +840,17 @@ func (p *PaginatedCustomObjectList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedCustomObjectList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedCustomObjectList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedCustomObjectList) String() string {

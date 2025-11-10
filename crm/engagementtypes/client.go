@@ -4,31 +4,32 @@ package engagementtypes
 
 import (
 	context "context"
-	fmt "fmt"
-	core "github.com/merge-api/merge-go-client/v2/core"
-	crm "github.com/merge-api/merge-go-client/v2/crm"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
+	core "github.com/merge-api/merge-go-client/core"
+	crm "github.com/merge-api/merge-go-client/crm"
+	internal "github.com/merge-api/merge-go-client/internal"
+	option "github.com/merge-api/merge-go-client/option"
 	http "net/http"
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,7 +38,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *crm.EngagementTypesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*crm.EngagementType], error) {
+) (*core.Page[*string, *crm.EngagementType], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,13 +51,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -73,11 +73,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedEngagementTypeList) *internal.PageResponse[*string, *crm.EngagementType] {
+	readPageResponse := func(response *crm.PaginatedEngagementTypeList) *core.PageResponse[*string, *crm.EngagementType] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *crm.EngagementType]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *crm.EngagementType]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -98,45 +98,16 @@ func (c *Client) Retrieve(
 	request *crm.EngagementTypesRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*crm.EngagementType, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/crm/v1/engagement-types/%v",
+	response, err := c.WithRawResponse.Retrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *crm.EngagementType
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
@@ -144,7 +115,7 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *crm.EngagementTypesRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*crm.RemoteFieldClass], error) {
+) (*core.Page[*string, *crm.RemoteFieldClass], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -157,13 +128,12 @@ func (c *Client) RemoteFieldClassesList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -180,11 +150,11 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedRemoteFieldClassList) *internal.PageResponse[*string, *crm.RemoteFieldClass] {
+	readPageResponse := func(response *crm.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *crm.RemoteFieldClass] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *crm.RemoteFieldClass]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *crm.RemoteFieldClass]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,

@@ -5,8 +5,25 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	locationsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	locationsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	locationsListRequestFieldCursor             = big.NewInt(1 << 2)
+	locationsListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	locationsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	locationsListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	locationsListRequestFieldLocationType       = big.NewInt(1 << 6)
+	locationsListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	locationsListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	locationsListRequestFieldPageSize           = big.NewInt(1 << 9)
+	locationsListRequestFieldRemoteFields       = big.NewInt(1 << 10)
+	locationsListRequestFieldRemoteId           = big.NewInt(1 << 11)
+	locationsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 12)
 )
 
 type LocationsListRequest struct {
@@ -39,7 +56,115 @@ type LocationsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *LocationsListRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (l *LocationsListRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	l.CreatedAfter = createdAfter
+	l.require(locationsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	l.CreatedBefore = createdBefore
+	l.require(locationsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetCursor(cursor *string) {
+	l.Cursor = cursor
+	l.require(locationsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	l.IncludeDeletedData = includeDeletedData
+	l.require(locationsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	l.IncludeRemoteData = includeRemoteData
+	l.require(locationsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetIncludeShellData(includeShellData *bool) {
+	l.IncludeShellData = includeShellData
+	l.require(locationsListRequestFieldIncludeShellData)
+}
+
+// SetLocationType sets the LocationType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetLocationType(locationType *LocationsListRequestLocationType) {
+	l.LocationType = locationType
+	l.require(locationsListRequestFieldLocationType)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	l.ModifiedAfter = modifiedAfter
+	l.require(locationsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	l.ModifiedBefore = modifiedBefore
+	l.require(locationsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetPageSize(pageSize *int) {
+	l.PageSize = pageSize
+	l.require(locationsListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetRemoteFields(remoteFields *LocationsListRequestRemoteFields) {
+	l.RemoteFields = remoteFields
+	l.require(locationsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetRemoteId(remoteId *string) {
+	l.RemoteId = remoteId
+	l.require(locationsListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsListRequest) SetShowEnumOrigins(showEnumOrigins *LocationsListRequestShowEnumOrigins) {
+	l.ShowEnumOrigins = showEnumOrigins
+	l.require(locationsListRequestFieldShowEnumOrigins)
+}
+
+var (
+	locationsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	locationsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+	locationsRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 2)
+	locationsRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 3)
+)
 
 type LocationsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -50,6 +175,44 @@ type LocationsRetrieveRequest struct {
 	RemoteFields *LocationsRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *LocationsRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (l *LocationsRetrieveRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	l.IncludeRemoteData = includeRemoteData
+	l.require(locationsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	l.IncludeShellData = includeShellData
+	l.require(locationsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsRetrieveRequest) SetRemoteFields(remoteFields *LocationsRetrieveRequestRemoteFields) {
+	l.RemoteFields = remoteFields
+	l.require(locationsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LocationsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *LocationsRetrieveRequestShowEnumOrigins) {
+	l.ShowEnumOrigins = showEnumOrigins
+	l.require(locationsRetrieveRequestFieldShowEnumOrigins)
 }
 
 type LocationsListRequestLocationType string
@@ -174,10 +337,19 @@ func (l LocationsRetrieveRequestShowEnumOrigins) Ptr() *LocationsRetrieveRequest
 	return &l
 }
 
+var (
+	paginatedLocationListFieldNext     = big.NewInt(1 << 0)
+	paginatedLocationListFieldPrevious = big.NewInt(1 << 1)
+	paginatedLocationListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedLocationList struct {
 	Next     *string     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Location `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -208,6 +380,34 @@ func (p *PaginatedLocationList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedLocationList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedLocationList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedLocationListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedLocationList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedLocationListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedLocationList) SetResults(results []*Location) {
+	p.Results = results
+	p.require(paginatedLocationListFieldResults)
+}
+
 func (p *PaginatedLocationList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedLocationList
 	var value unmarshaler
@@ -222,6 +422,17 @@ func (p *PaginatedLocationList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedLocationList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedLocationList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedLocationList) String() string {

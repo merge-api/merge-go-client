@@ -5,8 +5,22 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	departmentsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	departmentsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	departmentsListRequestFieldCursor             = big.NewInt(1 << 2)
+	departmentsListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	departmentsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	departmentsListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	departmentsListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	departmentsListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	departmentsListRequestFieldPageSize           = big.NewInt(1 << 8)
+	departmentsListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type DepartmentsListRequest struct {
@@ -30,19 +44,137 @@ type DepartmentsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (d *DepartmentsListRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	d.CreatedAfter = createdAfter
+	d.require(departmentsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	d.CreatedBefore = createdBefore
+	d.require(departmentsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetCursor(cursor *string) {
+	d.Cursor = cursor
+	d.require(departmentsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	d.IncludeDeletedData = includeDeletedData
+	d.require(departmentsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	d.IncludeRemoteData = includeRemoteData
+	d.require(departmentsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetIncludeShellData(includeShellData *bool) {
+	d.IncludeShellData = includeShellData
+	d.require(departmentsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	d.ModifiedAfter = modifiedAfter
+	d.require(departmentsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	d.ModifiedBefore = modifiedBefore
+	d.require(departmentsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetPageSize(pageSize *int) {
+	d.PageSize = pageSize
+	d.require(departmentsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsListRequest) SetRemoteId(remoteId *string) {
+	d.RemoteId = remoteId
+	d.require(departmentsListRequestFieldRemoteId)
+}
+
+var (
+	departmentsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	departmentsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type DepartmentsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (d *DepartmentsRetrieveRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	d.IncludeRemoteData = includeRemoteData
+	d.require(departmentsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DepartmentsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	d.IncludeShellData = includeShellData
+	d.require(departmentsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedDepartmentListFieldNext     = big.NewInt(1 << 0)
+	paginatedDepartmentListFieldPrevious = big.NewInt(1 << 1)
+	paginatedDepartmentListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedDepartmentList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Department `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedDepartmentList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedDepartmentList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDepartmentList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedDepartmentListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDepartmentList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedDepartmentListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDepartmentList) SetResults(results []*Department) {
+	p.Results = results
+	p.require(paginatedDepartmentListFieldResults)
+}
+
 func (p *PaginatedDepartmentList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedDepartmentList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedDepartmentList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedDepartmentList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedDepartmentList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedDepartmentList) String() string {

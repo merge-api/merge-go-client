@@ -5,8 +5,27 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	offersListRequestFieldApplicationId      = big.NewInt(1 << 0)
+	offersListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	offersListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	offersListRequestFieldCreatorId          = big.NewInt(1 << 3)
+	offersListRequestFieldCursor             = big.NewInt(1 << 4)
+	offersListRequestFieldExpand             = big.NewInt(1 << 5)
+	offersListRequestFieldIncludeDeletedData = big.NewInt(1 << 6)
+	offersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 7)
+	offersListRequestFieldIncludeShellData   = big.NewInt(1 << 8)
+	offersListRequestFieldModifiedAfter      = big.NewInt(1 << 9)
+	offersListRequestFieldModifiedBefore     = big.NewInt(1 << 10)
+	offersListRequestFieldPageSize           = big.NewInt(1 << 11)
+	offersListRequestFieldRemoteFields       = big.NewInt(1 << 12)
+	offersListRequestFieldRemoteId           = big.NewInt(1 << 13)
+	offersListRequestFieldShowEnumOrigins    = big.NewInt(1 << 14)
 )
 
 type OffersListRequest struct {
@@ -40,7 +59,130 @@ type OffersListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (o *OffersListRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetApplicationId sets the ApplicationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetApplicationId(applicationId *string) {
+	o.ApplicationId = applicationId
+	o.require(offersListRequestFieldApplicationId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	o.CreatedAfter = createdAfter
+	o.require(offersListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	o.CreatedBefore = createdBefore
+	o.require(offersListRequestFieldCreatedBefore)
+}
+
+// SetCreatorId sets the CreatorId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetCreatorId(creatorId *string) {
+	o.CreatorId = creatorId
+	o.require(offersListRequestFieldCreatorId)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetCursor(cursor *string) {
+	o.Cursor = cursor
+	o.require(offersListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetExpand(expand []*OffersListRequestExpandItem) {
+	o.Expand = expand
+	o.require(offersListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	o.IncludeDeletedData = includeDeletedData
+	o.require(offersListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(offersListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(offersListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	o.ModifiedAfter = modifiedAfter
+	o.require(offersListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	o.ModifiedBefore = modifiedBefore
+	o.require(offersListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetPageSize(pageSize *int) {
+	o.PageSize = pageSize
+	o.require(offersListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetRemoteFields(remoteFields *string) {
+	o.RemoteFields = remoteFields
+	o.require(offersListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetRemoteId(remoteId *string) {
+	o.RemoteId = remoteId
+	o.require(offersListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	o.ShowEnumOrigins = showEnumOrigins
+	o.require(offersListRequestFieldShowEnumOrigins)
+}
+
+var (
+	offersRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	offersRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	offersRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	offersRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	offersRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type OffersRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -53,6 +195,51 @@ type OffersRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (o *OffersRetrieveRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersRetrieveRequest) SetExpand(expand []*OffersRetrieveRequestExpandItem) {
+	o.Expand = expand
+	o.require(offersRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(offersRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(offersRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	o.RemoteFields = remoteFields
+	o.require(offersRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	o.ShowEnumOrigins = showEnumOrigins
+	o.require(offersRetrieveRequestFieldShowEnumOrigins)
 }
 
 type OffersListRequestExpandItem string
@@ -99,10 +286,19 @@ func (o OffersRetrieveRequestExpandItem) Ptr() *OffersRetrieveRequestExpandItem 
 	return &o
 }
 
+var (
+	paginatedOfferListFieldNext     = big.NewInt(1 << 0)
+	paginatedOfferListFieldPrevious = big.NewInt(1 << 1)
+	paginatedOfferListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedOfferList struct {
 	Next     *string  `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Offer `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -133,6 +329,34 @@ func (p *PaginatedOfferList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedOfferList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOfferList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedOfferListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOfferList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedOfferListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOfferList) SetResults(results []*Offer) {
+	p.Results = results
+	p.require(paginatedOfferListFieldResults)
+}
+
 func (p *PaginatedOfferList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedOfferList
 	var value unmarshaler
@@ -147,6 +371,17 @@ func (p *PaginatedOfferList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedOfferList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedOfferList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedOfferList) String() string {

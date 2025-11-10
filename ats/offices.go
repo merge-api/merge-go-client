@@ -5,8 +5,22 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	officesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	officesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	officesListRequestFieldCursor             = big.NewInt(1 << 2)
+	officesListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	officesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	officesListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	officesListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	officesListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	officesListRequestFieldPageSize           = big.NewInt(1 << 8)
+	officesListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type OfficesListRequest struct {
@@ -30,19 +44,137 @@ type OfficesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (o *OfficesListRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	o.CreatedAfter = createdAfter
+	o.require(officesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	o.CreatedBefore = createdBefore
+	o.require(officesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetCursor(cursor *string) {
+	o.Cursor = cursor
+	o.require(officesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	o.IncludeDeletedData = includeDeletedData
+	o.require(officesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(officesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(officesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	o.ModifiedAfter = modifiedAfter
+	o.require(officesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	o.ModifiedBefore = modifiedBefore
+	o.require(officesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetPageSize(pageSize *int) {
+	o.PageSize = pageSize
+	o.require(officesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesListRequest) SetRemoteId(remoteId *string) {
+	o.RemoteId = remoteId
+	o.require(officesListRequestFieldRemoteId)
+}
+
+var (
+	officesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	officesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type OfficesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (o *OfficesRetrieveRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(officesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OfficesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(officesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedOfficeListFieldNext     = big.NewInt(1 << 0)
+	paginatedOfficeListFieldPrevious = big.NewInt(1 << 1)
+	paginatedOfficeListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedOfficeList struct {
 	Next     *string   `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string   `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Office `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedOfficeList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedOfficeList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOfficeList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedOfficeListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOfficeList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedOfficeListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOfficeList) SetResults(results []*Office) {
+	p.Results = results
+	p.require(paginatedOfficeListFieldResults)
+}
+
 func (p *PaginatedOfficeList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedOfficeList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedOfficeList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedOfficeList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedOfficeList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedOfficeList) String() string {

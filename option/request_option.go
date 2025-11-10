@@ -3,7 +3,7 @@
 package option
 
 import (
-	core "github.com/merge-api/merge-go-client/v2/core"
+	core "github.com/merge-api/merge-go-client/core"
 	http "net/http"
 	url "net/url"
 )

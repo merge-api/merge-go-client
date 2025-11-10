@@ -5,8 +5,29 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	payrollRunsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	payrollRunsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	payrollRunsListRequestFieldCursor             = big.NewInt(1 << 2)
+	payrollRunsListRequestFieldEndedAfter         = big.NewInt(1 << 3)
+	payrollRunsListRequestFieldEndedBefore        = big.NewInt(1 << 4)
+	payrollRunsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	payrollRunsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	payrollRunsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	payrollRunsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	payrollRunsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	payrollRunsListRequestFieldPageSize           = big.NewInt(1 << 10)
+	payrollRunsListRequestFieldRemoteFields       = big.NewInt(1 << 11)
+	payrollRunsListRequestFieldRemoteId           = big.NewInt(1 << 12)
+	payrollRunsListRequestFieldRunType            = big.NewInt(1 << 13)
+	payrollRunsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 14)
+	payrollRunsListRequestFieldStartedAfter       = big.NewInt(1 << 15)
+	payrollRunsListRequestFieldStartedBefore      = big.NewInt(1 << 16)
 )
 
 type PayrollRunsListRequest struct {
@@ -50,7 +71,143 @@ type PayrollRunsListRequest struct {
 	StartedAfter *time.Time `json:"-" url:"started_after,omitempty"`
 	// If provided, will only return payroll runs started before this datetime.
 	StartedBefore *time.Time `json:"-" url:"started_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PayrollRunsListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	p.CreatedAfter = createdAfter
+	p.require(payrollRunsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	p.CreatedBefore = createdBefore
+	p.require(payrollRunsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(payrollRunsListRequestFieldCursor)
+}
+
+// SetEndedAfter sets the EndedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetEndedAfter(endedAfter *time.Time) {
+	p.EndedAfter = endedAfter
+	p.require(payrollRunsListRequestFieldEndedAfter)
+}
+
+// SetEndedBefore sets the EndedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetEndedBefore(endedBefore *time.Time) {
+	p.EndedBefore = endedBefore
+	p.require(payrollRunsListRequestFieldEndedBefore)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(payrollRunsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(payrollRunsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(payrollRunsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	p.ModifiedAfter = modifiedAfter
+	p.require(payrollRunsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	p.ModifiedBefore = modifiedBefore
+	p.require(payrollRunsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(payrollRunsListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetRemoteFields(remoteFields *PayrollRunsListRequestRemoteFields) {
+	p.RemoteFields = remoteFields
+	p.require(payrollRunsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(payrollRunsListRequestFieldRemoteId)
+}
+
+// SetRunType sets the RunType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetRunType(runType *PayrollRunsListRequestRunType) {
+	p.RunType = runType
+	p.require(payrollRunsListRequestFieldRunType)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetShowEnumOrigins(showEnumOrigins *PayrollRunsListRequestShowEnumOrigins) {
+	p.ShowEnumOrigins = showEnumOrigins
+	p.require(payrollRunsListRequestFieldShowEnumOrigins)
+}
+
+// SetStartedAfter sets the StartedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetStartedAfter(startedAfter *time.Time) {
+	p.StartedAfter = startedAfter
+	p.require(payrollRunsListRequestFieldStartedAfter)
+}
+
+// SetStartedBefore sets the StartedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsListRequest) SetStartedBefore(startedBefore *time.Time) {
+	p.StartedBefore = startedBefore
+	p.require(payrollRunsListRequestFieldStartedBefore)
+}
+
+var (
+	payrollRunsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	payrollRunsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+	payrollRunsRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 2)
+	payrollRunsRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 3)
+)
 
 type PayrollRunsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -61,6 +218,44 @@ type PayrollRunsRetrieveRequest struct {
 	RemoteFields *PayrollRunsRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *PayrollRunsRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *PayrollRunsRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(payrollRunsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(payrollRunsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsRetrieveRequest) SetRemoteFields(remoteFields *PayrollRunsRetrieveRequestRemoteFields) {
+	p.RemoteFields = remoteFields
+	p.require(payrollRunsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PayrollRunsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *PayrollRunsRetrieveRequestShowEnumOrigins) {
+	p.ShowEnumOrigins = showEnumOrigins
+	p.require(payrollRunsRetrieveRequestFieldShowEnumOrigins)
 }
 
 type PayrollRunsListRequestRemoteFields string
@@ -194,10 +389,19 @@ func (p PayrollRunsRetrieveRequestShowEnumOrigins) Ptr() *PayrollRunsRetrieveReq
 	return &p
 }
 
+var (
+	paginatedPayrollRunListFieldNext     = big.NewInt(1 << 0)
+	paginatedPayrollRunListFieldPrevious = big.NewInt(1 << 1)
+	paginatedPayrollRunListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedPayrollRunList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*PayrollRun `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -228,6 +432,34 @@ func (p *PaginatedPayrollRunList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedPayrollRunList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPayrollRunList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedPayrollRunListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPayrollRunList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedPayrollRunListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPayrollRunList) SetResults(results []*PayrollRun) {
+	p.Results = results
+	p.require(paginatedPayrollRunListFieldResults)
+}
+
 func (p *PaginatedPayrollRunList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedPayrollRunList
 	var value unmarshaler
@@ -242,6 +474,17 @@ func (p *PaginatedPayrollRunList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedPayrollRunList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedPayrollRunList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedPayrollRunList) String() string {

@@ -5,7 +5,16 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	accountingPeriodsListRequestFieldCursor             = big.NewInt(1 << 0)
+	accountingPeriodsListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	accountingPeriodsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	accountingPeriodsListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	accountingPeriodsListRequestFieldPageSize           = big.NewInt(1 << 4)
 )
 
 type AccountingPeriodsListRequest struct {
@@ -19,19 +28,102 @@ type AccountingPeriodsListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *AccountingPeriodsListRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsListRequest) SetCursor(cursor *string) {
+	a.Cursor = cursor
+	a.require(accountingPeriodsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	a.IncludeDeletedData = includeDeletedData
+	a.require(accountingPeriodsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(accountingPeriodsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsListRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(accountingPeriodsListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsListRequest) SetPageSize(pageSize *int) {
+	a.PageSize = pageSize
+	a.require(accountingPeriodsListRequestFieldPageSize)
+}
+
+var (
+	accountingPeriodsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	accountingPeriodsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type AccountingPeriodsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *AccountingPeriodsRetrieveRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(accountingPeriodsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriodsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(accountingPeriodsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedAccountingPeriodListFieldNext     = big.NewInt(1 << 0)
+	paginatedAccountingPeriodListFieldPrevious = big.NewInt(1 << 1)
+	paginatedAccountingPeriodListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedAccountingPeriodList struct {
 	Next     *string             `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string             `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*AccountingPeriod `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -62,6 +154,34 @@ func (p *PaginatedAccountingPeriodList) GetExtraProperties() map[string]interfac
 	return p.extraProperties
 }
 
+func (p *PaginatedAccountingPeriodList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountingPeriodList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedAccountingPeriodListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountingPeriodList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedAccountingPeriodListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountingPeriodList) SetResults(results []*AccountingPeriod) {
+	p.Results = results
+	p.require(paginatedAccountingPeriodListFieldResults)
+}
+
 func (p *PaginatedAccountingPeriodList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedAccountingPeriodList
 	var value unmarshaler
@@ -76,6 +196,17 @@ func (p *PaginatedAccountingPeriodList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedAccountingPeriodList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedAccountingPeriodList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedAccountingPeriodList) String() string {

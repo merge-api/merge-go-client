@@ -5,8 +5,15 @@ package crm
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	crmContactEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	crmContactEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	crmContactEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type CrmContactEndpointRequest struct {
@@ -15,7 +22,56 @@ type CrmContactEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool           `json:"-" url:"run_async,omitempty"`
 	Model    *ContactRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CrmContactEndpointRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	c.IsDebugMode = isDebugMode
+	c.require(crmContactEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactEndpointRequest) SetRunAsync(runAsync *bool) {
+	c.RunAsync = runAsync
+	c.require(crmContactEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactEndpointRequest) SetModel(model *ContactRequest) {
+	c.Model = model
+	c.require(crmContactEndpointRequestFieldModel)
+}
+
+var (
+	contactsListRequestFieldAccountId           = big.NewInt(1 << 0)
+	contactsListRequestFieldCreatedAfter        = big.NewInt(1 << 1)
+	contactsListRequestFieldCreatedBefore       = big.NewInt(1 << 2)
+	contactsListRequestFieldCursor              = big.NewInt(1 << 3)
+	contactsListRequestFieldEmailAddresses      = big.NewInt(1 << 4)
+	contactsListRequestFieldExpand              = big.NewInt(1 << 5)
+	contactsListRequestFieldIncludeDeletedData  = big.NewInt(1 << 6)
+	contactsListRequestFieldIncludeRemoteData   = big.NewInt(1 << 7)
+	contactsListRequestFieldIncludeRemoteFields = big.NewInt(1 << 8)
+	contactsListRequestFieldIncludeShellData    = big.NewInt(1 << 9)
+	contactsListRequestFieldModifiedAfter       = big.NewInt(1 << 10)
+	contactsListRequestFieldModifiedBefore      = big.NewInt(1 << 11)
+	contactsListRequestFieldPageSize            = big.NewInt(1 << 12)
+	contactsListRequestFieldPhoneNumbers        = big.NewInt(1 << 13)
+	contactsListRequestFieldRemoteId            = big.NewInt(1 << 14)
+)
 
 type ContactsListRequest struct {
 	// If provided, will only return contacts with this account.
@@ -48,7 +104,128 @@ type ContactsListRequest struct {
 	PhoneNumbers *string `json:"-" url:"phone_numbers,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *ContactsListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetAccountId sets the AccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetAccountId(accountId *string) {
+	c.AccountId = accountId
+	c.require(contactsListRequestFieldAccountId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(contactsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(contactsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(contactsListRequestFieldCursor)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetEmailAddresses(emailAddresses *string) {
+	c.EmailAddresses = emailAddresses
+	c.require(contactsListRequestFieldEmailAddresses)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetExpand(expand []*ContactsListRequestExpandItem) {
+	c.Expand = expand
+	c.require(contactsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(contactsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(contactsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	c.IncludeRemoteFields = includeRemoteFields
+	c.require(contactsListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(contactsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(contactsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(contactsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(contactsListRequestFieldPageSize)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetPhoneNumbers(phoneNumbers *string) {
+	c.PhoneNumbers = phoneNumbers
+	c.require(contactsListRequestFieldPhoneNumbers)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(contactsListRequestFieldRemoteId)
+}
+
+var (
+	patchedCrmContactEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedCrmContactEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedCrmContactEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedCrmContactEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -56,7 +233,49 @@ type PatchedCrmContactEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                  `json:"-" url:"run_async,omitempty"`
 	Model    *PatchedContactRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedCrmContactEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCrmContactEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedCrmContactEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCrmContactEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedCrmContactEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCrmContactEndpointRequest) SetModel(model *PatchedContactRequest) {
+	p.Model = model
+	p.require(patchedCrmContactEndpointRequestFieldModel)
+}
+
+var (
+	contactsRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	contactsRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	contactsRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	contactsRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	contactsRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	contactsRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	contactsRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	contactsRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type ContactsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -75,7 +294,80 @@ type ContactsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *ContactsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(contactsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(contactsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(contactsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	c.IncludeRemoteFields = includeRemoteFields
+	c.require(contactsRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(contactsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	c.IsCommonModelField = isCommonModelField
+	c.require(contactsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	c.IsCustom = isCustom
+	c.require(contactsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(contactsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	contactsRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	contactsRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	contactsRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	contactsRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type ContactsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -86,6 +378,44 @@ type ContactsRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (c *ContactsRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRetrieveRequest) SetExpand(expand []*ContactsRetrieveRequestExpandItem) {
+	c.Expand = expand
+	c.require(contactsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(contactsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	c.IncludeRemoteFields = includeRemoteFields
+	c.require(contactsRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(contactsRetrieveRequestFieldIncludeShellData)
 }
 
 type ContactsListRequestExpandItem string
@@ -137,6 +467,20 @@ func (c ContactsRetrieveRequestExpandItem) Ptr() *ContactsRetrieveRequestExpandI
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	contactRequestFieldFirstName           = big.NewInt(1 << 0)
+	contactRequestFieldLastName            = big.NewInt(1 << 1)
+	contactRequestFieldAccount             = big.NewInt(1 << 2)
+	contactRequestFieldOwner               = big.NewInt(1 << 3)
+	contactRequestFieldAddresses           = big.NewInt(1 << 4)
+	contactRequestFieldEmailAddresses      = big.NewInt(1 << 5)
+	contactRequestFieldPhoneNumbers        = big.NewInt(1 << 6)
+	contactRequestFieldLastActivityAt      = big.NewInt(1 << 7)
+	contactRequestFieldIntegrationParams   = big.NewInt(1 << 8)
+	contactRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
+	contactRequestFieldRemoteFields        = big.NewInt(1 << 10)
+)
+
 type ContactRequest struct {
 	// The contact's first name.
 	FirstName *string `json:"first_name,omitempty" url:"first_name,omitempty"`
@@ -154,6 +498,9 @@ type ContactRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -240,6 +587,90 @@ func (c *ContactRequest) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *ContactRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetFirstName(firstName *string) {
+	c.FirstName = firstName
+	c.require(contactRequestFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetLastName(lastName *string) {
+	c.LastName = lastName
+	c.require(contactRequestFieldLastName)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetAccount(account *ContactRequestAccount) {
+	c.Account = account
+	c.require(contactRequestFieldAccount)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetOwner(owner *ContactRequestOwner) {
+	c.Owner = owner
+	c.require(contactRequestFieldOwner)
+}
+
+// SetAddresses sets the Addresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetAddresses(addresses []*AddressRequest) {
+	c.Addresses = addresses
+	c.require(contactRequestFieldAddresses)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetEmailAddresses(emailAddresses []*EmailAddressRequest) {
+	c.EmailAddresses = emailAddresses
+	c.require(contactRequestFieldEmailAddresses)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetPhoneNumbers(phoneNumbers []*PhoneNumberRequest) {
+	c.PhoneNumbers = phoneNumbers
+	c.require(contactRequestFieldPhoneNumbers)
+}
+
+// SetLastActivityAt sets the LastActivityAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetLastActivityAt(lastActivityAt *time.Time) {
+	c.LastActivityAt = lastActivityAt
+	c.require(contactRequestFieldLastActivityAt)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(contactRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(contactRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	c.RemoteFields = remoteFields
+	c.require(contactRequestFieldRemoteFields)
+}
+
 func (c *ContactRequest) UnmarshalJSON(data []byte) error {
 	type embed ContactRequest
 	var unmarshaler = struct {
@@ -271,7 +702,8 @@ func (c *ContactRequest) MarshalJSON() ([]byte, error) {
 		embed:          embed(*c),
 		LastActivityAt: internal.NewOptionalDateTime(c.LastActivityAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *ContactRequest) String() string {
@@ -412,11 +844,21 @@ func (c *ContactRequestOwner) Accept(visitor ContactRequestOwnerVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+var (
+	crmContactResponseFieldModel    = big.NewInt(1 << 0)
+	crmContactResponseFieldWarnings = big.NewInt(1 << 1)
+	crmContactResponseFieldErrors   = big.NewInt(1 << 2)
+	crmContactResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type CrmContactResponse struct {
 	Model    *Contact                    `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -454,6 +896,41 @@ func (c *CrmContactResponse) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CrmContactResponse) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactResponse) SetModel(model *Contact) {
+	c.Model = model
+	c.require(crmContactResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	c.Warnings = warnings
+	c.require(crmContactResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactResponse) SetErrors(errors []*ErrorValidationProblem) {
+	c.Errors = errors
+	c.require(crmContactResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CrmContactResponse) SetLogs(logs []*DebugModeLog) {
+	c.Logs = logs
+	c.require(crmContactResponseFieldLogs)
+}
+
 func (c *CrmContactResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler CrmContactResponse
 	var value unmarshaler
@@ -470,6 +947,17 @@ func (c *CrmContactResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (c *CrmContactResponse) MarshalJSON() ([]byte, error) {
+	type embed CrmContactResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (c *CrmContactResponse) String() string {
 	if len(c.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
@@ -482,10 +970,19 @@ func (c *CrmContactResponse) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+var (
+	paginatedContactListFieldNext     = big.NewInt(1 << 0)
+	paginatedContactListFieldPrevious = big.NewInt(1 << 1)
+	paginatedContactListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedContactList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Contact `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -516,6 +1013,34 @@ func (p *PaginatedContactList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedContactList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedContactList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedContactListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedContactList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedContactListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedContactList) SetResults(results []*Contact) {
+	p.Results = results
+	p.require(paginatedContactListFieldResults)
+}
+
 func (p *PaginatedContactList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedContactList
 	var value unmarshaler
@@ -530,6 +1055,17 @@ func (p *PaginatedContactList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedContactList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedContactList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedContactList) String() string {
@@ -549,6 +1085,20 @@ func (p *PaginatedContactList) String() string {
 // The `Contact` object is used to represent an existing point of contact at a company in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	patchedContactRequestFieldFirstName           = big.NewInt(1 << 0)
+	patchedContactRequestFieldLastName            = big.NewInt(1 << 1)
+	patchedContactRequestFieldAccount             = big.NewInt(1 << 2)
+	patchedContactRequestFieldOwner               = big.NewInt(1 << 3)
+	patchedContactRequestFieldAddresses           = big.NewInt(1 << 4)
+	patchedContactRequestFieldEmailAddresses      = big.NewInt(1 << 5)
+	patchedContactRequestFieldPhoneNumbers        = big.NewInt(1 << 6)
+	patchedContactRequestFieldLastActivityAt      = big.NewInt(1 << 7)
+	patchedContactRequestFieldIntegrationParams   = big.NewInt(1 << 8)
+	patchedContactRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
+	patchedContactRequestFieldRemoteFields        = big.NewInt(1 << 10)
+)
+
 type PatchedContactRequest struct {
 	// The contact's first name.
 	FirstName *string `json:"first_name,omitempty" url:"first_name,omitempty"`
@@ -566,6 +1116,9 @@ type PatchedContactRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -652,6 +1205,90 @@ func (p *PatchedContactRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PatchedContactRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetFirstName(firstName *string) {
+	p.FirstName = firstName
+	p.require(patchedContactRequestFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetLastName(lastName *string) {
+	p.LastName = lastName
+	p.require(patchedContactRequestFieldLastName)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(patchedContactRequestFieldAccount)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetOwner(owner *PatchedContactRequestOwner) {
+	p.Owner = owner
+	p.require(patchedContactRequestFieldOwner)
+}
+
+// SetAddresses sets the Addresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetAddresses(addresses []*AddressRequest) {
+	p.Addresses = addresses
+	p.require(patchedContactRequestFieldAddresses)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetEmailAddresses(emailAddresses []*EmailAddressRequest) {
+	p.EmailAddresses = emailAddresses
+	p.require(patchedContactRequestFieldEmailAddresses)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetPhoneNumbers(phoneNumbers []*PhoneNumberRequest) {
+	p.PhoneNumbers = phoneNumbers
+	p.require(patchedContactRequestFieldPhoneNumbers)
+}
+
+// SetLastActivityAt sets the LastActivityAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetLastActivityAt(lastActivityAt *time.Time) {
+	p.LastActivityAt = lastActivityAt
+	p.require(patchedContactRequestFieldLastActivityAt)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedContactRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedContactRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedContactRequestFieldRemoteFields)
+}
+
 func (p *PatchedContactRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedContactRequest
 	var unmarshaler = struct {
@@ -683,7 +1320,8 @@ func (p *PatchedContactRequest) MarshalJSON() ([]byte, error) {
 		embed:          embed(*p),
 		LastActivityAt: internal.NewOptionalDateTime(p.LastActivityAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedContactRequest) String() string {

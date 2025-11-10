@@ -5,7 +5,17 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	projectsListRequestFieldCursor             = big.NewInt(1 << 0)
+	projectsListRequestFieldExpand             = big.NewInt(1 << 1)
+	projectsListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
+	projectsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
+	projectsListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
+	projectsListRequestFieldPageSize           = big.NewInt(1 << 5)
 )
 
 type ProjectsListRequest struct {
@@ -21,7 +31,65 @@ type ProjectsListRequest struct {
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *ProjectsListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(projectsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetExpand(expand []*ProjectsListRequestExpandItem) {
+	p.Expand = expand
+	p.require(projectsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(projectsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(projectsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(projectsListRequestFieldIncludeShellData)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(projectsListRequestFieldPageSize)
+}
+
+var (
+	projectsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	projectsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	projectsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type ProjectsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -30,6 +98,37 @@ type ProjectsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *ProjectsRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsRetrieveRequest) SetExpand(expand []*ProjectsRetrieveRequestExpandItem) {
+	p.Expand = expand
+	p.require(projectsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(projectsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(projectsRetrieveRequestFieldIncludeShellData)
 }
 
 type ProjectsListRequestExpandItem string
@@ -76,10 +175,19 @@ func (p ProjectsRetrieveRequestExpandItem) Ptr() *ProjectsRetrieveRequestExpandI
 	return &p
 }
 
+var (
+	paginatedProjectListFieldNext     = big.NewInt(1 << 0)
+	paginatedProjectListFieldPrevious = big.NewInt(1 << 1)
+	paginatedProjectListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedProjectList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Project `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -110,6 +218,34 @@ func (p *PaginatedProjectList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedProjectList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedProjectList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedProjectListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedProjectList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedProjectListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedProjectList) SetResults(results []*Project) {
+	p.Results = results
+	p.require(paginatedProjectListFieldResults)
+}
+
 func (p *PaginatedProjectList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedProjectList
 	var value unmarshaler
@@ -124,6 +260,17 @@ func (p *PaginatedProjectList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedProjectList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedProjectList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedProjectList) String() string {

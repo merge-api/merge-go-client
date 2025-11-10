@@ -5,8 +5,26 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	eeocsListRequestFieldCandidateId        = big.NewInt(1 << 0)
+	eeocsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	eeocsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	eeocsListRequestFieldCursor             = big.NewInt(1 << 3)
+	eeocsListRequestFieldExpand             = big.NewInt(1 << 4)
+	eeocsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	eeocsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	eeocsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	eeocsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	eeocsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	eeocsListRequestFieldPageSize           = big.NewInt(1 << 10)
+	eeocsListRequestFieldRemoteFields       = big.NewInt(1 << 11)
+	eeocsListRequestFieldRemoteId           = big.NewInt(1 << 12)
+	eeocsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 13)
 )
 
 type EeocsListRequest struct {
@@ -38,7 +56,123 @@ type EeocsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *EeocsListRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EeocsListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCandidateId sets the CandidateId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetCandidateId(candidateId *string) {
+	e.CandidateId = candidateId
+	e.require(eeocsListRequestFieldCandidateId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(eeocsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(eeocsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(eeocsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetExpand(expand []*string) {
+	e.Expand = expand
+	e.require(eeocsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(eeocsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(eeocsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(eeocsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(eeocsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(eeocsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(eeocsListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetRemoteFields(remoteFields *EeocsListRequestRemoteFields) {
+	e.RemoteFields = remoteFields
+	e.require(eeocsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(eeocsListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsListRequest) SetShowEnumOrigins(showEnumOrigins *EeocsListRequestShowEnumOrigins) {
+	e.ShowEnumOrigins = showEnumOrigins
+	e.require(eeocsListRequestFieldShowEnumOrigins)
+}
+
+var (
+	eeocsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	eeocsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	eeocsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	eeocsRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	eeocsRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type EeocsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -51,6 +185,51 @@ type EeocsRetrieveRequest struct {
 	RemoteFields *EeocsRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *EeocsRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (e *EeocsRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsRetrieveRequest) SetExpand(expand []*string) {
+	e.Expand = expand
+	e.require(eeocsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(eeocsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(eeocsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsRetrieveRequest) SetRemoteFields(remoteFields *EeocsRetrieveRequestRemoteFields) {
+	e.RemoteFields = remoteFields
+	e.require(eeocsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EeocsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *EeocsRetrieveRequestShowEnumOrigins) {
+	e.ShowEnumOrigins = showEnumOrigins
+	e.require(eeocsRetrieveRequestFieldShowEnumOrigins)
 }
 
 type EeocsListRequestRemoteFields string
@@ -330,6 +509,22 @@ func (d DisabilityStatusEnum) Ptr() *DisabilityStatusEnum {
 // The `EEOC` object is used to represent the Equal Employment Opportunity Commission information for a candidate (race, gender, veteran status, disability status).
 // ### Usage Example
 // Fetch from the `LIST EEOCs` endpoint and filter by `candidate` to show all EEOC information for a candidate.
+var (
+	eeocFieldId               = big.NewInt(1 << 0)
+	eeocFieldRemoteId         = big.NewInt(1 << 1)
+	eeocFieldCreatedAt        = big.NewInt(1 << 2)
+	eeocFieldModifiedAt       = big.NewInt(1 << 3)
+	eeocFieldCandidate        = big.NewInt(1 << 4)
+	eeocFieldSubmittedAt      = big.NewInt(1 << 5)
+	eeocFieldRace             = big.NewInt(1 << 6)
+	eeocFieldGender           = big.NewInt(1 << 7)
+	eeocFieldVeteranStatus    = big.NewInt(1 << 8)
+	eeocFieldDisabilityStatus = big.NewInt(1 << 9)
+	eeocFieldRemoteWasDeleted = big.NewInt(1 << 10)
+	eeocFieldFieldMappings    = big.NewInt(1 << 11)
+	eeocFieldRemoteData       = big.NewInt(1 << 12)
+)
+
 type Eeoc struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -377,6 +572,9 @@ type Eeoc struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -477,6 +675,104 @@ func (e *Eeoc) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *Eeoc) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetId(id *string) {
+	e.Id = id
+	e.require(eeocFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(eeocFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetCreatedAt(createdAt *time.Time) {
+	e.CreatedAt = createdAt
+	e.require(eeocFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetModifiedAt(modifiedAt *time.Time) {
+	e.ModifiedAt = modifiedAt
+	e.require(eeocFieldModifiedAt)
+}
+
+// SetCandidate sets the Candidate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetCandidate(candidate *EeocCandidate) {
+	e.Candidate = candidate
+	e.require(eeocFieldCandidate)
+}
+
+// SetSubmittedAt sets the SubmittedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetSubmittedAt(submittedAt *time.Time) {
+	e.SubmittedAt = submittedAt
+	e.require(eeocFieldSubmittedAt)
+}
+
+// SetRace sets the Race field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetRace(race *EeocRace) {
+	e.Race = race
+	e.require(eeocFieldRace)
+}
+
+// SetGender sets the Gender field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetGender(gender *EeocGender) {
+	e.Gender = gender
+	e.require(eeocFieldGender)
+}
+
+// SetVeteranStatus sets the VeteranStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetVeteranStatus(veteranStatus *EeocVeteranStatus) {
+	e.VeteranStatus = veteranStatus
+	e.require(eeocFieldVeteranStatus)
+}
+
+// SetDisabilityStatus sets the DisabilityStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetDisabilityStatus(disabilityStatus *EeocDisabilityStatus) {
+	e.DisabilityStatus = disabilityStatus
+	e.require(eeocFieldDisabilityStatus)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	e.RemoteWasDeleted = remoteWasDeleted
+	e.require(eeocFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetFieldMappings(fieldMappings map[string]interface{}) {
+	e.FieldMappings = fieldMappings
+	e.require(eeocFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Eeoc) SetRemoteData(remoteData []*RemoteData) {
+	e.RemoteData = remoteData
+	e.require(eeocFieldRemoteData)
+}
+
 func (e *Eeoc) UnmarshalJSON(data []byte) error {
 	type embed Eeoc
 	var unmarshaler = struct {
@@ -516,7 +812,8 @@ func (e *Eeoc) MarshalJSON() ([]byte, error) {
 		ModifiedAt:  internal.NewOptionalDateTime(e.ModifiedAt),
 		SubmittedAt: internal.NewOptionalDateTime(e.SubmittedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *Eeoc) String() string {
@@ -905,10 +1202,19 @@ func (g GenderEnum) Ptr() *GenderEnum {
 	return &g
 }
 
+var (
+	paginatedEeocListFieldNext     = big.NewInt(1 << 0)
+	paginatedEeocListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEeocListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedEeocList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Eeoc `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -939,6 +1245,34 @@ func (p *PaginatedEeocList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedEeocList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEeocList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEeocListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEeocList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEeocListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEeocList) SetResults(results []*Eeoc) {
+	p.Results = results
+	p.require(paginatedEeocListFieldResults)
+}
+
 func (p *PaginatedEeocList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEeocList
 	var value unmarshaler
@@ -953,6 +1287,17 @@ func (p *PaginatedEeocList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEeocList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEeocList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEeocList) String() string {

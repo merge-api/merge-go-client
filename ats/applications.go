@@ -5,8 +5,16 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	updateApplicationStageRequestFieldIsDebugMode       = big.NewInt(1 << 0)
+	updateApplicationStageRequestFieldRunAsync          = big.NewInt(1 << 1)
+	updateApplicationStageRequestFieldJobInterviewStage = big.NewInt(1 << 2)
+	updateApplicationStageRequestFieldRemoteUserId      = big.NewInt(1 << 3)
 )
 
 type UpdateApplicationStageRequest struct {
@@ -17,7 +25,52 @@ type UpdateApplicationStageRequest struct {
 	// The interview stage to move the application to.
 	JobInterviewStage *string `json:"job_interview_stage,omitempty" url:"-"`
 	RemoteUserId      *string `json:"remote_user_id,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (u *UpdateApplicationStageRequest) require(field *big.Int) {
+	if u.explicitFields == nil {
+		u.explicitFields = big.NewInt(0)
+	}
+	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateApplicationStageRequest) SetIsDebugMode(isDebugMode *bool) {
+	u.IsDebugMode = isDebugMode
+	u.require(updateApplicationStageRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateApplicationStageRequest) SetRunAsync(runAsync *bool) {
+	u.RunAsync = runAsync
+	u.require(updateApplicationStageRequestFieldRunAsync)
+}
+
+// SetJobInterviewStage sets the JobInterviewStage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateApplicationStageRequest) SetJobInterviewStage(jobInterviewStage *string) {
+	u.JobInterviewStage = jobInterviewStage
+	u.require(updateApplicationStageRequestFieldJobInterviewStage)
+}
+
+// SetRemoteUserId sets the RemoteUserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateApplicationStageRequest) SetRemoteUserId(remoteUserId *string) {
+	u.RemoteUserId = remoteUserId
+	u.require(updateApplicationStageRequestFieldRemoteUserId)
+}
+
+var (
+	applicationEndpointRequestFieldIsDebugMode  = big.NewInt(1 << 0)
+	applicationEndpointRequestFieldRunAsync     = big.NewInt(1 << 1)
+	applicationEndpointRequestFieldModel        = big.NewInt(1 << 2)
+	applicationEndpointRequestFieldRemoteUserId = big.NewInt(1 << 3)
+)
 
 type ApplicationEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -26,7 +79,65 @@ type ApplicationEndpointRequest struct {
 	RunAsync     *bool               `json:"-" url:"run_async,omitempty"`
 	Model        *ApplicationRequest `json:"model,omitempty" url:"-"`
 	RemoteUserId string              `json:"remote_user_id" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *ApplicationEndpointRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	a.IsDebugMode = isDebugMode
+	a.require(applicationEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationEndpointRequest) SetRunAsync(runAsync *bool) {
+	a.RunAsync = runAsync
+	a.require(applicationEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationEndpointRequest) SetModel(model *ApplicationRequest) {
+	a.Model = model
+	a.require(applicationEndpointRequestFieldModel)
+}
+
+// SetRemoteUserId sets the RemoteUserId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationEndpointRequest) SetRemoteUserId(remoteUserId string) {
+	a.RemoteUserId = remoteUserId
+	a.require(applicationEndpointRequestFieldRemoteUserId)
+}
+
+var (
+	applicationsListRequestFieldCandidateId        = big.NewInt(1 << 0)
+	applicationsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	applicationsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	applicationsListRequestFieldCreditedToId       = big.NewInt(1 << 3)
+	applicationsListRequestFieldCurrentStageId     = big.NewInt(1 << 4)
+	applicationsListRequestFieldCursor             = big.NewInt(1 << 5)
+	applicationsListRequestFieldExpand             = big.NewInt(1 << 6)
+	applicationsListRequestFieldIncludeDeletedData = big.NewInt(1 << 7)
+	applicationsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 8)
+	applicationsListRequestFieldIncludeShellData   = big.NewInt(1 << 9)
+	applicationsListRequestFieldJobId              = big.NewInt(1 << 10)
+	applicationsListRequestFieldModifiedAfter      = big.NewInt(1 << 11)
+	applicationsListRequestFieldModifiedBefore     = big.NewInt(1 << 12)
+	applicationsListRequestFieldPageSize           = big.NewInt(1 << 13)
+	applicationsListRequestFieldRejectReasonId     = big.NewInt(1 << 14)
+	applicationsListRequestFieldRemoteId           = big.NewInt(1 << 15)
+	applicationsListRequestFieldSource             = big.NewInt(1 << 16)
+)
 
 type ApplicationsListRequest struct {
 	// If provided, will only return applications for this candidate.
@@ -63,12 +174,168 @@ type ApplicationsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// If provided, will only return applications with this source.
 	Source *string `json:"-" url:"source,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *ApplicationsListRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetCandidateId sets the CandidateId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetCandidateId(candidateId *string) {
+	a.CandidateId = candidateId
+	a.require(applicationsListRequestFieldCandidateId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	a.CreatedAfter = createdAfter
+	a.require(applicationsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	a.CreatedBefore = createdBefore
+	a.require(applicationsListRequestFieldCreatedBefore)
+}
+
+// SetCreditedToId sets the CreditedToId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetCreditedToId(creditedToId *string) {
+	a.CreditedToId = creditedToId
+	a.require(applicationsListRequestFieldCreditedToId)
+}
+
+// SetCurrentStageId sets the CurrentStageId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetCurrentStageId(currentStageId *string) {
+	a.CurrentStageId = currentStageId
+	a.require(applicationsListRequestFieldCurrentStageId)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetCursor(cursor *string) {
+	a.Cursor = cursor
+	a.require(applicationsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetExpand(expand []*ApplicationsListRequestExpandItem) {
+	a.Expand = expand
+	a.require(applicationsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	a.IncludeDeletedData = includeDeletedData
+	a.require(applicationsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(applicationsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(applicationsListRequestFieldIncludeShellData)
+}
+
+// SetJobId sets the JobId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetJobId(jobId *string) {
+	a.JobId = jobId
+	a.require(applicationsListRequestFieldJobId)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	a.ModifiedAfter = modifiedAfter
+	a.require(applicationsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	a.ModifiedBefore = modifiedBefore
+	a.require(applicationsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetPageSize(pageSize *int) {
+	a.PageSize = pageSize
+	a.require(applicationsListRequestFieldPageSize)
+}
+
+// SetRejectReasonId sets the RejectReasonId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetRejectReasonId(rejectReasonId *string) {
+	a.RejectReasonId = rejectReasonId
+	a.require(applicationsListRequestFieldRejectReasonId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetRemoteId(remoteId *string) {
+	a.RemoteId = remoteId
+	a.require(applicationsListRequestFieldRemoteId)
+}
+
+// SetSource sets the Source field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsListRequest) SetSource(source *string) {
+	a.Source = source
+	a.require(applicationsListRequestFieldSource)
+}
+
+var (
+	applicationsMetaPostRetrieveRequestFieldApplicationRemoteTemplateId = big.NewInt(1 << 0)
+)
 
 type ApplicationsMetaPostRetrieveRequest struct {
 	// The template ID associated with the nested application in the request.
 	ApplicationRemoteTemplateId *string `json:"-" url:"application_remote_template_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *ApplicationsMetaPostRetrieveRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetApplicationRemoteTemplateId sets the ApplicationRemoteTemplateId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsMetaPostRetrieveRequest) SetApplicationRemoteTemplateId(applicationRemoteTemplateId *string) {
+	a.ApplicationRemoteTemplateId = applicationRemoteTemplateId
+	a.require(applicationsMetaPostRetrieveRequestFieldApplicationRemoteTemplateId)
+}
+
+var (
+	applicationsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	applicationsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	applicationsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type ApplicationsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -77,6 +344,37 @@ type ApplicationsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (a *ApplicationsRetrieveRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsRetrieveRequest) SetExpand(expand []*ApplicationsRetrieveRequestExpandItem) {
+	a.Expand = expand
+	a.require(applicationsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(applicationsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(applicationsRetrieveRequestFieldIncludeShellData)
 }
 
 type ApplicationsListRequestExpandItem string
@@ -165,6 +463,22 @@ func (a ApplicationsRetrieveRequestExpandItem) Ptr() *ApplicationsRetrieveReques
 //
 // ### Usage Example
 // Fetch from the `LIST Applications` endpoint and filter by `ID` to show all applications.
+var (
+	applicationRequestFieldCandidate                = big.NewInt(1 << 0)
+	applicationRequestFieldJob                      = big.NewInt(1 << 1)
+	applicationRequestFieldAppliedAt                = big.NewInt(1 << 2)
+	applicationRequestFieldRejectedAt               = big.NewInt(1 << 3)
+	applicationRequestFieldOffers                   = big.NewInt(1 << 4)
+	applicationRequestFieldSource                   = big.NewInt(1 << 5)
+	applicationRequestFieldCreditedTo               = big.NewInt(1 << 6)
+	applicationRequestFieldScreeningQuestionAnswers = big.NewInt(1 << 7)
+	applicationRequestFieldCurrentStage             = big.NewInt(1 << 8)
+	applicationRequestFieldRejectReason             = big.NewInt(1 << 9)
+	applicationRequestFieldRemoteTemplateId         = big.NewInt(1 << 10)
+	applicationRequestFieldIntegrationParams        = big.NewInt(1 << 11)
+	applicationRequestFieldLinkedAccountParams      = big.NewInt(1 << 12)
+)
+
 type ApplicationRequest struct {
 	// The candidate applying.
 	Candidate *ApplicationRequestCandidate `json:"candidate,omitempty" url:"candidate,omitempty"`
@@ -187,6 +501,9 @@ type ApplicationRequest struct {
 	RemoteTemplateId    *string                         `json:"remote_template_id,omitempty" url:"remote_template_id,omitempty"`
 	IntegrationParams   map[string]interface{}          `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}          `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -287,6 +604,104 @@ func (a *ApplicationRequest) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *ApplicationRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetCandidate sets the Candidate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetCandidate(candidate *ApplicationRequestCandidate) {
+	a.Candidate = candidate
+	a.require(applicationRequestFieldCandidate)
+}
+
+// SetJob sets the Job field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetJob(job *ApplicationRequestJob) {
+	a.Job = job
+	a.require(applicationRequestFieldJob)
+}
+
+// SetAppliedAt sets the AppliedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetAppliedAt(appliedAt *time.Time) {
+	a.AppliedAt = appliedAt
+	a.require(applicationRequestFieldAppliedAt)
+}
+
+// SetRejectedAt sets the RejectedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetRejectedAt(rejectedAt *time.Time) {
+	a.RejectedAt = rejectedAt
+	a.require(applicationRequestFieldRejectedAt)
+}
+
+// SetOffers sets the Offers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetOffers(offers []*ApplicationRequestOffersItem) {
+	a.Offers = offers
+	a.require(applicationRequestFieldOffers)
+}
+
+// SetSource sets the Source field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetSource(source *string) {
+	a.Source = source
+	a.require(applicationRequestFieldSource)
+}
+
+// SetCreditedTo sets the CreditedTo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetCreditedTo(creditedTo *ApplicationRequestCreditedTo) {
+	a.CreditedTo = creditedTo
+	a.require(applicationRequestFieldCreditedTo)
+}
+
+// SetScreeningQuestionAnswers sets the ScreeningQuestionAnswers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetScreeningQuestionAnswers(screeningQuestionAnswers []*ApplicationRequestScreeningQuestionAnswersItem) {
+	a.ScreeningQuestionAnswers = screeningQuestionAnswers
+	a.require(applicationRequestFieldScreeningQuestionAnswers)
+}
+
+// SetCurrentStage sets the CurrentStage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetCurrentStage(currentStage *ApplicationRequestCurrentStage) {
+	a.CurrentStage = currentStage
+	a.require(applicationRequestFieldCurrentStage)
+}
+
+// SetRejectReason sets the RejectReason field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetRejectReason(rejectReason *ApplicationRequestRejectReason) {
+	a.RejectReason = rejectReason
+	a.require(applicationRequestFieldRejectReason)
+}
+
+// SetRemoteTemplateId sets the RemoteTemplateId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetRemoteTemplateId(remoteTemplateId *string) {
+	a.RemoteTemplateId = remoteTemplateId
+	a.require(applicationRequestFieldRemoteTemplateId)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	a.IntegrationParams = integrationParams
+	a.require(applicationRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	a.LinkedAccountParams = linkedAccountParams
+	a.require(applicationRequestFieldLinkedAccountParams)
+}
+
 func (a *ApplicationRequest) UnmarshalJSON(data []byte) error {
 	type embed ApplicationRequest
 	var unmarshaler = struct {
@@ -322,7 +737,8 @@ func (a *ApplicationRequest) MarshalJSON() ([]byte, error) {
 		AppliedAt:  internal.NewOptionalDateTime(a.AppliedAt),
 		RejectedAt: internal.NewOptionalDateTime(a.RejectedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *ApplicationRequest) String() string {
@@ -776,11 +1192,21 @@ func (a *ApplicationRequestScreeningQuestionAnswersItem) Accept(visitor Applicat
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
 
+var (
+	applicationResponseFieldModel    = big.NewInt(1 << 0)
+	applicationResponseFieldWarnings = big.NewInt(1 << 1)
+	applicationResponseFieldErrors   = big.NewInt(1 << 2)
+	applicationResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type ApplicationResponse struct {
 	Model    *Application                `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -818,6 +1244,41 @@ func (a *ApplicationResponse) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *ApplicationResponse) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationResponse) SetModel(model *Application) {
+	a.Model = model
+	a.require(applicationResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	a.Warnings = warnings
+	a.require(applicationResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationResponse) SetErrors(errors []*ErrorValidationProblem) {
+	a.Errors = errors
+	a.require(applicationResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplicationResponse) SetLogs(logs []*DebugModeLog) {
+	a.Logs = logs
+	a.require(applicationResponseFieldLogs)
+}
+
 func (a *ApplicationResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler ApplicationResponse
 	var value unmarshaler
@@ -834,6 +1295,17 @@ func (a *ApplicationResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (a *ApplicationResponse) MarshalJSON() ([]byte, error) {
+	type embed ApplicationResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (a *ApplicationResponse) String() string {
 	if len(a.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
@@ -846,10 +1318,19 @@ func (a *ApplicationResponse) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+var (
+	paginatedApplicationListFieldNext     = big.NewInt(1 << 0)
+	paginatedApplicationListFieldPrevious = big.NewInt(1 << 1)
+	paginatedApplicationListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedApplicationList struct {
 	Next     *string        `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string        `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Application `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -880,6 +1361,34 @@ func (p *PaginatedApplicationList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedApplicationList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedApplicationList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedApplicationListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedApplicationList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedApplicationListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedApplicationList) SetResults(results []*Application) {
+	p.Results = results
+	p.require(paginatedApplicationListFieldResults)
+}
+
 func (p *PaginatedApplicationList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedApplicationList
 	var value unmarshaler
@@ -894,6 +1403,17 @@ func (p *PaginatedApplicationList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedApplicationList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedApplicationList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedApplicationList) String() string {
@@ -914,6 +1434,14 @@ func (p *PaginatedApplicationList) String() string {
 //
 // ### Usage Example
 // TODO
+var (
+	screeningQuestionAnswerRequestFieldRemoteId            = big.NewInt(1 << 0)
+	screeningQuestionAnswerRequestFieldQuestion            = big.NewInt(1 << 1)
+	screeningQuestionAnswerRequestFieldAnswer              = big.NewInt(1 << 2)
+	screeningQuestionAnswerRequestFieldIntegrationParams   = big.NewInt(1 << 3)
+	screeningQuestionAnswerRequestFieldLinkedAccountParams = big.NewInt(1 << 4)
+)
+
 type ScreeningQuestionAnswerRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -923,6 +1451,9 @@ type ScreeningQuestionAnswerRequest struct {
 	Answer              *string                `json:"answer,omitempty" url:"answer,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -967,6 +1498,48 @@ func (s *ScreeningQuestionAnswerRequest) GetExtraProperties() map[string]interfa
 	return s.extraProperties
 }
 
+func (s *ScreeningQuestionAnswerRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScreeningQuestionAnswerRequest) SetRemoteId(remoteId *string) {
+	s.RemoteId = remoteId
+	s.require(screeningQuestionAnswerRequestFieldRemoteId)
+}
+
+// SetQuestion sets the Question field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScreeningQuestionAnswerRequest) SetQuestion(question *ScreeningQuestionAnswerRequestQuestion) {
+	s.Question = question
+	s.require(screeningQuestionAnswerRequestFieldQuestion)
+}
+
+// SetAnswer sets the Answer field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScreeningQuestionAnswerRequest) SetAnswer(answer *string) {
+	s.Answer = answer
+	s.require(screeningQuestionAnswerRequestFieldAnswer)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScreeningQuestionAnswerRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	s.IntegrationParams = integrationParams
+	s.require(screeningQuestionAnswerRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScreeningQuestionAnswerRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	s.LinkedAccountParams = linkedAccountParams
+	s.require(screeningQuestionAnswerRequestFieldLinkedAccountParams)
+}
+
 func (s *ScreeningQuestionAnswerRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler ScreeningQuestionAnswerRequest
 	var value unmarshaler
@@ -981,6 +1554,17 @@ func (s *ScreeningQuestionAnswerRequest) UnmarshalJSON(data []byte) error {
 	s.extraProperties = extraProperties
 	s.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (s *ScreeningQuestionAnswerRequest) MarshalJSON() ([]byte, error) {
+	type embed ScreeningQuestionAnswerRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*s),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, s.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (s *ScreeningQuestionAnswerRequest) String() string {

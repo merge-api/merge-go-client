@@ -5,8 +5,22 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	employerBenefitsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	employerBenefitsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	employerBenefitsListRequestFieldCursor             = big.NewInt(1 << 2)
+	employerBenefitsListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	employerBenefitsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	employerBenefitsListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	employerBenefitsListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	employerBenefitsListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	employerBenefitsListRequestFieldPageSize           = big.NewInt(1 << 8)
+	employerBenefitsListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type EmployerBenefitsListRequest struct {
@@ -30,13 +44,122 @@ type EmployerBenefitsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EmployerBenefitsListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(employerBenefitsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(employerBenefitsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(employerBenefitsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(employerBenefitsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employerBenefitsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employerBenefitsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(employerBenefitsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(employerBenefitsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(employerBenefitsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(employerBenefitsListRequestFieldRemoteId)
+}
+
+var (
+	employerBenefitsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	employerBenefitsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type EmployerBenefitsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (e *EmployerBenefitsRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employerBenefitsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefitsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employerBenefitsRetrieveRequestFieldIncludeShellData)
 }
 
 // * `MEDICAL` - MEDICAL
@@ -81,6 +204,20 @@ func (b BenefitPlanTypeEnum) Ptr() *BenefitPlanTypeEnum {
 //
 // ### Usage Example
 // Fetch from the `LIST EmployerBenefits` endpoint and filter by `ID` to show all EmployerBenefits.
+var (
+	employerBenefitFieldId               = big.NewInt(1 << 0)
+	employerBenefitFieldRemoteId         = big.NewInt(1 << 1)
+	employerBenefitFieldCreatedAt        = big.NewInt(1 << 2)
+	employerBenefitFieldModifiedAt       = big.NewInt(1 << 3)
+	employerBenefitFieldBenefitPlanType  = big.NewInt(1 << 4)
+	employerBenefitFieldName             = big.NewInt(1 << 5)
+	employerBenefitFieldDescription      = big.NewInt(1 << 6)
+	employerBenefitFieldDeductionCode    = big.NewInt(1 << 7)
+	employerBenefitFieldRemoteWasDeleted = big.NewInt(1 << 8)
+	employerBenefitFieldFieldMappings    = big.NewInt(1 << 9)
+	employerBenefitFieldRemoteData       = big.NewInt(1 << 10)
+)
+
 type EmployerBenefit struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -107,6 +244,9 @@ type EmployerBenefit struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -193,6 +333,90 @@ func (e *EmployerBenefit) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EmployerBenefit) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetId(id *string) {
+	e.Id = id
+	e.require(employerBenefitFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(employerBenefitFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetCreatedAt(createdAt *time.Time) {
+	e.CreatedAt = createdAt
+	e.require(employerBenefitFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetModifiedAt(modifiedAt *time.Time) {
+	e.ModifiedAt = modifiedAt
+	e.require(employerBenefitFieldModifiedAt)
+}
+
+// SetBenefitPlanType sets the BenefitPlanType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetBenefitPlanType(benefitPlanType *EmployerBenefitBenefitPlanType) {
+	e.BenefitPlanType = benefitPlanType
+	e.require(employerBenefitFieldBenefitPlanType)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetName(name *string) {
+	e.Name = name
+	e.require(employerBenefitFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetDescription(description *string) {
+	e.Description = description
+	e.require(employerBenefitFieldDescription)
+}
+
+// SetDeductionCode sets the DeductionCode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetDeductionCode(deductionCode *string) {
+	e.DeductionCode = deductionCode
+	e.require(employerBenefitFieldDeductionCode)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	e.RemoteWasDeleted = remoteWasDeleted
+	e.require(employerBenefitFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetFieldMappings(fieldMappings map[string]interface{}) {
+	e.FieldMappings = fieldMappings
+	e.require(employerBenefitFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployerBenefit) SetRemoteData(remoteData []*RemoteData) {
+	e.RemoteData = remoteData
+	e.require(employerBenefitFieldRemoteData)
+}
+
 func (e *EmployerBenefit) UnmarshalJSON(data []byte) error {
 	type embed EmployerBenefit
 	var unmarshaler = struct {
@@ -228,7 +452,8 @@ func (e *EmployerBenefit) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(e.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(e.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *EmployerBenefit) String() string {
@@ -312,10 +537,19 @@ func (e *EmployerBenefitBenefitPlanType) Accept(visitor EmployerBenefitBenefitPl
 	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
+var (
+	paginatedEmployerBenefitListFieldNext     = big.NewInt(1 << 0)
+	paginatedEmployerBenefitListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEmployerBenefitListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedEmployerBenefitList struct {
 	Next     *string            `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string            `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*EmployerBenefit `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -346,6 +580,34 @@ func (p *PaginatedEmployerBenefitList) GetExtraProperties() map[string]interface
 	return p.extraProperties
 }
 
+func (p *PaginatedEmployerBenefitList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployerBenefitList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEmployerBenefitListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployerBenefitList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEmployerBenefitListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployerBenefitList) SetResults(results []*EmployerBenefit) {
+	p.Results = results
+	p.require(paginatedEmployerBenefitListFieldResults)
+}
+
 func (p *PaginatedEmployerBenefitList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEmployerBenefitList
 	var value unmarshaler
@@ -360,6 +622,17 @@ func (p *PaginatedEmployerBenefitList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEmployerBenefitList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEmployerBenefitList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEmployerBenefitList) String() string {

@@ -60,9 +60,9 @@ func (r *RequestOptions) ToHeader() http.Header {
 func (r *RequestOptions) cloneHeader() http.Header {
 	headers := r.HTTPHeader.Clone()
 	headers.Set("X-Fern-Language", "Go")
-	headers.Set("X-Fern-SDK-Name", "github.com/merge-api/merge-go-client/v2")
-	headers.Set("X-Fern-SDK-Version", "v2.0.0")
-	headers.Set("User-Agent", "github.com/merge-api/merge-go-client/2.0.0")
+	headers.Set("X-Fern-SDK-Name", "github.com/merge-api/merge-go-client")
+	headers.Set("X-Fern-SDK-Version", "v0.0.180")
+	headers.Set("User-Agent", "github.com/merge-api/merge-go-client/2.0.1")
 	return headers
 }
 

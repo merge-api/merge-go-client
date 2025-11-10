@@ -5,8 +5,23 @@ package crm
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	stagesListRequestFieldCreatedAfter        = big.NewInt(1 << 0)
+	stagesListRequestFieldCreatedBefore       = big.NewInt(1 << 1)
+	stagesListRequestFieldCursor              = big.NewInt(1 << 2)
+	stagesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 3)
+	stagesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 4)
+	stagesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 5)
+	stagesListRequestFieldIncludeShellData    = big.NewInt(1 << 6)
+	stagesListRequestFieldModifiedAfter       = big.NewInt(1 << 7)
+	stagesListRequestFieldModifiedBefore      = big.NewInt(1 << 8)
+	stagesListRequestFieldPageSize            = big.NewInt(1 << 9)
+	stagesListRequestFieldRemoteId            = big.NewInt(1 << 10)
 )
 
 type StagesListRequest struct {
@@ -32,7 +47,105 @@ type StagesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (s *StagesListRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	s.CreatedAfter = createdAfter
+	s.require(stagesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	s.CreatedBefore = createdBefore
+	s.require(stagesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetCursor(cursor *string) {
+	s.Cursor = cursor
+	s.require(stagesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	s.IncludeDeletedData = includeDeletedData
+	s.require(stagesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	s.IncludeRemoteData = includeRemoteData
+	s.require(stagesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	s.IncludeRemoteFields = includeRemoteFields
+	s.require(stagesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetIncludeShellData(includeShellData *bool) {
+	s.IncludeShellData = includeShellData
+	s.require(stagesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	s.ModifiedAfter = modifiedAfter
+	s.require(stagesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	s.ModifiedBefore = modifiedBefore
+	s.require(stagesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetPageSize(pageSize *int) {
+	s.PageSize = pageSize
+	s.require(stagesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesListRequest) SetRemoteId(remoteId *string) {
+	s.RemoteId = remoteId
+	s.require(stagesListRequestFieldRemoteId)
+}
+
+var (
+	stagesRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	stagesRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	stagesRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	stagesRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	stagesRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	stagesRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	stagesRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	stagesRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type StagesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -51,7 +164,79 @@ type StagesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (s *StagesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	s.Cursor = cursor
+	s.require(stagesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	s.IncludeDeletedData = includeDeletedData
+	s.require(stagesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	s.IncludeRemoteData = includeRemoteData
+	s.require(stagesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	s.IncludeRemoteFields = includeRemoteFields
+	s.require(stagesRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	s.IncludeShellData = includeShellData
+	s.require(stagesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	s.IsCommonModelField = isCommonModelField
+	s.require(stagesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	s.IsCustom = isCustom
+	s.require(stagesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	s.PageSize = pageSize
+	s.require(stagesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	stagesRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 0)
+	stagesRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 1)
+	stagesRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 2)
+)
 
 type StagesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -60,12 +245,52 @@ type StagesRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (s *StagesRetrieveRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	s.IncludeRemoteData = includeRemoteData
+	s.require(stagesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	s.IncludeRemoteFields = includeRemoteFields
+	s.require(stagesRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *StagesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	s.IncludeShellData = includeShellData
+	s.require(stagesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedStageListFieldNext     = big.NewInt(1 << 0)
+	paginatedStageListFieldPrevious = big.NewInt(1 << 1)
+	paginatedStageListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedStageList struct {
 	Next     *string  `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Stage `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -96,6 +321,34 @@ func (p *PaginatedStageList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedStageList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedStageList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedStageListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedStageList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedStageListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedStageList) SetResults(results []*Stage) {
+	p.Results = results
+	p.require(paginatedStageListFieldResults)
+}
+
 func (p *PaginatedStageList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedStageList
 	var value unmarshaler
@@ -110,6 +363,17 @@ func (p *PaginatedStageList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedStageList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedStageList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedStageList) String() string {

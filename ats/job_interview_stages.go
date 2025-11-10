@@ -5,8 +5,24 @@ package ats
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	jobInterviewStagesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	jobInterviewStagesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	jobInterviewStagesListRequestFieldCursor             = big.NewInt(1 << 2)
+	jobInterviewStagesListRequestFieldExpand             = big.NewInt(1 << 3)
+	jobInterviewStagesListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	jobInterviewStagesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	jobInterviewStagesListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	jobInterviewStagesListRequestFieldJobId              = big.NewInt(1 << 7)
+	jobInterviewStagesListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	jobInterviewStagesListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	jobInterviewStagesListRequestFieldPageSize           = big.NewInt(1 << 10)
+	jobInterviewStagesListRequestFieldRemoteId           = big.NewInt(1 << 11)
 )
 
 type JobInterviewStagesListRequest struct {
@@ -34,7 +50,107 @@ type JobInterviewStagesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JobInterviewStagesListRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	j.CreatedAfter = createdAfter
+	j.require(jobInterviewStagesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	j.CreatedBefore = createdBefore
+	j.require(jobInterviewStagesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetCursor(cursor *string) {
+	j.Cursor = cursor
+	j.require(jobInterviewStagesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetExpand(expand []*string) {
+	j.Expand = expand
+	j.require(jobInterviewStagesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	j.IncludeDeletedData = includeDeletedData
+	j.require(jobInterviewStagesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(jobInterviewStagesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(jobInterviewStagesListRequestFieldIncludeShellData)
+}
+
+// SetJobId sets the JobId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetJobId(jobId *string) {
+	j.JobId = jobId
+	j.require(jobInterviewStagesListRequestFieldJobId)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	j.ModifiedAfter = modifiedAfter
+	j.require(jobInterviewStagesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	j.ModifiedBefore = modifiedBefore
+	j.require(jobInterviewStagesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetPageSize(pageSize *int) {
+	j.PageSize = pageSize
+	j.require(jobInterviewStagesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesListRequest) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(jobInterviewStagesListRequestFieldRemoteId)
+}
+
+var (
+	jobInterviewStagesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	jobInterviewStagesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	jobInterviewStagesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type JobInterviewStagesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -43,12 +159,52 @@ type JobInterviewStagesRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JobInterviewStagesRetrieveRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesRetrieveRequest) SetExpand(expand []*string) {
+	j.Expand = expand
+	j.require(jobInterviewStagesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(jobInterviewStagesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobInterviewStagesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(jobInterviewStagesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedJobInterviewStageListFieldNext     = big.NewInt(1 << 0)
+	paginatedJobInterviewStageListFieldPrevious = big.NewInt(1 << 1)
+	paginatedJobInterviewStageListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedJobInterviewStageList struct {
 	Next     *string              `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string              `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*JobInterviewStage `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -79,6 +235,34 @@ func (p *PaginatedJobInterviewStageList) GetExtraProperties() map[string]interfa
 	return p.extraProperties
 }
 
+func (p *PaginatedJobInterviewStageList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJobInterviewStageList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedJobInterviewStageListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJobInterviewStageList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedJobInterviewStageListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJobInterviewStageList) SetResults(results []*JobInterviewStage) {
+	p.Results = results
+	p.require(paginatedJobInterviewStageListFieldResults)
+}
+
 func (p *PaginatedJobInterviewStageList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedJobInterviewStageList
 	var value unmarshaler
@@ -93,6 +277,17 @@ func (p *PaginatedJobInterviewStageList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedJobInterviewStageList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedJobInterviewStageList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedJobInterviewStageList) String() string {

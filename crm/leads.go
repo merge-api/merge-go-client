@@ -5,8 +5,15 @@ package crm
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	leadEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	leadEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	leadEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type LeadEndpointRequest struct {
@@ -15,7 +22,58 @@ type LeadEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool        `json:"-" url:"run_async,omitempty"`
 	Model    *LeadRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (l *LeadEndpointRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	l.IsDebugMode = isDebugMode
+	l.require(leadEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadEndpointRequest) SetRunAsync(runAsync *bool) {
+	l.RunAsync = runAsync
+	l.require(leadEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadEndpointRequest) SetModel(model *LeadRequest) {
+	l.Model = model
+	l.require(leadEndpointRequestFieldModel)
+}
+
+var (
+	leadsListRequestFieldConvertedAccountId  = big.NewInt(1 << 0)
+	leadsListRequestFieldConvertedContactId  = big.NewInt(1 << 1)
+	leadsListRequestFieldCreatedAfter        = big.NewInt(1 << 2)
+	leadsListRequestFieldCreatedBefore       = big.NewInt(1 << 3)
+	leadsListRequestFieldCursor              = big.NewInt(1 << 4)
+	leadsListRequestFieldEmailAddresses      = big.NewInt(1 << 5)
+	leadsListRequestFieldExpand              = big.NewInt(1 << 6)
+	leadsListRequestFieldIncludeDeletedData  = big.NewInt(1 << 7)
+	leadsListRequestFieldIncludeRemoteData   = big.NewInt(1 << 8)
+	leadsListRequestFieldIncludeRemoteFields = big.NewInt(1 << 9)
+	leadsListRequestFieldIncludeShellData    = big.NewInt(1 << 10)
+	leadsListRequestFieldModifiedAfter       = big.NewInt(1 << 11)
+	leadsListRequestFieldModifiedBefore      = big.NewInt(1 << 12)
+	leadsListRequestFieldOwnerId             = big.NewInt(1 << 13)
+	leadsListRequestFieldPageSize            = big.NewInt(1 << 14)
+	leadsListRequestFieldPhoneNumbers        = big.NewInt(1 << 15)
+	leadsListRequestFieldRemoteId            = big.NewInt(1 << 16)
+)
 
 type LeadsListRequest struct {
 	// If provided, will only return leads with this account.
@@ -52,7 +110,147 @@ type LeadsListRequest struct {
 	PhoneNumbers *string `json:"-" url:"phone_numbers,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (l *LeadsListRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetConvertedAccountId sets the ConvertedAccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetConvertedAccountId(convertedAccountId *string) {
+	l.ConvertedAccountId = convertedAccountId
+	l.require(leadsListRequestFieldConvertedAccountId)
+}
+
+// SetConvertedContactId sets the ConvertedContactId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetConvertedContactId(convertedContactId *string) {
+	l.ConvertedContactId = convertedContactId
+	l.require(leadsListRequestFieldConvertedContactId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	l.CreatedAfter = createdAfter
+	l.require(leadsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	l.CreatedBefore = createdBefore
+	l.require(leadsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetCursor(cursor *string) {
+	l.Cursor = cursor
+	l.require(leadsListRequestFieldCursor)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetEmailAddresses(emailAddresses *string) {
+	l.EmailAddresses = emailAddresses
+	l.require(leadsListRequestFieldEmailAddresses)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetExpand(expand []*LeadsListRequestExpandItem) {
+	l.Expand = expand
+	l.require(leadsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	l.IncludeDeletedData = includeDeletedData
+	l.require(leadsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	l.IncludeRemoteData = includeRemoteData
+	l.require(leadsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	l.IncludeRemoteFields = includeRemoteFields
+	l.require(leadsListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetIncludeShellData(includeShellData *bool) {
+	l.IncludeShellData = includeShellData
+	l.require(leadsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	l.ModifiedAfter = modifiedAfter
+	l.require(leadsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	l.ModifiedBefore = modifiedBefore
+	l.require(leadsListRequestFieldModifiedBefore)
+}
+
+// SetOwnerId sets the OwnerId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetOwnerId(ownerId *string) {
+	l.OwnerId = ownerId
+	l.require(leadsListRequestFieldOwnerId)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetPageSize(pageSize *int) {
+	l.PageSize = pageSize
+	l.require(leadsListRequestFieldPageSize)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetPhoneNumbers(phoneNumbers *string) {
+	l.PhoneNumbers = phoneNumbers
+	l.require(leadsListRequestFieldPhoneNumbers)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsListRequest) SetRemoteId(remoteId *string) {
+	l.RemoteId = remoteId
+	l.require(leadsListRequestFieldRemoteId)
+}
+
+var (
+	leadsRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	leadsRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	leadsRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	leadsRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	leadsRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	leadsRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	leadsRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	leadsRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type LeadsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -71,7 +269,80 @@ type LeadsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (l *LeadsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	l.Cursor = cursor
+	l.require(leadsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	l.IncludeDeletedData = includeDeletedData
+	l.require(leadsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	l.IncludeRemoteData = includeRemoteData
+	l.require(leadsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	l.IncludeRemoteFields = includeRemoteFields
+	l.require(leadsRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	l.IncludeShellData = includeShellData
+	l.require(leadsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	l.IsCommonModelField = isCommonModelField
+	l.require(leadsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	l.IsCustom = isCustom
+	l.require(leadsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	l.PageSize = pageSize
+	l.require(leadsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	leadsRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	leadsRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	leadsRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	leadsRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type LeadsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -82,6 +353,44 @@ type LeadsRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (l *LeadsRetrieveRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRetrieveRequest) SetExpand(expand []*LeadsRetrieveRequestExpandItem) {
+	l.Expand = expand
+	l.require(leadsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	l.IncludeRemoteData = includeRemoteData
+	l.require(leadsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	l.IncludeRemoteFields = includeRemoteFields
+	l.require(leadsRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	l.IncludeShellData = includeShellData
+	l.require(leadsRetrieveRequestFieldIncludeShellData)
 }
 
 type LeadsListRequestExpandItem string
@@ -139,6 +448,31 @@ func (l LeadsRetrieveRequestExpandItem) Ptr() *LeadsRetrieveRequestExpandItem {
 // The `Lead` object is used to represent an individual who is a potential customer.
 // ### Usage Example
 // TODO
+var (
+	leadFieldId               = big.NewInt(1 << 0)
+	leadFieldRemoteId         = big.NewInt(1 << 1)
+	leadFieldCreatedAt        = big.NewInt(1 << 2)
+	leadFieldModifiedAt       = big.NewInt(1 << 3)
+	leadFieldOwner            = big.NewInt(1 << 4)
+	leadFieldLeadSource       = big.NewInt(1 << 5)
+	leadFieldTitle            = big.NewInt(1 << 6)
+	leadFieldCompany          = big.NewInt(1 << 7)
+	leadFieldFirstName        = big.NewInt(1 << 8)
+	leadFieldLastName         = big.NewInt(1 << 9)
+	leadFieldAddresses        = big.NewInt(1 << 10)
+	leadFieldEmailAddresses   = big.NewInt(1 << 11)
+	leadFieldPhoneNumbers     = big.NewInt(1 << 12)
+	leadFieldRemoteUpdatedAt  = big.NewInt(1 << 13)
+	leadFieldRemoteCreatedAt  = big.NewInt(1 << 14)
+	leadFieldConvertedDate    = big.NewInt(1 << 15)
+	leadFieldConvertedContact = big.NewInt(1 << 16)
+	leadFieldConvertedAccount = big.NewInt(1 << 17)
+	leadFieldRemoteWasDeleted = big.NewInt(1 << 18)
+	leadFieldFieldMappings    = big.NewInt(1 << 19)
+	leadFieldRemoteData       = big.NewInt(1 << 20)
+	leadFieldRemoteFields     = big.NewInt(1 << 21)
+)
+
 type Lead struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -177,6 +511,9 @@ type Lead struct {
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -340,6 +677,167 @@ func (l *Lead) GetExtraProperties() map[string]interface{} {
 	return l.extraProperties
 }
 
+func (l *Lead) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetId(id *string) {
+	l.Id = id
+	l.require(leadFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetRemoteId(remoteId *string) {
+	l.RemoteId = remoteId
+	l.require(leadFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetCreatedAt(createdAt *time.Time) {
+	l.CreatedAt = createdAt
+	l.require(leadFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetModifiedAt(modifiedAt *time.Time) {
+	l.ModifiedAt = modifiedAt
+	l.require(leadFieldModifiedAt)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetOwner(owner *LeadOwner) {
+	l.Owner = owner
+	l.require(leadFieldOwner)
+}
+
+// SetLeadSource sets the LeadSource field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetLeadSource(leadSource *string) {
+	l.LeadSource = leadSource
+	l.require(leadFieldLeadSource)
+}
+
+// SetTitle sets the Title field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetTitle(title *string) {
+	l.Title = title
+	l.require(leadFieldTitle)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetCompany(company *string) {
+	l.Company = company
+	l.require(leadFieldCompany)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetFirstName(firstName *string) {
+	l.FirstName = firstName
+	l.require(leadFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetLastName(lastName *string) {
+	l.LastName = lastName
+	l.require(leadFieldLastName)
+}
+
+// SetAddresses sets the Addresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetAddresses(addresses []*Address) {
+	l.Addresses = addresses
+	l.require(leadFieldAddresses)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetEmailAddresses(emailAddresses []*EmailAddress) {
+	l.EmailAddresses = emailAddresses
+	l.require(leadFieldEmailAddresses)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetPhoneNumbers(phoneNumbers []*PhoneNumber) {
+	l.PhoneNumbers = phoneNumbers
+	l.require(leadFieldPhoneNumbers)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	l.RemoteUpdatedAt = remoteUpdatedAt
+	l.require(leadFieldRemoteUpdatedAt)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	l.RemoteCreatedAt = remoteCreatedAt
+	l.require(leadFieldRemoteCreatedAt)
+}
+
+// SetConvertedDate sets the ConvertedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetConvertedDate(convertedDate *time.Time) {
+	l.ConvertedDate = convertedDate
+	l.require(leadFieldConvertedDate)
+}
+
+// SetConvertedContact sets the ConvertedContact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetConvertedContact(convertedContact *LeadConvertedContact) {
+	l.ConvertedContact = convertedContact
+	l.require(leadFieldConvertedContact)
+}
+
+// SetConvertedAccount sets the ConvertedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetConvertedAccount(convertedAccount *LeadConvertedAccount) {
+	l.ConvertedAccount = convertedAccount
+	l.require(leadFieldConvertedAccount)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	l.RemoteWasDeleted = remoteWasDeleted
+	l.require(leadFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetFieldMappings(fieldMappings map[string]interface{}) {
+	l.FieldMappings = fieldMappings
+	l.require(leadFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetRemoteData(remoteData []*RemoteData) {
+	l.RemoteData = remoteData
+	l.require(leadFieldRemoteData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetRemoteFields(remoteFields []*RemoteField) {
+	l.RemoteFields = remoteFields
+	l.require(leadFieldRemoteFields)
+}
+
 func (l *Lead) UnmarshalJSON(data []byte) error {
 	type embed Lead
 	var unmarshaler = struct {
@@ -387,7 +885,8 @@ func (l *Lead) MarshalJSON() ([]byte, error) {
 		RemoteCreatedAt: internal.NewOptionalDateTime(l.RemoteCreatedAt),
 		ConvertedDate:   internal.NewOptionalDateTime(l.ConvertedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, l.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (l *Lead) String() string {
@@ -596,6 +1095,24 @@ func (l *LeadOwner) Accept(visitor LeadOwnerVisitor) error {
 // The `Lead` object is used to represent an individual who is a potential customer.
 // ### Usage Example
 // TODO
+var (
+	leadRequestFieldOwner               = big.NewInt(1 << 0)
+	leadRequestFieldLeadSource          = big.NewInt(1 << 1)
+	leadRequestFieldTitle               = big.NewInt(1 << 2)
+	leadRequestFieldCompany             = big.NewInt(1 << 3)
+	leadRequestFieldFirstName           = big.NewInt(1 << 4)
+	leadRequestFieldLastName            = big.NewInt(1 << 5)
+	leadRequestFieldAddresses           = big.NewInt(1 << 6)
+	leadRequestFieldEmailAddresses      = big.NewInt(1 << 7)
+	leadRequestFieldPhoneNumbers        = big.NewInt(1 << 8)
+	leadRequestFieldConvertedDate       = big.NewInt(1 << 9)
+	leadRequestFieldConvertedContact    = big.NewInt(1 << 10)
+	leadRequestFieldConvertedAccount    = big.NewInt(1 << 11)
+	leadRequestFieldIntegrationParams   = big.NewInt(1 << 12)
+	leadRequestFieldLinkedAccountParams = big.NewInt(1 << 13)
+	leadRequestFieldRemoteFields        = big.NewInt(1 << 14)
+)
+
 type LeadRequest struct {
 	// The lead's owner.
 	Owner *LeadRequestOwner `json:"owner,omitempty" url:"owner,omitempty"`
@@ -621,6 +1138,9 @@ type LeadRequest struct {
 	IntegrationParams   map[string]interface{}       `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}       `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest        `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -735,6 +1255,118 @@ func (l *LeadRequest) GetExtraProperties() map[string]interface{} {
 	return l.extraProperties
 }
 
+func (l *LeadRequest) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetOwner(owner *LeadRequestOwner) {
+	l.Owner = owner
+	l.require(leadRequestFieldOwner)
+}
+
+// SetLeadSource sets the LeadSource field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetLeadSource(leadSource *string) {
+	l.LeadSource = leadSource
+	l.require(leadRequestFieldLeadSource)
+}
+
+// SetTitle sets the Title field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetTitle(title *string) {
+	l.Title = title
+	l.require(leadRequestFieldTitle)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetCompany(company *string) {
+	l.Company = company
+	l.require(leadRequestFieldCompany)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetFirstName(firstName *string) {
+	l.FirstName = firstName
+	l.require(leadRequestFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetLastName(lastName *string) {
+	l.LastName = lastName
+	l.require(leadRequestFieldLastName)
+}
+
+// SetAddresses sets the Addresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetAddresses(addresses []*AddressRequest) {
+	l.Addresses = addresses
+	l.require(leadRequestFieldAddresses)
+}
+
+// SetEmailAddresses sets the EmailAddresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetEmailAddresses(emailAddresses []*EmailAddressRequest) {
+	l.EmailAddresses = emailAddresses
+	l.require(leadRequestFieldEmailAddresses)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetPhoneNumbers(phoneNumbers []*PhoneNumberRequest) {
+	l.PhoneNumbers = phoneNumbers
+	l.require(leadRequestFieldPhoneNumbers)
+}
+
+// SetConvertedDate sets the ConvertedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetConvertedDate(convertedDate *time.Time) {
+	l.ConvertedDate = convertedDate
+	l.require(leadRequestFieldConvertedDate)
+}
+
+// SetConvertedContact sets the ConvertedContact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetConvertedContact(convertedContact *LeadRequestConvertedContact) {
+	l.ConvertedContact = convertedContact
+	l.require(leadRequestFieldConvertedContact)
+}
+
+// SetConvertedAccount sets the ConvertedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetConvertedAccount(convertedAccount *LeadRequestConvertedAccount) {
+	l.ConvertedAccount = convertedAccount
+	l.require(leadRequestFieldConvertedAccount)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	l.IntegrationParams = integrationParams
+	l.require(leadRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	l.LinkedAccountParams = linkedAccountParams
+	l.require(leadRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	l.RemoteFields = remoteFields
+	l.require(leadRequestFieldRemoteFields)
+}
+
 func (l *LeadRequest) UnmarshalJSON(data []byte) error {
 	type embed LeadRequest
 	var unmarshaler = struct {
@@ -766,7 +1398,8 @@ func (l *LeadRequest) MarshalJSON() ([]byte, error) {
 		embed:         embed(*l),
 		ConvertedDate: internal.NewOptionalDateTime(l.ConvertedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, l.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (l *LeadRequest) String() string {
@@ -970,11 +1603,21 @@ func (l *LeadRequestOwner) Accept(visitor LeadRequestOwnerVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", l)
 }
 
+var (
+	leadResponseFieldModel    = big.NewInt(1 << 0)
+	leadResponseFieldWarnings = big.NewInt(1 << 1)
+	leadResponseFieldErrors   = big.NewInt(1 << 2)
+	leadResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type LeadResponse struct {
 	Model    *Lead                       `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1012,6 +1655,41 @@ func (l *LeadResponse) GetExtraProperties() map[string]interface{} {
 	return l.extraProperties
 }
 
+func (l *LeadResponse) require(field *big.Int) {
+	if l.explicitFields == nil {
+		l.explicitFields = big.NewInt(0)
+	}
+	l.explicitFields.Or(l.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadResponse) SetModel(model *Lead) {
+	l.Model = model
+	l.require(leadResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	l.Warnings = warnings
+	l.require(leadResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadResponse) SetErrors(errors []*ErrorValidationProblem) {
+	l.Errors = errors
+	l.require(leadResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *LeadResponse) SetLogs(logs []*DebugModeLog) {
+	l.Logs = logs
+	l.require(leadResponseFieldLogs)
+}
+
 func (l *LeadResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler LeadResponse
 	var value unmarshaler
@@ -1028,6 +1706,17 @@ func (l *LeadResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (l *LeadResponse) MarshalJSON() ([]byte, error) {
+	type embed LeadResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*l),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, l.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (l *LeadResponse) String() string {
 	if len(l.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(l.rawJSON); err == nil {
@@ -1040,10 +1729,19 @@ func (l *LeadResponse) String() string {
 	return fmt.Sprintf("%#v", l)
 }
 
+var (
+	paginatedLeadListFieldNext     = big.NewInt(1 << 0)
+	paginatedLeadListFieldPrevious = big.NewInt(1 << 1)
+	paginatedLeadListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedLeadList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Lead `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1074,6 +1772,34 @@ func (p *PaginatedLeadList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedLeadList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedLeadList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedLeadListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedLeadList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedLeadListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedLeadList) SetResults(results []*Lead) {
+	p.Results = results
+	p.require(paginatedLeadListFieldResults)
+}
+
 func (p *PaginatedLeadList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedLeadList
 	var value unmarshaler
@@ -1088,6 +1814,17 @@ func (p *PaginatedLeadList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedLeadList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedLeadList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedLeadList) String() string {

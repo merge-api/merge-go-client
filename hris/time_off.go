@@ -5,8 +5,15 @@ package hris
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	timeOffEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	timeOffEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	timeOffEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type TimeOffEndpointRequest struct {
@@ -15,7 +22,62 @@ type TimeOffEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool           `json:"-" url:"run_async,omitempty"`
 	Model    *TimeOffRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TimeOffEndpointRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	t.IsDebugMode = isDebugMode
+	t.require(timeOffEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffEndpointRequest) SetRunAsync(runAsync *bool) {
+	t.RunAsync = runAsync
+	t.require(timeOffEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffEndpointRequest) SetModel(model *TimeOffRequest) {
+	t.Model = model
+	t.require(timeOffEndpointRequestFieldModel)
+}
+
+var (
+	timeOffListRequestFieldApproverId         = big.NewInt(1 << 0)
+	timeOffListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	timeOffListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	timeOffListRequestFieldCursor             = big.NewInt(1 << 3)
+	timeOffListRequestFieldEmployeeId         = big.NewInt(1 << 4)
+	timeOffListRequestFieldEndedAfter         = big.NewInt(1 << 5)
+	timeOffListRequestFieldEndedBefore        = big.NewInt(1 << 6)
+	timeOffListRequestFieldExpand             = big.NewInt(1 << 7)
+	timeOffListRequestFieldIncludeDeletedData = big.NewInt(1 << 8)
+	timeOffListRequestFieldIncludeRemoteData  = big.NewInt(1 << 9)
+	timeOffListRequestFieldIncludeShellData   = big.NewInt(1 << 10)
+	timeOffListRequestFieldModifiedAfter      = big.NewInt(1 << 11)
+	timeOffListRequestFieldModifiedBefore     = big.NewInt(1 << 12)
+	timeOffListRequestFieldPageSize           = big.NewInt(1 << 13)
+	timeOffListRequestFieldRemoteFields       = big.NewInt(1 << 14)
+	timeOffListRequestFieldRemoteId           = big.NewInt(1 << 15)
+	timeOffListRequestFieldRequestType        = big.NewInt(1 << 16)
+	timeOffListRequestFieldShowEnumOrigins    = big.NewInt(1 << 17)
+	timeOffListRequestFieldStartedAfter       = big.NewInt(1 << 18)
+	timeOffListRequestFieldStartedBefore      = big.NewInt(1 << 19)
+	timeOffListRequestFieldStatus             = big.NewInt(1 << 20)
+)
 
 type TimeOffListRequest struct {
 	// If provided, will only return time off for this approver.
@@ -73,7 +135,172 @@ type TimeOffListRequest struct {
 	// * `CANCELLED` - CANCELLED
 	// * `DELETED` - DELETED
 	Status *TimeOffListRequestStatus `json:"-" url:"status,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TimeOffListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetApproverId sets the ApproverId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetApproverId(approverId *string) {
+	t.ApproverId = approverId
+	t.require(timeOffListRequestFieldApproverId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(timeOffListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(timeOffListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(timeOffListRequestFieldCursor)
+}
+
+// SetEmployeeId sets the EmployeeId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetEmployeeId(employeeId *string) {
+	t.EmployeeId = employeeId
+	t.require(timeOffListRequestFieldEmployeeId)
+}
+
+// SetEndedAfter sets the EndedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetEndedAfter(endedAfter *time.Time) {
+	t.EndedAfter = endedAfter
+	t.require(timeOffListRequestFieldEndedAfter)
+}
+
+// SetEndedBefore sets the EndedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetEndedBefore(endedBefore *time.Time) {
+	t.EndedBefore = endedBefore
+	t.require(timeOffListRequestFieldEndedBefore)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetExpand(expand []*TimeOffListRequestExpandItem) {
+	t.Expand = expand
+	t.require(timeOffListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(timeOffListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(timeOffListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(timeOffListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(timeOffListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(timeOffListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(timeOffListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetRemoteFields(remoteFields *TimeOffListRequestRemoteFields) {
+	t.RemoteFields = remoteFields
+	t.require(timeOffListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(timeOffListRequestFieldRemoteId)
+}
+
+// SetRequestType sets the RequestType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetRequestType(requestType *TimeOffListRequestRequestType) {
+	t.RequestType = requestType
+	t.require(timeOffListRequestFieldRequestType)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetShowEnumOrigins(showEnumOrigins *TimeOffListRequestShowEnumOrigins) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(timeOffListRequestFieldShowEnumOrigins)
+}
+
+// SetStartedAfter sets the StartedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetStartedAfter(startedAfter *time.Time) {
+	t.StartedAfter = startedAfter
+	t.require(timeOffListRequestFieldStartedAfter)
+}
+
+// SetStartedBefore sets the StartedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetStartedBefore(startedBefore *time.Time) {
+	t.StartedBefore = startedBefore
+	t.require(timeOffListRequestFieldStartedBefore)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffListRequest) SetStatus(status *TimeOffListRequestStatus) {
+	t.Status = status
+	t.require(timeOffListRequestFieldStatus)
+}
+
+var (
+	timeOffRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	timeOffRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	timeOffRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	timeOffRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	timeOffRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type TimeOffRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -86,6 +313,51 @@ type TimeOffRetrieveRequest struct {
 	RemoteFields *TimeOffRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *TimeOffRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TimeOffRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRetrieveRequest) SetExpand(expand []*TimeOffRetrieveRequestExpandItem) {
+	t.Expand = expand
+	t.require(timeOffRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(timeOffRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(timeOffRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRetrieveRequest) SetRemoteFields(remoteFields *TimeOffRetrieveRequestRemoteFields) {
+	t.RemoteFields = remoteFields
+	t.require(timeOffRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *TimeOffRetrieveRequestShowEnumOrigins) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(timeOffRetrieveRequestFieldShowEnumOrigins)
 }
 
 type TimeOffListRequestExpandItem string
@@ -345,10 +617,19 @@ func (t TimeOffRetrieveRequestShowEnumOrigins) Ptr() *TimeOffRetrieveRequestShow
 	return &t
 }
 
+var (
+	paginatedTimeOffListFieldNext     = big.NewInt(1 << 0)
+	paginatedTimeOffListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTimeOffListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedTimeOffList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*TimeOff `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -379,6 +660,34 @@ func (p *PaginatedTimeOffList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedTimeOffList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimeOffList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTimeOffListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimeOffList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTimeOffListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTimeOffList) SetResults(results []*TimeOff) {
+	p.Results = results
+	p.require(paginatedTimeOffListFieldResults)
+}
+
 func (p *PaginatedTimeOffList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTimeOffList
 	var value unmarshaler
@@ -393,6 +702,17 @@ func (p *PaginatedTimeOffList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTimeOffList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTimeOffList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTimeOffList) String() string {
@@ -453,6 +773,25 @@ func (r RequestTypeEnum) Ptr() *RequestTypeEnum {
 //
 // ### Usage Example
 // Fetch from the `LIST TimeOffs` endpoint and filter by `ID` to show all time off requests.
+var (
+	timeOffFieldId               = big.NewInt(1 << 0)
+	timeOffFieldRemoteId         = big.NewInt(1 << 1)
+	timeOffFieldCreatedAt        = big.NewInt(1 << 2)
+	timeOffFieldModifiedAt       = big.NewInt(1 << 3)
+	timeOffFieldEmployee         = big.NewInt(1 << 4)
+	timeOffFieldApprover         = big.NewInt(1 << 5)
+	timeOffFieldStatus           = big.NewInt(1 << 6)
+	timeOffFieldEmployeeNote     = big.NewInt(1 << 7)
+	timeOffFieldUnits            = big.NewInt(1 << 8)
+	timeOffFieldAmount           = big.NewInt(1 << 9)
+	timeOffFieldRequestType      = big.NewInt(1 << 10)
+	timeOffFieldStartTime        = big.NewInt(1 << 11)
+	timeOffFieldEndTime          = big.NewInt(1 << 12)
+	timeOffFieldRemoteWasDeleted = big.NewInt(1 << 13)
+	timeOffFieldFieldMappings    = big.NewInt(1 << 14)
+	timeOffFieldRemoteData       = big.NewInt(1 << 15)
+)
+
 type TimeOff struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -499,6 +838,9 @@ type TimeOff struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -620,6 +962,125 @@ func (t *TimeOff) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimeOff) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetId(id *string) {
+	t.Id = id
+	t.require(timeOffFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(timeOffFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(timeOffFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(timeOffFieldModifiedAt)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetEmployee(employee *TimeOffEmployee) {
+	t.Employee = employee
+	t.require(timeOffFieldEmployee)
+}
+
+// SetApprover sets the Approver field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetApprover(approver *TimeOffApprover) {
+	t.Approver = approver
+	t.require(timeOffFieldApprover)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetStatus(status *TimeOffStatus) {
+	t.Status = status
+	t.require(timeOffFieldStatus)
+}
+
+// SetEmployeeNote sets the EmployeeNote field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetEmployeeNote(employeeNote *string) {
+	t.EmployeeNote = employeeNote
+	t.require(timeOffFieldEmployeeNote)
+}
+
+// SetUnits sets the Units field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetUnits(units *TimeOffUnits) {
+	t.Units = units
+	t.require(timeOffFieldUnits)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetAmount(amount *float64) {
+	t.Amount = amount
+	t.require(timeOffFieldAmount)
+}
+
+// SetRequestType sets the RequestType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetRequestType(requestType *TimeOffRequestType) {
+	t.RequestType = requestType
+	t.require(timeOffFieldRequestType)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetStartTime(startTime *time.Time) {
+	t.StartTime = startTime
+	t.require(timeOffFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetEndTime(endTime *time.Time) {
+	t.EndTime = endTime
+	t.require(timeOffFieldEndTime)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(timeOffFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(timeOffFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOff) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(timeOffFieldRemoteData)
+}
+
 func (t *TimeOff) UnmarshalJSON(data []byte) error {
 	type embed TimeOff
 	var unmarshaler = struct {
@@ -663,7 +1124,8 @@ func (t *TimeOff) MarshalJSON() ([]byte, error) {
 		StartTime:  internal.NewOptionalDateTime(t.StartTime),
 		EndTime:    internal.NewOptionalDateTime(t.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimeOff) String() string {
@@ -810,6 +1272,20 @@ func (t *TimeOffEmployee) Accept(visitor TimeOffEmployeeVisitor) error {
 //
 // ### Usage Example
 // Fetch from the `LIST TimeOffs` endpoint and filter by `ID` to show all time off requests.
+var (
+	timeOffRequestFieldEmployee            = big.NewInt(1 << 0)
+	timeOffRequestFieldApprover            = big.NewInt(1 << 1)
+	timeOffRequestFieldStatus              = big.NewInt(1 << 2)
+	timeOffRequestFieldEmployeeNote        = big.NewInt(1 << 3)
+	timeOffRequestFieldUnits               = big.NewInt(1 << 4)
+	timeOffRequestFieldAmount              = big.NewInt(1 << 5)
+	timeOffRequestFieldRequestType         = big.NewInt(1 << 6)
+	timeOffRequestFieldStartTime           = big.NewInt(1 << 7)
+	timeOffRequestFieldEndTime             = big.NewInt(1 << 8)
+	timeOffRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	timeOffRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+)
+
 type TimeOffRequest struct {
 	// The employee requesting time off.
 	Employee *TimeOffRequestEmployee `json:"employee,omitempty" url:"employee,omitempty"`
@@ -847,6 +1323,9 @@ type TimeOffRequest struct {
 	EndTime             *time.Time             `json:"end_time,omitempty" url:"end_time,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -933,6 +1412,90 @@ func (t *TimeOffRequest) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimeOffRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetEmployee(employee *TimeOffRequestEmployee) {
+	t.Employee = employee
+	t.require(timeOffRequestFieldEmployee)
+}
+
+// SetApprover sets the Approver field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetApprover(approver *TimeOffRequestApprover) {
+	t.Approver = approver
+	t.require(timeOffRequestFieldApprover)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetStatus(status *TimeOffRequestStatus) {
+	t.Status = status
+	t.require(timeOffRequestFieldStatus)
+}
+
+// SetEmployeeNote sets the EmployeeNote field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetEmployeeNote(employeeNote *string) {
+	t.EmployeeNote = employeeNote
+	t.require(timeOffRequestFieldEmployeeNote)
+}
+
+// SetUnits sets the Units field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetUnits(units *TimeOffRequestUnits) {
+	t.Units = units
+	t.require(timeOffRequestFieldUnits)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetAmount(amount *float64) {
+	t.Amount = amount
+	t.require(timeOffRequestFieldAmount)
+}
+
+// SetRequestType sets the RequestType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetRequestType(requestType *TimeOffRequestRequestType) {
+	t.RequestType = requestType
+	t.require(timeOffRequestFieldRequestType)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetStartTime(startTime *time.Time) {
+	t.StartTime = startTime
+	t.require(timeOffRequestFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetEndTime(endTime *time.Time) {
+	t.EndTime = endTime
+	t.require(timeOffRequestFieldEndTime)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	t.IntegrationParams = integrationParams
+	t.require(timeOffRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	t.LinkedAccountParams = linkedAccountParams
+	t.require(timeOffRequestFieldLinkedAccountParams)
+}
+
 func (t *TimeOffRequest) UnmarshalJSON(data []byte) error {
 	type embed TimeOffRequest
 	var unmarshaler = struct {
@@ -968,7 +1531,8 @@ func (t *TimeOffRequest) MarshalJSON() ([]byte, error) {
 		StartTime: internal.NewOptionalDateTime(t.StartTime),
 		EndTime:   internal.NewOptionalDateTime(t.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimeOffRequest) String() string {
@@ -1384,11 +1948,21 @@ func (t *TimeOffRequestUnits) Accept(visitor TimeOffRequestUnitsVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
 
+var (
+	timeOffResponseFieldModel    = big.NewInt(1 << 0)
+	timeOffResponseFieldWarnings = big.NewInt(1 << 1)
+	timeOffResponseFieldErrors   = big.NewInt(1 << 2)
+	timeOffResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type TimeOffResponse struct {
 	Model    *TimeOff                    `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1426,6 +2000,41 @@ func (t *TimeOffResponse) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TimeOffResponse) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffResponse) SetModel(model *TimeOff) {
+	t.Model = model
+	t.require(timeOffResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	t.Warnings = warnings
+	t.require(timeOffResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffResponse) SetErrors(errors []*ErrorValidationProblem) {
+	t.Errors = errors
+	t.require(timeOffResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TimeOffResponse) SetLogs(logs []*DebugModeLog) {
+	t.Logs = logs
+	t.require(timeOffResponseFieldLogs)
+}
+
 func (t *TimeOffResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler TimeOffResponse
 	var value unmarshaler
@@ -1440,6 +2049,17 @@ func (t *TimeOffResponse) UnmarshalJSON(data []byte) error {
 	t.extraProperties = extraProperties
 	t.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (t *TimeOffResponse) MarshalJSON() ([]byte, error) {
+	type embed TimeOffResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*t),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TimeOffResponse) String() string {

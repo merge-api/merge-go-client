@@ -5,8 +5,23 @@ package filestorage
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	groupsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	groupsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	groupsListRequestFieldCursor             = big.NewInt(1 << 2)
+	groupsListRequestFieldExpand             = big.NewInt(1 << 3)
+	groupsListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	groupsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	groupsListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	groupsListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	groupsListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	groupsListRequestFieldPageSize           = big.NewInt(1 << 9)
+	groupsListRequestFieldRemoteId           = big.NewInt(1 << 10)
 )
 
 type GroupsListRequest struct {
@@ -32,7 +47,100 @@ type GroupsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (g *GroupsListRequest) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	g.CreatedAfter = createdAfter
+	g.require(groupsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	g.CreatedBefore = createdBefore
+	g.require(groupsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetCursor(cursor *string) {
+	g.Cursor = cursor
+	g.require(groupsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetExpand(expand []*GroupsListRequestExpandItem) {
+	g.Expand = expand
+	g.require(groupsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	g.IncludeDeletedData = includeDeletedData
+	g.require(groupsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	g.IncludeRemoteData = includeRemoteData
+	g.require(groupsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetIncludeShellData(includeShellData *bool) {
+	g.IncludeShellData = includeShellData
+	g.require(groupsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	g.ModifiedAfter = modifiedAfter
+	g.require(groupsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	g.ModifiedBefore = modifiedBefore
+	g.require(groupsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetPageSize(pageSize *int) {
+	g.PageSize = pageSize
+	g.require(groupsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsListRequest) SetRemoteId(remoteId *string) {
+	g.RemoteId = remoteId
+	g.require(groupsListRequestFieldRemoteId)
+}
+
+var (
+	groupsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	groupsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	groupsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type GroupsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -41,6 +149,37 @@ type GroupsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (g *GroupsRetrieveRequest) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsRetrieveRequest) SetExpand(expand []*GroupsRetrieveRequestExpandItem) {
+	g.Expand = expand
+	g.require(groupsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	g.IncludeRemoteData = includeRemoteData
+	g.require(groupsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	g.IncludeShellData = includeShellData
+	g.require(groupsRetrieveRequestFieldIncludeShellData)
 }
 
 type GroupsListRequestExpandItem string
@@ -87,10 +226,19 @@ func (g GroupsRetrieveRequestExpandItem) Ptr() *GroupsRetrieveRequestExpandItem 
 	return &g
 }
 
+var (
+	paginatedGroupListFieldNext     = big.NewInt(1 << 0)
+	paginatedGroupListFieldPrevious = big.NewInt(1 << 1)
+	paginatedGroupListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedGroupList struct {
 	Next     *string  `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Group `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -121,6 +269,34 @@ func (p *PaginatedGroupList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedGroupList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedGroupList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedGroupListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedGroupList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedGroupListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedGroupList) SetResults(results []*Group) {
+	p.Results = results
+	p.require(paginatedGroupListFieldResults)
+}
+
 func (p *PaginatedGroupList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedGroupList
 	var value unmarshaler
@@ -135,6 +311,17 @@ func (p *PaginatedGroupList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedGroupList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedGroupList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedGroupList) String() string {

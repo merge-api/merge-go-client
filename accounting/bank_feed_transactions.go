@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	bankFeedTransactionEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	bankFeedTransactionEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	bankFeedTransactionEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type BankFeedTransactionEndpointRequest struct {
@@ -15,7 +22,53 @@ type BankFeedTransactionEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                              `json:"-" url:"run_async,omitempty"`
 	Model    *BankFeedTransactionRequestRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (b *BankFeedTransactionEndpointRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	b.IsDebugMode = isDebugMode
+	b.require(bankFeedTransactionEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionEndpointRequest) SetRunAsync(runAsync *bool) {
+	b.RunAsync = runAsync
+	b.require(bankFeedTransactionEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionEndpointRequest) SetModel(model *BankFeedTransactionRequestRequest) {
+	b.Model = model
+	b.require(bankFeedTransactionEndpointRequestFieldModel)
+}
+
+var (
+	bankFeedTransactionsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	bankFeedTransactionsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	bankFeedTransactionsListRequestFieldCursor             = big.NewInt(1 << 2)
+	bankFeedTransactionsListRequestFieldExpand             = big.NewInt(1 << 3)
+	bankFeedTransactionsListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	bankFeedTransactionsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	bankFeedTransactionsListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	bankFeedTransactionsListRequestFieldIsProcessed        = big.NewInt(1 << 7)
+	bankFeedTransactionsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	bankFeedTransactionsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	bankFeedTransactionsListRequestFieldPageSize           = big.NewInt(1 << 10)
+	bankFeedTransactionsListRequestFieldRemoteId           = big.NewInt(1 << 11)
+)
 
 type BankFeedTransactionsListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -42,7 +95,107 @@ type BankFeedTransactionsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (b *BankFeedTransactionsListRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	b.CreatedAfter = createdAfter
+	b.require(bankFeedTransactionsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	b.CreatedBefore = createdBefore
+	b.require(bankFeedTransactionsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetCursor(cursor *string) {
+	b.Cursor = cursor
+	b.require(bankFeedTransactionsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetExpand(expand []*string) {
+	b.Expand = expand
+	b.require(bankFeedTransactionsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	b.IncludeDeletedData = includeDeletedData
+	b.require(bankFeedTransactionsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(bankFeedTransactionsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(bankFeedTransactionsListRequestFieldIncludeShellData)
+}
+
+// SetIsProcessed sets the IsProcessed field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetIsProcessed(isProcessed *bool) {
+	b.IsProcessed = isProcessed
+	b.require(bankFeedTransactionsListRequestFieldIsProcessed)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	b.ModifiedAfter = modifiedAfter
+	b.require(bankFeedTransactionsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	b.ModifiedBefore = modifiedBefore
+	b.require(bankFeedTransactionsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetPageSize(pageSize *int) {
+	b.PageSize = pageSize
+	b.require(bankFeedTransactionsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsListRequest) SetRemoteId(remoteId *string) {
+	b.RemoteId = remoteId
+	b.require(bankFeedTransactionsListRequestFieldRemoteId)
+}
+
+var (
+	bankFeedTransactionsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	bankFeedTransactionsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	bankFeedTransactionsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type BankFeedTransactionsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -51,6 +204,37 @@ type BankFeedTransactionsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (b *BankFeedTransactionsRetrieveRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsRetrieveRequest) SetExpand(expand []*string) {
+	b.Expand = expand
+	b.require(bankFeedTransactionsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	b.IncludeRemoteData = includeRemoteData
+	b.require(bankFeedTransactionsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	b.IncludeShellData = includeShellData
+	b.require(bankFeedTransactionsRetrieveRequestFieldIncludeShellData)
 }
 
 // # The BankFeedTransaction Object
@@ -59,6 +243,24 @@ type BankFeedTransactionsRetrieveRequest struct {
 //
 // ### Usage Example
 // Fetch from the `GET BankFeedTransaction` endpoint to view details of a transaction associated with a bank feed account.
+var (
+	bankFeedTransactionFieldId                  = big.NewInt(1 << 0)
+	bankFeedTransactionFieldRemoteId            = big.NewInt(1 << 1)
+	bankFeedTransactionFieldCreatedAt           = big.NewInt(1 << 2)
+	bankFeedTransactionFieldModifiedAt          = big.NewInt(1 << 3)
+	bankFeedTransactionFieldBankFeedAccount     = big.NewInt(1 << 4)
+	bankFeedTransactionFieldTransactionDate     = big.NewInt(1 << 5)
+	bankFeedTransactionFieldPostedDate          = big.NewInt(1 << 6)
+	bankFeedTransactionFieldAmount              = big.NewInt(1 << 7)
+	bankFeedTransactionFieldDescription         = big.NewInt(1 << 8)
+	bankFeedTransactionFieldTransactionType     = big.NewInt(1 << 9)
+	bankFeedTransactionFieldPayee               = big.NewInt(1 << 10)
+	bankFeedTransactionFieldCreditOrDebit       = big.NewInt(1 << 11)
+	bankFeedTransactionFieldSourceTransactionId = big.NewInt(1 << 12)
+	bankFeedTransactionFieldRemoteWasDeleted    = big.NewInt(1 << 13)
+	bankFeedTransactionFieldIsProcessed         = big.NewInt(1 << 14)
+)
+
 type BankFeedTransaction struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -92,6 +294,9 @@ type BankFeedTransaction struct {
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	// Whether or not this transaction has been processed by the external system. For example, NetSuite writes this field as True when the SuiteApp has processed the transaction.
 	IsProcessed *bool `json:"is_processed,omitempty" url:"is_processed,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -206,6 +411,118 @@ func (b *BankFeedTransaction) GetExtraProperties() map[string]interface{} {
 	return b.extraProperties
 }
 
+func (b *BankFeedTransaction) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetId(id *string) {
+	b.Id = id
+	b.require(bankFeedTransactionFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetRemoteId(remoteId *string) {
+	b.RemoteId = remoteId
+	b.require(bankFeedTransactionFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetCreatedAt(createdAt *time.Time) {
+	b.CreatedAt = createdAt
+	b.require(bankFeedTransactionFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetModifiedAt(modifiedAt *time.Time) {
+	b.ModifiedAt = modifiedAt
+	b.require(bankFeedTransactionFieldModifiedAt)
+}
+
+// SetBankFeedAccount sets the BankFeedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetBankFeedAccount(bankFeedAccount *BankFeedTransactionBankFeedAccount) {
+	b.BankFeedAccount = bankFeedAccount
+	b.require(bankFeedTransactionFieldBankFeedAccount)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetTransactionDate(transactionDate *time.Time) {
+	b.TransactionDate = transactionDate
+	b.require(bankFeedTransactionFieldTransactionDate)
+}
+
+// SetPostedDate sets the PostedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetPostedDate(postedDate *time.Time) {
+	b.PostedDate = postedDate
+	b.require(bankFeedTransactionFieldPostedDate)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetAmount(amount *float64) {
+	b.Amount = amount
+	b.require(bankFeedTransactionFieldAmount)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetDescription(description *string) {
+	b.Description = description
+	b.require(bankFeedTransactionFieldDescription)
+}
+
+// SetTransactionType sets the TransactionType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetTransactionType(transactionType *string) {
+	b.TransactionType = transactionType
+	b.require(bankFeedTransactionFieldTransactionType)
+}
+
+// SetPayee sets the Payee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetPayee(payee *string) {
+	b.Payee = payee
+	b.require(bankFeedTransactionFieldPayee)
+}
+
+// SetCreditOrDebit sets the CreditOrDebit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetCreditOrDebit(creditOrDebit *BankFeedTransactionCreditOrDebit) {
+	b.CreditOrDebit = creditOrDebit
+	b.require(bankFeedTransactionFieldCreditOrDebit)
+}
+
+// SetSourceTransactionId sets the SourceTransactionId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetSourceTransactionId(sourceTransactionId *string) {
+	b.SourceTransactionId = sourceTransactionId
+	b.require(bankFeedTransactionFieldSourceTransactionId)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	b.RemoteWasDeleted = remoteWasDeleted
+	b.require(bankFeedTransactionFieldRemoteWasDeleted)
+}
+
+// SetIsProcessed sets the IsProcessed field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetIsProcessed(isProcessed *bool) {
+	b.IsProcessed = isProcessed
+	b.require(bankFeedTransactionFieldIsProcessed)
+}
+
 func (b *BankFeedTransaction) UnmarshalJSON(data []byte) error {
 	type embed BankFeedTransaction
 	var unmarshaler = struct {
@@ -249,7 +566,8 @@ func (b *BankFeedTransaction) MarshalJSON() ([]byte, error) {
 		TransactionDate: internal.NewOptionalDateTime(b.TransactionDate),
 		PostedDate:      internal.NewOptionalDateTime(b.PostedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (b *BankFeedTransaction) String() string {
@@ -399,6 +717,20 @@ func (b *BankFeedTransactionCreditOrDebit) Accept(visitor BankFeedTransactionCre
 //
 // ### Usage Example
 // Fetch from the `GET BankFeedTransaction` endpoint to view details of a transaction associated with a bank feed account.
+var (
+	bankFeedTransactionRequestRequestFieldBankFeedAccount     = big.NewInt(1 << 0)
+	bankFeedTransactionRequestRequestFieldTransactionDate     = big.NewInt(1 << 1)
+	bankFeedTransactionRequestRequestFieldPostedDate          = big.NewInt(1 << 2)
+	bankFeedTransactionRequestRequestFieldAmount              = big.NewInt(1 << 3)
+	bankFeedTransactionRequestRequestFieldDescription         = big.NewInt(1 << 4)
+	bankFeedTransactionRequestRequestFieldTransactionType     = big.NewInt(1 << 5)
+	bankFeedTransactionRequestRequestFieldPayee               = big.NewInt(1 << 6)
+	bankFeedTransactionRequestRequestFieldCreditOrDebit       = big.NewInt(1 << 7)
+	bankFeedTransactionRequestRequestFieldSourceTransactionId = big.NewInt(1 << 8)
+	bankFeedTransactionRequestRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	bankFeedTransactionRequestRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+)
+
 type BankFeedTransactionRequestRequest struct {
 	// The bank feed account associated with the transaction.
 	BankFeedAccount *BankFeedTransactionRequestRequestBankFeedAccount `json:"bank_feed_account,omitempty" url:"bank_feed_account,omitempty"`
@@ -423,6 +755,9 @@ type BankFeedTransactionRequestRequest struct {
 	SourceTransactionId *string                `json:"source_transaction_id,omitempty" url:"source_transaction_id,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -509,6 +844,90 @@ func (b *BankFeedTransactionRequestRequest) GetExtraProperties() map[string]inte
 	return b.extraProperties
 }
 
+func (b *BankFeedTransactionRequestRequest) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetBankFeedAccount sets the BankFeedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetBankFeedAccount(bankFeedAccount *BankFeedTransactionRequestRequestBankFeedAccount) {
+	b.BankFeedAccount = bankFeedAccount
+	b.require(bankFeedTransactionRequestRequestFieldBankFeedAccount)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetTransactionDate(transactionDate *time.Time) {
+	b.TransactionDate = transactionDate
+	b.require(bankFeedTransactionRequestRequestFieldTransactionDate)
+}
+
+// SetPostedDate sets the PostedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetPostedDate(postedDate *time.Time) {
+	b.PostedDate = postedDate
+	b.require(bankFeedTransactionRequestRequestFieldPostedDate)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetAmount(amount *float64) {
+	b.Amount = amount
+	b.require(bankFeedTransactionRequestRequestFieldAmount)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetDescription(description *string) {
+	b.Description = description
+	b.require(bankFeedTransactionRequestRequestFieldDescription)
+}
+
+// SetTransactionType sets the TransactionType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetTransactionType(transactionType *string) {
+	b.TransactionType = transactionType
+	b.require(bankFeedTransactionRequestRequestFieldTransactionType)
+}
+
+// SetPayee sets the Payee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetPayee(payee *string) {
+	b.Payee = payee
+	b.require(bankFeedTransactionRequestRequestFieldPayee)
+}
+
+// SetCreditOrDebit sets the CreditOrDebit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetCreditOrDebit(creditOrDebit *BankFeedTransactionRequestRequestCreditOrDebit) {
+	b.CreditOrDebit = creditOrDebit
+	b.require(bankFeedTransactionRequestRequestFieldCreditOrDebit)
+}
+
+// SetSourceTransactionId sets the SourceTransactionId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetSourceTransactionId(sourceTransactionId *string) {
+	b.SourceTransactionId = sourceTransactionId
+	b.require(bankFeedTransactionRequestRequestFieldSourceTransactionId)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	b.IntegrationParams = integrationParams
+	b.require(bankFeedTransactionRequestRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionRequestRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	b.LinkedAccountParams = linkedAccountParams
+	b.require(bankFeedTransactionRequestRequestFieldLinkedAccountParams)
+}
+
 func (b *BankFeedTransactionRequestRequest) UnmarshalJSON(data []byte) error {
 	type embed BankFeedTransactionRequestRequest
 	var unmarshaler = struct {
@@ -544,7 +963,8 @@ func (b *BankFeedTransactionRequestRequest) MarshalJSON() ([]byte, error) {
 		TransactionDate: internal.NewOptionalDateTime(b.TransactionDate),
 		PostedDate:      internal.NewOptionalDateTime(b.PostedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (b *BankFeedTransactionRequestRequest) String() string {
@@ -688,11 +1108,21 @@ func (b *BankFeedTransactionRequestRequestCreditOrDebit) Accept(visitor BankFeed
 	return fmt.Errorf("type %T does not include a non-empty union type", b)
 }
 
+var (
+	bankFeedTransactionResponseFieldModel    = big.NewInt(1 << 0)
+	bankFeedTransactionResponseFieldWarnings = big.NewInt(1 << 1)
+	bankFeedTransactionResponseFieldErrors   = big.NewInt(1 << 2)
+	bankFeedTransactionResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type BankFeedTransactionResponse struct {
 	Model    *BankFeedTransaction        `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -730,6 +1160,41 @@ func (b *BankFeedTransactionResponse) GetExtraProperties() map[string]interface{
 	return b.extraProperties
 }
 
+func (b *BankFeedTransactionResponse) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionResponse) SetModel(model *BankFeedTransaction) {
+	b.Model = model
+	b.require(bankFeedTransactionResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	b.Warnings = warnings
+	b.require(bankFeedTransactionResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionResponse) SetErrors(errors []*ErrorValidationProblem) {
+	b.Errors = errors
+	b.require(bankFeedTransactionResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransactionResponse) SetLogs(logs []*DebugModeLog) {
+	b.Logs = logs
+	b.require(bankFeedTransactionResponseFieldLogs)
+}
+
 func (b *BankFeedTransactionResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler BankFeedTransactionResponse
 	var value unmarshaler
@@ -744,6 +1209,17 @@ func (b *BankFeedTransactionResponse) UnmarshalJSON(data []byte) error {
 	b.extraProperties = extraProperties
 	b.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (b *BankFeedTransactionResponse) MarshalJSON() ([]byte, error) {
+	type embed BankFeedTransactionResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*b),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (b *BankFeedTransactionResponse) String() string {
@@ -782,10 +1258,19 @@ func (c CreditOrDebitEnum) Ptr() *CreditOrDebitEnum {
 	return &c
 }
 
+var (
+	paginatedBankFeedTransactionListFieldNext     = big.NewInt(1 << 0)
+	paginatedBankFeedTransactionListFieldPrevious = big.NewInt(1 << 1)
+	paginatedBankFeedTransactionListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedBankFeedTransactionList struct {
 	Next     *string                `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string                `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*BankFeedTransaction `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -816,6 +1301,34 @@ func (p *PaginatedBankFeedTransactionList) GetExtraProperties() map[string]inter
 	return p.extraProperties
 }
 
+func (p *PaginatedBankFeedTransactionList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankFeedTransactionList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedBankFeedTransactionListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankFeedTransactionList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedBankFeedTransactionListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedBankFeedTransactionList) SetResults(results []*BankFeedTransaction) {
+	p.Results = results
+	p.require(paginatedBankFeedTransactionListFieldResults)
+}
+
 func (p *PaginatedBankFeedTransactionList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedBankFeedTransactionList
 	var value unmarshaler
@@ -830,6 +1343,17 @@ func (p *PaginatedBankFeedTransactionList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedBankFeedTransactionList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedBankFeedTransactionList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedBankFeedTransactionList) String() string {

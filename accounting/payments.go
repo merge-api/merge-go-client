@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	paymentEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	paymentEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	paymentEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type PaymentEndpointRequest struct {
@@ -15,7 +22,48 @@ type PaymentEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool           `json:"-" url:"run_async,omitempty"`
 	Model    *PaymentRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PaymentEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(paymentEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(paymentEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentEndpointRequest) SetModel(model *PaymentRequest) {
+	p.Model = model
+	p.require(paymentEndpointRequestFieldModel)
+}
+
+var (
+	paymentsLineItemsRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	paymentsLineItemsRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	paymentsLineItemsRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	paymentsLineItemsRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	paymentsLineItemsRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	paymentsLineItemsRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	paymentsLineItemsRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type PaymentsLineItemsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -32,7 +80,86 @@ type PaymentsLineItemsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	p.IsCommonModelField = isCommonModelField
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	p.IsCustom = isCustom
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsLineItemsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(paymentsLineItemsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	paymentsListRequestFieldAccountId             = big.NewInt(1 << 0)
+	paymentsListRequestFieldCompanyId             = big.NewInt(1 << 1)
+	paymentsListRequestFieldContactId             = big.NewInt(1 << 2)
+	paymentsListRequestFieldCreatedAfter          = big.NewInt(1 << 3)
+	paymentsListRequestFieldCreatedBefore         = big.NewInt(1 << 4)
+	paymentsListRequestFieldCursor                = big.NewInt(1 << 5)
+	paymentsListRequestFieldExpand                = big.NewInt(1 << 6)
+	paymentsListRequestFieldIncludeDeletedData    = big.NewInt(1 << 7)
+	paymentsListRequestFieldIncludeRemoteData     = big.NewInt(1 << 8)
+	paymentsListRequestFieldIncludeRemoteFields   = big.NewInt(1 << 9)
+	paymentsListRequestFieldIncludeShellData      = big.NewInt(1 << 10)
+	paymentsListRequestFieldModifiedAfter         = big.NewInt(1 << 11)
+	paymentsListRequestFieldModifiedBefore        = big.NewInt(1 << 12)
+	paymentsListRequestFieldPageSize              = big.NewInt(1 << 13)
+	paymentsListRequestFieldRemoteId              = big.NewInt(1 << 14)
+	paymentsListRequestFieldTransactionDateAfter  = big.NewInt(1 << 15)
+	paymentsListRequestFieldTransactionDateBefore = big.NewInt(1 << 16)
+)
 
 type PaymentsListRequest struct {
 	// If provided, will only return payments for this account.
@@ -69,7 +196,142 @@ type PaymentsListRequest struct {
 	TransactionDateAfter *time.Time `json:"-" url:"transaction_date_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
 	TransactionDateBefore *time.Time `json:"-" url:"transaction_date_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PaymentsListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetAccountId sets the AccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetAccountId(accountId *string) {
+	p.AccountId = accountId
+	p.require(paymentsListRequestFieldAccountId)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetCompanyId(companyId *string) {
+	p.CompanyId = companyId
+	p.require(paymentsListRequestFieldCompanyId)
+}
+
+// SetContactId sets the ContactId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetContactId(contactId *string) {
+	p.ContactId = contactId
+	p.require(paymentsListRequestFieldContactId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	p.CreatedAfter = createdAfter
+	p.require(paymentsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	p.CreatedBefore = createdBefore
+	p.require(paymentsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(paymentsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetExpand(expand []*PaymentsListRequestExpandItem) {
+	p.Expand = expand
+	p.require(paymentsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(paymentsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(paymentsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	p.IncludeRemoteFields = includeRemoteFields
+	p.require(paymentsListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(paymentsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	p.ModifiedAfter = modifiedAfter
+	p.require(paymentsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	p.ModifiedBefore = modifiedBefore
+	p.require(paymentsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(paymentsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(paymentsListRequestFieldRemoteId)
+}
+
+// SetTransactionDateAfter sets the TransactionDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetTransactionDateAfter(transactionDateAfter *time.Time) {
+	p.TransactionDateAfter = transactionDateAfter
+	p.require(paymentsListRequestFieldTransactionDateAfter)
+}
+
+// SetTransactionDateBefore sets the TransactionDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsListRequest) SetTransactionDateBefore(transactionDateBefore *time.Time) {
+	p.TransactionDateBefore = transactionDateBefore
+	p.require(paymentsListRequestFieldTransactionDateBefore)
+}
+
+var (
+	patchedPaymentEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedPaymentEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedPaymentEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedPaymentEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -77,7 +339,48 @@ type PatchedPaymentEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                  `json:"-" url:"run_async,omitempty"`
 	Model    *PatchedPaymentRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedPaymentEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedPaymentEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedPaymentEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentEndpointRequest) SetModel(model *PatchedPaymentRequest) {
+	p.Model = model
+	p.require(patchedPaymentEndpointRequestFieldModel)
+}
+
+var (
+	paymentsRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	paymentsRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	paymentsRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	paymentsRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	paymentsRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	paymentsRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	paymentsRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type PaymentsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -94,7 +397,73 @@ type PaymentsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PaymentsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(paymentsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(paymentsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(paymentsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(paymentsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	p.IsCommonModelField = isCommonModelField
+	p.require(paymentsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	p.IsCustom = isCustom
+	p.require(paymentsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(paymentsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	paymentsRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	paymentsRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	paymentsRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	paymentsRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type PaymentsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -105,6 +474,44 @@ type PaymentsRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *PaymentsRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRetrieveRequest) SetExpand(expand []*PaymentsRetrieveRequestExpandItem) {
+	p.Expand = expand
+	p.require(paymentsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(paymentsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	p.IncludeRemoteFields = includeRemoteFields
+	p.require(paymentsRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(paymentsRetrieveRequestFieldIncludeShellData)
 }
 
 type PaymentsListRequestExpandItem string
@@ -181,10 +588,19 @@ func (p PaymentsRetrieveRequestExpandItem) Ptr() *PaymentsRetrieveRequestExpandI
 	return &p
 }
 
+var (
+	paginatedPaymentListFieldNext     = big.NewInt(1 << 0)
+	paginatedPaymentListFieldPrevious = big.NewInt(1 << 1)
+	paginatedPaymentListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedPaymentList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Payment `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -215,6 +631,34 @@ func (p *PaginatedPaymentList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedPaymentList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPaymentList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedPaymentListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPaymentList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedPaymentListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPaymentList) SetResults(results []*Payment) {
+	p.Results = results
+	p.require(paginatedPaymentListFieldResults)
+}
+
 func (p *PaginatedPaymentList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedPaymentList
 	var value unmarshaler
@@ -229,6 +673,17 @@ func (p *PaginatedPaymentList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedPaymentList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedPaymentList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedPaymentList) String() string {
@@ -249,6 +704,24 @@ func (p *PaginatedPaymentList) String() string {
 //
 // ### Usage Example
 // Fetch from the `GET Payment` endpoint and view an invoice's payment.
+var (
+	patchedPaymentRequestFieldTransactionDate     = big.NewInt(1 << 0)
+	patchedPaymentRequestFieldContact             = big.NewInt(1 << 1)
+	patchedPaymentRequestFieldAccount             = big.NewInt(1 << 2)
+	patchedPaymentRequestFieldPaymentMethod       = big.NewInt(1 << 3)
+	patchedPaymentRequestFieldCurrency            = big.NewInt(1 << 4)
+	patchedPaymentRequestFieldExchangeRate        = big.NewInt(1 << 5)
+	patchedPaymentRequestFieldCompany             = big.NewInt(1 << 6)
+	patchedPaymentRequestFieldTotalAmount         = big.NewInt(1 << 7)
+	patchedPaymentRequestFieldType                = big.NewInt(1 << 8)
+	patchedPaymentRequestFieldTrackingCategories  = big.NewInt(1 << 9)
+	patchedPaymentRequestFieldAccountingPeriod    = big.NewInt(1 << 10)
+	patchedPaymentRequestFieldAppliedToLines      = big.NewInt(1 << 11)
+	patchedPaymentRequestFieldIntegrationParams   = big.NewInt(1 << 12)
+	patchedPaymentRequestFieldLinkedAccountParams = big.NewInt(1 << 13)
+	patchedPaymentRequestFieldRemoteFields        = big.NewInt(1 << 14)
+)
+
 type PatchedPaymentRequest struct {
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty" url:"transaction_date,omitempty"`
@@ -587,6 +1060,9 @@ type PatchedPaymentRequest struct {
 	LinkedAccountParams map[string]interface{}                     `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest                      `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -700,6 +1176,118 @@ func (p *PatchedPaymentRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PatchedPaymentRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetTransactionDate(transactionDate *time.Time) {
+	p.TransactionDate = transactionDate
+	p.require(patchedPaymentRequestFieldTransactionDate)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetContact(contact *PatchedPaymentRequestContact) {
+	p.Contact = contact
+	p.require(patchedPaymentRequestFieldContact)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetAccount(account *PatchedPaymentRequestAccount) {
+	p.Account = account
+	p.require(patchedPaymentRequestFieldAccount)
+}
+
+// SetPaymentMethod sets the PaymentMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetPaymentMethod(paymentMethod *PatchedPaymentRequestPaymentMethod) {
+	p.PaymentMethod = paymentMethod
+	p.require(patchedPaymentRequestFieldPaymentMethod)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetCurrency(currency *PatchedPaymentRequestCurrency) {
+	p.Currency = currency
+	p.require(patchedPaymentRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetExchangeRate(exchangeRate *string) {
+	p.ExchangeRate = exchangeRate
+	p.require(patchedPaymentRequestFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetCompany(company *PatchedPaymentRequestCompany) {
+	p.Company = company
+	p.require(patchedPaymentRequestFieldCompany)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetTotalAmount(totalAmount *float64) {
+	p.TotalAmount = totalAmount
+	p.require(patchedPaymentRequestFieldTotalAmount)
+}
+
+// SetType sets the Type field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetType(type_ *PatchedPaymentRequestType) {
+	p.Type = type_
+	p.require(patchedPaymentRequestFieldType)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetTrackingCategories(trackingCategories []*PatchedPaymentRequestTrackingCategoriesItem) {
+	p.TrackingCategories = trackingCategories
+	p.require(patchedPaymentRequestFieldTrackingCategories)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetAccountingPeriod(accountingPeriod *PatchedPaymentRequestAccountingPeriod) {
+	p.AccountingPeriod = accountingPeriod
+	p.require(patchedPaymentRequestFieldAccountingPeriod)
+}
+
+// SetAppliedToLines sets the AppliedToLines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetAppliedToLines(appliedToLines []*PatchedPaymentRequestAppliedToLinesItem) {
+	p.AppliedToLines = appliedToLines
+	p.require(patchedPaymentRequestFieldAppliedToLines)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedPaymentRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedPaymentRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedPaymentRequestFieldRemoteFields)
+}
+
 func (p *PatchedPaymentRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedPaymentRequest
 	var unmarshaler = struct {
@@ -731,7 +1319,8 @@ func (p *PatchedPaymentRequest) MarshalJSON() ([]byte, error) {
 		embed:           embed(*p),
 		TransactionDate: internal.NewOptionalDateTime(p.TransactionDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedPaymentRequest) String() string {
@@ -1627,6 +2216,17 @@ func (p *PatchedPaymentRequestType) Accept(visitor PatchedPaymentRequestTypeVisi
 //
 // ### Usage Example
 // `Payment` will have a field called `applied-to-lines` which will be an array of `PaymentLineItemInternalMappingSerializer` objects that can either be a `Invoice`, `CreditNote`, or `JournalEntry`.
+var (
+	paymentLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
+	paymentLineItemRequestFieldAppliedAmount       = big.NewInt(1 << 1)
+	paymentLineItemRequestFieldAppliedDate         = big.NewInt(1 << 2)
+	paymentLineItemRequestFieldRelatedObjectId     = big.NewInt(1 << 3)
+	paymentLineItemRequestFieldRelatedObjectType   = big.NewInt(1 << 4)
+	paymentLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 5)
+	paymentLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 6)
+	paymentLineItemRequestFieldRemoteFields        = big.NewInt(1 << 7)
+)
+
 type PaymentLineItemRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -1641,6 +2241,9 @@ type PaymentLineItemRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1706,6 +2309,69 @@ func (p *PaymentLineItemRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaymentLineItemRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(paymentLineItemRequestFieldRemoteId)
+}
+
+// SetAppliedAmount sets the AppliedAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetAppliedAmount(appliedAmount *string) {
+	p.AppliedAmount = appliedAmount
+	p.require(paymentLineItemRequestFieldAppliedAmount)
+}
+
+// SetAppliedDate sets the AppliedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetAppliedDate(appliedDate *time.Time) {
+	p.AppliedDate = appliedDate
+	p.require(paymentLineItemRequestFieldAppliedDate)
+}
+
+// SetRelatedObjectId sets the RelatedObjectId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetRelatedObjectId(relatedObjectId *string) {
+	p.RelatedObjectId = relatedObjectId
+	p.require(paymentLineItemRequestFieldRelatedObjectId)
+}
+
+// SetRelatedObjectType sets the RelatedObjectType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetRelatedObjectType(relatedObjectType *string) {
+	p.RelatedObjectType = relatedObjectType
+	p.require(paymentLineItemRequestFieldRelatedObjectType)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(paymentLineItemRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(paymentLineItemRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentLineItemRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(paymentLineItemRequestFieldRemoteFields)
+}
+
 func (p *PaymentLineItemRequest) UnmarshalJSON(data []byte) error {
 	type embed PaymentLineItemRequest
 	var unmarshaler = struct {
@@ -1737,7 +2403,8 @@ func (p *PaymentLineItemRequest) MarshalJSON() ([]byte, error) {
 		embed:       embed(*p),
 		AppliedDate: internal.NewOptionalDateTime(p.AppliedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaymentLineItemRequest) String() string {
@@ -1758,6 +2425,24 @@ func (p *PaymentLineItemRequest) String() string {
 //
 // ### Usage Example
 // Fetch from the `GET Payment` endpoint and view an invoice's payment.
+var (
+	paymentRequestFieldTransactionDate     = big.NewInt(1 << 0)
+	paymentRequestFieldContact             = big.NewInt(1 << 1)
+	paymentRequestFieldAccount             = big.NewInt(1 << 2)
+	paymentRequestFieldPaymentMethod       = big.NewInt(1 << 3)
+	paymentRequestFieldCurrency            = big.NewInt(1 << 4)
+	paymentRequestFieldExchangeRate        = big.NewInt(1 << 5)
+	paymentRequestFieldCompany             = big.NewInt(1 << 6)
+	paymentRequestFieldTotalAmount         = big.NewInt(1 << 7)
+	paymentRequestFieldType                = big.NewInt(1 << 8)
+	paymentRequestFieldTrackingCategories  = big.NewInt(1 << 9)
+	paymentRequestFieldAccountingPeriod    = big.NewInt(1 << 10)
+	paymentRequestFieldAppliedToLines      = big.NewInt(1 << 11)
+	paymentRequestFieldIntegrationParams   = big.NewInt(1 << 12)
+	paymentRequestFieldLinkedAccountParams = big.NewInt(1 << 13)
+	paymentRequestFieldRemoteFields        = big.NewInt(1 << 14)
+)
+
 type PaymentRequest struct {
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty" url:"transaction_date,omitempty"`
@@ -2096,6 +2781,9 @@ type PaymentRequest struct {
 	LinkedAccountParams map[string]interface{}              `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest               `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -2209,6 +2897,118 @@ func (p *PaymentRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaymentRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetTransactionDate(transactionDate *time.Time) {
+	p.TransactionDate = transactionDate
+	p.require(paymentRequestFieldTransactionDate)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetContact(contact *PaymentRequestContact) {
+	p.Contact = contact
+	p.require(paymentRequestFieldContact)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetAccount(account *PaymentRequestAccount) {
+	p.Account = account
+	p.require(paymentRequestFieldAccount)
+}
+
+// SetPaymentMethod sets the PaymentMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetPaymentMethod(paymentMethod *PaymentRequestPaymentMethod) {
+	p.PaymentMethod = paymentMethod
+	p.require(paymentRequestFieldPaymentMethod)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetCurrency(currency *PaymentRequestCurrency) {
+	p.Currency = currency
+	p.require(paymentRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetExchangeRate(exchangeRate *string) {
+	p.ExchangeRate = exchangeRate
+	p.require(paymentRequestFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetCompany(company *PaymentRequestCompany) {
+	p.Company = company
+	p.require(paymentRequestFieldCompany)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetTotalAmount(totalAmount *float64) {
+	p.TotalAmount = totalAmount
+	p.require(paymentRequestFieldTotalAmount)
+}
+
+// SetType sets the Type field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetType(type_ *PaymentRequestType) {
+	p.Type = type_
+	p.require(paymentRequestFieldType)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetTrackingCategories(trackingCategories []*PaymentRequestTrackingCategoriesItem) {
+	p.TrackingCategories = trackingCategories
+	p.require(paymentRequestFieldTrackingCategories)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetAccountingPeriod(accountingPeriod *PaymentRequestAccountingPeriod) {
+	p.AccountingPeriod = accountingPeriod
+	p.require(paymentRequestFieldAccountingPeriod)
+}
+
+// SetAppliedToLines sets the AppliedToLines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetAppliedToLines(appliedToLines []*PaymentRequestAppliedToLinesItem) {
+	p.AppliedToLines = appliedToLines
+	p.require(paymentRequestFieldAppliedToLines)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(paymentRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(paymentRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(paymentRequestFieldRemoteFields)
+}
+
 func (p *PaymentRequest) UnmarshalJSON(data []byte) error {
 	type embed PaymentRequest
 	var unmarshaler = struct {
@@ -2240,7 +3040,8 @@ func (p *PaymentRequest) MarshalJSON() ([]byte, error) {
 		embed:           embed(*p),
 		TransactionDate: internal.NewOptionalDateTime(p.TransactionDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaymentRequest) String() string {
@@ -3130,11 +3931,21 @@ func (p *PaymentRequestType) Accept(visitor PaymentRequestTypeVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
+var (
+	paymentResponseFieldModel    = big.NewInt(1 << 0)
+	paymentResponseFieldWarnings = big.NewInt(1 << 1)
+	paymentResponseFieldErrors   = big.NewInt(1 << 2)
+	paymentResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type PaymentResponse struct {
 	Model    *Payment                    `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -3172,6 +3983,41 @@ func (p *PaymentResponse) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaymentResponse) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentResponse) SetModel(model *Payment) {
+	p.Model = model
+	p.require(paymentResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	p.Warnings = warnings
+	p.require(paymentResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentResponse) SetErrors(errors []*ErrorValidationProblem) {
+	p.Errors = errors
+	p.require(paymentResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentResponse) SetLogs(logs []*DebugModeLog) {
+	p.Logs = logs
+	p.require(paymentResponseFieldLogs)
+}
+
 func (p *PaymentResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaymentResponse
 	var value unmarshaler
@@ -3186,6 +4032,17 @@ func (p *PaymentResponse) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaymentResponse) MarshalJSON() ([]byte, error) {
+	type embed PaymentResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaymentResponse) String() string {

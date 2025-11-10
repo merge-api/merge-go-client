@@ -5,7 +5,8 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 )
 
 // # The AvailableActions Object
@@ -14,10 +15,19 @@ import (
 //
 // ### Usage Example
 // Fetch all the actions available for the `Zenefits` integration.
+var (
+	availableActionsFieldIntegration              = big.NewInt(1 << 0)
+	availableActionsFieldPassthroughAvailable     = big.NewInt(1 << 1)
+	availableActionsFieldAvailableModelOperations = big.NewInt(1 << 2)
+)
+
 type AvailableActions struct {
 	Integration              *AccountIntegration `json:"integration" url:"integration"`
 	PassthroughAvailable     bool                `json:"passthrough_available" url:"passthrough_available"`
 	AvailableModelOperations []*ModelOperation   `json:"available_model_operations,omitempty" url:"available_model_operations,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -48,6 +58,34 @@ func (a *AvailableActions) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AvailableActions) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIntegration sets the Integration field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AvailableActions) SetIntegration(integration *AccountIntegration) {
+	a.Integration = integration
+	a.require(availableActionsFieldIntegration)
+}
+
+// SetPassthroughAvailable sets the PassthroughAvailable field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AvailableActions) SetPassthroughAvailable(passthroughAvailable bool) {
+	a.PassthroughAvailable = passthroughAvailable
+	a.require(availableActionsFieldPassthroughAvailable)
+}
+
+// SetAvailableModelOperations sets the AvailableModelOperations field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AvailableActions) SetAvailableModelOperations(availableModelOperations []*ModelOperation) {
+	a.AvailableModelOperations = availableModelOperations
+	a.require(availableActionsFieldAvailableModelOperations)
+}
+
 func (a *AvailableActions) UnmarshalJSON(data []byte) error {
 	type unmarshaler AvailableActions
 	var value unmarshaler
@@ -62,6 +100,17 @@ func (a *AvailableActions) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AvailableActions) MarshalJSON() ([]byte, error) {
+	type embed AvailableActions
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AvailableActions) String() string {

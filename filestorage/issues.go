@@ -5,8 +5,26 @@ package filestorage
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	issuesListRequestFieldAccountToken            = big.NewInt(1 << 0)
+	issuesListRequestFieldCursor                  = big.NewInt(1 << 1)
+	issuesListRequestFieldEndDate                 = big.NewInt(1 << 2)
+	issuesListRequestFieldEndUserOrganizationName = big.NewInt(1 << 3)
+	issuesListRequestFieldFirstIncidentTimeAfter  = big.NewInt(1 << 4)
+	issuesListRequestFieldFirstIncidentTimeBefore = big.NewInt(1 << 5)
+	issuesListRequestFieldIncludeMuted            = big.NewInt(1 << 6)
+	issuesListRequestFieldIntegrationName         = big.NewInt(1 << 7)
+	issuesListRequestFieldLastIncidentTimeAfter   = big.NewInt(1 << 8)
+	issuesListRequestFieldLastIncidentTimeBefore  = big.NewInt(1 << 9)
+	issuesListRequestFieldLinkedAccountId         = big.NewInt(1 << 10)
+	issuesListRequestFieldPageSize                = big.NewInt(1 << 11)
+	issuesListRequestFieldStartDate               = big.NewInt(1 << 12)
+	issuesListRequestFieldStatus                  = big.NewInt(1 << 13)
 )
 
 type IssuesListRequest struct {
@@ -38,6 +56,114 @@ type IssuesListRequest struct {
 	// * `ONGOING` - ONGOING
 	// * `RESOLVED` - RESOLVED
 	Status *IssuesListRequestStatus `json:"-" url:"status,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (i *IssuesListRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetAccountToken sets the AccountToken field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetAccountToken(accountToken *string) {
+	i.AccountToken = accountToken
+	i.require(issuesListRequestFieldAccountToken)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetCursor(cursor *string) {
+	i.Cursor = cursor
+	i.require(issuesListRequestFieldCursor)
+}
+
+// SetEndDate sets the EndDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetEndDate(endDate *string) {
+	i.EndDate = endDate
+	i.require(issuesListRequestFieldEndDate)
+}
+
+// SetEndUserOrganizationName sets the EndUserOrganizationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetEndUserOrganizationName(endUserOrganizationName *string) {
+	i.EndUserOrganizationName = endUserOrganizationName
+	i.require(issuesListRequestFieldEndUserOrganizationName)
+}
+
+// SetFirstIncidentTimeAfter sets the FirstIncidentTimeAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetFirstIncidentTimeAfter(firstIncidentTimeAfter *time.Time) {
+	i.FirstIncidentTimeAfter = firstIncidentTimeAfter
+	i.require(issuesListRequestFieldFirstIncidentTimeAfter)
+}
+
+// SetFirstIncidentTimeBefore sets the FirstIncidentTimeBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetFirstIncidentTimeBefore(firstIncidentTimeBefore *time.Time) {
+	i.FirstIncidentTimeBefore = firstIncidentTimeBefore
+	i.require(issuesListRequestFieldFirstIncidentTimeBefore)
+}
+
+// SetIncludeMuted sets the IncludeMuted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetIncludeMuted(includeMuted *string) {
+	i.IncludeMuted = includeMuted
+	i.require(issuesListRequestFieldIncludeMuted)
+}
+
+// SetIntegrationName sets the IntegrationName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetIntegrationName(integrationName *string) {
+	i.IntegrationName = integrationName
+	i.require(issuesListRequestFieldIntegrationName)
+}
+
+// SetLastIncidentTimeAfter sets the LastIncidentTimeAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetLastIncidentTimeAfter(lastIncidentTimeAfter *time.Time) {
+	i.LastIncidentTimeAfter = lastIncidentTimeAfter
+	i.require(issuesListRequestFieldLastIncidentTimeAfter)
+}
+
+// SetLastIncidentTimeBefore sets the LastIncidentTimeBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetLastIncidentTimeBefore(lastIncidentTimeBefore *time.Time) {
+	i.LastIncidentTimeBefore = lastIncidentTimeBefore
+	i.require(issuesListRequestFieldLastIncidentTimeBefore)
+}
+
+// SetLinkedAccountId sets the LinkedAccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetLinkedAccountId(linkedAccountId *string) {
+	i.LinkedAccountId = linkedAccountId
+	i.require(issuesListRequestFieldLinkedAccountId)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetPageSize(pageSize *int) {
+	i.PageSize = pageSize
+	i.require(issuesListRequestFieldPageSize)
+}
+
+// SetStartDate sets the StartDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetStartDate(startDate *string) {
+	i.StartDate = startDate
+	i.require(issuesListRequestFieldStartDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IssuesListRequest) SetStatus(status *IssuesListRequestStatus) {
+	i.Status = status
+	i.require(issuesListRequestFieldStatus)
 }
 
 type IssuesListRequestStatus string
@@ -62,6 +188,17 @@ func (i IssuesListRequestStatus) Ptr() *IssuesListRequestStatus {
 	return &i
 }
 
+var (
+	issueFieldId                = big.NewInt(1 << 0)
+	issueFieldStatus            = big.NewInt(1 << 1)
+	issueFieldErrorDescription  = big.NewInt(1 << 2)
+	issueFieldEndUser           = big.NewInt(1 << 3)
+	issueFieldFirstIncidentTime = big.NewInt(1 << 4)
+	issueFieldLastIncidentTime  = big.NewInt(1 << 5)
+	issueFieldIsMuted           = big.NewInt(1 << 6)
+	issueFieldErrorDetails      = big.NewInt(1 << 7)
+)
+
 type Issue struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// Status of the issue. Options: ('ONGOING', 'RESOLVED')
@@ -75,6 +212,9 @@ type Issue struct {
 	LastIncidentTime  *time.Time             `json:"last_incident_time,omitempty" url:"last_incident_time,omitempty"`
 	IsMuted           *bool                  `json:"is_muted,omitempty" url:"is_muted,omitempty"`
 	ErrorDetails      []string               `json:"error_details,omitempty" url:"error_details,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -140,6 +280,69 @@ func (i *Issue) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *Issue) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetId(id *string) {
+	i.Id = id
+	i.require(issueFieldId)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetStatus(status *IssueStatus) {
+	i.Status = status
+	i.require(issueFieldStatus)
+}
+
+// SetErrorDescription sets the ErrorDescription field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetErrorDescription(errorDescription string) {
+	i.ErrorDescription = errorDescription
+	i.require(issueFieldErrorDescription)
+}
+
+// SetEndUser sets the EndUser field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetEndUser(endUser map[string]interface{}) {
+	i.EndUser = endUser
+	i.require(issueFieldEndUser)
+}
+
+// SetFirstIncidentTime sets the FirstIncidentTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetFirstIncidentTime(firstIncidentTime *time.Time) {
+	i.FirstIncidentTime = firstIncidentTime
+	i.require(issueFieldFirstIncidentTime)
+}
+
+// SetLastIncidentTime sets the LastIncidentTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetLastIncidentTime(lastIncidentTime *time.Time) {
+	i.LastIncidentTime = lastIncidentTime
+	i.require(issueFieldLastIncidentTime)
+}
+
+// SetIsMuted sets the IsMuted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetIsMuted(isMuted *bool) {
+	i.IsMuted = isMuted
+	i.require(issueFieldIsMuted)
+}
+
+// SetErrorDetails sets the ErrorDetails field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Issue) SetErrorDetails(errorDetails []string) {
+	i.ErrorDetails = errorDetails
+	i.require(issueFieldErrorDetails)
+}
+
 func (i *Issue) UnmarshalJSON(data []byte) error {
 	type embed Issue
 	var unmarshaler = struct {
@@ -175,7 +378,8 @@ func (i *Issue) MarshalJSON() ([]byte, error) {
 		FirstIncidentTime: internal.NewOptionalDateTime(i.FirstIncidentTime),
 		LastIncidentTime:  internal.NewOptionalDateTime(i.LastIncidentTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (i *Issue) String() string {
@@ -280,10 +484,19 @@ func (i IssueStatusEnum) Ptr() *IssueStatusEnum {
 	return &i
 }
 
+var (
+	paginatedIssueListFieldNext     = big.NewInt(1 << 0)
+	paginatedIssueListFieldPrevious = big.NewInt(1 << 1)
+	paginatedIssueListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedIssueList struct {
 	Next     *string  `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string  `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Issue `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -314,6 +527,34 @@ func (p *PaginatedIssueList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedIssueList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedIssueList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedIssueListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedIssueList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedIssueListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedIssueList) SetResults(results []*Issue) {
+	p.Results = results
+	p.require(paginatedIssueListFieldResults)
+}
+
 func (p *PaginatedIssueList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedIssueList
 	var value unmarshaler
@@ -328,6 +569,17 @@ func (p *PaginatedIssueList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedIssueList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedIssueList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedIssueList) String() string {

@@ -4,31 +4,32 @@ package associationtypes
 
 import (
 	context "context"
-	fmt "fmt"
-	core "github.com/merge-api/merge-go-client/v2/core"
-	crm "github.com/merge-api/merge-go-client/v2/crm"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
+	core "github.com/merge-api/merge-go-client/core"
+	crm "github.com/merge-api/merge-go-client/crm"
+	internal "github.com/merge-api/merge-go-client/internal"
+	option "github.com/merge-api/merge-go-client/option"
 	http "net/http"
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -38,7 +39,7 @@ func (c *Client) CustomObjectClassesAssociationTypesList(
 	customObjectClassId string,
 	request *crm.CustomObjectClassesAssociationTypesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*crm.AssociationType], error) {
+) (*core.Page[*string, *crm.AssociationType], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -54,13 +55,12 @@ func (c *Client) CustomObjectClassesAssociationTypesList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -77,11 +77,11 @@ func (c *Client) CustomObjectClassesAssociationTypesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedAssociationTypeList) *internal.PageResponse[*string, *crm.AssociationType] {
+	readPageResponse := func(response *crm.PaginatedAssociationTypeList) *core.PageResponse[*string, *crm.AssociationType] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *crm.AssociationType]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *crm.AssociationType]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -102,47 +102,16 @@ func (c *Client) CustomObjectClassesAssociationTypesCreate(
 	request *crm.CrmAssociationTypeEndpointRequest,
 	opts ...option.RequestOption,
 ) (*crm.CrmAssociationTypeResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/crm/v1/custom-object-classes/%v/association-types",
+	response, err := c.WithRawResponse.CustomObjectClassesAssociationTypesCreate(
+		ctx,
 		customObjectClassId,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *crm.CrmAssociationTypeResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns an `AssociationType` object with the given `id`.
@@ -153,46 +122,17 @@ func (c *Client) CustomObjectClassesAssociationTypesRetrieve(
 	request *crm.CustomObjectClassesAssociationTypesRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*crm.AssociationType, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/crm/v1/custom-object-classes/%v/association-types/%v",
+	response, err := c.WithRawResponse.CustomObjectClassesAssociationTypesRetrieve(
+		ctx,
 		customObjectClassId,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *crm.AssociationType
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns metadata for `CRMAssociationType` POSTs.
@@ -201,36 +141,13 @@ func (c *Client) CustomObjectClassesAssociationTypesMetaPostRetrieve(
 	customObjectClassId string,
 	opts ...option.RequestOption,
 ) (*crm.MetaResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/crm/v1/custom-object-classes/%v/association-types/meta/post",
-		customObjectClassId,
-	)
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *crm.MetaResponse
-	if err := c.caller.Call(
+	response, err := c.WithRawResponse.CustomObjectClassesAssociationTypesMetaPostRetrieve(
 		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
+		customObjectClassId,
+		opts...,
+	)
+	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Body, nil
 }

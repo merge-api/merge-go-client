@@ -5,13 +5,34 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	trackingCategoriesListRequestFieldCategoryType       = big.NewInt(1 << 0)
+	trackingCategoriesListRequestFieldCompanyId          = big.NewInt(1 << 1)
+	trackingCategoriesListRequestFieldCreatedAfter       = big.NewInt(1 << 2)
+	trackingCategoriesListRequestFieldCreatedBefore      = big.NewInt(1 << 3)
+	trackingCategoriesListRequestFieldCursor             = big.NewInt(1 << 4)
+	trackingCategoriesListRequestFieldExpand             = big.NewInt(1 << 5)
+	trackingCategoriesListRequestFieldIncludeDeletedData = big.NewInt(1 << 6)
+	trackingCategoriesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 7)
+	trackingCategoriesListRequestFieldIncludeShellData   = big.NewInt(1 << 8)
+	trackingCategoriesListRequestFieldModifiedAfter      = big.NewInt(1 << 9)
+	trackingCategoriesListRequestFieldModifiedBefore     = big.NewInt(1 << 10)
+	trackingCategoriesListRequestFieldName               = big.NewInt(1 << 11)
+	trackingCategoriesListRequestFieldPageSize           = big.NewInt(1 << 12)
+	trackingCategoriesListRequestFieldRemoteFields       = big.NewInt(1 << 13)
+	trackingCategoriesListRequestFieldRemoteId           = big.NewInt(1 << 14)
+	trackingCategoriesListRequestFieldShowEnumOrigins    = big.NewInt(1 << 15)
+	trackingCategoriesListRequestFieldStatus             = big.NewInt(1 << 16)
 )
 
 type TrackingCategoriesListRequest struct {
 	// If provided, will only return tracking categories with this type.
-	CategoryType *string `json:"-" url:"category_type,omitempty"`
+	CategoryType *TrackingCategoriesListRequestCategoryType `json:"-" url:"category_type,omitempty"`
 	// If provided, will only return tracking categories for this company.
 	CompanyId *string `json:"-" url:"company_id,omitempty"`
 	// If provided, will only return objects created after this datetime.
@@ -43,8 +64,145 @@ type TrackingCategoriesListRequest struct {
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
 	// If provided, will only return tracking categories with this status.
-	Status *string `json:"-" url:"status,omitempty"`
+	Status *TrackingCategoriesListRequestStatus `json:"-" url:"status,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TrackingCategoriesListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCategoryType sets the CategoryType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetCategoryType(categoryType *TrackingCategoriesListRequestCategoryType) {
+	t.CategoryType = categoryType
+	t.require(trackingCategoriesListRequestFieldCategoryType)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetCompanyId(companyId *string) {
+	t.CompanyId = companyId
+	t.require(trackingCategoriesListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(trackingCategoriesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(trackingCategoriesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(trackingCategoriesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(trackingCategoriesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(trackingCategoriesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(trackingCategoriesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(trackingCategoriesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(trackingCategoriesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(trackingCategoriesListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetName(name *string) {
+	t.Name = name
+	t.require(trackingCategoriesListRequestFieldName)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(trackingCategoriesListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetRemoteFields(remoteFields *string) {
+	t.RemoteFields = remoteFields
+	t.require(trackingCategoriesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(trackingCategoriesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(trackingCategoriesListRequestFieldShowEnumOrigins)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesListRequest) SetStatus(status *TrackingCategoriesListRequestStatus) {
+	t.Status = status
+	t.require(trackingCategoriesListRequestFieldStatus)
+}
+
+var (
+	trackingCategoriesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	trackingCategoriesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	trackingCategoriesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	trackingCategoriesRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	trackingCategoriesRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type TrackingCategoriesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -57,12 +215,116 @@ type TrackingCategoriesRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TrackingCategoriesRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesRetrieveRequest) SetExpand(expand []*string) {
+	t.Expand = expand
+	t.require(trackingCategoriesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(trackingCategoriesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(trackingCategoriesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	t.RemoteFields = remoteFields
+	t.require(trackingCategoriesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategoriesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(trackingCategoriesRetrieveRequestFieldShowEnumOrigins)
+}
+
+type TrackingCategoriesListRequestCategoryType string
+
+const (
+	TrackingCategoriesListRequestCategoryTypeEmpty      TrackingCategoriesListRequestCategoryType = ""
+	TrackingCategoriesListRequestCategoryTypeClass      TrackingCategoriesListRequestCategoryType = "CLASS"
+	TrackingCategoriesListRequestCategoryTypeDepartment TrackingCategoriesListRequestCategoryType = "DEPARTMENT"
+)
+
+func NewTrackingCategoriesListRequestCategoryTypeFromString(s string) (TrackingCategoriesListRequestCategoryType, error) {
+	switch s {
+	case "":
+		return TrackingCategoriesListRequestCategoryTypeEmpty, nil
+	case "CLASS":
+		return TrackingCategoriesListRequestCategoryTypeClass, nil
+	case "DEPARTMENT":
+		return TrackingCategoriesListRequestCategoryTypeDepartment, nil
+	}
+	var t TrackingCategoriesListRequestCategoryType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TrackingCategoriesListRequestCategoryType) Ptr() *TrackingCategoriesListRequestCategoryType {
+	return &t
+}
+
+type TrackingCategoriesListRequestStatus string
+
+const (
+	TrackingCategoriesListRequestStatusEmpty    TrackingCategoriesListRequestStatus = ""
+	TrackingCategoriesListRequestStatusActive   TrackingCategoriesListRequestStatus = "ACTIVE"
+	TrackingCategoriesListRequestStatusArchived TrackingCategoriesListRequestStatus = "ARCHIVED"
+)
+
+func NewTrackingCategoriesListRequestStatusFromString(s string) (TrackingCategoriesListRequestStatus, error) {
+	switch s {
+	case "":
+		return TrackingCategoriesListRequestStatusEmpty, nil
+	case "ACTIVE":
+		return TrackingCategoriesListRequestStatusActive, nil
+	case "ARCHIVED":
+		return TrackingCategoriesListRequestStatusArchived, nil
+	}
+	var t TrackingCategoriesListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TrackingCategoriesListRequestStatus) Ptr() *TrackingCategoriesListRequestStatus {
+	return &t
+}
+
+var (
+	paginatedTrackingCategoryListFieldNext     = big.NewInt(1 << 0)
+	paginatedTrackingCategoryListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTrackingCategoryListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedTrackingCategoryList struct {
 	Next     *string             `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string             `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*TrackingCategory `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -93,6 +355,34 @@ func (p *PaginatedTrackingCategoryList) GetExtraProperties() map[string]interfac
 	return p.extraProperties
 }
 
+func (p *PaginatedTrackingCategoryList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTrackingCategoryList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTrackingCategoryListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTrackingCategoryList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTrackingCategoryListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTrackingCategoryList) SetResults(results []*TrackingCategory) {
+	p.Results = results
+	p.require(paginatedTrackingCategoryListFieldResults)
+}
+
 func (p *PaginatedTrackingCategoryList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTrackingCategoryList
 	var value unmarshaler
@@ -107,6 +397,17 @@ func (p *PaginatedTrackingCategoryList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTrackingCategoryList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTrackingCategoryList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTrackingCategoryList) String() string {

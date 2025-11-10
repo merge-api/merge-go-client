@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	purchaseOrderEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	purchaseOrderEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	purchaseOrderEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type PurchaseOrderEndpointRequest struct {
@@ -15,7 +22,48 @@ type PurchaseOrderEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                 `json:"-" url:"run_async,omitempty"`
 	Model    *PurchaseOrderRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PurchaseOrderEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(purchaseOrderEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(purchaseOrderEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderEndpointRequest) SetModel(model *PurchaseOrderRequest) {
+	p.Model = model
+	p.require(purchaseOrderEndpointRequestFieldModel)
+}
+
+var (
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type PurchaseOrdersLineItemsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -32,7 +80,86 @@ type PurchaseOrdersLineItemsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	p.IsCommonModelField = isCommonModelField
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	p.IsCustom = isCustom
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersLineItemsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(purchaseOrdersLineItemsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	purchaseOrdersListRequestFieldCompanyId           = big.NewInt(1 << 0)
+	purchaseOrdersListRequestFieldCreatedAfter        = big.NewInt(1 << 1)
+	purchaseOrdersListRequestFieldCreatedBefore       = big.NewInt(1 << 2)
+	purchaseOrdersListRequestFieldCursor              = big.NewInt(1 << 3)
+	purchaseOrdersListRequestFieldExpand              = big.NewInt(1 << 4)
+	purchaseOrdersListRequestFieldIncludeDeletedData  = big.NewInt(1 << 5)
+	purchaseOrdersListRequestFieldIncludeRemoteData   = big.NewInt(1 << 6)
+	purchaseOrdersListRequestFieldIncludeRemoteFields = big.NewInt(1 << 7)
+	purchaseOrdersListRequestFieldIncludeShellData    = big.NewInt(1 << 8)
+	purchaseOrdersListRequestFieldIssueDateAfter      = big.NewInt(1 << 9)
+	purchaseOrdersListRequestFieldIssueDateBefore     = big.NewInt(1 << 10)
+	purchaseOrdersListRequestFieldModifiedAfter       = big.NewInt(1 << 11)
+	purchaseOrdersListRequestFieldModifiedBefore      = big.NewInt(1 << 12)
+	purchaseOrdersListRequestFieldPageSize            = big.NewInt(1 << 13)
+	purchaseOrdersListRequestFieldRemoteFields        = big.NewInt(1 << 14)
+	purchaseOrdersListRequestFieldRemoteId            = big.NewInt(1 << 15)
+	purchaseOrdersListRequestFieldShowEnumOrigins     = big.NewInt(1 << 16)
+)
 
 type PurchaseOrdersListRequest struct {
 	// If provided, will only return purchase orders for this company.
@@ -69,7 +196,146 @@ type PurchaseOrdersListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PurchaseOrdersListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetCompanyId(companyId *string) {
+	p.CompanyId = companyId
+	p.require(purchaseOrdersListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	p.CreatedAfter = createdAfter
+	p.require(purchaseOrdersListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	p.CreatedBefore = createdBefore
+	p.require(purchaseOrdersListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(purchaseOrdersListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetExpand(expand []*PurchaseOrdersListRequestExpandItem) {
+	p.Expand = expand
+	p.require(purchaseOrdersListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(purchaseOrdersListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(purchaseOrdersListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	p.IncludeRemoteFields = includeRemoteFields
+	p.require(purchaseOrdersListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(purchaseOrdersListRequestFieldIncludeShellData)
+}
+
+// SetIssueDateAfter sets the IssueDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetIssueDateAfter(issueDateAfter *time.Time) {
+	p.IssueDateAfter = issueDateAfter
+	p.require(purchaseOrdersListRequestFieldIssueDateAfter)
+}
+
+// SetIssueDateBefore sets the IssueDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetIssueDateBefore(issueDateBefore *time.Time) {
+	p.IssueDateBefore = issueDateBefore
+	p.require(purchaseOrdersListRequestFieldIssueDateBefore)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	p.ModifiedAfter = modifiedAfter
+	p.require(purchaseOrdersListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	p.ModifiedBefore = modifiedBefore
+	p.require(purchaseOrdersListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(purchaseOrdersListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetRemoteFields(remoteFields *string) {
+	p.RemoteFields = remoteFields
+	p.require(purchaseOrdersListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(purchaseOrdersListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	p.ShowEnumOrigins = showEnumOrigins
+	p.require(purchaseOrdersListRequestFieldShowEnumOrigins)
+}
+
+var (
+	purchaseOrdersRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	purchaseOrdersRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	purchaseOrdersRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	purchaseOrdersRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	purchaseOrdersRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	purchaseOrdersRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	purchaseOrdersRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type PurchaseOrdersRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -86,7 +352,75 @@ type PurchaseOrdersRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	p.Cursor = cursor
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	p.IncludeDeletedData = includeDeletedData
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	p.IsCommonModelField = isCommonModelField
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	p.IsCustom = isCustom
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	p.PageSize = pageSize
+	p.require(purchaseOrdersRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	purchaseOrdersRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	purchaseOrdersRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	purchaseOrdersRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	purchaseOrdersRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+	purchaseOrdersRetrieveRequestFieldRemoteFields        = big.NewInt(1 << 4)
+	purchaseOrdersRetrieveRequestFieldShowEnumOrigins     = big.NewInt(1 << 5)
+)
 
 type PurchaseOrdersRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -101,6 +435,58 @@ type PurchaseOrdersRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *PurchaseOrdersRetrieveRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRetrieveRequest) SetExpand(expand []*PurchaseOrdersRetrieveRequestExpandItem) {
+	p.Expand = expand
+	p.require(purchaseOrdersRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	p.IncludeRemoteData = includeRemoteData
+	p.require(purchaseOrdersRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	p.IncludeRemoteFields = includeRemoteFields
+	p.require(purchaseOrdersRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	p.IncludeShellData = includeShellData
+	p.require(purchaseOrdersRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	p.RemoteFields = remoteFields
+	p.require(purchaseOrdersRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrdersRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	p.ShowEnumOrigins = showEnumOrigins
+	p.require(purchaseOrdersRetrieveRequestFieldShowEnumOrigins)
 }
 
 type PurchaseOrdersListRequestExpandItem string
@@ -177,10 +563,19 @@ func (p PurchaseOrdersRetrieveRequestExpandItem) Ptr() *PurchaseOrdersRetrieveRe
 	return &p
 }
 
+var (
+	paginatedPurchaseOrderListFieldNext     = big.NewInt(1 << 0)
+	paginatedPurchaseOrderListFieldPrevious = big.NewInt(1 << 1)
+	paginatedPurchaseOrderListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedPurchaseOrderList struct {
 	Next     *string          `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*PurchaseOrder `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -211,6 +606,34 @@ func (p *PaginatedPurchaseOrderList) GetExtraProperties() map[string]interface{}
 	return p.extraProperties
 }
 
+func (p *PaginatedPurchaseOrderList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPurchaseOrderList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedPurchaseOrderListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPurchaseOrderList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedPurchaseOrderListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedPurchaseOrderList) SetResults(results []*PurchaseOrder) {
+	p.Results = results
+	p.require(paginatedPurchaseOrderListFieldResults)
+}
+
 func (p *PaginatedPurchaseOrderList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedPurchaseOrderList
 	var value unmarshaler
@@ -225,6 +648,17 @@ func (p *PaginatedPurchaseOrderList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedPurchaseOrderList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedPurchaseOrderList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedPurchaseOrderList) String() string {
@@ -245,6 +679,26 @@ func (p *PaginatedPurchaseOrderList) String() string {
 //
 // ### Usage Example
 // Fetch from the `GET PurchaseOrder` endpoint and view a company's purchase orders.
+var (
+	purchaseOrderLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
+	purchaseOrderLineItemRequestFieldDescription         = big.NewInt(1 << 1)
+	purchaseOrderLineItemRequestFieldUnitPrice           = big.NewInt(1 << 2)
+	purchaseOrderLineItemRequestFieldQuantity            = big.NewInt(1 << 3)
+	purchaseOrderLineItemRequestFieldItem                = big.NewInt(1 << 4)
+	purchaseOrderLineItemRequestFieldAccount             = big.NewInt(1 << 5)
+	purchaseOrderLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 6)
+	purchaseOrderLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 7)
+	purchaseOrderLineItemRequestFieldTaxAmount           = big.NewInt(1 << 8)
+	purchaseOrderLineItemRequestFieldTotalLineAmount     = big.NewInt(1 << 9)
+	purchaseOrderLineItemRequestFieldCurrency            = big.NewInt(1 << 10)
+	purchaseOrderLineItemRequestFieldTaxRate             = big.NewInt(1 << 11)
+	purchaseOrderLineItemRequestFieldExchangeRate        = big.NewInt(1 << 12)
+	purchaseOrderLineItemRequestFieldCompany             = big.NewInt(1 << 13)
+	purchaseOrderLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 14)
+	purchaseOrderLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 15)
+	purchaseOrderLineItemRequestFieldRemoteFields        = big.NewInt(1 << 16)
+)
+
 type PurchaseOrderLineItemRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -584,6 +1038,9 @@ type PurchaseOrderLineItemRequest struct {
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -711,6 +1168,132 @@ func (p *PurchaseOrderLineItemRequest) GetExtraProperties() map[string]interface
 	return p.extraProperties
 }
 
+func (p *PurchaseOrderLineItemRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(purchaseOrderLineItemRequestFieldRemoteId)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetDescription(description *string) {
+	p.Description = description
+	p.require(purchaseOrderLineItemRequestFieldDescription)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetUnitPrice(unitPrice *float64) {
+	p.UnitPrice = unitPrice
+	p.require(purchaseOrderLineItemRequestFieldUnitPrice)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetQuantity(quantity *float64) {
+	p.Quantity = quantity
+	p.require(purchaseOrderLineItemRequestFieldQuantity)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetItem(item *PurchaseOrderLineItemRequestItem) {
+	p.Item = item
+	p.require(purchaseOrderLineItemRequestFieldItem)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(purchaseOrderLineItemRequestFieldAccount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTrackingCategory(trackingCategory *string) {
+	p.TrackingCategory = trackingCategory
+	p.require(purchaseOrderLineItemRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTrackingCategories(trackingCategories []*string) {
+	p.TrackingCategories = trackingCategories
+	p.require(purchaseOrderLineItemRequestFieldTrackingCategories)
+}
+
+// SetTaxAmount sets the TaxAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTaxAmount(taxAmount *string) {
+	p.TaxAmount = taxAmount
+	p.require(purchaseOrderLineItemRequestFieldTaxAmount)
+}
+
+// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTotalLineAmount(totalLineAmount *string) {
+	p.TotalLineAmount = totalLineAmount
+	p.require(purchaseOrderLineItemRequestFieldTotalLineAmount)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetCurrency(currency *PurchaseOrderLineItemRequestCurrency) {
+	p.Currency = currency
+	p.require(purchaseOrderLineItemRequestFieldCurrency)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTaxRate(taxRate *string) {
+	p.TaxRate = taxRate
+	p.require(purchaseOrderLineItemRequestFieldTaxRate)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetExchangeRate(exchangeRate *string) {
+	p.ExchangeRate = exchangeRate
+	p.require(purchaseOrderLineItemRequestFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetCompany(company *string) {
+	p.Company = company
+	p.require(purchaseOrderLineItemRequestFieldCompany)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(purchaseOrderLineItemRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(purchaseOrderLineItemRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(purchaseOrderLineItemRequestFieldRemoteFields)
+}
+
 func (p *PurchaseOrderLineItemRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler PurchaseOrderLineItemRequest
 	var value unmarshaler
@@ -725,6 +1308,17 @@ func (p *PurchaseOrderLineItemRequest) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PurchaseOrderLineItemRequest) MarshalJSON() ([]byte, error) {
+	type embed PurchaseOrderLineItemRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PurchaseOrderLineItemRequest) String() string {
@@ -1177,6 +1771,27 @@ func (p *PurchaseOrderLineItemRequestItem) Accept(visitor PurchaseOrderLineItemR
 //
 // ### Usage Example
 // Fetch from the `LIST PurchaseOrders` endpoint and view a company's purchase orders.
+var (
+	purchaseOrderRequestFieldStatus              = big.NewInt(1 << 0)
+	purchaseOrderRequestFieldIssueDate           = big.NewInt(1 << 1)
+	purchaseOrderRequestFieldDeliveryDate        = big.NewInt(1 << 2)
+	purchaseOrderRequestFieldDeliveryAddress     = big.NewInt(1 << 3)
+	purchaseOrderRequestFieldCustomer            = big.NewInt(1 << 4)
+	purchaseOrderRequestFieldVendor              = big.NewInt(1 << 5)
+	purchaseOrderRequestFieldMemo                = big.NewInt(1 << 6)
+	purchaseOrderRequestFieldCompany             = big.NewInt(1 << 7)
+	purchaseOrderRequestFieldTotalAmount         = big.NewInt(1 << 8)
+	purchaseOrderRequestFieldPaymentTerm         = big.NewInt(1 << 9)
+	purchaseOrderRequestFieldCurrency            = big.NewInt(1 << 10)
+	purchaseOrderRequestFieldInclusiveOfTax      = big.NewInt(1 << 11)
+	purchaseOrderRequestFieldExchangeRate        = big.NewInt(1 << 12)
+	purchaseOrderRequestFieldTrackingCategories  = big.NewInt(1 << 13)
+	purchaseOrderRequestFieldLineItems           = big.NewInt(1 << 14)
+	purchaseOrderRequestFieldIntegrationParams   = big.NewInt(1 << 15)
+	purchaseOrderRequestFieldLinkedAccountParams = big.NewInt(1 << 16)
+	purchaseOrderRequestFieldRemoteFields        = big.NewInt(1 << 17)
+)
+
 type PurchaseOrderRequest struct {
 	// The purchase order's status.
 	//
@@ -1523,6 +2138,9 @@ type PurchaseOrderRequest struct {
 	LinkedAccountParams map[string]interface{}                        `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest                         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -1657,6 +2275,139 @@ func (p *PurchaseOrderRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PurchaseOrderRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetStatus(status *PurchaseOrderRequestStatus) {
+	p.Status = status
+	p.require(purchaseOrderRequestFieldStatus)
+}
+
+// SetIssueDate sets the IssueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetIssueDate(issueDate *time.Time) {
+	p.IssueDate = issueDate
+	p.require(purchaseOrderRequestFieldIssueDate)
+}
+
+// SetDeliveryDate sets the DeliveryDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetDeliveryDate(deliveryDate *time.Time) {
+	p.DeliveryDate = deliveryDate
+	p.require(purchaseOrderRequestFieldDeliveryDate)
+}
+
+// SetDeliveryAddress sets the DeliveryAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetDeliveryAddress(deliveryAddress *PurchaseOrderRequestDeliveryAddress) {
+	p.DeliveryAddress = deliveryAddress
+	p.require(purchaseOrderRequestFieldDeliveryAddress)
+}
+
+// SetCustomer sets the Customer field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetCustomer(customer *string) {
+	p.Customer = customer
+	p.require(purchaseOrderRequestFieldCustomer)
+}
+
+// SetVendor sets the Vendor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetVendor(vendor_ *PurchaseOrderRequestVendor) {
+	p.Vendor = vendor_
+	p.require(purchaseOrderRequestFieldVendor)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetMemo(memo *string) {
+	p.Memo = memo
+	p.require(purchaseOrderRequestFieldMemo)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetCompany(company *PurchaseOrderRequestCompany) {
+	p.Company = company
+	p.require(purchaseOrderRequestFieldCompany)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetTotalAmount(totalAmount *float64) {
+	p.TotalAmount = totalAmount
+	p.require(purchaseOrderRequestFieldTotalAmount)
+}
+
+// SetPaymentTerm sets the PaymentTerm field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetPaymentTerm(paymentTerm *PurchaseOrderRequestPaymentTerm) {
+	p.PaymentTerm = paymentTerm
+	p.require(purchaseOrderRequestFieldPaymentTerm)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetCurrency(currency *PurchaseOrderRequestCurrency) {
+	p.Currency = currency
+	p.require(purchaseOrderRequestFieldCurrency)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	p.InclusiveOfTax = inclusiveOfTax
+	p.require(purchaseOrderRequestFieldInclusiveOfTax)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetExchangeRate(exchangeRate *string) {
+	p.ExchangeRate = exchangeRate
+	p.require(purchaseOrderRequestFieldExchangeRate)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetTrackingCategories(trackingCategories []*PurchaseOrderRequestTrackingCategoriesItem) {
+	p.TrackingCategories = trackingCategories
+	p.require(purchaseOrderRequestFieldTrackingCategories)
+}
+
+// SetLineItems sets the LineItems field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetLineItems(lineItems []*PurchaseOrderLineItemRequest) {
+	p.LineItems = lineItems
+	p.require(purchaseOrderRequestFieldLineItems)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(purchaseOrderRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(purchaseOrderRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(purchaseOrderRequestFieldRemoteFields)
+}
+
 func (p *PurchaseOrderRequest) UnmarshalJSON(data []byte) error {
 	type embed PurchaseOrderRequest
 	var unmarshaler = struct {
@@ -1692,7 +2443,8 @@ func (p *PurchaseOrderRequest) MarshalJSON() ([]byte, error) {
 		IssueDate:    internal.NewOptionalDateTime(p.IssueDate),
 		DeliveryDate: internal.NewOptionalDateTime(p.DeliveryDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PurchaseOrderRequest) String() string {
@@ -2460,11 +3212,21 @@ func (p *PurchaseOrderRequestVendor) Accept(visitor PurchaseOrderRequestVendorVi
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
+var (
+	purchaseOrderResponseFieldModel    = big.NewInt(1 << 0)
+	purchaseOrderResponseFieldWarnings = big.NewInt(1 << 1)
+	purchaseOrderResponseFieldErrors   = big.NewInt(1 << 2)
+	purchaseOrderResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type PurchaseOrderResponse struct {
 	Model    *PurchaseOrder              `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -2502,6 +3264,41 @@ func (p *PurchaseOrderResponse) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PurchaseOrderResponse) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderResponse) SetModel(model *PurchaseOrder) {
+	p.Model = model
+	p.require(purchaseOrderResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	p.Warnings = warnings
+	p.require(purchaseOrderResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderResponse) SetErrors(errors []*ErrorValidationProblem) {
+	p.Errors = errors
+	p.require(purchaseOrderResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderResponse) SetLogs(logs []*DebugModeLog) {
+	p.Logs = logs
+	p.require(purchaseOrderResponseFieldLogs)
+}
+
 func (p *PurchaseOrderResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler PurchaseOrderResponse
 	var value unmarshaler
@@ -2516,6 +3313,17 @@ func (p *PurchaseOrderResponse) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PurchaseOrderResponse) MarshalJSON() ([]byte, error) {
+	type embed PurchaseOrderResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PurchaseOrderResponse) String() string {

@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	journalEntryEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	journalEntryEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	journalEntryEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type JournalEntryEndpointRequest struct {
@@ -15,7 +22,48 @@ type JournalEntryEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                `json:"-" url:"run_async,omitempty"`
 	Model    *JournalEntryRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JournalEntryEndpointRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	j.IsDebugMode = isDebugMode
+	j.require(journalEntryEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryEndpointRequest) SetRunAsync(runAsync *bool) {
+	j.RunAsync = runAsync
+	j.require(journalEntryEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryEndpointRequest) SetModel(model *JournalEntryRequest) {
+	j.Model = model
+	j.require(journalEntryEndpointRequestFieldModel)
+}
+
+var (
+	journalEntriesLinesRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	journalEntriesLinesRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	journalEntriesLinesRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	journalEntriesLinesRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	journalEntriesLinesRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	journalEntriesLinesRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	journalEntriesLinesRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type JournalEntriesLinesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -32,7 +80,84 @@ type JournalEntriesLinesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	j.Cursor = cursor
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	j.IncludeDeletedData = includeDeletedData
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	j.IsCommonModelField = isCommonModelField
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	j.IsCustom = isCustom
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesLinesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	j.PageSize = pageSize
+	j.require(journalEntriesLinesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	journalEntriesListRequestFieldCompanyId             = big.NewInt(1 << 0)
+	journalEntriesListRequestFieldCreatedAfter          = big.NewInt(1 << 1)
+	journalEntriesListRequestFieldCreatedBefore         = big.NewInt(1 << 2)
+	journalEntriesListRequestFieldCursor                = big.NewInt(1 << 3)
+	journalEntriesListRequestFieldExpand                = big.NewInt(1 << 4)
+	journalEntriesListRequestFieldIncludeDeletedData    = big.NewInt(1 << 5)
+	journalEntriesListRequestFieldIncludeRemoteData     = big.NewInt(1 << 6)
+	journalEntriesListRequestFieldIncludeRemoteFields   = big.NewInt(1 << 7)
+	journalEntriesListRequestFieldIncludeShellData      = big.NewInt(1 << 8)
+	journalEntriesListRequestFieldModifiedAfter         = big.NewInt(1 << 9)
+	journalEntriesListRequestFieldModifiedBefore        = big.NewInt(1 << 10)
+	journalEntriesListRequestFieldPageSize              = big.NewInt(1 << 11)
+	journalEntriesListRequestFieldRemoteId              = big.NewInt(1 << 12)
+	journalEntriesListRequestFieldTransactionDateAfter  = big.NewInt(1 << 13)
+	journalEntriesListRequestFieldTransactionDateBefore = big.NewInt(1 << 14)
+)
 
 type JournalEntriesListRequest struct {
 	// If provided, will only return journal entries for this company.
@@ -65,7 +190,132 @@ type JournalEntriesListRequest struct {
 	TransactionDateAfter *time.Time `json:"-" url:"transaction_date_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
 	TransactionDateBefore *time.Time `json:"-" url:"transaction_date_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JournalEntriesListRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetCompanyId(companyId *string) {
+	j.CompanyId = companyId
+	j.require(journalEntriesListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	j.CreatedAfter = createdAfter
+	j.require(journalEntriesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	j.CreatedBefore = createdBefore
+	j.require(journalEntriesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetCursor(cursor *string) {
+	j.Cursor = cursor
+	j.require(journalEntriesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetExpand(expand []*JournalEntriesListRequestExpandItem) {
+	j.Expand = expand
+	j.require(journalEntriesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	j.IncludeDeletedData = includeDeletedData
+	j.require(journalEntriesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(journalEntriesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	j.IncludeRemoteFields = includeRemoteFields
+	j.require(journalEntriesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(journalEntriesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	j.ModifiedAfter = modifiedAfter
+	j.require(journalEntriesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	j.ModifiedBefore = modifiedBefore
+	j.require(journalEntriesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetPageSize(pageSize *int) {
+	j.PageSize = pageSize
+	j.require(journalEntriesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(journalEntriesListRequestFieldRemoteId)
+}
+
+// SetTransactionDateAfter sets the TransactionDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetTransactionDateAfter(transactionDateAfter *time.Time) {
+	j.TransactionDateAfter = transactionDateAfter
+	j.require(journalEntriesListRequestFieldTransactionDateAfter)
+}
+
+// SetTransactionDateBefore sets the TransactionDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesListRequest) SetTransactionDateBefore(transactionDateBefore *time.Time) {
+	j.TransactionDateBefore = transactionDateBefore
+	j.require(journalEntriesListRequestFieldTransactionDateBefore)
+}
+
+var (
+	journalEntriesRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
+	journalEntriesRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
+	journalEntriesRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
+	journalEntriesRemoteFieldClassesListRequestFieldIncludeShellData   = big.NewInt(1 << 3)
+	journalEntriesRemoteFieldClassesListRequestFieldIsCommonModelField = big.NewInt(1 << 4)
+	journalEntriesRemoteFieldClassesListRequestFieldIsCustom           = big.NewInt(1 << 5)
+	journalEntriesRemoteFieldClassesListRequestFieldPageSize           = big.NewInt(1 << 6)
+)
 
 type JournalEntriesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -82,7 +332,73 @@ type JournalEntriesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JournalEntriesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	j.Cursor = cursor
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	j.IncludeDeletedData = includeDeletedData
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	j.IsCommonModelField = isCommonModelField
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	j.IsCustom = isCustom
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	j.PageSize = pageSize
+	j.require(journalEntriesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	journalEntriesRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	journalEntriesRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	journalEntriesRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	journalEntriesRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type JournalEntriesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -93,6 +409,44 @@ type JournalEntriesRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (j *JournalEntriesRetrieveRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRetrieveRequest) SetExpand(expand []*JournalEntriesRetrieveRequestExpandItem) {
+	j.Expand = expand
+	j.require(journalEntriesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(journalEntriesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	j.IncludeRemoteFields = includeRemoteFields
+	j.require(journalEntriesRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntriesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(journalEntriesRetrieveRequestFieldIncludeShellData)
 }
 
 type JournalEntriesListRequestExpandItem string
@@ -173,6 +527,32 @@ func (j JournalEntriesRetrieveRequestExpandItem) Ptr() *JournalEntriesRetrieveRe
 //
 // ### Usage Example
 // Fetch from the `GET JournalEntry` endpoint and view a company's journey entry.
+var (
+	journalEntryFieldId                 = big.NewInt(1 << 0)
+	journalEntryFieldRemoteId           = big.NewInt(1 << 1)
+	journalEntryFieldCreatedAt          = big.NewInt(1 << 2)
+	journalEntryFieldModifiedAt         = big.NewInt(1 << 3)
+	journalEntryFieldTransactionDate    = big.NewInt(1 << 4)
+	journalEntryFieldPayments           = big.NewInt(1 << 5)
+	journalEntryFieldAppliedPayments    = big.NewInt(1 << 6)
+	journalEntryFieldMemo               = big.NewInt(1 << 7)
+	journalEntryFieldCurrency           = big.NewInt(1 << 8)
+	journalEntryFieldExchangeRate       = big.NewInt(1 << 9)
+	journalEntryFieldCompany            = big.NewInt(1 << 10)
+	journalEntryFieldInclusiveOfTax     = big.NewInt(1 << 11)
+	journalEntryFieldLines              = big.NewInt(1 << 12)
+	journalEntryFieldJournalNumber      = big.NewInt(1 << 13)
+	journalEntryFieldTrackingCategories = big.NewInt(1 << 14)
+	journalEntryFieldRemoteWasDeleted   = big.NewInt(1 << 15)
+	journalEntryFieldPostingStatus      = big.NewInt(1 << 16)
+	journalEntryFieldAccountingPeriod   = big.NewInt(1 << 17)
+	journalEntryFieldRemoteCreatedAt    = big.NewInt(1 << 18)
+	journalEntryFieldRemoteUpdatedAt    = big.NewInt(1 << 19)
+	journalEntryFieldFieldMappings      = big.NewInt(1 << 20)
+	journalEntryFieldRemoteData         = big.NewInt(1 << 21)
+	journalEntryFieldRemoteFields       = big.NewInt(1 << 22)
+)
+
 type JournalEntry struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -525,6 +905,9 @@ type JournalEntry struct {
 	RemoteData      []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 	RemoteFields    []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -694,6 +1077,174 @@ func (j *JournalEntry) GetExtraProperties() map[string]interface{} {
 	return j.extraProperties
 }
 
+func (j *JournalEntry) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetId(id *string) {
+	j.Id = id
+	j.require(journalEntryFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(journalEntryFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetCreatedAt(createdAt *time.Time) {
+	j.CreatedAt = createdAt
+	j.require(journalEntryFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetModifiedAt(modifiedAt *time.Time) {
+	j.ModifiedAt = modifiedAt
+	j.require(journalEntryFieldModifiedAt)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetTransactionDate(transactionDate *time.Time) {
+	j.TransactionDate = transactionDate
+	j.require(journalEntryFieldTransactionDate)
+}
+
+// SetPayments sets the Payments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetPayments(payments []*JournalEntryPaymentsItem) {
+	j.Payments = payments
+	j.require(journalEntryFieldPayments)
+}
+
+// SetAppliedPayments sets the AppliedPayments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetAppliedPayments(appliedPayments []*JournalEntryAppliedPaymentsItem) {
+	j.AppliedPayments = appliedPayments
+	j.require(journalEntryFieldAppliedPayments)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetMemo(memo *string) {
+	j.Memo = memo
+	j.require(journalEntryFieldMemo)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetCurrency(currency *JournalEntryCurrency) {
+	j.Currency = currency
+	j.require(journalEntryFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetExchangeRate(exchangeRate *string) {
+	j.ExchangeRate = exchangeRate
+	j.require(journalEntryFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetCompany(company *JournalEntryCompany) {
+	j.Company = company
+	j.require(journalEntryFieldCompany)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	j.InclusiveOfTax = inclusiveOfTax
+	j.require(journalEntryFieldInclusiveOfTax)
+}
+
+// SetLines sets the Lines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetLines(lines []*JournalLine) {
+	j.Lines = lines
+	j.require(journalEntryFieldLines)
+}
+
+// SetJournalNumber sets the JournalNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetJournalNumber(journalNumber *string) {
+	j.JournalNumber = journalNumber
+	j.require(journalEntryFieldJournalNumber)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetTrackingCategories(trackingCategories []*JournalEntryTrackingCategoriesItem) {
+	j.TrackingCategories = trackingCategories
+	j.require(journalEntryFieldTrackingCategories)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	j.RemoteWasDeleted = remoteWasDeleted
+	j.require(journalEntryFieldRemoteWasDeleted)
+}
+
+// SetPostingStatus sets the PostingStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetPostingStatus(postingStatus *JournalEntryPostingStatus) {
+	j.PostingStatus = postingStatus
+	j.require(journalEntryFieldPostingStatus)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetAccountingPeriod(accountingPeriod *JournalEntryAccountingPeriod) {
+	j.AccountingPeriod = accountingPeriod
+	j.require(journalEntryFieldAccountingPeriod)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	j.RemoteCreatedAt = remoteCreatedAt
+	j.require(journalEntryFieldRemoteCreatedAt)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	j.RemoteUpdatedAt = remoteUpdatedAt
+	j.require(journalEntryFieldRemoteUpdatedAt)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetFieldMappings(fieldMappings map[string]interface{}) {
+	j.FieldMappings = fieldMappings
+	j.require(journalEntryFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetRemoteData(remoteData []*RemoteData) {
+	j.RemoteData = remoteData
+	j.require(journalEntryFieldRemoteData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntry) SetRemoteFields(remoteFields []*RemoteField) {
+	j.RemoteFields = remoteFields
+	j.require(journalEntryFieldRemoteFields)
+}
+
 func (j *JournalEntry) UnmarshalJSON(data []byte) error {
 	type embed JournalEntry
 	var unmarshaler = struct {
@@ -741,7 +1292,8 @@ func (j *JournalEntry) MarshalJSON() ([]byte, error) {
 		RemoteCreatedAt: internal.NewOptionalDateTime(j.RemoteCreatedAt),
 		RemoteUpdatedAt: internal.NewOptionalDateTime(j.RemoteUpdatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (j *JournalEntry) String() string {
@@ -1448,6 +2000,23 @@ func (j *JournalEntryPostingStatus) Accept(visitor JournalEntryPostingStatusVisi
 //
 // ### Usage Example
 // Fetch from the `GET JournalEntry` endpoint and view a company's journey entry.
+var (
+	journalEntryRequestFieldTransactionDate     = big.NewInt(1 << 0)
+	journalEntryRequestFieldPayments            = big.NewInt(1 << 1)
+	journalEntryRequestFieldMemo                = big.NewInt(1 << 2)
+	journalEntryRequestFieldCurrency            = big.NewInt(1 << 3)
+	journalEntryRequestFieldExchangeRate        = big.NewInt(1 << 4)
+	journalEntryRequestFieldCompany             = big.NewInt(1 << 5)
+	journalEntryRequestFieldTrackingCategories  = big.NewInt(1 << 6)
+	journalEntryRequestFieldInclusiveOfTax      = big.NewInt(1 << 7)
+	journalEntryRequestFieldLines               = big.NewInt(1 << 8)
+	journalEntryRequestFieldJournalNumber       = big.NewInt(1 << 9)
+	journalEntryRequestFieldPostingStatus       = big.NewInt(1 << 10)
+	journalEntryRequestFieldIntegrationParams   = big.NewInt(1 << 11)
+	journalEntryRequestFieldLinkedAccountParams = big.NewInt(1 << 12)
+	journalEntryRequestFieldRemoteFields        = big.NewInt(1 << 13)
+)
+
 type JournalEntryRequest struct {
 	// The journal entry's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty" url:"transaction_date,omitempty"`
@@ -1783,6 +2352,9 @@ type JournalEntryRequest struct {
 	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest             `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -1889,6 +2461,111 @@ func (j *JournalEntryRequest) GetExtraProperties() map[string]interface{} {
 	return j.extraProperties
 }
 
+func (j *JournalEntryRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetTransactionDate(transactionDate *time.Time) {
+	j.TransactionDate = transactionDate
+	j.require(journalEntryRequestFieldTransactionDate)
+}
+
+// SetPayments sets the Payments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetPayments(payments []*JournalEntryRequestPaymentsItem) {
+	j.Payments = payments
+	j.require(journalEntryRequestFieldPayments)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetMemo(memo *string) {
+	j.Memo = memo
+	j.require(journalEntryRequestFieldMemo)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetCurrency(currency *JournalEntryRequestCurrency) {
+	j.Currency = currency
+	j.require(journalEntryRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetExchangeRate(exchangeRate *string) {
+	j.ExchangeRate = exchangeRate
+	j.require(journalEntryRequestFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetCompany(company *JournalEntryRequestCompany) {
+	j.Company = company
+	j.require(journalEntryRequestFieldCompany)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetTrackingCategories(trackingCategories []*JournalEntryRequestTrackingCategoriesItem) {
+	j.TrackingCategories = trackingCategories
+	j.require(journalEntryRequestFieldTrackingCategories)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	j.InclusiveOfTax = inclusiveOfTax
+	j.require(journalEntryRequestFieldInclusiveOfTax)
+}
+
+// SetLines sets the Lines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetLines(lines []*JournalLineRequest) {
+	j.Lines = lines
+	j.require(journalEntryRequestFieldLines)
+}
+
+// SetJournalNumber sets the JournalNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetJournalNumber(journalNumber *string) {
+	j.JournalNumber = journalNumber
+	j.require(journalEntryRequestFieldJournalNumber)
+}
+
+// SetPostingStatus sets the PostingStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetPostingStatus(postingStatus *JournalEntryRequestPostingStatus) {
+	j.PostingStatus = postingStatus
+	j.require(journalEntryRequestFieldPostingStatus)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	j.IntegrationParams = integrationParams
+	j.require(journalEntryRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	j.LinkedAccountParams = linkedAccountParams
+	j.require(journalEntryRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	j.RemoteFields = remoteFields
+	j.require(journalEntryRequestFieldRemoteFields)
+}
+
 func (j *JournalEntryRequest) UnmarshalJSON(data []byte) error {
 	type embed JournalEntryRequest
 	var unmarshaler = struct {
@@ -1920,7 +2597,8 @@ func (j *JournalEntryRequest) MarshalJSON() ([]byte, error) {
 		embed:           embed(*j),
 		TransactionDate: internal.NewOptionalDateTime(j.TransactionDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (j *JournalEntryRequest) String() string {
@@ -2558,11 +3236,21 @@ func (j *JournalEntryRequestTrackingCategoriesItem) Accept(visitor JournalEntryR
 	return fmt.Errorf("type %T does not include a non-empty union type", j)
 }
 
+var (
+	journalEntryResponseFieldModel    = big.NewInt(1 << 0)
+	journalEntryResponseFieldWarnings = big.NewInt(1 << 1)
+	journalEntryResponseFieldErrors   = big.NewInt(1 << 2)
+	journalEntryResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type JournalEntryResponse struct {
 	Model    *JournalEntry               `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -2600,6 +3288,41 @@ func (j *JournalEntryResponse) GetExtraProperties() map[string]interface{} {
 	return j.extraProperties
 }
 
+func (j *JournalEntryResponse) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryResponse) SetModel(model *JournalEntry) {
+	j.Model = model
+	j.require(journalEntryResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	j.Warnings = warnings
+	j.require(journalEntryResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryResponse) SetErrors(errors []*ErrorValidationProblem) {
+	j.Errors = errors
+	j.require(journalEntryResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalEntryResponse) SetLogs(logs []*DebugModeLog) {
+	j.Logs = logs
+	j.require(journalEntryResponseFieldLogs)
+}
+
 func (j *JournalEntryResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler JournalEntryResponse
 	var value unmarshaler
@@ -2614,6 +3337,17 @@ func (j *JournalEntryResponse) UnmarshalJSON(data []byte) error {
 	j.extraProperties = extraProperties
 	j.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (j *JournalEntryResponse) MarshalJSON() ([]byte, error) {
+	type embed JournalEntryResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*j),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (j *JournalEntryResponse) String() string {
@@ -2696,6 +3430,27 @@ func (j *JournalEntryTrackingCategoriesItem) Accept(visitor JournalEntryTracking
 //
 // ### Usage Example
 // Fetch from the `GET JournalEntry` endpoint and view the journal entry's line items.
+var (
+	journalLineFieldId                 = big.NewInt(1 << 0)
+	journalLineFieldRemoteId           = big.NewInt(1 << 1)
+	journalLineFieldCreatedAt          = big.NewInt(1 << 2)
+	journalLineFieldModifiedAt         = big.NewInt(1 << 3)
+	journalLineFieldAccount            = big.NewInt(1 << 4)
+	journalLineFieldNetAmount          = big.NewInt(1 << 5)
+	journalLineFieldTrackingCategory   = big.NewInt(1 << 6)
+	journalLineFieldTrackingCategories = big.NewInt(1 << 7)
+	journalLineFieldCurrency           = big.NewInt(1 << 8)
+	journalLineFieldCompany            = big.NewInt(1 << 9)
+	journalLineFieldEmployee           = big.NewInt(1 << 10)
+	journalLineFieldProject            = big.NewInt(1 << 11)
+	journalLineFieldContact            = big.NewInt(1 << 12)
+	journalLineFieldTaxRate            = big.NewInt(1 << 13)
+	journalLineFieldDescription        = big.NewInt(1 << 14)
+	journalLineFieldExchangeRate       = big.NewInt(1 << 15)
+	journalLineFieldRemoteWasDeleted   = big.NewInt(1 << 16)
+	journalLineFieldRemoteFields       = big.NewInt(1 << 17)
+)
+
 type JournalLine struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -3034,6 +3789,9 @@ type JournalLine struct {
 	RemoteWasDeleted *bool          `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	RemoteFields     []*RemoteField `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -3168,6 +3926,139 @@ func (j *JournalLine) GetExtraProperties() map[string]interface{} {
 	return j.extraProperties
 }
 
+func (j *JournalLine) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetId(id *string) {
+	j.Id = id
+	j.require(journalLineFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(journalLineFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetCreatedAt(createdAt *time.Time) {
+	j.CreatedAt = createdAt
+	j.require(journalLineFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetModifiedAt(modifiedAt *time.Time) {
+	j.ModifiedAt = modifiedAt
+	j.require(journalLineFieldModifiedAt)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetAccount(account *JournalLineAccount) {
+	j.Account = account
+	j.require(journalLineFieldAccount)
+}
+
+// SetNetAmount sets the NetAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetNetAmount(netAmount *float64) {
+	j.NetAmount = netAmount
+	j.require(journalLineFieldNetAmount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetTrackingCategory(trackingCategory *JournalLineTrackingCategory) {
+	j.TrackingCategory = trackingCategory
+	j.require(journalLineFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetTrackingCategories(trackingCategories []*JournalLineTrackingCategoriesItem) {
+	j.TrackingCategories = trackingCategories
+	j.require(journalLineFieldTrackingCategories)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetCurrency(currency *JournalLineCurrency) {
+	j.Currency = currency
+	j.require(journalLineFieldCurrency)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetCompany(company *string) {
+	j.Company = company
+	j.require(journalLineFieldCompany)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetEmployee(employee *string) {
+	j.Employee = employee
+	j.require(journalLineFieldEmployee)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetProject(project *JournalLineProject) {
+	j.Project = project
+	j.require(journalLineFieldProject)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetContact(contact *string) {
+	j.Contact = contact
+	j.require(journalLineFieldContact)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetTaxRate(taxRate *string) {
+	j.TaxRate = taxRate
+	j.require(journalLineFieldTaxRate)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetDescription(description *string) {
+	j.Description = description
+	j.require(journalLineFieldDescription)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetExchangeRate(exchangeRate *string) {
+	j.ExchangeRate = exchangeRate
+	j.require(journalLineFieldExchangeRate)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	j.RemoteWasDeleted = remoteWasDeleted
+	j.require(journalLineFieldRemoteWasDeleted)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLine) SetRemoteFields(remoteFields []*RemoteField) {
+	j.RemoteFields = remoteFields
+	j.require(journalLineFieldRemoteFields)
+}
+
 func (j *JournalLine) UnmarshalJSON(data []byte) error {
 	type embed JournalLine
 	var unmarshaler = struct {
@@ -3203,7 +4094,8 @@ func (j *JournalLine) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(j.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(j.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (j *JournalLine) String() string {
@@ -3718,6 +4610,25 @@ func (j *JournalLineProject) Accept(visitor JournalLineProjectVisitor) error {
 //
 // ### Usage Example
 // Fetch from the `GET JournalEntry` endpoint and view the journal entry's line items.
+var (
+	journalLineRequestFieldRemoteId            = big.NewInt(1 << 0)
+	journalLineRequestFieldAccount             = big.NewInt(1 << 1)
+	journalLineRequestFieldNetAmount           = big.NewInt(1 << 2)
+	journalLineRequestFieldTrackingCategory    = big.NewInt(1 << 3)
+	journalLineRequestFieldTrackingCategories  = big.NewInt(1 << 4)
+	journalLineRequestFieldCurrency            = big.NewInt(1 << 5)
+	journalLineRequestFieldCompany             = big.NewInt(1 << 6)
+	journalLineRequestFieldEmployee            = big.NewInt(1 << 7)
+	journalLineRequestFieldProject             = big.NewInt(1 << 8)
+	journalLineRequestFieldContact             = big.NewInt(1 << 9)
+	journalLineRequestFieldTaxRate             = big.NewInt(1 << 10)
+	journalLineRequestFieldDescription         = big.NewInt(1 << 11)
+	journalLineRequestFieldExchangeRate        = big.NewInt(1 << 12)
+	journalLineRequestFieldIntegrationParams   = big.NewInt(1 << 13)
+	journalLineRequestFieldLinkedAccountParams = big.NewInt(1 << 14)
+	journalLineRequestFieldRemoteFields        = big.NewInt(1 << 15)
+)
+
 type JournalLineRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string                    `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -4051,6 +4962,9 @@ type JournalLineRequest struct {
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -4171,6 +5085,125 @@ func (j *JournalLineRequest) GetExtraProperties() map[string]interface{} {
 	return j.extraProperties
 }
 
+func (j *JournalLineRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(journalLineRequestFieldRemoteId)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetAccount(account *JournalLineRequestAccount) {
+	j.Account = account
+	j.require(journalLineRequestFieldAccount)
+}
+
+// SetNetAmount sets the NetAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetNetAmount(netAmount *float64) {
+	j.NetAmount = netAmount
+	j.require(journalLineRequestFieldNetAmount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetTrackingCategory(trackingCategory *JournalLineRequestTrackingCategory) {
+	j.TrackingCategory = trackingCategory
+	j.require(journalLineRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetTrackingCategories(trackingCategories []*JournalLineRequestTrackingCategoriesItem) {
+	j.TrackingCategories = trackingCategories
+	j.require(journalLineRequestFieldTrackingCategories)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetCurrency(currency *JournalLineRequestCurrency) {
+	j.Currency = currency
+	j.require(journalLineRequestFieldCurrency)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetCompany(company *string) {
+	j.Company = company
+	j.require(journalLineRequestFieldCompany)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetEmployee(employee *string) {
+	j.Employee = employee
+	j.require(journalLineRequestFieldEmployee)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetProject(project *JournalLineRequestProject) {
+	j.Project = project
+	j.require(journalLineRequestFieldProject)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetContact(contact *string) {
+	j.Contact = contact
+	j.require(journalLineRequestFieldContact)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetTaxRate(taxRate *string) {
+	j.TaxRate = taxRate
+	j.require(journalLineRequestFieldTaxRate)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetDescription(description *string) {
+	j.Description = description
+	j.require(journalLineRequestFieldDescription)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetExchangeRate(exchangeRate *string) {
+	j.ExchangeRate = exchangeRate
+	j.require(journalLineRequestFieldExchangeRate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	j.IntegrationParams = integrationParams
+	j.require(journalLineRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	j.LinkedAccountParams = linkedAccountParams
+	j.require(journalLineRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	j.RemoteFields = remoteFields
+	j.require(journalLineRequestFieldRemoteFields)
+}
+
 func (j *JournalLineRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler JournalLineRequest
 	var value unmarshaler
@@ -4185,6 +5218,17 @@ func (j *JournalLineRequest) UnmarshalJSON(data []byte) error {
 	j.extraProperties = extraProperties
 	j.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (j *JournalLineRequest) MarshalJSON() ([]byte, error) {
+	type embed JournalLineRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*j),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (j *JournalLineRequest) String() string {
@@ -4941,10 +5985,19 @@ func (j *JournalLineTrackingCategory) Accept(visitor JournalLineTrackingCategory
 	return fmt.Errorf("type %T does not include a non-empty union type", j)
 }
 
+var (
+	paginatedJournalEntryListFieldNext     = big.NewInt(1 << 0)
+	paginatedJournalEntryListFieldPrevious = big.NewInt(1 << 1)
+	paginatedJournalEntryListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedJournalEntryList struct {
 	Next     *string         `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string         `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*JournalEntry `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -4975,6 +6028,34 @@ func (p *PaginatedJournalEntryList) GetExtraProperties() map[string]interface{} 
 	return p.extraProperties
 }
 
+func (p *PaginatedJournalEntryList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJournalEntryList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedJournalEntryListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJournalEntryList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedJournalEntryListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJournalEntryList) SetResults(results []*JournalEntry) {
+	p.Results = results
+	p.require(paginatedJournalEntryListFieldResults)
+}
+
 func (p *PaginatedJournalEntryList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedJournalEntryList
 	var value unmarshaler
@@ -4989,6 +6070,17 @@ func (p *PaginatedJournalEntryList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedJournalEntryList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedJournalEntryList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedJournalEntryList) String() string {

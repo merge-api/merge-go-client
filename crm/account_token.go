@@ -5,13 +5,23 @@ package crm
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	accountTokenFieldAccountToken = big.NewInt(1 << 0)
+	accountTokenFieldIntegration  = big.NewInt(1 << 1)
+	accountTokenFieldId           = big.NewInt(1 << 2)
 )
 
 type AccountToken struct {
 	AccountToken string              `json:"account_token" url:"account_token"`
 	Integration  *AccountIntegration `json:"integration" url:"integration"`
 	Id           string              `json:"id" url:"id"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -42,6 +52,34 @@ func (a *AccountToken) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AccountToken) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetAccountToken sets the AccountToken field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountToken) SetAccountToken(accountToken string) {
+	a.AccountToken = accountToken
+	a.require(accountTokenFieldAccountToken)
+}
+
+// SetIntegration sets the Integration field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountToken) SetIntegration(integration *AccountIntegration) {
+	a.Integration = integration
+	a.require(accountTokenFieldIntegration)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountToken) SetId(id string) {
+	a.Id = id
+	a.require(accountTokenFieldId)
+}
+
 func (a *AccountToken) UnmarshalJSON(data []byte) error {
 	type unmarshaler AccountToken
 	var value unmarshaler
@@ -56,6 +94,17 @@ func (a *AccountToken) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AccountToken) MarshalJSON() ([]byte, error) {
+	type embed AccountToken
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AccountToken) String() string {

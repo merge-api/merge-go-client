@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	creditNoteEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	creditNoteEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	creditNoteEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type CreditNoteEndpointRequest struct {
@@ -15,7 +22,57 @@ type CreditNoteEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool              `json:"-" url:"run_async,omitempty"`
 	Model    *CreditNoteRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CreditNoteEndpointRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	c.IsDebugMode = isDebugMode
+	c.require(creditNoteEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteEndpointRequest) SetRunAsync(runAsync *bool) {
+	c.RunAsync = runAsync
+	c.require(creditNoteEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteEndpointRequest) SetModel(model *CreditNoteRequest) {
+	c.Model = model
+	c.require(creditNoteEndpointRequestFieldModel)
+}
+
+var (
+	creditNotesListRequestFieldCompanyId             = big.NewInt(1 << 0)
+	creditNotesListRequestFieldCreatedAfter          = big.NewInt(1 << 1)
+	creditNotesListRequestFieldCreatedBefore         = big.NewInt(1 << 2)
+	creditNotesListRequestFieldCursor                = big.NewInt(1 << 3)
+	creditNotesListRequestFieldExpand                = big.NewInt(1 << 4)
+	creditNotesListRequestFieldIncludeDeletedData    = big.NewInt(1 << 5)
+	creditNotesListRequestFieldIncludeRemoteData     = big.NewInt(1 << 6)
+	creditNotesListRequestFieldIncludeShellData      = big.NewInt(1 << 7)
+	creditNotesListRequestFieldModifiedAfter         = big.NewInt(1 << 8)
+	creditNotesListRequestFieldModifiedBefore        = big.NewInt(1 << 9)
+	creditNotesListRequestFieldPageSize              = big.NewInt(1 << 10)
+	creditNotesListRequestFieldRemoteFields          = big.NewInt(1 << 11)
+	creditNotesListRequestFieldRemoteId              = big.NewInt(1 << 12)
+	creditNotesListRequestFieldShowEnumOrigins       = big.NewInt(1 << 13)
+	creditNotesListRequestFieldTransactionDateAfter  = big.NewInt(1 << 14)
+	creditNotesListRequestFieldTransactionDateBefore = big.NewInt(1 << 15)
+)
 
 type CreditNotesListRequest struct {
 	// If provided, will only return credit notes for this company.
@@ -50,7 +107,137 @@ type CreditNotesListRequest struct {
 	TransactionDateAfter *time.Time `json:"-" url:"transaction_date_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
 	TransactionDateBefore *time.Time `json:"-" url:"transaction_date_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CreditNotesListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetCompanyId(companyId *string) {
+	c.CompanyId = companyId
+	c.require(creditNotesListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(creditNotesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(creditNotesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(creditNotesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetExpand(expand []*CreditNotesListRequestExpandItem) {
+	c.Expand = expand
+	c.require(creditNotesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(creditNotesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(creditNotesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(creditNotesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(creditNotesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(creditNotesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(creditNotesListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetRemoteFields(remoteFields *CreditNotesListRequestRemoteFields) {
+	c.RemoteFields = remoteFields
+	c.require(creditNotesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(creditNotesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetShowEnumOrigins(showEnumOrigins *CreditNotesListRequestShowEnumOrigins) {
+	c.ShowEnumOrigins = showEnumOrigins
+	c.require(creditNotesListRequestFieldShowEnumOrigins)
+}
+
+// SetTransactionDateAfter sets the TransactionDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetTransactionDateAfter(transactionDateAfter *time.Time) {
+	c.TransactionDateAfter = transactionDateAfter
+	c.require(creditNotesListRequestFieldTransactionDateAfter)
+}
+
+// SetTransactionDateBefore sets the TransactionDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesListRequest) SetTransactionDateBefore(transactionDateBefore *time.Time) {
+	c.TransactionDateBefore = transactionDateBefore
+	c.require(creditNotesListRequestFieldTransactionDateBefore)
+}
+
+var (
+	creditNotesRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	creditNotesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	creditNotesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	creditNotesRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	creditNotesRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type CreditNotesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -63,6 +250,51 @@ type CreditNotesRetrieveRequest struct {
 	RemoteFields *CreditNotesRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *CreditNotesRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (c *CreditNotesRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesRetrieveRequest) SetExpand(expand []*CreditNotesRetrieveRequestExpandItem) {
+	c.Expand = expand
+	c.require(creditNotesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(creditNotesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(creditNotesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesRetrieveRequest) SetRemoteFields(remoteFields *CreditNotesRetrieveRequestRemoteFields) {
+	c.RemoteFields = remoteFields
+	c.require(creditNotesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNotesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *CreditNotesRetrieveRequestShowEnumOrigins) {
+	c.ShowEnumOrigins = showEnumOrigins
+	c.require(creditNotesRetrieveRequestFieldShowEnumOrigins)
 }
 
 type CreditNotesListRequestExpandItem string
@@ -245,6 +477,15 @@ func (c CreditNotesRetrieveRequestShowEnumOrigins) Ptr() *CreditNotesRetrieveReq
 //
 // ### Usage Example
 // Fetch from the `GET CreditNote` endpoint and view the invoice's applied to lines.
+var (
+	creditNoteApplyLineForCreditNoteRequestFieldRemoteId            = big.NewInt(1 << 0)
+	creditNoteApplyLineForCreditNoteRequestFieldInvoice             = big.NewInt(1 << 1)
+	creditNoteApplyLineForCreditNoteRequestFieldAppliedDate         = big.NewInt(1 << 2)
+	creditNoteApplyLineForCreditNoteRequestFieldAppliedAmount       = big.NewInt(1 << 3)
+	creditNoteApplyLineForCreditNoteRequestFieldIntegrationParams   = big.NewInt(1 << 4)
+	creditNoteApplyLineForCreditNoteRequestFieldLinkedAccountParams = big.NewInt(1 << 5)
+)
+
 type CreditNoteApplyLineForCreditNoteRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string                                         `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -255,6 +496,9 @@ type CreditNoteApplyLineForCreditNoteRequest struct {
 	AppliedAmount       *string                `json:"applied_amount,omitempty" url:"applied_amount,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -306,6 +550,55 @@ func (c *CreditNoteApplyLineForCreditNoteRequest) GetExtraProperties() map[strin
 	return c.extraProperties
 }
 
+func (c *CreditNoteApplyLineForCreditNoteRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteApplyLineForCreditNoteRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(creditNoteApplyLineForCreditNoteRequestFieldRemoteId)
+}
+
+// SetInvoice sets the Invoice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteApplyLineForCreditNoteRequest) SetInvoice(invoice *CreditNoteApplyLineForCreditNoteRequestInvoice) {
+	c.Invoice = invoice
+	c.require(creditNoteApplyLineForCreditNoteRequestFieldInvoice)
+}
+
+// SetAppliedDate sets the AppliedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteApplyLineForCreditNoteRequest) SetAppliedDate(appliedDate *time.Time) {
+	c.AppliedDate = appliedDate
+	c.require(creditNoteApplyLineForCreditNoteRequestFieldAppliedDate)
+}
+
+// SetAppliedAmount sets the AppliedAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteApplyLineForCreditNoteRequest) SetAppliedAmount(appliedAmount *string) {
+	c.AppliedAmount = appliedAmount
+	c.require(creditNoteApplyLineForCreditNoteRequestFieldAppliedAmount)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteApplyLineForCreditNoteRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(creditNoteApplyLineForCreditNoteRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteApplyLineForCreditNoteRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(creditNoteApplyLineForCreditNoteRequestFieldLinkedAccountParams)
+}
+
 func (c *CreditNoteApplyLineForCreditNoteRequest) UnmarshalJSON(data []byte) error {
 	type embed CreditNoteApplyLineForCreditNoteRequest
 	var unmarshaler = struct {
@@ -337,7 +630,8 @@ func (c *CreditNoteApplyLineForCreditNoteRequest) MarshalJSON() ([]byte, error) 
 		embed:       embed(*c),
 		AppliedDate: internal.NewOptionalDateTime(c.AppliedDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CreditNoteApplyLineForCreditNoteRequest) String() string {
@@ -420,6 +714,26 @@ func (c *CreditNoteApplyLineForCreditNoteRequestInvoice) Accept(visitor CreditNo
 //
 // ### Usage Example
 // Fetch from the `GET CreditNote` endpoint and view the credit note's line items.
+var (
+	creditNoteLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
+	creditNoteLineItemRequestFieldItem                = big.NewInt(1 << 1)
+	creditNoteLineItemRequestFieldName                = big.NewInt(1 << 2)
+	creditNoteLineItemRequestFieldDescription         = big.NewInt(1 << 3)
+	creditNoteLineItemRequestFieldQuantity            = big.NewInt(1 << 4)
+	creditNoteLineItemRequestFieldMemo                = big.NewInt(1 << 5)
+	creditNoteLineItemRequestFieldUnitPrice           = big.NewInt(1 << 6)
+	creditNoteLineItemRequestFieldTaxRate             = big.NewInt(1 << 7)
+	creditNoteLineItemRequestFieldTotalLineAmount     = big.NewInt(1 << 8)
+	creditNoteLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 9)
+	creditNoteLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 10)
+	creditNoteLineItemRequestFieldAccount             = big.NewInt(1 << 11)
+	creditNoteLineItemRequestFieldCompany             = big.NewInt(1 << 12)
+	creditNoteLineItemRequestFieldContact             = big.NewInt(1 << 13)
+	creditNoteLineItemRequestFieldProject             = big.NewInt(1 << 14)
+	creditNoteLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 15)
+	creditNoteLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 16)
+)
+
 type CreditNoteLineItemRequest struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string                        `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -451,6 +765,9 @@ type CreditNoteLineItemRequest struct {
 	Project             *CreditNoteLineItemRequestProject `json:"project,omitempty" url:"project,omitempty"`
 	IntegrationParams   map[string]interface{}            `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -579,6 +896,132 @@ func (c *CreditNoteLineItemRequest) GetExtraProperties() map[string]interface{} 
 	return c.extraProperties
 }
 
+func (c *CreditNoteLineItemRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(creditNoteLineItemRequestFieldRemoteId)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetItem(item *CreditNoteLineItemRequestItem) {
+	c.Item = item
+	c.require(creditNoteLineItemRequestFieldItem)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetName(name *string) {
+	c.Name = name
+	c.require(creditNoteLineItemRequestFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetDescription(description *string) {
+	c.Description = description
+	c.require(creditNoteLineItemRequestFieldDescription)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetQuantity(quantity *string) {
+	c.Quantity = quantity
+	c.require(creditNoteLineItemRequestFieldQuantity)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetMemo(memo *string) {
+	c.Memo = memo
+	c.require(creditNoteLineItemRequestFieldMemo)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetUnitPrice(unitPrice *string) {
+	c.UnitPrice = unitPrice
+	c.require(creditNoteLineItemRequestFieldUnitPrice)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTaxRate(taxRate *string) {
+	c.TaxRate = taxRate
+	c.require(creditNoteLineItemRequestFieldTaxRate)
+}
+
+// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTotalLineAmount(totalLineAmount *string) {
+	c.TotalLineAmount = totalLineAmount
+	c.require(creditNoteLineItemRequestFieldTotalLineAmount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTrackingCategory(trackingCategory *string) {
+	c.TrackingCategory = trackingCategory
+	c.require(creditNoteLineItemRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTrackingCategories(trackingCategories []*string) {
+	c.TrackingCategories = trackingCategories
+	c.require(creditNoteLineItemRequestFieldTrackingCategories)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetAccount(account *string) {
+	c.Account = account
+	c.require(creditNoteLineItemRequestFieldAccount)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetCompany(company *CreditNoteLineItemRequestCompany) {
+	c.Company = company
+	c.require(creditNoteLineItemRequestFieldCompany)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetContact(contact *CreditNoteLineItemRequestContact) {
+	c.Contact = contact
+	c.require(creditNoteLineItemRequestFieldContact)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetProject(project *CreditNoteLineItemRequestProject) {
+	c.Project = project
+	c.require(creditNoteLineItemRequestFieldProject)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(creditNoteLineItemRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(creditNoteLineItemRequestFieldLinkedAccountParams)
+}
+
 func (c *CreditNoteLineItemRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler CreditNoteLineItemRequest
 	var value unmarshaler
@@ -593,6 +1036,17 @@ func (c *CreditNoteLineItemRequest) UnmarshalJSON(data []byte) error {
 	c.extraProperties = extraProperties
 	c.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (c *CreditNoteLineItemRequest) MarshalJSON() ([]byte, error) {
+	type embed CreditNoteLineItemRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CreditNoteLineItemRequest) String() string {
@@ -863,6 +1317,27 @@ func (c *CreditNoteLineItemRequestProject) Accept(visitor CreditNoteLineItemRequ
 //
 // ### Usage Example
 // Fetch from the `LIST CreditNotes` endpoint and view a company's credit notes.
+var (
+	creditNoteRequestFieldTransactionDate     = big.NewInt(1 << 0)
+	creditNoteRequestFieldStatus              = big.NewInt(1 << 1)
+	creditNoteRequestFieldNumber              = big.NewInt(1 << 2)
+	creditNoteRequestFieldContact             = big.NewInt(1 << 3)
+	creditNoteRequestFieldCompany             = big.NewInt(1 << 4)
+	creditNoteRequestFieldExchangeRate        = big.NewInt(1 << 5)
+	creditNoteRequestFieldTotalAmount         = big.NewInt(1 << 6)
+	creditNoteRequestFieldRemainingCredit     = big.NewInt(1 << 7)
+	creditNoteRequestFieldInclusiveOfTax      = big.NewInt(1 << 8)
+	creditNoteRequestFieldLineItems           = big.NewInt(1 << 9)
+	creditNoteRequestFieldTrackingCategories  = big.NewInt(1 << 10)
+	creditNoteRequestFieldCurrency            = big.NewInt(1 << 11)
+	creditNoteRequestFieldPayments            = big.NewInt(1 << 12)
+	creditNoteRequestFieldAppliedPayments     = big.NewInt(1 << 13)
+	creditNoteRequestFieldAccountingPeriod    = big.NewInt(1 << 14)
+	creditNoteRequestFieldAppliedToLines      = big.NewInt(1 << 15)
+	creditNoteRequestFieldIntegrationParams   = big.NewInt(1 << 16)
+	creditNoteRequestFieldLinkedAccountParams = big.NewInt(1 << 17)
+)
+
 type CreditNoteRequest struct {
 	// The credit note's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty" url:"transaction_date,omitempty"`
@@ -1208,6 +1683,9 @@ type CreditNoteRequest struct {
 	IntegrationParams   map[string]interface{}                     `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}                     `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -1342,6 +1820,139 @@ func (c *CreditNoteRequest) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CreditNoteRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetTransactionDate(transactionDate *time.Time) {
+	c.TransactionDate = transactionDate
+	c.require(creditNoteRequestFieldTransactionDate)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetStatus(status *CreditNoteRequestStatus) {
+	c.Status = status
+	c.require(creditNoteRequestFieldStatus)
+}
+
+// SetNumber sets the Number field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetNumber(number *string) {
+	c.Number = number
+	c.require(creditNoteRequestFieldNumber)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetContact(contact *CreditNoteRequestContact) {
+	c.Contact = contact
+	c.require(creditNoteRequestFieldContact)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetCompany(company *CreditNoteRequestCompany) {
+	c.Company = company
+	c.require(creditNoteRequestFieldCompany)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetExchangeRate(exchangeRate *string) {
+	c.ExchangeRate = exchangeRate
+	c.require(creditNoteRequestFieldExchangeRate)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetTotalAmount(totalAmount *float64) {
+	c.TotalAmount = totalAmount
+	c.require(creditNoteRequestFieldTotalAmount)
+}
+
+// SetRemainingCredit sets the RemainingCredit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetRemainingCredit(remainingCredit *float64) {
+	c.RemainingCredit = remainingCredit
+	c.require(creditNoteRequestFieldRemainingCredit)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	c.InclusiveOfTax = inclusiveOfTax
+	c.require(creditNoteRequestFieldInclusiveOfTax)
+}
+
+// SetLineItems sets the LineItems field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetLineItems(lineItems []*CreditNoteRequestLineItemsItem) {
+	c.LineItems = lineItems
+	c.require(creditNoteRequestFieldLineItems)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetTrackingCategories(trackingCategories []*CreditNoteRequestTrackingCategoriesItem) {
+	c.TrackingCategories = trackingCategories
+	c.require(creditNoteRequestFieldTrackingCategories)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetCurrency(currency *CreditNoteRequestCurrency) {
+	c.Currency = currency
+	c.require(creditNoteRequestFieldCurrency)
+}
+
+// SetPayments sets the Payments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetPayments(payments []*CreditNoteRequestPaymentsItem) {
+	c.Payments = payments
+	c.require(creditNoteRequestFieldPayments)
+}
+
+// SetAppliedPayments sets the AppliedPayments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetAppliedPayments(appliedPayments []*CreditNoteRequestAppliedPaymentsItem) {
+	c.AppliedPayments = appliedPayments
+	c.require(creditNoteRequestFieldAppliedPayments)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetAccountingPeriod(accountingPeriod *CreditNoteRequestAccountingPeriod) {
+	c.AccountingPeriod = accountingPeriod
+	c.require(creditNoteRequestFieldAccountingPeriod)
+}
+
+// SetAppliedToLines sets the AppliedToLines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetAppliedToLines(appliedToLines []*CreditNoteApplyLineForCreditNoteRequest) {
+	c.AppliedToLines = appliedToLines
+	c.require(creditNoteRequestFieldAppliedToLines)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(creditNoteRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(creditNoteRequestFieldLinkedAccountParams)
+}
+
 func (c *CreditNoteRequest) UnmarshalJSON(data []byte) error {
 	type embed CreditNoteRequest
 	var unmarshaler = struct {
@@ -1373,7 +1984,8 @@ func (c *CreditNoteRequest) MarshalJSON() ([]byte, error) {
 		embed:           embed(*c),
 		TransactionDate: internal.NewOptionalDateTime(c.TransactionDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CreditNoteRequest) String() string {
@@ -2262,11 +2874,21 @@ func (c *CreditNoteRequestTrackingCategoriesItem) Accept(visitor CreditNoteReque
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+var (
+	creditNoteResponseFieldModel    = big.NewInt(1 << 0)
+	creditNoteResponseFieldWarnings = big.NewInt(1 << 1)
+	creditNoteResponseFieldErrors   = big.NewInt(1 << 2)
+	creditNoteResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type CreditNoteResponse struct {
 	Model    *CreditNote                 `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -2304,6 +2926,41 @@ func (c *CreditNoteResponse) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CreditNoteResponse) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteResponse) SetModel(model *CreditNote) {
+	c.Model = model
+	c.require(creditNoteResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	c.Warnings = warnings
+	c.require(creditNoteResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteResponse) SetErrors(errors []*ErrorValidationProblem) {
+	c.Errors = errors
+	c.require(creditNoteResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteResponse) SetLogs(logs []*DebugModeLog) {
+	c.Logs = logs
+	c.require(creditNoteResponseFieldLogs)
+}
+
 func (c *CreditNoteResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler CreditNoteResponse
 	var value unmarshaler
@@ -2320,6 +2977,17 @@ func (c *CreditNoteResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (c *CreditNoteResponse) MarshalJSON() ([]byte, error) {
+	type embed CreditNoteResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (c *CreditNoteResponse) String() string {
 	if len(c.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
@@ -2332,10 +3000,19 @@ func (c *CreditNoteResponse) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+var (
+	paginatedCreditNoteListFieldNext     = big.NewInt(1 << 0)
+	paginatedCreditNoteListFieldPrevious = big.NewInt(1 << 1)
+	paginatedCreditNoteListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedCreditNoteList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*CreditNote `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -2366,6 +3043,34 @@ func (p *PaginatedCreditNoteList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedCreditNoteList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCreditNoteList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedCreditNoteListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCreditNoteList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedCreditNoteListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCreditNoteList) SetResults(results []*CreditNote) {
+	p.Results = results
+	p.require(paginatedCreditNoteListFieldResults)
+}
+
 func (p *PaginatedCreditNoteList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedCreditNoteList
 	var value unmarshaler
@@ -2380,6 +3085,17 @@ func (p *PaginatedCreditNoteList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedCreditNoteList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedCreditNoteList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedCreditNoteList) String() string {

@@ -5,8 +5,15 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	accountingAttachmentEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	accountingAttachmentEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	accountingAttachmentEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type AccountingAttachmentEndpointRequest struct {
@@ -15,7 +22,52 @@ type AccountingAttachmentEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                        `json:"-" url:"run_async,omitempty"`
 	Model    *AccountingAttachmentRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *AccountingAttachmentEndpointRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	a.IsDebugMode = isDebugMode
+	a.require(accountingAttachmentEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentEndpointRequest) SetRunAsync(runAsync *bool) {
+	a.RunAsync = runAsync
+	a.require(accountingAttachmentEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentEndpointRequest) SetModel(model *AccountingAttachmentRequest) {
+	a.Model = model
+	a.require(accountingAttachmentEndpointRequestFieldModel)
+}
+
+var (
+	attachmentsListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	attachmentsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	attachmentsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	attachmentsListRequestFieldCursor             = big.NewInt(1 << 3)
+	attachmentsListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	attachmentsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	attachmentsListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	attachmentsListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	attachmentsListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	attachmentsListRequestFieldPageSize           = big.NewInt(1 << 9)
+	attachmentsListRequestFieldRemoteId           = big.NewInt(1 << 10)
+)
 
 type AttachmentsListRequest struct {
 	// If provided, will only return accounting attachments for this company.
@@ -40,13 +92,129 @@ type AttachmentsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *AttachmentsListRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetCompanyId(companyId *string) {
+	a.CompanyId = companyId
+	a.require(attachmentsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	a.CreatedAfter = createdAfter
+	a.require(attachmentsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	a.CreatedBefore = createdBefore
+	a.require(attachmentsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetCursor(cursor *string) {
+	a.Cursor = cursor
+	a.require(attachmentsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	a.IncludeDeletedData = includeDeletedData
+	a.require(attachmentsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(attachmentsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(attachmentsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	a.ModifiedAfter = modifiedAfter
+	a.require(attachmentsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	a.ModifiedBefore = modifiedBefore
+	a.require(attachmentsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetPageSize(pageSize *int) {
+	a.PageSize = pageSize
+	a.require(attachmentsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsListRequest) SetRemoteId(remoteId *string) {
+	a.RemoteId = remoteId
+	a.require(attachmentsListRequestFieldRemoteId)
+}
+
+var (
+	attachmentsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	attachmentsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type AttachmentsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (a *AttachmentsRetrieveRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(attachmentsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AttachmentsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(attachmentsRetrieveRequestFieldIncludeShellData)
 }
 
 // # The Accounting Attachment Object
@@ -55,6 +223,19 @@ type AttachmentsRetrieveRequest struct {
 //
 // ### Usage Example
 // Fetch from the `LIST AccountingAttachments` endpoint and view a company's attachments.
+var (
+	accountingAttachmentFieldId               = big.NewInt(1 << 0)
+	accountingAttachmentFieldRemoteId         = big.NewInt(1 << 1)
+	accountingAttachmentFieldCreatedAt        = big.NewInt(1 << 2)
+	accountingAttachmentFieldModifiedAt       = big.NewInt(1 << 3)
+	accountingAttachmentFieldFileName         = big.NewInt(1 << 4)
+	accountingAttachmentFieldFileUrl          = big.NewInt(1 << 5)
+	accountingAttachmentFieldCompany          = big.NewInt(1 << 6)
+	accountingAttachmentFieldRemoteWasDeleted = big.NewInt(1 << 7)
+	accountingAttachmentFieldFieldMappings    = big.NewInt(1 << 8)
+	accountingAttachmentFieldRemoteData       = big.NewInt(1 << 9)
+)
+
 type AccountingAttachment struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -73,6 +254,9 @@ type AccountingAttachment struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -152,6 +336,83 @@ func (a *AccountingAttachment) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AccountingAttachment) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetId(id *string) {
+	a.Id = id
+	a.require(accountingAttachmentFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetRemoteId(remoteId *string) {
+	a.RemoteId = remoteId
+	a.require(accountingAttachmentFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetCreatedAt(createdAt *time.Time) {
+	a.CreatedAt = createdAt
+	a.require(accountingAttachmentFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetModifiedAt(modifiedAt *time.Time) {
+	a.ModifiedAt = modifiedAt
+	a.require(accountingAttachmentFieldModifiedAt)
+}
+
+// SetFileName sets the FileName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetFileName(fileName *string) {
+	a.FileName = fileName
+	a.require(accountingAttachmentFieldFileName)
+}
+
+// SetFileUrl sets the FileUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetFileUrl(fileUrl *string) {
+	a.FileUrl = fileUrl
+	a.require(accountingAttachmentFieldFileUrl)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetCompany(company *string) {
+	a.Company = company
+	a.require(accountingAttachmentFieldCompany)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	a.RemoteWasDeleted = remoteWasDeleted
+	a.require(accountingAttachmentFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetFieldMappings(fieldMappings map[string]interface{}) {
+	a.FieldMappings = fieldMappings
+	a.require(accountingAttachmentFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachment) SetRemoteData(remoteData []*RemoteData) {
+	a.RemoteData = remoteData
+	a.require(accountingAttachmentFieldRemoteData)
+}
+
 func (a *AccountingAttachment) UnmarshalJSON(data []byte) error {
 	type embed AccountingAttachment
 	var unmarshaler = struct {
@@ -187,7 +448,8 @@ func (a *AccountingAttachment) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(a.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(a.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AccountingAttachment) String() string {
@@ -208,6 +470,14 @@ func (a *AccountingAttachment) String() string {
 //
 // ### Usage Example
 // Fetch from the `LIST AccountingAttachments` endpoint and view a company's attachments.
+var (
+	accountingAttachmentRequestFieldFileName            = big.NewInt(1 << 0)
+	accountingAttachmentRequestFieldFileUrl             = big.NewInt(1 << 1)
+	accountingAttachmentRequestFieldCompany             = big.NewInt(1 << 2)
+	accountingAttachmentRequestFieldIntegrationParams   = big.NewInt(1 << 3)
+	accountingAttachmentRequestFieldLinkedAccountParams = big.NewInt(1 << 4)
+)
+
 type AccountingAttachmentRequest struct {
 	// The attachment's name.
 	FileName *string `json:"file_name,omitempty" url:"file_name,omitempty"`
@@ -217,6 +487,9 @@ type AccountingAttachmentRequest struct {
 	Company             *string                `json:"company,omitempty" url:"company,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -261,6 +534,48 @@ func (a *AccountingAttachmentRequest) GetExtraProperties() map[string]interface{
 	return a.extraProperties
 }
 
+func (a *AccountingAttachmentRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetFileName sets the FileName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentRequest) SetFileName(fileName *string) {
+	a.FileName = fileName
+	a.require(accountingAttachmentRequestFieldFileName)
+}
+
+// SetFileUrl sets the FileUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentRequest) SetFileUrl(fileUrl *string) {
+	a.FileUrl = fileUrl
+	a.require(accountingAttachmentRequestFieldFileUrl)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentRequest) SetCompany(company *string) {
+	a.Company = company
+	a.require(accountingAttachmentRequestFieldCompany)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	a.IntegrationParams = integrationParams
+	a.require(accountingAttachmentRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	a.LinkedAccountParams = linkedAccountParams
+	a.require(accountingAttachmentRequestFieldLinkedAccountParams)
+}
+
 func (a *AccountingAttachmentRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler AccountingAttachmentRequest
 	var value unmarshaler
@@ -277,6 +592,17 @@ func (a *AccountingAttachmentRequest) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (a *AccountingAttachmentRequest) MarshalJSON() ([]byte, error) {
+	type embed AccountingAttachmentRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (a *AccountingAttachmentRequest) String() string {
 	if len(a.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
@@ -289,11 +615,21 @@ func (a *AccountingAttachmentRequest) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+var (
+	accountingAttachmentResponseFieldModel    = big.NewInt(1 << 0)
+	accountingAttachmentResponseFieldWarnings = big.NewInt(1 << 1)
+	accountingAttachmentResponseFieldErrors   = big.NewInt(1 << 2)
+	accountingAttachmentResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type AccountingAttachmentResponse struct {
 	Model    *AccountingAttachment       `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -331,6 +667,41 @@ func (a *AccountingAttachmentResponse) GetExtraProperties() map[string]interface
 	return a.extraProperties
 }
 
+func (a *AccountingAttachmentResponse) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentResponse) SetModel(model *AccountingAttachment) {
+	a.Model = model
+	a.require(accountingAttachmentResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	a.Warnings = warnings
+	a.require(accountingAttachmentResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentResponse) SetErrors(errors []*ErrorValidationProblem) {
+	a.Errors = errors
+	a.require(accountingAttachmentResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingAttachmentResponse) SetLogs(logs []*DebugModeLog) {
+	a.Logs = logs
+	a.require(accountingAttachmentResponseFieldLogs)
+}
+
 func (a *AccountingAttachmentResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler AccountingAttachmentResponse
 	var value unmarshaler
@@ -347,6 +718,17 @@ func (a *AccountingAttachmentResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (a *AccountingAttachmentResponse) MarshalJSON() ([]byte, error) {
+	type embed AccountingAttachmentResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (a *AccountingAttachmentResponse) String() string {
 	if len(a.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
@@ -359,10 +741,19 @@ func (a *AccountingAttachmentResponse) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+var (
+	paginatedAccountingAttachmentListFieldNext     = big.NewInt(1 << 0)
+	paginatedAccountingAttachmentListFieldPrevious = big.NewInt(1 << 1)
+	paginatedAccountingAttachmentListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedAccountingAttachmentList struct {
 	Next     *string                 `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string                 `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*AccountingAttachment `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -393,6 +784,34 @@ func (p *PaginatedAccountingAttachmentList) GetExtraProperties() map[string]inte
 	return p.extraProperties
 }
 
+func (p *PaginatedAccountingAttachmentList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountingAttachmentList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedAccountingAttachmentListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountingAttachmentList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedAccountingAttachmentListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAccountingAttachmentList) SetResults(results []*AccountingAttachment) {
+	p.Results = results
+	p.require(paginatedAccountingAttachmentListFieldResults)
+}
+
 func (p *PaginatedAccountingAttachmentList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedAccountingAttachmentList
 	var value unmarshaler
@@ -407,6 +826,17 @@ func (p *PaginatedAccountingAttachmentList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedAccountingAttachmentList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedAccountingAttachmentList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedAccountingAttachmentList) String() string {

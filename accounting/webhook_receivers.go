@@ -5,19 +5,66 @@ package accounting
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
+)
+
+var (
+	webhookReceiverRequestFieldEvent    = big.NewInt(1 << 0)
+	webhookReceiverRequestFieldIsActive = big.NewInt(1 << 1)
+	webhookReceiverRequestFieldKey      = big.NewInt(1 << 2)
 )
 
 type WebhookReceiverRequest struct {
 	Event    string  `json:"event" url:"-"`
 	IsActive bool    `json:"is_active" url:"-"`
 	Key      *string `json:"key,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (w *WebhookReceiverRequest) require(field *big.Int) {
+	if w.explicitFields == nil {
+		w.explicitFields = big.NewInt(0)
+	}
+	w.explicitFields.Or(w.explicitFields, field)
+}
+
+// SetEvent sets the Event field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WebhookReceiverRequest) SetEvent(event string) {
+	w.Event = event
+	w.require(webhookReceiverRequestFieldEvent)
+}
+
+// SetIsActive sets the IsActive field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WebhookReceiverRequest) SetIsActive(isActive bool) {
+	w.IsActive = isActive
+	w.require(webhookReceiverRequestFieldIsActive)
+}
+
+// SetKey sets the Key field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WebhookReceiverRequest) SetKey(key *string) {
+	w.Key = key
+	w.require(webhookReceiverRequestFieldKey)
+}
+
+var (
+	webhookReceiverFieldEvent    = big.NewInt(1 << 0)
+	webhookReceiverFieldIsActive = big.NewInt(1 << 1)
+	webhookReceiverFieldKey      = big.NewInt(1 << 2)
+)
 
 type WebhookReceiver struct {
 	Event    string  `json:"event" url:"event"`
 	IsActive bool    `json:"is_active" url:"is_active"`
 	Key      *string `json:"key,omitempty" url:"key,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -48,6 +95,34 @@ func (w *WebhookReceiver) GetExtraProperties() map[string]interface{} {
 	return w.extraProperties
 }
 
+func (w *WebhookReceiver) require(field *big.Int) {
+	if w.explicitFields == nil {
+		w.explicitFields = big.NewInt(0)
+	}
+	w.explicitFields.Or(w.explicitFields, field)
+}
+
+// SetEvent sets the Event field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WebhookReceiver) SetEvent(event string) {
+	w.Event = event
+	w.require(webhookReceiverFieldEvent)
+}
+
+// SetIsActive sets the IsActive field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WebhookReceiver) SetIsActive(isActive bool) {
+	w.IsActive = isActive
+	w.require(webhookReceiverFieldIsActive)
+}
+
+// SetKey sets the Key field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WebhookReceiver) SetKey(key *string) {
+	w.Key = key
+	w.require(webhookReceiverFieldKey)
+}
+
 func (w *WebhookReceiver) UnmarshalJSON(data []byte) error {
 	type unmarshaler WebhookReceiver
 	var value unmarshaler
@@ -62,6 +137,17 @@ func (w *WebhookReceiver) UnmarshalJSON(data []byte) error {
 	w.extraProperties = extraProperties
 	w.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (w *WebhookReceiver) MarshalJSON() ([]byte, error) {
+	type embed WebhookReceiver
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*w),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, w.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (w *WebhookReceiver) String() string {

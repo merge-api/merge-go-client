@@ -5,8 +5,18 @@ package ticketing
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/merge-api/merge-go-client/v2/internal"
+	internal "github.com/merge-api/merge-go-client/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	auditTrailListRequestFieldCursor    = big.NewInt(1 << 0)
+	auditTrailListRequestFieldEndDate   = big.NewInt(1 << 1)
+	auditTrailListRequestFieldEventType = big.NewInt(1 << 2)
+	auditTrailListRequestFieldPageSize  = big.NewInt(1 << 3)
+	auditTrailListRequestFieldStartDate = big.NewInt(1 << 4)
+	auditTrailListRequestFieldUserEmail = big.NewInt(1 << 5)
 )
 
 type AuditTrailListRequest struct {
@@ -22,7 +32,70 @@ type AuditTrailListRequest struct {
 	StartDate *string `json:"-" url:"start_date,omitempty"`
 	// If provided, this will return events associated with the specified user email. Please note that the email address reflects the user's email at the time of the event, and may not be their current email.
 	UserEmail *string `json:"-" url:"user_email,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (a *AuditTrailListRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditTrailListRequest) SetCursor(cursor *string) {
+	a.Cursor = cursor
+	a.require(auditTrailListRequestFieldCursor)
+}
+
+// SetEndDate sets the EndDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditTrailListRequest) SetEndDate(endDate *string) {
+	a.EndDate = endDate
+	a.require(auditTrailListRequestFieldEndDate)
+}
+
+// SetEventType sets the EventType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditTrailListRequest) SetEventType(eventType *string) {
+	a.EventType = eventType
+	a.require(auditTrailListRequestFieldEventType)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditTrailListRequest) SetPageSize(pageSize *int) {
+	a.PageSize = pageSize
+	a.require(auditTrailListRequestFieldPageSize)
+}
+
+// SetStartDate sets the StartDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditTrailListRequest) SetStartDate(startDate *string) {
+	a.StartDate = startDate
+	a.require(auditTrailListRequestFieldStartDate)
+}
+
+// SetUserEmail sets the UserEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditTrailListRequest) SetUserEmail(userEmail *string) {
+	a.UserEmail = userEmail
+	a.require(auditTrailListRequestFieldUserEmail)
+}
+
+var (
+	auditLogEventFieldId               = big.NewInt(1 << 0)
+	auditLogEventFieldUserName         = big.NewInt(1 << 1)
+	auditLogEventFieldUserEmail        = big.NewInt(1 << 2)
+	auditLogEventFieldRole             = big.NewInt(1 << 3)
+	auditLogEventFieldIpAddress        = big.NewInt(1 << 4)
+	auditLogEventFieldEventType        = big.NewInt(1 << 5)
+	auditLogEventFieldEventDescription = big.NewInt(1 << 6)
+	auditLogEventFieldCreatedAt        = big.NewInt(1 << 7)
+)
 
 type AuditLogEvent struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
@@ -89,6 +162,9 @@ type AuditLogEvent struct {
 	EventDescription string                  `json:"event_description" url:"event_description"`
 	CreatedAt        *time.Time              `json:"created_at,omitempty" url:"created_at,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -153,6 +229,69 @@ func (a *AuditLogEvent) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AuditLogEvent) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetId(id *string) {
+	a.Id = id
+	a.require(auditLogEventFieldId)
+}
+
+// SetUserName sets the UserName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetUserName(userName *string) {
+	a.UserName = userName
+	a.require(auditLogEventFieldUserName)
+}
+
+// SetUserEmail sets the UserEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetUserEmail(userEmail *string) {
+	a.UserEmail = userEmail
+	a.require(auditLogEventFieldUserEmail)
+}
+
+// SetRole sets the Role field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetRole(role *AuditLogEventRole) {
+	a.Role = role
+	a.require(auditLogEventFieldRole)
+}
+
+// SetIpAddress sets the IpAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetIpAddress(ipAddress string) {
+	a.IpAddress = ipAddress
+	a.require(auditLogEventFieldIpAddress)
+}
+
+// SetEventType sets the EventType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetEventType(eventType *AuditLogEventEventType) {
+	a.EventType = eventType
+	a.require(auditLogEventFieldEventType)
+}
+
+// SetEventDescription sets the EventDescription field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetEventDescription(eventDescription string) {
+	a.EventDescription = eventDescription
+	a.require(auditLogEventFieldEventDescription)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AuditLogEvent) SetCreatedAt(createdAt *time.Time) {
+	a.CreatedAt = createdAt
+	a.require(auditLogEventFieldCreatedAt)
+}
+
 func (a *AuditLogEvent) UnmarshalJSON(data []byte) error {
 	type embed AuditLogEvent
 	var unmarshaler = struct {
@@ -184,7 +323,8 @@ func (a *AuditLogEvent) MarshalJSON() ([]byte, error) {
 		embed:     embed(*a),
 		CreatedAt: internal.NewOptionalDateTime(a.CreatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AuditLogEvent) String() string {
@@ -564,10 +704,19 @@ func (e EventTypeEnum) Ptr() *EventTypeEnum {
 	return &e
 }
 
+var (
+	paginatedAuditLogEventListFieldNext     = big.NewInt(1 << 0)
+	paginatedAuditLogEventListFieldPrevious = big.NewInt(1 << 1)
+	paginatedAuditLogEventListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedAuditLogEventList struct {
 	Next     *string          `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string          `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*AuditLogEvent `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -598,6 +747,34 @@ func (p *PaginatedAuditLogEventList) GetExtraProperties() map[string]interface{}
 	return p.extraProperties
 }
 
+func (p *PaginatedAuditLogEventList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAuditLogEventList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedAuditLogEventListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAuditLogEventList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedAuditLogEventListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedAuditLogEventList) SetResults(results []*AuditLogEvent) {
+	p.Results = results
+	p.require(paginatedAuditLogEventListFieldResults)
+}
+
 func (p *PaginatedAuditLogEventList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedAuditLogEventList
 	var value unmarshaler
@@ -612,6 +789,17 @@ func (p *PaginatedAuditLogEventList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedAuditLogEventList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedAuditLogEventList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedAuditLogEventList) String() string {
