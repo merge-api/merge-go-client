@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-go@v4
 
       - name: Start WireMock
-        run: docker-compose -f wiremock/docker-compose.test.yml up -d
+        run: docker compose -f wiremock/docker-compose.test.yml up -d
 
       - name: Wait for WireMock
         run: |
@@ -35,4 +35,4 @@ jobs:
 
       - name: Stop WireMock
         if: always()
-        run: docker-compose -f wiremock/docker-compose.test.yml down
+        run: docker compose -f wiremock/docker-compose.test.yml down
