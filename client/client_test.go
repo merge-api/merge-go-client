@@ -3,8 +3,8 @@
 package client
 
 import (
-	option "github.com/merge-api/merge-go-client/v2/option"
-	merge "github.com/merge-api/merge-go-client/v2"
+	option "github.com/merge-api/merge-go-client/option"
+	merge "github.com/merge-api/merge-go-client"
 	assert "github.com/stretchr/testify/assert"
 	http "net/http"
 	testing "testing"
