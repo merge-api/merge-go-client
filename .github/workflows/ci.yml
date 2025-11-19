@@ -23,5 +23,16 @@ jobs:
       - name: Set up go
         uses: actions/setup-go@v4
 
+      - name: Start WireMock
+        run: docker-compose -f wiremock/docker-compose.test.yml up -d
+
+      - name: Wait for WireMock
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:8080/__admin/health; do sleep 1; done'
+
       - name: Test
         run: go test ./...
+
+      - name: Stop WireMock
+        if: always()
+        run: docker-compose -f wiremock/docker-compose.test.yml down
