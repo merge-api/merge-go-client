@@ -33,6 +33,8 @@ func NewClient(opts ...option.RequestOption) *Client {
 	if baseURL == "" {
 		baseURL = "https://api.merge.dev/api"
 	}
+	// Update the options with the resolved base URL
+	options.BaseURL = baseURL
 	return &Client{
 		Ats:         client.NewClient(options),
 		Accounting:  accountingclient.NewClient(options),
