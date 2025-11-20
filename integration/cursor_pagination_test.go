@@ -16,8 +16,9 @@ func TestCursorPaginationWithFileStorageFolders(t *testing.T) {
 	apiKey := os.Getenv("MERGE_API_KEY_FILESTORAGE")
 	accountToken := os.Getenv("MERGE_ACCOUNT_TOKEN_FILESTORAGE")
 
-	require.NotEmpty(t, apiKey, "MERGE_API_KEY_FILESTORAGE environment variable must be set")
-	require.NotEmpty(t, accountToken, "MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variable must be set")
+	if apiKey == "" || accountToken == "" {
+		t.Fatal("MERGE_API_KEY_FILESTORAGE and MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variables must be set")
+	}
 
 	mergeClient := client.NewClient(
 		option.WithApiKey(apiKey),
@@ -37,8 +38,8 @@ func TestCursorPaginationWithFileStorageFolders(t *testing.T) {
 	assert.NotNil(t, response.Results, "Results list should not be null")
 
 	// Test cursor pagination metadata access
-	if response.Next != nil {
-		assert.NotEmpty(t, *response.Next, "Cursor token should not be empty when present")
+	if response.RawResponse.Next != nil {
+		assert.NotEmpty(t, *response.RawResponse.Next, "Cursor token should not be empty when present")
 	}
 
 	// Test that we have some data structure even if empty
@@ -49,8 +50,9 @@ func TestStatelessPaginationWithCursor(t *testing.T) {
 	apiKey := os.Getenv("MERGE_API_KEY_FILESTORAGE")
 	accountToken := os.Getenv("MERGE_ACCOUNT_TOKEN_FILESTORAGE")
 
-	require.NotEmpty(t, apiKey, "MERGE_API_KEY_FILESTORAGE environment variable must be set")
-	require.NotEmpty(t, accountToken, "MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variable must be set")
+	if apiKey == "" || accountToken == "" {
+		t.Fatal("MERGE_API_KEY_FILESTORAGE and MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variables must be set")
+	}
 
 	mergeClient := client.NewClient(
 		option.WithApiKey(apiKey),
@@ -67,8 +69,8 @@ func TestStatelessPaginationWithCursor(t *testing.T) {
 	require.NotNil(t, firstPageResponse, "First page response should not be null")
 
 	// If there's a next cursor, test stateless pagination by actually using it
-	if firstPageResponse.Next != nil && *firstPageResponse.Next != "" {
-		nextCursor := *firstPageResponse.Next
+	if firstPageResponse.RawResponse.Next != nil && *firstPageResponse.RawResponse.Next != "" {
+		nextCursor := *firstPageResponse.RawResponse.Next
 		assert.NotEmpty(t, nextCursor, "Next cursor should not be empty")
 
 		// Frontend sends cursor back to backend for next page
@@ -96,8 +98,9 @@ func TestPaginationMetadataAccess(t *testing.T) {
 	apiKey := os.Getenv("MERGE_API_KEY_FILESTORAGE")
 	accountToken := os.Getenv("MERGE_ACCOUNT_TOKEN_FILESTORAGE")
 
-	require.NotEmpty(t, apiKey, "MERGE_API_KEY_FILESTORAGE environment variable must be set")
-	require.NotEmpty(t, accountToken, "MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variable must be set")
+	if apiKey == "" || accountToken == "" {
+		t.Fatal("MERGE_API_KEY_FILESTORAGE and MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variables must be set")
+	}
 
 	mergeClient := client.NewClient(
 		option.WithApiKey(apiKey),
@@ -114,12 +117,8 @@ func TestPaginationMetadataAccess(t *testing.T) {
 
 	// Test access to pagination metadata
 	// These fields may be nil if no pagination is needed
-	if response.Next != nil {
-		assert.NotNil(t, response.Next, "Next cursor should not be null if present")
-	}
-
-	if response.Previous != nil {
-		assert.NotNil(t, response.Previous, "Previous cursor should not be null if present")
+	if response.RawResponse.Next != nil {
+		assert.NotNil(t, response.RawResponse.Next, "Next cursor should not be null if present")
 	}
 
 	// At minimum, results should be accessible
@@ -130,8 +129,9 @@ func TestIterationOverPaginatedResults(t *testing.T) {
 	apiKey := os.Getenv("MERGE_API_KEY_FILESTORAGE")
 	accountToken := os.Getenv("MERGE_ACCOUNT_TOKEN_FILESTORAGE")
 
-	require.NotEmpty(t, apiKey, "MERGE_API_KEY_FILESTORAGE environment variable must be set")
-	require.NotEmpty(t, accountToken, "MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variable must be set")
+	if apiKey == "" || accountToken == "" {
+		t.Fatal("MERGE_API_KEY_FILESTORAGE and MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variables must be set")
+	}
 
 	mergeClient := client.NewClient(
 		option.WithApiKey(apiKey),
@@ -166,8 +166,9 @@ func TestPaginationWithPageSize(t *testing.T) {
 	apiKey := os.Getenv("MERGE_API_KEY_FILESTORAGE")
 	accountToken := os.Getenv("MERGE_ACCOUNT_TOKEN_FILESTORAGE")
 
-	require.NotEmpty(t, apiKey, "MERGE_API_KEY_FILESTORAGE environment variable must be set")
-	require.NotEmpty(t, accountToken, "MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variable must be set")
+	if apiKey == "" || accountToken == "" {
+		t.Fatal("MERGE_API_KEY_FILESTORAGE and MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variables must be set")
+	}
 
 	mergeClient := client.NewClient(
 		option.WithApiKey(apiKey),
