@@ -41,6 +41,6 @@ func TestNewClient(t *testing.T) {
 			option.WithHTTPHeader(header),
 		)
 		assert.Equal(t, merge.Environments.Production, c.baseURL)
-		assert.Equal(t, "test", c.header.Get("X-API-Tenancy"))
+		assert.Equal(t, "test", c.options.HTTPHeader.Get("X-API-Tenancy"))
 	})
 }
