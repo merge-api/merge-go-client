@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	engagementEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	engagementEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	engagementEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type EngagementEndpointRequest struct {
@@ -15,7 +22,55 @@ type EngagementEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool              `json:"-" url:"run_async,omitempty"`
 	Model    *EngagementRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EngagementEndpointRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	e.IsDebugMode = isDebugMode
+	e.require(engagementEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementEndpointRequest) SetRunAsync(runAsync *bool) {
+	e.RunAsync = runAsync
+	e.require(engagementEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementEndpointRequest) SetModel(model *EngagementRequest) {
+	e.Model = model
+	e.require(engagementEndpointRequestFieldModel)
+}
+
+var (
+	engagementsListRequestFieldCreatedAfter        = big.NewInt(1 << 0)
+	engagementsListRequestFieldCreatedBefore       = big.NewInt(1 << 1)
+	engagementsListRequestFieldCursor              = big.NewInt(1 << 2)
+	engagementsListRequestFieldExpand              = big.NewInt(1 << 3)
+	engagementsListRequestFieldIncludeDeletedData  = big.NewInt(1 << 4)
+	engagementsListRequestFieldIncludeRemoteData   = big.NewInt(1 << 5)
+	engagementsListRequestFieldIncludeRemoteFields = big.NewInt(1 << 6)
+	engagementsListRequestFieldIncludeShellData    = big.NewInt(1 << 7)
+	engagementsListRequestFieldModifiedAfter       = big.NewInt(1 << 8)
+	engagementsListRequestFieldModifiedBefore      = big.NewInt(1 << 9)
+	engagementsListRequestFieldPageSize            = big.NewInt(1 << 10)
+	engagementsListRequestFieldRemoteId            = big.NewInt(1 << 11)
+	engagementsListRequestFieldStartedAfter        = big.NewInt(1 << 12)
+	engagementsListRequestFieldStartedBefore       = big.NewInt(1 << 13)
+)
 
 type EngagementsListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -46,7 +101,121 @@ type EngagementsListRequest struct {
 	StartedAfter *time.Time `json:"-" url:"started_after,omitempty"`
 	// If provided, will only return engagements started before this datetime.
 	StartedBefore *time.Time `json:"-" url:"started_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EngagementsListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(engagementsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(engagementsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(engagementsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetExpand(expand []*EngagementsListRequestExpandItem) {
+	e.Expand = expand
+	e.require(engagementsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(engagementsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(engagementsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	e.IncludeRemoteFields = includeRemoteFields
+	e.require(engagementsListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(engagementsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(engagementsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(engagementsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(engagementsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(engagementsListRequestFieldRemoteId)
+}
+
+// SetStartedAfter sets the StartedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetStartedAfter(startedAfter *time.Time) {
+	e.StartedAfter = startedAfter
+	e.require(engagementsListRequestFieldStartedAfter)
+}
+
+// SetStartedBefore sets the StartedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsListRequest) SetStartedBefore(startedBefore *time.Time) {
+	e.StartedBefore = startedBefore
+	e.require(engagementsListRequestFieldStartedBefore)
+}
+
+var (
+	patchedEngagementEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedEngagementEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedEngagementEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedEngagementEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -54,7 +223,49 @@ type PatchedEngagementEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                     `json:"-" url:"run_async,omitempty"`
 	Model    *PatchedEngagementRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedEngagementEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedEngagementEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedEngagementEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementEndpointRequest) SetModel(model *PatchedEngagementRequest) {
+	p.Model = model
+	p.require(patchedEngagementEndpointRequestFieldModel)
+}
+
+var (
+	engagementsRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	engagementsRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	engagementsRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	engagementsRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	engagementsRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	engagementsRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	engagementsRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	engagementsRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type EngagementsRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -73,7 +284,80 @@ type EngagementsRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EngagementsRemoteFieldClassesListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(engagementsRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(engagementsRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(engagementsRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	e.IncludeRemoteFields = includeRemoteFields
+	e.require(engagementsRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(engagementsRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	e.IsCommonModelField = isCommonModelField
+	e.require(engagementsRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	e.IsCustom = isCustom
+	e.require(engagementsRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(engagementsRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	engagementsRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	engagementsRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	engagementsRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	engagementsRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type EngagementsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -84,6 +368,44 @@ type EngagementsRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (e *EngagementsRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRetrieveRequest) SetExpand(expand []*EngagementsRetrieveRequestExpandItem) {
+	e.Expand = expand
+	e.require(engagementsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(engagementsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	e.IncludeRemoteFields = includeRemoteFields
+	e.require(engagementsRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(engagementsRetrieveRequestFieldIncludeShellData)
 }
 
 type EngagementsListRequestExpandItem string
@@ -171,6 +493,26 @@ func (d DirectionEnum) Ptr() *DirectionEnum {
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	engagementFieldId               = big.NewInt(1 << 0)
+	engagementFieldRemoteId         = big.NewInt(1 << 1)
+	engagementFieldCreatedAt        = big.NewInt(1 << 2)
+	engagementFieldModifiedAt       = big.NewInt(1 << 3)
+	engagementFieldOwner            = big.NewInt(1 << 4)
+	engagementFieldContent          = big.NewInt(1 << 5)
+	engagementFieldSubject          = big.NewInt(1 << 6)
+	engagementFieldDirection        = big.NewInt(1 << 7)
+	engagementFieldEngagementType   = big.NewInt(1 << 8)
+	engagementFieldStartTime        = big.NewInt(1 << 9)
+	engagementFieldEndTime          = big.NewInt(1 << 10)
+	engagementFieldAccount          = big.NewInt(1 << 11)
+	engagementFieldContacts         = big.NewInt(1 << 12)
+	engagementFieldRemoteWasDeleted = big.NewInt(1 << 13)
+	engagementFieldFieldMappings    = big.NewInt(1 << 14)
+	engagementFieldRemoteData       = big.NewInt(1 << 15)
+	engagementFieldRemoteFields     = big.NewInt(1 << 16)
+)
+
 type Engagement struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -204,6 +546,9 @@ type Engagement struct {
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -332,6 +677,132 @@ func (e *Engagement) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *Engagement) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetId(id *string) {
+	e.Id = id
+	e.require(engagementFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(engagementFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetCreatedAt(createdAt *time.Time) {
+	e.CreatedAt = createdAt
+	e.require(engagementFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetModifiedAt(modifiedAt *time.Time) {
+	e.ModifiedAt = modifiedAt
+	e.require(engagementFieldModifiedAt)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetOwner(owner *EngagementOwner) {
+	e.Owner = owner
+	e.require(engagementFieldOwner)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetContent(content *string) {
+	e.Content = content
+	e.require(engagementFieldContent)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetSubject(subject *string) {
+	e.Subject = subject
+	e.require(engagementFieldSubject)
+}
+
+// SetDirection sets the Direction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetDirection(direction *EngagementDirection) {
+	e.Direction = direction
+	e.require(engagementFieldDirection)
+}
+
+// SetEngagementType sets the EngagementType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetEngagementType(engagementType *EngagementEngagementType) {
+	e.EngagementType = engagementType
+	e.require(engagementFieldEngagementType)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetStartTime(startTime *time.Time) {
+	e.StartTime = startTime
+	e.require(engagementFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetEndTime(endTime *time.Time) {
+	e.EndTime = endTime
+	e.require(engagementFieldEndTime)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetAccount(account *EngagementAccount) {
+	e.Account = account
+	e.require(engagementFieldAccount)
+}
+
+// SetContacts sets the Contacts field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetContacts(contacts []*EngagementContactsItem) {
+	e.Contacts = contacts
+	e.require(engagementFieldContacts)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	e.RemoteWasDeleted = remoteWasDeleted
+	e.require(engagementFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetFieldMappings(fieldMappings map[string]interface{}) {
+	e.FieldMappings = fieldMappings
+	e.require(engagementFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetRemoteData(remoteData []*RemoteData) {
+	e.RemoteData = remoteData
+	e.require(engagementFieldRemoteData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Engagement) SetRemoteFields(remoteFields []*RemoteField) {
+	e.RemoteFields = remoteFields
+	e.require(engagementFieldRemoteFields)
+}
+
 func (e *Engagement) UnmarshalJSON(data []byte) error {
 	type embed Engagement
 	var unmarshaler = struct {
@@ -375,7 +846,8 @@ func (e *Engagement) MarshalJSON() ([]byte, error) {
 		StartTime:  internal.NewOptionalDateTime(e.StartTime),
 		EndTime:    internal.NewOptionalDateTime(e.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *Engagement) String() string {
@@ -712,6 +1184,21 @@ func (e *EngagementOwner) Accept(visitor EngagementOwnerVisitor) error {
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	engagementRequestFieldOwner               = big.NewInt(1 << 0)
+	engagementRequestFieldContent             = big.NewInt(1 << 1)
+	engagementRequestFieldSubject             = big.NewInt(1 << 2)
+	engagementRequestFieldDirection           = big.NewInt(1 << 3)
+	engagementRequestFieldEngagementType      = big.NewInt(1 << 4)
+	engagementRequestFieldStartTime           = big.NewInt(1 << 5)
+	engagementRequestFieldEndTime             = big.NewInt(1 << 6)
+	engagementRequestFieldAccount             = big.NewInt(1 << 7)
+	engagementRequestFieldContacts            = big.NewInt(1 << 8)
+	engagementRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	engagementRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+	engagementRequestFieldRemoteFields        = big.NewInt(1 << 11)
+)
+
 type EngagementRequest struct {
 	// The engagement's owner.
 	Owner *EngagementRequestOwner `json:"owner,omitempty" url:"owner,omitempty"`
@@ -736,6 +1223,9 @@ type EngagementRequest struct {
 	IntegrationParams   map[string]interface{}           `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}           `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest            `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -829,6 +1319,97 @@ func (e *EngagementRequest) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EngagementRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetOwner(owner *EngagementRequestOwner) {
+	e.Owner = owner
+	e.require(engagementRequestFieldOwner)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetContent(content *string) {
+	e.Content = content
+	e.require(engagementRequestFieldContent)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetSubject(subject *string) {
+	e.Subject = subject
+	e.require(engagementRequestFieldSubject)
+}
+
+// SetDirection sets the Direction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetDirection(direction *EngagementRequestDirection) {
+	e.Direction = direction
+	e.require(engagementRequestFieldDirection)
+}
+
+// SetEngagementType sets the EngagementType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetEngagementType(engagementType *EngagementRequestEngagementType) {
+	e.EngagementType = engagementType
+	e.require(engagementRequestFieldEngagementType)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetStartTime(startTime *time.Time) {
+	e.StartTime = startTime
+	e.require(engagementRequestFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetEndTime(endTime *time.Time) {
+	e.EndTime = endTime
+	e.require(engagementRequestFieldEndTime)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetAccount(account *EngagementRequestAccount) {
+	e.Account = account
+	e.require(engagementRequestFieldAccount)
+}
+
+// SetContacts sets the Contacts field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetContacts(contacts []*EngagementRequestContactsItem) {
+	e.Contacts = contacts
+	e.require(engagementRequestFieldContacts)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	e.IntegrationParams = integrationParams
+	e.require(engagementRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	e.LinkedAccountParams = linkedAccountParams
+	e.require(engagementRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	e.RemoteFields = remoteFields
+	e.require(engagementRequestFieldRemoteFields)
+}
+
 func (e *EngagementRequest) UnmarshalJSON(data []byte) error {
 	type embed EngagementRequest
 	var unmarshaler = struct {
@@ -864,7 +1445,8 @@ func (e *EngagementRequest) MarshalJSON() ([]byte, error) {
 		StartTime: internal.NewOptionalDateTime(e.StartTime),
 		EndTime:   internal.NewOptionalDateTime(e.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *EngagementRequest) String() string {
@@ -1196,11 +1778,21 @@ func (e *EngagementRequestOwner) Accept(visitor EngagementRequestOwnerVisitor) e
 	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
+var (
+	engagementResponseFieldModel    = big.NewInt(1 << 0)
+	engagementResponseFieldWarnings = big.NewInt(1 << 1)
+	engagementResponseFieldErrors   = big.NewInt(1 << 2)
+	engagementResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type EngagementResponse struct {
 	Model    *Engagement                 `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1238,6 +1830,41 @@ func (e *EngagementResponse) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EngagementResponse) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementResponse) SetModel(model *Engagement) {
+	e.Model = model
+	e.require(engagementResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	e.Warnings = warnings
+	e.require(engagementResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementResponse) SetErrors(errors []*ErrorValidationProblem) {
+	e.Errors = errors
+	e.require(engagementResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementResponse) SetLogs(logs []*DebugModeLog) {
+	e.Logs = logs
+	e.require(engagementResponseFieldLogs)
+}
+
 func (e *EngagementResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler EngagementResponse
 	var value unmarshaler
@@ -1254,6 +1881,17 @@ func (e *EngagementResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (e *EngagementResponse) MarshalJSON() ([]byte, error) {
+	type embed EngagementResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (e *EngagementResponse) String() string {
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
@@ -1266,10 +1904,19 @@ func (e *EngagementResponse) String() string {
 	return fmt.Sprintf("%#v", e)
 }
 
+var (
+	paginatedEngagementListFieldNext     = big.NewInt(1 << 0)
+	paginatedEngagementListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEngagementListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedEngagementList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Engagement `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1300,6 +1947,34 @@ func (p *PaginatedEngagementList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedEngagementList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEngagementList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEngagementListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEngagementList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEngagementListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEngagementList) SetResults(results []*Engagement) {
+	p.Results = results
+	p.require(paginatedEngagementListFieldResults)
+}
+
 func (p *PaginatedEngagementList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEngagementList
 	var value unmarshaler
@@ -1314,6 +1989,17 @@ func (p *PaginatedEngagementList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEngagementList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEngagementList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEngagementList) String() string {
@@ -1333,6 +2019,21 @@ func (p *PaginatedEngagementList) String() string {
 // The `Engagement` object is used to represent an interaction noted in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	patchedEngagementRequestFieldOwner               = big.NewInt(1 << 0)
+	patchedEngagementRequestFieldContent             = big.NewInt(1 << 1)
+	patchedEngagementRequestFieldSubject             = big.NewInt(1 << 2)
+	patchedEngagementRequestFieldDirection           = big.NewInt(1 << 3)
+	patchedEngagementRequestFieldEngagementType      = big.NewInt(1 << 4)
+	patchedEngagementRequestFieldStartTime           = big.NewInt(1 << 5)
+	patchedEngagementRequestFieldEndTime             = big.NewInt(1 << 6)
+	patchedEngagementRequestFieldAccount             = big.NewInt(1 << 7)
+	patchedEngagementRequestFieldContacts            = big.NewInt(1 << 8)
+	patchedEngagementRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	patchedEngagementRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+	patchedEngagementRequestFieldRemoteFields        = big.NewInt(1 << 11)
+)
+
 type PatchedEngagementRequest struct {
 	// The engagement's owner.
 	Owner *string `json:"owner,omitempty" url:"owner,omitempty"`
@@ -1357,6 +2058,9 @@ type PatchedEngagementRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1450,6 +2154,97 @@ func (p *PatchedEngagementRequest) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PatchedEngagementRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetOwner(owner *string) {
+	p.Owner = owner
+	p.require(patchedEngagementRequestFieldOwner)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetContent(content *string) {
+	p.Content = content
+	p.require(patchedEngagementRequestFieldContent)
+}
+
+// SetSubject sets the Subject field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetSubject(subject *string) {
+	p.Subject = subject
+	p.require(patchedEngagementRequestFieldSubject)
+}
+
+// SetDirection sets the Direction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetDirection(direction *PatchedEngagementRequestDirection) {
+	p.Direction = direction
+	p.require(patchedEngagementRequestFieldDirection)
+}
+
+// SetEngagementType sets the EngagementType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetEngagementType(engagementType *string) {
+	p.EngagementType = engagementType
+	p.require(patchedEngagementRequestFieldEngagementType)
+}
+
+// SetStartTime sets the StartTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetStartTime(startTime *time.Time) {
+	p.StartTime = startTime
+	p.require(patchedEngagementRequestFieldStartTime)
+}
+
+// SetEndTime sets the EndTime field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetEndTime(endTime *time.Time) {
+	p.EndTime = endTime
+	p.require(patchedEngagementRequestFieldEndTime)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(patchedEngagementRequestFieldAccount)
+}
+
+// SetContacts sets the Contacts field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetContacts(contacts []*string) {
+	p.Contacts = contacts
+	p.require(patchedEngagementRequestFieldContacts)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedEngagementRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedEngagementRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEngagementRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedEngagementRequestFieldRemoteFields)
+}
+
 func (p *PatchedEngagementRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedEngagementRequest
 	var unmarshaler = struct {
@@ -1485,7 +2280,8 @@ func (p *PatchedEngagementRequest) MarshalJSON() ([]byte, error) {
 		StartTime: internal.NewOptionalDateTime(p.StartTime),
 		EndTime:   internal.NewOptionalDateTime(p.EndTime),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedEngagementRequest) String() string {

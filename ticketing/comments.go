@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	commentEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	commentEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	commentEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type CommentEndpointRequest struct {
@@ -15,7 +22,54 @@ type CommentEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool           `json:"-" url:"run_async,omitempty"`
 	Model    *CommentRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CommentEndpointRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	c.IsDebugMode = isDebugMode
+	c.require(commentEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentEndpointRequest) SetRunAsync(runAsync *bool) {
+	c.RunAsync = runAsync
+	c.require(commentEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentEndpointRequest) SetModel(model *CommentRequest) {
+	c.Model = model
+	c.require(commentEndpointRequestFieldModel)
+}
+
+var (
+	commentsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	commentsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	commentsListRequestFieldCursor             = big.NewInt(1 << 2)
+	commentsListRequestFieldExpand             = big.NewInt(1 << 3)
+	commentsListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	commentsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	commentsListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	commentsListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	commentsListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	commentsListRequestFieldPageSize           = big.NewInt(1 << 9)
+	commentsListRequestFieldRemoteCreatedAfter = big.NewInt(1 << 10)
+	commentsListRequestFieldRemoteId           = big.NewInt(1 << 11)
+	commentsListRequestFieldTicketId           = big.NewInt(1 << 12)
+)
 
 type CommentsListRequest struct {
 	// If provided, will only return objects created after this datetime.
@@ -44,7 +98,114 @@ type CommentsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// If provided, will only return comments for this ticket.
 	TicketId *string `json:"-" url:"ticket_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CommentsListRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	c.CreatedAfter = createdAfter
+	c.require(commentsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	c.CreatedBefore = createdBefore
+	c.require(commentsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetCursor(cursor *string) {
+	c.Cursor = cursor
+	c.require(commentsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetExpand(expand []*CommentsListRequestExpandItem) {
+	c.Expand = expand
+	c.require(commentsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	c.IncludeDeletedData = includeDeletedData
+	c.require(commentsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(commentsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(commentsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	c.ModifiedAfter = modifiedAfter
+	c.require(commentsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	c.ModifiedBefore = modifiedBefore
+	c.require(commentsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetPageSize(pageSize *int) {
+	c.PageSize = pageSize
+	c.require(commentsListRequestFieldPageSize)
+}
+
+// SetRemoteCreatedAfter sets the RemoteCreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetRemoteCreatedAfter(remoteCreatedAfter *time.Time) {
+	c.RemoteCreatedAfter = remoteCreatedAfter
+	c.require(commentsListRequestFieldRemoteCreatedAfter)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(commentsListRequestFieldRemoteId)
+}
+
+// SetTicketId sets the TicketId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsListRequest) SetTicketId(ticketId *string) {
+	c.TicketId = ticketId
+	c.require(commentsListRequestFieldTicketId)
+}
+
+var (
+	commentsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	commentsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	commentsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type CommentsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -53,6 +214,37 @@ type CommentsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (c *CommentsRetrieveRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsRetrieveRequest) SetExpand(expand []*CommentsRetrieveRequestExpandItem) {
+	c.Expand = expand
+	c.require(commentsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	c.IncludeRemoteData = includeRemoteData
+	c.require(commentsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	c.IncludeShellData = includeShellData
+	c.require(commentsRetrieveRequestFieldIncludeShellData)
 }
 
 type CommentsListRequestExpandItem string
@@ -111,6 +303,23 @@ func (c CommentsRetrieveRequestExpandItem) Ptr() *CommentsRetrieveRequestExpandI
 //
 // ### Usage Example
 // TODO
+var (
+	commentFieldId               = big.NewInt(1 << 0)
+	commentFieldRemoteId         = big.NewInt(1 << 1)
+	commentFieldCreatedAt        = big.NewInt(1 << 2)
+	commentFieldModifiedAt       = big.NewInt(1 << 3)
+	commentFieldUser             = big.NewInt(1 << 4)
+	commentFieldContact          = big.NewInt(1 << 5)
+	commentFieldBody             = big.NewInt(1 << 6)
+	commentFieldHtmlBody         = big.NewInt(1 << 7)
+	commentFieldTicket           = big.NewInt(1 << 8)
+	commentFieldIsPrivate        = big.NewInt(1 << 9)
+	commentFieldRemoteCreatedAt  = big.NewInt(1 << 10)
+	commentFieldRemoteWasDeleted = big.NewInt(1 << 11)
+	commentFieldFieldMappings    = big.NewInt(1 << 12)
+	commentFieldRemoteData       = big.NewInt(1 << 13)
+)
+
 type Comment struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -137,6 +346,9 @@ type Comment struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -244,6 +456,111 @@ func (c *Comment) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *Comment) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetId(id *string) {
+	c.Id = id
+	c.require(commentFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(commentFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetCreatedAt(createdAt *time.Time) {
+	c.CreatedAt = createdAt
+	c.require(commentFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetModifiedAt(modifiedAt *time.Time) {
+	c.ModifiedAt = modifiedAt
+	c.require(commentFieldModifiedAt)
+}
+
+// SetUser sets the User field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetUser(user *CommentUser) {
+	c.User = user
+	c.require(commentFieldUser)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetContact(contact *CommentContact) {
+	c.Contact = contact
+	c.require(commentFieldContact)
+}
+
+// SetBody sets the Body field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetBody(body *string) {
+	c.Body = body
+	c.require(commentFieldBody)
+}
+
+// SetHtmlBody sets the HtmlBody field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetHtmlBody(htmlBody *string) {
+	c.HtmlBody = htmlBody
+	c.require(commentFieldHtmlBody)
+}
+
+// SetTicket sets the Ticket field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetTicket(ticket *CommentTicket) {
+	c.Ticket = ticket
+	c.require(commentFieldTicket)
+}
+
+// SetIsPrivate sets the IsPrivate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetIsPrivate(isPrivate *bool) {
+	c.IsPrivate = isPrivate
+	c.require(commentFieldIsPrivate)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	c.RemoteCreatedAt = remoteCreatedAt
+	c.require(commentFieldRemoteCreatedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	c.RemoteWasDeleted = remoteWasDeleted
+	c.require(commentFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetFieldMappings(fieldMappings map[string]interface{}) {
+	c.FieldMappings = fieldMappings
+	c.require(commentFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Comment) SetRemoteData(remoteData []*RemoteData) {
+	c.RemoteData = remoteData
+	c.require(commentFieldRemoteData)
+}
+
 func (c *Comment) UnmarshalJSON(data []byte) error {
 	type embed Comment
 	var unmarshaler = struct {
@@ -283,7 +600,8 @@ func (c *Comment) MarshalJSON() ([]byte, error) {
 		ModifiedAt:      internal.NewOptionalDateTime(c.ModifiedAt),
 		RemoteCreatedAt: internal.NewOptionalDateTime(c.RemoteCreatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *Comment) String() string {
@@ -367,6 +685,17 @@ func (c *CommentContact) Accept(visitor CommentContactVisitor) error {
 //
 // ### Usage Example
 // TODO
+var (
+	commentRequestFieldUser                = big.NewInt(1 << 0)
+	commentRequestFieldContact             = big.NewInt(1 << 1)
+	commentRequestFieldBody                = big.NewInt(1 << 2)
+	commentRequestFieldHtmlBody            = big.NewInt(1 << 3)
+	commentRequestFieldTicket              = big.NewInt(1 << 4)
+	commentRequestFieldIsPrivate           = big.NewInt(1 << 5)
+	commentRequestFieldIntegrationParams   = big.NewInt(1 << 6)
+	commentRequestFieldLinkedAccountParams = big.NewInt(1 << 7)
+)
+
 type CommentRequest struct {
 	// The author of the Comment, if the author is a User. If the third party does not support specifying an author, we will append "[Posted on behalf of {name}]" to the comment.
 	User *CommentRequestUser `json:"user,omitempty" url:"user,omitempty"`
@@ -382,6 +711,9 @@ type CommentRequest struct {
 	IsPrivate           *bool                  `json:"is_private,omitempty" url:"is_private,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -447,6 +779,69 @@ func (c *CommentRequest) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CommentRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetUser sets the User field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetUser(user *CommentRequestUser) {
+	c.User = user
+	c.require(commentRequestFieldUser)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetContact(contact *CommentRequestContact) {
+	c.Contact = contact
+	c.require(commentRequestFieldContact)
+}
+
+// SetBody sets the Body field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetBody(body *string) {
+	c.Body = body
+	c.require(commentRequestFieldBody)
+}
+
+// SetHtmlBody sets the HtmlBody field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetHtmlBody(htmlBody *string) {
+	c.HtmlBody = htmlBody
+	c.require(commentRequestFieldHtmlBody)
+}
+
+// SetTicket sets the Ticket field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetTicket(ticket *CommentRequestTicket) {
+	c.Ticket = ticket
+	c.require(commentRequestFieldTicket)
+}
+
+// SetIsPrivate sets the IsPrivate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetIsPrivate(isPrivate *bool) {
+	c.IsPrivate = isPrivate
+	c.require(commentRequestFieldIsPrivate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(commentRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(commentRequestFieldLinkedAccountParams)
+}
+
 func (c *CommentRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler CommentRequest
 	var value unmarshaler
@@ -461,6 +856,17 @@ func (c *CommentRequest) UnmarshalJSON(data []byte) error {
 	c.extraProperties = extraProperties
 	c.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (c *CommentRequest) MarshalJSON() ([]byte, error) {
+	type embed CommentRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CommentRequest) String() string {
@@ -664,11 +1070,21 @@ func (c *CommentRequestUser) Accept(visitor CommentRequestUserVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+var (
+	commentResponseFieldModel    = big.NewInt(1 << 0)
+	commentResponseFieldWarnings = big.NewInt(1 << 1)
+	commentResponseFieldErrors   = big.NewInt(1 << 2)
+	commentResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type CommentResponse struct {
 	Model    *Comment                    `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -706,6 +1122,41 @@ func (c *CommentResponse) GetExtraProperties() map[string]interface{} {
 	return c.extraProperties
 }
 
+func (c *CommentResponse) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentResponse) SetModel(model *Comment) {
+	c.Model = model
+	c.require(commentResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	c.Warnings = warnings
+	c.require(commentResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentResponse) SetErrors(errors []*ErrorValidationProblem) {
+	c.Errors = errors
+	c.require(commentResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CommentResponse) SetLogs(logs []*DebugModeLog) {
+	c.Logs = logs
+	c.require(commentResponseFieldLogs)
+}
+
 func (c *CommentResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler CommentResponse
 	var value unmarshaler
@@ -720,6 +1171,17 @@ func (c *CommentResponse) UnmarshalJSON(data []byte) error {
 	c.extraProperties = extraProperties
 	c.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (c *CommentResponse) MarshalJSON() ([]byte, error) {
+	type embed CommentResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (c *CommentResponse) String() string {
@@ -860,10 +1322,19 @@ func (c *CommentUser) Accept(visitor CommentUserVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+var (
+	paginatedCommentListFieldNext     = big.NewInt(1 << 0)
+	paginatedCommentListFieldPrevious = big.NewInt(1 << 1)
+	paginatedCommentListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedCommentList struct {
 	Next     *string    `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string    `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Comment `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -894,6 +1365,34 @@ func (p *PaginatedCommentList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedCommentList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCommentList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedCommentListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCommentList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedCommentListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedCommentList) SetResults(results []*Comment) {
+	p.Results = results
+	p.require(paginatedCommentListFieldResults)
+}
+
 func (p *PaginatedCommentList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedCommentList
 	var value unmarshaler
@@ -908,6 +1407,17 @@ func (p *PaginatedCommentList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedCommentList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedCommentList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedCommentList) String() string {

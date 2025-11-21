@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	noteEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	noteEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	noteEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type NoteEndpointRequest struct {
@@ -15,7 +22,57 @@ type NoteEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool        `json:"-" url:"run_async,omitempty"`
 	Model    *NoteRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (n *NoteEndpointRequest) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	n.IsDebugMode = isDebugMode
+	n.require(noteEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteEndpointRequest) SetRunAsync(runAsync *bool) {
+	n.RunAsync = runAsync
+	n.require(noteEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteEndpointRequest) SetModel(model *NoteRequest) {
+	n.Model = model
+	n.require(noteEndpointRequestFieldModel)
+}
+
+var (
+	notesListRequestFieldAccountId           = big.NewInt(1 << 0)
+	notesListRequestFieldContactId           = big.NewInt(1 << 1)
+	notesListRequestFieldCreatedAfter        = big.NewInt(1 << 2)
+	notesListRequestFieldCreatedBefore       = big.NewInt(1 << 3)
+	notesListRequestFieldCursor              = big.NewInt(1 << 4)
+	notesListRequestFieldExpand              = big.NewInt(1 << 5)
+	notesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 6)
+	notesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 7)
+	notesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 8)
+	notesListRequestFieldIncludeShellData    = big.NewInt(1 << 9)
+	notesListRequestFieldModifiedAfter       = big.NewInt(1 << 10)
+	notesListRequestFieldModifiedBefore      = big.NewInt(1 << 11)
+	notesListRequestFieldOpportunityId       = big.NewInt(1 << 12)
+	notesListRequestFieldOwnerId             = big.NewInt(1 << 13)
+	notesListRequestFieldPageSize            = big.NewInt(1 << 14)
+	notesListRequestFieldRemoteId            = big.NewInt(1 << 15)
+)
 
 type NotesListRequest struct {
 	// If provided, will only return notes with this account.
@@ -50,7 +107,140 @@ type NotesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (n *NotesListRequest) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetAccountId sets the AccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetAccountId(accountId *string) {
+	n.AccountId = accountId
+	n.require(notesListRequestFieldAccountId)
+}
+
+// SetContactId sets the ContactId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetContactId(contactId *string) {
+	n.ContactId = contactId
+	n.require(notesListRequestFieldContactId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	n.CreatedAfter = createdAfter
+	n.require(notesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	n.CreatedBefore = createdBefore
+	n.require(notesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetCursor(cursor *string) {
+	n.Cursor = cursor
+	n.require(notesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetExpand(expand []*NotesListRequestExpandItem) {
+	n.Expand = expand
+	n.require(notesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	n.IncludeDeletedData = includeDeletedData
+	n.require(notesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	n.IncludeRemoteData = includeRemoteData
+	n.require(notesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	n.IncludeRemoteFields = includeRemoteFields
+	n.require(notesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetIncludeShellData(includeShellData *bool) {
+	n.IncludeShellData = includeShellData
+	n.require(notesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	n.ModifiedAfter = modifiedAfter
+	n.require(notesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	n.ModifiedBefore = modifiedBefore
+	n.require(notesListRequestFieldModifiedBefore)
+}
+
+// SetOpportunityId sets the OpportunityId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetOpportunityId(opportunityId *string) {
+	n.OpportunityId = opportunityId
+	n.require(notesListRequestFieldOpportunityId)
+}
+
+// SetOwnerId sets the OwnerId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetOwnerId(ownerId *string) {
+	n.OwnerId = ownerId
+	n.require(notesListRequestFieldOwnerId)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetPageSize(pageSize *int) {
+	n.PageSize = pageSize
+	n.require(notesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesListRequest) SetRemoteId(remoteId *string) {
+	n.RemoteId = remoteId
+	n.require(notesListRequestFieldRemoteId)
+}
+
+var (
+	notesRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	notesRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	notesRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	notesRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	notesRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	notesRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	notesRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	notesRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type NotesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -69,7 +259,80 @@ type NotesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (n *NotesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	n.Cursor = cursor
+	n.require(notesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	n.IncludeDeletedData = includeDeletedData
+	n.require(notesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	n.IncludeRemoteData = includeRemoteData
+	n.require(notesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	n.IncludeRemoteFields = includeRemoteFields
+	n.require(notesRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	n.IncludeShellData = includeShellData
+	n.require(notesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	n.IsCommonModelField = isCommonModelField
+	n.require(notesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	n.IsCustom = isCustom
+	n.require(notesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	n.PageSize = pageSize
+	n.require(notesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	notesRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	notesRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	notesRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	notesRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+)
 
 type NotesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -80,6 +343,44 @@ type NotesRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (n *NotesRetrieveRequest) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRetrieveRequest) SetExpand(expand []*NotesRetrieveRequestExpandItem) {
+	n.Expand = expand
+	n.require(notesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	n.IncludeRemoteData = includeRemoteData
+	n.require(notesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	n.IncludeRemoteFields = includeRemoteFields
+	n.require(notesRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NotesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	n.IncludeShellData = includeShellData
+	n.require(notesRetrieveRequestFieldIncludeShellData)
 }
 
 type NotesListRequestExpandItem string
@@ -143,6 +444,24 @@ func (n NotesRetrieveRequestExpandItem) Ptr() *NotesRetrieveRequestExpandItem {
 // The `Note` object is used to represent a note on another object.
 // ### Usage Example
 // TODO
+var (
+	noteFieldId               = big.NewInt(1 << 0)
+	noteFieldRemoteId         = big.NewInt(1 << 1)
+	noteFieldCreatedAt        = big.NewInt(1 << 2)
+	noteFieldModifiedAt       = big.NewInt(1 << 3)
+	noteFieldOwner            = big.NewInt(1 << 4)
+	noteFieldContent          = big.NewInt(1 << 5)
+	noteFieldContact          = big.NewInt(1 << 6)
+	noteFieldAccount          = big.NewInt(1 << 7)
+	noteFieldOpportunity      = big.NewInt(1 << 8)
+	noteFieldRemoteUpdatedAt  = big.NewInt(1 << 9)
+	noteFieldRemoteCreatedAt  = big.NewInt(1 << 10)
+	noteFieldRemoteWasDeleted = big.NewInt(1 << 11)
+	noteFieldFieldMappings    = big.NewInt(1 << 12)
+	noteFieldRemoteData       = big.NewInt(1 << 13)
+	noteFieldRemoteFields     = big.NewInt(1 << 14)
+)
+
 type Note struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -170,6 +489,9 @@ type Note struct {
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -284,6 +606,118 @@ func (n *Note) GetExtraProperties() map[string]interface{} {
 	return n.extraProperties
 }
 
+func (n *Note) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetId(id *string) {
+	n.Id = id
+	n.require(noteFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetRemoteId(remoteId *string) {
+	n.RemoteId = remoteId
+	n.require(noteFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetCreatedAt(createdAt *time.Time) {
+	n.CreatedAt = createdAt
+	n.require(noteFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetModifiedAt(modifiedAt *time.Time) {
+	n.ModifiedAt = modifiedAt
+	n.require(noteFieldModifiedAt)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetOwner(owner *NoteOwner) {
+	n.Owner = owner
+	n.require(noteFieldOwner)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetContent(content *string) {
+	n.Content = content
+	n.require(noteFieldContent)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetContact(contact *NoteContact) {
+	n.Contact = contact
+	n.require(noteFieldContact)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetAccount(account *NoteAccount) {
+	n.Account = account
+	n.require(noteFieldAccount)
+}
+
+// SetOpportunity sets the Opportunity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetOpportunity(opportunity *NoteOpportunity) {
+	n.Opportunity = opportunity
+	n.require(noteFieldOpportunity)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	n.RemoteUpdatedAt = remoteUpdatedAt
+	n.require(noteFieldRemoteUpdatedAt)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	n.RemoteCreatedAt = remoteCreatedAt
+	n.require(noteFieldRemoteCreatedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	n.RemoteWasDeleted = remoteWasDeleted
+	n.require(noteFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetFieldMappings(fieldMappings map[string]interface{}) {
+	n.FieldMappings = fieldMappings
+	n.require(noteFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetRemoteData(remoteData []*RemoteData) {
+	n.RemoteData = remoteData
+	n.require(noteFieldRemoteData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *Note) SetRemoteFields(remoteFields []*RemoteField) {
+	n.RemoteFields = remoteFields
+	n.require(noteFieldRemoteFields)
+}
+
 func (n *Note) UnmarshalJSON(data []byte) error {
 	type embed Note
 	var unmarshaler = struct {
@@ -327,7 +761,8 @@ func (n *Note) MarshalJSON() ([]byte, error) {
 		RemoteUpdatedAt: internal.NewOptionalDateTime(n.RemoteUpdatedAt),
 		RemoteCreatedAt: internal.NewOptionalDateTime(n.RemoteCreatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, n.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (n *Note) String() string {
@@ -599,6 +1034,17 @@ func (n *NoteOwner) Accept(visitor NoteOwnerVisitor) error {
 // The `Note` object is used to represent a note on another object.
 // ### Usage Example
 // TODO
+var (
+	noteRequestFieldOwner               = big.NewInt(1 << 0)
+	noteRequestFieldContent             = big.NewInt(1 << 1)
+	noteRequestFieldContact             = big.NewInt(1 << 2)
+	noteRequestFieldAccount             = big.NewInt(1 << 3)
+	noteRequestFieldOpportunity         = big.NewInt(1 << 4)
+	noteRequestFieldIntegrationParams   = big.NewInt(1 << 5)
+	noteRequestFieldLinkedAccountParams = big.NewInt(1 << 6)
+	noteRequestFieldRemoteFields        = big.NewInt(1 << 7)
+)
+
 type NoteRequest struct {
 	// The note's owner.
 	Owner *NoteRequestOwner `json:"owner,omitempty" url:"owner,omitempty"`
@@ -613,6 +1059,9 @@ type NoteRequest struct {
 	IntegrationParams   map[string]interface{}  `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}  `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest   `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -678,6 +1127,69 @@ func (n *NoteRequest) GetExtraProperties() map[string]interface{} {
 	return n.extraProperties
 }
 
+func (n *NoteRequest) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetOwner(owner *NoteRequestOwner) {
+	n.Owner = owner
+	n.require(noteRequestFieldOwner)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetContent(content *string) {
+	n.Content = content
+	n.require(noteRequestFieldContent)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetContact(contact *NoteRequestContact) {
+	n.Contact = contact
+	n.require(noteRequestFieldContact)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetAccount(account *NoteRequestAccount) {
+	n.Account = account
+	n.require(noteRequestFieldAccount)
+}
+
+// SetOpportunity sets the Opportunity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetOpportunity(opportunity *NoteRequestOpportunity) {
+	n.Opportunity = opportunity
+	n.require(noteRequestFieldOpportunity)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	n.IntegrationParams = integrationParams
+	n.require(noteRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	n.LinkedAccountParams = linkedAccountParams
+	n.require(noteRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	n.RemoteFields = remoteFields
+	n.require(noteRequestFieldRemoteFields)
+}
+
 func (n *NoteRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler NoteRequest
 	var value unmarshaler
@@ -692,6 +1204,17 @@ func (n *NoteRequest) UnmarshalJSON(data []byte) error {
 	n.extraProperties = extraProperties
 	n.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (n *NoteRequest) MarshalJSON() ([]byte, error) {
+	type embed NoteRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*n),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, n.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (n *NoteRequest) String() string {
@@ -958,11 +1481,21 @@ func (n *NoteRequestOwner) Accept(visitor NoteRequestOwnerVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", n)
 }
 
+var (
+	noteResponseFieldModel    = big.NewInt(1 << 0)
+	noteResponseFieldWarnings = big.NewInt(1 << 1)
+	noteResponseFieldErrors   = big.NewInt(1 << 2)
+	noteResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type NoteResponse struct {
 	Model    *Note                       `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1000,6 +1533,41 @@ func (n *NoteResponse) GetExtraProperties() map[string]interface{} {
 	return n.extraProperties
 }
 
+func (n *NoteResponse) require(field *big.Int) {
+	if n.explicitFields == nil {
+		n.explicitFields = big.NewInt(0)
+	}
+	n.explicitFields.Or(n.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteResponse) SetModel(model *Note) {
+	n.Model = model
+	n.require(noteResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	n.Warnings = warnings
+	n.require(noteResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteResponse) SetErrors(errors []*ErrorValidationProblem) {
+	n.Errors = errors
+	n.require(noteResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (n *NoteResponse) SetLogs(logs []*DebugModeLog) {
+	n.Logs = logs
+	n.require(noteResponseFieldLogs)
+}
+
 func (n *NoteResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler NoteResponse
 	var value unmarshaler
@@ -1016,6 +1584,17 @@ func (n *NoteResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (n *NoteResponse) MarshalJSON() ([]byte, error) {
+	type embed NoteResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*n),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, n.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (n *NoteResponse) String() string {
 	if len(n.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(n.rawJSON); err == nil {
@@ -1028,10 +1607,19 @@ func (n *NoteResponse) String() string {
 	return fmt.Sprintf("%#v", n)
 }
 
+var (
+	paginatedNoteListFieldNext     = big.NewInt(1 << 0)
+	paginatedNoteListFieldPrevious = big.NewInt(1 << 1)
+	paginatedNoteListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedNoteList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Note `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1062,6 +1650,34 @@ func (p *PaginatedNoteList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedNoteList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedNoteList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedNoteListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedNoteList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedNoteListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedNoteList) SetResults(results []*Note) {
+	p.Results = results
+	p.require(paginatedNoteListFieldResults)
+}
+
 func (p *PaginatedNoteList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedNoteList
 	var value unmarshaler
@@ -1076,6 +1692,17 @@ func (p *PaginatedNoteList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedNoteList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedNoteList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedNoteList) String() string {

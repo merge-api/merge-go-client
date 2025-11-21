@@ -6,7 +6,25 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	transactionsListRequestFieldCompanyId             = big.NewInt(1 << 0)
+	transactionsListRequestFieldCreatedAfter          = big.NewInt(1 << 1)
+	transactionsListRequestFieldCreatedBefore         = big.NewInt(1 << 2)
+	transactionsListRequestFieldCursor                = big.NewInt(1 << 3)
+	transactionsListRequestFieldExpand                = big.NewInt(1 << 4)
+	transactionsListRequestFieldIncludeDeletedData    = big.NewInt(1 << 5)
+	transactionsListRequestFieldIncludeRemoteData     = big.NewInt(1 << 6)
+	transactionsListRequestFieldIncludeShellData      = big.NewInt(1 << 7)
+	transactionsListRequestFieldModifiedAfter         = big.NewInt(1 << 8)
+	transactionsListRequestFieldModifiedBefore        = big.NewInt(1 << 9)
+	transactionsListRequestFieldPageSize              = big.NewInt(1 << 10)
+	transactionsListRequestFieldRemoteId              = big.NewInt(1 << 11)
+	transactionsListRequestFieldTransactionDateAfter  = big.NewInt(1 << 12)
+	transactionsListRequestFieldTransactionDateBefore = big.NewInt(1 << 13)
 )
 
 type TransactionsListRequest struct {
@@ -38,7 +56,121 @@ type TransactionsListRequest struct {
 	TransactionDateAfter *time.Time `json:"-" url:"transaction_date_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
 	TransactionDateBefore *time.Time `json:"-" url:"transaction_date_before,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TransactionsListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetCompanyId(companyId *string) {
+	t.CompanyId = companyId
+	t.require(transactionsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(transactionsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(transactionsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(transactionsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetExpand(expand []*TransactionsListRequestExpandItem) {
+	t.Expand = expand
+	t.require(transactionsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(transactionsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(transactionsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(transactionsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(transactionsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(transactionsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(transactionsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(transactionsListRequestFieldRemoteId)
+}
+
+// SetTransactionDateAfter sets the TransactionDateAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetTransactionDateAfter(transactionDateAfter *time.Time) {
+	t.TransactionDateAfter = transactionDateAfter
+	t.require(transactionsListRequestFieldTransactionDateAfter)
+}
+
+// SetTransactionDateBefore sets the TransactionDateBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsListRequest) SetTransactionDateBefore(transactionDateBefore *time.Time) {
+	t.TransactionDateBefore = transactionDateBefore
+	t.require(transactionsListRequestFieldTransactionDateBefore)
+}
+
+var (
+	transactionsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	transactionsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	transactionsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type TransactionsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -47,6 +179,37 @@ type TransactionsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TransactionsRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsRetrieveRequest) SetExpand(expand []*TransactionsRetrieveRequestExpandItem) {
+	t.Expand = expand
+	t.require(transactionsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(transactionsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(transactionsRetrieveRequestFieldIncludeShellData)
 }
 
 type TransactionsListRequestExpandItem string
@@ -111,10 +274,19 @@ func (t TransactionsRetrieveRequestExpandItem) Ptr() *TransactionsRetrieveReques
 	return &t
 }
 
+var (
+	paginatedTransactionListFieldNext     = big.NewInt(1 << 0)
+	paginatedTransactionListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTransactionListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedTransactionList struct {
 	Next     *string        `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string        `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Transaction `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -145,6 +317,34 @@ func (p *PaginatedTransactionList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedTransactionList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTransactionList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTransactionListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTransactionList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTransactionListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTransactionList) SetResults(results []*Transaction) {
+	p.Results = results
+	p.require(paginatedTransactionListFieldResults)
+}
+
 func (p *PaginatedTransactionList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTransactionList
 	var value unmarshaler
@@ -159,6 +359,17 @@ func (p *PaginatedTransactionList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTransactionList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTransactionList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTransactionList) String() string {
@@ -186,6 +397,29 @@ func (p *PaginatedTransactionList) String() string {
 //
 // ### Usage Example
 // Fetch from the `GET Transaction` endpoint and view a company's transactions.
+var (
+	transactionFieldId                 = big.NewInt(1 << 0)
+	transactionFieldRemoteId           = big.NewInt(1 << 1)
+	transactionFieldCreatedAt          = big.NewInt(1 << 2)
+	transactionFieldModifiedAt         = big.NewInt(1 << 3)
+	transactionFieldTransactionType    = big.NewInt(1 << 4)
+	transactionFieldNumber             = big.NewInt(1 << 5)
+	transactionFieldTransactionDate    = big.NewInt(1 << 6)
+	transactionFieldAccount            = big.NewInt(1 << 7)
+	transactionFieldContact            = big.NewInt(1 << 8)
+	transactionFieldInclusiveOfTax     = big.NewInt(1 << 9)
+	transactionFieldTotalAmount        = big.NewInt(1 << 10)
+	transactionFieldCurrency           = big.NewInt(1 << 11)
+	transactionFieldExchangeRate       = big.NewInt(1 << 12)
+	transactionFieldCompany            = big.NewInt(1 << 13)
+	transactionFieldTrackingCategories = big.NewInt(1 << 14)
+	transactionFieldLineItems          = big.NewInt(1 << 15)
+	transactionFieldRemoteWasDeleted   = big.NewInt(1 << 16)
+	transactionFieldAccountingPeriod   = big.NewInt(1 << 17)
+	transactionFieldFieldMappings      = big.NewInt(1 << 18)
+	transactionFieldRemoteData         = big.NewInt(1 << 19)
+)
+
 type Transaction struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -530,6 +764,9 @@ type Transaction struct {
 	FieldMappings    map[string]interface{}       `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData                `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -678,6 +915,153 @@ func (t *Transaction) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *Transaction) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetId(id *string) {
+	t.Id = id
+	t.require(transactionFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(transactionFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(transactionFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(transactionFieldModifiedAt)
+}
+
+// SetTransactionType sets the TransactionType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetTransactionType(transactionType *string) {
+	t.TransactionType = transactionType
+	t.require(transactionFieldTransactionType)
+}
+
+// SetNumber sets the Number field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetNumber(number *string) {
+	t.Number = number
+	t.require(transactionFieldNumber)
+}
+
+// SetTransactionDate sets the TransactionDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetTransactionDate(transactionDate *time.Time) {
+	t.TransactionDate = transactionDate
+	t.require(transactionFieldTransactionDate)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetAccount(account *TransactionAccount) {
+	t.Account = account
+	t.require(transactionFieldAccount)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetContact(contact *TransactionContact) {
+	t.Contact = contact
+	t.require(transactionFieldContact)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	t.InclusiveOfTax = inclusiveOfTax
+	t.require(transactionFieldInclusiveOfTax)
+}
+
+// SetTotalAmount sets the TotalAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetTotalAmount(totalAmount *string) {
+	t.TotalAmount = totalAmount
+	t.require(transactionFieldTotalAmount)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetCurrency(currency *TransactionCurrency) {
+	t.Currency = currency
+	t.require(transactionFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetExchangeRate(exchangeRate *string) {
+	t.ExchangeRate = exchangeRate
+	t.require(transactionFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetCompany(company *string) {
+	t.Company = company
+	t.require(transactionFieldCompany)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetTrackingCategories(trackingCategories []*TransactionTrackingCategoriesItem) {
+	t.TrackingCategories = trackingCategories
+	t.require(transactionFieldTrackingCategories)
+}
+
+// SetLineItems sets the LineItems field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetLineItems(lineItems []*TransactionLineItem) {
+	t.LineItems = lineItems
+	t.require(transactionFieldLineItems)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(transactionFieldRemoteWasDeleted)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetAccountingPeriod(accountingPeriod *TransactionAccountingPeriod) {
+	t.AccountingPeriod = accountingPeriod
+	t.require(transactionFieldAccountingPeriod)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(transactionFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(transactionFieldRemoteData)
+}
+
 func (t *Transaction) UnmarshalJSON(data []byte) error {
 	type embed Transaction
 	var unmarshaler = struct {
@@ -717,7 +1101,8 @@ func (t *Transaction) MarshalJSON() ([]byte, error) {
 		ModifiedAt:      internal.NewOptionalDateTime(t.ModifiedAt),
 		TransactionDate: internal.NewOptionalDateTime(t.TransactionDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *Transaction) String() string {
@@ -1297,6 +1682,26 @@ func (t *TransactionCurrency) Accept(visitor TransactionCurrencyVisitor) error {
 //
 // ### Usage Example
 // Fetch from the `GET TransactionLineItem` endpoint and view the transaction's line items.
+var (
+	transactionLineItemFieldId                 = big.NewInt(1 << 0)
+	transactionLineItemFieldRemoteId           = big.NewInt(1 << 1)
+	transactionLineItemFieldCreatedAt          = big.NewInt(1 << 2)
+	transactionLineItemFieldModifiedAt         = big.NewInt(1 << 3)
+	transactionLineItemFieldMemo               = big.NewInt(1 << 4)
+	transactionLineItemFieldUnitPrice          = big.NewInt(1 << 5)
+	transactionLineItemFieldQuantity           = big.NewInt(1 << 6)
+	transactionLineItemFieldItem               = big.NewInt(1 << 7)
+	transactionLineItemFieldAccount            = big.NewInt(1 << 8)
+	transactionLineItemFieldTrackingCategory   = big.NewInt(1 << 9)
+	transactionLineItemFieldTrackingCategories = big.NewInt(1 << 10)
+	transactionLineItemFieldTotalLineAmount    = big.NewInt(1 << 11)
+	transactionLineItemFieldTaxRate            = big.NewInt(1 << 12)
+	transactionLineItemFieldCurrency           = big.NewInt(1 << 13)
+	transactionLineItemFieldExchangeRate       = big.NewInt(1 << 14)
+	transactionLineItemFieldCompany            = big.NewInt(1 << 15)
+	transactionLineItemFieldRemoteWasDeleted   = big.NewInt(1 << 16)
+)
+
 type TransactionLineItem struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -1638,6 +2043,9 @@ type TransactionLineItem struct {
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
@@ -1765,6 +2173,132 @@ func (t *TransactionLineItem) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *TransactionLineItem) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetId(id *string) {
+	t.Id = id
+	t.require(transactionLineItemFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(transactionLineItemFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(transactionLineItemFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(transactionLineItemFieldModifiedAt)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetMemo(memo *string) {
+	t.Memo = memo
+	t.require(transactionLineItemFieldMemo)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetUnitPrice(unitPrice *string) {
+	t.UnitPrice = unitPrice
+	t.require(transactionLineItemFieldUnitPrice)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetQuantity(quantity *string) {
+	t.Quantity = quantity
+	t.require(transactionLineItemFieldQuantity)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetItem(item *TransactionLineItemItem) {
+	t.Item = item
+	t.require(transactionLineItemFieldItem)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetAccount(account *string) {
+	t.Account = account
+	t.require(transactionLineItemFieldAccount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetTrackingCategory(trackingCategory *string) {
+	t.TrackingCategory = trackingCategory
+	t.require(transactionLineItemFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetTrackingCategories(trackingCategories []*string) {
+	t.TrackingCategories = trackingCategories
+	t.require(transactionLineItemFieldTrackingCategories)
+}
+
+// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetTotalLineAmount(totalLineAmount *string) {
+	t.TotalLineAmount = totalLineAmount
+	t.require(transactionLineItemFieldTotalLineAmount)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetTaxRate(taxRate *string) {
+	t.TaxRate = taxRate
+	t.require(transactionLineItemFieldTaxRate)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetCurrency(currency *TransactionLineItemCurrency) {
+	t.Currency = currency
+	t.require(transactionLineItemFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetExchangeRate(exchangeRate *string) {
+	t.ExchangeRate = exchangeRate
+	t.require(transactionLineItemFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetCompany(company *string) {
+	t.Company = company
+	t.require(transactionLineItemFieldCompany)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TransactionLineItem) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(transactionLineItemFieldRemoteWasDeleted)
+}
+
 func (t *TransactionLineItem) UnmarshalJSON(data []byte) error {
 	type embed TransactionLineItem
 	var unmarshaler = struct {
@@ -1800,7 +2334,8 @@ func (t *TransactionLineItem) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(t.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(t.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *TransactionLineItem) String() string {

@@ -6,7 +6,22 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	engagementTypesListRequestFieldCreatedAfter        = big.NewInt(1 << 0)
+	engagementTypesListRequestFieldCreatedBefore       = big.NewInt(1 << 1)
+	engagementTypesListRequestFieldCursor              = big.NewInt(1 << 2)
+	engagementTypesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 3)
+	engagementTypesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 4)
+	engagementTypesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 5)
+	engagementTypesListRequestFieldIncludeShellData    = big.NewInt(1 << 6)
+	engagementTypesListRequestFieldModifiedAfter       = big.NewInt(1 << 7)
+	engagementTypesListRequestFieldModifiedBefore      = big.NewInt(1 << 8)
+	engagementTypesListRequestFieldPageSize            = big.NewInt(1 << 9)
+	engagementTypesListRequestFieldRemoteId            = big.NewInt(1 << 10)
 )
 
 type EngagementTypesListRequest struct {
@@ -32,7 +47,105 @@ type EngagementTypesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EngagementTypesListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(engagementTypesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(engagementTypesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(engagementTypesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(engagementTypesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(engagementTypesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	e.IncludeRemoteFields = includeRemoteFields
+	e.require(engagementTypesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(engagementTypesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(engagementTypesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(engagementTypesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(engagementTypesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(engagementTypesListRequestFieldRemoteId)
+}
+
+var (
+	engagementTypesRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	engagementTypesRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	engagementTypesRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	engagementTypesRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	engagementTypesRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	engagementTypesRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	engagementTypesRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	engagementTypesRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type EngagementTypesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -51,7 +164,79 @@ type EngagementTypesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EngagementTypesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	e.IncludeRemoteFields = includeRemoteFields
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	e.IsCommonModelField = isCommonModelField
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	e.IsCustom = isCustom
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(engagementTypesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	engagementTypesRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 0)
+	engagementTypesRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 1)
+	engagementTypesRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 2)
+)
 
 type EngagementTypesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -60,12 +245,52 @@ type EngagementTypesRetrieveRequest struct {
 	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EngagementTypesRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(engagementTypesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	e.IncludeRemoteFields = includeRemoteFields
+	e.require(engagementTypesRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EngagementTypesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(engagementTypesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedEngagementTypeListFieldNext     = big.NewInt(1 << 0)
+	paginatedEngagementTypeListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEngagementTypeListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedEngagementTypeList struct {
 	Next     *string           `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string           `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*EngagementType `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -96,6 +321,34 @@ func (p *PaginatedEngagementTypeList) GetExtraProperties() map[string]interface{
 	return p.extraProperties
 }
 
+func (p *PaginatedEngagementTypeList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEngagementTypeList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEngagementTypeListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEngagementTypeList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEngagementTypeListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEngagementTypeList) SetResults(results []*EngagementType) {
+	p.Results = results
+	p.require(paginatedEngagementTypeListFieldResults)
+}
+
 func (p *PaginatedEngagementTypeList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEngagementTypeList
 	var value unmarshaler
@@ -110,6 +363,17 @@ func (p *PaginatedEngagementTypeList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEngagementTypeList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEngagementTypeList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEngagementTypeList) String() string {

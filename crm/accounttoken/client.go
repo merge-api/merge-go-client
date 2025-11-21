@@ -8,26 +8,27 @@ import (
 	crm "github.com/merge-api/merge-go-client/v2/crm"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,36 +38,13 @@ func (c *Client) Retrieve(
 	publicToken string,
 	opts ...option.RequestOption,
 ) (*crm.AccountToken, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/crm/v1/account-token/%v",
-		publicToken,
-	)
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *crm.AccountToken
-	if err := c.caller.Call(
+	response, err := c.WithRawResponse.Retrieve(
 		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
+		publicToken,
+		opts...,
+	)
+	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Body, nil
 }

@@ -4,7 +4,6 @@ package journalentries
 
 import (
 	context "context"
-	fmt "fmt"
 	accounting "github.com/merge-api/merge-go-client/v2/accounting"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
@@ -13,22 +12,24 @@ import (
 )
 
 type Client struct {
+	WithRawResponse *RawClient
+
+	options *core.RequestOptions
 	baseURL string
 	caller  *internal.Caller
-	header  http.Header
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		WithRawResponse: NewRawClient(options),
+		options:         options,
+		baseURL:         options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header: options.ToHeader(),
 	}
 }
 
@@ -37,7 +38,7 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.JournalEntriesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*accounting.JournalEntry], error) {
+) (*core.Page[*string, *accounting.JournalEntry], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,13 +51,12 @@ func (c *Client) List(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -73,11 +73,11 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedJournalEntryList) *internal.PageResponse[*string, *accounting.JournalEntry] {
+	readPageResponse := func(response *accounting.PaginatedJournalEntryList) *core.PageResponse[*string, *accounting.JournalEntry] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *accounting.JournalEntry]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *accounting.JournalEntry]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -97,44 +97,15 @@ func (c *Client) Create(
 	request *accounting.JournalEntryEndpointRequest,
 	opts ...option.RequestOption,
 ) (*accounting.JournalEntryResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
+	response, err := c.WithRawResponse.Create(
+		ctx,
+		request,
+		opts...,
 	)
-	endpointURL := baseURL + "/accounting/v1/journal-entries"
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *accounting.JournalEntryResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a `JournalEntry` object with the given `id`.
@@ -144,45 +115,16 @@ func (c *Client) Retrieve(
 	request *accounting.JournalEntriesRetrieveRequest,
 	opts ...option.RequestOption,
 ) (*accounting.JournalEntry, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := internal.EncodeURL(
-		baseURL+"/accounting/v1/journal-entries/%v",
+	response, err := c.WithRawResponse.Retrieve(
+		ctx,
 		id,
+		request,
+		opts...,
 	)
-	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *accounting.JournalEntry
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
@@ -190,7 +132,7 @@ func (c *Client) LinesRemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.JournalEntriesLinesRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -203,13 +145,12 @@ func (c *Client) LinesRemoteFieldClassesList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -226,11 +167,11 @@ func (c *Client) LinesRemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *internal.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *accounting.RemoteFieldClass]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,
@@ -249,35 +190,14 @@ func (c *Client) MetaPostRetrieve(
 	ctx context.Context,
 	opts ...option.RequestOption,
 ) (*accounting.MetaResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"",
-	)
-	endpointURL := baseURL + "/accounting/v1/journal-entries/meta/post"
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	var response *accounting.MetaResponse
-	if err := c.caller.Call(
+	response, err := c.WithRawResponse.MetaPostRetrieve(
 		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	); err != nil {
+		opts...,
+	)
+	if err != nil {
 		return nil, err
 	}
-	return response, nil
+	return response.Body, nil
 }
 
 // Returns a list of `RemoteFieldClass` objects.
@@ -285,7 +205,7 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.JournalEntriesRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -298,13 +218,12 @@ func (c *Client) RemoteFieldClassesList(
 		return nil, err
 	}
 	headers := internal.MergeHeaders(
-		c.header.Clone(),
+		c.options.ToHeader(),
 		options.ToHeader(),
 	)
-
-	prepareCall := func(pageRequest *internal.PageRequest[*string]) *internal.CallParams {
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
 		if pageRequest.Cursor != nil {
-			queryParams.Set("cursor", fmt.Sprintf("%v", *pageRequest.Cursor))
+			queryParams.Set("cursor", *pageRequest.Cursor)
 		}
 		nextURL := endpointURL
 		if len(queryParams) > 0 {
@@ -321,11 +240,11 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *internal.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
 		var zeroValue *string
-		next := response.Next
-		results := response.Results
-		return &internal.PageResponse[*string, *accounting.RemoteFieldClass]{
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
 			Next:    next,
 			Results: results,
 			Done:    next == zeroValue,

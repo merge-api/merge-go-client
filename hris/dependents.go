@@ -6,7 +6,22 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	dependentsListRequestFieldCreatedAfter           = big.NewInt(1 << 0)
+	dependentsListRequestFieldCreatedBefore          = big.NewInt(1 << 1)
+	dependentsListRequestFieldCursor                 = big.NewInt(1 << 2)
+	dependentsListRequestFieldIncludeDeletedData     = big.NewInt(1 << 3)
+	dependentsListRequestFieldIncludeRemoteData      = big.NewInt(1 << 4)
+	dependentsListRequestFieldIncludeSensitiveFields = big.NewInt(1 << 5)
+	dependentsListRequestFieldIncludeShellData       = big.NewInt(1 << 6)
+	dependentsListRequestFieldModifiedAfter          = big.NewInt(1 << 7)
+	dependentsListRequestFieldModifiedBefore         = big.NewInt(1 << 8)
+	dependentsListRequestFieldPageSize               = big.NewInt(1 << 9)
+	dependentsListRequestFieldRemoteId               = big.NewInt(1 << 10)
 )
 
 type DependentsListRequest struct {
@@ -32,7 +47,100 @@ type DependentsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (d *DependentsListRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	d.CreatedAfter = createdAfter
+	d.require(dependentsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	d.CreatedBefore = createdBefore
+	d.require(dependentsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetCursor(cursor *string) {
+	d.Cursor = cursor
+	d.require(dependentsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	d.IncludeDeletedData = includeDeletedData
+	d.require(dependentsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	d.IncludeRemoteData = includeRemoteData
+	d.require(dependentsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeSensitiveFields sets the IncludeSensitiveFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetIncludeSensitiveFields(includeSensitiveFields *bool) {
+	d.IncludeSensitiveFields = includeSensitiveFields
+	d.require(dependentsListRequestFieldIncludeSensitiveFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetIncludeShellData(includeShellData *bool) {
+	d.IncludeShellData = includeShellData
+	d.require(dependentsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	d.ModifiedAfter = modifiedAfter
+	d.require(dependentsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	d.ModifiedBefore = modifiedBefore
+	d.require(dependentsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetPageSize(pageSize *int) {
+	d.PageSize = pageSize
+	d.require(dependentsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetRemoteId(remoteId *string) {
+	d.RemoteId = remoteId
+	d.require(dependentsListRequestFieldRemoteId)
+}
+
+var (
+	dependentsRetrieveRequestFieldIncludeRemoteData      = big.NewInt(1 << 0)
+	dependentsRetrieveRequestFieldIncludeSensitiveFields = big.NewInt(1 << 1)
+	dependentsRetrieveRequestFieldIncludeShellData       = big.NewInt(1 << 2)
+)
 
 type DependentsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -41,6 +149,37 @@ type DependentsRetrieveRequest struct {
 	IncludeSensitiveFields *bool `json:"-" url:"include_sensitive_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (d *DependentsRetrieveRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	d.IncludeRemoteData = includeRemoteData
+	d.require(dependentsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeSensitiveFields sets the IncludeSensitiveFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsRetrieveRequest) SetIncludeSensitiveFields(includeSensitiveFields *bool) {
+	d.IncludeSensitiveFields = includeSensitiveFields
+	d.require(dependentsRetrieveRequestFieldIncludeSensitiveFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	d.IncludeShellData = includeShellData
+	d.require(dependentsRetrieveRequestFieldIncludeShellData)
 }
 
 // # The Dependent Object
@@ -49,6 +188,27 @@ type DependentsRetrieveRequest struct {
 //
 // ### Usage Example
 // Fetch from the `LIST Dependents` endpoint and filter by `ID` to show all dependents.
+var (
+	dependentFieldId               = big.NewInt(1 << 0)
+	dependentFieldRemoteId         = big.NewInt(1 << 1)
+	dependentFieldCreatedAt        = big.NewInt(1 << 2)
+	dependentFieldModifiedAt       = big.NewInt(1 << 3)
+	dependentFieldFirstName        = big.NewInt(1 << 4)
+	dependentFieldMiddleName       = big.NewInt(1 << 5)
+	dependentFieldLastName         = big.NewInt(1 << 6)
+	dependentFieldRelationship     = big.NewInt(1 << 7)
+	dependentFieldEmployee         = big.NewInt(1 << 8)
+	dependentFieldDateOfBirth      = big.NewInt(1 << 9)
+	dependentFieldGender           = big.NewInt(1 << 10)
+	dependentFieldPhoneNumber      = big.NewInt(1 << 11)
+	dependentFieldHomeLocation     = big.NewInt(1 << 12)
+	dependentFieldIsStudent        = big.NewInt(1 << 13)
+	dependentFieldSsn              = big.NewInt(1 << 14)
+	dependentFieldRemoteWasDeleted = big.NewInt(1 << 15)
+	dependentFieldFieldMappings    = big.NewInt(1 << 16)
+	dependentFieldRemoteData       = big.NewInt(1 << 17)
+)
+
 type Dependent struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -93,6 +253,9 @@ type Dependent struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -228,6 +391,139 @@ func (d *Dependent) GetExtraProperties() map[string]interface{} {
 	return d.extraProperties
 }
 
+func (d *Dependent) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetId(id *string) {
+	d.Id = id
+	d.require(dependentFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetRemoteId(remoteId *string) {
+	d.RemoteId = remoteId
+	d.require(dependentFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetCreatedAt(createdAt *time.Time) {
+	d.CreatedAt = createdAt
+	d.require(dependentFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetModifiedAt(modifiedAt *time.Time) {
+	d.ModifiedAt = modifiedAt
+	d.require(dependentFieldModifiedAt)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetFirstName(firstName *string) {
+	d.FirstName = firstName
+	d.require(dependentFieldFirstName)
+}
+
+// SetMiddleName sets the MiddleName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetMiddleName(middleName *string) {
+	d.MiddleName = middleName
+	d.require(dependentFieldMiddleName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetLastName(lastName *string) {
+	d.LastName = lastName
+	d.require(dependentFieldLastName)
+}
+
+// SetRelationship sets the Relationship field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetRelationship(relationship *DependentRelationship) {
+	d.Relationship = relationship
+	d.require(dependentFieldRelationship)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetEmployee(employee *string) {
+	d.Employee = employee
+	d.require(dependentFieldEmployee)
+}
+
+// SetDateOfBirth sets the DateOfBirth field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetDateOfBirth(dateOfBirth *time.Time) {
+	d.DateOfBirth = dateOfBirth
+	d.require(dependentFieldDateOfBirth)
+}
+
+// SetGender sets the Gender field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetGender(gender *DependentGender) {
+	d.Gender = gender
+	d.require(dependentFieldGender)
+}
+
+// SetPhoneNumber sets the PhoneNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetPhoneNumber(phoneNumber *string) {
+	d.PhoneNumber = phoneNumber
+	d.require(dependentFieldPhoneNumber)
+}
+
+// SetHomeLocation sets the HomeLocation field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetHomeLocation(homeLocation *string) {
+	d.HomeLocation = homeLocation
+	d.require(dependentFieldHomeLocation)
+}
+
+// SetIsStudent sets the IsStudent field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetIsStudent(isStudent *bool) {
+	d.IsStudent = isStudent
+	d.require(dependentFieldIsStudent)
+}
+
+// SetSsn sets the Ssn field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetSsn(ssn *string) {
+	d.Ssn = ssn
+	d.require(dependentFieldSsn)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	d.RemoteWasDeleted = remoteWasDeleted
+	d.require(dependentFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetFieldMappings(fieldMappings map[string]interface{}) {
+	d.FieldMappings = fieldMappings
+	d.require(dependentFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *Dependent) SetRemoteData(remoteData []*RemoteData) {
+	d.RemoteData = remoteData
+	d.require(dependentFieldRemoteData)
+}
+
 func (d *Dependent) UnmarshalJSON(data []byte) error {
 	type embed Dependent
 	var unmarshaler = struct {
@@ -267,7 +563,8 @@ func (d *Dependent) MarshalJSON() ([]byte, error) {
 		ModifiedAt:  internal.NewOptionalDateTime(d.ModifiedAt),
 		DateOfBirth: internal.NewOptionalDateTime(d.DateOfBirth),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (d *Dependent) String() string {
@@ -418,10 +715,19 @@ func (d *DependentRelationship) Accept(visitor DependentRelationshipVisitor) err
 	return fmt.Errorf("type %T does not include a non-empty union type", d)
 }
 
+var (
+	paginatedDependentListFieldNext     = big.NewInt(1 << 0)
+	paginatedDependentListFieldPrevious = big.NewInt(1 << 1)
+	paginatedDependentListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedDependentList struct {
 	Next     *string      `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string      `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Dependent `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -452,6 +758,34 @@ func (p *PaginatedDependentList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedDependentList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDependentList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedDependentListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDependentList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedDependentListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedDependentList) SetResults(results []*Dependent) {
+	p.Results = results
+	p.require(paginatedDependentListFieldResults)
+}
+
 func (p *PaginatedDependentList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedDependentList
 	var value unmarshaler
@@ -466,6 +800,17 @@ func (p *PaginatedDependentList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedDependentList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedDependentList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedDependentList) String() string {

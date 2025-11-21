@@ -6,6 +6,17 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
+)
+
+var (
+	createFieldMappingRequestFieldExcludeRemoteFieldMetadata = big.NewInt(1 << 0)
+	createFieldMappingRequestFieldTargetFieldName            = big.NewInt(1 << 1)
+	createFieldMappingRequestFieldTargetFieldDescription     = big.NewInt(1 << 2)
+	createFieldMappingRequestFieldRemoteFieldTraversalPath   = big.NewInt(1 << 3)
+	createFieldMappingRequestFieldRemoteMethod               = big.NewInt(1 << 4)
+	createFieldMappingRequestFieldRemoteUrlPath              = big.NewInt(1 << 5)
+	createFieldMappingRequestFieldCommonModelName            = big.NewInt(1 << 6)
 )
 
 type CreateFieldMappingRequest struct {
@@ -23,7 +34,72 @@ type CreateFieldMappingRequest struct {
 	RemoteUrlPath string `json:"remote_url_path" url:"-"`
 	// The name of the Common Model that the remote field corresponds to in a given category.
 	CommonModelName string `json:"common_model_name" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (c *CreateFieldMappingRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetExcludeRemoteFieldMetadata sets the ExcludeRemoteFieldMetadata field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetExcludeRemoteFieldMetadata(excludeRemoteFieldMetadata *bool) {
+	c.ExcludeRemoteFieldMetadata = excludeRemoteFieldMetadata
+	c.require(createFieldMappingRequestFieldExcludeRemoteFieldMetadata)
+}
+
+// SetTargetFieldName sets the TargetFieldName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetTargetFieldName(targetFieldName string) {
+	c.TargetFieldName = targetFieldName
+	c.require(createFieldMappingRequestFieldTargetFieldName)
+}
+
+// SetTargetFieldDescription sets the TargetFieldDescription field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetTargetFieldDescription(targetFieldDescription string) {
+	c.TargetFieldDescription = targetFieldDescription
+	c.require(createFieldMappingRequestFieldTargetFieldDescription)
+}
+
+// SetRemoteFieldTraversalPath sets the RemoteFieldTraversalPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetRemoteFieldTraversalPath(remoteFieldTraversalPath []interface{}) {
+	c.RemoteFieldTraversalPath = remoteFieldTraversalPath
+	c.require(createFieldMappingRequestFieldRemoteFieldTraversalPath)
+}
+
+// SetRemoteMethod sets the RemoteMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetRemoteMethod(remoteMethod string) {
+	c.RemoteMethod = remoteMethod
+	c.require(createFieldMappingRequestFieldRemoteMethod)
+}
+
+// SetRemoteUrlPath sets the RemoteUrlPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetRemoteUrlPath(remoteUrlPath string) {
+	c.RemoteUrlPath = remoteUrlPath
+	c.require(createFieldMappingRequestFieldRemoteUrlPath)
+}
+
+// SetCommonModelName sets the CommonModelName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetCommonModelName(commonModelName string) {
+	c.CommonModelName = commonModelName
+	c.require(createFieldMappingRequestFieldCommonModelName)
+}
+
+var (
+	patchedEditFieldMappingRequestFieldRemoteFieldTraversalPath = big.NewInt(1 << 0)
+	patchedEditFieldMappingRequestFieldRemoteMethod             = big.NewInt(1 << 1)
+	patchedEditFieldMappingRequestFieldRemoteUrlPath            = big.NewInt(1 << 2)
+)
 
 type PatchedEditFieldMappingRequest struct {
 	// The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
@@ -32,19 +108,109 @@ type PatchedEditFieldMappingRequest struct {
 	RemoteMethod *string `json:"remote_method,omitempty" url:"-"`
 	// The path of the remote endpoint where the remote field is coming from.
 	RemoteUrlPath *string `json:"remote_url_path,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedEditFieldMappingRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteFieldTraversalPath sets the RemoteFieldTraversalPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetRemoteFieldTraversalPath(remoteFieldTraversalPath []interface{}) {
+	p.RemoteFieldTraversalPath = remoteFieldTraversalPath
+	p.require(patchedEditFieldMappingRequestFieldRemoteFieldTraversalPath)
+}
+
+// SetRemoteMethod sets the RemoteMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetRemoteMethod(remoteMethod *string) {
+	p.RemoteMethod = remoteMethod
+	p.require(patchedEditFieldMappingRequestFieldRemoteMethod)
+}
+
+// SetRemoteUrlPath sets the RemoteUrlPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetRemoteUrlPath(remoteUrlPath *string) {
+	p.RemoteUrlPath = remoteUrlPath
+	p.require(patchedEditFieldMappingRequestFieldRemoteUrlPath)
+}
+
+var (
+	fieldMappingsRetrieveRequestFieldExcludeRemoteFieldMetadata = big.NewInt(1 << 0)
+)
 
 type FieldMappingsRetrieveRequest struct {
 	// If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
 	ExcludeRemoteFieldMetadata *bool `json:"-" url:"exclude_remote_field_metadata,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (f *FieldMappingsRetrieveRequest) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetExcludeRemoteFieldMetadata sets the ExcludeRemoteFieldMetadata field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingsRetrieveRequest) SetExcludeRemoteFieldMetadata(excludeRemoteFieldMetadata *bool) {
+	f.ExcludeRemoteFieldMetadata = excludeRemoteFieldMetadata
+	f.require(fieldMappingsRetrieveRequestFieldExcludeRemoteFieldMetadata)
+}
+
+var (
+	remoteFieldsRetrieveRequestFieldCommonModels         = big.NewInt(1 << 0)
+	remoteFieldsRetrieveRequestFieldIncludeExampleValues = big.NewInt(1 << 1)
+)
 
 type RemoteFieldsRetrieveRequest struct {
 	// A comma seperated list of Common Model names. If included, will only return Remote Fields for those Common Models.
 	CommonModels *string `json:"-" url:"common_models,omitempty"`
 	// If true, will include example values, where available, for remote fields in the 3rd party platform. These examples come from active data from your customers.
 	IncludeExampleValues *string `json:"-" url:"include_example_values,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (r *RemoteFieldsRetrieveRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetCommonModels sets the CommonModels field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldsRetrieveRequest) SetCommonModels(commonModels *string) {
+	r.CommonModels = commonModels
+	r.require(remoteFieldsRetrieveRequestFieldCommonModels)
+}
+
+// SetIncludeExampleValues sets the IncludeExampleValues field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldsRetrieveRequest) SetIncludeExampleValues(includeExampleValues *string) {
+	r.IncludeExampleValues = includeExampleValues
+	r.require(remoteFieldsRetrieveRequestFieldIncludeExampleValues)
+}
+
+var (
+	advancedMetadataFieldId           = big.NewInt(1 << 0)
+	advancedMetadataFieldDisplayName  = big.NewInt(1 << 1)
+	advancedMetadataFieldDescription  = big.NewInt(1 << 2)
+	advancedMetadataFieldIsRequired   = big.NewInt(1 << 3)
+	advancedMetadataFieldIsCustom     = big.NewInt(1 << 4)
+	advancedMetadataFieldFieldChoices = big.NewInt(1 << 5)
+)
 
 type AdvancedMetadata struct {
 	Id           string        `json:"id" url:"id"`
@@ -53,6 +219,9 @@ type AdvancedMetadata struct {
 	IsRequired   *bool         `json:"is_required,omitempty" url:"is_required,omitempty"`
 	IsCustom     *bool         `json:"is_custom,omitempty" url:"is_custom,omitempty"`
 	FieldChoices []interface{} `json:"field_choices,omitempty" url:"field_choices,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -104,6 +273,55 @@ func (a *AdvancedMetadata) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AdvancedMetadata) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AdvancedMetadata) SetId(id string) {
+	a.Id = id
+	a.require(advancedMetadataFieldId)
+}
+
+// SetDisplayName sets the DisplayName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AdvancedMetadata) SetDisplayName(displayName *string) {
+	a.DisplayName = displayName
+	a.require(advancedMetadataFieldDisplayName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AdvancedMetadata) SetDescription(description *string) {
+	a.Description = description
+	a.require(advancedMetadataFieldDescription)
+}
+
+// SetIsRequired sets the IsRequired field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AdvancedMetadata) SetIsRequired(isRequired *bool) {
+	a.IsRequired = isRequired
+	a.require(advancedMetadataFieldIsRequired)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AdvancedMetadata) SetIsCustom(isCustom *bool) {
+	a.IsCustom = isCustom
+	a.require(advancedMetadataFieldIsCustom)
+}
+
+// SetFieldChoices sets the FieldChoices field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AdvancedMetadata) SetFieldChoices(fieldChoices []interface{}) {
+	a.FieldChoices = fieldChoices
+	a.require(advancedMetadataFieldFieldChoices)
+}
+
 func (a *AdvancedMetadata) UnmarshalJSON(data []byte) error {
 	type unmarshaler AdvancedMetadata
 	var value unmarshaler
@@ -120,6 +338,17 @@ func (a *AdvancedMetadata) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (a *AdvancedMetadata) MarshalJSON() ([]byte, error) {
+	type embed AdvancedMetadata
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (a *AdvancedMetadata) String() string {
 	if len(a.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
@@ -132,10 +361,19 @@ func (a *AdvancedMetadata) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+var (
+	externalTargetFieldApiFieldName        = big.NewInt(1 << 0)
+	externalTargetFieldApiFieldDescription = big.NewInt(1 << 1)
+	externalTargetFieldApiFieldIsMapped    = big.NewInt(1 << 2)
+)
+
 type ExternalTargetFieldApi struct {
 	Name        *string `json:"name,omitempty" url:"name,omitempty"`
 	Description *string `json:"description,omitempty" url:"description,omitempty"`
 	IsMapped    *string `json:"is_mapped,omitempty" url:"is_mapped,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -166,6 +404,34 @@ func (e *ExternalTargetFieldApi) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *ExternalTargetFieldApi) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApi) SetName(name *string) {
+	e.Name = name
+	e.require(externalTargetFieldApiFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApi) SetDescription(description *string) {
+	e.Description = description
+	e.require(externalTargetFieldApiFieldDescription)
+}
+
+// SetIsMapped sets the IsMapped field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApi) SetIsMapped(isMapped *string) {
+	e.IsMapped = isMapped
+	e.require(externalTargetFieldApiFieldIsMapped)
+}
+
 func (e *ExternalTargetFieldApi) UnmarshalJSON(data []byte) error {
 	type unmarshaler ExternalTargetFieldApi
 	var value unmarshaler
@@ -182,6 +448,17 @@ func (e *ExternalTargetFieldApi) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (e *ExternalTargetFieldApi) MarshalJSON() ([]byte, error) {
+	type embed ExternalTargetFieldApi
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (e *ExternalTargetFieldApi) String() string {
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
@@ -193,6 +470,34 @@ func (e *ExternalTargetFieldApi) String() string {
 	}
 	return fmt.Sprintf("%#v", e)
 }
+
+var (
+	externalTargetFieldApiResponseFieldAccount                  = big.NewInt(1 << 0)
+	externalTargetFieldApiResponseFieldAccountingAttachment     = big.NewInt(1 << 1)
+	externalTargetFieldApiResponseFieldBalanceSheet             = big.NewInt(1 << 2)
+	externalTargetFieldApiResponseFieldCashFlowStatement        = big.NewInt(1 << 3)
+	externalTargetFieldApiResponseFieldCompanyInfo              = big.NewInt(1 << 4)
+	externalTargetFieldApiResponseFieldContact                  = big.NewInt(1 << 5)
+	externalTargetFieldApiResponseFieldIncomeStatement          = big.NewInt(1 << 6)
+	externalTargetFieldApiResponseFieldCreditNote               = big.NewInt(1 << 7)
+	externalTargetFieldApiResponseFieldItem                     = big.NewInt(1 << 8)
+	externalTargetFieldApiResponseFieldPurchaseOrder            = big.NewInt(1 << 9)
+	externalTargetFieldApiResponseFieldTrackingCategory         = big.NewInt(1 << 10)
+	externalTargetFieldApiResponseFieldJournalEntry             = big.NewInt(1 << 11)
+	externalTargetFieldApiResponseFieldTaxRate                  = big.NewInt(1 << 12)
+	externalTargetFieldApiResponseFieldInvoice                  = big.NewInt(1 << 13)
+	externalTargetFieldApiResponseFieldPayment                  = big.NewInt(1 << 14)
+	externalTargetFieldApiResponseFieldExpense                  = big.NewInt(1 << 15)
+	externalTargetFieldApiResponseFieldVendorCredit             = big.NewInt(1 << 16)
+	externalTargetFieldApiResponseFieldTransaction              = big.NewInt(1 << 17)
+	externalTargetFieldApiResponseFieldAccountingPeriod         = big.NewInt(1 << 18)
+	externalTargetFieldApiResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 19)
+	externalTargetFieldApiResponseFieldBankFeedAccount          = big.NewInt(1 << 20)
+	externalTargetFieldApiResponseFieldEmployee                 = big.NewInt(1 << 21)
+	externalTargetFieldApiResponseFieldPaymentMethod            = big.NewInt(1 << 22)
+	externalTargetFieldApiResponseFieldProject                  = big.NewInt(1 << 23)
+	externalTargetFieldApiResponseFieldPaymentTerm              = big.NewInt(1 << 24)
+)
 
 type ExternalTargetFieldApiResponse struct {
 	Account                  []*ExternalTargetFieldApi `json:"Account,omitempty" url:"Account,omitempty"`
@@ -220,6 +525,9 @@ type ExternalTargetFieldApiResponse struct {
 	PaymentMethod            []*ExternalTargetFieldApi `json:"PaymentMethod,omitempty" url:"PaymentMethod,omitempty"`
 	Project                  []*ExternalTargetFieldApi `json:"Project,omitempty" url:"Project,omitempty"`
 	PaymentTerm              []*ExternalTargetFieldApi `json:"PaymentTerm,omitempty" url:"PaymentTerm,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -404,6 +712,188 @@ func (e *ExternalTargetFieldApiResponse) GetExtraProperties() map[string]interfa
 	return e.extraProperties
 }
 
+func (e *ExternalTargetFieldApiResponse) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetAccount(account []*ExternalTargetFieldApi) {
+	e.Account = account
+	e.require(externalTargetFieldApiResponseFieldAccount)
+}
+
+// SetAccountingAttachment sets the AccountingAttachment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetAccountingAttachment(accountingAttachment []*ExternalTargetFieldApi) {
+	e.AccountingAttachment = accountingAttachment
+	e.require(externalTargetFieldApiResponseFieldAccountingAttachment)
+}
+
+// SetBalanceSheet sets the BalanceSheet field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetBalanceSheet(balanceSheet []*ExternalTargetFieldApi) {
+	e.BalanceSheet = balanceSheet
+	e.require(externalTargetFieldApiResponseFieldBalanceSheet)
+}
+
+// SetCashFlowStatement sets the CashFlowStatement field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetCashFlowStatement(cashFlowStatement []*ExternalTargetFieldApi) {
+	e.CashFlowStatement = cashFlowStatement
+	e.require(externalTargetFieldApiResponseFieldCashFlowStatement)
+}
+
+// SetCompanyInfo sets the CompanyInfo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetCompanyInfo(companyInfo []*ExternalTargetFieldApi) {
+	e.CompanyInfo = companyInfo
+	e.require(externalTargetFieldApiResponseFieldCompanyInfo)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetContact(contact []*ExternalTargetFieldApi) {
+	e.Contact = contact
+	e.require(externalTargetFieldApiResponseFieldContact)
+}
+
+// SetIncomeStatement sets the IncomeStatement field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetIncomeStatement(incomeStatement []*ExternalTargetFieldApi) {
+	e.IncomeStatement = incomeStatement
+	e.require(externalTargetFieldApiResponseFieldIncomeStatement)
+}
+
+// SetCreditNote sets the CreditNote field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetCreditNote(creditNote []*ExternalTargetFieldApi) {
+	e.CreditNote = creditNote
+	e.require(externalTargetFieldApiResponseFieldCreditNote)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetItem(item []*ExternalTargetFieldApi) {
+	e.Item = item
+	e.require(externalTargetFieldApiResponseFieldItem)
+}
+
+// SetPurchaseOrder sets the PurchaseOrder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetPurchaseOrder(purchaseOrder []*ExternalTargetFieldApi) {
+	e.PurchaseOrder = purchaseOrder
+	e.require(externalTargetFieldApiResponseFieldPurchaseOrder)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetTrackingCategory(trackingCategory []*ExternalTargetFieldApi) {
+	e.TrackingCategory = trackingCategory
+	e.require(externalTargetFieldApiResponseFieldTrackingCategory)
+}
+
+// SetJournalEntry sets the JournalEntry field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetJournalEntry(journalEntry []*ExternalTargetFieldApi) {
+	e.JournalEntry = journalEntry
+	e.require(externalTargetFieldApiResponseFieldJournalEntry)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetTaxRate(taxRate []*ExternalTargetFieldApi) {
+	e.TaxRate = taxRate
+	e.require(externalTargetFieldApiResponseFieldTaxRate)
+}
+
+// SetInvoice sets the Invoice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetInvoice(invoice []*ExternalTargetFieldApi) {
+	e.Invoice = invoice
+	e.require(externalTargetFieldApiResponseFieldInvoice)
+}
+
+// SetPayment sets the Payment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetPayment(payment []*ExternalTargetFieldApi) {
+	e.Payment = payment
+	e.require(externalTargetFieldApiResponseFieldPayment)
+}
+
+// SetExpense sets the Expense field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetExpense(expense []*ExternalTargetFieldApi) {
+	e.Expense = expense
+	e.require(externalTargetFieldApiResponseFieldExpense)
+}
+
+// SetVendorCredit sets the VendorCredit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetVendorCredit(vendorCredit []*ExternalTargetFieldApi) {
+	e.VendorCredit = vendorCredit
+	e.require(externalTargetFieldApiResponseFieldVendorCredit)
+}
+
+// SetTransaction sets the Transaction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetTransaction(transaction []*ExternalTargetFieldApi) {
+	e.Transaction = transaction
+	e.require(externalTargetFieldApiResponseFieldTransaction)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetAccountingPeriod(accountingPeriod []*ExternalTargetFieldApi) {
+	e.AccountingPeriod = accountingPeriod
+	e.require(externalTargetFieldApiResponseFieldAccountingPeriod)
+}
+
+// SetGeneralLedgerTransaction sets the GeneralLedgerTransaction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetGeneralLedgerTransaction(generalLedgerTransaction []*ExternalTargetFieldApi) {
+	e.GeneralLedgerTransaction = generalLedgerTransaction
+	e.require(externalTargetFieldApiResponseFieldGeneralLedgerTransaction)
+}
+
+// SetBankFeedAccount sets the BankFeedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetBankFeedAccount(bankFeedAccount []*ExternalTargetFieldApi) {
+	e.BankFeedAccount = bankFeedAccount
+	e.require(externalTargetFieldApiResponseFieldBankFeedAccount)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetEmployee(employee []*ExternalTargetFieldApi) {
+	e.Employee = employee
+	e.require(externalTargetFieldApiResponseFieldEmployee)
+}
+
+// SetPaymentMethod sets the PaymentMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetPaymentMethod(paymentMethod []*ExternalTargetFieldApi) {
+	e.PaymentMethod = paymentMethod
+	e.require(externalTargetFieldApiResponseFieldPaymentMethod)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetProject(project []*ExternalTargetFieldApi) {
+	e.Project = project
+	e.require(externalTargetFieldApiResponseFieldProject)
+}
+
+// SetPaymentTerm sets the PaymentTerm field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetPaymentTerm(paymentTerm []*ExternalTargetFieldApi) {
+	e.PaymentTerm = paymentTerm
+	e.require(externalTargetFieldApiResponseFieldPaymentTerm)
+}
+
 func (e *ExternalTargetFieldApiResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler ExternalTargetFieldApiResponse
 	var value unmarshaler
@@ -420,6 +910,17 @@ func (e *ExternalTargetFieldApiResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (e *ExternalTargetFieldApiResponse) MarshalJSON() ([]byte, error) {
+	type embed ExternalTargetFieldApiResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (e *ExternalTargetFieldApiResponse) String() string {
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
@@ -432,11 +933,21 @@ func (e *ExternalTargetFieldApiResponse) String() string {
 	return fmt.Sprintf("%#v", e)
 }
 
+var (
+	fieldMappingApiInstanceFieldId                = big.NewInt(1 << 0)
+	fieldMappingApiInstanceFieldIsIntegrationWide = big.NewInt(1 << 1)
+	fieldMappingApiInstanceFieldTargetField       = big.NewInt(1 << 2)
+	fieldMappingApiInstanceFieldRemoteField       = big.NewInt(1 << 3)
+)
+
 type FieldMappingApiInstance struct {
 	Id                *string                             `json:"id,omitempty" url:"id,omitempty"`
 	IsIntegrationWide *bool                               `json:"is_integration_wide,omitempty" url:"is_integration_wide,omitempty"`
 	TargetField       *FieldMappingApiInstanceTargetField `json:"target_field,omitempty" url:"target_field,omitempty"`
 	RemoteField       *FieldMappingApiInstanceRemoteField `json:"remote_field,omitempty" url:"remote_field,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -474,6 +985,41 @@ func (f *FieldMappingApiInstance) GetExtraProperties() map[string]interface{} {
 	return f.extraProperties
 }
 
+func (f *FieldMappingApiInstance) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetId(id *string) {
+	f.Id = id
+	f.require(fieldMappingApiInstanceFieldId)
+}
+
+// SetIsIntegrationWide sets the IsIntegrationWide field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetIsIntegrationWide(isIntegrationWide *bool) {
+	f.IsIntegrationWide = isIntegrationWide
+	f.require(fieldMappingApiInstanceFieldIsIntegrationWide)
+}
+
+// SetTargetField sets the TargetField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetTargetField(targetField *FieldMappingApiInstanceTargetField) {
+	f.TargetField = targetField
+	f.require(fieldMappingApiInstanceFieldTargetField)
+}
+
+// SetRemoteField sets the RemoteField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetRemoteField(remoteField *FieldMappingApiInstanceRemoteField) {
+	f.RemoteField = remoteField
+	f.require(fieldMappingApiInstanceFieldRemoteField)
+}
+
 func (f *FieldMappingApiInstance) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldMappingApiInstance
 	var value unmarshaler
@@ -490,6 +1036,17 @@ func (f *FieldMappingApiInstance) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FieldMappingApiInstance) MarshalJSON() ([]byte, error) {
+	type embed FieldMappingApiInstance
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldMappingApiInstance) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -502,10 +1059,19 @@ func (f *FieldMappingApiInstance) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	fieldMappingApiInstanceRemoteFieldFieldRemoteKeyName      = big.NewInt(1 << 0)
+	fieldMappingApiInstanceRemoteFieldFieldSchema             = big.NewInt(1 << 1)
+	fieldMappingApiInstanceRemoteFieldFieldRemoteEndpointInfo = big.NewInt(1 << 2)
+)
+
 type FieldMappingApiInstanceRemoteField struct {
 	RemoteKeyName      *string                                               `json:"remote_key_name,omitempty" url:"remote_key_name,omitempty"`
 	Schema             map[string]interface{}                                `json:"schema,omitempty" url:"schema,omitempty"`
 	RemoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo `json:"remote_endpoint_info" url:"remote_endpoint_info"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -536,6 +1102,34 @@ func (f *FieldMappingApiInstanceRemoteField) GetExtraProperties() map[string]int
 	return f.extraProperties
 }
 
+func (f *FieldMappingApiInstanceRemoteField) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetRemoteKeyName sets the RemoteKeyName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceRemoteField) SetRemoteKeyName(remoteKeyName *string) {
+	f.RemoteKeyName = remoteKeyName
+	f.require(fieldMappingApiInstanceRemoteFieldFieldRemoteKeyName)
+}
+
+// SetSchema sets the Schema field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceRemoteField) SetSchema(schema map[string]interface{}) {
+	f.Schema = schema
+	f.require(fieldMappingApiInstanceRemoteFieldFieldSchema)
+}
+
+// SetRemoteEndpointInfo sets the RemoteEndpointInfo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceRemoteField) SetRemoteEndpointInfo(remoteEndpointInfo *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) {
+	f.RemoteEndpointInfo = remoteEndpointInfo
+	f.require(fieldMappingApiInstanceRemoteFieldFieldRemoteEndpointInfo)
+}
+
 func (f *FieldMappingApiInstanceRemoteField) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldMappingApiInstanceRemoteField
 	var value unmarshaler
@@ -552,6 +1146,17 @@ func (f *FieldMappingApiInstanceRemoteField) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FieldMappingApiInstanceRemoteField) MarshalJSON() ([]byte, error) {
+	type embed FieldMappingApiInstanceRemoteField
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldMappingApiInstanceRemoteField) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -564,10 +1169,19 @@ func (f *FieldMappingApiInstanceRemoteField) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	fieldMappingApiInstanceRemoteFieldRemoteEndpointInfoFieldMethod             = big.NewInt(1 << 0)
+	fieldMappingApiInstanceRemoteFieldRemoteEndpointInfoFieldUrlPath            = big.NewInt(1 << 1)
+	fieldMappingApiInstanceRemoteFieldRemoteEndpointInfoFieldFieldTraversalPath = big.NewInt(1 << 2)
+)
+
 type FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo struct {
 	Method             *string  `json:"method,omitempty" url:"method,omitempty"`
 	UrlPath            *string  `json:"url_path,omitempty" url:"url_path,omitempty"`
 	FieldTraversalPath []string `json:"field_traversal_path,omitempty" url:"field_traversal_path,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -598,6 +1212,34 @@ func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) GetExtraPropertie
 	return f.extraProperties
 }
 
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetMethod sets the Method field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) SetMethod(method *string) {
+	f.Method = method
+	f.require(fieldMappingApiInstanceRemoteFieldRemoteEndpointInfoFieldMethod)
+}
+
+// SetUrlPath sets the UrlPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) SetUrlPath(urlPath *string) {
+	f.UrlPath = urlPath
+	f.require(fieldMappingApiInstanceRemoteFieldRemoteEndpointInfoFieldUrlPath)
+}
+
+// SetFieldTraversalPath sets the FieldTraversalPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) SetFieldTraversalPath(fieldTraversalPath []string) {
+	f.FieldTraversalPath = fieldTraversalPath
+	f.require(fieldMappingApiInstanceRemoteFieldRemoteEndpointInfoFieldFieldTraversalPath)
+}
+
 func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo
 	var value unmarshaler
@@ -614,6 +1256,17 @@ func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) UnmarshalJSON(dat
 	return nil
 }
 
+func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) MarshalJSON() ([]byte, error) {
+	type embed FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -625,6 +1278,34 @@ func (f *FieldMappingApiInstanceRemoteFieldRemoteEndpointInfo) String() string {
 	}
 	return fmt.Sprintf("%#v", f)
 }
+
+var (
+	fieldMappingApiInstanceResponseFieldAccount                  = big.NewInt(1 << 0)
+	fieldMappingApiInstanceResponseFieldAccountingAttachment     = big.NewInt(1 << 1)
+	fieldMappingApiInstanceResponseFieldBalanceSheet             = big.NewInt(1 << 2)
+	fieldMappingApiInstanceResponseFieldCashFlowStatement        = big.NewInt(1 << 3)
+	fieldMappingApiInstanceResponseFieldCompanyInfo              = big.NewInt(1 << 4)
+	fieldMappingApiInstanceResponseFieldContact                  = big.NewInt(1 << 5)
+	fieldMappingApiInstanceResponseFieldIncomeStatement          = big.NewInt(1 << 6)
+	fieldMappingApiInstanceResponseFieldCreditNote               = big.NewInt(1 << 7)
+	fieldMappingApiInstanceResponseFieldItem                     = big.NewInt(1 << 8)
+	fieldMappingApiInstanceResponseFieldPurchaseOrder            = big.NewInt(1 << 9)
+	fieldMappingApiInstanceResponseFieldTrackingCategory         = big.NewInt(1 << 10)
+	fieldMappingApiInstanceResponseFieldJournalEntry             = big.NewInt(1 << 11)
+	fieldMappingApiInstanceResponseFieldTaxRate                  = big.NewInt(1 << 12)
+	fieldMappingApiInstanceResponseFieldInvoice                  = big.NewInt(1 << 13)
+	fieldMappingApiInstanceResponseFieldPayment                  = big.NewInt(1 << 14)
+	fieldMappingApiInstanceResponseFieldExpense                  = big.NewInt(1 << 15)
+	fieldMappingApiInstanceResponseFieldVendorCredit             = big.NewInt(1 << 16)
+	fieldMappingApiInstanceResponseFieldTransaction              = big.NewInt(1 << 17)
+	fieldMappingApiInstanceResponseFieldAccountingPeriod         = big.NewInt(1 << 18)
+	fieldMappingApiInstanceResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 19)
+	fieldMappingApiInstanceResponseFieldBankFeedAccount          = big.NewInt(1 << 20)
+	fieldMappingApiInstanceResponseFieldEmployee                 = big.NewInt(1 << 21)
+	fieldMappingApiInstanceResponseFieldPaymentMethod            = big.NewInt(1 << 22)
+	fieldMappingApiInstanceResponseFieldProject                  = big.NewInt(1 << 23)
+	fieldMappingApiInstanceResponseFieldPaymentTerm              = big.NewInt(1 << 24)
+)
 
 type FieldMappingApiInstanceResponse struct {
 	Account                  []*FieldMappingApiInstance `json:"Account,omitempty" url:"Account,omitempty"`
@@ -652,6 +1333,9 @@ type FieldMappingApiInstanceResponse struct {
 	PaymentMethod            []*FieldMappingApiInstance `json:"PaymentMethod,omitempty" url:"PaymentMethod,omitempty"`
 	Project                  []*FieldMappingApiInstance `json:"Project,omitempty" url:"Project,omitempty"`
 	PaymentTerm              []*FieldMappingApiInstance `json:"PaymentTerm,omitempty" url:"PaymentTerm,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -836,6 +1520,188 @@ func (f *FieldMappingApiInstanceResponse) GetExtraProperties() map[string]interf
 	return f.extraProperties
 }
 
+func (f *FieldMappingApiInstanceResponse) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetAccount(account []*FieldMappingApiInstance) {
+	f.Account = account
+	f.require(fieldMappingApiInstanceResponseFieldAccount)
+}
+
+// SetAccountingAttachment sets the AccountingAttachment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetAccountingAttachment(accountingAttachment []*FieldMappingApiInstance) {
+	f.AccountingAttachment = accountingAttachment
+	f.require(fieldMappingApiInstanceResponseFieldAccountingAttachment)
+}
+
+// SetBalanceSheet sets the BalanceSheet field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetBalanceSheet(balanceSheet []*FieldMappingApiInstance) {
+	f.BalanceSheet = balanceSheet
+	f.require(fieldMappingApiInstanceResponseFieldBalanceSheet)
+}
+
+// SetCashFlowStatement sets the CashFlowStatement field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetCashFlowStatement(cashFlowStatement []*FieldMappingApiInstance) {
+	f.CashFlowStatement = cashFlowStatement
+	f.require(fieldMappingApiInstanceResponseFieldCashFlowStatement)
+}
+
+// SetCompanyInfo sets the CompanyInfo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetCompanyInfo(companyInfo []*FieldMappingApiInstance) {
+	f.CompanyInfo = companyInfo
+	f.require(fieldMappingApiInstanceResponseFieldCompanyInfo)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetContact(contact []*FieldMappingApiInstance) {
+	f.Contact = contact
+	f.require(fieldMappingApiInstanceResponseFieldContact)
+}
+
+// SetIncomeStatement sets the IncomeStatement field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetIncomeStatement(incomeStatement []*FieldMappingApiInstance) {
+	f.IncomeStatement = incomeStatement
+	f.require(fieldMappingApiInstanceResponseFieldIncomeStatement)
+}
+
+// SetCreditNote sets the CreditNote field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetCreditNote(creditNote []*FieldMappingApiInstance) {
+	f.CreditNote = creditNote
+	f.require(fieldMappingApiInstanceResponseFieldCreditNote)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetItem(item []*FieldMappingApiInstance) {
+	f.Item = item
+	f.require(fieldMappingApiInstanceResponseFieldItem)
+}
+
+// SetPurchaseOrder sets the PurchaseOrder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetPurchaseOrder(purchaseOrder []*FieldMappingApiInstance) {
+	f.PurchaseOrder = purchaseOrder
+	f.require(fieldMappingApiInstanceResponseFieldPurchaseOrder)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetTrackingCategory(trackingCategory []*FieldMappingApiInstance) {
+	f.TrackingCategory = trackingCategory
+	f.require(fieldMappingApiInstanceResponseFieldTrackingCategory)
+}
+
+// SetJournalEntry sets the JournalEntry field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetJournalEntry(journalEntry []*FieldMappingApiInstance) {
+	f.JournalEntry = journalEntry
+	f.require(fieldMappingApiInstanceResponseFieldJournalEntry)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetTaxRate(taxRate []*FieldMappingApiInstance) {
+	f.TaxRate = taxRate
+	f.require(fieldMappingApiInstanceResponseFieldTaxRate)
+}
+
+// SetInvoice sets the Invoice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetInvoice(invoice []*FieldMappingApiInstance) {
+	f.Invoice = invoice
+	f.require(fieldMappingApiInstanceResponseFieldInvoice)
+}
+
+// SetPayment sets the Payment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetPayment(payment []*FieldMappingApiInstance) {
+	f.Payment = payment
+	f.require(fieldMappingApiInstanceResponseFieldPayment)
+}
+
+// SetExpense sets the Expense field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetExpense(expense []*FieldMappingApiInstance) {
+	f.Expense = expense
+	f.require(fieldMappingApiInstanceResponseFieldExpense)
+}
+
+// SetVendorCredit sets the VendorCredit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetVendorCredit(vendorCredit []*FieldMappingApiInstance) {
+	f.VendorCredit = vendorCredit
+	f.require(fieldMappingApiInstanceResponseFieldVendorCredit)
+}
+
+// SetTransaction sets the Transaction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetTransaction(transaction []*FieldMappingApiInstance) {
+	f.Transaction = transaction
+	f.require(fieldMappingApiInstanceResponseFieldTransaction)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetAccountingPeriod(accountingPeriod []*FieldMappingApiInstance) {
+	f.AccountingPeriod = accountingPeriod
+	f.require(fieldMappingApiInstanceResponseFieldAccountingPeriod)
+}
+
+// SetGeneralLedgerTransaction sets the GeneralLedgerTransaction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetGeneralLedgerTransaction(generalLedgerTransaction []*FieldMappingApiInstance) {
+	f.GeneralLedgerTransaction = generalLedgerTransaction
+	f.require(fieldMappingApiInstanceResponseFieldGeneralLedgerTransaction)
+}
+
+// SetBankFeedAccount sets the BankFeedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetBankFeedAccount(bankFeedAccount []*FieldMappingApiInstance) {
+	f.BankFeedAccount = bankFeedAccount
+	f.require(fieldMappingApiInstanceResponseFieldBankFeedAccount)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetEmployee(employee []*FieldMappingApiInstance) {
+	f.Employee = employee
+	f.require(fieldMappingApiInstanceResponseFieldEmployee)
+}
+
+// SetPaymentMethod sets the PaymentMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetPaymentMethod(paymentMethod []*FieldMappingApiInstance) {
+	f.PaymentMethod = paymentMethod
+	f.require(fieldMappingApiInstanceResponseFieldPaymentMethod)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetProject(project []*FieldMappingApiInstance) {
+	f.Project = project
+	f.require(fieldMappingApiInstanceResponseFieldProject)
+}
+
+// SetPaymentTerm sets the PaymentTerm field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetPaymentTerm(paymentTerm []*FieldMappingApiInstance) {
+	f.PaymentTerm = paymentTerm
+	f.require(fieldMappingApiInstanceResponseFieldPaymentTerm)
+}
+
 func (f *FieldMappingApiInstanceResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldMappingApiInstanceResponse
 	var value unmarshaler
@@ -852,6 +1718,17 @@ func (f *FieldMappingApiInstanceResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FieldMappingApiInstanceResponse) MarshalJSON() ([]byte, error) {
+	type embed FieldMappingApiInstanceResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldMappingApiInstanceResponse) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -864,10 +1741,19 @@ func (f *FieldMappingApiInstanceResponse) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	fieldMappingApiInstanceTargetFieldFieldName               = big.NewInt(1 << 0)
+	fieldMappingApiInstanceTargetFieldFieldDescription        = big.NewInt(1 << 1)
+	fieldMappingApiInstanceTargetFieldFieldIsOrganizationWide = big.NewInt(1 << 2)
+)
+
 type FieldMappingApiInstanceTargetField struct {
 	Name               string `json:"name" url:"name"`
 	Description        string `json:"description" url:"description"`
 	IsOrganizationWide bool   `json:"is_organization_wide" url:"is_organization_wide"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -898,6 +1784,34 @@ func (f *FieldMappingApiInstanceTargetField) GetExtraProperties() map[string]int
 	return f.extraProperties
 }
 
+func (f *FieldMappingApiInstanceTargetField) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceTargetField) SetName(name string) {
+	f.Name = name
+	f.require(fieldMappingApiInstanceTargetFieldFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceTargetField) SetDescription(description string) {
+	f.Description = description
+	f.require(fieldMappingApiInstanceTargetFieldFieldDescription)
+}
+
+// SetIsOrganizationWide sets the IsOrganizationWide field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceTargetField) SetIsOrganizationWide(isOrganizationWide bool) {
+	f.IsOrganizationWide = isOrganizationWide
+	f.require(fieldMappingApiInstanceTargetFieldFieldIsOrganizationWide)
+}
+
 func (f *FieldMappingApiInstanceTargetField) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldMappingApiInstanceTargetField
 	var value unmarshaler
@@ -914,6 +1828,17 @@ func (f *FieldMappingApiInstanceTargetField) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FieldMappingApiInstanceTargetField) MarshalJSON() ([]byte, error) {
+	type embed FieldMappingApiInstanceTargetField
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldMappingApiInstanceTargetField) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -926,11 +1851,21 @@ func (f *FieldMappingApiInstanceTargetField) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	fieldMappingInstanceResponseFieldModel    = big.NewInt(1 << 0)
+	fieldMappingInstanceResponseFieldWarnings = big.NewInt(1 << 1)
+	fieldMappingInstanceResponseFieldErrors   = big.NewInt(1 << 2)
+	fieldMappingInstanceResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type FieldMappingInstanceResponse struct {
 	Model    *FieldMappingApiInstance    `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -968,6 +1903,41 @@ func (f *FieldMappingInstanceResponse) GetExtraProperties() map[string]interface
 	return f.extraProperties
 }
 
+func (f *FieldMappingInstanceResponse) require(field *big.Int) {
+	if f.explicitFields == nil {
+		f.explicitFields = big.NewInt(0)
+	}
+	f.explicitFields.Or(f.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingInstanceResponse) SetModel(model *FieldMappingApiInstance) {
+	f.Model = model
+	f.require(fieldMappingInstanceResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingInstanceResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	f.Warnings = warnings
+	f.require(fieldMappingInstanceResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingInstanceResponse) SetErrors(errors []*ErrorValidationProblem) {
+	f.Errors = errors
+	f.require(fieldMappingInstanceResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingInstanceResponse) SetLogs(logs []*DebugModeLog) {
+	f.Logs = logs
+	f.require(fieldMappingInstanceResponseFieldLogs)
+}
+
 func (f *FieldMappingInstanceResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler FieldMappingInstanceResponse
 	var value unmarshaler
@@ -984,6 +1954,17 @@ func (f *FieldMappingInstanceResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (f *FieldMappingInstanceResponse) MarshalJSON() ([]byte, error) {
+	type embed FieldMappingInstanceResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*f),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, f.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (f *FieldMappingInstanceResponse) String() string {
 	if len(f.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(f.rawJSON); err == nil {
@@ -996,10 +1977,19 @@ func (f *FieldMappingInstanceResponse) String() string {
 	return fmt.Sprintf("%#v", f)
 }
 
+var (
+	remoteEndpointInfoFieldMethod             = big.NewInt(1 << 0)
+	remoteEndpointInfoFieldUrlPath            = big.NewInt(1 << 1)
+	remoteEndpointInfoFieldFieldTraversalPath = big.NewInt(1 << 2)
+)
+
 type RemoteEndpointInfo struct {
 	Method             string        `json:"method" url:"method"`
 	UrlPath            string        `json:"url_path" url:"url_path"`
 	FieldTraversalPath []interface{} `json:"field_traversal_path" url:"field_traversal_path"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1030,6 +2020,34 @@ func (r *RemoteEndpointInfo) GetExtraProperties() map[string]interface{} {
 	return r.extraProperties
 }
 
+func (r *RemoteEndpointInfo) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetMethod sets the Method field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteEndpointInfo) SetMethod(method string) {
+	r.Method = method
+	r.require(remoteEndpointInfoFieldMethod)
+}
+
+// SetUrlPath sets the UrlPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteEndpointInfo) SetUrlPath(urlPath string) {
+	r.UrlPath = urlPath
+	r.require(remoteEndpointInfoFieldUrlPath)
+}
+
+// SetFieldTraversalPath sets the FieldTraversalPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteEndpointInfo) SetFieldTraversalPath(fieldTraversalPath []interface{}) {
+	r.FieldTraversalPath = fieldTraversalPath
+	r.require(remoteEndpointInfoFieldFieldTraversalPath)
+}
+
 func (r *RemoteEndpointInfo) UnmarshalJSON(data []byte) error {
 	type unmarshaler RemoteEndpointInfo
 	var value unmarshaler
@@ -1046,6 +2064,17 @@ func (r *RemoteEndpointInfo) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (r *RemoteEndpointInfo) MarshalJSON() ([]byte, error) {
+	type embed RemoteEndpointInfo
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*r),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, r.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (r *RemoteEndpointInfo) String() string {
 	if len(r.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(r.rawJSON); err == nil {
@@ -1058,6 +2087,15 @@ func (r *RemoteEndpointInfo) String() string {
 	return fmt.Sprintf("%#v", r)
 }
 
+var (
+	remoteFieldApiFieldSchema             = big.NewInt(1 << 0)
+	remoteFieldApiFieldRemoteKeyName      = big.NewInt(1 << 1)
+	remoteFieldApiFieldRemoteEndpointInfo = big.NewInt(1 << 2)
+	remoteFieldApiFieldExampleValues      = big.NewInt(1 << 3)
+	remoteFieldApiFieldAdvancedMetadata   = big.NewInt(1 << 4)
+	remoteFieldApiFieldCoverage           = big.NewInt(1 << 5)
+)
+
 type RemoteFieldApi struct {
 	Schema             map[string]interface{}  `json:"schema" url:"schema"`
 	RemoteKeyName      string                  `json:"remote_key_name" url:"remote_key_name"`
@@ -1065,6 +2103,9 @@ type RemoteFieldApi struct {
 	ExampleValues      []interface{}           `json:"example_values,omitempty" url:"example_values,omitempty"`
 	AdvancedMetadata   *AdvancedMetadata       `json:"advanced_metadata,omitempty" url:"advanced_metadata,omitempty"`
 	Coverage           *RemoteFieldApiCoverage `json:"coverage,omitempty" url:"coverage,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1116,6 +2157,55 @@ func (r *RemoteFieldApi) GetExtraProperties() map[string]interface{} {
 	return r.extraProperties
 }
 
+func (r *RemoteFieldApi) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetSchema sets the Schema field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApi) SetSchema(schema map[string]interface{}) {
+	r.Schema = schema
+	r.require(remoteFieldApiFieldSchema)
+}
+
+// SetRemoteKeyName sets the RemoteKeyName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApi) SetRemoteKeyName(remoteKeyName string) {
+	r.RemoteKeyName = remoteKeyName
+	r.require(remoteFieldApiFieldRemoteKeyName)
+}
+
+// SetRemoteEndpointInfo sets the RemoteEndpointInfo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApi) SetRemoteEndpointInfo(remoteEndpointInfo *RemoteEndpointInfo) {
+	r.RemoteEndpointInfo = remoteEndpointInfo
+	r.require(remoteFieldApiFieldRemoteEndpointInfo)
+}
+
+// SetExampleValues sets the ExampleValues field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApi) SetExampleValues(exampleValues []interface{}) {
+	r.ExampleValues = exampleValues
+	r.require(remoteFieldApiFieldExampleValues)
+}
+
+// SetAdvancedMetadata sets the AdvancedMetadata field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApi) SetAdvancedMetadata(advancedMetadata *AdvancedMetadata) {
+	r.AdvancedMetadata = advancedMetadata
+	r.require(remoteFieldApiFieldAdvancedMetadata)
+}
+
+// SetCoverage sets the Coverage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApi) SetCoverage(coverage *RemoteFieldApiCoverage) {
+	r.Coverage = coverage
+	r.require(remoteFieldApiFieldCoverage)
+}
+
 func (r *RemoteFieldApi) UnmarshalJSON(data []byte) error {
 	type unmarshaler RemoteFieldApi
 	var value unmarshaler
@@ -1130,6 +2220,17 @@ func (r *RemoteFieldApi) UnmarshalJSON(data []byte) error {
 	r.extraProperties = extraProperties
 	r.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (r *RemoteFieldApi) MarshalJSON() ([]byte, error) {
+	type embed RemoteFieldApi
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*r),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, r.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (r *RemoteFieldApi) String() string {
@@ -1206,6 +2307,34 @@ func (r *RemoteFieldApiCoverage) Accept(visitor RemoteFieldApiCoverageVisitor) e
 	return fmt.Errorf("type %T does not include a non-empty union type", r)
 }
 
+var (
+	remoteFieldApiResponseFieldAccount                  = big.NewInt(1 << 0)
+	remoteFieldApiResponseFieldAccountingAttachment     = big.NewInt(1 << 1)
+	remoteFieldApiResponseFieldBalanceSheet             = big.NewInt(1 << 2)
+	remoteFieldApiResponseFieldCashFlowStatement        = big.NewInt(1 << 3)
+	remoteFieldApiResponseFieldCompanyInfo              = big.NewInt(1 << 4)
+	remoteFieldApiResponseFieldContact                  = big.NewInt(1 << 5)
+	remoteFieldApiResponseFieldIncomeStatement          = big.NewInt(1 << 6)
+	remoteFieldApiResponseFieldCreditNote               = big.NewInt(1 << 7)
+	remoteFieldApiResponseFieldItem                     = big.NewInt(1 << 8)
+	remoteFieldApiResponseFieldPurchaseOrder            = big.NewInt(1 << 9)
+	remoteFieldApiResponseFieldTrackingCategory         = big.NewInt(1 << 10)
+	remoteFieldApiResponseFieldJournalEntry             = big.NewInt(1 << 11)
+	remoteFieldApiResponseFieldTaxRate                  = big.NewInt(1 << 12)
+	remoteFieldApiResponseFieldInvoice                  = big.NewInt(1 << 13)
+	remoteFieldApiResponseFieldPayment                  = big.NewInt(1 << 14)
+	remoteFieldApiResponseFieldExpense                  = big.NewInt(1 << 15)
+	remoteFieldApiResponseFieldVendorCredit             = big.NewInt(1 << 16)
+	remoteFieldApiResponseFieldTransaction              = big.NewInt(1 << 17)
+	remoteFieldApiResponseFieldAccountingPeriod         = big.NewInt(1 << 18)
+	remoteFieldApiResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 19)
+	remoteFieldApiResponseFieldBankFeedAccount          = big.NewInt(1 << 20)
+	remoteFieldApiResponseFieldEmployee                 = big.NewInt(1 << 21)
+	remoteFieldApiResponseFieldPaymentMethod            = big.NewInt(1 << 22)
+	remoteFieldApiResponseFieldProject                  = big.NewInt(1 << 23)
+	remoteFieldApiResponseFieldPaymentTerm              = big.NewInt(1 << 24)
+)
+
 type RemoteFieldApiResponse struct {
 	Account                  []*RemoteFieldApi `json:"Account,omitempty" url:"Account,omitempty"`
 	AccountingAttachment     []*RemoteFieldApi `json:"AccountingAttachment,omitempty" url:"AccountingAttachment,omitempty"`
@@ -1232,6 +2361,9 @@ type RemoteFieldApiResponse struct {
 	PaymentMethod            []*RemoteFieldApi `json:"PaymentMethod,omitempty" url:"PaymentMethod,omitempty"`
 	Project                  []*RemoteFieldApi `json:"Project,omitempty" url:"Project,omitempty"`
 	PaymentTerm              []*RemoteFieldApi `json:"PaymentTerm,omitempty" url:"PaymentTerm,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1416,6 +2548,188 @@ func (r *RemoteFieldApiResponse) GetExtraProperties() map[string]interface{} {
 	return r.extraProperties
 }
 
+func (r *RemoteFieldApiResponse) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetAccount(account []*RemoteFieldApi) {
+	r.Account = account
+	r.require(remoteFieldApiResponseFieldAccount)
+}
+
+// SetAccountingAttachment sets the AccountingAttachment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetAccountingAttachment(accountingAttachment []*RemoteFieldApi) {
+	r.AccountingAttachment = accountingAttachment
+	r.require(remoteFieldApiResponseFieldAccountingAttachment)
+}
+
+// SetBalanceSheet sets the BalanceSheet field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetBalanceSheet(balanceSheet []*RemoteFieldApi) {
+	r.BalanceSheet = balanceSheet
+	r.require(remoteFieldApiResponseFieldBalanceSheet)
+}
+
+// SetCashFlowStatement sets the CashFlowStatement field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetCashFlowStatement(cashFlowStatement []*RemoteFieldApi) {
+	r.CashFlowStatement = cashFlowStatement
+	r.require(remoteFieldApiResponseFieldCashFlowStatement)
+}
+
+// SetCompanyInfo sets the CompanyInfo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetCompanyInfo(companyInfo []*RemoteFieldApi) {
+	r.CompanyInfo = companyInfo
+	r.require(remoteFieldApiResponseFieldCompanyInfo)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetContact(contact []*RemoteFieldApi) {
+	r.Contact = contact
+	r.require(remoteFieldApiResponseFieldContact)
+}
+
+// SetIncomeStatement sets the IncomeStatement field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetIncomeStatement(incomeStatement []*RemoteFieldApi) {
+	r.IncomeStatement = incomeStatement
+	r.require(remoteFieldApiResponseFieldIncomeStatement)
+}
+
+// SetCreditNote sets the CreditNote field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetCreditNote(creditNote []*RemoteFieldApi) {
+	r.CreditNote = creditNote
+	r.require(remoteFieldApiResponseFieldCreditNote)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetItem(item []*RemoteFieldApi) {
+	r.Item = item
+	r.require(remoteFieldApiResponseFieldItem)
+}
+
+// SetPurchaseOrder sets the PurchaseOrder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetPurchaseOrder(purchaseOrder []*RemoteFieldApi) {
+	r.PurchaseOrder = purchaseOrder
+	r.require(remoteFieldApiResponseFieldPurchaseOrder)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetTrackingCategory(trackingCategory []*RemoteFieldApi) {
+	r.TrackingCategory = trackingCategory
+	r.require(remoteFieldApiResponseFieldTrackingCategory)
+}
+
+// SetJournalEntry sets the JournalEntry field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetJournalEntry(journalEntry []*RemoteFieldApi) {
+	r.JournalEntry = journalEntry
+	r.require(remoteFieldApiResponseFieldJournalEntry)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetTaxRate(taxRate []*RemoteFieldApi) {
+	r.TaxRate = taxRate
+	r.require(remoteFieldApiResponseFieldTaxRate)
+}
+
+// SetInvoice sets the Invoice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetInvoice(invoice []*RemoteFieldApi) {
+	r.Invoice = invoice
+	r.require(remoteFieldApiResponseFieldInvoice)
+}
+
+// SetPayment sets the Payment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetPayment(payment []*RemoteFieldApi) {
+	r.Payment = payment
+	r.require(remoteFieldApiResponseFieldPayment)
+}
+
+// SetExpense sets the Expense field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetExpense(expense []*RemoteFieldApi) {
+	r.Expense = expense
+	r.require(remoteFieldApiResponseFieldExpense)
+}
+
+// SetVendorCredit sets the VendorCredit field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetVendorCredit(vendorCredit []*RemoteFieldApi) {
+	r.VendorCredit = vendorCredit
+	r.require(remoteFieldApiResponseFieldVendorCredit)
+}
+
+// SetTransaction sets the Transaction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetTransaction(transaction []*RemoteFieldApi) {
+	r.Transaction = transaction
+	r.require(remoteFieldApiResponseFieldTransaction)
+}
+
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetAccountingPeriod(accountingPeriod []*RemoteFieldApi) {
+	r.AccountingPeriod = accountingPeriod
+	r.require(remoteFieldApiResponseFieldAccountingPeriod)
+}
+
+// SetGeneralLedgerTransaction sets the GeneralLedgerTransaction field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetGeneralLedgerTransaction(generalLedgerTransaction []*RemoteFieldApi) {
+	r.GeneralLedgerTransaction = generalLedgerTransaction
+	r.require(remoteFieldApiResponseFieldGeneralLedgerTransaction)
+}
+
+// SetBankFeedAccount sets the BankFeedAccount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetBankFeedAccount(bankFeedAccount []*RemoteFieldApi) {
+	r.BankFeedAccount = bankFeedAccount
+	r.require(remoteFieldApiResponseFieldBankFeedAccount)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetEmployee(employee []*RemoteFieldApi) {
+	r.Employee = employee
+	r.require(remoteFieldApiResponseFieldEmployee)
+}
+
+// SetPaymentMethod sets the PaymentMethod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetPaymentMethod(paymentMethod []*RemoteFieldApi) {
+	r.PaymentMethod = paymentMethod
+	r.require(remoteFieldApiResponseFieldPaymentMethod)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetProject(project []*RemoteFieldApi) {
+	r.Project = project
+	r.require(remoteFieldApiResponseFieldProject)
+}
+
+// SetPaymentTerm sets the PaymentTerm field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetPaymentTerm(paymentTerm []*RemoteFieldApi) {
+	r.PaymentTerm = paymentTerm
+	r.require(remoteFieldApiResponseFieldPaymentTerm)
+}
+
 func (r *RemoteFieldApiResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler RemoteFieldApiResponse
 	var value unmarshaler
@@ -1430,6 +2744,17 @@ func (r *RemoteFieldApiResponse) UnmarshalJSON(data []byte) error {
 	r.extraProperties = extraProperties
 	r.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (r *RemoteFieldApiResponse) MarshalJSON() ([]byte, error) {
+	type embed RemoteFieldApiResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*r),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, r.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (r *RemoteFieldApiResponse) String() string {

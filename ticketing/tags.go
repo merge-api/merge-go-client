@@ -6,7 +6,21 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	tagsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	tagsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	tagsListRequestFieldCursor             = big.NewInt(1 << 2)
+	tagsListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	tagsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	tagsListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	tagsListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	tagsListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	tagsListRequestFieldPageSize           = big.NewInt(1 << 8)
+	tagsListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type TagsListRequest struct {
@@ -30,19 +44,137 @@ type TagsListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TagsListRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	t.CreatedAfter = createdAfter
+	t.require(tagsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	t.CreatedBefore = createdBefore
+	t.require(tagsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetCursor(cursor *string) {
+	t.Cursor = cursor
+	t.require(tagsListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(tagsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(tagsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(tagsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	t.ModifiedAfter = modifiedAfter
+	t.require(tagsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	t.ModifiedBefore = modifiedBefore
+	t.require(tagsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetPageSize(pageSize *int) {
+	t.PageSize = pageSize
+	t.require(tagsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsListRequest) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(tagsListRequestFieldRemoteId)
+}
+
+var (
+	tagsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	tagsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type TagsRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (t *TagsRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	t.IncludeRemoteData = includeRemoteData
+	t.require(tagsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TagsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(tagsRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedTagListFieldNext     = big.NewInt(1 << 0)
+	paginatedTagListFieldPrevious = big.NewInt(1 << 1)
+	paginatedTagListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedTagList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Tag  `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedTagList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedTagList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTagList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedTagListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTagList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedTagListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedTagList) SetResults(results []*Tag) {
+	p.Results = results
+	p.require(paginatedTagListFieldResults)
+}
+
 func (p *PaginatedTagList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedTagList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedTagList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedTagList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedTagList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedTagList) String() string {
@@ -107,6 +278,17 @@ func (p *PaginatedTagList) String() string {
 //
 // ### Usage Example
 // TODO
+var (
+	tagFieldRemoteId         = big.NewInt(1 << 0)
+	tagFieldCreatedAt        = big.NewInt(1 << 1)
+	tagFieldModifiedAt       = big.NewInt(1 << 2)
+	tagFieldId               = big.NewInt(1 << 3)
+	tagFieldName             = big.NewInt(1 << 4)
+	tagFieldRemoteWasDeleted = big.NewInt(1 << 5)
+	tagFieldFieldMappings    = big.NewInt(1 << 6)
+	tagFieldRemoteData       = big.NewInt(1 << 7)
+)
+
 type Tag struct {
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
@@ -121,6 +303,9 @@ type Tag struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -186,6 +371,69 @@ func (t *Tag) GetExtraProperties() map[string]interface{} {
 	return t.extraProperties
 }
 
+func (t *Tag) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetRemoteId(remoteId *string) {
+	t.RemoteId = remoteId
+	t.require(tagFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetCreatedAt(createdAt *time.Time) {
+	t.CreatedAt = createdAt
+	t.require(tagFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetModifiedAt(modifiedAt *time.Time) {
+	t.ModifiedAt = modifiedAt
+	t.require(tagFieldModifiedAt)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetId(id *string) {
+	t.Id = id
+	t.require(tagFieldId)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetName(name *string) {
+	t.Name = name
+	t.require(tagFieldName)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	t.RemoteWasDeleted = remoteWasDeleted
+	t.require(tagFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetFieldMappings(fieldMappings map[string]interface{}) {
+	t.FieldMappings = fieldMappings
+	t.require(tagFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Tag) SetRemoteData(remoteData []*RemoteData) {
+	t.RemoteData = remoteData
+	t.require(tagFieldRemoteData)
+}
+
 func (t *Tag) UnmarshalJSON(data []byte) error {
 	type embed Tag
 	var unmarshaler = struct {
@@ -221,7 +469,8 @@ func (t *Tag) MarshalJSON() ([]byte, error) {
 		CreatedAt:  internal.NewOptionalDateTime(t.CreatedAt),
 		ModifiedAt: internal.NewOptionalDateTime(t.ModifiedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, t.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (t *Tag) String() string {

@@ -51,15 +51,9 @@ import (
 	webhookreceivers "github.com/merge-api/merge-go-client/v2/accounting/webhookreceivers"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
 	AccountDetails            *accountdetails.Client
 	AccountToken              *accounttoken.Client
 	AccountingPeriods         *accountingperiods.Client
@@ -106,64 +100,67 @@ type Client struct {
 	Transactions              *transactions.Client
 	VendorCredits             *vendorcredits.Client
 	WebhookReceivers          *webhookreceivers.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
-func NewClient(opts ...option.RequestOption) *Client {
-	options := core.NewRequestOptions(opts...)
+func NewClient(options *core.RequestOptions) *Client {
 	return &Client{
-		baseURL: options.BaseURL,
+		AccountDetails:            accountdetails.NewClient(options),
+		AccountToken:              accounttoken.NewClient(options),
+		AccountingPeriods:         accountingperiods.NewClient(options),
+		Accounts:                  accounts.NewClient(options),
+		Addresses:                 addresses.NewClient(options),
+		AsyncPassthrough:          asyncpassthrough.NewClient(options),
+		AsyncTasks:                asynctasks.NewClient(options),
+		Attachments:               attachments.NewClient(options),
+		AuditTrail:                audittrail.NewClient(options),
+		AvailableActions:          availableactions.NewClient(options),
+		BalanceSheets:             balancesheets.NewClient(options),
+		BankFeedAccounts:          bankfeedaccounts.NewClient(options),
+		BankFeedTransactions:      bankfeedtransactions.NewClient(options),
+		CashFlowStatements:        cashflowstatements.NewClient(options),
+		CompanyInfo:               companyinfo.NewClient(options),
+		Contacts:                  contacts.NewClient(options),
+		CreditNotes:               creditnotes.NewClient(options),
+		Scopes:                    scopes.NewClient(options),
+		DeleteAccount:             deleteaccount.NewClient(options),
+		Employees:                 employees.NewClient(options),
+		Expenses:                  expenses.NewClient(options),
+		FieldMapping:              fieldmapping.NewClient(options),
+		GeneralLedgerTransactions: generalledgertransactions.NewClient(options),
+		GenerateKey:               generatekey.NewClient(options),
+		IncomeStatements:          incomestatements.NewClient(options),
+		Invoices:                  invoices.NewClient(options),
+		Issues:                    issues.NewClient(options),
+		Items:                     items.NewClient(options),
+		JournalEntries:            journalentries.NewClient(options),
+		LinkToken:                 linktoken.NewClient(options),
+		LinkedAccounts:            linkedaccounts.NewClient(options),
+		Passthrough:               passthrough.NewClient(options),
+		PaymentMethods:            paymentmethods.NewClient(options),
+		PaymentTerms:              paymentterms.NewClient(options),
+		Payments:                  payments.NewClient(options),
+		PhoneNumbers:              phonenumbers.NewClient(options),
+		Projects:                  projects.NewClient(options),
+		PurchaseOrders:            purchaseorders.NewClient(options),
+		RegenerateKey:             regeneratekey.NewClient(options),
+		SyncStatus:                syncstatus.NewClient(options),
+		ForceResync:               forceresync.NewClient(options),
+		TaxRates:                  taxrates.NewClient(options),
+		TrackingCategories:        trackingcategories.NewClient(options),
+		Transactions:              transactions.NewClient(options),
+		VendorCredits:             vendorcredits.NewClient(options),
+		WebhookReceivers:          webhookreceivers.NewClient(options),
+		options:                   options,
+		baseURL:                   options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:                    options.ToHeader(),
-		AccountDetails:            accountdetails.NewClient(opts...),
-		AccountToken:              accounttoken.NewClient(opts...),
-		AccountingPeriods:         accountingperiods.NewClient(opts...),
-		Accounts:                  accounts.NewClient(opts...),
-		Addresses:                 addresses.NewClient(opts...),
-		AsyncPassthrough:          asyncpassthrough.NewClient(opts...),
-		AsyncTasks:                asynctasks.NewClient(opts...),
-		Attachments:               attachments.NewClient(opts...),
-		AuditTrail:                audittrail.NewClient(opts...),
-		AvailableActions:          availableactions.NewClient(opts...),
-		BalanceSheets:             balancesheets.NewClient(opts...),
-		BankFeedAccounts:          bankfeedaccounts.NewClient(opts...),
-		BankFeedTransactions:      bankfeedtransactions.NewClient(opts...),
-		CashFlowStatements:        cashflowstatements.NewClient(opts...),
-		CompanyInfo:               companyinfo.NewClient(opts...),
-		Contacts:                  contacts.NewClient(opts...),
-		CreditNotes:               creditnotes.NewClient(opts...),
-		Scopes:                    scopes.NewClient(opts...),
-		DeleteAccount:             deleteaccount.NewClient(opts...),
-		Employees:                 employees.NewClient(opts...),
-		Expenses:                  expenses.NewClient(opts...),
-		FieldMapping:              fieldmapping.NewClient(opts...),
-		GeneralLedgerTransactions: generalledgertransactions.NewClient(opts...),
-		GenerateKey:               generatekey.NewClient(opts...),
-		IncomeStatements:          incomestatements.NewClient(opts...),
-		Invoices:                  invoices.NewClient(opts...),
-		Issues:                    issues.NewClient(opts...),
-		Items:                     items.NewClient(opts...),
-		JournalEntries:            journalentries.NewClient(opts...),
-		LinkToken:                 linktoken.NewClient(opts...),
-		LinkedAccounts:            linkedaccounts.NewClient(opts...),
-		Passthrough:               passthrough.NewClient(opts...),
-		PaymentMethods:            paymentmethods.NewClient(opts...),
-		PaymentTerms:              paymentterms.NewClient(opts...),
-		Payments:                  payments.NewClient(opts...),
-		PhoneNumbers:              phonenumbers.NewClient(opts...),
-		Projects:                  projects.NewClient(opts...),
-		PurchaseOrders:            purchaseorders.NewClient(opts...),
-		RegenerateKey:             regeneratekey.NewClient(opts...),
-		SyncStatus:                syncstatus.NewClient(opts...),
-		ForceResync:               forceresync.NewClient(opts...),
-		TaxRates:                  taxrates.NewClient(opts...),
-		TrackingCategories:        trackingcategories.NewClient(opts...),
-		Transactions:              transactions.NewClient(opts...),
-		VendorCredits:             vendorcredits.NewClient(opts...),
-		WebhookReceivers:          webhookreceivers.NewClient(opts...),
 	}
 }

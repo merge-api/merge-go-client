@@ -2,6 +2,17 @@
 
 package accounting
 
+import (
+	big "math/big"
+)
+
+var (
+	addressesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	addressesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+	addressesRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 2)
+	addressesRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 3)
+)
+
 type AddressesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
@@ -11,4 +22,42 @@ type AddressesRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (a *AddressesRetrieveRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	a.IncludeRemoteData = includeRemoteData
+	a.require(addressesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	a.IncludeShellData = includeShellData
+	a.require(addressesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressesRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	a.RemoteFields = remoteFields
+	a.require(addressesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	a.ShowEnumOrigins = showEnumOrigins
+	a.require(addressesRetrieveRequestFieldShowEnumOrigins)
 }
