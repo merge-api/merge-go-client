@@ -128,12 +128,18 @@ func TestFileStorageFieldMappingFieldMappingsDestroyWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	_, invocationErr := client.FileStorage.FieldMapping.FieldMappingsDestroy(
+	response, invocationErr := client.FileStorage.FieldMapping.FieldMappingsDestroy(
 		context.TODO(),
 		"field_mapping_id",
 	)
 
-	require.NoError(t, invocationErr, "Client method call should succeed")
+	// DELETE operations may return nil response body, which is acceptable
+	if invocationErr != nil && response == nil {
+		// This is expected for DELETE operations that return 204 No Content
+		require.Contains(t, invocationErr.Error(), "but the server responded with nothing", "Expected empty response error")
+	} else {
+		require.NoError(t, invocationErr, "Client method call should succeed")
+	}
 	VerifyRequestCount(t, "DELETE", "/filestorage/v1/field-mappings/field_mapping_id", nil, 1)
 }
 
