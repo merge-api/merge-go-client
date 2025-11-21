@@ -6,7 +6,7 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	v2 "github.com/merge-api/merge-go-client/v2"
+	merge "github.com/merge-api/merge-go-client/v2"
 	client "github.com/merge-api/merge-go-client/v2/client"
 	hris "github.com/merge-api/merge-go-client/v2/hris"
 	option "github.com/merge-api/merge-go-client/v2/option"
