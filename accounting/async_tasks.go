@@ -6,11 +6,20 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
+)
+
+var (
+	asyncPostTaskFieldStatus = big.NewInt(1 << 0)
+	asyncPostTaskFieldResult = big.NewInt(1 << 1)
 )
 
 type AsyncPostTask struct {
 	Status *AsyncPostTaskStatus `json:"status" url:"status"`
 	Result *AsyncPostTaskResult `json:"result" url:"result"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -34,6 +43,27 @@ func (a *AsyncPostTask) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AsyncPostTask) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AsyncPostTask) SetStatus(status *AsyncPostTaskStatus) {
+	a.Status = status
+	a.require(asyncPostTaskFieldStatus)
+}
+
+// SetResult sets the Result field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AsyncPostTask) SetResult(result *AsyncPostTaskResult) {
+	a.Result = result
+	a.require(asyncPostTaskFieldResult)
+}
+
 func (a *AsyncPostTask) UnmarshalJSON(data []byte) error {
 	type unmarshaler AsyncPostTask
 	var value unmarshaler
@@ -50,6 +80,17 @@ func (a *AsyncPostTask) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (a *AsyncPostTask) MarshalJSON() ([]byte, error) {
+	type embed AsyncPostTask
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (a *AsyncPostTask) String() string {
 	if len(a.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
@@ -62,9 +103,17 @@ func (a *AsyncPostTask) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+var (
+	asyncPostTaskResultFieldStatusCode = big.NewInt(1 << 0)
+	asyncPostTaskResultFieldResponse   = big.NewInt(1 << 1)
+)
+
 type AsyncPostTaskResult struct {
 	StatusCode *int                   `json:"status_code,omitempty" url:"status_code,omitempty"`
 	Response   map[string]interface{} `json:"response,omitempty" url:"response,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -88,6 +137,27 @@ func (a *AsyncPostTaskResult) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
 
+func (a *AsyncPostTaskResult) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetStatusCode sets the StatusCode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AsyncPostTaskResult) SetStatusCode(statusCode *int) {
+	a.StatusCode = statusCode
+	a.require(asyncPostTaskResultFieldStatusCode)
+}
+
+// SetResponse sets the Response field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AsyncPostTaskResult) SetResponse(response map[string]interface{}) {
+	a.Response = response
+	a.require(asyncPostTaskResultFieldResponse)
+}
+
 func (a *AsyncPostTaskResult) UnmarshalJSON(data []byte) error {
 	type unmarshaler AsyncPostTaskResult
 	var value unmarshaler
@@ -102,6 +172,17 @@ func (a *AsyncPostTaskResult) UnmarshalJSON(data []byte) error {
 	a.extraProperties = extraProperties
 	a.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (a *AsyncPostTaskResult) MarshalJSON() ([]byte, error) {
+	type embed AsyncPostTaskResult
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (a *AsyncPostTaskResult) String() string {

@@ -3,9 +3,8 @@
 package client
 
 import (
-	merge "github.com/merge-api/merge-go-client/v2"
 	accountingclient "github.com/merge-api/merge-go-client/v2/accounting/client"
-	atsclient "github.com/merge-api/merge-go-client/v2/ats/client"
+	client "github.com/merge-api/merge-go-client/v2/ats/client"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	crmclient "github.com/merge-api/merge-go-client/v2/crm/client"
 	filestorageclient "github.com/merge-api/merge-go-client/v2/filestorage/client"
@@ -13,42 +12,43 @@ import (
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
 	ticketingclient "github.com/merge-api/merge-go-client/v2/ticketing/client"
-	http "net/http"
 )
 
 type Client struct {
-	baseURL string
-	caller  *internal.Caller
-	header  http.Header
-
-	Ats         *atsclient.Client
+	Ats         *client.Client
 	Accounting  *accountingclient.Client
 	Crm         *crmclient.Client
 	FileStorage *filestorageclient.Client
 	Hris        *hrisclient.Client
 	Ticketing   *ticketingclient.Client
+
+	options *core.RequestOptions
+	baseURL string
+	caller  *internal.Caller
 }
 
 func NewClient(opts ...option.RequestOption) *Client {
 	options := core.NewRequestOptions(opts...)
-	if options.BaseURL == "" {
-		options.BaseURL = merge.Environments.Production
+	baseURL := options.BaseURL
+	if baseURL == "" {
+		baseURL = "https://api.merge.dev/api"
 	}
-
+	// Update the options with the resolved base URL
+	options.BaseURL = baseURL
 	return &Client{
-		baseURL: options.BaseURL,
+		Ats:         client.NewClient(options),
+		Accounting:  accountingclient.NewClient(options),
+		Crm:         crmclient.NewClient(options),
+		FileStorage: filestorageclient.NewClient(options),
+		Hris:        hrisclient.NewClient(options),
+		Ticketing:   ticketingclient.NewClient(options),
+		options:     options,
+		baseURL:     baseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,
 				MaxAttempts: options.MaxAttempts,
 			},
 		),
-		header:      options.ToHeader(),
-		Ats:         atsclient.NewClient(opts...),
-		Accounting:  accountingclient.NewClient(opts...),
-		Crm:         crmclient.NewClient(opts...),
-		FileStorage: filestorageclient.NewClient(opts...),
-		Hris:        hrisclient.NewClient(opts...),
-		Ticketing:   ticketingclient.NewClient(opts...),
 	}
 }

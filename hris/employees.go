@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	employeeEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	employeeEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	employeeEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type EmployeeEndpointRequest struct {
@@ -15,7 +22,74 @@ type EmployeeEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool            `json:"-" url:"run_async,omitempty"`
 	Model    *EmployeeRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EmployeeEndpointRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	e.IsDebugMode = isDebugMode
+	e.require(employeeEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeEndpointRequest) SetRunAsync(runAsync *bool) {
+	e.RunAsync = runAsync
+	e.require(employeeEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeEndpointRequest) SetModel(model *EmployeeRequest) {
+	e.Model = model
+	e.require(employeeEndpointRequestFieldModel)
+}
+
+var (
+	employeesListRequestFieldCompanyId              = big.NewInt(1 << 0)
+	employeesListRequestFieldCreatedAfter           = big.NewInt(1 << 1)
+	employeesListRequestFieldCreatedBefore          = big.NewInt(1 << 2)
+	employeesListRequestFieldCursor                 = big.NewInt(1 << 3)
+	employeesListRequestFieldDisplayFullName        = big.NewInt(1 << 4)
+	employeesListRequestFieldEmploymentStatus       = big.NewInt(1 << 5)
+	employeesListRequestFieldEmploymentType         = big.NewInt(1 << 6)
+	employeesListRequestFieldExpand                 = big.NewInt(1 << 7)
+	employeesListRequestFieldFirstName              = big.NewInt(1 << 8)
+	employeesListRequestFieldGroups                 = big.NewInt(1 << 9)
+	employeesListRequestFieldHomeLocationId         = big.NewInt(1 << 10)
+	employeesListRequestFieldIncludeDeletedData     = big.NewInt(1 << 11)
+	employeesListRequestFieldIncludeRemoteData      = big.NewInt(1 << 12)
+	employeesListRequestFieldIncludeSensitiveFields = big.NewInt(1 << 13)
+	employeesListRequestFieldIncludeShellData       = big.NewInt(1 << 14)
+	employeesListRequestFieldJobTitle               = big.NewInt(1 << 15)
+	employeesListRequestFieldLastName               = big.NewInt(1 << 16)
+	employeesListRequestFieldManagerId              = big.NewInt(1 << 17)
+	employeesListRequestFieldModifiedAfter          = big.NewInt(1 << 18)
+	employeesListRequestFieldModifiedBefore         = big.NewInt(1 << 19)
+	employeesListRequestFieldPageSize               = big.NewInt(1 << 20)
+	employeesListRequestFieldPayGroupId             = big.NewInt(1 << 21)
+	employeesListRequestFieldPersonalEmail          = big.NewInt(1 << 22)
+	employeesListRequestFieldRemoteFields           = big.NewInt(1 << 23)
+	employeesListRequestFieldRemoteId               = big.NewInt(1 << 24)
+	employeesListRequestFieldShowEnumOrigins        = big.NewInt(1 << 25)
+	employeesListRequestFieldStartedAfter           = big.NewInt(1 << 26)
+	employeesListRequestFieldStartedBefore          = big.NewInt(1 << 27)
+	employeesListRequestFieldTeamId                 = big.NewInt(1 << 28)
+	employeesListRequestFieldTerminatedAfter        = big.NewInt(1 << 29)
+	employeesListRequestFieldTerminatedBefore       = big.NewInt(1 << 30)
+	employeesListRequestFieldWorkEmail              = big.NewInt(1 << 31)
+	employeesListRequestFieldWorkLocationId         = big.NewInt(1 << 32)
+)
 
 type EmployeesListRequest struct {
 	// If provided, will only return employees for this company.
@@ -88,7 +162,257 @@ type EmployeesListRequest struct {
 	WorkEmail *string `json:"-" url:"work_email,omitempty"`
 	// If provided, will only return employees for this location.
 	WorkLocationId *string `json:"-" url:"work_location_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (e *EmployeesListRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCompanyId(companyId *string) {
+	e.CompanyId = companyId
+	e.require(employeesListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(employeesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(employeesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCursor(cursor *string) {
+	e.Cursor = cursor
+	e.require(employeesListRequestFieldCursor)
+}
+
+// SetDisplayFullName sets the DisplayFullName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetDisplayFullName(displayFullName *string) {
+	e.DisplayFullName = displayFullName
+	e.require(employeesListRequestFieldDisplayFullName)
+}
+
+// SetEmploymentStatus sets the EmploymentStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetEmploymentStatus(employmentStatus *EmployeesListRequestEmploymentStatus) {
+	e.EmploymentStatus = employmentStatus
+	e.require(employeesListRequestFieldEmploymentStatus)
+}
+
+// SetEmploymentType sets the EmploymentType field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetEmploymentType(employmentType *string) {
+	e.EmploymentType = employmentType
+	e.require(employeesListRequestFieldEmploymentType)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetExpand(expand []*EmployeesListRequestExpandItem) {
+	e.Expand = expand
+	e.require(employeesListRequestFieldExpand)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetFirstName(firstName *string) {
+	e.FirstName = firstName
+	e.require(employeesListRequestFieldFirstName)
+}
+
+// SetGroups sets the Groups field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetGroups(groups *string) {
+	e.Groups = groups
+	e.require(employeesListRequestFieldGroups)
+}
+
+// SetHomeLocationId sets the HomeLocationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetHomeLocationId(homeLocationId *string) {
+	e.HomeLocationId = homeLocationId
+	e.require(employeesListRequestFieldHomeLocationId)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	e.IncludeDeletedData = includeDeletedData
+	e.require(employeesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employeesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeSensitiveFields sets the IncludeSensitiveFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeSensitiveFields(includeSensitiveFields *bool) {
+	e.IncludeSensitiveFields = includeSensitiveFields
+	e.require(employeesListRequestFieldIncludeSensitiveFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employeesListRequestFieldIncludeShellData)
+}
+
+// SetJobTitle sets the JobTitle field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetJobTitle(jobTitle *string) {
+	e.JobTitle = jobTitle
+	e.require(employeesListRequestFieldJobTitle)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetLastName(lastName *string) {
+	e.LastName = lastName
+	e.require(employeesListRequestFieldLastName)
+}
+
+// SetManagerId sets the ManagerId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetManagerId(managerId *string) {
+	e.ManagerId = managerId
+	e.require(employeesListRequestFieldManagerId)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(employeesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(employeesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetPageSize(pageSize *int) {
+	e.PageSize = pageSize
+	e.require(employeesListRequestFieldPageSize)
+}
+
+// SetPayGroupId sets the PayGroupId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetPayGroupId(payGroupId *string) {
+	e.PayGroupId = payGroupId
+	e.require(employeesListRequestFieldPayGroupId)
+}
+
+// SetPersonalEmail sets the PersonalEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetPersonalEmail(personalEmail *string) {
+	e.PersonalEmail = personalEmail
+	e.require(employeesListRequestFieldPersonalEmail)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetRemoteFields(remoteFields *EmployeesListRequestRemoteFields) {
+	e.RemoteFields = remoteFields
+	e.require(employeesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(employeesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetShowEnumOrigins(showEnumOrigins *EmployeesListRequestShowEnumOrigins) {
+	e.ShowEnumOrigins = showEnumOrigins
+	e.require(employeesListRequestFieldShowEnumOrigins)
+}
+
+// SetStartedAfter sets the StartedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetStartedAfter(startedAfter *time.Time) {
+	e.StartedAfter = startedAfter
+	e.require(employeesListRequestFieldStartedAfter)
+}
+
+// SetStartedBefore sets the StartedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetStartedBefore(startedBefore *time.Time) {
+	e.StartedBefore = startedBefore
+	e.require(employeesListRequestFieldStartedBefore)
+}
+
+// SetTeamId sets the TeamId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetTeamId(teamId *string) {
+	e.TeamId = teamId
+	e.require(employeesListRequestFieldTeamId)
+}
+
+// SetTerminatedAfter sets the TerminatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetTerminatedAfter(terminatedAfter *time.Time) {
+	e.TerminatedAfter = terminatedAfter
+	e.require(employeesListRequestFieldTerminatedAfter)
+}
+
+// SetTerminatedBefore sets the TerminatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetTerminatedBefore(terminatedBefore *time.Time) {
+	e.TerminatedBefore = terminatedBefore
+	e.require(employeesListRequestFieldTerminatedBefore)
+}
+
+// SetWorkEmail sets the WorkEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetWorkEmail(workEmail *string) {
+	e.WorkEmail = workEmail
+	e.require(employeesListRequestFieldWorkEmail)
+}
+
+// SetWorkLocationId sets the WorkLocationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetWorkLocationId(workLocationId *string) {
+	e.WorkLocationId = workLocationId
+	e.require(employeesListRequestFieldWorkLocationId)
+}
+
+var (
+	employeesRetrieveRequestFieldExpand                 = big.NewInt(1 << 0)
+	employeesRetrieveRequestFieldIncludeRemoteData      = big.NewInt(1 << 1)
+	employeesRetrieveRequestFieldIncludeSensitiveFields = big.NewInt(1 << 2)
+	employeesRetrieveRequestFieldIncludeShellData       = big.NewInt(1 << 3)
+	employeesRetrieveRequestFieldRemoteFields           = big.NewInt(1 << 4)
+	employeesRetrieveRequestFieldShowEnumOrigins        = big.NewInt(1 << 5)
+)
 
 type EmployeesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -103,6 +427,58 @@ type EmployeesRetrieveRequest struct {
 	RemoteFields *EmployeesRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *EmployeesRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (e *EmployeesRetrieveRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetExpand(expand []*EmployeesRetrieveRequestExpandItem) {
+	e.Expand = expand
+	e.require(employeesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	e.IncludeRemoteData = includeRemoteData
+	e.require(employeesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeSensitiveFields sets the IncludeSensitiveFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetIncludeSensitiveFields(includeSensitiveFields *bool) {
+	e.IncludeSensitiveFields = includeSensitiveFields
+	e.require(employeesRetrieveRequestFieldIncludeSensitiveFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	e.IncludeShellData = includeShellData
+	e.require(employeesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetRemoteFields(remoteFields *EmployeesRetrieveRequestRemoteFields) {
+	e.RemoteFields = remoteFields
+	e.require(employeesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *EmployeesRetrieveRequestShowEnumOrigins) {
+	e.ShowEnumOrigins = showEnumOrigins
+	e.require(employeesRetrieveRequestFieldShowEnumOrigins)
 }
 
 type EmployeesListRequestEmploymentStatus string
@@ -460,6 +836,38 @@ func (e EmployeesRetrieveRequestShowEnumOrigins) Ptr() *EmployeesRetrieveRequest
 //
 // ### Usage Example
 // Fetch from the `LIST Employee` endpoint and filter by `ID` to show all employees.
+var (
+	employeeRequestFieldEmployeeNumber      = big.NewInt(1 << 0)
+	employeeRequestFieldCompany             = big.NewInt(1 << 1)
+	employeeRequestFieldFirstName           = big.NewInt(1 << 2)
+	employeeRequestFieldLastName            = big.NewInt(1 << 3)
+	employeeRequestFieldPreferredName       = big.NewInt(1 << 4)
+	employeeRequestFieldDisplayFullName     = big.NewInt(1 << 5)
+	employeeRequestFieldUsername            = big.NewInt(1 << 6)
+	employeeRequestFieldGroups              = big.NewInt(1 << 7)
+	employeeRequestFieldWorkEmail           = big.NewInt(1 << 8)
+	employeeRequestFieldPersonalEmail       = big.NewInt(1 << 9)
+	employeeRequestFieldMobilePhoneNumber   = big.NewInt(1 << 10)
+	employeeRequestFieldEmployments         = big.NewInt(1 << 11)
+	employeeRequestFieldHomeLocation        = big.NewInt(1 << 12)
+	employeeRequestFieldWorkLocation        = big.NewInt(1 << 13)
+	employeeRequestFieldManager             = big.NewInt(1 << 14)
+	employeeRequestFieldTeam                = big.NewInt(1 << 15)
+	employeeRequestFieldPayGroup            = big.NewInt(1 << 16)
+	employeeRequestFieldSsn                 = big.NewInt(1 << 17)
+	employeeRequestFieldGender              = big.NewInt(1 << 18)
+	employeeRequestFieldEthnicity           = big.NewInt(1 << 19)
+	employeeRequestFieldMaritalStatus       = big.NewInt(1 << 20)
+	employeeRequestFieldDateOfBirth         = big.NewInt(1 << 21)
+	employeeRequestFieldHireDate            = big.NewInt(1 << 22)
+	employeeRequestFieldStartDate           = big.NewInt(1 << 23)
+	employeeRequestFieldEmploymentStatus    = big.NewInt(1 << 24)
+	employeeRequestFieldTerminationDate     = big.NewInt(1 << 25)
+	employeeRequestFieldAvatar              = big.NewInt(1 << 26)
+	employeeRequestFieldIntegrationParams   = big.NewInt(1 << 27)
+	employeeRequestFieldLinkedAccountParams = big.NewInt(1 << 28)
+)
+
 type EmployeeRequest struct {
 	// The employee's number that appears in the third-party integration's UI.
 	EmployeeNumber *string `json:"employee_number,omitempty" url:"employee_number,omitempty"`
@@ -541,6 +949,9 @@ type EmployeeRequest struct {
 	Avatar              *string                `json:"avatar,omitempty" url:"avatar,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -753,6 +1164,216 @@ func (e *EmployeeRequest) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EmployeeRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetEmployeeNumber sets the EmployeeNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetEmployeeNumber(employeeNumber *string) {
+	e.EmployeeNumber = employeeNumber
+	e.require(employeeRequestFieldEmployeeNumber)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetCompany(company *EmployeeRequestCompany) {
+	e.Company = company
+	e.require(employeeRequestFieldCompany)
+}
+
+// SetFirstName sets the FirstName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetFirstName(firstName *string) {
+	e.FirstName = firstName
+	e.require(employeeRequestFieldFirstName)
+}
+
+// SetLastName sets the LastName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetLastName(lastName *string) {
+	e.LastName = lastName
+	e.require(employeeRequestFieldLastName)
+}
+
+// SetPreferredName sets the PreferredName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetPreferredName(preferredName *string) {
+	e.PreferredName = preferredName
+	e.require(employeeRequestFieldPreferredName)
+}
+
+// SetDisplayFullName sets the DisplayFullName field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetDisplayFullName(displayFullName *string) {
+	e.DisplayFullName = displayFullName
+	e.require(employeeRequestFieldDisplayFullName)
+}
+
+// SetUsername sets the Username field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetUsername(username *string) {
+	e.Username = username
+	e.require(employeeRequestFieldUsername)
+}
+
+// SetGroups sets the Groups field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetGroups(groups []*EmployeeRequestGroupsItem) {
+	e.Groups = groups
+	e.require(employeeRequestFieldGroups)
+}
+
+// SetWorkEmail sets the WorkEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetWorkEmail(workEmail *string) {
+	e.WorkEmail = workEmail
+	e.require(employeeRequestFieldWorkEmail)
+}
+
+// SetPersonalEmail sets the PersonalEmail field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetPersonalEmail(personalEmail *string) {
+	e.PersonalEmail = personalEmail
+	e.require(employeeRequestFieldPersonalEmail)
+}
+
+// SetMobilePhoneNumber sets the MobilePhoneNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetMobilePhoneNumber(mobilePhoneNumber *string) {
+	e.MobilePhoneNumber = mobilePhoneNumber
+	e.require(employeeRequestFieldMobilePhoneNumber)
+}
+
+// SetEmployments sets the Employments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetEmployments(employments []*EmployeeRequestEmploymentsItem) {
+	e.Employments = employments
+	e.require(employeeRequestFieldEmployments)
+}
+
+// SetHomeLocation sets the HomeLocation field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetHomeLocation(homeLocation *EmployeeRequestHomeLocation) {
+	e.HomeLocation = homeLocation
+	e.require(employeeRequestFieldHomeLocation)
+}
+
+// SetWorkLocation sets the WorkLocation field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetWorkLocation(workLocation *EmployeeRequestWorkLocation) {
+	e.WorkLocation = workLocation
+	e.require(employeeRequestFieldWorkLocation)
+}
+
+// SetManager sets the Manager field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetManager(manager *EmployeeRequestManager) {
+	e.Manager = manager
+	e.require(employeeRequestFieldManager)
+}
+
+// SetTeam sets the Team field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetTeam(team *EmployeeRequestTeam) {
+	e.Team = team
+	e.require(employeeRequestFieldTeam)
+}
+
+// SetPayGroup sets the PayGroup field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetPayGroup(payGroup *EmployeeRequestPayGroup) {
+	e.PayGroup = payGroup
+	e.require(employeeRequestFieldPayGroup)
+}
+
+// SetSsn sets the Ssn field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetSsn(ssn *string) {
+	e.Ssn = ssn
+	e.require(employeeRequestFieldSsn)
+}
+
+// SetGender sets the Gender field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetGender(gender *EmployeeRequestGender) {
+	e.Gender = gender
+	e.require(employeeRequestFieldGender)
+}
+
+// SetEthnicity sets the Ethnicity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetEthnicity(ethnicity *EmployeeRequestEthnicity) {
+	e.Ethnicity = ethnicity
+	e.require(employeeRequestFieldEthnicity)
+}
+
+// SetMaritalStatus sets the MaritalStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetMaritalStatus(maritalStatus *EmployeeRequestMaritalStatus) {
+	e.MaritalStatus = maritalStatus
+	e.require(employeeRequestFieldMaritalStatus)
+}
+
+// SetDateOfBirth sets the DateOfBirth field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetDateOfBirth(dateOfBirth *time.Time) {
+	e.DateOfBirth = dateOfBirth
+	e.require(employeeRequestFieldDateOfBirth)
+}
+
+// SetHireDate sets the HireDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetHireDate(hireDate *time.Time) {
+	e.HireDate = hireDate
+	e.require(employeeRequestFieldHireDate)
+}
+
+// SetStartDate sets the StartDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetStartDate(startDate *time.Time) {
+	e.StartDate = startDate
+	e.require(employeeRequestFieldStartDate)
+}
+
+// SetEmploymentStatus sets the EmploymentStatus field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetEmploymentStatus(employmentStatus *EmployeeRequestEmploymentStatus) {
+	e.EmploymentStatus = employmentStatus
+	e.require(employeeRequestFieldEmploymentStatus)
+}
+
+// SetTerminationDate sets the TerminationDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetTerminationDate(terminationDate *time.Time) {
+	e.TerminationDate = terminationDate
+	e.require(employeeRequestFieldTerminationDate)
+}
+
+// SetAvatar sets the Avatar field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetAvatar(avatar *string) {
+	e.Avatar = avatar
+	e.require(employeeRequestFieldAvatar)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	e.IntegrationParams = integrationParams
+	e.require(employeeRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	e.LinkedAccountParams = linkedAccountParams
+	e.require(employeeRequestFieldLinkedAccountParams)
+}
+
 func (e *EmployeeRequest) UnmarshalJSON(data []byte) error {
 	type embed EmployeeRequest
 	var unmarshaler = struct {
@@ -796,7 +1417,8 @@ func (e *EmployeeRequest) MarshalJSON() ([]byte, error) {
 		StartDate:       internal.NewOptionalDateTime(e.StartDate),
 		TerminationDate: internal.NewOptionalDateTime(e.TerminationDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (e *EmployeeRequest) String() string {
@@ -1590,11 +2212,21 @@ func (e *EmployeeRequestWorkLocation) Accept(visitor EmployeeRequestWorkLocation
 	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
+var (
+	employeeResponseFieldModel    = big.NewInt(1 << 0)
+	employeeResponseFieldWarnings = big.NewInt(1 << 1)
+	employeeResponseFieldErrors   = big.NewInt(1 << 2)
+	employeeResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type EmployeeResponse struct {
 	Model    *Employee                   `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1632,6 +2264,41 @@ func (e *EmployeeResponse) GetExtraProperties() map[string]interface{} {
 	return e.extraProperties
 }
 
+func (e *EmployeeResponse) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeResponse) SetModel(model *Employee) {
+	e.Model = model
+	e.require(employeeResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	e.Warnings = warnings
+	e.require(employeeResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeResponse) SetErrors(errors []*ErrorValidationProblem) {
+	e.Errors = errors
+	e.require(employeeResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeResponse) SetLogs(logs []*DebugModeLog) {
+	e.Logs = logs
+	e.require(employeeResponseFieldLogs)
+}
+
 func (e *EmployeeResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler EmployeeResponse
 	var value unmarshaler
@@ -1648,6 +2315,17 @@ func (e *EmployeeResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (e *EmployeeResponse) MarshalJSON() ([]byte, error) {
+	type embed EmployeeResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (e *EmployeeResponse) String() string {
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
@@ -1660,9 +2338,17 @@ func (e *EmployeeResponse) String() string {
 	return fmt.Sprintf("%#v", e)
 }
 
+var (
+	ignoreCommonModelRequestFieldReason  = big.NewInt(1 << 0)
+	ignoreCommonModelRequestFieldMessage = big.NewInt(1 << 1)
+)
+
 type IgnoreCommonModelRequest struct {
 	Reason  *IgnoreCommonModelRequestReason `json:"reason" url:"reason"`
 	Message *string                         `json:"message,omitempty" url:"message,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1686,6 +2372,27 @@ func (i *IgnoreCommonModelRequest) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
 
+func (i *IgnoreCommonModelRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetReason sets the Reason field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IgnoreCommonModelRequest) SetReason(reason *IgnoreCommonModelRequestReason) {
+	i.Reason = reason
+	i.require(ignoreCommonModelRequestFieldReason)
+}
+
+// SetMessage sets the Message field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *IgnoreCommonModelRequest) SetMessage(message *string) {
+	i.Message = message
+	i.require(ignoreCommonModelRequestFieldMessage)
+}
+
 func (i *IgnoreCommonModelRequest) UnmarshalJSON(data []byte) error {
 	type unmarshaler IgnoreCommonModelRequest
 	var value unmarshaler
@@ -1700,6 +2407,17 @@ func (i *IgnoreCommonModelRequest) UnmarshalJSON(data []byte) error {
 	i.extraProperties = extraProperties
 	i.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (i *IgnoreCommonModelRequest) MarshalJSON() ([]byte, error) {
+	type embed IgnoreCommonModelRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*i),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (i *IgnoreCommonModelRequest) String() string {
@@ -1776,10 +2494,19 @@ func (i *IgnoreCommonModelRequestReason) Accept(visitor IgnoreCommonModelRequest
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+var (
+	paginatedEmployeeListFieldNext     = big.NewInt(1 << 0)
+	paginatedEmployeeListFieldPrevious = big.NewInt(1 << 1)
+	paginatedEmployeeListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedEmployeeList struct {
 	Next     *string     `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string     `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Employee `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1810,6 +2537,34 @@ func (p *PaginatedEmployeeList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedEmployeeList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeeList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedEmployeeListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeeList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedEmployeeListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedEmployeeList) SetResults(results []*Employee) {
+	p.Results = results
+	p.require(paginatedEmployeeListFieldResults)
+}
+
 func (p *PaginatedEmployeeList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedEmployeeList
 	var value unmarshaler
@@ -1824,6 +2579,17 @@ func (p *PaginatedEmployeeList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedEmployeeList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedEmployeeList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedEmployeeList) String() string {

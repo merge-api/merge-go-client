@@ -6,7 +6,23 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	jobPostingsListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	jobPostingsListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	jobPostingsListRequestFieldCursor             = big.NewInt(1 << 2)
+	jobPostingsListRequestFieldExpand             = big.NewInt(1 << 3)
+	jobPostingsListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	jobPostingsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	jobPostingsListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	jobPostingsListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	jobPostingsListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	jobPostingsListRequestFieldPageSize           = big.NewInt(1 << 9)
+	jobPostingsListRequestFieldRemoteId           = big.NewInt(1 << 10)
+	jobPostingsListRequestFieldStatus             = big.NewInt(1 << 11)
 )
 
 type JobPostingsListRequest struct {
@@ -40,7 +56,107 @@ type JobPostingsListRequest struct {
 	// * `INTERNAL` - INTERNAL
 	// * `PENDING` - PENDING
 	Status *JobPostingsListRequestStatus `json:"-" url:"status,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (j *JobPostingsListRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	j.CreatedAfter = createdAfter
+	j.require(jobPostingsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	j.CreatedBefore = createdBefore
+	j.require(jobPostingsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetCursor(cursor *string) {
+	j.Cursor = cursor
+	j.require(jobPostingsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetExpand(expand []*string) {
+	j.Expand = expand
+	j.require(jobPostingsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	j.IncludeDeletedData = includeDeletedData
+	j.require(jobPostingsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(jobPostingsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(jobPostingsListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	j.ModifiedAfter = modifiedAfter
+	j.require(jobPostingsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	j.ModifiedBefore = modifiedBefore
+	j.require(jobPostingsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetPageSize(pageSize *int) {
+	j.PageSize = pageSize
+	j.require(jobPostingsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(jobPostingsListRequestFieldRemoteId)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsListRequest) SetStatus(status *JobPostingsListRequestStatus) {
+	j.Status = status
+	j.require(jobPostingsListRequestFieldStatus)
+}
+
+var (
+	jobPostingsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	jobPostingsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	jobPostingsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+)
 
 type JobPostingsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -49,6 +165,37 @@ type JobPostingsRetrieveRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (j *JobPostingsRetrieveRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsRetrieveRequest) SetExpand(expand []*string) {
+	j.Expand = expand
+	j.require(jobPostingsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	j.IncludeRemoteData = includeRemoteData
+	j.require(jobPostingsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPostingsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	j.IncludeShellData = includeShellData
+	j.require(jobPostingsRetrieveRequestFieldIncludeShellData)
 }
 
 type JobPostingsListRequestStatus string
@@ -87,6 +234,24 @@ func (j JobPostingsListRequestStatus) Ptr() *JobPostingsListRequestStatus {
 // The `JobPosting` object represents an external announcement on a job board created by an organization to attract qualified candidates to apply for a specific `Job` opening
 // ### Usage Example
 // Fetch from the `LIST JobPostings` endpoint to show all job postings.
+var (
+	jobPostingFieldId               = big.NewInt(1 << 0)
+	jobPostingFieldRemoteId         = big.NewInt(1 << 1)
+	jobPostingFieldCreatedAt        = big.NewInt(1 << 2)
+	jobPostingFieldModifiedAt       = big.NewInt(1 << 3)
+	jobPostingFieldTitle            = big.NewInt(1 << 4)
+	jobPostingFieldJobPostingUrls   = big.NewInt(1 << 5)
+	jobPostingFieldJob              = big.NewInt(1 << 6)
+	jobPostingFieldStatus           = big.NewInt(1 << 7)
+	jobPostingFieldContent          = big.NewInt(1 << 8)
+	jobPostingFieldRemoteCreatedAt  = big.NewInt(1 << 9)
+	jobPostingFieldRemoteUpdatedAt  = big.NewInt(1 << 10)
+	jobPostingFieldIsInternal       = big.NewInt(1 << 11)
+	jobPostingFieldRemoteWasDeleted = big.NewInt(1 << 12)
+	jobPostingFieldFieldMappings    = big.NewInt(1 << 13)
+	jobPostingFieldRemoteData       = big.NewInt(1 << 14)
+)
+
 type JobPosting struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -121,6 +286,9 @@ type JobPosting struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -235,6 +403,118 @@ func (j *JobPosting) GetExtraProperties() map[string]interface{} {
 	return j.extraProperties
 }
 
+func (j *JobPosting) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetId(id *string) {
+	j.Id = id
+	j.require(jobPostingFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(jobPostingFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetCreatedAt(createdAt *time.Time) {
+	j.CreatedAt = createdAt
+	j.require(jobPostingFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetModifiedAt(modifiedAt *time.Time) {
+	j.ModifiedAt = modifiedAt
+	j.require(jobPostingFieldModifiedAt)
+}
+
+// SetTitle sets the Title field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetTitle(title *string) {
+	j.Title = title
+	j.require(jobPostingFieldTitle)
+}
+
+// SetJobPostingUrls sets the JobPostingUrls field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetJobPostingUrls(jobPostingUrls []*JobPostingJobPostingUrlsItem) {
+	j.JobPostingUrls = jobPostingUrls
+	j.require(jobPostingFieldJobPostingUrls)
+}
+
+// SetJob sets the Job field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetJob(job *JobPostingJob) {
+	j.Job = job
+	j.require(jobPostingFieldJob)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetStatus(status *JobPostingStatus) {
+	j.Status = status
+	j.require(jobPostingFieldStatus)
+}
+
+// SetContent sets the Content field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetContent(content *string) {
+	j.Content = content
+	j.require(jobPostingFieldContent)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	j.RemoteCreatedAt = remoteCreatedAt
+	j.require(jobPostingFieldRemoteCreatedAt)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	j.RemoteUpdatedAt = remoteUpdatedAt
+	j.require(jobPostingFieldRemoteUpdatedAt)
+}
+
+// SetIsInternal sets the IsInternal field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetIsInternal(isInternal *bool) {
+	j.IsInternal = isInternal
+	j.require(jobPostingFieldIsInternal)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	j.RemoteWasDeleted = remoteWasDeleted
+	j.require(jobPostingFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetFieldMappings(fieldMappings map[string]interface{}) {
+	j.FieldMappings = fieldMappings
+	j.require(jobPostingFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JobPosting) SetRemoteData(remoteData []*RemoteData) {
+	j.RemoteData = remoteData
+	j.require(jobPostingFieldRemoteData)
+}
+
 func (j *JobPosting) UnmarshalJSON(data []byte) error {
 	type embed JobPosting
 	var unmarshaler = struct {
@@ -278,7 +558,8 @@ func (j *JobPosting) MarshalJSON() ([]byte, error) {
 		RemoteCreatedAt: internal.NewOptionalDateTime(j.RemoteCreatedAt),
 		RemoteUpdatedAt: internal.NewOptionalDateTime(j.RemoteUpdatedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (j *JobPosting) String() string {
@@ -523,10 +804,19 @@ func (j JobPostingStatusEnum) Ptr() *JobPostingStatusEnum {
 	return &j
 }
 
+var (
+	paginatedJobPostingListFieldNext     = big.NewInt(1 << 0)
+	paginatedJobPostingListFieldPrevious = big.NewInt(1 << 1)
+	paginatedJobPostingListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedJobPostingList struct {
 	Next     *string       `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string       `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*JobPosting `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -557,6 +847,34 @@ func (p *PaginatedJobPostingList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedJobPostingList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJobPostingList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedJobPostingListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJobPostingList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedJobPostingListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedJobPostingList) SetResults(results []*JobPosting) {
+	p.Results = results
+	p.require(paginatedJobPostingListFieldResults)
+}
+
 func (p *PaginatedJobPostingList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedJobPostingList
 	var value unmarshaler
@@ -571,6 +889,17 @@ func (p *PaginatedJobPostingList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedJobPostingList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedJobPostingList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedJobPostingList) String() string {

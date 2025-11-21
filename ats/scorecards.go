@@ -6,7 +6,27 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	scorecardsListRequestFieldApplicationId      = big.NewInt(1 << 0)
+	scorecardsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	scorecardsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	scorecardsListRequestFieldCursor             = big.NewInt(1 << 3)
+	scorecardsListRequestFieldExpand             = big.NewInt(1 << 4)
+	scorecardsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	scorecardsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	scorecardsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	scorecardsListRequestFieldInterviewId        = big.NewInt(1 << 8)
+	scorecardsListRequestFieldInterviewerId      = big.NewInt(1 << 9)
+	scorecardsListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
+	scorecardsListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
+	scorecardsListRequestFieldPageSize           = big.NewInt(1 << 12)
+	scorecardsListRequestFieldRemoteFields       = big.NewInt(1 << 13)
+	scorecardsListRequestFieldRemoteId           = big.NewInt(1 << 14)
+	scorecardsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 15)
 )
 
 type ScorecardsListRequest struct {
@@ -42,7 +62,137 @@ type ScorecardsListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (s *ScorecardsListRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetApplicationId sets the ApplicationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetApplicationId(applicationId *string) {
+	s.ApplicationId = applicationId
+	s.require(scorecardsListRequestFieldApplicationId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	s.CreatedAfter = createdAfter
+	s.require(scorecardsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	s.CreatedBefore = createdBefore
+	s.require(scorecardsListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetCursor(cursor *string) {
+	s.Cursor = cursor
+	s.require(scorecardsListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetExpand(expand []*ScorecardsListRequestExpandItem) {
+	s.Expand = expand
+	s.require(scorecardsListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	s.IncludeDeletedData = includeDeletedData
+	s.require(scorecardsListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	s.IncludeRemoteData = includeRemoteData
+	s.require(scorecardsListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetIncludeShellData(includeShellData *bool) {
+	s.IncludeShellData = includeShellData
+	s.require(scorecardsListRequestFieldIncludeShellData)
+}
+
+// SetInterviewId sets the InterviewId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetInterviewId(interviewId *string) {
+	s.InterviewId = interviewId
+	s.require(scorecardsListRequestFieldInterviewId)
+}
+
+// SetInterviewerId sets the InterviewerId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetInterviewerId(interviewerId *string) {
+	s.InterviewerId = interviewerId
+	s.require(scorecardsListRequestFieldInterviewerId)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	s.ModifiedAfter = modifiedAfter
+	s.require(scorecardsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	s.ModifiedBefore = modifiedBefore
+	s.require(scorecardsListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetPageSize(pageSize *int) {
+	s.PageSize = pageSize
+	s.require(scorecardsListRequestFieldPageSize)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetRemoteFields(remoteFields *string) {
+	s.RemoteFields = remoteFields
+	s.require(scorecardsListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetRemoteId(remoteId *string) {
+	s.RemoteId = remoteId
+	s.require(scorecardsListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	s.ShowEnumOrigins = showEnumOrigins
+	s.require(scorecardsListRequestFieldShowEnumOrigins)
+}
+
+var (
+	scorecardsRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
+	scorecardsRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
+	scorecardsRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 2)
+	scorecardsRetrieveRequestFieldRemoteFields      = big.NewInt(1 << 3)
+	scorecardsRetrieveRequestFieldShowEnumOrigins   = big.NewInt(1 << 4)
+)
 
 type ScorecardsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -55,6 +205,51 @@ type ScorecardsRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (s *ScorecardsRetrieveRequest) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsRetrieveRequest) SetExpand(expand []*ScorecardsRetrieveRequestExpandItem) {
+	s.Expand = expand
+	s.require(scorecardsRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	s.IncludeRemoteData = includeRemoteData
+	s.require(scorecardsRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	s.IncludeShellData = includeShellData
+	s.require(scorecardsRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	s.RemoteFields = remoteFields
+	s.require(scorecardsRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *ScorecardsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	s.ShowEnumOrigins = showEnumOrigins
+	s.require(scorecardsRetrieveRequestFieldShowEnumOrigins)
 }
 
 type ScorecardsListRequestExpandItem string
@@ -143,10 +338,19 @@ func (o OverallRecommendationEnum) Ptr() *OverallRecommendationEnum {
 	return &o
 }
 
+var (
+	paginatedScorecardListFieldNext     = big.NewInt(1 << 0)
+	paginatedScorecardListFieldPrevious = big.NewInt(1 << 1)
+	paginatedScorecardListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedScorecardList struct {
 	Next     *string      `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string      `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Scorecard `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -177,6 +381,34 @@ func (p *PaginatedScorecardList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedScorecardList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedScorecardList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedScorecardListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedScorecardList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedScorecardListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedScorecardList) SetResults(results []*Scorecard) {
+	p.Results = results
+	p.require(paginatedScorecardListFieldResults)
+}
+
 func (p *PaginatedScorecardList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedScorecardList
 	var value unmarshaler
@@ -191,6 +423,17 @@ func (p *PaginatedScorecardList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedScorecardList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedScorecardList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedScorecardList) String() string {
@@ -210,6 +453,22 @@ func (p *PaginatedScorecardList) String() string {
 // The `Scorecard` object is used to represent an interviewer's candidate recommendation based on a particular interview.
 // ### Usage Example
 // Fetch from the `LIST Scorecards` endpoint and filter by `application` to show all scorecard for an applicant.
+var (
+	scorecardFieldId                    = big.NewInt(1 << 0)
+	scorecardFieldRemoteId              = big.NewInt(1 << 1)
+	scorecardFieldCreatedAt             = big.NewInt(1 << 2)
+	scorecardFieldModifiedAt            = big.NewInt(1 << 3)
+	scorecardFieldApplication           = big.NewInt(1 << 4)
+	scorecardFieldInterview             = big.NewInt(1 << 5)
+	scorecardFieldInterviewer           = big.NewInt(1 << 6)
+	scorecardFieldRemoteCreatedAt       = big.NewInt(1 << 7)
+	scorecardFieldSubmittedAt           = big.NewInt(1 << 8)
+	scorecardFieldOverallRecommendation = big.NewInt(1 << 9)
+	scorecardFieldRemoteWasDeleted      = big.NewInt(1 << 10)
+	scorecardFieldFieldMappings         = big.NewInt(1 << 11)
+	scorecardFieldRemoteData            = big.NewInt(1 << 12)
+)
+
 type Scorecard struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
@@ -240,6 +499,9 @@ type Scorecard struct {
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -340,6 +602,104 @@ func (s *Scorecard) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
 
+func (s *Scorecard) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetId(id *string) {
+	s.Id = id
+	s.require(scorecardFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetRemoteId(remoteId *string) {
+	s.RemoteId = remoteId
+	s.require(scorecardFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetCreatedAt(createdAt *time.Time) {
+	s.CreatedAt = createdAt
+	s.require(scorecardFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetModifiedAt(modifiedAt *time.Time) {
+	s.ModifiedAt = modifiedAt
+	s.require(scorecardFieldModifiedAt)
+}
+
+// SetApplication sets the Application field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetApplication(application *ScorecardApplication) {
+	s.Application = application
+	s.require(scorecardFieldApplication)
+}
+
+// SetInterview sets the Interview field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetInterview(interview *ScorecardInterview) {
+	s.Interview = interview
+	s.require(scorecardFieldInterview)
+}
+
+// SetInterviewer sets the Interviewer field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetInterviewer(interviewer *ScorecardInterviewer) {
+	s.Interviewer = interviewer
+	s.require(scorecardFieldInterviewer)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	s.RemoteCreatedAt = remoteCreatedAt
+	s.require(scorecardFieldRemoteCreatedAt)
+}
+
+// SetSubmittedAt sets the SubmittedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetSubmittedAt(submittedAt *time.Time) {
+	s.SubmittedAt = submittedAt
+	s.require(scorecardFieldSubmittedAt)
+}
+
+// SetOverallRecommendation sets the OverallRecommendation field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetOverallRecommendation(overallRecommendation *ScorecardOverallRecommendation) {
+	s.OverallRecommendation = overallRecommendation
+	s.require(scorecardFieldOverallRecommendation)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	s.RemoteWasDeleted = remoteWasDeleted
+	s.require(scorecardFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetFieldMappings(fieldMappings map[string]interface{}) {
+	s.FieldMappings = fieldMappings
+	s.require(scorecardFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *Scorecard) SetRemoteData(remoteData []*RemoteData) {
+	s.RemoteData = remoteData
+	s.require(scorecardFieldRemoteData)
+}
+
 func (s *Scorecard) UnmarshalJSON(data []byte) error {
 	type embed Scorecard
 	var unmarshaler = struct {
@@ -383,7 +743,8 @@ func (s *Scorecard) MarshalJSON() ([]byte, error) {
 		RemoteCreatedAt: internal.NewOptionalDateTime(s.RemoteCreatedAt),
 		SubmittedAt:     internal.NewOptionalDateTime(s.SubmittedAt),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, s.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (s *Scorecard) String() string {

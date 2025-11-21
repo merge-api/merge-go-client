@@ -6,7 +6,22 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	usersListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	usersListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	usersListRequestFieldCursor             = big.NewInt(1 << 2)
+	usersListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	usersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	usersListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	usersListRequestFieldIsMe               = big.NewInt(1 << 6)
+	usersListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
+	usersListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
+	usersListRequestFieldPageSize           = big.NewInt(1 << 9)
+	usersListRequestFieldRemoteId           = big.NewInt(1 << 10)
 )
 
 type UsersListRequest struct {
@@ -32,19 +47,144 @@ type UsersListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (u *UsersListRequest) require(field *big.Int) {
+	if u.explicitFields == nil {
+		u.explicitFields = big.NewInt(0)
+	}
+	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	u.CreatedAfter = createdAfter
+	u.require(usersListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	u.CreatedBefore = createdBefore
+	u.require(usersListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetCursor(cursor *string) {
+	u.Cursor = cursor
+	u.require(usersListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	u.IncludeDeletedData = includeDeletedData
+	u.require(usersListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	u.IncludeRemoteData = includeRemoteData
+	u.require(usersListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetIncludeShellData(includeShellData *bool) {
+	u.IncludeShellData = includeShellData
+	u.require(usersListRequestFieldIncludeShellData)
+}
+
+// SetIsMe sets the IsMe field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetIsMe(isMe *string) {
+	u.IsMe = isMe
+	u.require(usersListRequestFieldIsMe)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	u.ModifiedAfter = modifiedAfter
+	u.require(usersListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	u.ModifiedBefore = modifiedBefore
+	u.require(usersListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetPageSize(pageSize *int) {
+	u.PageSize = pageSize
+	u.require(usersListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetRemoteId(remoteId *string) {
+	u.RemoteId = remoteId
+	u.require(usersListRequestFieldRemoteId)
+}
+
+var (
+	usersRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	usersRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type UsersRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (u *UsersRetrieveRequest) require(field *big.Int) {
+	if u.explicitFields == nil {
+		u.explicitFields = big.NewInt(0)
+	}
+	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	u.IncludeRemoteData = includeRemoteData
+	u.require(usersRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	u.IncludeShellData = includeShellData
+	u.require(usersRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedUserListFieldNext     = big.NewInt(1 << 0)
+	paginatedUserListFieldPrevious = big.NewInt(1 << 1)
+	paginatedUserListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedUserList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*User `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -75,6 +215,34 @@ func (p *PaginatedUserList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedUserList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedUserList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedUserListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedUserList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedUserListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedUserList) SetResults(results []*User) {
+	p.Results = results
+	p.require(paginatedUserListFieldResults)
+}
+
 func (p *PaginatedUserList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedUserList
 	var value unmarshaler
@@ -89,6 +257,17 @@ func (p *PaginatedUserList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedUserList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedUserList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedUserList) String() string {

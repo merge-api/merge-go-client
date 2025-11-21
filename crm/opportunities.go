@@ -6,7 +6,14 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	opportunityEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	opportunityEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	opportunityEndpointRequestFieldModel       = big.NewInt(1 << 2)
 )
 
 type OpportunityEndpointRequest struct {
@@ -15,7 +22,60 @@ type OpportunityEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool               `json:"-" url:"run_async,omitempty"`
 	Model    *OpportunityRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (o *OpportunityEndpointRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	o.IsDebugMode = isDebugMode
+	o.require(opportunityEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityEndpointRequest) SetRunAsync(runAsync *bool) {
+	o.RunAsync = runAsync
+	o.require(opportunityEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityEndpointRequest) SetModel(model *OpportunityRequest) {
+	o.Model = model
+	o.require(opportunityEndpointRequestFieldModel)
+}
+
+var (
+	opportunitiesListRequestFieldAccountId           = big.NewInt(1 << 0)
+	opportunitiesListRequestFieldCreatedAfter        = big.NewInt(1 << 1)
+	opportunitiesListRequestFieldCreatedBefore       = big.NewInt(1 << 2)
+	opportunitiesListRequestFieldCursor              = big.NewInt(1 << 3)
+	opportunitiesListRequestFieldExpand              = big.NewInt(1 << 4)
+	opportunitiesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 5)
+	opportunitiesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 6)
+	opportunitiesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 7)
+	opportunitiesListRequestFieldIncludeShellData    = big.NewInt(1 << 8)
+	opportunitiesListRequestFieldModifiedAfter       = big.NewInt(1 << 9)
+	opportunitiesListRequestFieldModifiedBefore      = big.NewInt(1 << 10)
+	opportunitiesListRequestFieldOwnerId             = big.NewInt(1 << 11)
+	opportunitiesListRequestFieldPageSize            = big.NewInt(1 << 12)
+	opportunitiesListRequestFieldRemoteCreatedAfter  = big.NewInt(1 << 13)
+	opportunitiesListRequestFieldRemoteFields        = big.NewInt(1 << 14)
+	opportunitiesListRequestFieldRemoteId            = big.NewInt(1 << 15)
+	opportunitiesListRequestFieldShowEnumOrigins     = big.NewInt(1 << 16)
+	opportunitiesListRequestFieldStageId             = big.NewInt(1 << 17)
+	opportunitiesListRequestFieldStatus              = big.NewInt(1 << 18)
+)
 
 type OpportunitiesListRequest struct {
 	// If provided, will only return opportunities with this account.
@@ -60,7 +120,156 @@ type OpportunitiesListRequest struct {
 	// * `WON` - WON
 	// * `LOST` - LOST
 	Status *OpportunitiesListRequestStatus `json:"-" url:"status,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (o *OpportunitiesListRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetAccountId sets the AccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetAccountId(accountId *string) {
+	o.AccountId = accountId
+	o.require(opportunitiesListRequestFieldAccountId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	o.CreatedAfter = createdAfter
+	o.require(opportunitiesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	o.CreatedBefore = createdBefore
+	o.require(opportunitiesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetCursor(cursor *string) {
+	o.Cursor = cursor
+	o.require(opportunitiesListRequestFieldCursor)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetExpand(expand []*OpportunitiesListRequestExpandItem) {
+	o.Expand = expand
+	o.require(opportunitiesListRequestFieldExpand)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	o.IncludeDeletedData = includeDeletedData
+	o.require(opportunitiesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(opportunitiesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	o.IncludeRemoteFields = includeRemoteFields
+	o.require(opportunitiesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(opportunitiesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	o.ModifiedAfter = modifiedAfter
+	o.require(opportunitiesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	o.ModifiedBefore = modifiedBefore
+	o.require(opportunitiesListRequestFieldModifiedBefore)
+}
+
+// SetOwnerId sets the OwnerId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetOwnerId(ownerId *string) {
+	o.OwnerId = ownerId
+	o.require(opportunitiesListRequestFieldOwnerId)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetPageSize(pageSize *int) {
+	o.PageSize = pageSize
+	o.require(opportunitiesListRequestFieldPageSize)
+}
+
+// SetRemoteCreatedAfter sets the RemoteCreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetRemoteCreatedAfter(remoteCreatedAfter *time.Time) {
+	o.RemoteCreatedAfter = remoteCreatedAfter
+	o.require(opportunitiesListRequestFieldRemoteCreatedAfter)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetRemoteFields(remoteFields *string) {
+	o.RemoteFields = remoteFields
+	o.require(opportunitiesListRequestFieldRemoteFields)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetRemoteId(remoteId *string) {
+	o.RemoteId = remoteId
+	o.require(opportunitiesListRequestFieldRemoteId)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	o.ShowEnumOrigins = showEnumOrigins
+	o.require(opportunitiesListRequestFieldShowEnumOrigins)
+}
+
+// SetStageId sets the StageId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetStageId(stageId *string) {
+	o.StageId = stageId
+	o.require(opportunitiesListRequestFieldStageId)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesListRequest) SetStatus(status *OpportunitiesListRequestStatus) {
+	o.Status = status
+	o.require(opportunitiesListRequestFieldStatus)
+}
+
+var (
+	patchedOpportunityEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedOpportunityEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedOpportunityEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
 
 type PatchedOpportunityEndpointRequest struct {
 	// Whether to include debug fields (such as log file links) in the response.
@@ -68,7 +277,49 @@ type PatchedOpportunityEndpointRequest struct {
 	// Whether or not third-party updates should be run asynchronously.
 	RunAsync *bool                      `json:"-" url:"run_async,omitempty"`
 	Model    *PatchedOpportunityRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (p *PatchedOpportunityEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedOpportunityEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedOpportunityEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityEndpointRequest) SetModel(model *PatchedOpportunityRequest) {
+	p.Model = model
+	p.require(patchedOpportunityEndpointRequestFieldModel)
+}
+
+var (
+	opportunitiesRemoteFieldClassesListRequestFieldCursor              = big.NewInt(1 << 0)
+	opportunitiesRemoteFieldClassesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 1)
+	opportunitiesRemoteFieldClassesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 2)
+	opportunitiesRemoteFieldClassesListRequestFieldIncludeRemoteFields = big.NewInt(1 << 3)
+	opportunitiesRemoteFieldClassesListRequestFieldIncludeShellData    = big.NewInt(1 << 4)
+	opportunitiesRemoteFieldClassesListRequestFieldIsCommonModelField  = big.NewInt(1 << 5)
+	opportunitiesRemoteFieldClassesListRequestFieldIsCustom            = big.NewInt(1 << 6)
+	opportunitiesRemoteFieldClassesListRequestFieldPageSize            = big.NewInt(1 << 7)
+)
 
 type OpportunitiesRemoteFieldClassesListRequest struct {
 	// The pagination cursor value.
@@ -87,7 +338,82 @@ type OpportunitiesRemoteFieldClassesListRequest struct {
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
 	// Number of results to return per page.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (o *OpportunitiesRemoteFieldClassesListRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetCursor(cursor *string) {
+	o.Cursor = cursor
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	o.IncludeDeletedData = includeDeletedData
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	o.IncludeRemoteFields = includeRemoteFields
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldIncludeShellData)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetIsCommonModelField(isCommonModelField *bool) {
+	o.IsCommonModelField = isCommonModelField
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldIsCommonModelField)
+}
+
+// SetIsCustom sets the IsCustom field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetIsCustom(isCustom *bool) {
+	o.IsCustom = isCustom
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldIsCustom)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRemoteFieldClassesListRequest) SetPageSize(pageSize *int) {
+	o.PageSize = pageSize
+	o.require(opportunitiesRemoteFieldClassesListRequestFieldPageSize)
+}
+
+var (
+	opportunitiesRetrieveRequestFieldExpand              = big.NewInt(1 << 0)
+	opportunitiesRetrieveRequestFieldIncludeRemoteData   = big.NewInt(1 << 1)
+	opportunitiesRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 2)
+	opportunitiesRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 3)
+	opportunitiesRetrieveRequestFieldRemoteFields        = big.NewInt(1 << 4)
+	opportunitiesRetrieveRequestFieldShowEnumOrigins     = big.NewInt(1 << 5)
+)
 
 type OpportunitiesRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -102,6 +428,58 @@ type OpportunitiesRetrieveRequest struct {
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (o *OpportunitiesRetrieveRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetExpand sets the Expand field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRetrieveRequest) SetExpand(expand []*OpportunitiesRetrieveRequestExpandItem) {
+	o.Expand = expand
+	o.require(opportunitiesRetrieveRequestFieldExpand)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	o.IncludeRemoteData = includeRemoteData
+	o.require(opportunitiesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	o.IncludeRemoteFields = includeRemoteFields
+	o.require(opportunitiesRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	o.IncludeShellData = includeShellData
+	o.require(opportunitiesRetrieveRequestFieldIncludeShellData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRetrieveRequest) SetRemoteFields(remoteFields *string) {
+	o.RemoteFields = remoteFields
+	o.require(opportunitiesRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunitiesRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	o.ShowEnumOrigins = showEnumOrigins
+	o.require(opportunitiesRetrieveRequestFieldShowEnumOrigins)
 }
 
 type OpportunitiesListRequestExpandItem string
@@ -184,6 +562,21 @@ func (o OpportunitiesRetrieveRequestExpandItem) Ptr() *OpportunitiesRetrieveRequ
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	opportunityRequestFieldName                = big.NewInt(1 << 0)
+	opportunityRequestFieldDescription         = big.NewInt(1 << 1)
+	opportunityRequestFieldAmount              = big.NewInt(1 << 2)
+	opportunityRequestFieldOwner               = big.NewInt(1 << 3)
+	opportunityRequestFieldAccount             = big.NewInt(1 << 4)
+	opportunityRequestFieldStage               = big.NewInt(1 << 5)
+	opportunityRequestFieldStatus              = big.NewInt(1 << 6)
+	opportunityRequestFieldLastActivityAt      = big.NewInt(1 << 7)
+	opportunityRequestFieldCloseDate           = big.NewInt(1 << 8)
+	opportunityRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	opportunityRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+	opportunityRequestFieldRemoteFields        = big.NewInt(1 << 11)
+)
+
 type OpportunityRequest struct {
 	// The opportunity's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -210,6 +603,9 @@ type OpportunityRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -303,6 +699,97 @@ func (o *OpportunityRequest) GetExtraProperties() map[string]interface{} {
 	return o.extraProperties
 }
 
+func (o *OpportunityRequest) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetName(name *string) {
+	o.Name = name
+	o.require(opportunityRequestFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetDescription(description *string) {
+	o.Description = description
+	o.require(opportunityRequestFieldDescription)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetAmount(amount *int) {
+	o.Amount = amount
+	o.require(opportunityRequestFieldAmount)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetOwner(owner *OpportunityRequestOwner) {
+	o.Owner = owner
+	o.require(opportunityRequestFieldOwner)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetAccount(account *OpportunityRequestAccount) {
+	o.Account = account
+	o.require(opportunityRequestFieldAccount)
+}
+
+// SetStage sets the Stage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetStage(stage *OpportunityRequestStage) {
+	o.Stage = stage
+	o.require(opportunityRequestFieldStage)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetStatus(status *OpportunityRequestStatus) {
+	o.Status = status
+	o.require(opportunityRequestFieldStatus)
+}
+
+// SetLastActivityAt sets the LastActivityAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetLastActivityAt(lastActivityAt *time.Time) {
+	o.LastActivityAt = lastActivityAt
+	o.require(opportunityRequestFieldLastActivityAt)
+}
+
+// SetCloseDate sets the CloseDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetCloseDate(closeDate *time.Time) {
+	o.CloseDate = closeDate
+	o.require(opportunityRequestFieldCloseDate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	o.IntegrationParams = integrationParams
+	o.require(opportunityRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	o.LinkedAccountParams = linkedAccountParams
+	o.require(opportunityRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	o.RemoteFields = remoteFields
+	o.require(opportunityRequestFieldRemoteFields)
+}
+
 func (o *OpportunityRequest) UnmarshalJSON(data []byte) error {
 	type embed OpportunityRequest
 	var unmarshaler = struct {
@@ -338,7 +825,8 @@ func (o *OpportunityRequest) MarshalJSON() ([]byte, error) {
 		LastActivityAt: internal.NewOptionalDateTime(o.LastActivityAt),
 		CloseDate:      internal.NewOptionalDateTime(o.CloseDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, o.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (o *OpportunityRequest) String() string {
@@ -609,11 +1097,21 @@ func (o *OpportunityRequestStatus) Accept(visitor OpportunityRequestStatusVisito
 	return fmt.Errorf("type %T does not include a non-empty union type", o)
 }
 
+var (
+	opportunityResponseFieldModel    = big.NewInt(1 << 0)
+	opportunityResponseFieldWarnings = big.NewInt(1 << 1)
+	opportunityResponseFieldErrors   = big.NewInt(1 << 2)
+	opportunityResponseFieldLogs     = big.NewInt(1 << 3)
+)
+
 type OpportunityResponse struct {
 	Model    *Opportunity                `json:"model" url:"model"`
 	Warnings []*WarningValidationProblem `json:"warnings" url:"warnings"`
 	Errors   []*ErrorValidationProblem   `json:"errors" url:"errors"`
 	Logs     []*DebugModeLog             `json:"logs,omitempty" url:"logs,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -651,6 +1149,41 @@ func (o *OpportunityResponse) GetExtraProperties() map[string]interface{} {
 	return o.extraProperties
 }
 
+func (o *OpportunityResponse) require(field *big.Int) {
+	if o.explicitFields == nil {
+		o.explicitFields = big.NewInt(0)
+	}
+	o.explicitFields.Or(o.explicitFields, field)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityResponse) SetModel(model *Opportunity) {
+	o.Model = model
+	o.require(opportunityResponseFieldModel)
+}
+
+// SetWarnings sets the Warnings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityResponse) SetWarnings(warnings []*WarningValidationProblem) {
+	o.Warnings = warnings
+	o.require(opportunityResponseFieldWarnings)
+}
+
+// SetErrors sets the Errors field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityResponse) SetErrors(errors []*ErrorValidationProblem) {
+	o.Errors = errors
+	o.require(opportunityResponseFieldErrors)
+}
+
+// SetLogs sets the Logs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OpportunityResponse) SetLogs(logs []*DebugModeLog) {
+	o.Logs = logs
+	o.require(opportunityResponseFieldLogs)
+}
+
 func (o *OpportunityResponse) UnmarshalJSON(data []byte) error {
 	type unmarshaler OpportunityResponse
 	var value unmarshaler
@@ -667,6 +1200,17 @@ func (o *OpportunityResponse) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (o *OpportunityResponse) MarshalJSON() ([]byte, error) {
+	type embed OpportunityResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*o),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, o.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 func (o *OpportunityResponse) String() string {
 	if len(o.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(o.rawJSON); err == nil {
@@ -679,10 +1223,19 @@ func (o *OpportunityResponse) String() string {
 	return fmt.Sprintf("%#v", o)
 }
 
+var (
+	paginatedOpportunityListFieldNext     = big.NewInt(1 << 0)
+	paginatedOpportunityListFieldPrevious = big.NewInt(1 << 1)
+	paginatedOpportunityListFieldResults  = big.NewInt(1 << 2)
+)
+
 type PaginatedOpportunityList struct {
 	Next     *string        `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string        `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Opportunity `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -713,6 +1266,34 @@ func (p *PaginatedOpportunityList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedOpportunityList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOpportunityList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedOpportunityListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOpportunityList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedOpportunityListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedOpportunityList) SetResults(results []*Opportunity) {
+	p.Results = results
+	p.require(paginatedOpportunityListFieldResults)
+}
+
 func (p *PaginatedOpportunityList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedOpportunityList
 	var value unmarshaler
@@ -727,6 +1308,17 @@ func (p *PaginatedOpportunityList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedOpportunityList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedOpportunityList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedOpportunityList) String() string {
@@ -746,6 +1338,21 @@ func (p *PaginatedOpportunityList) String() string {
 // The `Opportunity` object is used to represent a deal opportunity in a CRM system.
 // ### Usage Example
 // TODO
+var (
+	patchedOpportunityRequestFieldName                = big.NewInt(1 << 0)
+	patchedOpportunityRequestFieldDescription         = big.NewInt(1 << 1)
+	patchedOpportunityRequestFieldAmount              = big.NewInt(1 << 2)
+	patchedOpportunityRequestFieldOwner               = big.NewInt(1 << 3)
+	patchedOpportunityRequestFieldAccount             = big.NewInt(1 << 4)
+	patchedOpportunityRequestFieldStage               = big.NewInt(1 << 5)
+	patchedOpportunityRequestFieldStatus              = big.NewInt(1 << 6)
+	patchedOpportunityRequestFieldLastActivityAt      = big.NewInt(1 << 7)
+	patchedOpportunityRequestFieldCloseDate           = big.NewInt(1 << 8)
+	patchedOpportunityRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	patchedOpportunityRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+	patchedOpportunityRequestFieldRemoteFields        = big.NewInt(1 << 11)
+)
+
 type PatchedOpportunityRequest struct {
 	// The opportunity's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -772,6 +1379,9 @@ type PatchedOpportunityRequest struct {
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -865,6 +1475,97 @@ func (p *PatchedOpportunityRequest) GetExtraProperties() map[string]interface{} 
 	return p.extraProperties
 }
 
+func (p *PatchedOpportunityRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetName(name *string) {
+	p.Name = name
+	p.require(patchedOpportunityRequestFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetDescription(description *string) {
+	p.Description = description
+	p.require(patchedOpportunityRequestFieldDescription)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetAmount(amount *int) {
+	p.Amount = amount
+	p.require(patchedOpportunityRequestFieldAmount)
+}
+
+// SetOwner sets the Owner field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetOwner(owner *string) {
+	p.Owner = owner
+	p.require(patchedOpportunityRequestFieldOwner)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(patchedOpportunityRequestFieldAccount)
+}
+
+// SetStage sets the Stage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetStage(stage *string) {
+	p.Stage = stage
+	p.require(patchedOpportunityRequestFieldStage)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetStatus(status *PatchedOpportunityRequestStatus) {
+	p.Status = status
+	p.require(patchedOpportunityRequestFieldStatus)
+}
+
+// SetLastActivityAt sets the LastActivityAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetLastActivityAt(lastActivityAt *time.Time) {
+	p.LastActivityAt = lastActivityAt
+	p.require(patchedOpportunityRequestFieldLastActivityAt)
+}
+
+// SetCloseDate sets the CloseDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetCloseDate(closeDate *time.Time) {
+	p.CloseDate = closeDate
+	p.require(patchedOpportunityRequestFieldCloseDate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedOpportunityRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedOpportunityRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedOpportunityRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedOpportunityRequestFieldRemoteFields)
+}
+
 func (p *PatchedOpportunityRequest) UnmarshalJSON(data []byte) error {
 	type embed PatchedOpportunityRequest
 	var unmarshaler = struct {
@@ -900,7 +1601,8 @@ func (p *PatchedOpportunityRequest) MarshalJSON() ([]byte, error) {
 		LastActivityAt: internal.NewOptionalDateTime(p.LastActivityAt),
 		CloseDate:      internal.NewOptionalDateTime(p.CloseDate),
 	}
-	return json.Marshal(marshaler)
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PatchedOpportunityRequest) String() string {

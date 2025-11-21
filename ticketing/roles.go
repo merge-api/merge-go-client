@@ -6,7 +6,21 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
+	big "math/big"
 	time "time"
+)
+
+var (
+	rolesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
+	rolesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
+	rolesListRequestFieldCursor             = big.NewInt(1 << 2)
+	rolesListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
+	rolesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
+	rolesListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
+	rolesListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	rolesListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	rolesListRequestFieldPageSize           = big.NewInt(1 << 8)
+	rolesListRequestFieldRemoteId           = big.NewInt(1 << 9)
 )
 
 type RolesListRequest struct {
@@ -30,19 +44,137 @@ type RolesListRequest struct {
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (r *RolesListRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	r.CreatedAfter = createdAfter
+	r.require(rolesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	r.CreatedBefore = createdBefore
+	r.require(rolesListRequestFieldCreatedBefore)
+}
+
+// SetCursor sets the Cursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetCursor(cursor *string) {
+	r.Cursor = cursor
+	r.require(rolesListRequestFieldCursor)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	r.IncludeDeletedData = includeDeletedData
+	r.require(rolesListRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	r.IncludeRemoteData = includeRemoteData
+	r.require(rolesListRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetIncludeShellData(includeShellData *bool) {
+	r.IncludeShellData = includeShellData
+	r.require(rolesListRequestFieldIncludeShellData)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	r.ModifiedAfter = modifiedAfter
+	r.require(rolesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	r.ModifiedBefore = modifiedBefore
+	r.require(rolesListRequestFieldModifiedBefore)
+}
+
+// SetPageSize sets the PageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetPageSize(pageSize *int) {
+	r.PageSize = pageSize
+	r.require(rolesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesListRequest) SetRemoteId(remoteId *string) {
+	r.RemoteId = remoteId
+	r.require(rolesListRequestFieldRemoteId)
+}
+
+var (
+	rolesRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 0)
+	rolesRetrieveRequestFieldIncludeShellData  = big.NewInt(1 << 1)
+)
 
 type RolesRetrieveRequest struct {
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 }
+
+func (r *RolesRetrieveRequest) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetIncludeRemoteData sets the IncludeRemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesRetrieveRequest) SetIncludeRemoteData(includeRemoteData *bool) {
+	r.IncludeRemoteData = includeRemoteData
+	r.require(rolesRetrieveRequestFieldIncludeRemoteData)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RolesRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	r.IncludeShellData = includeShellData
+	r.require(rolesRetrieveRequestFieldIncludeShellData)
+}
+
+var (
+	paginatedRoleListFieldNext     = big.NewInt(1 << 0)
+	paginatedRoleListFieldPrevious = big.NewInt(1 << 1)
+	paginatedRoleListFieldResults  = big.NewInt(1 << 2)
+)
 
 type PaginatedRoleList struct {
 	Next     *string `json:"next,omitempty" url:"next,omitempty"`
 	Previous *string `json:"previous,omitempty" url:"previous,omitempty"`
 	Results  []*Role `json:"results,omitempty" url:"results,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -73,6 +205,34 @@ func (p *PaginatedRoleList) GetExtraProperties() map[string]interface{} {
 	return p.extraProperties
 }
 
+func (p *PaginatedRoleList) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetNext sets the Next field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRoleList) SetNext(next *string) {
+	p.Next = next
+	p.require(paginatedRoleListFieldNext)
+}
+
+// SetPrevious sets the Previous field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRoleList) SetPrevious(previous *string) {
+	p.Previous = previous
+	p.require(paginatedRoleListFieldPrevious)
+}
+
+// SetResults sets the Results field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaginatedRoleList) SetResults(results []*Role) {
+	p.Results = results
+	p.require(paginatedRoleListFieldResults)
+}
+
 func (p *PaginatedRoleList) UnmarshalJSON(data []byte) error {
 	type unmarshaler PaginatedRoleList
 	var value unmarshaler
@@ -87,6 +247,17 @@ func (p *PaginatedRoleList) UnmarshalJSON(data []byte) error {
 	p.extraProperties = extraProperties
 	p.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (p *PaginatedRoleList) MarshalJSON() ([]byte, error) {
+	type embed PaginatedRoleList
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 func (p *PaginatedRoleList) String() string {
