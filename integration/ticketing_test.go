@@ -14,10 +14,10 @@ import (
 
 func newTicketingClient(t *testing.T) *client.Client {
 	t.Helper()
-	apiKey := os.Getenv("SDK_TESTING_KEY_SECONDARY")
+	apiKey := os.Getenv("SDK_TESTING_KEY")
 	accountToken := os.Getenv("SDK_TESTING_TICKETING_ACCOUNT_TOKEN")
 	if apiKey == "" || accountToken == "" {
-		t.Fatal("SDK_TESTING_KEY_SECONDARY and SDK_TESTING_TICKETING_ACCOUNT_TOKEN environment variables must be set")
+		t.Fatal("SDK_TESTING_KEY and SDK_TESTING_TICKETING_ACCOUNT_TOKEN environment variables must be set")
 	}
 	return client.NewClient(
 		option.WithApiKey(apiKey),

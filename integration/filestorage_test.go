@@ -14,10 +14,10 @@ import (
 
 func newFileStorageClient(t *testing.T) *client.Client {
 	t.Helper()
-	apiKey := os.Getenv("SDK_TESTING_KEY")
-	accountToken := os.Getenv("SDK_TESTING_FILE_STORAGE_ACCOUNT_TOKEN")
+	apiKey := os.Getenv("MERGE_API_KEY_FILESTORAGE")
+	accountToken := os.Getenv("MERGE_ACCOUNT_TOKEN_FILESTORAGE")
 	if apiKey == "" || accountToken == "" {
-		t.Fatal("SDK_TESTING_KEY and SDK_TESTING_FILE_STORAGE_ACCOUNT_TOKEN environment variables must be set")
+		t.Fatal("MERGE_API_KEY_FILESTORAGE and MERGE_ACCOUNT_TOKEN_FILESTORAGE environment variables must be set")
 	}
 	return client.NewClient(
 		option.WithApiKey(apiKey),
