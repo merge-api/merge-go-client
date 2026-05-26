@@ -4,3 +4,12 @@ README.md
 LICENSE
 internal/query.go
 client/client_test.go
+integration/helpers_test.go
+integration/cursor_pagination_test.go
+integration/filestorage_test.go
+integration/ticketing_test.go
+integration/hris_test.go
+integration/environment_routing_test.go
+integration/expand_url_format_test.go
+integration/error_response_handling_test.go
+integration/datetime_filters_test.go

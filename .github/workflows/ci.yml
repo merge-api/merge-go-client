@@ -35,6 +35,9 @@ jobs:
         env:
           MERGE_API_KEY_FILESTORAGE: ${{ secrets.MERGE_API_KEY_FILESTORAGE }}
           MERGE_ACCOUNT_TOKEN_FILESTORAGE: ${{ secrets.MERGE_ACCOUNT_TOKEN_FILESTORAGE }}
+          SDK_TESTING_KEY: ${{ secrets.SDK_TESTING_KEY }}
+          SDK_TESTING_TICKETING_ACCOUNT_TOKEN: ${{ secrets.SDK_TESTING_TICKETING_ACCOUNT_TOKEN }}
+          SDK_TESTING_HRIS_ACCOUNT_TOKEN: ${{ secrets.SDK_TESTING_HRIS_ACCOUNT_TOKEN }}
 
       - name: Stop WireMock
         if: always()
