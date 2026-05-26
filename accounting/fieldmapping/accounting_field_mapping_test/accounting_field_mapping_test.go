@@ -136,17 +136,11 @@ func TestAccountingFieldMappingFieldMappingsDestroyWithWireMock(
 		"field_mapping_id",
 	)
 
-<<<<<<< Updated upstream
-	require.NoError(t, invocationErr, "Client method call should succeed")
-=======
-	// DELETE operations may return nil response body, which is acceptable
 	if invocationErr != nil {
-		// This is expected for DELETE operations that return 204 No Content
 		require.Contains(t, invocationErr.Error(), "but the server responded with nothing", "Expected empty response error")
 	} else {
 		require.NoError(t, invocationErr, "Client method call should succeed")
 	}
->>>>>>> Stashed changes
 	VerifyRequestCount(t, "DELETE", "/accounting/v1/field-mappings/field_mapping_id", nil, 1)
 }
 

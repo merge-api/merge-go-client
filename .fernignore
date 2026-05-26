@@ -13,15 +13,13 @@ integration/environment_routing_test.go
 integration/expand_url_format_test.go
 integration/error_response_handling_test.go
 integration/datetime_filters_test.go
-<<<<<<< Updated upstream
 .fern/replay.lock
 .fern/replay.yml
 .gitattributes
-=======
 accounting/fieldmapping/accounting_field_mapping_test/accounting_field_mapping_test.go
 ats/fieldmapping/ats_field_mapping_test/ats_field_mapping_test.go
 crm/fieldmapping/crm_field_mapping_test/crm_field_mapping_test.go
 filestorage/fieldmapping/file_storage_field_mapping_test/file_storage_field_mapping_test.go
 hris/fieldmapping/hris_field_mapping_test/hris_field_mapping_test.go
 ticketing/fieldmapping/ticketing_field_mapping_test/ticketing_field_mapping_test.go
->>>>>>> Stashed changes
+internal/query_test.go
