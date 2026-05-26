@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *hris.AuditTrailListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *hris.AuditLogEvent], error) {
+) (*core.Page[*string, *hris.AuditLogEvent, *hris.PaginatedAuditLogEventList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/audit-trail"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *hris.PaginatedAuditLogEventList) *core.PageResponse[*string, *hris.AuditLogEvent] {
+	readPageResponse := func(response *hris.PaginatedAuditLogEventList) *core.PageResponse[*string, *hris.AuditLogEvent, *hris.PaginatedAuditLogEventList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *hris.AuditLogEvent]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *hris.AuditLogEvent, *hris.PaginatedAuditLogEventList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

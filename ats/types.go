@@ -6679,7 +6679,8 @@ var (
 
 type RemoteData struct {
 	// The third-party API path that is being called.
-	Path string      `json:"path" url:"path"`
+	Path string `json:"path" url:"path"`
+	// The data returned from the third-party for this object in its original, unnormalized format.
 	Data interface{} `json:"data,omitempty" url:"data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -8314,8 +8315,8 @@ type ScreeningQuestion struct {
 	// * `BOOLEAN` - BOOLEAN
 	Type *ScreeningQuestionType `json:"type,omitempty" url:"type,omitempty"`
 	// Whether or not the screening question is required.
-	Required *bool         `json:"required,omitempty" url:"required,omitempty"`
-	Options  []interface{} `json:"options,omitempty" url:"options,omitempty"`
+	Required *bool                           `json:"required,omitempty" url:"required,omitempty"`
+	Options  []*ScreeningQuestionOptionsItem `json:"options,omitempty" url:"options,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 
@@ -8389,7 +8390,7 @@ func (s *ScreeningQuestion) GetRequired() *bool {
 	return s.Required
 }
 
-func (s *ScreeningQuestion) GetOptions() []interface{} {
+func (s *ScreeningQuestion) GetOptions() []*ScreeningQuestionOptionsItem {
 	if s == nil {
 		return nil
 	}
@@ -8479,7 +8480,7 @@ func (s *ScreeningQuestion) SetRequired(required *bool) {
 
 // SetOptions sets the Options field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (s *ScreeningQuestion) SetOptions(options []interface{}) {
+func (s *ScreeningQuestion) SetOptions(options []*ScreeningQuestionOptionsItem) {
 	s.Options = options
 	s.require(screeningQuestionFieldOptions)
 }
@@ -9045,6 +9046,68 @@ func (s *ScreeningQuestionOption) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", s)
+}
+
+type ScreeningQuestionOptionsItem struct {
+	String                  string
+	ScreeningQuestionOption *ScreeningQuestionOption
+
+	typ string
+}
+
+func (s *ScreeningQuestionOptionsItem) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *ScreeningQuestionOptionsItem) GetScreeningQuestionOption() *ScreeningQuestionOption {
+	if s == nil {
+		return nil
+	}
+	return s.ScreeningQuestionOption
+}
+
+func (s *ScreeningQuestionOptionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueScreeningQuestionOption := new(ScreeningQuestionOption)
+	if err := json.Unmarshal(data, &valueScreeningQuestionOption); err == nil {
+		s.typ = "ScreeningQuestionOption"
+		s.ScreeningQuestionOption = valueScreeningQuestionOption
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s ScreeningQuestionOptionsItem) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "ScreeningQuestionOption" || s.ScreeningQuestionOption != nil {
+		return json.Marshal(s.ScreeningQuestionOption)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type ScreeningQuestionOptionsItemVisitor interface {
+	VisitString(string) error
+	VisitScreeningQuestionOption(*ScreeningQuestionOption) error
+}
+
+func (s *ScreeningQuestionOptionsItem) Accept(visitor ScreeningQuestionOptionsItemVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "ScreeningQuestionOption" || s.ScreeningQuestionOption != nil {
+		return visitor.VisitScreeningQuestionOption(s.ScreeningQuestionOption)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
 }
 
 // The data type for the screening question.

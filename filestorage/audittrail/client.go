@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.AuditTrailListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *filestorage.AuditLogEvent], error) {
+) (*core.Page[*string, *filestorage.AuditLogEvent, *filestorage.PaginatedAuditLogEventList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/audit-trail"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedAuditLogEventList) *core.PageResponse[*string, *filestorage.AuditLogEvent] {
+	readPageResponse := func(response *filestorage.PaginatedAuditLogEventList) *core.PageResponse[*string, *filestorage.AuditLogEvent, *filestorage.PaginatedAuditLogEventList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *filestorage.AuditLogEvent]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *filestorage.AuditLogEvent, *filestorage.PaginatedAuditLogEventList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

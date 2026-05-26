@@ -40,7 +40,7 @@ func (r *RawClient) CustomObjectClassesCustomObjectsCreate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/crm/v1/custom-object-classes/%v/custom-objects",
@@ -94,7 +94,7 @@ func (r *RawClient) CustomObjectClassesCustomObjectsRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/crm/v1/custom-object-classes/%v/custom-objects/%v",
@@ -145,7 +145,7 @@ func (r *RawClient) CustomObjectClassesCustomObjectsMetaPostRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/crm/v1/custom-object-classes/%v/custom-objects/meta/post",

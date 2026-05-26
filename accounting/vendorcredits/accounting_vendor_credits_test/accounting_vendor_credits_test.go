@@ -190,6 +190,86 @@ func TestAccountingVendorCreditsRetrieveWithWireMock(
 	VerifyRequestCount(t, "GET", "/accounting/v1/vendor-credits/id", map[string]string{"include_remote_data": "true", "include_shell_data": "true"}, 1)
 }
 
+func TestAccountingVendorCreditsPartialUpdateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.PatchedVendorCreditEndpointRequest{
+		IsDebugMode: merge.Bool(
+			true,
+		),
+		RunAsync: merge.Bool(
+			true,
+		),
+		Model: &accounting.PatchedVendorCreditRequest{},
+	}
+	_, invocationErr := client.Accounting.VendorCredits.PartialUpdate(
+		context.TODO(),
+		"id",
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "PATCH", "/accounting/v1/vendor-credits/id", map[string]string{"is_debug_mode": "true", "run_async": "true"}, 1)
+}
+
+func TestAccountingVendorCreditsApplicationCreateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.ApplyVendorCreditRequest{
+		IsDebugMode: merge.Bool(
+			true,
+		),
+		RunAsync: merge.Bool(
+			true,
+		),
+		AppliedDate: merge.MustParseDateTime(
+			"2024-01-15T09:30:00Z",
+		),
+		AppliedAmount: "applied_amount",
+	}
+	_, invocationErr := client.Accounting.VendorCredits.ApplicationCreate(
+		context.TODO(),
+		"id",
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "POST", "/accounting/v1/vendor-credits/id/application", map[string]string{"is_debug_mode": "true", "run_async": "true"}, 1)
+}
+
+func TestAccountingVendorCreditsMetaPatchRetrieveWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	_, invocationErr := client.Accounting.VendorCredits.MetaPatchRetrieve(
+		context.TODO(),
+		"id",
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "GET", "/accounting/v1/vendor-credits/meta/patch/id", nil, 1)
+}
+
 func TestAccountingVendorCreditsMetaPostRetrieveWithWireMock(
 	t *testing.T,
 ) {

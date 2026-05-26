@@ -95,7 +95,7 @@ type FoldersListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return folders with this name. This performs an exact match.
 	Name *string `json:"-" url:"name,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If provided, will only return folders in this parent folder. If null, will return folders in root directory.
 	ParentFolderId *string `json:"-" url:"parent_folder_id,omitempty"`
@@ -861,6 +861,7 @@ func (f *FolderRequestPermissions) Accept(visitor FolderRequestPermissionsVisito
 	return fmt.Errorf("type %T does not include a non-empty union type", f)
 }
 
+// A single permission item for requests that can be either a UUID reference or a full PermissionRequest object.
 type FolderRequestPermissionsItem struct {
 	String            string
 	PermissionRequest *PermissionRequest

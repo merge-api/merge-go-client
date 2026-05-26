@@ -128,18 +128,12 @@ func TestHrisFieldMappingFieldMappingsDestroyWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	response, invocationErr := client.Hris.FieldMapping.FieldMappingsDestroy(
+	_, invocationErr := client.Hris.FieldMapping.FieldMappingsDestroy(
 		context.TODO(),
 		"field_mapping_id",
 	)
 
-	// DELETE operations may return nil response body, which is acceptable
-	if invocationErr != nil && response == nil {
-		// This is expected for DELETE operations that return 204 No Content
-		require.Contains(t, invocationErr.Error(), "but the server responded with nothing", "Expected empty response error")
-	} else {
-		require.NoError(t, invocationErr, "Client method call should succeed")
-	}
+	require.NoError(t, invocationErr, "Client method call should succeed")
 	VerifyRequestCount(t, "DELETE", "/hris/v1/field-mappings/field_mapping_id", nil, 1)
 }
 
@@ -153,7 +147,11 @@ func TestHrisFieldMappingFieldMappingsPartialUpdateWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	request := &hris.PatchedEditFieldMappingRequest{}
+	request := &hris.PatchedEditFieldMappingRequest{
+		RemoteDataIterationCount: merge.Int(
+			1,
+		),
+	}
 	_, invocationErr := client.Hris.FieldMapping.FieldMappingsPartialUpdate(
 		context.TODO(),
 		"field_mapping_id",
@@ -161,7 +159,7 @@ func TestHrisFieldMappingFieldMappingsPartialUpdateWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "PATCH", "/hris/v1/field-mappings/field_mapping_id", nil, 1)
+	VerifyRequestCount(t, "PATCH", "/hris/v1/field-mappings/field_mapping_id", map[string]string{"remote_data_iteration_count": "1"}, 1)
 }
 
 func TestHrisFieldMappingRemoteFieldsRetrieveWithWireMock(

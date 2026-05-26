@@ -13,3 +13,6 @@ integration/environment_routing_test.go
 integration/expand_url_format_test.go
 integration/error_response_handling_test.go
 integration/datetime_filters_test.go
+.fern/replay.lock
+.fern/replay.yml
+.gitattributes

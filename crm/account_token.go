@@ -118,3 +118,103 @@ func (a *AccountToken) String() string {
 	}
 	return fmt.Sprintf("%#v", a)
 }
+
+// # The RegenerateAccountToken Object
+// ### Description
+// The `RegenerateAccountToken` object is used to exchange an old account token for a new one.
+//
+// ### Usage Example
+// Post to receive a new `RegenerateAccountToken`.
+var (
+	regenerateAccountTokenFieldLinkedAccountId = big.NewInt(1 << 0)
+	regenerateAccountTokenFieldAccountToken    = big.NewInt(1 << 1)
+)
+
+type RegenerateAccountToken struct {
+	LinkedAccountId string `json:"linked_account_id" url:"linked_account_id"`
+	AccountToken    string `json:"account_token" url:"account_token"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (r *RegenerateAccountToken) GetLinkedAccountId() string {
+	if r == nil {
+		return ""
+	}
+	return r.LinkedAccountId
+}
+
+func (r *RegenerateAccountToken) GetAccountToken() string {
+	if r == nil {
+		return ""
+	}
+	return r.AccountToken
+}
+
+func (r *RegenerateAccountToken) GetExtraProperties() map[string]interface{} {
+	return r.extraProperties
+}
+
+func (r *RegenerateAccountToken) require(field *big.Int) {
+	if r.explicitFields == nil {
+		r.explicitFields = big.NewInt(0)
+	}
+	r.explicitFields.Or(r.explicitFields, field)
+}
+
+// SetLinkedAccountId sets the LinkedAccountId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RegenerateAccountToken) SetLinkedAccountId(linkedAccountId string) {
+	r.LinkedAccountId = linkedAccountId
+	r.require(regenerateAccountTokenFieldLinkedAccountId)
+}
+
+// SetAccountToken sets the AccountToken field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RegenerateAccountToken) SetAccountToken(accountToken string) {
+	r.AccountToken = accountToken
+	r.require(regenerateAccountTokenFieldAccountToken)
+}
+
+func (r *RegenerateAccountToken) UnmarshalJSON(data []byte) error {
+	type unmarshaler RegenerateAccountToken
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RegenerateAccountToken(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *r)
+	if err != nil {
+		return err
+	}
+	r.extraProperties = extraProperties
+	r.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RegenerateAccountToken) MarshalJSON() ([]byte, error) {
+	type embed RegenerateAccountToken
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*r),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, r.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (r *RegenerateAccountToken) String() string {
+	if len(r.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(r.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}

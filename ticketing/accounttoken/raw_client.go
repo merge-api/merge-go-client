@@ -39,7 +39,7 @@ func (r *RawClient) Retrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ticketing/v1/account-token/%v",
@@ -67,6 +67,45 @@ func (r *RawClient) Retrieve(
 		return nil, err
 	}
 	return &core.Response[*ticketing.AccountToken]{
+		StatusCode: raw.StatusCode,
+		Header:     raw.Header,
+		Body:       response,
+	}, nil
+}
+
+func (r *RawClient) RegenerateCreate(
+	ctx context.Context,
+	opts ...option.RequestOption,
+) (*core.Response[*ticketing.RegenerateAccountToken], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		r.baseURL,
+		"https://api.merge.dev/api",
+	)
+	endpointURL := baseURL + "/ticketing/v1/account-token/regenerate"
+	headers := internal.MergeHeaders(
+		r.options.ToHeader(),
+		options.ToHeader(),
+	)
+	var response *ticketing.RegenerateAccountToken
+	raw, err := r.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &core.Response[*ticketing.RegenerateAccountToken]{
 		StatusCode: raw.StatusCode,
 		Header:     raw.Header,
 		Body:       response,

@@ -109,7 +109,7 @@ type ContactsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return Contacts that match this name.
 	Name *string `json:"-" url:"name,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
@@ -272,6 +272,51 @@ func (c *ContactsListRequest) SetStatus(status *ContactsListRequestStatus) {
 }
 
 var (
+	patchedContactEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedContactEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedContactEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
+
+type PatchedContactEndpointRequest struct {
+	// Whether to include debug fields (such as log file links) in the response.
+	IsDebugMode *bool `json:"-" url:"is_debug_mode,omitempty"`
+	// Whether or not third-party updates should be run asynchronously.
+	RunAsync *bool                  `json:"-" url:"run_async,omitempty"`
+	Model    *PatchedContactRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *PatchedContactEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedContactEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedContactEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactEndpointRequest) SetModel(model *PatchedContactRequest) {
+	p.Model = model
+	p.require(patchedContactEndpointRequestFieldModel)
+}
+
+var (
 	contactsRemoteFieldClassesListRequestFieldCursor             = big.NewInt(1 << 0)
 	contactsRemoteFieldClassesListRequestFieldIncludeDeletedData = big.NewInt(1 << 1)
 	contactsRemoteFieldClassesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 2)
@@ -294,7 +339,7 @@ type ContactsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -642,6 +687,857 @@ func (a *AccountingPhoneNumberRequest) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+// # The Address Object
+// ### Description
+// The `Address` object is used to represent a contact's or company's address.
+//
+// ### Usage Example
+// Fetch from the `GET CompanyInfo` endpoint and view the company's addresses.
+var (
+	addressRequestFieldType                = big.NewInt(1 << 0)
+	addressRequestFieldStreet1             = big.NewInt(1 << 1)
+	addressRequestFieldStreet2             = big.NewInt(1 << 2)
+	addressRequestFieldCity                = big.NewInt(1 << 3)
+	addressRequestFieldCountrySubdivision  = big.NewInt(1 << 4)
+	addressRequestFieldCountry             = big.NewInt(1 << 5)
+	addressRequestFieldZipCode             = big.NewInt(1 << 6)
+	addressRequestFieldIntegrationParams   = big.NewInt(1 << 7)
+	addressRequestFieldLinkedAccountParams = big.NewInt(1 << 8)
+)
+
+type AddressRequest struct {
+	// The address type.
+	//
+	// * `BILLING` - BILLING
+	// * `SHIPPING` - SHIPPING
+	Type *AddressRequestType `json:"type,omitempty" url:"type,omitempty"`
+	// Line 1 of the address's street.
+	Street1 *string `json:"street_1,omitempty" url:"street_1,omitempty"`
+	// Line 2 of the address's street.
+	Street2 *string `json:"street_2,omitempty" url:"street_2,omitempty"`
+	// The address's city.
+	City *string `json:"city,omitempty" url:"city,omitempty"`
+	// The address's state or region.
+	CountrySubdivision *string `json:"country_subdivision,omitempty" url:"country_subdivision,omitempty"`
+	// The address's country.
+	//
+	// * `AF` - Afghanistan
+	// * `AX` - Åland Islands
+	// * `AL` - Albania
+	// * `DZ` - Algeria
+	// * `AS` - American Samoa
+	// * `AD` - Andorra
+	// * `AO` - Angola
+	// * `AI` - Anguilla
+	// * `AQ` - Antarctica
+	// * `AG` - Antigua and Barbuda
+	// * `AR` - Argentina
+	// * `AM` - Armenia
+	// * `AW` - Aruba
+	// * `AU` - Australia
+	// * `AT` - Austria
+	// * `AZ` - Azerbaijan
+	// * `BS` - Bahamas
+	// * `BH` - Bahrain
+	// * `BD` - Bangladesh
+	// * `BB` - Barbados
+	// * `BY` - Belarus
+	// * `BE` - Belgium
+	// * `BZ` - Belize
+	// * `BJ` - Benin
+	// * `BM` - Bermuda
+	// * `BT` - Bhutan
+	// * `BO` - Bolivia
+	// * `BQ` - Bonaire, Sint Eustatius and Saba
+	// * `BA` - Bosnia and Herzegovina
+	// * `BW` - Botswana
+	// * `BV` - Bouvet Island
+	// * `BR` - Brazil
+	// * `IO` - British Indian Ocean Territory
+	// * `BN` - Brunei
+	// * `BG` - Bulgaria
+	// * `BF` - Burkina Faso
+	// * `BI` - Burundi
+	// * `CV` - Cabo Verde
+	// * `KH` - Cambodia
+	// * `CM` - Cameroon
+	// * `CA` - Canada
+	// * `KY` - Cayman Islands
+	// * `CF` - Central African Republic
+	// * `TD` - Chad
+	// * `CL` - Chile
+	// * `CN` - China
+	// * `CX` - Christmas Island
+	// * `CC` - Cocos (Keeling) Islands
+	// * `CO` - Colombia
+	// * `KM` - Comoros
+	// * `CG` - Congo
+	// * `CD` - Congo (the Democratic Republic of the)
+	// * `CK` - Cook Islands
+	// * `CR` - Costa Rica
+	// * `CI` - Côte d'Ivoire
+	// * `HR` - Croatia
+	// * `CU` - Cuba
+	// * `CW` - Curaçao
+	// * `CY` - Cyprus
+	// * `CZ` - Czechia
+	// * `DK` - Denmark
+	// * `DJ` - Djibouti
+	// * `DM` - Dominica
+	// * `DO` - Dominican Republic
+	// * `EC` - Ecuador
+	// * `EG` - Egypt
+	// * `SV` - El Salvador
+	// * `GQ` - Equatorial Guinea
+	// * `ER` - Eritrea
+	// * `EE` - Estonia
+	// * `SZ` - Eswatini
+	// * `ET` - Ethiopia
+	// * `FK` - Falkland Islands (Malvinas)
+	// * `FO` - Faroe Islands
+	// * `FJ` - Fiji
+	// * `FI` - Finland
+	// * `FR` - France
+	// * `GF` - French Guiana
+	// * `PF` - French Polynesia
+	// * `TF` - French Southern Territories
+	// * `GA` - Gabon
+	// * `GM` - Gambia
+	// * `GE` - Georgia
+	// * `DE` - Germany
+	// * `GH` - Ghana
+	// * `GI` - Gibraltar
+	// * `GR` - Greece
+	// * `GL` - Greenland
+	// * `GD` - Grenada
+	// * `GP` - Guadeloupe
+	// * `GU` - Guam
+	// * `GT` - Guatemala
+	// * `GG` - Guernsey
+	// * `GN` - Guinea
+	// * `GW` - Guinea-Bissau
+	// * `GY` - Guyana
+	// * `HT` - Haiti
+	// * `HM` - Heard Island and McDonald Islands
+	// * `VA` - Holy See
+	// * `HN` - Honduras
+	// * `HK` - Hong Kong
+	// * `HU` - Hungary
+	// * `IS` - Iceland
+	// * `IN` - India
+	// * `ID` - Indonesia
+	// * `IR` - Iran
+	// * `IQ` - Iraq
+	// * `IE` - Ireland
+	// * `IM` - Isle of Man
+	// * `IL` - Israel
+	// * `IT` - Italy
+	// * `JM` - Jamaica
+	// * `JP` - Japan
+	// * `JE` - Jersey
+	// * `JO` - Jordan
+	// * `KZ` - Kazakhstan
+	// * `KE` - Kenya
+	// * `KI` - Kiribati
+	// * `KW` - Kuwait
+	// * `KG` - Kyrgyzstan
+	// * `LA` - Laos
+	// * `LV` - Latvia
+	// * `LB` - Lebanon
+	// * `LS` - Lesotho
+	// * `LR` - Liberia
+	// * `LY` - Libya
+	// * `LI` - Liechtenstein
+	// * `LT` - Lithuania
+	// * `LU` - Luxembourg
+	// * `MO` - Macao
+	// * `MG` - Madagascar
+	// * `MW` - Malawi
+	// * `MY` - Malaysia
+	// * `MV` - Maldives
+	// * `ML` - Mali
+	// * `MT` - Malta
+	// * `MH` - Marshall Islands
+	// * `MQ` - Martinique
+	// * `MR` - Mauritania
+	// * `MU` - Mauritius
+	// * `YT` - Mayotte
+	// * `MX` - Mexico
+	// * `FM` - Micronesia (Federated States of)
+	// * `MD` - Moldova
+	// * `MC` - Monaco
+	// * `MN` - Mongolia
+	// * `ME` - Montenegro
+	// * `MS` - Montserrat
+	// * `MA` - Morocco
+	// * `MZ` - Mozambique
+	// * `MM` - Myanmar
+	// * `NA` - Namibia
+	// * `NR` - Nauru
+	// * `NP` - Nepal
+	// * `NL` - Netherlands
+	// * `NC` - New Caledonia
+	// * `NZ` - New Zealand
+	// * `NI` - Nicaragua
+	// * `NE` - Niger
+	// * `NG` - Nigeria
+	// * `NU` - Niue
+	// * `NF` - Norfolk Island
+	// * `KP` - North Korea
+	// * `MK` - North Macedonia
+	// * `MP` - Northern Mariana Islands
+	// * `NO` - Norway
+	// * `OM` - Oman
+	// * `PK` - Pakistan
+	// * `PW` - Palau
+	// * `PS` - Palestine, State of
+	// * `PA` - Panama
+	// * `PG` - Papua New Guinea
+	// * `PY` - Paraguay
+	// * `PE` - Peru
+	// * `PH` - Philippines
+	// * `PN` - Pitcairn
+	// * `PL` - Poland
+	// * `PT` - Portugal
+	// * `PR` - Puerto Rico
+	// * `QA` - Qatar
+	// * `RE` - Réunion
+	// * `RO` - Romania
+	// * `RU` - Russia
+	// * `RW` - Rwanda
+	// * `BL` - Saint Barthélemy
+	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+	// * `KN` - Saint Kitts and Nevis
+	// * `LC` - Saint Lucia
+	// * `MF` - Saint Martin (French part)
+	// * `PM` - Saint Pierre and Miquelon
+	// * `VC` - Saint Vincent and the Grenadines
+	// * `WS` - Samoa
+	// * `SM` - San Marino
+	// * `ST` - Sao Tome and Principe
+	// * `SA` - Saudi Arabia
+	// * `SN` - Senegal
+	// * `RS` - Serbia
+	// * `SC` - Seychelles
+	// * `SL` - Sierra Leone
+	// * `SG` - Singapore
+	// * `SX` - Sint Maarten (Dutch part)
+	// * `SK` - Slovakia
+	// * `SI` - Slovenia
+	// * `SB` - Solomon Islands
+	// * `SO` - Somalia
+	// * `ZA` - South Africa
+	// * `GS` - South Georgia and the South Sandwich Islands
+	// * `KR` - South Korea
+	// * `SS` - South Sudan
+	// * `ES` - Spain
+	// * `LK` - Sri Lanka
+	// * `SD` - Sudan
+	// * `SR` - Suriname
+	// * `SJ` - Svalbard and Jan Mayen
+	// * `SE` - Sweden
+	// * `CH` - Switzerland
+	// * `SY` - Syria
+	// * `TW` - Taiwan
+	// * `TJ` - Tajikistan
+	// * `TZ` - Tanzania
+	// * `TH` - Thailand
+	// * `TL` - Timor-Leste
+	// * `TG` - Togo
+	// * `TK` - Tokelau
+	// * `TO` - Tonga
+	// * `TT` - Trinidad and Tobago
+	// * `TN` - Tunisia
+	// * `TR` - Turkey
+	// * `TM` - Turkmenistan
+	// * `TC` - Turks and Caicos Islands
+	// * `TV` - Tuvalu
+	// * `UG` - Uganda
+	// * `UA` - Ukraine
+	// * `AE` - United Arab Emirates
+	// * `GB` - United Kingdom
+	// * `UM` - United States Minor Outlying Islands
+	// * `US` - United States of America
+	// * `UY` - Uruguay
+	// * `UZ` - Uzbekistan
+	// * `VU` - Vanuatu
+	// * `VE` - Venezuela
+	// * `VN` - Vietnam
+	// * `VG` - Virgin Islands (British)
+	// * `VI` - Virgin Islands (U.S.)
+	// * `WF` - Wallis and Futuna
+	// * `EH` - Western Sahara
+	// * `YE` - Yemen
+	// * `ZM` - Zambia
+	// * `ZW` - Zimbabwe
+	Country *AddressRequestCountry `json:"country,omitempty" url:"country,omitempty"`
+	// The address's zip code.
+	ZipCode             *string                `json:"zip_code,omitempty" url:"zip_code,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (a *AddressRequest) GetType() *AddressRequestType {
+	if a == nil {
+		return nil
+	}
+	return a.Type
+}
+
+func (a *AddressRequest) GetStreet1() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Street1
+}
+
+func (a *AddressRequest) GetStreet2() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Street2
+}
+
+func (a *AddressRequest) GetCity() *string {
+	if a == nil {
+		return nil
+	}
+	return a.City
+}
+
+func (a *AddressRequest) GetCountrySubdivision() *string {
+	if a == nil {
+		return nil
+	}
+	return a.CountrySubdivision
+}
+
+func (a *AddressRequest) GetCountry() *AddressRequestCountry {
+	if a == nil {
+		return nil
+	}
+	return a.Country
+}
+
+func (a *AddressRequest) GetZipCode() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ZipCode
+}
+
+func (a *AddressRequest) GetIntegrationParams() map[string]interface{} {
+	if a == nil {
+		return nil
+	}
+	return a.IntegrationParams
+}
+
+func (a *AddressRequest) GetLinkedAccountParams() map[string]interface{} {
+	if a == nil {
+		return nil
+	}
+	return a.LinkedAccountParams
+}
+
+func (a *AddressRequest) GetExtraProperties() map[string]interface{} {
+	return a.extraProperties
+}
+
+func (a *AddressRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetType sets the Type field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetType(type_ *AddressRequestType) {
+	a.Type = type_
+	a.require(addressRequestFieldType)
+}
+
+// SetStreet1 sets the Street1 field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetStreet1(street1 *string) {
+	a.Street1 = street1
+	a.require(addressRequestFieldStreet1)
+}
+
+// SetStreet2 sets the Street2 field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetStreet2(street2 *string) {
+	a.Street2 = street2
+	a.require(addressRequestFieldStreet2)
+}
+
+// SetCity sets the City field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetCity(city *string) {
+	a.City = city
+	a.require(addressRequestFieldCity)
+}
+
+// SetCountrySubdivision sets the CountrySubdivision field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetCountrySubdivision(countrySubdivision *string) {
+	a.CountrySubdivision = countrySubdivision
+	a.require(addressRequestFieldCountrySubdivision)
+}
+
+// SetCountry sets the Country field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetCountry(country *AddressRequestCountry) {
+	a.Country = country
+	a.require(addressRequestFieldCountry)
+}
+
+// SetZipCode sets the ZipCode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetZipCode(zipCode *string) {
+	a.ZipCode = zipCode
+	a.require(addressRequestFieldZipCode)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	a.IntegrationParams = integrationParams
+	a.require(addressRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AddressRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	a.LinkedAccountParams = linkedAccountParams
+	a.require(addressRequestFieldLinkedAccountParams)
+}
+
+func (a *AddressRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler AddressRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AddressRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *a)
+	if err != nil {
+		return err
+	}
+	a.extraProperties = extraProperties
+	a.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AddressRequest) MarshalJSON() ([]byte, error) {
+	type embed AddressRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (a *AddressRequest) String() string {
+	if len(a.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
+// The address's country.
+//
+// * `AF` - Afghanistan
+// * `AX` - Åland Islands
+// * `AL` - Albania
+// * `DZ` - Algeria
+// * `AS` - American Samoa
+// * `AD` - Andorra
+// * `AO` - Angola
+// * `AI` - Anguilla
+// * `AQ` - Antarctica
+// * `AG` - Antigua and Barbuda
+// * `AR` - Argentina
+// * `AM` - Armenia
+// * `AW` - Aruba
+// * `AU` - Australia
+// * `AT` - Austria
+// * `AZ` - Azerbaijan
+// * `BS` - Bahamas
+// * `BH` - Bahrain
+// * `BD` - Bangladesh
+// * `BB` - Barbados
+// * `BY` - Belarus
+// * `BE` - Belgium
+// * `BZ` - Belize
+// * `BJ` - Benin
+// * `BM` - Bermuda
+// * `BT` - Bhutan
+// * `BO` - Bolivia
+// * `BQ` - Bonaire, Sint Eustatius and Saba
+// * `BA` - Bosnia and Herzegovina
+// * `BW` - Botswana
+// * `BV` - Bouvet Island
+// * `BR` - Brazil
+// * `IO` - British Indian Ocean Territory
+// * `BN` - Brunei
+// * `BG` - Bulgaria
+// * `BF` - Burkina Faso
+// * `BI` - Burundi
+// * `CV` - Cabo Verde
+// * `KH` - Cambodia
+// * `CM` - Cameroon
+// * `CA` - Canada
+// * `KY` - Cayman Islands
+// * `CF` - Central African Republic
+// * `TD` - Chad
+// * `CL` - Chile
+// * `CN` - China
+// * `CX` - Christmas Island
+// * `CC` - Cocos (Keeling) Islands
+// * `CO` - Colombia
+// * `KM` - Comoros
+// * `CG` - Congo
+// * `CD` - Congo (the Democratic Republic of the)
+// * `CK` - Cook Islands
+// * `CR` - Costa Rica
+// * `CI` - Côte d'Ivoire
+// * `HR` - Croatia
+// * `CU` - Cuba
+// * `CW` - Curaçao
+// * `CY` - Cyprus
+// * `CZ` - Czechia
+// * `DK` - Denmark
+// * `DJ` - Djibouti
+// * `DM` - Dominica
+// * `DO` - Dominican Republic
+// * `EC` - Ecuador
+// * `EG` - Egypt
+// * `SV` - El Salvador
+// * `GQ` - Equatorial Guinea
+// * `ER` - Eritrea
+// * `EE` - Estonia
+// * `SZ` - Eswatini
+// * `ET` - Ethiopia
+// * `FK` - Falkland Islands (Malvinas)
+// * `FO` - Faroe Islands
+// * `FJ` - Fiji
+// * `FI` - Finland
+// * `FR` - France
+// * `GF` - French Guiana
+// * `PF` - French Polynesia
+// * `TF` - French Southern Territories
+// * `GA` - Gabon
+// * `GM` - Gambia
+// * `GE` - Georgia
+// * `DE` - Germany
+// * `GH` - Ghana
+// * `GI` - Gibraltar
+// * `GR` - Greece
+// * `GL` - Greenland
+// * `GD` - Grenada
+// * `GP` - Guadeloupe
+// * `GU` - Guam
+// * `GT` - Guatemala
+// * `GG` - Guernsey
+// * `GN` - Guinea
+// * `GW` - Guinea-Bissau
+// * `GY` - Guyana
+// * `HT` - Haiti
+// * `HM` - Heard Island and McDonald Islands
+// * `VA` - Holy See
+// * `HN` - Honduras
+// * `HK` - Hong Kong
+// * `HU` - Hungary
+// * `IS` - Iceland
+// * `IN` - India
+// * `ID` - Indonesia
+// * `IR` - Iran
+// * `IQ` - Iraq
+// * `IE` - Ireland
+// * `IM` - Isle of Man
+// * `IL` - Israel
+// * `IT` - Italy
+// * `JM` - Jamaica
+// * `JP` - Japan
+// * `JE` - Jersey
+// * `JO` - Jordan
+// * `KZ` - Kazakhstan
+// * `KE` - Kenya
+// * `KI` - Kiribati
+// * `KW` - Kuwait
+// * `KG` - Kyrgyzstan
+// * `LA` - Laos
+// * `LV` - Latvia
+// * `LB` - Lebanon
+// * `LS` - Lesotho
+// * `LR` - Liberia
+// * `LY` - Libya
+// * `LI` - Liechtenstein
+// * `LT` - Lithuania
+// * `LU` - Luxembourg
+// * `MO` - Macao
+// * `MG` - Madagascar
+// * `MW` - Malawi
+// * `MY` - Malaysia
+// * `MV` - Maldives
+// * `ML` - Mali
+// * `MT` - Malta
+// * `MH` - Marshall Islands
+// * `MQ` - Martinique
+// * `MR` - Mauritania
+// * `MU` - Mauritius
+// * `YT` - Mayotte
+// * `MX` - Mexico
+// * `FM` - Micronesia (Federated States of)
+// * `MD` - Moldova
+// * `MC` - Monaco
+// * `MN` - Mongolia
+// * `ME` - Montenegro
+// * `MS` - Montserrat
+// * `MA` - Morocco
+// * `MZ` - Mozambique
+// * `MM` - Myanmar
+// * `NA` - Namibia
+// * `NR` - Nauru
+// * `NP` - Nepal
+// * `NL` - Netherlands
+// * `NC` - New Caledonia
+// * `NZ` - New Zealand
+// * `NI` - Nicaragua
+// * `NE` - Niger
+// * `NG` - Nigeria
+// * `NU` - Niue
+// * `NF` - Norfolk Island
+// * `KP` - North Korea
+// * `MK` - North Macedonia
+// * `MP` - Northern Mariana Islands
+// * `NO` - Norway
+// * `OM` - Oman
+// * `PK` - Pakistan
+// * `PW` - Palau
+// * `PS` - Palestine, State of
+// * `PA` - Panama
+// * `PG` - Papua New Guinea
+// * `PY` - Paraguay
+// * `PE` - Peru
+// * `PH` - Philippines
+// * `PN` - Pitcairn
+// * `PL` - Poland
+// * `PT` - Portugal
+// * `PR` - Puerto Rico
+// * `QA` - Qatar
+// * `RE` - Réunion
+// * `RO` - Romania
+// * `RU` - Russia
+// * `RW` - Rwanda
+// * `BL` - Saint Barthélemy
+// * `SH` - Saint Helena, Ascension and Tristan da Cunha
+// * `KN` - Saint Kitts and Nevis
+// * `LC` - Saint Lucia
+// * `MF` - Saint Martin (French part)
+// * `PM` - Saint Pierre and Miquelon
+// * `VC` - Saint Vincent and the Grenadines
+// * `WS` - Samoa
+// * `SM` - San Marino
+// * `ST` - Sao Tome and Principe
+// * `SA` - Saudi Arabia
+// * `SN` - Senegal
+// * `RS` - Serbia
+// * `SC` - Seychelles
+// * `SL` - Sierra Leone
+// * `SG` - Singapore
+// * `SX` - Sint Maarten (Dutch part)
+// * `SK` - Slovakia
+// * `SI` - Slovenia
+// * `SB` - Solomon Islands
+// * `SO` - Somalia
+// * `ZA` - South Africa
+// * `GS` - South Georgia and the South Sandwich Islands
+// * `KR` - South Korea
+// * `SS` - South Sudan
+// * `ES` - Spain
+// * `LK` - Sri Lanka
+// * `SD` - Sudan
+// * `SR` - Suriname
+// * `SJ` - Svalbard and Jan Mayen
+// * `SE` - Sweden
+// * `CH` - Switzerland
+// * `SY` - Syria
+// * `TW` - Taiwan
+// * `TJ` - Tajikistan
+// * `TZ` - Tanzania
+// * `TH` - Thailand
+// * `TL` - Timor-Leste
+// * `TG` - Togo
+// * `TK` - Tokelau
+// * `TO` - Tonga
+// * `TT` - Trinidad and Tobago
+// * `TN` - Tunisia
+// * `TR` - Turkey
+// * `TM` - Turkmenistan
+// * `TC` - Turks and Caicos Islands
+// * `TV` - Tuvalu
+// * `UG` - Uganda
+// * `UA` - Ukraine
+// * `AE` - United Arab Emirates
+// * `GB` - United Kingdom
+// * `UM` - United States Minor Outlying Islands
+// * `US` - United States of America
+// * `UY` - Uruguay
+// * `UZ` - Uzbekistan
+// * `VU` - Vanuatu
+// * `VE` - Venezuela
+// * `VN` - Vietnam
+// * `VG` - Virgin Islands (British)
+// * `VI` - Virgin Islands (U.S.)
+// * `WF` - Wallis and Futuna
+// * `EH` - Western Sahara
+// * `YE` - Yemen
+// * `ZM` - Zambia
+// * `ZW` - Zimbabwe
+type AddressRequestCountry struct {
+	CountryEnum CountryEnum
+	String      string
+
+	typ string
+}
+
+func (a *AddressRequestCountry) GetCountryEnum() CountryEnum {
+	if a == nil {
+		return ""
+	}
+	return a.CountryEnum
+}
+
+func (a *AddressRequestCountry) GetString() string {
+	if a == nil {
+		return ""
+	}
+	return a.String
+}
+
+func (a *AddressRequestCountry) UnmarshalJSON(data []byte) error {
+	var valueCountryEnum CountryEnum
+	if err := json.Unmarshal(data, &valueCountryEnum); err == nil {
+		a.typ = "CountryEnum"
+		a.CountryEnum = valueCountryEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typ = "String"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AddressRequestCountry) MarshalJSON() ([]byte, error) {
+	if a.typ == "CountryEnum" || a.CountryEnum != "" {
+		return json.Marshal(a.CountryEnum)
+	}
+	if a.typ == "String" || a.String != "" {
+		return json.Marshal(a.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+type AddressRequestCountryVisitor interface {
+	VisitCountryEnum(CountryEnum) error
+	VisitString(string) error
+}
+
+func (a *AddressRequestCountry) Accept(visitor AddressRequestCountryVisitor) error {
+	if a.typ == "CountryEnum" || a.CountryEnum != "" {
+		return visitor.VisitCountryEnum(a.CountryEnum)
+	}
+	if a.typ == "String" || a.String != "" {
+		return visitor.VisitString(a.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+// The address type.
+//
+// * `BILLING` - BILLING
+// * `SHIPPING` - SHIPPING
+type AddressRequestType struct {
+	AddressTypeEnum AddressTypeEnum
+	String          string
+
+	typ string
+}
+
+func (a *AddressRequestType) GetAddressTypeEnum() AddressTypeEnum {
+	if a == nil {
+		return ""
+	}
+	return a.AddressTypeEnum
+}
+
+func (a *AddressRequestType) GetString() string {
+	if a == nil {
+		return ""
+	}
+	return a.String
+}
+
+func (a *AddressRequestType) UnmarshalJSON(data []byte) error {
+	var valueAddressTypeEnum AddressTypeEnum
+	if err := json.Unmarshal(data, &valueAddressTypeEnum); err == nil {
+		a.typ = "AddressTypeEnum"
+		a.AddressTypeEnum = valueAddressTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typ = "String"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AddressRequestType) MarshalJSON() ([]byte, error) {
+	if a.typ == "AddressTypeEnum" || a.AddressTypeEnum != "" {
+		return json.Marshal(a.AddressTypeEnum)
+	}
+	if a.typ == "String" || a.String != "" {
+		return json.Marshal(a.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+type AddressRequestTypeVisitor interface {
+	VisitAddressTypeEnum(AddressTypeEnum) error
+	VisitString(string) error
+}
+
+func (a *AddressRequestType) Accept(visitor AddressRequestTypeVisitor) error {
+	if a.typ == "AddressTypeEnum" || a.AddressTypeEnum != "" {
+		return visitor.VisitAddressTypeEnum(a.AddressTypeEnum)
+	}
+	if a.typ == "String" || a.String != "" {
+		return visitor.VisitString(a.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
 // # The Contact Object
 // ### Description
 // A `Contact` is an individual or business entity to which products and services are sold to or purchased from. The `Contact` model contains both Customers, in which products and services are sold to, and Vendors (or Suppliers), in which products and services are purchased from.
@@ -651,22 +1547,25 @@ func (a *AccountingPhoneNumberRequest) String() string {
 // ### Usage Example
 // Fetch from the `LIST Contacts` endpoint and view a company's contacts.
 var (
-	contactRequestFieldName                = big.NewInt(1 << 0)
-	contactRequestFieldIsSupplier          = big.NewInt(1 << 1)
-	contactRequestFieldIsCustomer          = big.NewInt(1 << 2)
-	contactRequestFieldEmailAddress        = big.NewInt(1 << 3)
-	contactRequestFieldTaxNumber           = big.NewInt(1 << 4)
-	contactRequestFieldStatus              = big.NewInt(1 << 5)
-	contactRequestFieldCurrency            = big.NewInt(1 << 6)
-	contactRequestFieldCompany             = big.NewInt(1 << 7)
-	contactRequestFieldAddresses           = big.NewInt(1 << 8)
-	contactRequestFieldPhoneNumbers        = big.NewInt(1 << 9)
-	contactRequestFieldIntegrationParams   = big.NewInt(1 << 10)
-	contactRequestFieldLinkedAccountParams = big.NewInt(1 << 11)
-	contactRequestFieldRemoteFields        = big.NewInt(1 << 12)
+	contactRequestFieldContactUrl          = big.NewInt(1 << 0)
+	contactRequestFieldName                = big.NewInt(1 << 1)
+	contactRequestFieldIsSupplier          = big.NewInt(1 << 2)
+	contactRequestFieldIsCustomer          = big.NewInt(1 << 3)
+	contactRequestFieldEmailAddress        = big.NewInt(1 << 4)
+	contactRequestFieldTaxNumber           = big.NewInt(1 << 5)
+	contactRequestFieldStatus              = big.NewInt(1 << 6)
+	contactRequestFieldCurrency            = big.NewInt(1 << 7)
+	contactRequestFieldCompany             = big.NewInt(1 << 8)
+	contactRequestFieldAddresses           = big.NewInt(1 << 9)
+	contactRequestFieldPhoneNumbers        = big.NewInt(1 << 10)
+	contactRequestFieldIntegrationParams   = big.NewInt(1 << 11)
+	contactRequestFieldLinkedAccountParams = big.NewInt(1 << 12)
+	contactRequestFieldRemoteFields        = big.NewInt(1 << 13)
 )
 
 type ContactRequest struct {
+	// The 3rd party URL of the contact.
+	ContactUrl *string `json:"contact_url,omitempty" url:"contact_url,omitempty"`
 	// The contact's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// Whether the contact is a supplier.
@@ -685,20 +1584,27 @@ type ContactRequest struct {
 	// The currency the contact's transactions are in.
 	Currency *string `json:"currency,omitempty" url:"currency,omitempty"`
 	// The company the contact belongs to.
-	Company *string `json:"company,omitempty" url:"company,omitempty"`
+	Company *ContactRequestCompany `json:"company,omitempty" url:"company,omitempty"`
 	// `Address` object IDs for the given `Contacts` object.
 	Addresses []*ContactRequestAddressesItem `json:"addresses,omitempty" url:"addresses,omitempty"`
 	// `AccountingPhoneNumber` object for the given `Contacts` object.
-	PhoneNumbers        []*AccountingPhoneNumberRequest `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
-	IntegrationParams   map[string]interface{}          `json:"integration_params,omitempty" url:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{}          `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest           `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+	PhoneNumbers        []*ContactRequestPhoneNumbersItem `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
+	IntegrationParams   map[string]interface{}            `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest             `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (c *ContactRequest) GetContactUrl() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ContactUrl
 }
 
 func (c *ContactRequest) GetName() *string {
@@ -750,7 +1656,7 @@ func (c *ContactRequest) GetCurrency() *string {
 	return c.Currency
 }
 
-func (c *ContactRequest) GetCompany() *string {
+func (c *ContactRequest) GetCompany() *ContactRequestCompany {
 	if c == nil {
 		return nil
 	}
@@ -764,7 +1670,7 @@ func (c *ContactRequest) GetAddresses() []*ContactRequestAddressesItem {
 	return c.Addresses
 }
 
-func (c *ContactRequest) GetPhoneNumbers() []*AccountingPhoneNumberRequest {
+func (c *ContactRequest) GetPhoneNumbers() []*ContactRequestPhoneNumbersItem {
 	if c == nil {
 		return nil
 	}
@@ -801,6 +1707,13 @@ func (c *ContactRequest) require(field *big.Int) {
 		c.explicitFields = big.NewInt(0)
 	}
 	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetContactUrl sets the ContactUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactRequest) SetContactUrl(contactUrl *string) {
+	c.ContactUrl = contactUrl
+	c.require(contactRequestFieldContactUrl)
 }
 
 // SetName sets the Name field and marks it as non-optional;
@@ -854,7 +1767,7 @@ func (c *ContactRequest) SetCurrency(currency *string) {
 
 // SetCompany sets the Company field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *ContactRequest) SetCompany(company *string) {
+func (c *ContactRequest) SetCompany(company *ContactRequestCompany) {
 	c.Company = company
 	c.require(contactRequestFieldCompany)
 }
@@ -868,7 +1781,7 @@ func (c *ContactRequest) SetAddresses(addresses []*ContactRequestAddressesItem) 
 
 // SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *ContactRequest) SetPhoneNumbers(phoneNumbers []*AccountingPhoneNumberRequest) {
+func (c *ContactRequest) SetPhoneNumbers(phoneNumbers []*ContactRequestPhoneNumbersItem) {
 	c.PhoneNumbers = phoneNumbers
 	c.require(contactRequestFieldPhoneNumbers)
 }
@@ -991,6 +1904,131 @@ func (c *ContactRequestAddressesItem) Accept(visitor ContactRequestAddressesItem
 	}
 	if c.typ == "Address" || c.Address != nil {
 		return visitor.VisitAddress(c.Address)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+// The company the contact belongs to.
+type ContactRequestCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (c *ContactRequestCompany) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *ContactRequestCompany) GetCompanyInfo() *CompanyInfo {
+	if c == nil {
+		return nil
+	}
+	return c.CompanyInfo
+}
+
+func (c *ContactRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typ = "CompanyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactRequestCompany) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
+		return json.Marshal(c.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type ContactRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *ContactRequestCompany) Accept(visitor ContactRequestCompanyVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type ContactRequestPhoneNumbersItem struct {
+	String                string
+	AccountingPhoneNumber *AccountingPhoneNumber
+
+	typ string
+}
+
+func (c *ContactRequestPhoneNumbersItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *ContactRequestPhoneNumbersItem) GetAccountingPhoneNumber() *AccountingPhoneNumber {
+	if c == nil {
+		return nil
+	}
+	return c.AccountingPhoneNumber
+}
+
+func (c *ContactRequestPhoneNumbersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueAccountingPhoneNumber := new(AccountingPhoneNumber)
+	if err := json.Unmarshal(data, &valueAccountingPhoneNumber); err == nil {
+		c.typ = "AccountingPhoneNumber"
+		c.AccountingPhoneNumber = valueAccountingPhoneNumber
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactRequestPhoneNumbersItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "AccountingPhoneNumber" || c.AccountingPhoneNumber != nil {
+		return json.Marshal(c.AccountingPhoneNumber)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type ContactRequestPhoneNumbersItemVisitor interface {
+	VisitString(string) error
+	VisitAccountingPhoneNumber(*AccountingPhoneNumber) error
+}
+
+func (c *ContactRequestPhoneNumbersItem) Accept(visitor ContactRequestPhoneNumbersItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "AccountingPhoneNumber" || c.AccountingPhoneNumber != nil {
+		return visitor.VisitAccountingPhoneNumber(c.AccountingPhoneNumber)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
@@ -1295,4 +2333,378 @@ func (p *PaginatedContactList) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", p)
+}
+
+// # The Contact Object
+// ### Description
+// A `Contact` is an individual or business entity to which products and services are sold to or purchased from. The `Contact` model contains both Customers, in which products and services are sold to, and Vendors (or Suppliers), in which products and services are purchased from.
+// * A `Contact` is a Vendor/Supplier if the `is_supplier` property is true.
+// * A `Contact` is a customer if the `is_customer` property is true.
+//
+// ### Usage Example
+// Fetch from the `LIST Contacts` endpoint and view a company's contacts.
+var (
+	patchedContactRequestFieldContactUrl          = big.NewInt(1 << 0)
+	patchedContactRequestFieldName                = big.NewInt(1 << 1)
+	patchedContactRequestFieldIsSupplier          = big.NewInt(1 << 2)
+	patchedContactRequestFieldIsCustomer          = big.NewInt(1 << 3)
+	patchedContactRequestFieldEmailAddress        = big.NewInt(1 << 4)
+	patchedContactRequestFieldTaxNumber           = big.NewInt(1 << 5)
+	patchedContactRequestFieldStatus              = big.NewInt(1 << 6)
+	patchedContactRequestFieldCurrency            = big.NewInt(1 << 7)
+	patchedContactRequestFieldCompany             = big.NewInt(1 << 8)
+	patchedContactRequestFieldAddresses           = big.NewInt(1 << 9)
+	patchedContactRequestFieldPhoneNumbers        = big.NewInt(1 << 10)
+	patchedContactRequestFieldIntegrationParams   = big.NewInt(1 << 11)
+	patchedContactRequestFieldLinkedAccountParams = big.NewInt(1 << 12)
+	patchedContactRequestFieldRemoteFields        = big.NewInt(1 << 13)
+)
+
+type PatchedContactRequest struct {
+	// The 3rd party URL of the contact.
+	ContactUrl *string `json:"contact_url,omitempty" url:"contact_url,omitempty"`
+	// The contact's name.
+	Name *string `json:"name,omitempty" url:"name,omitempty"`
+	// Whether the contact is a supplier.
+	IsSupplier *bool `json:"is_supplier,omitempty" url:"is_supplier,omitempty"`
+	// Whether the contact is a customer.
+	IsCustomer *bool `json:"is_customer,omitempty" url:"is_customer,omitempty"`
+	// The contact's email address.
+	EmailAddress *string `json:"email_address,omitempty" url:"email_address,omitempty"`
+	// The contact's tax number.
+	TaxNumber *string `json:"tax_number,omitempty" url:"tax_number,omitempty"`
+	// The contact's status
+	//
+	// * `ACTIVE` - ACTIVE
+	// * `ARCHIVED` - ARCHIVED
+	Status *PatchedContactRequestStatus `json:"status,omitempty" url:"status,omitempty"`
+	// The currency the contact's transactions are in.
+	Currency *string `json:"currency,omitempty" url:"currency,omitempty"`
+	// The company the contact belongs to.
+	Company *string `json:"company,omitempty" url:"company,omitempty"`
+	// `Address` object IDs for the given `Contacts` object.
+	Addresses []*AddressRequest `json:"addresses,omitempty" url:"addresses,omitempty"`
+	// `AccountingPhoneNumber` object for the given `Contacts` object.
+	PhoneNumbers        []*AccountingPhoneNumberRequest `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
+	IntegrationParams   map[string]interface{}          `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}          `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest           `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (p *PatchedContactRequest) GetContactUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ContactUrl
+}
+
+func (p *PatchedContactRequest) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PatchedContactRequest) GetIsSupplier() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.IsSupplier
+}
+
+func (p *PatchedContactRequest) GetIsCustomer() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.IsCustomer
+}
+
+func (p *PatchedContactRequest) GetEmailAddress() *string {
+	if p == nil {
+		return nil
+	}
+	return p.EmailAddress
+}
+
+func (p *PatchedContactRequest) GetTaxNumber() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TaxNumber
+}
+
+func (p *PatchedContactRequest) GetStatus() *PatchedContactRequestStatus {
+	if p == nil {
+		return nil
+	}
+	return p.Status
+}
+
+func (p *PatchedContactRequest) GetCurrency() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Currency
+}
+
+func (p *PatchedContactRequest) GetCompany() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Company
+}
+
+func (p *PatchedContactRequest) GetAddresses() []*AddressRequest {
+	if p == nil {
+		return nil
+	}
+	return p.Addresses
+}
+
+func (p *PatchedContactRequest) GetPhoneNumbers() []*AccountingPhoneNumberRequest {
+	if p == nil {
+		return nil
+	}
+	return p.PhoneNumbers
+}
+
+func (p *PatchedContactRequest) GetIntegrationParams() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.IntegrationParams
+}
+
+func (p *PatchedContactRequest) GetLinkedAccountParams() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.LinkedAccountParams
+}
+
+func (p *PatchedContactRequest) GetRemoteFields() []*RemoteFieldRequest {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteFields
+}
+
+func (p *PatchedContactRequest) GetExtraProperties() map[string]interface{} {
+	return p.extraProperties
+}
+
+func (p *PatchedContactRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetContactUrl sets the ContactUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetContactUrl(contactUrl *string) {
+	p.ContactUrl = contactUrl
+	p.require(patchedContactRequestFieldContactUrl)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetName(name *string) {
+	p.Name = name
+	p.require(patchedContactRequestFieldName)
+}
+
+// SetIsSupplier sets the IsSupplier field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetIsSupplier(isSupplier *bool) {
+	p.IsSupplier = isSupplier
+	p.require(patchedContactRequestFieldIsSupplier)
+}
+
+// SetIsCustomer sets the IsCustomer field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetIsCustomer(isCustomer *bool) {
+	p.IsCustomer = isCustomer
+	p.require(patchedContactRequestFieldIsCustomer)
+}
+
+// SetEmailAddress sets the EmailAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetEmailAddress(emailAddress *string) {
+	p.EmailAddress = emailAddress
+	p.require(patchedContactRequestFieldEmailAddress)
+}
+
+// SetTaxNumber sets the TaxNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetTaxNumber(taxNumber *string) {
+	p.TaxNumber = taxNumber
+	p.require(patchedContactRequestFieldTaxNumber)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetStatus(status *PatchedContactRequestStatus) {
+	p.Status = status
+	p.require(patchedContactRequestFieldStatus)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetCurrency(currency *string) {
+	p.Currency = currency
+	p.require(patchedContactRequestFieldCurrency)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetCompany(company *string) {
+	p.Company = company
+	p.require(patchedContactRequestFieldCompany)
+}
+
+// SetAddresses sets the Addresses field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetAddresses(addresses []*AddressRequest) {
+	p.Addresses = addresses
+	p.require(patchedContactRequestFieldAddresses)
+}
+
+// SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetPhoneNumbers(phoneNumbers []*AccountingPhoneNumberRequest) {
+	p.PhoneNumbers = phoneNumbers
+	p.require(patchedContactRequestFieldPhoneNumbers)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(patchedContactRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(patchedContactRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedContactRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(patchedContactRequestFieldRemoteFields)
+}
+
+func (p *PatchedContactRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PatchedContactRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PatchedContactRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *p)
+	if err != nil {
+		return err
+	}
+	p.extraProperties = extraProperties
+	p.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PatchedContactRequest) MarshalJSON() ([]byte, error) {
+	type embed PatchedContactRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (p *PatchedContactRequest) String() string {
+	if len(p.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// The contact's status
+//
+// * `ACTIVE` - ACTIVE
+// * `ARCHIVED` - ARCHIVED
+type PatchedContactRequestStatus struct {
+	Status7D1Enum Status7D1Enum
+	String        string
+
+	typ string
+}
+
+func (p *PatchedContactRequestStatus) GetStatus7D1Enum() Status7D1Enum {
+	if p == nil {
+		return ""
+	}
+	return p.Status7D1Enum
+}
+
+func (p *PatchedContactRequestStatus) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PatchedContactRequestStatus) UnmarshalJSON(data []byte) error {
+	var valueStatus7D1Enum Status7D1Enum
+	if err := json.Unmarshal(data, &valueStatus7D1Enum); err == nil {
+		p.typ = "Status7D1Enum"
+		p.Status7D1Enum = valueStatus7D1Enum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PatchedContactRequestStatus) MarshalJSON() ([]byte, error) {
+	if p.typ == "Status7D1Enum" || p.Status7D1Enum != "" {
+		return json.Marshal(p.Status7D1Enum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PatchedContactRequestStatusVisitor interface {
+	VisitStatus7D1Enum(Status7D1Enum) error
+	VisitString(string) error
+}
+
+func (p *PatchedContactRequestStatus) Accept(visitor PatchedContactRequestStatusVisitor) error {
+	if p.typ == "Status7D1Enum" || p.Status7D1Enum != "" {
+		return visitor.VisitStatus7D1Enum(p.Status7D1Enum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }

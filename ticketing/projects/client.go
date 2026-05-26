@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ticketing.ProjectsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ticketing.Project], error) {
+) (*core.Page[*string, *ticketing.Project, *ticketing.PaginatedProjectList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ticketing/v1/projects"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedProjectList) *core.PageResponse[*string, *ticketing.Project] {
+	readPageResponse := func(response *ticketing.PaginatedProjectList) *core.PageResponse[*string, *ticketing.Project, *ticketing.PaginatedProjectList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ticketing.Project]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ticketing.Project, *ticketing.PaginatedProjectList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -116,12 +117,12 @@ func (c *Client) UsersList(
 	parentId string,
 	request *ticketing.ProjectsUsersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ticketing.User], error) {
+) (*core.Page[*string, *ticketing.User, *ticketing.PaginatedUserList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ticketing/v1/projects/%v/users",
@@ -154,14 +155,15 @@ func (c *Client) UsersList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedUserList) *core.PageResponse[*string, *ticketing.User] {
+	readPageResponse := func(response *ticketing.PaginatedUserList) *core.PageResponse[*string, *ticketing.User, *ticketing.PaginatedUserList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ticketing.User]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ticketing.User, *ticketing.PaginatedUserList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

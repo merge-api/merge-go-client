@@ -7,18 +7,32 @@ import (
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	big "math/big"
+	time "time"
 )
 
 var (
-	projectsListRequestFieldCursor             = big.NewInt(1 << 0)
-	projectsListRequestFieldExpand             = big.NewInt(1 << 1)
-	projectsListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
-	projectsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
-	projectsListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
-	projectsListRequestFieldPageSize           = big.NewInt(1 << 5)
+	projectsListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	projectsListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	projectsListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	projectsListRequestFieldCursor             = big.NewInt(1 << 3)
+	projectsListRequestFieldExpand             = big.NewInt(1 << 4)
+	projectsListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	projectsListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	projectsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	projectsListRequestFieldIsActive           = big.NewInt(1 << 8)
+	projectsListRequestFieldModifiedAfter      = big.NewInt(1 << 9)
+	projectsListRequestFieldModifiedBefore     = big.NewInt(1 << 10)
+	projectsListRequestFieldPageSize           = big.NewInt(1 << 11)
+	projectsListRequestFieldRemoteId           = big.NewInt(1 << 12)
 )
 
 type ProjectsListRequest struct {
+	// If provided, will only return projects for this company.
+	CompanyId *string `json:"-" url:"company_id,omitempty"`
+	// If provided, will only return objects created after this datetime.
+	CreatedAfter *time.Time `json:"-" url:"created_after,omitempty"`
+	// If provided, will only return objects created before this datetime.
+	CreatedBefore *time.Time `json:"-" url:"created_before,omitempty"`
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -29,8 +43,16 @@ type ProjectsListRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// Number of results to return per page.
+	// If provided, will only return projects with this value for is_active.
+	IsActive *string `json:"-" url:"is_active,omitempty"`
+	// If provided, only objects synced by Merge after this date time will be returned.
+	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
+	// If provided, only objects synced by Merge before this date time will be returned.
+	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+	// The API provider's ID for the given object.
+	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -41,6 +63,27 @@ func (p *ProjectsListRequest) require(field *big.Int) {
 		p.explicitFields = big.NewInt(0)
 	}
 	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetCompanyId(companyId *string) {
+	p.CompanyId = companyId
+	p.require(projectsListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	p.CreatedAfter = createdAfter
+	p.require(projectsListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	p.CreatedBefore = createdBefore
+	p.require(projectsListRequestFieldCreatedBefore)
 }
 
 // SetCursor sets the Cursor field and marks it as non-optional;
@@ -78,11 +121,39 @@ func (p *ProjectsListRequest) SetIncludeShellData(includeShellData *bool) {
 	p.require(projectsListRequestFieldIncludeShellData)
 }
 
+// SetIsActive sets the IsActive field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetIsActive(isActive *string) {
+	p.IsActive = isActive
+	p.require(projectsListRequestFieldIsActive)
+}
+
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	p.ModifiedAfter = modifiedAfter
+	p.require(projectsListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	p.ModifiedBefore = modifiedBefore
+	p.require(projectsListRequestFieldModifiedBefore)
+}
+
 // SetPageSize sets the PageSize field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (p *ProjectsListRequest) SetPageSize(pageSize *int) {
 	p.PageSize = pageSize
 	p.require(projectsListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *ProjectsListRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(projectsListRequestFieldRemoteId)
 }
 
 var (

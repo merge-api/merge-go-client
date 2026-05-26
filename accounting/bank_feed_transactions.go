@@ -91,7 +91,7 @@ type BankFeedTransactionsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -244,25 +244,28 @@ func (b *BankFeedTransactionsRetrieveRequest) SetIncludeShellData(includeShellDa
 // ### Usage Example
 // Fetch from the `GET BankFeedTransaction` endpoint to view details of a transaction associated with a bank feed account.
 var (
-	bankFeedTransactionFieldId                  = big.NewInt(1 << 0)
-	bankFeedTransactionFieldRemoteId            = big.NewInt(1 << 1)
-	bankFeedTransactionFieldCreatedAt           = big.NewInt(1 << 2)
-	bankFeedTransactionFieldModifiedAt          = big.NewInt(1 << 3)
-	bankFeedTransactionFieldBankFeedAccount     = big.NewInt(1 << 4)
-	bankFeedTransactionFieldTransactionDate     = big.NewInt(1 << 5)
-	bankFeedTransactionFieldPostedDate          = big.NewInt(1 << 6)
-	bankFeedTransactionFieldAmount              = big.NewInt(1 << 7)
-	bankFeedTransactionFieldDescription         = big.NewInt(1 << 8)
-	bankFeedTransactionFieldTransactionType     = big.NewInt(1 << 9)
-	bankFeedTransactionFieldPayee               = big.NewInt(1 << 10)
-	bankFeedTransactionFieldCreditOrDebit       = big.NewInt(1 << 11)
-	bankFeedTransactionFieldSourceTransactionId = big.NewInt(1 << 12)
-	bankFeedTransactionFieldRemoteWasDeleted    = big.NewInt(1 << 13)
-	bankFeedTransactionFieldIsProcessed         = big.NewInt(1 << 14)
+	bankFeedTransactionFieldBankFeedTransactionUrl = big.NewInt(1 << 0)
+	bankFeedTransactionFieldId                     = big.NewInt(1 << 1)
+	bankFeedTransactionFieldRemoteId               = big.NewInt(1 << 2)
+	bankFeedTransactionFieldCreatedAt              = big.NewInt(1 << 3)
+	bankFeedTransactionFieldModifiedAt             = big.NewInt(1 << 4)
+	bankFeedTransactionFieldBankFeedAccount        = big.NewInt(1 << 5)
+	bankFeedTransactionFieldTransactionDate        = big.NewInt(1 << 6)
+	bankFeedTransactionFieldPostedDate             = big.NewInt(1 << 7)
+	bankFeedTransactionFieldAmount                 = big.NewInt(1 << 8)
+	bankFeedTransactionFieldDescription            = big.NewInt(1 << 9)
+	bankFeedTransactionFieldTransactionType        = big.NewInt(1 << 10)
+	bankFeedTransactionFieldPayee                  = big.NewInt(1 << 11)
+	bankFeedTransactionFieldCreditOrDebit          = big.NewInt(1 << 12)
+	bankFeedTransactionFieldSourceTransactionId    = big.NewInt(1 << 13)
+	bankFeedTransactionFieldRemoteWasDeleted       = big.NewInt(1 << 14)
+	bankFeedTransactionFieldIsProcessed            = big.NewInt(1 << 15)
 )
 
 type BankFeedTransaction struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the bank feed transaction.
+	BankFeedTransactionUrl *string `json:"bank_feed_transaction_url,omitempty" url:"bank_feed_transaction_url,omitempty"`
+	Id                     *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -300,6 +303,13 @@ type BankFeedTransaction struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (b *BankFeedTransaction) GetBankFeedTransactionUrl() *string {
+	if b == nil {
+		return nil
+	}
+	return b.BankFeedTransactionUrl
 }
 
 func (b *BankFeedTransaction) GetId() *string {
@@ -416,6 +426,13 @@ func (b *BankFeedTransaction) require(field *big.Int) {
 		b.explicitFields = big.NewInt(0)
 	}
 	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetBankFeedTransactionUrl sets the BankFeedTransactionUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedTransaction) SetBankFeedTransactionUrl(bankFeedTransactionUrl *string) {
+	b.BankFeedTransactionUrl = bankFeedTransactionUrl
+	b.require(bankFeedTransactionFieldBankFeedTransactionUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;

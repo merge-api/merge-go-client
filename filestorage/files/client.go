@@ -39,12 +39,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.FilesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *filestorage.File], error) {
+) (*core.Page[*string, *filestorage.File, *filestorage.PaginatedFileList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/files"
 	queryParams, err := internal.QueryValues(request)
@@ -74,14 +74,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedFileList) *core.PageResponse[*string, *filestorage.File] {
+	readPageResponse := func(response *filestorage.PaginatedFileList) *core.PageResponse[*string, *filestorage.File, *filestorage.PaginatedFileList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *filestorage.File]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *filestorage.File, *filestorage.PaginatedFileList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -147,7 +148,7 @@ func (c *Client) DownloadRetrieve(
 	return response.Body, nil
 }
 
-// Returns metadata to construct an authenticated file download request for a singular file, allowing you to download file directly from the third-party.
+// Returns metadata to construct an authenticated file download request for a singular file, allowing you to download file directly from the third-party. For information on our download process please refer to our <a href='https://help.merge.dev/articles/10644317' target='_blank'>direct file download help center article</a>.
 func (c *Client) DownloadRequestMetaRetrieve(
 	ctx context.Context,
 	id string,
@@ -171,12 +172,12 @@ func (c *Client) DownloadRequestMetaList(
 	ctx context.Context,
 	request *filestorage.FilesDownloadRequestMetaListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *filestorage.DownloadRequestMeta], error) {
+) (*core.Page[*string, *filestorage.DownloadRequestMeta, *filestorage.PaginatedDownloadRequestMetaList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/files/download/request-meta"
 	queryParams, err := internal.QueryValues(request)
@@ -206,14 +207,15 @@ func (c *Client) DownloadRequestMetaList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedDownloadRequestMetaList) *core.PageResponse[*string, *filestorage.DownloadRequestMeta] {
+	readPageResponse := func(response *filestorage.PaginatedDownloadRequestMetaList) *core.PageResponse[*string, *filestorage.DownloadRequestMeta, *filestorage.PaginatedDownloadRequestMetaList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *filestorage.DownloadRequestMeta]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *filestorage.DownloadRequestMeta, *filestorage.PaginatedDownloadRequestMetaList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

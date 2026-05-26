@@ -48,3 +48,18 @@ func (c *Client) Retrieve(
 	}
 	return response.Body, nil
 }
+
+// Exchange Linked Account account tokens.
+func (c *Client) RegenerateCreate(
+	ctx context.Context,
+	opts ...option.RequestOption,
+) (*ticketing.RegenerateAccountToken, error) {
+	response, err := c.WithRawResponse.RegenerateCreate(
+		ctx,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
