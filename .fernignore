@@ -3,6 +3,8 @@
 README.md
 LICENSE
 internal/query.go
+internal/query_test.go
+.github/workflows/ci.yml
 client/client_test.go
 integration/helpers_test.go
 integration/cursor_pagination_test.go
