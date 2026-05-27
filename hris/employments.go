@@ -51,7 +51,7 @@ type EmploymentsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// Overrides the default ordering for this endpoint. Possible values include: effective_date, -effective_date.
 	OrderBy *EmploymentsListRequestOrderBy `json:"-" url:"order_by,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *EmploymentsListRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`

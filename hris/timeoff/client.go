@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *hris.TimeOffListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *hris.TimeOff], error) {
+) (*core.Page[*string, *hris.TimeOff, *hris.PaginatedTimeOffList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/time-off"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *hris.PaginatedTimeOffList) *core.PageResponse[*string, *hris.TimeOff] {
+	readPageResponse := func(response *hris.PaginatedTimeOffList) *core.PageResponse[*string, *hris.TimeOff, *hris.PaginatedTimeOffList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *hris.TimeOff]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *hris.TimeOff, *hris.PaginatedTimeOffList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

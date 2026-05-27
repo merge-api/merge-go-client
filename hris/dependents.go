@@ -14,14 +14,15 @@ var (
 	dependentsListRequestFieldCreatedAfter           = big.NewInt(1 << 0)
 	dependentsListRequestFieldCreatedBefore          = big.NewInt(1 << 1)
 	dependentsListRequestFieldCursor                 = big.NewInt(1 << 2)
-	dependentsListRequestFieldIncludeDeletedData     = big.NewInt(1 << 3)
-	dependentsListRequestFieldIncludeRemoteData      = big.NewInt(1 << 4)
-	dependentsListRequestFieldIncludeSensitiveFields = big.NewInt(1 << 5)
-	dependentsListRequestFieldIncludeShellData       = big.NewInt(1 << 6)
-	dependentsListRequestFieldModifiedAfter          = big.NewInt(1 << 7)
-	dependentsListRequestFieldModifiedBefore         = big.NewInt(1 << 8)
-	dependentsListRequestFieldPageSize               = big.NewInt(1 << 9)
-	dependentsListRequestFieldRemoteId               = big.NewInt(1 << 10)
+	dependentsListRequestFieldEmployeeId             = big.NewInt(1 << 3)
+	dependentsListRequestFieldIncludeDeletedData     = big.NewInt(1 << 4)
+	dependentsListRequestFieldIncludeRemoteData      = big.NewInt(1 << 5)
+	dependentsListRequestFieldIncludeSensitiveFields = big.NewInt(1 << 6)
+	dependentsListRequestFieldIncludeShellData       = big.NewInt(1 << 7)
+	dependentsListRequestFieldModifiedAfter          = big.NewInt(1 << 8)
+	dependentsListRequestFieldModifiedBefore         = big.NewInt(1 << 9)
+	dependentsListRequestFieldPageSize               = big.NewInt(1 << 10)
+	dependentsListRequestFieldRemoteId               = big.NewInt(1 << 11)
 )
 
 type DependentsListRequest struct {
@@ -31,6 +32,8 @@ type DependentsListRequest struct {
 	CreatedBefore *time.Time `json:"-" url:"created_before,omitempty"`
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
+	// If provided, will only return dependents for this employee.
+	EmployeeId *string `json:"-" url:"employee_id,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-" url:"include_deleted_data,omitempty"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -43,7 +46,7 @@ type DependentsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -78,6 +81,13 @@ func (d *DependentsListRequest) SetCreatedBefore(createdBefore *time.Time) {
 func (d *DependentsListRequest) SetCursor(cursor *string) {
 	d.Cursor = cursor
 	d.require(dependentsListRequestFieldCursor)
+}
+
+// SetEmployeeId sets the EmployeeId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DependentsListRequest) SetEmployeeId(employeeId *string) {
+	d.EmployeeId = employeeId
+	d.require(dependentsListRequestFieldEmployeeId)
 }
 
 // SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;

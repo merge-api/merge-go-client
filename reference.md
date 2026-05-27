@@ -101,6 +101,48 @@ client.Ats.AccountToken.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Ats.AccountToken.RegenerateCreate() -> *ats.RegenerateAccountToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange Linked Account account tokens.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Ats.AccountToken.RegenerateCreate(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Ats Activities
 <details><summary><code>client.Ats.Activities.List() -> *ats.PaginatedActivityList</code></summary>
 <dl>
@@ -265,7 +307,7 @@ client.Ats.Activities.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -1804,7 +1846,7 @@ client.Ats.AuditTrail.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -3204,7 +3246,7 @@ client.Ats.Eeocs.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -3524,6 +3566,14 @@ client.Ats.FieldMapping.FieldMappingsCreate(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -3617,7 +3667,11 @@ Create or update existing Field Mappings for a Linked Account. Changes will be r
 <dd>
 
 ```go
-request := &ats.PatchedEditFieldMappingRequest{}
+request := &ats.PatchedEditFieldMappingRequest{
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
+    }
 client.Ats.FieldMapping.FieldMappingsPartialUpdate(
         context.TODO(),
         "field_mapping_id",
@@ -3646,6 +3700,14 @@ client.Ats.FieldMapping.FieldMappingsPartialUpdate(
 <dl>
 <dd>
 
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **remoteFieldTraversalPath:** `[]any` — The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
     
 </dd>
@@ -3663,6 +3725,14 @@ client.Ats.FieldMapping.FieldMappingsPartialUpdate(
 <dd>
 
 **remoteUrlPath:** `*string` — The path of the remote endpoint where the remote field is coming from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -4055,7 +4125,7 @@ client.Ats.Interviews.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -4517,7 +4587,7 @@ client.Ats.Issues.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -4778,7 +4848,7 @@ client.Ats.JobInterviewStages.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -5049,7 +5119,7 @@ client.Ats.JobPostings.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -5358,7 +5428,7 @@ client.Ats.Jobs.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -5629,7 +5699,7 @@ client.Ats.Jobs.ScreeningQuestionsList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -5654,7 +5724,7 @@ client.Ats.Jobs.ScreeningQuestionsList(
 <dl>
 <dd>
 
-Creates a link token to be used when linking a new end user.
+Creates a link token to be used when linking a new end user. The link token expires after single use.
 </dd>
 </dl>
 </dd>
@@ -5994,7 +6064,7 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -6087,6 +6157,7 @@ request := &ats.OffersListRequest{
         RemoteId: merge.String(
             "remote_id",
         ),
+        Status: ats.OffersListRequestStatusApprovalSent.Ptr(),
     }
 client.Ats.Offers.List(
         context.TODO(),
@@ -6220,6 +6291,26 @@ client.Ats.Offers.List(
 <dd>
 
 **showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `*ats.OffersListRequestStatus` 
+
+If provided, will only return offers with this status. Options: ('DRAFT', 'APPROVAL-SENT', 'APPROVED', 'SENT', 'SENT-MANUALLY', 'OPENED', 'DENIED', 'SIGNED', 'DEPRECATED')
+
+* `DRAFT` - DRAFT
+* `APPROVAL-SENT` - APPROVAL-SENT
+* `APPROVED` - APPROVED
+* `SENT` - SENT
+* `SENT-MANUALLY` - SENT-MANUALLY
+* `OPENED` - OPENED
+* `DENIED` - DENIED
+* `SIGNED` - SIGNED
+* `DEPRECATED` - DEPRECATED
     
 </dd>
 </dl>
@@ -6489,7 +6580,7 @@ client.Ats.Offices.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -6868,7 +6959,7 @@ client.Ats.RejectReasons.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -7163,7 +7254,7 @@ client.Ats.Scorecards.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -7369,7 +7460,7 @@ client.Ats.SyncStatus.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -7575,7 +7666,7 @@ client.Ats.Tags.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -7757,7 +7848,7 @@ client.Ats.Users.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -8115,6 +8206,48 @@ client.Accounting.AccountToken.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Accounting.AccountToken.RegenerateCreate() -> *accounting.RegenerateAccountToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange Linked Account account tokens.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.AccountToken.RegenerateCreate(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Accounting AccountingPeriods
 <details><summary><code>client.Accounting.AccountingPeriods.List() -> *accounting.PaginatedAccountingPeriodList</code></summary>
 <dl>
@@ -8211,7 +8344,7 @@ client.Accounting.AccountingPeriods.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -8510,7 +8643,7 @@ client.Accounting.Accounts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -9230,7 +9363,7 @@ client.Accounting.Attachments.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -9549,7 +9682,7 @@ client.Accounting.AuditTrail.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -9790,7 +9923,7 @@ client.Accounting.BalanceSheets.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -9997,7 +10130,7 @@ client.Accounting.BankFeedAccounts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -10387,7 +10520,7 @@ client.Accounting.BankFeedTransactions.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -10793,7 +10926,7 @@ client.Accounting.CashFlowStatements.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -10965,6 +11098,9 @@ request := &accounting.CompanyInfoListRequest{
                 "2024-01-15T09:30:00Z",
             ),
         ),
+        Name: merge.String(
+            "name",
+        ),
         PageSize: merge.Int(
             1,
         ),
@@ -11063,7 +11199,15 @@ client.Accounting.CompanyInfo.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**name:** `*string` — If provided, will only return CompanyInfo objects with this name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -11400,7 +11544,7 @@ client.Accounting.Contacts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -11645,6 +11789,156 @@ client.Accounting.Contacts.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Accounting.Contacts.PartialUpdate(Id, request) -> *accounting.ContactResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a `Contact` object with the given `id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.PatchedContactEndpointRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        Model: &accounting.PatchedContactRequest{},
+    }
+client.Accounting.Contacts.PartialUpdate(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `*accounting.PatchedContactRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.Contacts.MetaPatchRetrieve(Id) -> *accounting.MetaResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns metadata for `Contact` PATCHs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.Contacts.MetaPatchRetrieve(
+        context.TODO(),
+        "id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.Accounting.Contacts.MetaPostRetrieve() -> *accounting.MetaResponse</code></summary>
 <dl>
 <dd>
@@ -11804,7 +12098,7 @@ client.Accounting.Contacts.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -11998,7 +12292,7 @@ client.Accounting.CreditNotes.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -12231,6 +12525,267 @@ client.Accounting.CreditNotes.Retrieve(
 <dd>
 
 **showEnumOrigins:** `*accounting.CreditNotesRetrieveRequestShowEnumOrigins` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.CreditNotes.PartialUpdate(Id, request) -> *accounting.CreditNoteResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a `CreditNote` object with the given `id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.PatchedCreditNoteEndpointRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        Model: &accounting.CreditNoteRequest{},
+    }
+client.Accounting.CreditNotes.PartialUpdate(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `*accounting.CreditNoteRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.CreditNotes.ApplicationCreate(Id, request) -> *accounting.CreditNoteResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a new CreditNoteApplyLine to apply a credit note to an invoice
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ApplyCreditNoteRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        AppliedDate: merge.MustParseDateTime(
+            "2024-01-15T09:30:00Z",
+        ),
+        AppliedAmount: "applied_amount",
+    }
+client.Accounting.CreditNotes.ApplicationCreate(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**invoice:** `*string` — The invoice to apply the credit note to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**appliedDate:** `time.Time` — Date that the credit note is applied to the invoice.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**appliedAmount:** `string` — The amount of credit applied to the invoice.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.CreditNotes.MetaPatchRetrieve(Id) -> *accounting.MetaResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns metadata for `CreditNote` PATCHs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.CreditNotes.MetaPatchRetrieve(
+        context.TODO(),
+        "id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
     
 </dd>
 </dl>
@@ -12537,6 +13092,19 @@ Returns a list of `Employee` objects.
 
 ```go
 request := &accounting.EmployeesListRequest{
+        CompanyId: merge.String(
+            "company_id",
+        ),
+        CreatedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        CreatedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
         Cursor: merge.String(
             "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
         ),
@@ -12549,8 +13117,21 @@ request := &accounting.EmployeesListRequest{
         IncludeShellData: merge.Bool(
             true,
         ),
+        ModifiedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        ModifiedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
         PageSize: merge.Int(
             1,
+        ),
+        RemoteId: merge.String(
+            "remote_id",
         ),
     }
 client.Accounting.Employees.List(
@@ -12568,6 +13149,30 @@ client.Accounting.Employees.List(
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**companyId:** `*string` — If provided, will only return employees for this company.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `*time.Time` — If provided, will only return objects created after this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `*time.Time` — If provided, will only return objects created before this datetime.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -12612,7 +13217,31 @@ client.Accounting.Employees.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**modifiedAfter:** `*time.Time` — If provided, only objects synced by Merge after this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedBefore:** `*time.Time` — If provided, only objects synced by Merge before this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteId:** `*string` — The API provider's ID for the given object.
     
 </dd>
 </dl>
@@ -12704,6 +13333,832 @@ client.Accounting.Employees.Retrieve(
 <dd>
 
 **includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Accounting ExpenseReports
+<details><summary><code>client.Accounting.ExpenseReports.List() -> *accounting.PaginatedExpenseReportList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `ExpenseReport` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseReportsListRequest{
+        CompanyId: merge.String(
+            "company_id",
+        ),
+        CreatedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        CreatedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        ModifiedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        ModifiedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+        RemoteId: merge.String(
+            "remote_id",
+        ),
+    }
+client.Accounting.ExpenseReports.List(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**companyId:** `*string` — If provided, will only return expense reports for this company.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `*time.Time` — If provided, will only return objects created after this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `*time.Time` — If provided, will only return objects created before this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.ExpenseReportsListRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedAfter:** `*time.Time` — If provided, only objects synced by Merge after this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedBefore:** `*time.Time` — If provided, only objects synced by Merge before this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteId:** `*string` — The API provider's ID for the given object.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ExpenseReports.Create(request) -> *accounting.ExpenseReportResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates an `ExpenseReport` object with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseReportEndpointRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        Model: &accounting.ExpenseReportRequest{
+            TrackingCategories: []string{
+                "a1b2c3d4-e5f6-4a5b-9c3d-2e1f0a9b8c7d",
+                "d4c3b2a1-9e8f-7g6h-5i4j-3k2l1m0n9o8p",
+            },
+        },
+    }
+client.Accounting.ExpenseReports.Create(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `*accounting.ExpenseReportRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ExpenseReports.LinesList(ExpenseReportId) -> *accounting.PaginatedExpenseReportLineList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `ExpenseReportLine` objects that point to a `ExpenseReport` with the given id.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseReportsLinesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.ExpenseReports.LinesList(
+        context.TODO(),
+        "expense_report_id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**expenseReportId:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.ExpenseReportsLinesListRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ExpenseReports.Retrieve(Id) -> *accounting.ExpenseReport</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns an `ExpenseReport` object with the given `id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseReportsRetrieveRequest{
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+    }
+client.Accounting.ExpenseReports.Retrieve(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.ExpenseReportsRetrieveRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ExpenseReports.LinesRemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `RemoteFieldClass` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseReportsLinesRemoteFieldClassesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IsCommonModelField: merge.Bool(
+            true,
+        ),
+        IsCustom: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.ExpenseReports.LinesRemoteFieldClassesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCommonModelField:** `*bool` — If provided, will only return remote field classes with this is_common_model_field value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCustom:** `*bool` — If provided, will only return remote fields classes with this is_custom value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ExpenseReports.MetaPostRetrieve() -> *accounting.MetaResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns metadata for `ExpenseReport` POSTs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.ExpenseReports.MetaPostRetrieve(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ExpenseReports.RemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `RemoteFieldClass` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseReportsRemoteFieldClassesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IsCommonModelField: merge.Bool(
+            true,
+        ),
+        IsCustom: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.ExpenseReports.RemoteFieldClassesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCommonModelField:** `*bool` — If provided, will only return remote field classes with this is_common_model_field value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCustom:** `*bool` — If provided, will only return remote fields classes with this is_custom value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -12906,7 +14361,7 @@ client.Accounting.Expenses.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -13127,6 +14582,130 @@ client.Accounting.Expenses.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Accounting.Expenses.BulkCreate(request) -> *accounting.AsyncBulkCreateResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates multiple `Expense` objects with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ExpenseBulkRequest{
+        BatchItems: []*accounting.ExpenseBatchItemRequest{
+            &accounting.ExpenseBatchItemRequest{
+                ItemId: "item_id",
+                Payload: &accounting.ExpenseRequest{},
+            },
+        },
+    }
+client.Accounting.Expenses.BulkCreate(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchItems:** `[]*accounting.ExpenseBatchItemRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.Expenses.BulkRetrieve(BatchId) -> *accounting.BatchObjectsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the status and results of an `Expense` bulk create batch.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.Expenses.BulkRetrieve(
+        context.TODO(),
+        "batch_id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchId:** `string` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.Accounting.Expenses.LinesRemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
 <dl>
 <dd>
@@ -13244,7 +14823,7 @@ client.Accounting.Expenses.LinesRemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -13415,7 +14994,7 @@ client.Accounting.Expenses.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -13522,6 +15101,9 @@ request := &accounting.CreateFieldMappingRequest{
         ExcludeRemoteFieldMetadata: merge.Bool(
             true,
         ),
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
         TargetFieldName: "example_target_field_name",
         TargetFieldDescription: "this is a example description of the target field",
         RemoteFieldTraversalPath: []any{
@@ -13551,6 +15133,14 @@ client.Accounting.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **excludeRemoteFieldMetadata:** `*bool` — If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
     
 </dd>
 </dl>
@@ -13599,6 +15189,22 @@ client.Accounting.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **commonModelName:** `string` — The name of the Common Model that the remote field corresponds to in a given category.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — DEPRECATED: Use 'advanced_mapping_expression' instead.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**advancedMappingExpression:** `*string` — A JSONata expression used to transform the remote field data.
     
 </dd>
 </dl>
@@ -13695,7 +15301,11 @@ Create or update existing Field Mappings for a Linked Account. Changes will be r
 <dd>
 
 ```go
-request := &accounting.PatchedEditFieldMappingRequest{}
+request := &accounting.PatchedEditFieldMappingRequest{
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
+    }
 client.Accounting.FieldMapping.FieldMappingsPartialUpdate(
         context.TODO(),
         "field_mapping_id",
@@ -13724,6 +15334,14 @@ client.Accounting.FieldMapping.FieldMappingsPartialUpdate(
 <dl>
 <dd>
 
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **remoteFieldTraversalPath:** `[]any` — The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
     
 </dd>
@@ -13741,6 +15359,22 @@ client.Accounting.FieldMapping.FieldMappingsPartialUpdate(
 <dd>
 
 **remoteUrlPath:** `*string` — The path of the remote endpoint where the remote field is coming from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — DEPRECATED: Use 'advanced_mapping_expression' instead.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**advancedMappingExpression:** `*string` — A JSONata expression used to transform the remote field data.
     
 </dd>
 </dl>
@@ -14048,7 +15682,7 @@ client.Accounting.GeneralLedgerTransactions.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -14407,7 +16041,7 @@ client.Accounting.IncomeStatements.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -14749,7 +16383,7 @@ client.Accounting.Invoices.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -15110,6 +16744,130 @@ client.Accounting.Invoices.PartialUpdate(
 </dl>
 </details>
 
+<details><summary><code>client.Accounting.Invoices.BulkCreate(request) -> *accounting.AsyncBulkCreateResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates multiple `Invoice` objects with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.InvoiceBulkRequest{
+        BatchItems: []*accounting.InvoiceBatchItemRequest{
+            &accounting.InvoiceBatchItemRequest{
+                ItemId: "item_id",
+                Payload: &accounting.InvoiceRequest{},
+            },
+        },
+    }
+client.Accounting.Invoices.BulkCreate(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchItems:** `[]*accounting.InvoiceBatchItemRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.Invoices.BulkRetrieve(BatchId) -> *accounting.BatchObjectsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the status and results of an `Invoice` bulk create batch.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.Invoices.BulkRetrieve(
+        context.TODO(),
+        "batch_id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchId:** `string` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.Accounting.Invoices.LineItemsRemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
 <dl>
 <dd>
@@ -15227,7 +16985,7 @@ client.Accounting.Invoices.LineItemsRemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -15456,7 +17214,7 @@ client.Accounting.Invoices.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -15653,7 +17411,7 @@ client.Accounting.Issues.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -15744,6 +17502,774 @@ client.Accounting.Issues.Retrieve(
 </dl>
 </details>
 
+## Accounting ItemFulfillments
+<details><summary><code>client.Accounting.ItemFulfillments.List() -> *accounting.PaginatedItemFulfillmentList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `ItemFulfillment` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ItemFulfillmentsListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.ItemFulfillments.List(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.ItemFulfillmentsListRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteFields:** `*string` — Deprecated. Use show_enum_origins.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.Create(request) -> *accounting.ItemFulfillmentResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates an `ItemFulfillment` object with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ItemFulfillmentEndpointRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        Model: &accounting.ItemFulfillmentRequestRequest{},
+    }
+client.Accounting.ItemFulfillments.Create(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `*accounting.ItemFulfillmentRequestRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.Retrieve(Id) -> *accounting.ItemFulfillment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns an `ItemFulfillment` object with the given `id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ItemFulfillmentsRetrieveRequest{
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+    }
+client.Accounting.ItemFulfillments.Retrieve(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.ItemFulfillmentsRetrieveRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteFields:** `*string` — Deprecated. Use show_enum_origins.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.BulkCreate(request) -> *accounting.AsyncBulkCreateResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates multiple `ItemFulfillment` objects with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ItemFulfillmentBulkRequest{
+        BatchItems: []*accounting.ItemFulfillmentBatchItemRequest{
+            &accounting.ItemFulfillmentBatchItemRequest{
+                ItemId: "item_id",
+                Payload: &accounting.ItemFulfillmentRequestRequest{},
+            },
+        },
+    }
+client.Accounting.ItemFulfillments.BulkCreate(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchItems:** `[]*accounting.ItemFulfillmentBatchItemRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.BulkRetrieve(BatchId) -> *accounting.BatchObjectsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the status and results of an `ItemFulfillment` bulk create batch.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.ItemFulfillments.BulkRetrieve(
+        context.TODO(),
+        "batch_id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchId:** `string` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.LinesRemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `RemoteFieldClass` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ItemFulfillmentsLinesRemoteFieldClassesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IsCommonModelField: merge.Bool(
+            true,
+        ),
+        IsCustom: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.ItemFulfillments.LinesRemoteFieldClassesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCommonModelField:** `*bool` — If provided, will only return remote field classes with this is_common_model_field value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCustom:** `*bool` — If provided, will only return remote fields classes with this is_custom value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.MetaPostRetrieve() -> *accounting.MetaResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns metadata for `ItemFulfillment` POSTs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.ItemFulfillments.MetaPostRetrieve(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.ItemFulfillments.RemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `RemoteFieldClass` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ItemFulfillmentsRemoteFieldClassesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IsCommonModelField: merge.Bool(
+            true,
+        ),
+        IsCustom: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.ItemFulfillments.RemoteFieldClassesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCommonModelField:** `*bool` — If provided, will only return remote field classes with this is_common_model_field value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCustom:** `*bool` — If provided, will only return remote fields classes with this is_custom value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Accounting Items
 <details><summary><code>client.Accounting.Items.List() -> *accounting.PaginatedItemList</code></summary>
 <dl>
@@ -15807,6 +18333,9 @@ request := &accounting.ItemsListRequest{
             merge.MustParseDateTime(
                 "2024-01-15T09:30:00Z",
             ),
+        ),
+        Name: merge.String(
+            "name",
         ),
         PageSize: merge.Int(
             1,
@@ -15914,7 +18443,15 @@ client.Accounting.Items.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**name:** `*string` — If provided, will only return items with this name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -16523,7 +19060,7 @@ client.Accounting.JournalEntries.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -16861,7 +19398,7 @@ client.Accounting.JournalEntries.LinesRemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -17032,7 +19569,7 @@ client.Accounting.JournalEntries.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -17057,7 +19594,7 @@ client.Accounting.JournalEntries.RemoteFieldClassesList(
 <dl>
 <dd>
 
-Creates a link token to be used when linking a new end user.
+Creates a link token to be used when linking a new end user. The link token expires after single use.
 </dd>
 </dl>
 </dd>
@@ -17205,6 +19742,34 @@ The following subset of IETF language tags can be used to configure localization
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**completedAccountInitialScreen:** `*accounting.EndUserDetailsRequestCompletedAccountInitialScreen` 
+
+When creating a Link token, you can specifiy the initial screen of Linking Flow for a completed Linked Account.
+
+* `SELECTIVE_SYNC` - SELECTIVE_SYNC
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**linkedDestinationId:** `*string` — The UUID of the linked destination that you want this Linked Account to be tied to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**credentialId:** `*string` — The id of the credential that you want this Linked Account to be tied to.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -17301,7 +19866,7 @@ client.Accounting.LinkedAccounts.List(
 
 **category:** `*accounting.LinkedAccountsListRequestCategory` 
 
-Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
+Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `knowledgebase`, `mktg`, `ticketing`
 
 * `hris` - hris
 * `ats` - ats
@@ -17310,6 +19875,10 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 * `crm` - crm
 * `mktg` - mktg
 * `filestorage` - filestorage
+* `datawarehouse` - datawarehouse
+* `knowledgebase` - knowledgebase
+* `communication` - communication
+* `chat` - chat
     
 </dd>
 </dl>
@@ -17397,7 +19966,7 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -17576,7 +20145,7 @@ client.Accounting.PaymentMethods.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -17775,7 +20344,7 @@ client.Accounting.PaymentTerms.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -18091,7 +20660,7 @@ client.Accounting.Payments.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -18521,7 +21090,7 @@ client.Accounting.Payments.LineItemsRemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -18750,7 +21319,7 @@ client.Accounting.Payments.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -18875,6 +21444,19 @@ Returns a list of `Project` objects.
 
 ```go
 request := &accounting.ProjectsListRequest{
+        CompanyId: merge.String(
+            "company_id",
+        ),
+        CreatedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        CreatedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
         Cursor: merge.String(
             "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
         ),
@@ -18887,8 +21469,24 @@ request := &accounting.ProjectsListRequest{
         IncludeShellData: merge.Bool(
             true,
         ),
+        IsActive: merge.String(
+            "is_active",
+        ),
+        ModifiedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        ModifiedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
         PageSize: merge.Int(
             1,
+        ),
+        RemoteId: merge.String(
+            "remote_id",
         ),
     }
 client.Accounting.Projects.List(
@@ -18906,6 +21504,30 @@ client.Accounting.Projects.List(
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**companyId:** `*string` — If provided, will only return projects for this company.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `*time.Time` — If provided, will only return objects created after this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `*time.Time` — If provided, will only return objects created before this datetime.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -18950,7 +21572,39 @@ client.Accounting.Projects.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**isActive:** `*string` — If provided, will only return projects with this value for is_active.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedAfter:** `*time.Time` — If provided, only objects synced by Merge after this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedBefore:** `*time.Time` — If provided, only objects synced by Merge before this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteId:** `*string` — The API provider's ID for the given object.
     
 </dd>
 </dl>
@@ -19260,7 +21914,7 @@ client.Accounting.PurchaseOrders.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -19614,7 +22268,7 @@ client.Accounting.PurchaseOrders.LineItemsRemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -19785,7 +22439,7 @@ client.Accounting.PurchaseOrders.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -19848,6 +22502,874 @@ client.Accounting.RegenerateKey.Create(
 <dd>
 
 **name:** `string` — The name of the remote key
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Accounting SalesOrders
+<details><summary><code>client.Accounting.SalesOrders.List() -> *accounting.PaginatedSalesOrderList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `SalesOrder` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.SalesOrdersListRequest{
+        CompanyId: merge.String(
+            "company_id",
+        ),
+        CreatedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        CreatedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IssueDateAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        IssueDateBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        ModifiedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        ModifiedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+        RemoteId: merge.String(
+            "remote_id",
+        ),
+    }
+client.Accounting.SalesOrders.List(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**companyId:** `*string` — If provided, will only return sales orders for this company.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `*time.Time` — If provided, will only return objects created after this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `*time.Time` — If provided, will only return objects created before this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.SalesOrdersListRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**issueDateAfter:** `*time.Time` — If provided, will only return objects created after this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**issueDateBefore:** `*time.Time` — If provided, will only return objects created before this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedAfter:** `*time.Time` — If provided, only objects synced by Merge after this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modifiedBefore:** `*time.Time` — If provided, only objects synced by Merge before this date time will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteFields:** `*string` — Deprecated. Use show_enum_origins.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteId:** `*string` — The API provider's ID for the given object.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.Create(request) -> *accounting.SalesOrderResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a `SalesOrder` object with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.SalesOrderEndpointRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        Model: &accounting.SalesOrderRequestRequest{},
+    }
+client.Accounting.SalesOrders.Create(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `*accounting.SalesOrderRequestRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.Retrieve(Id) -> *accounting.SalesOrder</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a `SalesOrder` object with the given `id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.SalesOrdersRetrieveRequest{
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteFields: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+    }
+client.Accounting.SalesOrders.Retrieve(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expand:** `*accounting.SalesOrdersRetrieveRequestExpandItem` — Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteFields:** `*bool` — Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteFields:** `*string` — Deprecated. Use show_enum_origins.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.BulkCreate(request) -> *accounting.AsyncBulkCreateResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates multiple `SalesOrder` objects with the given values.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.SalesOrderBulkRequest{
+        BatchItems: []*accounting.SalesOrderBatchItemRequest{
+            &accounting.SalesOrderBatchItemRequest{
+                ItemId: "item_id",
+                Payload: &accounting.SalesOrderRequestRequest{},
+            },
+        },
+    }
+client.Accounting.SalesOrders.BulkCreate(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchItems:** `[]*accounting.SalesOrderBatchItemRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.BulkRetrieve(BatchId) -> *accounting.BatchObjectsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the status and results of a `SalesOrder` bulk create batch.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.SalesOrders.BulkRetrieve(
+        context.TODO(),
+        "batch_id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**batchId:** `string` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.LinesRemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `RemoteFieldClass` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.SalesOrdersLinesRemoteFieldClassesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IsCommonModelField: merge.Bool(
+            true,
+        ),
+        IsCustom: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.SalesOrders.LinesRemoteFieldClassesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCommonModelField:** `*bool` — If provided, will only return remote field classes with this is_common_model_field value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCustom:** `*bool` — If provided, will only return remote fields classes with this is_custom value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.MetaPostRetrieve() -> *accounting.MetaResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns metadata for `SalesOrder` POSTs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.SalesOrders.MetaPostRetrieve(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.SalesOrders.RemoteFieldClassesList() -> *accounting.PaginatedRemoteFieldClassList</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of `RemoteFieldClass` objects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.SalesOrdersRemoteFieldClassesListRequest{
+        Cursor: merge.String(
+            "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
+        ),
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        IncludeRemoteData: merge.Bool(
+            true,
+        ),
+        IncludeShellData: merge.Bool(
+            true,
+        ),
+        IsCommonModelField: merge.Bool(
+            true,
+        ),
+        IsCustom: merge.Bool(
+            true,
+        ),
+        PageSize: merge.Int(
+            1,
+        ),
+    }
+client.Accounting.SalesOrders.RemoteFieldClassesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeRemoteData:** `*bool` — Whether to include the original data Merge fetched from the third-party to produce these models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCommonModelField:** `*bool` — If provided, will only return remote field classes with this is_common_model_field value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isCustom:** `*bool` — If provided, will only return remote fields classes with this is_custom value
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -19922,7 +23444,7 @@ client.Accounting.SyncStatus.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -20158,7 +23680,7 @@ client.Accounting.TaxRates.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -20460,7 +23982,7 @@ client.Accounting.TrackingCategories.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -20791,7 +24313,7 @@ client.Accounting.Transactions.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -21098,7 +24620,7 @@ client.Accounting.VendorCredits.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -21297,6 +24819,267 @@ client.Accounting.VendorCredits.Retrieve(
 <dd>
 
 **includeShellData:** `*bool` — Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.VendorCredits.PartialUpdate(Id, request) -> *accounting.VendorCreditResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a `VendorCredit` object with the given `id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.PatchedVendorCreditEndpointRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        Model: &accounting.PatchedVendorCreditRequest{},
+    }
+client.Accounting.VendorCredits.PartialUpdate(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `*accounting.PatchedVendorCreditRequest` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.VendorCredits.ApplicationCreate(Id, request) -> *accounting.VendorCreditResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a new VendorCreditApplyLine to apply a vendor credit to an invoice
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &accounting.ApplyVendorCreditRequest{
+        IsDebugMode: merge.Bool(
+            true,
+        ),
+        RunAsync: merge.Bool(
+            true,
+        ),
+        AppliedDate: merge.MustParseDateTime(
+            "2024-01-15T09:30:00Z",
+        ),
+        AppliedAmount: "applied_amount",
+    }
+client.Accounting.VendorCredits.ApplicationCreate(
+        context.TODO(),
+        "id",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isDebugMode:** `*bool` — Whether to include debug fields (such as log file links) in the response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**runAsync:** `*bool` — Whether or not third-party updates should be run asynchronously.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**invoice:** `*string` — The invoice to apply the vendor credit to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**appliedDate:** `time.Time` — Date that the vendor credit is applied to the invoice.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**appliedAmount:** `string` — The amount of vendor credit applied to the invoice.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Accounting.VendorCredits.MetaPatchRetrieve(Id) -> *accounting.MetaResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns metadata for `VendorCredit` PATCHs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Accounting.VendorCredits.MetaPatchRetrieve(
+        context.TODO(),
+        "id",
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
     
 </dd>
 </dl>
@@ -21573,6 +25356,48 @@ client.Crm.AccountToken.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Crm.AccountToken.RegenerateCreate() -> *crm.RegenerateAccountToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange Linked Account account tokens.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Crm.AccountToken.RegenerateCreate(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Crm Accounts
 <details><summary><code>client.Crm.Accounts.List() -> *crm.PaginatedAccountList</code></summary>
 <dl>
@@ -21765,7 +25590,7 @@ client.Crm.Accounts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -22290,7 +26115,7 @@ client.Crm.Accounts.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -22514,7 +26339,7 @@ client.Crm.AuditTrail.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -22780,7 +26605,7 @@ client.Crm.Contacts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -23385,7 +27210,7 @@ client.Crm.Contacts.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -23556,7 +27381,7 @@ client.Crm.CustomObjectClasses.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -23835,7 +27660,7 @@ client.Crm.AssociationTypes.CustomObjectClassesAssociationTypesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -24288,7 +28113,7 @@ client.Crm.CustomObjects.CustomObjectClassesCustomObjectsList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -24693,7 +28518,7 @@ client.Crm.CustomObjects.CustomObjectClassesCustomObjectsRemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -24893,7 +28718,7 @@ client.Crm.Associations.CustomObjectClassesCustomObjectsAssociationsList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -25418,7 +29243,7 @@ client.Crm.EngagementTypes.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -25660,7 +29485,7 @@ client.Crm.EngagementTypes.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -25852,7 +29677,7 @@ client.Crm.Engagements.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -26393,7 +30218,7 @@ client.Crm.Engagements.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -26500,6 +30325,9 @@ request := &crm.CreateFieldMappingRequest{
         ExcludeRemoteFieldMetadata: merge.Bool(
             true,
         ),
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
         TargetFieldName: "example_target_field_name",
         TargetFieldDescription: "this is a example description of the target field",
         RemoteFieldTraversalPath: []any{
@@ -26529,6 +30357,14 @@ client.Crm.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **excludeRemoteFieldMetadata:** `*bool` — If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
     
 </dd>
 </dl>
@@ -26577,6 +30413,14 @@ client.Crm.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **commonModelName:** `string` — The name of the Common Model that the remote field corresponds to in a given category.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -26673,7 +30517,11 @@ Create or update existing Field Mappings for a Linked Account. Changes will be r
 <dd>
 
 ```go
-request := &crm.PatchedEditFieldMappingRequest{}
+request := &crm.PatchedEditFieldMappingRequest{
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
+    }
 client.Crm.FieldMapping.FieldMappingsPartialUpdate(
         context.TODO(),
         "field_mapping_id",
@@ -26702,6 +30550,14 @@ client.Crm.FieldMapping.FieldMappingsPartialUpdate(
 <dl>
 <dd>
 
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **remoteFieldTraversalPath:** `[]any` — The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
     
 </dd>
@@ -26719,6 +30575,14 @@ client.Crm.FieldMapping.FieldMappingsPartialUpdate(
 <dd>
 
 **remoteUrlPath:** `*string` — The path of the remote endpoint where the remote field is coming from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -27093,7 +30957,7 @@ client.Crm.Issues.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -27401,7 +31265,7 @@ client.Crm.Leads.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -27784,7 +31648,7 @@ client.Crm.Leads.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -27809,7 +31673,7 @@ client.Crm.Leads.RemoteFieldClassesList(
 <dl>
 <dd>
 
-Creates a link token to be used when linking a new end user.
+Creates a link token to be used when linking a new end user. The link token expires after single use.
 </dd>
 </dl>
 </dd>
@@ -28149,7 +32013,7 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -28383,7 +32247,7 @@ client.Crm.Notes.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -28758,7 +32622,7 @@ client.Crm.Notes.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -28971,7 +32835,7 @@ client.Crm.Opportunities.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -29558,7 +33422,7 @@ client.Crm.Opportunities.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -29857,7 +33721,7 @@ client.Crm.Stages.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -30099,7 +33963,7 @@ client.Crm.Stages.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -30174,7 +34038,7 @@ client.Crm.SyncStatus.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -30399,7 +34263,7 @@ client.Crm.Tasks.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -30924,7 +34788,7 @@ client.Crm.Tasks.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -31109,7 +34973,7 @@ client.Crm.Users.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -31423,7 +35287,7 @@ client.Crm.Users.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -31658,6 +35522,48 @@ client.FileStorage.AccountToken.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.FileStorage.AccountToken.RegenerateCreate() -> *filestorage.RegenerateAccountToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange Linked Account account tokens.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.FileStorage.AccountToken.RegenerateCreate(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## FileStorage AsyncPassthrough
 <details><summary><code>client.FileStorage.AsyncPassthrough.Create(request) -> *filestorage.AsyncPassthroughReciept</code></summary>
 <dl>
@@ -31870,7 +35776,7 @@ client.FileStorage.AuditTrail.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -32525,6 +36431,9 @@ request := &filestorage.CreateFieldMappingRequest{
         ExcludeRemoteFieldMetadata: merge.Bool(
             true,
         ),
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
         TargetFieldName: "example_target_field_name",
         TargetFieldDescription: "this is a example description of the target field",
         RemoteFieldTraversalPath: []any{
@@ -32554,6 +36463,14 @@ client.FileStorage.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **excludeRemoteFieldMetadata:** `*bool` — If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
     
 </dd>
 </dl>
@@ -32602,6 +36519,14 @@ client.FileStorage.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **commonModelName:** `string` — The name of the Common Model that the remote field corresponds to in a given category.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -32698,7 +36623,11 @@ Create or update existing Field Mappings for a Linked Account. Changes will be r
 <dd>
 
 ```go
-request := &filestorage.PatchedEditFieldMappingRequest{}
+request := &filestorage.PatchedEditFieldMappingRequest{
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
+    }
 client.FileStorage.FieldMapping.FieldMappingsPartialUpdate(
         context.TODO(),
         "field_mapping_id",
@@ -32727,6 +36656,14 @@ client.FileStorage.FieldMapping.FieldMappingsPartialUpdate(
 <dl>
 <dd>
 
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **remoteFieldTraversalPath:** `[]any` — The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
     
 </dd>
@@ -32744,6 +36681,14 @@ client.FileStorage.FieldMapping.FieldMappingsPartialUpdate(
 <dd>
 
 **remoteUrlPath:** `*string` — The path of the remote endpoint where the remote field is coming from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -32948,6 +36893,16 @@ request := &filestorage.FilesListRequest{
         PageSize: merge.Int(
             1,
         ),
+        RemoteCreatedAfter: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
+        RemoteCreatedBefore: merge.Time(
+            merge.MustParseDateTime(
+                "2024-01-15T09:30:00Z",
+            ),
+        ),
         RemoteId: merge.String(
             "remote_id",
         ),
@@ -33083,7 +37038,23 @@ client.FileStorage.Files.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteCreatedAfter:** `*time.Time` — If provided, will only return files created in the third party platform after this datetime.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteCreatedBefore:** `*time.Time` — If provided, will only return files created in the third party platform before this datetime.
     
 </dd>
 </dl>
@@ -33289,7 +37260,7 @@ client.FileStorage.Files.Retrieve(
 <dl>
 <dd>
 
-Returns metadata to construct an authenticated file download request for a singular file, allowing you to download file directly from the third-party.
+Returns metadata to construct an authenticated file download request for a singular file, allowing you to download file directly from the third-party. For information on our download process please refer to our <a href='https://help.merge.dev/articles/10644317' target='_blank'>direct file download help center article</a>.
 </dd>
 </dl>
 </dd>
@@ -33337,7 +37308,7 @@ client.FileStorage.Files.DownloadRequestMetaRetrieve(
 <dl>
 <dd>
 
-**mimeType:** `*string` — If provided, specifies the export format of the file to be downloaded. For information on supported export formats, please refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
+**mimeType:** `*string` — If provided, specifies the export format of the file to be downloaded.
     
 </dd>
 </dl>
@@ -33439,6 +37410,14 @@ client.FileStorage.Files.DownloadRequestMetaList(
 <dd>
 
 **cursor:** `*string` — The pagination cursor value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ids:** `*string` — If provided, will only return objects with the given IDs. Comma-separated list of strings.
     
 </dd>
 </dl>
@@ -33724,7 +37703,7 @@ client.FileStorage.Folders.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -34189,7 +38168,7 @@ client.FileStorage.Groups.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -34485,7 +38464,7 @@ client.FileStorage.Issues.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -34589,7 +38568,7 @@ client.FileStorage.Issues.Retrieve(
 <dl>
 <dd>
 
-Creates a link token to be used when linking a new end user.
+Creates a link token to be used when linking a new end user. The link token expires after single use.
 </dd>
 </dl>
 </dd>
@@ -34929,7 +38908,7 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -35137,7 +39116,7 @@ client.FileStorage.SyncStatus.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -35234,6 +39213,9 @@ request := &filestorage.UsersListRequest{
         Cursor: merge.String(
             "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
         ),
+        EmailAddress: merge.String(
+            "email_address",
+        ),
         IncludeDeletedData: merge.Bool(
             true,
         ),
@@ -35306,6 +39288,14 @@ client.FileStorage.Users.List(
 <dl>
 <dd>
 
+**emailAddress:** `*string` — If provided, will only return users with emails equal to this value (case insensitive).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
     
 </dd>
@@ -35354,7 +39344,7 @@ client.FileStorage.Users.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -35680,6 +39670,48 @@ client.Hris.AccountToken.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Hris.AccountToken.RegenerateCreate() -> *hris.RegenerateAccountToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange Linked Account account tokens.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Hris.AccountToken.RegenerateCreate(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Hris AsyncPassthrough
 <details><summary><code>client.Hris.AsyncPassthrough.Create(request) -> *hris.AsyncPassthroughReciept</code></summary>
 <dl>
@@ -35884,7 +39916,7 @@ client.Hris.AuditTrail.List(
 <dl>
 <dd>
 
-**eventType:** `*string` — If included, will only include events with the given event type. Possible values include: `CREATED_REMOTE_PRODUCTION_API_KEY`, `DELETED_REMOTE_PRODUCTION_API_KEY`, `CREATED_TEST_API_KEY`, `DELETED_TEST_API_KEY`, `REGENERATED_PRODUCTION_API_KEY`, `INVITED_USER`, `TWO_FACTOR_AUTH_ENABLED`, `TWO_FACTOR_AUTH_DISABLED`, `DELETED_LINKED_ACCOUNT`, `DELETED_ALL_COMMON_MODELS_FOR_LINKED_ACCOUNT`, `CREATED_DESTINATION`, `DELETED_DESTINATION`, `CHANGED_DESTINATION`, `CHANGED_SCOPES`, `CHANGED_PERSONAL_INFORMATION`, `CHANGED_ORGANIZATION_SETTINGS`, `ENABLED_INTEGRATION`, `DISABLED_INTEGRATION`, `ENABLED_CATEGORY`, `DISABLED_CATEGORY`, `CHANGED_PASSWORD`, `RESET_PASSWORD`, `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION`, `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT`, `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION`, `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT`, `CREATED_INTEGRATION_WIDE_FIELD_MAPPING`, `CREATED_LINKED_ACCOUNT_FIELD_MAPPING`, `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING`, `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING`, `DELETED_INTEGRATION_WIDE_FIELD_MAPPING`, `DELETED_LINKED_ACCOUNT_FIELD_MAPPING`, `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE`, `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE`, `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE`, `FORCED_LINKED_ACCOUNT_RESYNC`, `MUTED_ISSUE`, `GENERATED_MAGIC_LINK`, `ENABLED_MERGE_WEBHOOK`, `DISABLED_MERGE_WEBHOOK`, `MERGE_WEBHOOK_TARGET_CHANGED`, `END_USER_CREDENTIALS_ACCESSED`
+**eventType:** `*string` — If included, will only include events with the given event type. Possible values include: `CREATED_REMOTE_PRODUCTION_API_KEY`, `DELETED_REMOTE_PRODUCTION_API_KEY`, `CREATED_TEST_API_KEY`, `DELETED_TEST_API_KEY`, `REGENERATED_PRODUCTION_API_KEY`, `REGENERATED_WEBHOOK_SIGNATURE`, `INVITED_USER`, `TWO_FACTOR_AUTH_ENABLED`, `TWO_FACTOR_AUTH_DISABLED`, `DELETED_LINKED_ACCOUNT`, `DELETED_ALL_COMMON_MODELS_FOR_LINKED_ACCOUNT`, `CREATED_DESTINATION`, `DELETED_DESTINATION`, `CHANGED_DESTINATION`, `CHANGED_SCOPES`, `CHANGED_PERSONAL_INFORMATION`, `CHANGED_ORGANIZATION_SETTINGS`, `ENABLED_INTEGRATION`, `DISABLED_INTEGRATION`, `ENABLED_CATEGORY`, `DISABLED_CATEGORY`, `CHANGED_PASSWORD`, `RESET_PASSWORD`, `ENABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION`, `ENABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT`, `DISABLED_REDACT_UNMAPPED_DATA_FOR_ORGANIZATION`, `DISABLED_REDACT_UNMAPPED_DATA_FOR_LINKED_ACCOUNT`, `CREATED_INTEGRATION_WIDE_FIELD_MAPPING`, `CREATED_LINKED_ACCOUNT_FIELD_MAPPING`, `CHANGED_INTEGRATION_WIDE_FIELD_MAPPING`, `CHANGED_LINKED_ACCOUNT_FIELD_MAPPING`, `DELETED_INTEGRATION_WIDE_FIELD_MAPPING`, `DELETED_LINKED_ACCOUNT_FIELD_MAPPING`, `CREATED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE`, `CHANGED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE`, `DELETED_LINKED_ACCOUNT_COMMON_MODEL_OVERRIDE`, `FORCED_LINKED_ACCOUNT_RESYNC`, `MUTED_ISSUE`, `GENERATED_MAGIC_LINK`, `ENABLED_MERGE_WEBHOOK`, `DISABLED_MERGE_WEBHOOK`, `MERGE_WEBHOOK_TARGET_CHANGED`, `END_USER_CREDENTIALS_ACCESSED`
     
 </dd>
 </dl>
@@ -35892,7 +39924,7 @@ client.Hris.AuditTrail.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -36167,7 +40199,7 @@ If provided, will only return BankInfo's with this account type. Options: ('SAVI
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -36480,7 +40512,7 @@ client.Hris.Benefits.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -36742,7 +40774,7 @@ client.Hris.Companies.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -37111,6 +41143,9 @@ request := &hris.DependentsListRequest{
         Cursor: merge.String(
             "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
         ),
+        EmployeeId: merge.String(
+            "employee_id",
+        ),
         IncludeDeletedData: merge.Bool(
             true,
         ),
@@ -37183,6 +41218,14 @@ client.Hris.Dependents.List(
 <dl>
 <dd>
 
+**employeeId:** `*string` — If provided, will only return dependents for this employee.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **includeDeletedData:** `*bool` — Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
     
 </dd>
@@ -37231,7 +41274,7 @@ client.Hris.Dependents.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -37554,7 +41597,7 @@ client.Hris.EmployeePayrollRuns.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -37737,6 +41780,9 @@ request := &hris.EmployeesListRequest{
         DisplayFullName: merge.String(
             "display_full_name",
         ),
+        EmployeeNumber: merge.String(
+            "employee_number",
+        ),
         EmploymentStatus: hris.EmployeesListRequestEmploymentStatusActive.Ptr(),
         EmploymentType: merge.String(
             "employment_type",
@@ -37884,6 +41930,14 @@ client.Hris.Employees.List(
 <dl>
 <dd>
 
+**employeeNumber:** `*string` — If provided, will only return employees with this employee number.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **employmentStatus:** `*hris.EmployeesListRequestEmploymentStatus` 
 
 If provided, will only return employees with this employment status.
@@ -37898,7 +41952,7 @@ If provided, will only return employees with this employment status.
 <dl>
 <dd>
 
-**employmentType:** `*string` — If provided, will only return employees that have an employment of the specified employment_type.
+**employmentType:** `*string` — If provided, will only return employees that have an employment of the specified employment type.
     
 </dd>
 </dl>
@@ -37970,7 +42024,7 @@ If provided, will only return employees with this employment status.
 <dl>
 <dd>
 
-**jobTitle:** `*string` — If provided, will only return employees that have an employment of the specified job_title.
+**jobTitle:** `*string` — If provided, will only return employees that have an employment of the specified job title.
     
 </dd>
 </dl>
@@ -38010,7 +42064,7 @@ If provided, will only return employees with this employment status.
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -38586,7 +42640,7 @@ client.Hris.EmployerBenefits.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -38870,7 +42924,7 @@ client.Hris.Employments.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -39190,6 +43244,14 @@ client.Hris.FieldMapping.FieldMappingsCreate(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -39283,7 +43345,11 @@ Create or update existing Field Mappings for a Linked Account. Changes will be r
 <dd>
 
 ```go
-request := &hris.PatchedEditFieldMappingRequest{}
+request := &hris.PatchedEditFieldMappingRequest{
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
+    }
 client.Hris.FieldMapping.FieldMappingsPartialUpdate(
         context.TODO(),
         "field_mapping_id",
@@ -39312,6 +43378,14 @@ client.Hris.FieldMapping.FieldMappingsPartialUpdate(
 <dl>
 <dd>
 
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **remoteFieldTraversalPath:** `[]any` — The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
     
 </dd>
@@ -39329,6 +43403,14 @@ client.Hris.FieldMapping.FieldMappingsPartialUpdate(
 <dd>
 
 **remoteUrlPath:** `*string` — The path of the remote endpoint where the remote field is coming from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -39694,7 +43776,7 @@ client.Hris.Groups.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -39826,6 +43908,80 @@ client.Hris.Groups.Retrieve(
 <dd>
 
 **showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Hris.Groups.TypesList() -> *hris.GroupsTypesListResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns a list of distinct group type values from the Groups common model.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &hris.GroupsTypesListRequest{
+        IncludeDeletedData: merge.Bool(
+            true,
+        ),
+        ShowEnumOrigins: merge.String(
+            "show_enum_origins",
+        ),
+    }
+client.Hris.Groups.TypesList(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**includeDeletedData:** `*bool` — Whether to include data that was marked as deleted by third party webhooks.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**showEnumOrigins:** `*string` — A comma separated list of enum field names for which you'd like the original values instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins)
     
 </dd>
 </dl>
@@ -40022,7 +44178,7 @@ client.Hris.Issues.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -40126,7 +44282,7 @@ client.Hris.Issues.Retrieve(
 <dl>
 <dd>
 
-Creates a link token to be used when linking a new end user.
+Creates a link token to be used when linking a new end user. The link token expires after single use.
 </dd>
 </dl>
 </dd>
@@ -40271,6 +44427,14 @@ The following subset of IETF language tags can be used to configure localization
 <dd>
 
 **integrationSpecificConfig:** `map[string]any` — A JSON object containing integration-specific configuration options.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**linkedDestinationId:** `*string` — The UUID of the linked destination that you want this Linked Account to be tied to.
     
 </dd>
 </dl>
@@ -40466,7 +44630,7 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -40626,7 +44790,7 @@ client.Hris.Locations.List(
 
 **locationType:** `*hris.LocationsListRequestLocationType` 
 
-If provided, will only return locations with this location_type
+If provided, will only return locations with this location type
 
 * `HOME` - HOME
 * `WORK` - WORK
@@ -40653,7 +44817,7 @@ If provided, will only return locations with this location_type
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -41004,7 +45168,7 @@ client.Hris.PayGroups.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -41297,7 +45461,7 @@ client.Hris.PayrollRuns.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -41591,7 +45755,7 @@ client.Hris.SyncStatus.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -41808,7 +45972,7 @@ client.Hris.Teams.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -43013,7 +47177,7 @@ client.Hris.TimesheetEntries.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -43488,6 +47652,48 @@ client.Ticketing.AccountToken.Retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.Ticketing.AccountToken.RegenerateCreate() -> *ticketing.RegenerateAccountToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange Linked Account account tokens.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Ticketing.AccountToken.RegenerateCreate(
+        context.TODO(),
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Ticketing Accounts
 <details><summary><code>client.Ticketing.Accounts.List() -> *ticketing.PaginatedAccountList</code></summary>
 <dl>
@@ -43639,7 +47845,7 @@ client.Ticketing.Accounts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -44373,7 +48579,7 @@ client.Ticketing.AuditTrail.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -44626,7 +48832,7 @@ client.Ticketing.Collections.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -44782,7 +48988,7 @@ client.Ticketing.Collections.ViewersList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -45068,7 +49274,7 @@ client.Ticketing.Comments.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -45490,7 +49696,7 @@ client.Ticketing.Contacts.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -46045,6 +50251,9 @@ request := &ticketing.CreateFieldMappingRequest{
         ExcludeRemoteFieldMetadata: merge.Bool(
             true,
         ),
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
         TargetFieldName: "example_target_field_name",
         TargetFieldDescription: "this is a example description of the target field",
         RemoteFieldTraversalPath: []any{
@@ -46074,6 +50283,14 @@ client.Ticketing.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **excludeRemoteFieldMetadata:** `*bool` — If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
     
 </dd>
 </dl>
@@ -46122,6 +50339,14 @@ client.Ticketing.FieldMapping.FieldMappingsCreate(
 <dd>
 
 **commonModelName:** `string` — The name of the Common Model that the remote field corresponds to in a given category.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -46218,7 +50443,11 @@ Create or update existing Field Mappings for a Linked Account. Changes will be r
 <dd>
 
 ```go
-request := &ticketing.PatchedEditFieldMappingRequest{}
+request := &ticketing.PatchedEditFieldMappingRequest{
+        RemoteDataIterationCount: merge.Int(
+            1,
+        ),
+    }
 client.Ticketing.FieldMapping.FieldMappingsPartialUpdate(
         context.TODO(),
         "field_mapping_id",
@@ -46247,6 +50476,14 @@ client.Ticketing.FieldMapping.FieldMappingsPartialUpdate(
 <dl>
 <dd>
 
+**remoteDataIterationCount:** `*int` — Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **remoteFieldTraversalPath:** `[]any` — The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
     
 </dd>
@@ -46264,6 +50501,14 @@ client.Ticketing.FieldMapping.FieldMappingsPartialUpdate(
 <dd>
 
 **remoteUrlPath:** `*string` — The path of the remote endpoint where the remote field is coming from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**jmesPath:** `*string` — JMES path to specify json query expression to be used on field mapping.
     
 </dd>
 </dl>
@@ -46638,7 +50883,7 @@ client.Ticketing.Issues.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -46742,7 +50987,7 @@ client.Ticketing.Issues.Retrieve(
 <dl>
 <dd>
 
-Creates a link token to be used when linking a new end user.
+Creates a link token to be used when linking a new end user. The link token expires after single use.
 </dd>
 </dl>
 </dd>
@@ -47082,7 +51327,7 @@ Options: `accounting`, `ats`, `crm`, `filestorage`, `hris`, `mktg`, `ticketing`
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -47531,7 +51776,7 @@ client.Ticketing.Projects.UsersList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -47756,7 +52001,7 @@ client.Ticketing.Roles.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -47922,7 +52167,7 @@ client.Ticketing.SyncStatus.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -48128,7 +52373,7 @@ client.Ticketing.Tags.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -48382,7 +52627,7 @@ client.Ticketing.Teams.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -48611,6 +52856,9 @@ request := &ticketing.TicketsListRequest{
         RemoteId: merge.String(
             "remote_id",
         ),
+        RemoteIds: merge.String(
+            "remote_ids",
+        ),
         RemoteUpdatedAfter: merge.Time(
             merge.MustParseDateTime(
                 "2024-01-15T09:30:00Z",
@@ -48820,7 +53068,7 @@ client.Ticketing.Tickets.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -48876,6 +53124,14 @@ If provided, will only return tickets of this priority.
 <dd>
 
 **remoteId:** `*string` — The API provider's ID for the given object.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**remoteIds:** `*string` — If provided, will only return tickets with these remote IDs (comma-separated).
     
 </dd>
 </dl>
@@ -49350,7 +53606,7 @@ client.Ticketing.Tickets.ViewersList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -49622,7 +53878,7 @@ client.Ticketing.Tickets.RemoteFieldClassesList(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -49663,6 +53919,9 @@ Returns a list of `User` objects.
 
 ```go
 request := &ticketing.UsersListRequest{
+        Collections: merge.String(
+            "collections",
+        ),
         CreatedAfter: merge.Time(
             merge.MustParseDateTime(
                 "2024-01-15T09:30:00Z",
@@ -49704,8 +53963,14 @@ request := &ticketing.UsersListRequest{
         RemoteId: merge.String(
             "remote_id",
         ),
+        Roles: merge.String(
+            "roles",
+        ),
         Team: merge.String(
             "team",
+        ),
+        Teams: merge.String(
+            "teams",
         ),
     }
 client.Ticketing.Users.List(
@@ -49723,6 +53988,14 @@ client.Ticketing.Users.List(
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**collections:** `*string` — If provided, will only return users involved with at least one of these collections.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -49807,7 +54080,7 @@ client.Ticketing.Users.List(
 <dl>
 <dd>
 
-**pageSize:** `*int` — Number of results to return per page.
+**pageSize:** `*int` — Number of results to return per page. The maximum limit is 100.
     
 </dd>
 </dl>
@@ -49823,7 +54096,23 @@ client.Ticketing.Users.List(
 <dl>
 <dd>
 
+**roles:** `*string` — If provided, will only return users with at least one of these roles.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **team:** `*string` — If provided, will only return users matching in this team.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**teams:** `*string` — If provided, will only return users with at least one of these teams.
     
 </dd>
 </dl>

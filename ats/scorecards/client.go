@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.ScorecardsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.Scorecard], error) {
+) (*core.Page[*string, *ats.Scorecard, *ats.PaginatedScorecardList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/scorecards"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedScorecardList) *core.PageResponse[*string, *ats.Scorecard] {
+	readPageResponse := func(response *ats.PaginatedScorecardList) *core.PageResponse[*string, *ats.Scorecard, *ats.PaginatedScorecardList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.Scorecard]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.Scorecard, *ats.PaginatedScorecardList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

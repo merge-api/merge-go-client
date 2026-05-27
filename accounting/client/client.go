@@ -22,6 +22,7 @@ import (
 	creditnotes "github.com/merge-api/merge-go-client/v2/accounting/creditnotes"
 	deleteaccount "github.com/merge-api/merge-go-client/v2/accounting/deleteaccount"
 	employees "github.com/merge-api/merge-go-client/v2/accounting/employees"
+	expensereports "github.com/merge-api/merge-go-client/v2/accounting/expensereports"
 	expenses "github.com/merge-api/merge-go-client/v2/accounting/expenses"
 	fieldmapping "github.com/merge-api/merge-go-client/v2/accounting/fieldmapping"
 	forceresync "github.com/merge-api/merge-go-client/v2/accounting/forceresync"
@@ -30,6 +31,7 @@ import (
 	incomestatements "github.com/merge-api/merge-go-client/v2/accounting/incomestatements"
 	invoices "github.com/merge-api/merge-go-client/v2/accounting/invoices"
 	issues "github.com/merge-api/merge-go-client/v2/accounting/issues"
+	itemfulfillments "github.com/merge-api/merge-go-client/v2/accounting/itemfulfillments"
 	items "github.com/merge-api/merge-go-client/v2/accounting/items"
 	journalentries "github.com/merge-api/merge-go-client/v2/accounting/journalentries"
 	linkedaccounts "github.com/merge-api/merge-go-client/v2/accounting/linkedaccounts"
@@ -42,6 +44,7 @@ import (
 	projects "github.com/merge-api/merge-go-client/v2/accounting/projects"
 	purchaseorders "github.com/merge-api/merge-go-client/v2/accounting/purchaseorders"
 	regeneratekey "github.com/merge-api/merge-go-client/v2/accounting/regeneratekey"
+	salesorders "github.com/merge-api/merge-go-client/v2/accounting/salesorders"
 	scopes "github.com/merge-api/merge-go-client/v2/accounting/scopes"
 	syncstatus "github.com/merge-api/merge-go-client/v2/accounting/syncstatus"
 	taxrates "github.com/merge-api/merge-go-client/v2/accounting/taxrates"
@@ -74,6 +77,7 @@ type Client struct {
 	Scopes                    *scopes.Client
 	DeleteAccount             *deleteaccount.Client
 	Employees                 *employees.Client
+	ExpenseReports            *expensereports.Client
 	Expenses                  *expenses.Client
 	FieldMapping              *fieldmapping.Client
 	GeneralLedgerTransactions *generalledgertransactions.Client
@@ -81,6 +85,7 @@ type Client struct {
 	IncomeStatements          *incomestatements.Client
 	Invoices                  *invoices.Client
 	Issues                    *issues.Client
+	ItemFulfillments          *itemfulfillments.Client
 	Items                     *items.Client
 	JournalEntries            *journalentries.Client
 	LinkToken                 *linktoken.Client
@@ -93,6 +98,7 @@ type Client struct {
 	Projects                  *projects.Client
 	PurchaseOrders            *purchaseorders.Client
 	RegenerateKey             *regeneratekey.Client
+	SalesOrders               *salesorders.Client
 	SyncStatus                *syncstatus.Client
 	ForceResync               *forceresync.Client
 	TaxRates                  *taxrates.Client
@@ -128,6 +134,7 @@ func NewClient(options *core.RequestOptions) *Client {
 		Scopes:                    scopes.NewClient(options),
 		DeleteAccount:             deleteaccount.NewClient(options),
 		Employees:                 employees.NewClient(options),
+		ExpenseReports:            expensereports.NewClient(options),
 		Expenses:                  expenses.NewClient(options),
 		FieldMapping:              fieldmapping.NewClient(options),
 		GeneralLedgerTransactions: generalledgertransactions.NewClient(options),
@@ -135,6 +142,7 @@ func NewClient(options *core.RequestOptions) *Client {
 		IncomeStatements:          incomestatements.NewClient(options),
 		Invoices:                  invoices.NewClient(options),
 		Issues:                    issues.NewClient(options),
+		ItemFulfillments:          itemfulfillments.NewClient(options),
 		Items:                     items.NewClient(options),
 		JournalEntries:            journalentries.NewClient(options),
 		LinkToken:                 linktoken.NewClient(options),
@@ -147,6 +155,7 @@ func NewClient(options *core.RequestOptions) *Client {
 		Projects:                  projects.NewClient(options),
 		PurchaseOrders:            purchaseorders.NewClient(options),
 		RegenerateKey:             regeneratekey.NewClient(options),
+		SalesOrders:               salesorders.NewClient(options),
 		SyncStatus:                syncstatus.NewClient(options),
 		ForceResync:               forceresync.NewClient(options),
 		TaxRates:                  taxrates.NewClient(options),

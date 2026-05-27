@@ -91,7 +91,7 @@ type TasksListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -262,7 +262,7 @@ type TasksRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -392,6 +392,7 @@ type TasksListRequestExpandItem string
 
 const (
 	TasksListRequestExpandItemAccount     TasksListRequestExpandItem = "account"
+	TasksListRequestExpandItemContact     TasksListRequestExpandItem = "contact"
 	TasksListRequestExpandItemOpportunity TasksListRequestExpandItem = "opportunity"
 	TasksListRequestExpandItemOwner       TasksListRequestExpandItem = "owner"
 )
@@ -400,6 +401,8 @@ func NewTasksListRequestExpandItemFromString(s string) (TasksListRequestExpandIt
 	switch s {
 	case "account":
 		return TasksListRequestExpandItemAccount, nil
+	case "contact":
+		return TasksListRequestExpandItemContact, nil
 	case "opportunity":
 		return TasksListRequestExpandItemOpportunity, nil
 	case "owner":
@@ -417,6 +420,7 @@ type TasksRetrieveRequestExpandItem string
 
 const (
 	TasksRetrieveRequestExpandItemAccount     TasksRetrieveRequestExpandItem = "account"
+	TasksRetrieveRequestExpandItemContact     TasksRetrieveRequestExpandItem = "contact"
 	TasksRetrieveRequestExpandItemOpportunity TasksRetrieveRequestExpandItem = "opportunity"
 	TasksRetrieveRequestExpandItemOwner       TasksRetrieveRequestExpandItem = "owner"
 )
@@ -425,6 +429,8 @@ func NewTasksRetrieveRequestExpandItemFromString(s string) (TasksRetrieveRequest
 	switch s {
 	case "account":
 		return TasksRetrieveRequestExpandItemAccount, nil
+	case "contact":
+		return TasksRetrieveRequestExpandItemContact, nil
 	case "opportunity":
 		return TasksRetrieveRequestExpandItemOpportunity, nil
 	case "owner":
@@ -559,12 +565,13 @@ var (
 	patchedTaskRequestFieldOwner               = big.NewInt(1 << 2)
 	patchedTaskRequestFieldAccount             = big.NewInt(1 << 3)
 	patchedTaskRequestFieldOpportunity         = big.NewInt(1 << 4)
-	patchedTaskRequestFieldCompletedDate       = big.NewInt(1 << 5)
-	patchedTaskRequestFieldDueDate             = big.NewInt(1 << 6)
-	patchedTaskRequestFieldStatus              = big.NewInt(1 << 7)
-	patchedTaskRequestFieldIntegrationParams   = big.NewInt(1 << 8)
-	patchedTaskRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
-	patchedTaskRequestFieldRemoteFields        = big.NewInt(1 << 10)
+	patchedTaskRequestFieldContact             = big.NewInt(1 << 5)
+	patchedTaskRequestFieldCompletedDate       = big.NewInt(1 << 6)
+	patchedTaskRequestFieldDueDate             = big.NewInt(1 << 7)
+	patchedTaskRequestFieldStatus              = big.NewInt(1 << 8)
+	patchedTaskRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	patchedTaskRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+	patchedTaskRequestFieldRemoteFields        = big.NewInt(1 << 11)
 )
 
 type PatchedTaskRequest struct {
@@ -578,6 +585,8 @@ type PatchedTaskRequest struct {
 	Account *string `json:"account,omitempty" url:"account,omitempty"`
 	// The task's opportunity.
 	Opportunity *string `json:"opportunity,omitempty" url:"opportunity,omitempty"`
+	// The task's contact.
+	Contact *string `json:"contact,omitempty" url:"contact,omitempty"`
 	// When the task is completed.
 	CompletedDate *time.Time `json:"completed_date,omitempty" url:"completed_date,omitempty"`
 	// When the task is due.
@@ -631,6 +640,13 @@ func (p *PatchedTaskRequest) GetOpportunity() *string {
 		return nil
 	}
 	return p.Opportunity
+}
+
+func (p *PatchedTaskRequest) GetContact() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Contact
 }
 
 func (p *PatchedTaskRequest) GetCompletedDate() *time.Time {
@@ -719,6 +735,13 @@ func (p *PatchedTaskRequest) SetAccount(account *string) {
 func (p *PatchedTaskRequest) SetOpportunity(opportunity *string) {
 	p.Opportunity = opportunity
 	p.require(patchedTaskRequestFieldOpportunity)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedTaskRequest) SetContact(contact *string) {
+	p.Contact = contact
+	p.require(patchedTaskRequestFieldContact)
 }
 
 // SetCompletedDate sets the CompletedDate field and marks it as non-optional;
@@ -895,13 +918,14 @@ var (
 	taskFieldOwner            = big.NewInt(1 << 6)
 	taskFieldAccount          = big.NewInt(1 << 7)
 	taskFieldOpportunity      = big.NewInt(1 << 8)
-	taskFieldCompletedDate    = big.NewInt(1 << 9)
-	taskFieldDueDate          = big.NewInt(1 << 10)
-	taskFieldStatus           = big.NewInt(1 << 11)
-	taskFieldRemoteWasDeleted = big.NewInt(1 << 12)
-	taskFieldFieldMappings    = big.NewInt(1 << 13)
-	taskFieldRemoteData       = big.NewInt(1 << 14)
-	taskFieldRemoteFields     = big.NewInt(1 << 15)
+	taskFieldContact          = big.NewInt(1 << 9)
+	taskFieldCompletedDate    = big.NewInt(1 << 10)
+	taskFieldDueDate          = big.NewInt(1 << 11)
+	taskFieldStatus           = big.NewInt(1 << 12)
+	taskFieldRemoteWasDeleted = big.NewInt(1 << 13)
+	taskFieldFieldMappings    = big.NewInt(1 << 14)
+	taskFieldRemoteData       = big.NewInt(1 << 15)
+	taskFieldRemoteFields     = big.NewInt(1 << 16)
 )
 
 type Task struct {
@@ -922,6 +946,8 @@ type Task struct {
 	Account *TaskAccount `json:"account,omitempty" url:"account,omitempty"`
 	// The task's opportunity.
 	Opportunity *TaskOpportunity `json:"opportunity,omitempty" url:"opportunity,omitempty"`
+	// The task's contact.
+	Contact *TaskContact `json:"contact,omitempty" url:"contact,omitempty"`
 	// When the task is completed.
 	CompletedDate *time.Time `json:"completed_date,omitempty" url:"completed_date,omitempty"`
 	// When the task is due.
@@ -1005,6 +1031,13 @@ func (t *Task) GetOpportunity() *TaskOpportunity {
 		return nil
 	}
 	return t.Opportunity
+}
+
+func (t *Task) GetContact() *TaskContact {
+	if t == nil {
+		return nil
+	}
+	return t.Contact
 }
 
 func (t *Task) GetCompletedDate() *time.Time {
@@ -1128,6 +1161,13 @@ func (t *Task) SetAccount(account *TaskAccount) {
 func (t *Task) SetOpportunity(opportunity *TaskOpportunity) {
 	t.Opportunity = opportunity
 	t.require(taskFieldOpportunity)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Task) SetContact(contact *TaskContact) {
+	t.Contact = contact
+	t.require(taskFieldContact)
 }
 
 // SetCompletedDate sets the CompletedDate field and marks it as non-optional;
@@ -1301,6 +1341,69 @@ func (t *TaskAccount) Accept(visitor TaskAccountVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
 
+// The task's contact.
+type TaskContact struct {
+	String  string
+	Contact *Contact
+
+	typ string
+}
+
+func (t *TaskContact) GetString() string {
+	if t == nil {
+		return ""
+	}
+	return t.String
+}
+
+func (t *TaskContact) GetContact() *Contact {
+	if t == nil {
+		return nil
+	}
+	return t.Contact
+}
+
+func (t *TaskContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typ = "String"
+		t.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		t.typ = "Contact"
+		t.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskContact) MarshalJSON() ([]byte, error) {
+	if t.typ == "String" || t.String != "" {
+		return json.Marshal(t.String)
+	}
+	if t.typ == "Contact" || t.Contact != nil {
+		return json.Marshal(t.Contact)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+type TaskContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (t *TaskContact) Accept(visitor TaskContactVisitor) error {
+	if t.typ == "String" || t.String != "" {
+		return visitor.VisitString(t.String)
+	}
+	if t.typ == "Contact" || t.Contact != nil {
+		return visitor.VisitContact(t.Contact)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
 // The task's opportunity.
 type TaskOpportunity struct {
 	String      string
@@ -1438,12 +1541,13 @@ var (
 	taskRequestFieldOwner               = big.NewInt(1 << 2)
 	taskRequestFieldAccount             = big.NewInt(1 << 3)
 	taskRequestFieldOpportunity         = big.NewInt(1 << 4)
-	taskRequestFieldCompletedDate       = big.NewInt(1 << 5)
-	taskRequestFieldDueDate             = big.NewInt(1 << 6)
-	taskRequestFieldStatus              = big.NewInt(1 << 7)
-	taskRequestFieldIntegrationParams   = big.NewInt(1 << 8)
-	taskRequestFieldLinkedAccountParams = big.NewInt(1 << 9)
-	taskRequestFieldRemoteFields        = big.NewInt(1 << 10)
+	taskRequestFieldContact             = big.NewInt(1 << 5)
+	taskRequestFieldCompletedDate       = big.NewInt(1 << 6)
+	taskRequestFieldDueDate             = big.NewInt(1 << 7)
+	taskRequestFieldStatus              = big.NewInt(1 << 8)
+	taskRequestFieldIntegrationParams   = big.NewInt(1 << 9)
+	taskRequestFieldLinkedAccountParams = big.NewInt(1 << 10)
+	taskRequestFieldRemoteFields        = big.NewInt(1 << 11)
 )
 
 type TaskRequest struct {
@@ -1457,6 +1561,8 @@ type TaskRequest struct {
 	Account *TaskRequestAccount `json:"account,omitempty" url:"account,omitempty"`
 	// The task's opportunity.
 	Opportunity *TaskRequestOpportunity `json:"opportunity,omitempty" url:"opportunity,omitempty"`
+	// The task's contact.
+	Contact *TaskRequestContact `json:"contact,omitempty" url:"contact,omitempty"`
 	// When the task is completed.
 	CompletedDate *time.Time `json:"completed_date,omitempty" url:"completed_date,omitempty"`
 	// When the task is due.
@@ -1510,6 +1616,13 @@ func (t *TaskRequest) GetOpportunity() *TaskRequestOpportunity {
 		return nil
 	}
 	return t.Opportunity
+}
+
+func (t *TaskRequest) GetContact() *TaskRequestContact {
+	if t == nil {
+		return nil
+	}
+	return t.Contact
 }
 
 func (t *TaskRequest) GetCompletedDate() *time.Time {
@@ -1598,6 +1711,13 @@ func (t *TaskRequest) SetAccount(account *TaskRequestAccount) {
 func (t *TaskRequest) SetOpportunity(opportunity *TaskRequestOpportunity) {
 	t.Opportunity = opportunity
 	t.require(taskRequestFieldOpportunity)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TaskRequest) SetContact(contact *TaskRequestContact) {
+	t.Contact = contact
+	t.require(taskRequestFieldContact)
 }
 
 // SetCompletedDate sets the CompletedDate field and marks it as non-optional;
@@ -1752,6 +1872,69 @@ func (t *TaskRequestAccount) Accept(visitor TaskRequestAccountVisitor) error {
 	}
 	if t.typ == "Account" || t.Account != nil {
 		return visitor.VisitAccount(t.Account)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+// The task's contact.
+type TaskRequestContact struct {
+	String  string
+	Contact *Contact
+
+	typ string
+}
+
+func (t *TaskRequestContact) GetString() string {
+	if t == nil {
+		return ""
+	}
+	return t.String
+}
+
+func (t *TaskRequestContact) GetContact() *Contact {
+	if t == nil {
+		return nil
+	}
+	return t.Contact
+}
+
+func (t *TaskRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typ = "String"
+		t.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		t.typ = "Contact"
+		t.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TaskRequestContact) MarshalJSON() ([]byte, error) {
+	if t.typ == "String" || t.String != "" {
+		return json.Marshal(t.String)
+	}
+	if t.typ == "Contact" || t.Contact != nil {
+		return json.Marshal(t.Contact)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+type TaskRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (t *TaskRequestContact) Accept(visitor TaskRequestContactVisitor) error {
+	if t.typ == "String" || t.String != "" {
+		return visitor.VisitString(t.String)
+	}
+	if t.typ == "Contact" || t.Contact != nil {
+		return visitor.VisitContact(t.Contact)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }

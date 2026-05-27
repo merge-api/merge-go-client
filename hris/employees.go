@@ -61,34 +61,35 @@ var (
 	employeesListRequestFieldCreatedBefore          = big.NewInt(1 << 2)
 	employeesListRequestFieldCursor                 = big.NewInt(1 << 3)
 	employeesListRequestFieldDisplayFullName        = big.NewInt(1 << 4)
-	employeesListRequestFieldEmploymentStatus       = big.NewInt(1 << 5)
-	employeesListRequestFieldEmploymentType         = big.NewInt(1 << 6)
-	employeesListRequestFieldExpand                 = big.NewInt(1 << 7)
-	employeesListRequestFieldFirstName              = big.NewInt(1 << 8)
-	employeesListRequestFieldGroups                 = big.NewInt(1 << 9)
-	employeesListRequestFieldHomeLocationId         = big.NewInt(1 << 10)
-	employeesListRequestFieldIncludeDeletedData     = big.NewInt(1 << 11)
-	employeesListRequestFieldIncludeRemoteData      = big.NewInt(1 << 12)
-	employeesListRequestFieldIncludeSensitiveFields = big.NewInt(1 << 13)
-	employeesListRequestFieldIncludeShellData       = big.NewInt(1 << 14)
-	employeesListRequestFieldJobTitle               = big.NewInt(1 << 15)
-	employeesListRequestFieldLastName               = big.NewInt(1 << 16)
-	employeesListRequestFieldManagerId              = big.NewInt(1 << 17)
-	employeesListRequestFieldModifiedAfter          = big.NewInt(1 << 18)
-	employeesListRequestFieldModifiedBefore         = big.NewInt(1 << 19)
-	employeesListRequestFieldPageSize               = big.NewInt(1 << 20)
-	employeesListRequestFieldPayGroupId             = big.NewInt(1 << 21)
-	employeesListRequestFieldPersonalEmail          = big.NewInt(1 << 22)
-	employeesListRequestFieldRemoteFields           = big.NewInt(1 << 23)
-	employeesListRequestFieldRemoteId               = big.NewInt(1 << 24)
-	employeesListRequestFieldShowEnumOrigins        = big.NewInt(1 << 25)
-	employeesListRequestFieldStartedAfter           = big.NewInt(1 << 26)
-	employeesListRequestFieldStartedBefore          = big.NewInt(1 << 27)
-	employeesListRequestFieldTeamId                 = big.NewInt(1 << 28)
-	employeesListRequestFieldTerminatedAfter        = big.NewInt(1 << 29)
-	employeesListRequestFieldTerminatedBefore       = big.NewInt(1 << 30)
-	employeesListRequestFieldWorkEmail              = big.NewInt(1 << 31)
-	employeesListRequestFieldWorkLocationId         = big.NewInt(1 << 32)
+	employeesListRequestFieldEmployeeNumber         = big.NewInt(1 << 5)
+	employeesListRequestFieldEmploymentStatus       = big.NewInt(1 << 6)
+	employeesListRequestFieldEmploymentType         = big.NewInt(1 << 7)
+	employeesListRequestFieldExpand                 = big.NewInt(1 << 8)
+	employeesListRequestFieldFirstName              = big.NewInt(1 << 9)
+	employeesListRequestFieldGroups                 = big.NewInt(1 << 10)
+	employeesListRequestFieldHomeLocationId         = big.NewInt(1 << 11)
+	employeesListRequestFieldIncludeDeletedData     = big.NewInt(1 << 12)
+	employeesListRequestFieldIncludeRemoteData      = big.NewInt(1 << 13)
+	employeesListRequestFieldIncludeSensitiveFields = big.NewInt(1 << 14)
+	employeesListRequestFieldIncludeShellData       = big.NewInt(1 << 15)
+	employeesListRequestFieldJobTitle               = big.NewInt(1 << 16)
+	employeesListRequestFieldLastName               = big.NewInt(1 << 17)
+	employeesListRequestFieldManagerId              = big.NewInt(1 << 18)
+	employeesListRequestFieldModifiedAfter          = big.NewInt(1 << 19)
+	employeesListRequestFieldModifiedBefore         = big.NewInt(1 << 20)
+	employeesListRequestFieldPageSize               = big.NewInt(1 << 21)
+	employeesListRequestFieldPayGroupId             = big.NewInt(1 << 22)
+	employeesListRequestFieldPersonalEmail          = big.NewInt(1 << 23)
+	employeesListRequestFieldRemoteFields           = big.NewInt(1 << 24)
+	employeesListRequestFieldRemoteId               = big.NewInt(1 << 25)
+	employeesListRequestFieldShowEnumOrigins        = big.NewInt(1 << 26)
+	employeesListRequestFieldStartedAfter           = big.NewInt(1 << 27)
+	employeesListRequestFieldStartedBefore          = big.NewInt(1 << 28)
+	employeesListRequestFieldTeamId                 = big.NewInt(1 << 29)
+	employeesListRequestFieldTerminatedAfter        = big.NewInt(1 << 30)
+	employeesListRequestFieldTerminatedBefore       = big.NewInt(1 << 31)
+	employeesListRequestFieldWorkEmail              = big.NewInt(1 << 32)
+	employeesListRequestFieldWorkLocationId         = big.NewInt(1 << 33)
 )
 
 type EmployeesListRequest struct {
@@ -102,13 +103,15 @@ type EmployeesListRequest struct {
 	Cursor *string `json:"-" url:"cursor,omitempty"`
 	// If provided, will only return employees with this display name.
 	DisplayFullName *string `json:"-" url:"display_full_name,omitempty"`
+	// If provided, will only return employees with this employee number.
+	EmployeeNumber *string `json:"-" url:"employee_number,omitempty"`
 	// If provided, will only return employees with this employment status.
 	//
 	// * `ACTIVE` - ACTIVE
 	// * `PENDING` - PENDING
 	// * `INACTIVE` - INACTIVE
 	EmploymentStatus *EmployeesListRequestEmploymentStatus `json:"-" url:"employment_status,omitempty"`
-	// If provided, will only return employees that have an employment of the specified employment_type.
+	// If provided, will only return employees that have an employment of the specified employment type.
 	EmploymentType *string `json:"-" url:"employment_type,omitempty"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
 	Expand []*EmployeesListRequestExpandItem `json:"-" url:"expand,omitempty"`
@@ -126,7 +129,7 @@ type EmployeesListRequest struct {
 	IncludeSensitiveFields *bool `json:"-" url:"include_sensitive_fields,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// If provided, will only return employees that have an employment of the specified job_title.
+	// If provided, will only return employees that have an employment of the specified job title.
 	JobTitle *string `json:"-" url:"job_title,omitempty"`
 	// If provided, will only return employees with this last name.
 	LastName *string `json:"-" url:"last_name,omitempty"`
@@ -136,7 +139,7 @@ type EmployeesListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If provided, will only return employees for this pay group
 	PayGroupId *string `json:"-" url:"pay_group_id,omitempty"`
@@ -207,6 +210,13 @@ func (e *EmployeesListRequest) SetCursor(cursor *string) {
 func (e *EmployeesListRequest) SetDisplayFullName(displayFullName *string) {
 	e.DisplayFullName = displayFullName
 	e.require(employeesListRequestFieldDisplayFullName)
+}
+
+// SetEmployeeNumber sets the EmployeeNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetEmployeeNumber(employeeNumber *string) {
+	e.EmployeeNumber = employeeNumber
+	e.require(employeesListRequestFieldEmployeeNumber)
 }
 
 // SetEmploymentStatus sets the EmploymentStatus field and marks it as non-optional;
@@ -839,33 +849,34 @@ func (e EmployeesRetrieveRequestShowEnumOrigins) Ptr() *EmployeesRetrieveRequest
 var (
 	employeeRequestFieldEmployeeNumber      = big.NewInt(1 << 0)
 	employeeRequestFieldCompany             = big.NewInt(1 << 1)
-	employeeRequestFieldFirstName           = big.NewInt(1 << 2)
-	employeeRequestFieldLastName            = big.NewInt(1 << 3)
-	employeeRequestFieldPreferredName       = big.NewInt(1 << 4)
-	employeeRequestFieldDisplayFullName     = big.NewInt(1 << 5)
-	employeeRequestFieldUsername            = big.NewInt(1 << 6)
-	employeeRequestFieldGroups              = big.NewInt(1 << 7)
-	employeeRequestFieldWorkEmail           = big.NewInt(1 << 8)
-	employeeRequestFieldPersonalEmail       = big.NewInt(1 << 9)
-	employeeRequestFieldMobilePhoneNumber   = big.NewInt(1 << 10)
-	employeeRequestFieldEmployments         = big.NewInt(1 << 11)
-	employeeRequestFieldHomeLocation        = big.NewInt(1 << 12)
-	employeeRequestFieldWorkLocation        = big.NewInt(1 << 13)
-	employeeRequestFieldManager             = big.NewInt(1 << 14)
-	employeeRequestFieldTeam                = big.NewInt(1 << 15)
-	employeeRequestFieldPayGroup            = big.NewInt(1 << 16)
-	employeeRequestFieldSsn                 = big.NewInt(1 << 17)
-	employeeRequestFieldGender              = big.NewInt(1 << 18)
-	employeeRequestFieldEthnicity           = big.NewInt(1 << 19)
-	employeeRequestFieldMaritalStatus       = big.NewInt(1 << 20)
-	employeeRequestFieldDateOfBirth         = big.NewInt(1 << 21)
-	employeeRequestFieldHireDate            = big.NewInt(1 << 22)
-	employeeRequestFieldStartDate           = big.NewInt(1 << 23)
-	employeeRequestFieldEmploymentStatus    = big.NewInt(1 << 24)
-	employeeRequestFieldTerminationDate     = big.NewInt(1 << 25)
-	employeeRequestFieldAvatar              = big.NewInt(1 << 26)
-	employeeRequestFieldIntegrationParams   = big.NewInt(1 << 27)
-	employeeRequestFieldLinkedAccountParams = big.NewInt(1 << 28)
+	employeeRequestFieldEmployeeUrl         = big.NewInt(1 << 2)
+	employeeRequestFieldFirstName           = big.NewInt(1 << 3)
+	employeeRequestFieldLastName            = big.NewInt(1 << 4)
+	employeeRequestFieldPreferredName       = big.NewInt(1 << 5)
+	employeeRequestFieldDisplayFullName     = big.NewInt(1 << 6)
+	employeeRequestFieldUsername            = big.NewInt(1 << 7)
+	employeeRequestFieldGroups              = big.NewInt(1 << 8)
+	employeeRequestFieldWorkEmail           = big.NewInt(1 << 9)
+	employeeRequestFieldPersonalEmail       = big.NewInt(1 << 10)
+	employeeRequestFieldMobilePhoneNumber   = big.NewInt(1 << 11)
+	employeeRequestFieldEmployments         = big.NewInt(1 << 12)
+	employeeRequestFieldHomeLocation        = big.NewInt(1 << 13)
+	employeeRequestFieldWorkLocation        = big.NewInt(1 << 14)
+	employeeRequestFieldManager             = big.NewInt(1 << 15)
+	employeeRequestFieldTeam                = big.NewInt(1 << 16)
+	employeeRequestFieldPayGroup            = big.NewInt(1 << 17)
+	employeeRequestFieldSsn                 = big.NewInt(1 << 18)
+	employeeRequestFieldGender              = big.NewInt(1 << 19)
+	employeeRequestFieldEthnicity           = big.NewInt(1 << 20)
+	employeeRequestFieldMaritalStatus       = big.NewInt(1 << 21)
+	employeeRequestFieldDateOfBirth         = big.NewInt(1 << 22)
+	employeeRequestFieldHireDate            = big.NewInt(1 << 23)
+	employeeRequestFieldStartDate           = big.NewInt(1 << 24)
+	employeeRequestFieldEmploymentStatus    = big.NewInt(1 << 25)
+	employeeRequestFieldTerminationDate     = big.NewInt(1 << 26)
+	employeeRequestFieldAvatar              = big.NewInt(1 << 27)
+	employeeRequestFieldIntegrationParams   = big.NewInt(1 << 28)
+	employeeRequestFieldLinkedAccountParams = big.NewInt(1 << 29)
 )
 
 type EmployeeRequest struct {
@@ -873,6 +884,8 @@ type EmployeeRequest struct {
 	EmployeeNumber *string `json:"employee_number,omitempty" url:"employee_number,omitempty"`
 	// The ID of the employee's company.
 	Company *EmployeeRequestCompany `json:"company,omitempty" url:"company,omitempty"`
+	// The 3rd party URL of the employee.
+	EmployeeUrl *string `json:"employee_url,omitempty" url:"employee_url,omitempty"`
 	// The employee's first name.
 	FirstName *string `json:"first_name,omitempty" url:"first_name,omitempty"`
 	// The employee's last name.
@@ -969,6 +982,13 @@ func (e *EmployeeRequest) GetCompany() *EmployeeRequestCompany {
 		return nil
 	}
 	return e.Company
+}
+
+func (e *EmployeeRequest) GetEmployeeUrl() *string {
+	if e == nil {
+		return nil
+	}
+	return e.EmployeeUrl
 }
 
 func (e *EmployeeRequest) GetFirstName() *string {
@@ -1183,6 +1203,13 @@ func (e *EmployeeRequest) SetEmployeeNumber(employeeNumber *string) {
 func (e *EmployeeRequest) SetCompany(company *EmployeeRequestCompany) {
 	e.Company = company
 	e.require(employeeRequestFieldCompany)
+}
+
+// SetEmployeeUrl sets the EmployeeUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeeRequest) SetEmployeeUrl(employeeUrl *string) {
+	e.EmployeeUrl = employeeUrl
+	e.require(employeeRequestFieldEmployeeUrl)
 }
 
 // SetFirstName sets the FirstName field and marks it as non-optional;

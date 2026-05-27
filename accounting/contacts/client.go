@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.ContactsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.Contact], error) {
+) (*core.Page[*string, *accounting.Contact, *accounting.PaginatedContactList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/contacts"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedContactList) *core.PageResponse[*string, *accounting.Contact] {
+	readPageResponse := func(response *accounting.PaginatedContactList) *core.PageResponse[*string, *accounting.Contact, *accounting.PaginatedContactList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.Contact]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.Contact, *accounting.PaginatedContactList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -127,6 +128,42 @@ func (c *Client) Retrieve(
 	return response.Body, nil
 }
 
+// Updates a `Contact` object with the given `id`.
+func (c *Client) PartialUpdate(
+	ctx context.Context,
+	id string,
+	request *accounting.PatchedContactEndpointRequest,
+	opts ...option.RequestOption,
+) (*accounting.ContactResponse, error) {
+	response, err := c.WithRawResponse.PartialUpdate(
+		ctx,
+		id,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Returns metadata for `Contact` PATCHs.
+func (c *Client) MetaPatchRetrieve(
+	ctx context.Context,
+	id string,
+	opts ...option.RequestOption,
+) (*accounting.MetaResponse, error) {
+	response, err := c.WithRawResponse.MetaPatchRetrieve(
+		ctx,
+		id,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
 // Returns metadata for `Contact` POSTs.
 func (c *Client) MetaPostRetrieve(
 	ctx context.Context,
@@ -147,12 +184,12 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.ContactsRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/contacts/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -182,14 +219,15 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

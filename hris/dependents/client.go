@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *hris.DependentsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *hris.Dependent], error) {
+) (*core.Page[*string, *hris.Dependent, *hris.PaginatedDependentList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/dependents"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *hris.PaginatedDependentList) *core.PageResponse[*string, *hris.Dependent] {
+	readPageResponse := func(response *hris.PaginatedDependentList) *core.PageResponse[*string, *hris.Dependent, *hris.PaginatedDependentList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *hris.Dependent]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *hris.Dependent, *hris.PaginatedDependentList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

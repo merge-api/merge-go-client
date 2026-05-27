@@ -23,6 +23,7 @@ var (
 	endUserDetailsRequestFieldLanguage                  = big.NewInt(1 << 10)
 	endUserDetailsRequestFieldAreSyncsDisabled          = big.NewInt(1 << 11)
 	endUserDetailsRequestFieldIntegrationSpecificConfig = big.NewInt(1 << 12)
+	endUserDetailsRequestFieldLinkedDestinationId       = big.NewInt(1 << 13)
 )
 
 type EndUserDetailsRequest struct {
@@ -55,6 +56,8 @@ type EndUserDetailsRequest struct {
 	AreSyncsDisabled *bool `json:"are_syncs_disabled,omitempty" url:"-"`
 	// A JSON object containing integration-specific configuration options.
 	IntegrationSpecificConfig map[string]interface{} `json:"integration_specific_config,omitempty" url:"-"`
+	// The UUID of the linked destination that you want this Linked Account to be tied to.
+	LinkedDestinationId *string `json:"linked_destination_id,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -156,6 +159,13 @@ func (e *EndUserDetailsRequest) SetAreSyncsDisabled(areSyncsDisabled *bool) {
 func (e *EndUserDetailsRequest) SetIntegrationSpecificConfig(integrationSpecificConfig map[string]interface{}) {
 	e.IntegrationSpecificConfig = integrationSpecificConfig
 	e.require(endUserDetailsRequestFieldIntegrationSpecificConfig)
+}
+
+// SetLinkedDestinationId sets the LinkedDestinationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetLinkedDestinationId(linkedDestinationId *string) {
+	e.LinkedDestinationId = linkedDestinationId
+	e.require(endUserDetailsRequestFieldLinkedDestinationId)
 }
 
 // The following subset of IETF language tags can be used to configure localization.

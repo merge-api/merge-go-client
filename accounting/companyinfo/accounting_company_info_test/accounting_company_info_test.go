@@ -105,6 +105,9 @@ func TestAccountingCompanyInfoListWithWireMock(
 				"2024-01-15T09:30:00Z",
 			),
 		),
+		Name: merge.String(
+			"name",
+		),
 		PageSize: merge.Int(
 			1,
 		),
@@ -118,7 +121,7 @@ func TestAccountingCompanyInfoListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/accounting/v1/company-info", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id"}, 1)
+	VerifyRequestCount(t, "GET", "/accounting/v1/company-info", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "name": "name", "page_size": "1", "remote_id": "remote_id"}, 1)
 }
 
 func TestAccountingCompanyInfoRetrieveWithWireMock(

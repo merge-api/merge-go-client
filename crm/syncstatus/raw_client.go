@@ -3,12 +3,8 @@
 package syncstatus
 
 import (
-	context "context"
 	core "github.com/merge-api/merge-go-client/v2/core"
-	crm "github.com/merge-api/merge-go-client/v2/crm"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
-	option "github.com/merge-api/merge-go-client/v2/option"
-	http "net/http"
 )
 
 type RawClient struct {
@@ -28,51 +24,4 @@ func NewRawClient(options *core.RequestOptions) *RawClient {
 			},
 		),
 	}
-}
-
-func (r *RawClient) List(
-	ctx context.Context,
-	request *crm.SyncStatusListRequest,
-	opts ...option.RequestOption,
-) (*core.Response[*crm.PaginatedSyncStatusList], error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		r.baseURL,
-		"",
-	)
-	endpointURL := baseURL + "/crm/v1/sync-status"
-	queryParams, err := internal.QueryValues(request)
-	if err != nil {
-		return nil, err
-	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		r.options.ToHeader(),
-		options.ToHeader(),
-	)
-	var response *crm.PaginatedSyncStatusList
-	raw, err := r.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodGet,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Response:        &response,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &core.Response[*crm.PaginatedSyncStatusList]{
-		StatusCode: raw.StatusCode,
-		Header:     raw.Header,
-		Body:       response,
-	}, nil
 }

@@ -48,7 +48,7 @@ type TransactionsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -217,6 +217,7 @@ type TransactionsListRequestExpandItem string
 const (
 	TransactionsListRequestExpandItemAccount            TransactionsListRequestExpandItem = "account"
 	TransactionsListRequestExpandItemAccountingPeriod   TransactionsListRequestExpandItem = "accounting_period"
+	TransactionsListRequestExpandItemCompany            TransactionsListRequestExpandItem = "company"
 	TransactionsListRequestExpandItemContact            TransactionsListRequestExpandItem = "contact"
 	TransactionsListRequestExpandItemLineItems          TransactionsListRequestExpandItem = "line_items"
 	TransactionsListRequestExpandItemTrackingCategories TransactionsListRequestExpandItem = "tracking_categories"
@@ -228,6 +229,8 @@ func NewTransactionsListRequestExpandItemFromString(s string) (TransactionsListR
 		return TransactionsListRequestExpandItemAccount, nil
 	case "accounting_period":
 		return TransactionsListRequestExpandItemAccountingPeriod, nil
+	case "company":
+		return TransactionsListRequestExpandItemCompany, nil
 	case "contact":
 		return TransactionsListRequestExpandItemContact, nil
 	case "line_items":
@@ -248,6 +251,7 @@ type TransactionsRetrieveRequestExpandItem string
 const (
 	TransactionsRetrieveRequestExpandItemAccount            TransactionsRetrieveRequestExpandItem = "account"
 	TransactionsRetrieveRequestExpandItemAccountingPeriod   TransactionsRetrieveRequestExpandItem = "accounting_period"
+	TransactionsRetrieveRequestExpandItemCompany            TransactionsRetrieveRequestExpandItem = "company"
 	TransactionsRetrieveRequestExpandItemContact            TransactionsRetrieveRequestExpandItem = "contact"
 	TransactionsRetrieveRequestExpandItemLineItems          TransactionsRetrieveRequestExpandItem = "line_items"
 	TransactionsRetrieveRequestExpandItemTrackingCategories TransactionsRetrieveRequestExpandItem = "tracking_categories"
@@ -259,6 +263,8 @@ func NewTransactionsRetrieveRequestExpandItemFromString(s string) (TransactionsR
 		return TransactionsRetrieveRequestExpandItemAccount, nil
 	case "accounting_period":
 		return TransactionsRetrieveRequestExpandItemAccountingPeriod, nil
+	case "company":
+		return TransactionsRetrieveRequestExpandItemCompany, nil
 	case "contact":
 		return TransactionsRetrieveRequestExpandItemContact, nil
 	case "line_items":
@@ -418,6 +424,7 @@ var (
 	transactionFieldAccountingPeriod   = big.NewInt(1 << 17)
 	transactionFieldFieldMappings      = big.NewInt(1 << 18)
 	transactionFieldRemoteData         = big.NewInt(1 << 19)
+	transactionFieldTransactionUrl     = big.NewInt(1 << 20)
 )
 
 type Transaction struct {
@@ -754,15 +761,17 @@ type Transaction struct {
 	// The transaction's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
 	// The company the transaction belongs to.
-	Company            *string                              `json:"company,omitempty" url:"company,omitempty"`
+	Company            *TransactionCompany                  `json:"company,omitempty" url:"company,omitempty"`
 	TrackingCategories []*TransactionTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
-	LineItems          []*TransactionLineItem               `json:"line_items,omitempty" url:"line_items,omitempty"`
+	LineItems          []*TransactionLineItemsItem          `json:"line_items,omitempty" url:"line_items,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	// The accounting period that the Transaction was generated in.
 	AccountingPeriod *TransactionAccountingPeriod `json:"accounting_period,omitempty" url:"accounting_period,omitempty"`
 	FieldMappings    map[string]interface{}       `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData                `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+	// The 3rd party URL of the transaction.
+	TransactionUrl *string `json:"transaction_url,omitempty" url:"transaction_url,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -862,7 +871,7 @@ func (t *Transaction) GetExchangeRate() *string {
 	return t.ExchangeRate
 }
 
-func (t *Transaction) GetCompany() *string {
+func (t *Transaction) GetCompany() *TransactionCompany {
 	if t == nil {
 		return nil
 	}
@@ -876,7 +885,7 @@ func (t *Transaction) GetTrackingCategories() []*TransactionTrackingCategoriesIt
 	return t.TrackingCategories
 }
 
-func (t *Transaction) GetLineItems() []*TransactionLineItem {
+func (t *Transaction) GetLineItems() []*TransactionLineItemsItem {
 	if t == nil {
 		return nil
 	}
@@ -909,6 +918,13 @@ func (t *Transaction) GetRemoteData() []*RemoteData {
 		return nil
 	}
 	return t.RemoteData
+}
+
+func (t *Transaction) GetTransactionUrl() *string {
+	if t == nil {
+		return nil
+	}
+	return t.TransactionUrl
 }
 
 func (t *Transaction) GetExtraProperties() map[string]interface{} {
@@ -1015,7 +1031,7 @@ func (t *Transaction) SetExchangeRate(exchangeRate *string) {
 
 // SetCompany sets the Company field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (t *Transaction) SetCompany(company *string) {
+func (t *Transaction) SetCompany(company *TransactionCompany) {
 	t.Company = company
 	t.require(transactionFieldCompany)
 }
@@ -1029,7 +1045,7 @@ func (t *Transaction) SetTrackingCategories(trackingCategories []*TransactionTra
 
 // SetLineItems sets the LineItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (t *Transaction) SetLineItems(lineItems []*TransactionLineItem) {
+func (t *Transaction) SetLineItems(lineItems []*TransactionLineItemsItem) {
 	t.LineItems = lineItems
 	t.require(transactionFieldLineItems)
 }
@@ -1060,6 +1076,13 @@ func (t *Transaction) SetFieldMappings(fieldMappings map[string]interface{}) {
 func (t *Transaction) SetRemoteData(remoteData []*RemoteData) {
 	t.RemoteData = remoteData
 	t.require(transactionFieldRemoteData)
+}
+
+// SetTransactionUrl sets the TransactionUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Transaction) SetTransactionUrl(transactionUrl *string) {
+	t.TransactionUrl = transactionUrl
+	t.require(transactionFieldTransactionUrl)
 }
 
 func (t *Transaction) UnmarshalJSON(data []byte) error {
@@ -1239,6 +1262,69 @@ func (t *TransactionAccountingPeriod) Accept(visitor TransactionAccountingPeriod
 	}
 	if t.typ == "AccountingPeriod" || t.AccountingPeriod != nil {
 		return visitor.VisitAccountingPeriod(t.AccountingPeriod)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+// The company the transaction belongs to.
+type TransactionCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (t *TransactionCompany) GetString() string {
+	if t == nil {
+		return ""
+	}
+	return t.String
+}
+
+func (t *TransactionCompany) GetCompanyInfo() *CompanyInfo {
+	if t == nil {
+		return nil
+	}
+	return t.CompanyInfo
+}
+
+func (t *TransactionCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typ = "String"
+		t.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		t.typ = "CompanyInfo"
+		t.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TransactionCompany) MarshalJSON() ([]byte, error) {
+	if t.typ == "String" || t.String != "" {
+		return json.Marshal(t.String)
+	}
+	if t.typ == "CompanyInfo" || t.CompanyInfo != nil {
+		return json.Marshal(t.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+type TransactionCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (t *TransactionCompany) Accept(visitor TransactionCompanyVisitor) error {
+	if t.typ == "String" || t.String != "" {
+		return visitor.VisitString(t.String)
+	}
+	if t.typ == "CompanyInfo" || t.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(t.CompanyInfo)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
@@ -2778,6 +2864,68 @@ func (t *TransactionLineItemItem) Accept(visitor TransactionLineItemItemVisitor)
 	}
 	if t.typ == "Item" || t.Item != nil {
 		return visitor.VisitItem(t.Item)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+type TransactionLineItemsItem struct {
+	String              string
+	TransactionLineItem *TransactionLineItem
+
+	typ string
+}
+
+func (t *TransactionLineItemsItem) GetString() string {
+	if t == nil {
+		return ""
+	}
+	return t.String
+}
+
+func (t *TransactionLineItemsItem) GetTransactionLineItem() *TransactionLineItem {
+	if t == nil {
+		return nil
+	}
+	return t.TransactionLineItem
+}
+
+func (t *TransactionLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		t.typ = "String"
+		t.String = valueString
+		return nil
+	}
+	valueTransactionLineItem := new(TransactionLineItem)
+	if err := json.Unmarshal(data, &valueTransactionLineItem); err == nil {
+		t.typ = "TransactionLineItem"
+		t.TransactionLineItem = valueTransactionLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TransactionLineItemsItem) MarshalJSON() ([]byte, error) {
+	if t.typ == "String" || t.String != "" {
+		return json.Marshal(t.String)
+	}
+	if t.typ == "TransactionLineItem" || t.TransactionLineItem != nil {
+		return json.Marshal(t.TransactionLineItem)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+type TransactionLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitTransactionLineItem(*TransactionLineItem) error
+}
+
+func (t *TransactionLineItemsItem) Accept(visitor TransactionLineItemsItemVisitor) error {
+	if t.typ == "String" || t.String != "" {
+		return visitor.VisitString(t.String)
+	}
+	if t.typ == "TransactionLineItem" || t.TransactionLineItem != nil {
+		return visitor.VisitTransactionLineItem(t.TransactionLineItem)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }

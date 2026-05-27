@@ -92,6 +92,9 @@ func TestHrisEmployeesListWithWireMock(
 		DisplayFullName: merge.String(
 			"display_full_name",
 		),
+		EmployeeNumber: merge.String(
+			"employee_number",
+		),
 		EmploymentStatus: hris.EmployeesListRequestEmploymentStatusActive.Ptr(),
 		EmploymentType: merge.String(
 			"employment_type",
@@ -186,7 +189,7 @@ func TestHrisEmployeesListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/hris/v1/employees", map[string]string{"company_id": "company_id", "created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "display_full_name": "display_full_name", "employment_status": "ACTIVE", "employment_type": "employment_type", "first_name": "first_name", "groups": "groups", "home_location_id": "home_location_id", "include_deleted_data": "true", "include_remote_data": "true", "include_sensitive_fields": "true", "include_shell_data": "true", "job_title": "job_title", "last_name": "last_name", "manager_id": "manager_id", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "pay_group_id": "pay_group_id", "personal_email": "personal_email", "remote_fields": "employment_status", "remote_id": "remote_id", "show_enum_origins": "employment_status", "started_after": "2024-01-15T09:30:00Z", "started_before": "2024-01-15T09:30:00Z", "team_id": "team_id", "terminated_after": "2024-01-15T09:30:00Z", "terminated_before": "2024-01-15T09:30:00Z", "work_email": "work_email", "work_location_id": "work_location_id"}, 1)
+	VerifyRequestCount(t, "GET", "/hris/v1/employees", map[string]string{"company_id": "company_id", "created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "display_full_name": "display_full_name", "employee_number": "employee_number", "employment_status": "ACTIVE", "employment_type": "employment_type", "first_name": "first_name", "groups": "groups", "home_location_id": "home_location_id", "include_deleted_data": "true", "include_remote_data": "true", "include_sensitive_fields": "true", "include_shell_data": "true", "job_title": "job_title", "last_name": "last_name", "manager_id": "manager_id", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "pay_group_id": "pay_group_id", "personal_email": "personal_email", "remote_fields": "employment_status", "remote_id": "remote_id", "show_enum_origins": "employment_status", "started_after": "2024-01-15T09:30:00Z", "started_before": "2024-01-15T09:30:00Z", "team_id": "team_id", "terminated_after": "2024-01-15T09:30:00Z", "terminated_before": "2024-01-15T09:30:00Z", "work_email": "work_email", "work_location_id": "work_location_id"}, 1)
 }
 
 func TestHrisEmployeesCreateWithWireMock(

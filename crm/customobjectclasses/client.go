@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *crm.CustomObjectClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *crm.CustomObjectClass], error) {
+) (*core.Page[*string, *crm.CustomObjectClass, *crm.PaginatedCustomObjectClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/crm/v1/custom-object-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedCustomObjectClassList) *core.PageResponse[*string, *crm.CustomObjectClass] {
+	readPageResponse := func(response *crm.PaginatedCustomObjectClassList) *core.PageResponse[*string, *crm.CustomObjectClass, *crm.PaginatedCustomObjectClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *crm.CustomObjectClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *crm.CustomObjectClass, *crm.PaginatedCustomObjectClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

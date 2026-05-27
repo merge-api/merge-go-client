@@ -59,12 +59,13 @@ var (
 	filesDownloadRequestMetaListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
 	filesDownloadRequestMetaListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
 	filesDownloadRequestMetaListRequestFieldCursor             = big.NewInt(1 << 2)
-	filesDownloadRequestMetaListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
-	filesDownloadRequestMetaListRequestFieldMimeTypes          = big.NewInt(1 << 4)
-	filesDownloadRequestMetaListRequestFieldModifiedAfter      = big.NewInt(1 << 5)
-	filesDownloadRequestMetaListRequestFieldModifiedBefore     = big.NewInt(1 << 6)
-	filesDownloadRequestMetaListRequestFieldOrderBy            = big.NewInt(1 << 7)
-	filesDownloadRequestMetaListRequestFieldPageSize           = big.NewInt(1 << 8)
+	filesDownloadRequestMetaListRequestFieldIds                = big.NewInt(1 << 3)
+	filesDownloadRequestMetaListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	filesDownloadRequestMetaListRequestFieldMimeTypes          = big.NewInt(1 << 5)
+	filesDownloadRequestMetaListRequestFieldModifiedAfter      = big.NewInt(1 << 6)
+	filesDownloadRequestMetaListRequestFieldModifiedBefore     = big.NewInt(1 << 7)
+	filesDownloadRequestMetaListRequestFieldOrderBy            = big.NewInt(1 << 8)
+	filesDownloadRequestMetaListRequestFieldPageSize           = big.NewInt(1 << 9)
 )
 
 type FilesDownloadRequestMetaListRequest struct {
@@ -74,6 +75,8 @@ type FilesDownloadRequestMetaListRequest struct {
 	CreatedBefore *string `json:"-" url:"created_before,omitempty"`
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
+	// If provided, will only return objects with the given IDs. Comma-separated list of strings.
+	Ids []*string `json:"-" url:"ids,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-" url:"include_deleted_data,omitempty"`
 	// A comma-separated list of preferred MIME types in order of priority. If supported by the third-party provider, the file(s) will be returned in the first supported MIME type from the list. The default MIME type is PDF. To see supported MIME types by file type, refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
@@ -117,6 +120,13 @@ func (f *FilesDownloadRequestMetaListRequest) SetCreatedBefore(createdBefore *st
 func (f *FilesDownloadRequestMetaListRequest) SetCursor(cursor *string) {
 	f.Cursor = cursor
 	f.require(filesDownloadRequestMetaListRequestFieldCursor)
+}
+
+// SetIds sets the Ids field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesDownloadRequestMetaListRequest) SetIds(ids []*string) {
+	f.Ids = ids
+	f.require(filesDownloadRequestMetaListRequestFieldIds)
 }
 
 // SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
@@ -166,7 +176,7 @@ var (
 )
 
 type FilesDownloadRequestMetaRetrieveRequest struct {
-	// If provided, specifies the export format of the file to be downloaded. For information on supported export formats, please refer to our <a href='https://help.merge.dev/en/articles/8615316-file-export-and-download-specification' target='_blank'>export format help center article</a>.
+	// If provided, specifies the export format of the file to be downloaded.
 	MimeType *string `json:"-" url:"mime_type,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -224,22 +234,24 @@ func (f *FilesDownloadRetrieveRequest) SetMimeType(mimeType *string) {
 }
 
 var (
-	filesListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
-	filesListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
-	filesListRequestFieldCursor             = big.NewInt(1 << 2)
-	filesListRequestFieldDriveId            = big.NewInt(1 << 3)
-	filesListRequestFieldExpand             = big.NewInt(1 << 4)
-	filesListRequestFieldFolderId           = big.NewInt(1 << 5)
-	filesListRequestFieldIncludeDeletedData = big.NewInt(1 << 6)
-	filesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 7)
-	filesListRequestFieldIncludeShellData   = big.NewInt(1 << 8)
-	filesListRequestFieldMimeType           = big.NewInt(1 << 9)
-	filesListRequestFieldModifiedAfter      = big.NewInt(1 << 10)
-	filesListRequestFieldModifiedBefore     = big.NewInt(1 << 11)
-	filesListRequestFieldName               = big.NewInt(1 << 12)
-	filesListRequestFieldOrderBy            = big.NewInt(1 << 13)
-	filesListRequestFieldPageSize           = big.NewInt(1 << 14)
-	filesListRequestFieldRemoteId           = big.NewInt(1 << 15)
+	filesListRequestFieldCreatedAfter        = big.NewInt(1 << 0)
+	filesListRequestFieldCreatedBefore       = big.NewInt(1 << 1)
+	filesListRequestFieldCursor              = big.NewInt(1 << 2)
+	filesListRequestFieldDriveId             = big.NewInt(1 << 3)
+	filesListRequestFieldExpand              = big.NewInt(1 << 4)
+	filesListRequestFieldFolderId            = big.NewInt(1 << 5)
+	filesListRequestFieldIncludeDeletedData  = big.NewInt(1 << 6)
+	filesListRequestFieldIncludeRemoteData   = big.NewInt(1 << 7)
+	filesListRequestFieldIncludeShellData    = big.NewInt(1 << 8)
+	filesListRequestFieldMimeType            = big.NewInt(1 << 9)
+	filesListRequestFieldModifiedAfter       = big.NewInt(1 << 10)
+	filesListRequestFieldModifiedBefore      = big.NewInt(1 << 11)
+	filesListRequestFieldName                = big.NewInt(1 << 12)
+	filesListRequestFieldOrderBy             = big.NewInt(1 << 13)
+	filesListRequestFieldPageSize            = big.NewInt(1 << 14)
+	filesListRequestFieldRemoteCreatedAfter  = big.NewInt(1 << 15)
+	filesListRequestFieldRemoteCreatedBefore = big.NewInt(1 << 16)
+	filesListRequestFieldRemoteId            = big.NewInt(1 << 17)
 )
 
 type FilesListRequest struct {
@@ -271,8 +283,12 @@ type FilesListRequest struct {
 	Name *string `json:"-" url:"name,omitempty"`
 	// Overrides the default ordering for this endpoint. Possible values include: created_at, -created_at, modified_at, -modified_at.
 	OrderBy *FilesListRequestOrderBy `json:"-" url:"order_by,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+	// If provided, will only return files created in the third party platform after this datetime.
+	RemoteCreatedAfter *time.Time `json:"-" url:"remote_created_after,omitempty"`
+	// If provided, will only return files created in the third party platform before this datetime.
+	RemoteCreatedBefore *time.Time `json:"-" url:"remote_created_before,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 
@@ -390,6 +406,20 @@ func (f *FilesListRequest) SetOrderBy(orderBy *FilesListRequestOrderBy) {
 func (f *FilesListRequest) SetPageSize(pageSize *int) {
 	f.PageSize = pageSize
 	f.require(filesListRequestFieldPageSize)
+}
+
+// SetRemoteCreatedAfter sets the RemoteCreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetRemoteCreatedAfter(remoteCreatedAfter *time.Time) {
+	f.RemoteCreatedAfter = remoteCreatedAfter
+	f.require(filesListRequestFieldRemoteCreatedAfter)
+}
+
+// SetRemoteCreatedBefore sets the RemoteCreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FilesListRequest) SetRemoteCreatedBefore(remoteCreatedBefore *time.Time) {
+	f.RemoteCreatedBefore = remoteCreatedBefore
+	f.require(filesListRequestFieldRemoteCreatedBefore)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -1294,6 +1324,7 @@ func (f *FilePermissions) Accept(visitor FilePermissionsVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", f)
 }
 
+// A single permission item that can be either a UUID reference or a full Permission object.
 type FilePermissionsItem struct {
 	String     string
 	Permission *Permission
@@ -1835,6 +1866,7 @@ func (f *FileRequestPermissions) Accept(visitor FileRequestPermissionsVisitor) e
 	return fmt.Errorf("type %T does not include a non-empty union type", f)
 }
 
+// A single permission item for requests that can be either a UUID reference or a full PermissionRequest object.
 type FileRequestPermissionsItem struct {
 	String            string
 	PermissionRequest *PermissionRequest
