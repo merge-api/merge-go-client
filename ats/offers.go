@@ -26,6 +26,7 @@ var (
 	offersListRequestFieldRemoteFields       = big.NewInt(1 << 12)
 	offersListRequestFieldRemoteId           = big.NewInt(1 << 13)
 	offersListRequestFieldShowEnumOrigins    = big.NewInt(1 << 14)
+	offersListRequestFieldStatus             = big.NewInt(1 << 15)
 )
 
 type OffersListRequest struct {
@@ -59,6 +60,18 @@ type OffersListRequest struct {
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
 	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+	// If provided, will only return offers with this status. Options: ('DRAFT', 'APPROVAL-SENT', 'APPROVED', 'SENT', 'SENT-MANUALLY', 'OPENED', 'DENIED', 'SIGNED', 'DEPRECATED')
+	//
+	// * `DRAFT` - DRAFT
+	// * `APPROVAL-SENT` - APPROVAL-SENT
+	// * `APPROVED` - APPROVED
+	// * `SENT` - SENT
+	// * `SENT-MANUALLY` - SENT-MANUALLY
+	// * `OPENED` - OPENED
+	// * `DENIED` - DENIED
+	// * `SIGNED` - SIGNED
+	// * `DEPRECATED` - DEPRECATED
+	Status *OffersListRequestStatus `json:"-" url:"status,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -176,6 +189,13 @@ func (o *OffersListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
 	o.require(offersListRequestFieldShowEnumOrigins)
 }
 
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (o *OffersListRequest) SetStatus(status *OffersListRequestStatus) {
+	o.Status = status
+	o.require(offersListRequestFieldStatus)
+}
+
 var (
 	offersRetrieveRequestFieldExpand            = big.NewInt(1 << 0)
 	offersRetrieveRequestFieldIncludeRemoteData = big.NewInt(1 << 1)
@@ -261,6 +281,49 @@ func NewOffersListRequestExpandItemFromString(s string) (OffersListRequestExpand
 }
 
 func (o OffersListRequestExpandItem) Ptr() *OffersListRequestExpandItem {
+	return &o
+}
+
+type OffersListRequestStatus string
+
+const (
+	OffersListRequestStatusApprovalSent OffersListRequestStatus = "APPROVAL-SENT"
+	OffersListRequestStatusApproved     OffersListRequestStatus = "APPROVED"
+	OffersListRequestStatusDenied       OffersListRequestStatus = "DENIED"
+	OffersListRequestStatusDeprecated   OffersListRequestStatus = "DEPRECATED"
+	OffersListRequestStatusDraft        OffersListRequestStatus = "DRAFT"
+	OffersListRequestStatusOpened       OffersListRequestStatus = "OPENED"
+	OffersListRequestStatusSent         OffersListRequestStatus = "SENT"
+	OffersListRequestStatusSentManually OffersListRequestStatus = "SENT-MANUALLY"
+	OffersListRequestStatusSigned       OffersListRequestStatus = "SIGNED"
+)
+
+func NewOffersListRequestStatusFromString(s string) (OffersListRequestStatus, error) {
+	switch s {
+	case "APPROVAL-SENT":
+		return OffersListRequestStatusApprovalSent, nil
+	case "APPROVED":
+		return OffersListRequestStatusApproved, nil
+	case "DENIED":
+		return OffersListRequestStatusDenied, nil
+	case "DEPRECATED":
+		return OffersListRequestStatusDeprecated, nil
+	case "DRAFT":
+		return OffersListRequestStatusDraft, nil
+	case "OPENED":
+		return OffersListRequestStatusOpened, nil
+	case "SENT":
+		return OffersListRequestStatusSent, nil
+	case "SENT-MANUALLY":
+		return OffersListRequestStatusSentManually, nil
+	case "SIGNED":
+		return OffersListRequestStatusSigned, nil
+	}
+	var t OffersListRequestStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (o OffersListRequestStatus) Ptr() *OffersListRequestStatus {
 	return &o
 }
 

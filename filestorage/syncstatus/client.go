@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.SyncStatusListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *filestorage.SyncStatus], error) {
+) (*core.Page[*string, *filestorage.SyncStatus, *filestorage.PaginatedSyncStatusList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/sync-status"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedSyncStatusList) *core.PageResponse[*string, *filestorage.SyncStatus] {
+	readPageResponse := func(response *filestorage.PaginatedSyncStatusList) *core.PageResponse[*string, *filestorage.SyncStatus, *filestorage.PaginatedSyncStatusList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *filestorage.SyncStatus]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *filestorage.SyncStatus, *filestorage.PaginatedSyncStatusList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

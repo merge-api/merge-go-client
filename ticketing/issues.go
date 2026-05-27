@@ -47,7 +47,7 @@ type IssuesListRequest struct {
 	LastIncidentTimeBefore *time.Time `json:"-" url:"last_incident_time_before,omitempty"`
 	// If provided, will only include issues pertaining to the linked account passed in.
 	LinkedAccountId *string `json:"-" url:"linked_account_id,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If included, will only include issues whose most recent action occurred after this time
 	StartDate *string `json:"-" url:"start_date,omitempty"`

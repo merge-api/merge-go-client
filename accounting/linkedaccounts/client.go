@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.LinkedAccountsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.AccountDetailsAndActions], error) {
+) (*core.Page[*string, *accounting.AccountDetailsAndActions, *accounting.PaginatedAccountDetailsAndActionsList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/linked-accounts"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedAccountDetailsAndActionsList) *core.PageResponse[*string, *accounting.AccountDetailsAndActions] {
+	readPageResponse := func(response *accounting.PaginatedAccountDetailsAndActionsList) *core.PageResponse[*string, *accounting.AccountDetailsAndActions, *accounting.PaginatedAccountDetailsAndActionsList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.AccountDetailsAndActions]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.AccountDetailsAndActions, *accounting.PaginatedAccountDetailsAndActionsList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

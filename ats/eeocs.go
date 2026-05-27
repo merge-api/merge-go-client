@@ -48,7 +48,7 @@ type EeocsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *EeocsListRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`

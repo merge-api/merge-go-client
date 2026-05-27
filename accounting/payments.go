@@ -78,7 +78,7 @@ type PaymentsLineItemsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -188,7 +188,7 @@ type PaymentsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -395,7 +395,7 @@ type PaymentsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -705,32 +705,35 @@ func (p *PaginatedPaymentList) String() string {
 // ### Usage Example
 // Fetch from the `GET Payment` endpoint and view an invoice's payment.
 var (
-	patchedPaymentRequestFieldTransactionDate     = big.NewInt(1 << 0)
-	patchedPaymentRequestFieldContact             = big.NewInt(1 << 1)
-	patchedPaymentRequestFieldAccount             = big.NewInt(1 << 2)
-	patchedPaymentRequestFieldPaymentMethod       = big.NewInt(1 << 3)
-	patchedPaymentRequestFieldCurrency            = big.NewInt(1 << 4)
-	patchedPaymentRequestFieldExchangeRate        = big.NewInt(1 << 5)
-	patchedPaymentRequestFieldCompany             = big.NewInt(1 << 6)
-	patchedPaymentRequestFieldTotalAmount         = big.NewInt(1 << 7)
-	patchedPaymentRequestFieldType                = big.NewInt(1 << 8)
-	patchedPaymentRequestFieldTrackingCategories  = big.NewInt(1 << 9)
-	patchedPaymentRequestFieldAccountingPeriod    = big.NewInt(1 << 10)
-	patchedPaymentRequestFieldAppliedToLines      = big.NewInt(1 << 11)
-	patchedPaymentRequestFieldIntegrationParams   = big.NewInt(1 << 12)
-	patchedPaymentRequestFieldLinkedAccountParams = big.NewInt(1 << 13)
-	patchedPaymentRequestFieldRemoteFields        = big.NewInt(1 << 14)
+	patchedPaymentRequestFieldPaymentUrl          = big.NewInt(1 << 0)
+	patchedPaymentRequestFieldTransactionDate     = big.NewInt(1 << 1)
+	patchedPaymentRequestFieldContact             = big.NewInt(1 << 2)
+	patchedPaymentRequestFieldAccount             = big.NewInt(1 << 3)
+	patchedPaymentRequestFieldPaymentMethod       = big.NewInt(1 << 4)
+	patchedPaymentRequestFieldCurrency            = big.NewInt(1 << 5)
+	patchedPaymentRequestFieldExchangeRate        = big.NewInt(1 << 6)
+	patchedPaymentRequestFieldCompany             = big.NewInt(1 << 7)
+	patchedPaymentRequestFieldTotalAmount         = big.NewInt(1 << 8)
+	patchedPaymentRequestFieldType                = big.NewInt(1 << 9)
+	patchedPaymentRequestFieldTrackingCategories  = big.NewInt(1 << 10)
+	patchedPaymentRequestFieldAccountingPeriod    = big.NewInt(1 << 11)
+	patchedPaymentRequestFieldAppliedToLines      = big.NewInt(1 << 12)
+	patchedPaymentRequestFieldIntegrationParams   = big.NewInt(1 << 13)
+	patchedPaymentRequestFieldLinkedAccountParams = big.NewInt(1 << 14)
+	patchedPaymentRequestFieldRemoteFields        = big.NewInt(1 << 15)
 )
 
 type PatchedPaymentRequest struct {
+	// The 3rd party URL of the payment.
+	PaymentUrl *string `json:"payment_url,omitempty" url:"payment_url,omitempty"`
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty" url:"transaction_date,omitempty"`
 	// The supplier, or customer involved in the payment.
-	Contact *PatchedPaymentRequestContact `json:"contact,omitempty" url:"contact,omitempty"`
+	Contact *string `json:"contact,omitempty" url:"contact,omitempty"`
 	// The supplier’s or customer’s account in which the payment is made.
-	Account *PatchedPaymentRequestAccount `json:"account,omitempty" url:"account,omitempty"`
+	Account *string `json:"account,omitempty" url:"account,omitempty"`
 	// The method which this payment was made by.
-	PaymentMethod *PatchedPaymentRequestPaymentMethod `json:"payment_method,omitempty" url:"payment_method,omitempty"`
+	PaymentMethod *string `json:"payment_method,omitempty" url:"payment_method,omitempty"`
 	// The payment's currency.
 	//
 	// * `XUA` - ADB Unit of Account
@@ -1043,28 +1046,35 @@ type PatchedPaymentRequest struct {
 	// The payment's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
 	// The company the payment belongs to.
-	Company *PatchedPaymentRequestCompany `json:"company,omitempty" url:"company,omitempty"`
+	Company *string `json:"company,omitempty" url:"company,omitempty"`
 	// The total amount of money being paid to the supplier, or customer, after taxes.
 	TotalAmount *float64 `json:"total_amount,omitempty" url:"total_amount,omitempty"`
 	// The type of the invoice.
 	//
 	// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
 	// * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
-	Type               *PatchedPaymentRequestType                     `json:"type,omitempty" url:"type,omitempty"`
-	TrackingCategories []*PatchedPaymentRequestTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	Type               *PatchedPaymentRequestType `json:"type,omitempty" url:"type,omitempty"`
+	TrackingCategories []*string                  `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
 	// The accounting period that the Payment was generated in.
-	AccountingPeriod *PatchedPaymentRequestAccountingPeriod `json:"accounting_period,omitempty" url:"accounting_period,omitempty"`
+	AccountingPeriod *string `json:"accounting_period,omitempty" url:"accounting_period,omitempty"`
 	// A list of “Payment Applied to Lines” objects.
-	AppliedToLines      []*PatchedPaymentRequestAppliedToLinesItem `json:"applied_to_lines,omitempty" url:"applied_to_lines,omitempty"`
-	IntegrationParams   map[string]interface{}                     `json:"integration_params,omitempty" url:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{}                     `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest                      `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+	AppliedToLines      []*PaymentLineItemRequest `json:"applied_to_lines,omitempty" url:"applied_to_lines,omitempty"`
+	IntegrationParams   map[string]interface{}    `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}    `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest     `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (p *PatchedPaymentRequest) GetPaymentUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PaymentUrl
 }
 
 func (p *PatchedPaymentRequest) GetTransactionDate() *time.Time {
@@ -1074,21 +1084,21 @@ func (p *PatchedPaymentRequest) GetTransactionDate() *time.Time {
 	return p.TransactionDate
 }
 
-func (p *PatchedPaymentRequest) GetContact() *PatchedPaymentRequestContact {
+func (p *PatchedPaymentRequest) GetContact() *string {
 	if p == nil {
 		return nil
 	}
 	return p.Contact
 }
 
-func (p *PatchedPaymentRequest) GetAccount() *PatchedPaymentRequestAccount {
+func (p *PatchedPaymentRequest) GetAccount() *string {
 	if p == nil {
 		return nil
 	}
 	return p.Account
 }
 
-func (p *PatchedPaymentRequest) GetPaymentMethod() *PatchedPaymentRequestPaymentMethod {
+func (p *PatchedPaymentRequest) GetPaymentMethod() *string {
 	if p == nil {
 		return nil
 	}
@@ -1109,7 +1119,7 @@ func (p *PatchedPaymentRequest) GetExchangeRate() *string {
 	return p.ExchangeRate
 }
 
-func (p *PatchedPaymentRequest) GetCompany() *PatchedPaymentRequestCompany {
+func (p *PatchedPaymentRequest) GetCompany() *string {
 	if p == nil {
 		return nil
 	}
@@ -1130,21 +1140,21 @@ func (p *PatchedPaymentRequest) GetType() *PatchedPaymentRequestType {
 	return p.Type
 }
 
-func (p *PatchedPaymentRequest) GetTrackingCategories() []*PatchedPaymentRequestTrackingCategoriesItem {
+func (p *PatchedPaymentRequest) GetTrackingCategories() []*string {
 	if p == nil {
 		return nil
 	}
 	return p.TrackingCategories
 }
 
-func (p *PatchedPaymentRequest) GetAccountingPeriod() *PatchedPaymentRequestAccountingPeriod {
+func (p *PatchedPaymentRequest) GetAccountingPeriod() *string {
 	if p == nil {
 		return nil
 	}
 	return p.AccountingPeriod
 }
 
-func (p *PatchedPaymentRequest) GetAppliedToLines() []*PatchedPaymentRequestAppliedToLinesItem {
+func (p *PatchedPaymentRequest) GetAppliedToLines() []*PaymentLineItemRequest {
 	if p == nil {
 		return nil
 	}
@@ -1183,6 +1193,13 @@ func (p *PatchedPaymentRequest) require(field *big.Int) {
 	p.explicitFields.Or(p.explicitFields, field)
 }
 
+// SetPaymentUrl sets the PaymentUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedPaymentRequest) SetPaymentUrl(paymentUrl *string) {
+	p.PaymentUrl = paymentUrl
+	p.require(patchedPaymentRequestFieldPaymentUrl)
+}
+
 // SetTransactionDate sets the TransactionDate field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (p *PatchedPaymentRequest) SetTransactionDate(transactionDate *time.Time) {
@@ -1192,21 +1209,21 @@ func (p *PatchedPaymentRequest) SetTransactionDate(transactionDate *time.Time) {
 
 // SetContact sets the Contact field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetContact(contact *PatchedPaymentRequestContact) {
+func (p *PatchedPaymentRequest) SetContact(contact *string) {
 	p.Contact = contact
 	p.require(patchedPaymentRequestFieldContact)
 }
 
 // SetAccount sets the Account field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetAccount(account *PatchedPaymentRequestAccount) {
+func (p *PatchedPaymentRequest) SetAccount(account *string) {
 	p.Account = account
 	p.require(patchedPaymentRequestFieldAccount)
 }
 
 // SetPaymentMethod sets the PaymentMethod field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetPaymentMethod(paymentMethod *PatchedPaymentRequestPaymentMethod) {
+func (p *PatchedPaymentRequest) SetPaymentMethod(paymentMethod *string) {
 	p.PaymentMethod = paymentMethod
 	p.require(patchedPaymentRequestFieldPaymentMethod)
 }
@@ -1227,7 +1244,7 @@ func (p *PatchedPaymentRequest) SetExchangeRate(exchangeRate *string) {
 
 // SetCompany sets the Company field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetCompany(company *PatchedPaymentRequestCompany) {
+func (p *PatchedPaymentRequest) SetCompany(company *string) {
 	p.Company = company
 	p.require(patchedPaymentRequestFieldCompany)
 }
@@ -1248,21 +1265,21 @@ func (p *PatchedPaymentRequest) SetType(type_ *PatchedPaymentRequestType) {
 
 // SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetTrackingCategories(trackingCategories []*PatchedPaymentRequestTrackingCategoriesItem) {
+func (p *PatchedPaymentRequest) SetTrackingCategories(trackingCategories []*string) {
 	p.TrackingCategories = trackingCategories
 	p.require(patchedPaymentRequestFieldTrackingCategories)
 }
 
 // SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetAccountingPeriod(accountingPeriod *PatchedPaymentRequestAccountingPeriod) {
+func (p *PatchedPaymentRequest) SetAccountingPeriod(accountingPeriod *string) {
 	p.AccountingPeriod = accountingPeriod
 	p.require(patchedPaymentRequestFieldAccountingPeriod)
 }
 
 // SetAppliedToLines sets the AppliedToLines field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PatchedPaymentRequest) SetAppliedToLines(appliedToLines []*PatchedPaymentRequestAppliedToLinesItem) {
+func (p *PatchedPaymentRequest) SetAppliedToLines(appliedToLines []*PaymentLineItemRequest) {
 	p.AppliedToLines = appliedToLines
 	p.require(patchedPaymentRequestFieldAppliedToLines)
 }
@@ -1333,320 +1350,6 @@ func (p *PatchedPaymentRequest) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", p)
-}
-
-// The supplier’s or customer’s account in which the payment is made.
-type PatchedPaymentRequestAccount struct {
-	String  string
-	Account *Account
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestAccount) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestAccount) GetAccount() *Account {
-	if p == nil {
-		return nil
-	}
-	return p.Account
-}
-
-func (p *PatchedPaymentRequestAccount) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valueAccount := new(Account)
-	if err := json.Unmarshal(data, &valueAccount); err == nil {
-		p.typ = "Account"
-		p.Account = valueAccount
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestAccount) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "Account" || p.Account != nil {
-		return json.Marshal(p.Account)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestAccountVisitor interface {
-	VisitString(string) error
-	VisitAccount(*Account) error
-}
-
-func (p *PatchedPaymentRequestAccount) Accept(visitor PatchedPaymentRequestAccountVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "Account" || p.Account != nil {
-		return visitor.VisitAccount(p.Account)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-// The accounting period that the Payment was generated in.
-type PatchedPaymentRequestAccountingPeriod struct {
-	String           string
-	AccountingPeriod *AccountingPeriod
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestAccountingPeriod) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestAccountingPeriod) GetAccountingPeriod() *AccountingPeriod {
-	if p == nil {
-		return nil
-	}
-	return p.AccountingPeriod
-}
-
-func (p *PatchedPaymentRequestAccountingPeriod) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valueAccountingPeriod := new(AccountingPeriod)
-	if err := json.Unmarshal(data, &valueAccountingPeriod); err == nil {
-		p.typ = "AccountingPeriod"
-		p.AccountingPeriod = valueAccountingPeriod
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestAccountingPeriod) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "AccountingPeriod" || p.AccountingPeriod != nil {
-		return json.Marshal(p.AccountingPeriod)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestAccountingPeriodVisitor interface {
-	VisitString(string) error
-	VisitAccountingPeriod(*AccountingPeriod) error
-}
-
-func (p *PatchedPaymentRequestAccountingPeriod) Accept(visitor PatchedPaymentRequestAccountingPeriodVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "AccountingPeriod" || p.AccountingPeriod != nil {
-		return visitor.VisitAccountingPeriod(p.AccountingPeriod)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestAppliedToLinesItem struct {
-	String                 string
-	PaymentLineItemRequest *PaymentLineItemRequest
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestAppliedToLinesItem) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestAppliedToLinesItem) GetPaymentLineItemRequest() *PaymentLineItemRequest {
-	if p == nil {
-		return nil
-	}
-	return p.PaymentLineItemRequest
-}
-
-func (p *PatchedPaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valuePaymentLineItemRequest := new(PaymentLineItemRequest)
-	if err := json.Unmarshal(data, &valuePaymentLineItemRequest); err == nil {
-		p.typ = "PaymentLineItemRequest"
-		p.PaymentLineItemRequest = valuePaymentLineItemRequest
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestAppliedToLinesItem) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "PaymentLineItemRequest" || p.PaymentLineItemRequest != nil {
-		return json.Marshal(p.PaymentLineItemRequest)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestAppliedToLinesItemVisitor interface {
-	VisitString(string) error
-	VisitPaymentLineItemRequest(*PaymentLineItemRequest) error
-}
-
-func (p *PatchedPaymentRequestAppliedToLinesItem) Accept(visitor PatchedPaymentRequestAppliedToLinesItemVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "PaymentLineItemRequest" || p.PaymentLineItemRequest != nil {
-		return visitor.VisitPaymentLineItemRequest(p.PaymentLineItemRequest)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-// The company the payment belongs to.
-type PatchedPaymentRequestCompany struct {
-	String      string
-	CompanyInfo *CompanyInfo
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestCompany) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestCompany) GetCompanyInfo() *CompanyInfo {
-	if p == nil {
-		return nil
-	}
-	return p.CompanyInfo
-}
-
-func (p *PatchedPaymentRequestCompany) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valueCompanyInfo := new(CompanyInfo)
-	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
-		p.typ = "CompanyInfo"
-		p.CompanyInfo = valueCompanyInfo
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestCompany) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "CompanyInfo" || p.CompanyInfo != nil {
-		return json.Marshal(p.CompanyInfo)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestCompanyVisitor interface {
-	VisitString(string) error
-	VisitCompanyInfo(*CompanyInfo) error
-}
-
-func (p *PatchedPaymentRequestCompany) Accept(visitor PatchedPaymentRequestCompanyVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "CompanyInfo" || p.CompanyInfo != nil {
-		return visitor.VisitCompanyInfo(p.CompanyInfo)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-// The supplier, or customer involved in the payment.
-type PatchedPaymentRequestContact struct {
-	String  string
-	Contact *Contact
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestContact) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestContact) GetContact() *Contact {
-	if p == nil {
-		return nil
-	}
-	return p.Contact
-}
-
-func (p *PatchedPaymentRequestContact) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valueContact := new(Contact)
-	if err := json.Unmarshal(data, &valueContact); err == nil {
-		p.typ = "Contact"
-		p.Contact = valueContact
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestContact) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "Contact" || p.Contact != nil {
-		return json.Marshal(p.Contact)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestContactVisitor interface {
-	VisitString(string) error
-	VisitContact(*Contact) error
-}
-
-func (p *PatchedPaymentRequestContact) Accept(visitor PatchedPaymentRequestContactVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "Contact" || p.Contact != nil {
-		return visitor.VisitContact(p.Contact)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
 // The payment's currency.
@@ -2019,131 +1722,6 @@ func (p *PatchedPaymentRequestCurrency) Accept(visitor PatchedPaymentRequestCurr
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
-// The method which this payment was made by.
-type PatchedPaymentRequestPaymentMethod struct {
-	String        string
-	PaymentMethod *PaymentMethod
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestPaymentMethod) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestPaymentMethod) GetPaymentMethod() *PaymentMethod {
-	if p == nil {
-		return nil
-	}
-	return p.PaymentMethod
-}
-
-func (p *PatchedPaymentRequestPaymentMethod) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valuePaymentMethod := new(PaymentMethod)
-	if err := json.Unmarshal(data, &valuePaymentMethod); err == nil {
-		p.typ = "PaymentMethod"
-		p.PaymentMethod = valuePaymentMethod
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestPaymentMethod) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "PaymentMethod" || p.PaymentMethod != nil {
-		return json.Marshal(p.PaymentMethod)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestPaymentMethodVisitor interface {
-	VisitString(string) error
-	VisitPaymentMethod(*PaymentMethod) error
-}
-
-func (p *PatchedPaymentRequestPaymentMethod) Accept(visitor PatchedPaymentRequestPaymentMethodVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "PaymentMethod" || p.PaymentMethod != nil {
-		return visitor.VisitPaymentMethod(p.PaymentMethod)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestTrackingCategoriesItem struct {
-	String           string
-	TrackingCategory *TrackingCategory
-
-	typ string
-}
-
-func (p *PatchedPaymentRequestTrackingCategoriesItem) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PatchedPaymentRequestTrackingCategoriesItem) GetTrackingCategory() *TrackingCategory {
-	if p == nil {
-		return nil
-	}
-	return p.TrackingCategory
-}
-
-func (p *PatchedPaymentRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valueTrackingCategory := new(TrackingCategory)
-	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
-		p.typ = "TrackingCategory"
-		p.TrackingCategory = valueTrackingCategory
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PatchedPaymentRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "TrackingCategory" || p.TrackingCategory != nil {
-		return json.Marshal(p.TrackingCategory)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PatchedPaymentRequestTrackingCategoriesItemVisitor interface {
-	VisitString(string) error
-	VisitTrackingCategory(*TrackingCategory) error
-}
-
-func (p *PatchedPaymentRequestTrackingCategoriesItem) Accept(visitor PatchedPaymentRequestTrackingCategoriesItemVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "TrackingCategory" || p.TrackingCategory != nil {
-		return visitor.VisitTrackingCategory(p.TrackingCategory)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
 // The type of the invoice.
 //
 // * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
@@ -2426,24 +2004,27 @@ func (p *PaymentLineItemRequest) String() string {
 // ### Usage Example
 // Fetch from the `GET Payment` endpoint and view an invoice's payment.
 var (
-	paymentRequestFieldTransactionDate     = big.NewInt(1 << 0)
-	paymentRequestFieldContact             = big.NewInt(1 << 1)
-	paymentRequestFieldAccount             = big.NewInt(1 << 2)
-	paymentRequestFieldPaymentMethod       = big.NewInt(1 << 3)
-	paymentRequestFieldCurrency            = big.NewInt(1 << 4)
-	paymentRequestFieldExchangeRate        = big.NewInt(1 << 5)
-	paymentRequestFieldCompany             = big.NewInt(1 << 6)
-	paymentRequestFieldTotalAmount         = big.NewInt(1 << 7)
-	paymentRequestFieldType                = big.NewInt(1 << 8)
-	paymentRequestFieldTrackingCategories  = big.NewInt(1 << 9)
-	paymentRequestFieldAccountingPeriod    = big.NewInt(1 << 10)
-	paymentRequestFieldAppliedToLines      = big.NewInt(1 << 11)
-	paymentRequestFieldIntegrationParams   = big.NewInt(1 << 12)
-	paymentRequestFieldLinkedAccountParams = big.NewInt(1 << 13)
-	paymentRequestFieldRemoteFields        = big.NewInt(1 << 14)
+	paymentRequestFieldPaymentUrl          = big.NewInt(1 << 0)
+	paymentRequestFieldTransactionDate     = big.NewInt(1 << 1)
+	paymentRequestFieldContact             = big.NewInt(1 << 2)
+	paymentRequestFieldAccount             = big.NewInt(1 << 3)
+	paymentRequestFieldPaymentMethod       = big.NewInt(1 << 4)
+	paymentRequestFieldCurrency            = big.NewInt(1 << 5)
+	paymentRequestFieldExchangeRate        = big.NewInt(1 << 6)
+	paymentRequestFieldCompany             = big.NewInt(1 << 7)
+	paymentRequestFieldTotalAmount         = big.NewInt(1 << 8)
+	paymentRequestFieldType                = big.NewInt(1 << 9)
+	paymentRequestFieldTrackingCategories  = big.NewInt(1 << 10)
+	paymentRequestFieldAccountingPeriod    = big.NewInt(1 << 11)
+	paymentRequestFieldAppliedToLines      = big.NewInt(1 << 12)
+	paymentRequestFieldIntegrationParams   = big.NewInt(1 << 13)
+	paymentRequestFieldLinkedAccountParams = big.NewInt(1 << 14)
+	paymentRequestFieldRemoteFields        = big.NewInt(1 << 15)
 )
 
 type PaymentRequest struct {
+	// The 3rd party URL of the payment.
+	PaymentUrl *string `json:"payment_url,omitempty" url:"payment_url,omitempty"`
 	// The payment's transaction date.
 	TransactionDate *time.Time `json:"transaction_date,omitempty" url:"transaction_date,omitempty"`
 	// The supplier, or customer involved in the payment.
@@ -2788,6 +2369,13 @@ type PaymentRequest struct {
 	rawJSON         json.RawMessage
 }
 
+func (p *PaymentRequest) GetPaymentUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PaymentUrl
+}
+
 func (p *PaymentRequest) GetTransactionDate() *time.Time {
 	if p == nil {
 		return nil
@@ -2902,6 +2490,13 @@ func (p *PaymentRequest) require(field *big.Int) {
 		p.explicitFields = big.NewInt(0)
 	}
 	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetPaymentUrl sets the PaymentUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentRequest) SetPaymentUrl(paymentUrl *string) {
+	p.PaymentUrl = paymentUrl
+	p.require(paymentRequestFieldPaymentUrl)
 }
 
 // SetTransactionDate sets the TransactionDate field and marks it as non-optional;
@@ -3183,8 +2778,8 @@ func (p *PaymentRequestAccountingPeriod) Accept(visitor PaymentRequestAccounting
 }
 
 type PaymentRequestAppliedToLinesItem struct {
-	String                 string
-	PaymentLineItemRequest *PaymentLineItemRequest
+	String          string
+	PaymentLineItem *PaymentLineItem
 
 	typ string
 }
@@ -3196,11 +2791,11 @@ func (p *PaymentRequestAppliedToLinesItem) GetString() string {
 	return p.String
 }
 
-func (p *PaymentRequestAppliedToLinesItem) GetPaymentLineItemRequest() *PaymentLineItemRequest {
+func (p *PaymentRequestAppliedToLinesItem) GetPaymentLineItem() *PaymentLineItem {
 	if p == nil {
 		return nil
 	}
-	return p.PaymentLineItemRequest
+	return p.PaymentLineItem
 }
 
 func (p *PaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) error {
@@ -3210,10 +2805,10 @@ func (p *PaymentRequestAppliedToLinesItem) UnmarshalJSON(data []byte) error {
 		p.String = valueString
 		return nil
 	}
-	valuePaymentLineItemRequest := new(PaymentLineItemRequest)
-	if err := json.Unmarshal(data, &valuePaymentLineItemRequest); err == nil {
-		p.typ = "PaymentLineItemRequest"
-		p.PaymentLineItemRequest = valuePaymentLineItemRequest
+	valuePaymentLineItem := new(PaymentLineItem)
+	if err := json.Unmarshal(data, &valuePaymentLineItem); err == nil {
+		p.typ = "PaymentLineItem"
+		p.PaymentLineItem = valuePaymentLineItem
 		return nil
 	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
@@ -3223,23 +2818,23 @@ func (p PaymentRequestAppliedToLinesItem) MarshalJSON() ([]byte, error) {
 	if p.typ == "String" || p.String != "" {
 		return json.Marshal(p.String)
 	}
-	if p.typ == "PaymentLineItemRequest" || p.PaymentLineItemRequest != nil {
-		return json.Marshal(p.PaymentLineItemRequest)
+	if p.typ == "PaymentLineItem" || p.PaymentLineItem != nil {
+		return json.Marshal(p.PaymentLineItem)
 	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
 type PaymentRequestAppliedToLinesItemVisitor interface {
 	VisitString(string) error
-	VisitPaymentLineItemRequest(*PaymentLineItemRequest) error
+	VisitPaymentLineItem(*PaymentLineItem) error
 }
 
 func (p *PaymentRequestAppliedToLinesItem) Accept(visitor PaymentRequestAppliedToLinesItemVisitor) error {
 	if p.typ == "String" || p.String != "" {
 		return visitor.VisitString(p.String)
 	}
-	if p.typ == "PaymentLineItemRequest" || p.PaymentLineItemRequest != nil {
-		return visitor.VisitPaymentLineItemRequest(p.PaymentLineItemRequest)
+	if p.typ == "PaymentLineItem" || p.PaymentLineItem != nil {
+		return visitor.VisitPaymentLineItem(p.PaymentLineItem)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }

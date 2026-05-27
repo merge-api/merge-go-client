@@ -8,6 +8,7 @@ import (
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
+	http "net/http"
 )
 
 type Client struct {
@@ -37,16 +38,58 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.ProjectsListRequest,
 	opts ...option.RequestOption,
-) (*accounting.PaginatedProjectList, error) {
-	response, err := c.WithRawResponse.List(
-		ctx,
-		request,
-		opts...,
+) (*core.Page[*string, *accounting.Project, *accounting.PaginatedProjectList], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.merge.dev/api",
 	)
+	endpointURL := baseURL + "/accounting/v1/projects"
+	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	return response.Body, nil
+	headers := internal.MergeHeaders(
+		c.options.ToHeader(),
+		options.ToHeader(),
+	)
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
+		if pageRequest.Cursor != nil {
+			queryParams.Set("cursor", *pageRequest.Cursor)
+		}
+		nextURL := endpointURL
+		if len(queryParams) > 0 {
+			nextURL += "?" + queryParams.Encode()
+		}
+		return &internal.CallParams{
+			URL:             nextURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        pageRequest.Response,
+		}
+	}
+	readPageResponse := func(response *accounting.PaginatedProjectList) *core.PageResponse[*string, *accounting.Project, *accounting.PaginatedProjectList] {
+		var zeroValue *string
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *accounting.Project, *accounting.PaginatedProjectList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
+		}
+	}
+	pager := internal.NewCursorPager(
+		c.caller,
+		prepareCall,
+		readPageResponse,
+	)
+	return pager.GetPage(ctx, request.Cursor)
 }
 
 // Returns a `Project` object with the given `id`.

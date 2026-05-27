@@ -3,11 +3,13 @@
 package tickets
 
 import (
+	bytes "bytes"
 	context "context"
 	core "github.com/merge-api/merge-go-client/v2/core"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
 	ticketing "github.com/merge-api/merge-go-client/v2/ticketing"
+	io "io"
 	http "net/http"
 )
 
@@ -39,7 +41,7 @@ func (r *RawClient) Create(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ticketing/v1/tickets"
 	queryParams, err := internal.QueryValues(request)
@@ -89,7 +91,7 @@ func (r *RawClient) Retrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ticketing/v1/tickets/%v",
@@ -140,7 +142,7 @@ func (r *RawClient) PartialUpdate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ticketing/v1/tickets/%v",
@@ -183,6 +185,53 @@ func (r *RawClient) PartialUpdate(
 	}, nil
 }
 
+func (r *RawClient) LiveSearchRetrieve(
+	ctx context.Context,
+	request *ticketing.TicketsLiveSearchRetrieveRequest,
+	opts ...option.RequestOption,
+) (*core.Response[io.Reader], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		r.baseURL,
+		"https://api.merge.dev/api",
+	)
+	endpointURL := baseURL + "/ticketing/v1/tickets/live-search"
+	queryParams, err := internal.QueryValues(request)
+	if err != nil {
+		return nil, err
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+	headers := internal.MergeHeaders(
+		r.options.ToHeader(),
+		options.ToHeader(),
+	)
+	response := bytes.NewBuffer(nil)
+	raw, err := r.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        response,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &core.Response[io.Reader]{
+		StatusCode: raw.StatusCode,
+		Header:     raw.Header,
+		Body:       response,
+	}, nil
+}
+
 func (r *RawClient) MetaPatchRetrieve(
 	ctx context.Context,
 	id string,
@@ -192,7 +241,7 @@ func (r *RawClient) MetaPatchRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ticketing/v1/tickets/meta/patch/%v",
@@ -235,7 +284,7 @@ func (r *RawClient) MetaPostRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ticketing/v1/tickets/meta/post"
 	queryParams, err := internal.QueryValues(request)

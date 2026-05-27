@@ -8,6 +8,7 @@ import (
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
 	ticketing "github.com/merge-api/merge-go-client/v2/ticketing"
+	io "io"
 	http "net/http"
 )
 
@@ -38,12 +39,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ticketing.TicketsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ticketing.Ticket], error) {
+) (*core.Page[*string, *ticketing.Ticket, *ticketing.PaginatedTicketList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ticketing/v1/tickets"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +74,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedTicketList) *core.PageResponse[*string, *ticketing.Ticket] {
+	readPageResponse := func(response *ticketing.PaginatedTicketList) *core.PageResponse[*string, *ticketing.Ticket, *ticketing.PaginatedTicketList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ticketing.Ticket]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ticketing.Ticket, *ticketing.PaginatedTicketList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -152,12 +154,12 @@ func (c *Client) ViewersList(
 	ticketId string,
 	request *ticketing.TicketsViewersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ticketing.Viewer], error) {
+) (*core.Page[*string, *ticketing.Viewer, *ticketing.PaginatedViewerList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ticketing/v1/tickets/%v/viewers",
@@ -190,14 +192,15 @@ func (c *Client) ViewersList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedViewerList) *core.PageResponse[*string, *ticketing.Viewer] {
+	readPageResponse := func(response *ticketing.PaginatedViewerList) *core.PageResponse[*string, *ticketing.Viewer, *ticketing.PaginatedViewerList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ticketing.Viewer]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ticketing.Viewer, *ticketing.PaginatedViewerList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -206,6 +209,23 @@ func (c *Client) ViewersList(
 		readPageResponse,
 	)
 	return pager.GetPage(ctx, request.Cursor)
+}
+
+// Returns a list of `Ticket` objects.
+func (c *Client) LiveSearchRetrieve(
+	ctx context.Context,
+	request *ticketing.TicketsLiveSearchRetrieveRequest,
+	opts ...option.RequestOption,
+) (io.Reader, error) {
+	response, err := c.WithRawResponse.LiveSearchRetrieve(
+		ctx,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
 }
 
 // Returns metadata for `Ticket` PATCHs.
@@ -247,12 +267,12 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *ticketing.TicketsRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ticketing.RemoteFieldClass], error) {
+) (*core.Page[*string, *ticketing.RemoteFieldClass, *ticketing.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ticketing/v1/tickets/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -282,14 +302,15 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ticketing.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *ticketing.RemoteFieldClass] {
+	readPageResponse := func(response *ticketing.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *ticketing.RemoteFieldClass, *ticketing.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ticketing.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ticketing.RemoteFieldClass, *ticketing.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

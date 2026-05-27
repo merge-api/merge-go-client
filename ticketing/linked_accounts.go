@@ -56,7 +56,7 @@ type LinkedAccountsListRequest struct {
 	IntegrationName *string `json:"-" url:"integration_name,omitempty"`
 	// If included, will only include test linked accounts. If not included, will only include non-test linked accounts.
 	IsTestAccount *string `json:"-" url:"is_test_account,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Filter by status. Options: `COMPLETE`, `IDLE`, `INCOMPLETE`, `RELINK_NEEDED`
 	Status *string `json:"-" url:"status,omitempty"`
@@ -207,19 +207,20 @@ func (l LinkedAccountsListRequestCategory) Ptr() *LinkedAccountsListRequestCateg
 // ### Usage Example
 // View a list of your organization's `LinkedAccount` objects.
 var (
-	accountDetailsAndActionsFieldId                      = big.NewInt(1 << 0)
-	accountDetailsAndActionsFieldCategory                = big.NewInt(1 << 1)
-	accountDetailsAndActionsFieldStatus                  = big.NewInt(1 << 2)
-	accountDetailsAndActionsFieldStatusDetail            = big.NewInt(1 << 3)
-	accountDetailsAndActionsFieldEndUserOriginId         = big.NewInt(1 << 4)
-	accountDetailsAndActionsFieldEndUserOrganizationName = big.NewInt(1 << 5)
-	accountDetailsAndActionsFieldEndUserEmailAddress     = big.NewInt(1 << 6)
-	accountDetailsAndActionsFieldSubdomain               = big.NewInt(1 << 7)
-	accountDetailsAndActionsFieldWebhookListenerUrl      = big.NewInt(1 << 8)
-	accountDetailsAndActionsFieldIsDuplicate             = big.NewInt(1 << 9)
-	accountDetailsAndActionsFieldIntegration             = big.NewInt(1 << 10)
-	accountDetailsAndActionsFieldAccountType             = big.NewInt(1 << 11)
-	accountDetailsAndActionsFieldCompletedAt             = big.NewInt(1 << 12)
+	accountDetailsAndActionsFieldId                        = big.NewInt(1 << 0)
+	accountDetailsAndActionsFieldCategory                  = big.NewInt(1 << 1)
+	accountDetailsAndActionsFieldStatus                    = big.NewInt(1 << 2)
+	accountDetailsAndActionsFieldStatusDetail              = big.NewInt(1 << 3)
+	accountDetailsAndActionsFieldEndUserOriginId           = big.NewInt(1 << 4)
+	accountDetailsAndActionsFieldEndUserOrganizationName   = big.NewInt(1 << 5)
+	accountDetailsAndActionsFieldEndUserEmailAddress       = big.NewInt(1 << 6)
+	accountDetailsAndActionsFieldSubdomain                 = big.NewInt(1 << 7)
+	accountDetailsAndActionsFieldWebhookListenerUrl        = big.NewInt(1 << 8)
+	accountDetailsAndActionsFieldIsDuplicate               = big.NewInt(1 << 9)
+	accountDetailsAndActionsFieldIntegration               = big.NewInt(1 << 10)
+	accountDetailsAndActionsFieldAccountType               = big.NewInt(1 << 11)
+	accountDetailsAndActionsFieldCompletedAt               = big.NewInt(1 << 12)
+	accountDetailsAndActionsFieldIntegrationSpecificFields = big.NewInt(1 << 13)
 )
 
 type AccountDetailsAndActions struct {
@@ -234,10 +235,11 @@ type AccountDetailsAndActions struct {
 	Subdomain          *string `json:"subdomain,omitempty" url:"subdomain,omitempty"`
 	WebhookListenerUrl string  `json:"webhook_listener_url" url:"webhook_listener_url"`
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
-	IsDuplicate *bool                                `json:"is_duplicate,omitempty" url:"is_duplicate,omitempty"`
-	Integration *AccountDetailsAndActionsIntegration `json:"integration,omitempty" url:"integration,omitempty"`
-	AccountType string                               `json:"account_type" url:"account_type"`
-	CompletedAt time.Time                            `json:"completed_at" url:"completed_at"`
+	IsDuplicate               *bool                                `json:"is_duplicate,omitempty" url:"is_duplicate,omitempty"`
+	Integration               *AccountDetailsAndActionsIntegration `json:"integration,omitempty" url:"integration,omitempty"`
+	AccountType               string                               `json:"account_type" url:"account_type"`
+	CompletedAt               time.Time                            `json:"completed_at" url:"completed_at"`
+	IntegrationSpecificFields map[string]interface{}               `json:"integration_specific_fields,omitempty" url:"integration_specific_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -335,6 +337,13 @@ func (a *AccountDetailsAndActions) GetCompletedAt() time.Time {
 		return time.Time{}
 	}
 	return a.CompletedAt
+}
+
+func (a *AccountDetailsAndActions) GetIntegrationSpecificFields() map[string]interface{} {
+	if a == nil {
+		return nil
+	}
+	return a.IntegrationSpecificFields
 }
 
 func (a *AccountDetailsAndActions) GetExtraProperties() map[string]interface{} {
@@ -437,6 +446,13 @@ func (a *AccountDetailsAndActions) SetAccountType(accountType string) {
 func (a *AccountDetailsAndActions) SetCompletedAt(completedAt time.Time) {
 	a.CompletedAt = completedAt
 	a.require(accountDetailsAndActionsFieldCompletedAt)
+}
+
+// SetIntegrationSpecificFields sets the IntegrationSpecificFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetailsAndActions) SetIntegrationSpecificFields(integrationSpecificFields map[string]interface{}) {
+	a.IntegrationSpecificFields = integrationSpecificFields
+	a.require(accountDetailsAndActionsFieldIntegrationSpecificFields)
 }
 
 func (a *AccountDetailsAndActions) UnmarshalJSON(data []byte) error {

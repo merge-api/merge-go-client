@@ -23,22 +23,19 @@ jobs:
       - name: Set up go
         uses: actions/setup-go@v4
 
-      - name: Start WireMock
-        run: docker compose -f wiremock/docker-compose.test.yml up -d
-
-      - name: Wait for WireMock
+      - name: Setup wiremock server
         run: |
-          timeout 30 bash -c 'until curl -f http://localhost:8080/__admin/health; do sleep 1; done'
+          if [ -f wiremock/docker-compose.test.yml ]; then docker compose -f wiremock/docker-compose.test.yml down && docker compose -f wiremock/docker-compose.test.yml up -d; fi
 
       - name: Test
-        run: go test ./...
         env:
           MERGE_API_KEY_FILESTORAGE: ${{ secrets.MERGE_API_KEY_FILESTORAGE }}
           MERGE_ACCOUNT_TOKEN_FILESTORAGE: ${{ secrets.MERGE_ACCOUNT_TOKEN_FILESTORAGE }}
           SDK_TESTING_KEY: ${{ secrets.SDK_TESTING_KEY }}
           SDK_TESTING_TICKETING_ACCOUNT_TOKEN: ${{ secrets.SDK_TESTING_TICKETING_ACCOUNT_TOKEN }}
           SDK_TESTING_HRIS_ACCOUNT_TOKEN: ${{ secrets.SDK_TESTING_HRIS_ACCOUNT_TOKEN }}
+        run: go test ./...
 
-      - name: Stop WireMock
-        if: always()
-        run: docker compose -f wiremock/docker-compose.test.yml down
+      - name: Teardown wiremock server
+        run: |
+          if [ -f wiremock/docker-compose.test.yml ]; then docker compose -f wiremock/docker-compose.test.yml down; fi

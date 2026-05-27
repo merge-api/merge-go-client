@@ -1815,6 +1815,7 @@ func (f *FolderPermissions) Accept(visitor FolderPermissionsVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", f)
 }
 
+// A single permission item that can be either a UUID reference or a full Permission object.
 type FolderPermissionsItem struct {
 	String     string
 	Permission *Permission
@@ -3056,14 +3057,16 @@ func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldReq
 // ### Usage Example
 // Fetch from the `GET Files` or `GET Folders` endpoint. Permissions are unexpanded by default. Use the query param `expand=permissions` to see more details.
 var (
-	permissionFieldId         = big.NewInt(1 << 0)
-	permissionFieldRemoteId   = big.NewInt(1 << 1)
-	permissionFieldCreatedAt  = big.NewInt(1 << 2)
-	permissionFieldModifiedAt = big.NewInt(1 << 3)
-	permissionFieldUser       = big.NewInt(1 << 4)
-	permissionFieldGroup      = big.NewInt(1 << 5)
-	permissionFieldType       = big.NewInt(1 << 6)
-	permissionFieldRoles      = big.NewInt(1 << 7)
+	permissionFieldId               = big.NewInt(1 << 0)
+	permissionFieldRemoteId         = big.NewInt(1 << 1)
+	permissionFieldCreatedAt        = big.NewInt(1 << 2)
+	permissionFieldModifiedAt       = big.NewInt(1 << 3)
+	permissionFieldUser             = big.NewInt(1 << 4)
+	permissionFieldGroup            = big.NewInt(1 << 5)
+	permissionFieldType             = big.NewInt(1 << 6)
+	permissionFieldRoles            = big.NewInt(1 << 7)
+	permissionFieldRemoteWasDeleted = big.NewInt(1 << 8)
+	permissionFieldFieldMappings    = big.NewInt(1 << 9)
 )
 
 type Permission struct {
@@ -3087,6 +3090,9 @@ type Permission struct {
 	Type *PermissionType `json:"type,omitempty" url:"type,omitempty"`
 	// The permissions that the user or group has for the File or Folder. It is possible for a user or group to have multiple roles, such as viewing & uploading. Possible values include: `READ`, `WRITE`, `OWNER`. In cases where there is no clear mapping, the original value passed through will be returned.
 	Roles []*PermissionRolesItem `json:"roles,omitempty" url:"roles,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -3149,6 +3155,20 @@ func (p *Permission) GetRoles() []*PermissionRolesItem {
 		return nil
 	}
 	return p.Roles
+}
+
+func (p *Permission) GetRemoteWasDeleted() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteWasDeleted
+}
+
+func (p *Permission) GetFieldMappings() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.FieldMappings
 }
 
 func (p *Permission) GetExtraProperties() map[string]interface{} {
@@ -3216,6 +3236,20 @@ func (p *Permission) SetType(type_ *PermissionType) {
 func (p *Permission) SetRoles(roles []*PermissionRolesItem) {
 	p.Roles = roles
 	p.require(permissionFieldRoles)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	p.RemoteWasDeleted = remoteWasDeleted
+	p.require(permissionFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetFieldMappings(fieldMappings map[string]interface{}) {
+	p.FieldMappings = fieldMappings
+	p.require(permissionFieldFieldMappings)
 }
 
 func (p *Permission) UnmarshalJSON(data []byte) error {
@@ -3994,7 +4028,8 @@ var (
 
 type RemoteData struct {
 	// The third-party API path that is being called.
-	Path string      `json:"path" url:"path"`
+	Path string `json:"path" url:"path"`
+	// The data returned from the third-party for this object in its original, unnormalized format.
 	Data interface{} `json:"data,omitempty" url:"data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted

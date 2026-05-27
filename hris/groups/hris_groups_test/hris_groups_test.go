@@ -157,3 +157,30 @@ func TestHrisGroupsRetrieveWithWireMock(
 	require.NoError(t, invocationErr, "Client method call should succeed")
 	VerifyRequestCount(t, "GET", "/hris/v1/groups/id", map[string]string{"include_remote_data": "true", "include_shell_data": "true", "remote_fields": "type", "show_enum_origins": "type"}, 1)
 }
+
+func TestHrisGroupsTypesListWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &hris.GroupsTypesListRequest{
+		IncludeDeletedData: merge.Bool(
+			true,
+		),
+		ShowEnumOrigins: merge.String(
+			"show_enum_origins",
+		),
+	}
+	_, invocationErr := client.Hris.Groups.TypesList(
+		context.TODO(),
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "GET", "/hris/v1/groups/types", map[string]string{"include_deleted_data": "true", "show_enum_origins": "show_enum_origins"}, 1)
+}

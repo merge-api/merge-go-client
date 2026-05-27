@@ -100,6 +100,9 @@ func TestTicketingFieldMappingFieldMappingsCreateWithWireMock(
 		ExcludeRemoteFieldMetadata: merge.Bool(
 			true,
 		),
+		RemoteDataIterationCount: merge.Int(
+			1,
+		),
 		TargetFieldName:        "example_target_field_name",
 		TargetFieldDescription: "this is a example description of the target field",
 		RemoteFieldTraversalPath: []any{
@@ -115,7 +118,7 @@ func TestTicketingFieldMappingFieldMappingsCreateWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "POST", "/ticketing/v1/field-mappings", map[string]string{"exclude_remote_field_metadata": "true"}, 1)
+	VerifyRequestCount(t, "POST", "/ticketing/v1/field-mappings", map[string]string{"exclude_remote_field_metadata": "true", "remote_data_iteration_count": "1"}, 1)
 }
 
 func TestTicketingFieldMappingFieldMappingsDestroyWithWireMock(
@@ -128,14 +131,12 @@ func TestTicketingFieldMappingFieldMappingsDestroyWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	response, invocationErr := client.Ticketing.FieldMapping.FieldMappingsDestroy(
+	_, invocationErr := client.Ticketing.FieldMapping.FieldMappingsDestroy(
 		context.TODO(),
 		"field_mapping_id",
 	)
 
-	// DELETE operations may return nil response body, which is acceptable
-	if invocationErr != nil && response == nil {
-		// This is expected for DELETE operations that return 204 No Content
+	if invocationErr != nil {
 		require.Contains(t, invocationErr.Error(), "but the server responded with nothing", "Expected empty response error")
 	} else {
 		require.NoError(t, invocationErr, "Client method call should succeed")
@@ -153,7 +154,11 @@ func TestTicketingFieldMappingFieldMappingsPartialUpdateWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	request := &ticketing.PatchedEditFieldMappingRequest{}
+	request := &ticketing.PatchedEditFieldMappingRequest{
+		RemoteDataIterationCount: merge.Int(
+			1,
+		),
+	}
 	_, invocationErr := client.Ticketing.FieldMapping.FieldMappingsPartialUpdate(
 		context.TODO(),
 		"field_mapping_id",
@@ -161,7 +166,7 @@ func TestTicketingFieldMappingFieldMappingsPartialUpdateWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "PATCH", "/ticketing/v1/field-mappings/field_mapping_id", nil, 1)
+	VerifyRequestCount(t, "PATCH", "/ticketing/v1/field-mappings/field_mapping_id", map[string]string{"remote_data_iteration_count": "1"}, 1)
 }
 
 func TestTicketingFieldMappingRemoteFieldsRetrieveWithWireMock(

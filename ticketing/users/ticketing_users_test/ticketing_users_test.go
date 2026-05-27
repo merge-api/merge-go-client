@@ -73,6 +73,9 @@ func TestTicketingUsersListWithWireMock(
 		),
 	)
 	request := &ticketing.UsersListRequest{
+		Collections: merge.String(
+			"collections",
+		),
 		CreatedAfter: merge.Time(
 			merge.MustParseDateTime(
 				"2024-01-15T09:30:00Z",
@@ -114,8 +117,14 @@ func TestTicketingUsersListWithWireMock(
 		RemoteId: merge.String(
 			"remote_id",
 		),
+		Roles: merge.String(
+			"roles",
+		),
 		Team: merge.String(
 			"team",
+		),
+		Teams: merge.String(
+			"teams",
 		),
 	}
 	_, invocationErr := client.Ticketing.Users.List(
@@ -124,7 +133,7 @@ func TestTicketingUsersListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/ticketing/v1/users", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "email_address": "email_address", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id", "team": "team"}, 1)
+	VerifyRequestCount(t, "GET", "/ticketing/v1/users", map[string]string{"collections": "collections", "created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "email_address": "email_address", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id", "roles": "roles", "team": "team", "teams": "teams"}, 1)
 }
 
 func TestTicketingUsersRetrieveWithWireMock(

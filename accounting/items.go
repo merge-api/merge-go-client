@@ -66,10 +66,11 @@ var (
 	itemsListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
 	itemsListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
 	itemsListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
-	itemsListRequestFieldPageSize           = big.NewInt(1 << 10)
-	itemsListRequestFieldRemoteFields       = big.NewInt(1 << 11)
-	itemsListRequestFieldRemoteId           = big.NewInt(1 << 12)
-	itemsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 13)
+	itemsListRequestFieldName               = big.NewInt(1 << 10)
+	itemsListRequestFieldPageSize           = big.NewInt(1 << 11)
+	itemsListRequestFieldRemoteFields       = big.NewInt(1 << 12)
+	itemsListRequestFieldRemoteId           = big.NewInt(1 << 13)
+	itemsListRequestFieldShowEnumOrigins    = big.NewInt(1 << 14)
 )
 
 type ItemsListRequest struct {
@@ -93,7 +94,9 @@ type ItemsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// If provided, will only return items with this name.
+	Name *string `json:"-" url:"name,omitempty"`
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
@@ -181,6 +184,13 @@ func (i *ItemsListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
 func (i *ItemsListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
 	i.ModifiedBefore = modifiedBefore
 	i.require(itemsListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *ItemsListRequest) SetName(name *string) {
+	i.Name = name
+	i.require(itemsListRequestFieldName)
 }
 
 // SetPageSize sets the PageSize field and marks it as non-optional;

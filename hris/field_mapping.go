@@ -17,6 +17,7 @@ var (
 	createFieldMappingRequestFieldRemoteMethod               = big.NewInt(1 << 4)
 	createFieldMappingRequestFieldRemoteUrlPath              = big.NewInt(1 << 5)
 	createFieldMappingRequestFieldCommonModelName            = big.NewInt(1 << 6)
+	createFieldMappingRequestFieldJmesPath                   = big.NewInt(1 << 7)
 )
 
 type CreateFieldMappingRequest struct {
@@ -34,6 +35,8 @@ type CreateFieldMappingRequest struct {
 	RemoteUrlPath string `json:"remote_url_path" url:"-"`
 	// The name of the Common Model that the remote field corresponds to in a given category.
 	CommonModelName string `json:"common_model_name" url:"-"`
+	// JMES path to specify json query expression to be used on field mapping.
+	JmesPath *string `json:"jmes_path,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -95,19 +98,32 @@ func (c *CreateFieldMappingRequest) SetCommonModelName(commonModelName string) {
 	c.require(createFieldMappingRequestFieldCommonModelName)
 }
 
+// SetJmesPath sets the JmesPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetJmesPath(jmesPath *string) {
+	c.JmesPath = jmesPath
+	c.require(createFieldMappingRequestFieldJmesPath)
+}
+
 var (
-	patchedEditFieldMappingRequestFieldRemoteFieldTraversalPath = big.NewInt(1 << 0)
-	patchedEditFieldMappingRequestFieldRemoteMethod             = big.NewInt(1 << 1)
-	patchedEditFieldMappingRequestFieldRemoteUrlPath            = big.NewInt(1 << 2)
+	patchedEditFieldMappingRequestFieldRemoteDataIterationCount = big.NewInt(1 << 0)
+	patchedEditFieldMappingRequestFieldRemoteFieldTraversalPath = big.NewInt(1 << 1)
+	patchedEditFieldMappingRequestFieldRemoteMethod             = big.NewInt(1 << 2)
+	patchedEditFieldMappingRequestFieldRemoteUrlPath            = big.NewInt(1 << 3)
+	patchedEditFieldMappingRequestFieldJmesPath                 = big.NewInt(1 << 4)
 )
 
 type PatchedEditFieldMappingRequest struct {
+	// Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+	RemoteDataIterationCount *int `json:"-" url:"remote_data_iteration_count,omitempty"`
 	// The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
 	RemoteFieldTraversalPath []interface{} `json:"remote_field_traversal_path,omitempty" url:"-"`
 	// The method of the remote endpoint where the remote field is coming from.
 	RemoteMethod *string `json:"remote_method,omitempty" url:"-"`
 	// The path of the remote endpoint where the remote field is coming from.
 	RemoteUrlPath *string `json:"remote_url_path,omitempty" url:"-"`
+	// JMES path to specify json query expression to be used on field mapping.
+	JmesPath *string `json:"jmes_path,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -118,6 +134,13 @@ func (p *PatchedEditFieldMappingRequest) require(field *big.Int) {
 		p.explicitFields = big.NewInt(0)
 	}
 	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteDataIterationCount sets the RemoteDataIterationCount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetRemoteDataIterationCount(remoteDataIterationCount *int) {
+	p.RemoteDataIterationCount = remoteDataIterationCount
+	p.require(patchedEditFieldMappingRequestFieldRemoteDataIterationCount)
 }
 
 // SetRemoteFieldTraversalPath sets the RemoteFieldTraversalPath field and marks it as non-optional;
@@ -139,6 +162,13 @@ func (p *PatchedEditFieldMappingRequest) SetRemoteMethod(remoteMethod *string) {
 func (p *PatchedEditFieldMappingRequest) SetRemoteUrlPath(remoteUrlPath *string) {
 	p.RemoteUrlPath = remoteUrlPath
 	p.require(patchedEditFieldMappingRequestFieldRemoteUrlPath)
+}
+
+// SetJmesPath sets the JmesPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetJmesPath(jmesPath *string) {
+	p.JmesPath = jmesPath
+	p.require(patchedEditFieldMappingRequestFieldJmesPath)
 }
 
 var (
@@ -794,6 +824,7 @@ var (
 	fieldMappingApiInstanceFieldIsIntegrationWide = big.NewInt(1 << 1)
 	fieldMappingApiInstanceFieldTargetField       = big.NewInt(1 << 2)
 	fieldMappingApiInstanceFieldRemoteField       = big.NewInt(1 << 3)
+	fieldMappingApiInstanceFieldJmesPath          = big.NewInt(1 << 4)
 )
 
 type FieldMappingApiInstance struct {
@@ -801,6 +832,7 @@ type FieldMappingApiInstance struct {
 	IsIntegrationWide *bool                               `json:"is_integration_wide,omitempty" url:"is_integration_wide,omitempty"`
 	TargetField       *FieldMappingApiInstanceTargetField `json:"target_field,omitempty" url:"target_field,omitempty"`
 	RemoteField       *FieldMappingApiInstanceRemoteField `json:"remote_field,omitempty" url:"remote_field,omitempty"`
+	JmesPath          *string                             `json:"jmes_path,omitempty" url:"jmes_path,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -835,6 +867,13 @@ func (f *FieldMappingApiInstance) GetRemoteField() *FieldMappingApiInstanceRemot
 		return nil
 	}
 	return f.RemoteField
+}
+
+func (f *FieldMappingApiInstance) GetJmesPath() *string {
+	if f == nil {
+		return nil
+	}
+	return f.JmesPath
 }
 
 func (f *FieldMappingApiInstance) GetExtraProperties() map[string]interface{} {
@@ -874,6 +913,13 @@ func (f *FieldMappingApiInstance) SetTargetField(targetField *FieldMappingApiIns
 func (f *FieldMappingApiInstance) SetRemoteField(remoteField *FieldMappingApiInstanceRemoteField) {
 	f.RemoteField = remoteField
 	f.require(fieldMappingApiInstanceFieldRemoteField)
+}
+
+// SetJmesPath sets the JmesPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetJmesPath(jmesPath *string) {
+	f.JmesPath = jmesPath
+	f.require(fieldMappingApiInstanceFieldJmesPath)
 }
 
 func (f *FieldMappingApiInstance) UnmarshalJSON(data []byte) error {

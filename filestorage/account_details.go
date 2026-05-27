@@ -23,6 +23,8 @@ var (
 	accountDetailsFieldIsDuplicate             = big.NewInt(1 << 9)
 	accountDetailsFieldAccountType             = big.NewInt(1 << 10)
 	accountDetailsFieldCompletedAt             = big.NewInt(1 << 11)
+	accountDetailsFieldInstanceId              = big.NewInt(1 << 12)
+	accountDetailsFieldInstanceDisplayValue    = big.NewInt(1 << 13)
 )
 
 type AccountDetails struct {
@@ -39,7 +41,9 @@ type AccountDetails struct {
 	IsDuplicate *bool   `json:"is_duplicate,omitempty" url:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty" url:"account_type,omitempty"`
 	// The time at which account completes the linking flow.
-	CompletedAt *time.Time `json:"completed_at,omitempty" url:"completed_at,omitempty"`
+	CompletedAt          *time.Time `json:"completed_at,omitempty" url:"completed_at,omitempty"`
+	InstanceId           *string    `json:"instance_id,omitempty" url:"instance_id,omitempty"`
+	InstanceDisplayValue *string    `json:"instance_display_value,omitempty" url:"instance_display_value,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -130,6 +134,20 @@ func (a *AccountDetails) GetCompletedAt() *time.Time {
 		return nil
 	}
 	return a.CompletedAt
+}
+
+func (a *AccountDetails) GetInstanceId() *string {
+	if a == nil {
+		return nil
+	}
+	return a.InstanceId
+}
+
+func (a *AccountDetails) GetInstanceDisplayValue() *string {
+	if a == nil {
+		return nil
+	}
+	return a.InstanceDisplayValue
 }
 
 func (a *AccountDetails) GetExtraProperties() map[string]interface{} {
@@ -225,6 +243,20 @@ func (a *AccountDetails) SetAccountType(accountType *string) {
 func (a *AccountDetails) SetCompletedAt(completedAt *time.Time) {
 	a.CompletedAt = completedAt
 	a.require(accountDetailsFieldCompletedAt)
+}
+
+// SetInstanceId sets the InstanceId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetInstanceId(instanceId *string) {
+	a.InstanceId = instanceId
+	a.require(accountDetailsFieldInstanceId)
+}
+
+// SetInstanceDisplayValue sets the InstanceDisplayValue field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetInstanceDisplayValue(instanceDisplayValue *string) {
+	a.InstanceDisplayValue = instanceDisplayValue
+	a.require(accountDetailsFieldInstanceDisplayValue)
 }
 
 func (a *AccountDetails) UnmarshalJSON(data []byte) error {

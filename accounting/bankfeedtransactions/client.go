@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.BankFeedTransactionsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.BankFeedTransaction], error) {
+) (*core.Page[*string, *accounting.BankFeedTransaction, *accounting.PaginatedBankFeedTransactionList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/bank-feed-transactions"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedBankFeedTransactionList) *core.PageResponse[*string, *accounting.BankFeedTransaction] {
+	readPageResponse := func(response *accounting.PaginatedBankFeedTransactionList) *core.PageResponse[*string, *accounting.BankFeedTransaction, *accounting.PaginatedBankFeedTransactionList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.BankFeedTransaction]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.BankFeedTransaction, *accounting.PaginatedBankFeedTransactionList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

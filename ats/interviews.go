@@ -111,7 +111,7 @@ type InterviewsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return interviews organized by this user.
 	OrganizerId *string `json:"-" url:"organizer_id,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`

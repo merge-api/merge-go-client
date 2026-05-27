@@ -84,13 +84,14 @@ var (
 	ticketsListRequestFieldRemoteCreatedBefore = big.NewInt(1 << 25)
 	ticketsListRequestFieldRemoteFields        = big.NewInt(1 << 26)
 	ticketsListRequestFieldRemoteId            = big.NewInt(1 << 27)
-	ticketsListRequestFieldRemoteUpdatedAfter  = big.NewInt(1 << 28)
-	ticketsListRequestFieldRemoteUpdatedBefore = big.NewInt(1 << 29)
-	ticketsListRequestFieldShowEnumOrigins     = big.NewInt(1 << 30)
-	ticketsListRequestFieldStatus              = big.NewInt(1 << 31)
-	ticketsListRequestFieldTags                = big.NewInt(1 << 32)
-	ticketsListRequestFieldTicketType          = big.NewInt(1 << 33)
-	ticketsListRequestFieldTicketUrl           = big.NewInt(1 << 34)
+	ticketsListRequestFieldRemoteIds           = big.NewInt(1 << 28)
+	ticketsListRequestFieldRemoteUpdatedAfter  = big.NewInt(1 << 29)
+	ticketsListRequestFieldRemoteUpdatedBefore = big.NewInt(1 << 30)
+	ticketsListRequestFieldShowEnumOrigins     = big.NewInt(1 << 31)
+	ticketsListRequestFieldStatus              = big.NewInt(1 << 32)
+	ticketsListRequestFieldTags                = big.NewInt(1 << 33)
+	ticketsListRequestFieldTicketType          = big.NewInt(1 << 34)
+	ticketsListRequestFieldTicketUrl           = big.NewInt(1 << 35)
 )
 
 type TicketsListRequest struct {
@@ -136,7 +137,7 @@ type TicketsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return tickets with this name.
 	Name *string `json:"-" url:"name,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If provided, will only return sub tickets of the parent_ticket_id.
 	ParentTicketId *string `json:"-" url:"parent_ticket_id,omitempty"`
@@ -155,6 +156,8 @@ type TicketsListRequest struct {
 	RemoteFields *TicketsListRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+	// If provided, will only return tickets with these remote IDs (comma-separated).
+	RemoteIds *string `json:"-" url:"remote_ids,omitempty"`
 	// If provided, will only return tickets updated in the third party platform after this datetime.
 	RemoteUpdatedAfter *time.Time `json:"-" url:"remote_updated_after,omitempty"`
 	// If provided, will only return tickets updated in the third party platform before this datetime.
@@ -377,6 +380,13 @@ func (t *TicketsListRequest) SetRemoteId(remoteId *string) {
 	t.require(ticketsListRequestFieldRemoteId)
 }
 
+// SetRemoteIds sets the RemoteIds field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsListRequest) SetRemoteIds(remoteIds *string) {
+	t.RemoteIds = remoteIds
+	t.require(ticketsListRequestFieldRemoteIds)
+}
+
 // SetRemoteUpdatedAfter sets the RemoteUpdatedAfter field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (t *TicketsListRequest) SetRemoteUpdatedAfter(remoteUpdatedAfter *time.Time) {
@@ -424,6 +434,152 @@ func (t *TicketsListRequest) SetTicketType(ticketType *string) {
 func (t *TicketsListRequest) SetTicketUrl(ticketUrl *string) {
 	t.TicketUrl = ticketUrl
 	t.require(ticketsListRequestFieldTicketUrl)
+}
+
+var (
+	ticketsLiveSearchRetrieveRequestFieldAssigneeIds         = big.NewInt(1 << 0)
+	ticketsLiveSearchRetrieveRequestFieldAssignees           = big.NewInt(1 << 1)
+	ticketsLiveSearchRetrieveRequestFieldCollectionIds       = big.NewInt(1 << 2)
+	ticketsLiveSearchRetrieveRequestFieldCollections         = big.NewInt(1 << 3)
+	ticketsLiveSearchRetrieveRequestFieldIncludeDeletedData  = big.NewInt(1 << 4)
+	ticketsLiveSearchRetrieveRequestFieldIncludeRemoteFields = big.NewInt(1 << 5)
+	ticketsLiveSearchRetrieveRequestFieldIncludeShellData    = big.NewInt(1 << 6)
+	ticketsLiveSearchRetrieveRequestFieldName                = big.NewInt(1 << 7)
+	ticketsLiveSearchRetrieveRequestFieldRemoteCursor        = big.NewInt(1 << 8)
+	ticketsLiveSearchRetrieveRequestFieldRemoteFields        = big.NewInt(1 << 9)
+	ticketsLiveSearchRetrieveRequestFieldShowEnumOrigins     = big.NewInt(1 << 10)
+	ticketsLiveSearchRetrieveRequestFieldStatus              = big.NewInt(1 << 11)
+	ticketsLiveSearchRetrieveRequestFieldTicketUrl           = big.NewInt(1 << 12)
+)
+
+type TicketsLiveSearchRetrieveRequest struct {
+	// Filter tickets by assignee IDs (comma-separated)
+	AssigneeIds *string `json:"-" url:"assignee_ids,omitempty"`
+	// Filter tickets by assignee names (comma-separated)
+	Assignees *string `json:"-" url:"assignees,omitempty"`
+	// Filter tickets by collection IDs (comma-separated)
+	CollectionIds *string `json:"-" url:"collection_ids,omitempty"`
+	// Filter tickets by collection names (comma-separated)
+	Collections *string `json:"-" url:"collections,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	IncludeDeletedData *bool `json:"-" url:"include_deleted_data,omitempty"`
+	// Whether to include all remote fields, including fields that Merge did not map to common models, in a normalized format.
+	IncludeRemoteFields *bool `json:"-" url:"include_remote_fields,omitempty"`
+	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
+	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
+	// Filter tickets by name/title
+	Name *string `json:"-" url:"name,omitempty"`
+	// Pagination cursor for remote data
+	RemoteCursor *string `json:"-" url:"remote_cursor,omitempty"`
+	// Deprecated. Use show_enum_origins.
+	RemoteFields *TicketsLiveSearchRetrieveRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
+	// A comma separated list of enum field names for which you'd like the original values to be returned, instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins-query-parameter)
+	ShowEnumOrigins *TicketsLiveSearchRetrieveRequestShowEnumOrigins `json:"-" url:"show_enum_origins,omitempty"`
+	// Filter tickets by status
+	Status *string `json:"-" url:"status,omitempty"`
+	// Filter tickets by URL
+	TicketUrl *string `json:"-" url:"ticket_url,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (t *TicketsLiveSearchRetrieveRequest) require(field *big.Int) {
+	if t.explicitFields == nil {
+		t.explicitFields = big.NewInt(0)
+	}
+	t.explicitFields.Or(t.explicitFields, field)
+}
+
+// SetAssigneeIds sets the AssigneeIds field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetAssigneeIds(assigneeIds *string) {
+	t.AssigneeIds = assigneeIds
+	t.require(ticketsLiveSearchRetrieveRequestFieldAssigneeIds)
+}
+
+// SetAssignees sets the Assignees field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetAssignees(assignees *string) {
+	t.Assignees = assignees
+	t.require(ticketsLiveSearchRetrieveRequestFieldAssignees)
+}
+
+// SetCollectionIds sets the CollectionIds field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetCollectionIds(collectionIds *string) {
+	t.CollectionIds = collectionIds
+	t.require(ticketsLiveSearchRetrieveRequestFieldCollectionIds)
+}
+
+// SetCollections sets the Collections field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetCollections(collections *string) {
+	t.Collections = collections
+	t.require(ticketsLiveSearchRetrieveRequestFieldCollections)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	t.IncludeDeletedData = includeDeletedData
+	t.require(ticketsLiveSearchRetrieveRequestFieldIncludeDeletedData)
+}
+
+// SetIncludeRemoteFields sets the IncludeRemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetIncludeRemoteFields(includeRemoteFields *bool) {
+	t.IncludeRemoteFields = includeRemoteFields
+	t.require(ticketsLiveSearchRetrieveRequestFieldIncludeRemoteFields)
+}
+
+// SetIncludeShellData sets the IncludeShellData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetIncludeShellData(includeShellData *bool) {
+	t.IncludeShellData = includeShellData
+	t.require(ticketsLiveSearchRetrieveRequestFieldIncludeShellData)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetName(name *string) {
+	t.Name = name
+	t.require(ticketsLiveSearchRetrieveRequestFieldName)
+}
+
+// SetRemoteCursor sets the RemoteCursor field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetRemoteCursor(remoteCursor *string) {
+	t.RemoteCursor = remoteCursor
+	t.require(ticketsLiveSearchRetrieveRequestFieldRemoteCursor)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetRemoteFields(remoteFields *TicketsLiveSearchRetrieveRequestRemoteFields) {
+	t.RemoteFields = remoteFields
+	t.require(ticketsLiveSearchRetrieveRequestFieldRemoteFields)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *TicketsLiveSearchRetrieveRequestShowEnumOrigins) {
+	t.ShowEnumOrigins = showEnumOrigins
+	t.require(ticketsLiveSearchRetrieveRequestFieldShowEnumOrigins)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetStatus(status *string) {
+	t.Status = status
+	t.require(ticketsLiveSearchRetrieveRequestFieldStatus)
+}
+
+// SetTicketUrl sets the TicketUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TicketsLiveSearchRetrieveRequest) SetTicketUrl(ticketUrl *string) {
+	t.TicketUrl = ticketUrl
+	t.require(ticketsLiveSearchRetrieveRequestFieldTicketUrl)
 }
 
 var (
@@ -533,7 +689,7 @@ type TicketsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -690,6 +846,7 @@ const (
 	TicketsListRequestExpandItemContact       TicketsListRequestExpandItem = "contact"
 	TicketsListRequestExpandItemCreator       TicketsListRequestExpandItem = "creator"
 	TicketsListRequestExpandItemParentTicket  TicketsListRequestExpandItem = "parent_ticket"
+	TicketsListRequestExpandItemPermissions   TicketsListRequestExpandItem = "permissions"
 )
 
 func NewTicketsListRequestExpandItemFromString(s string) (TicketsListRequestExpandItem, error) {
@@ -710,6 +867,8 @@ func NewTicketsListRequestExpandItemFromString(s string) (TicketsListRequestExpa
 		return TicketsListRequestExpandItemCreator, nil
 	case "parent_ticket":
 		return TicketsListRequestExpandItemParentTicket, nil
+	case "permissions":
+		return TicketsListRequestExpandItemPermissions, nil
 	}
 	var t TicketsListRequestExpandItem
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -852,6 +1011,80 @@ func (t TicketsListRequestStatus) Ptr() *TicketsListRequestStatus {
 	return &t
 }
 
+type TicketsLiveSearchRetrieveRequestRemoteFields string
+
+const (
+	TicketsLiveSearchRetrieveRequestRemoteFieldsPriority                 TicketsLiveSearchRetrieveRequestRemoteFields = "priority"
+	TicketsLiveSearchRetrieveRequestRemoteFieldsPriorityStatus           TicketsLiveSearchRetrieveRequestRemoteFields = "priority,status"
+	TicketsLiveSearchRetrieveRequestRemoteFieldsPriorityStatusTicketType TicketsLiveSearchRetrieveRequestRemoteFields = "priority,status,ticket_type"
+	TicketsLiveSearchRetrieveRequestRemoteFieldsPriorityTicketType       TicketsLiveSearchRetrieveRequestRemoteFields = "priority,ticket_type"
+	TicketsLiveSearchRetrieveRequestRemoteFieldsStatus                   TicketsLiveSearchRetrieveRequestRemoteFields = "status"
+	TicketsLiveSearchRetrieveRequestRemoteFieldsStatusTicketType         TicketsLiveSearchRetrieveRequestRemoteFields = "status,ticket_type"
+	TicketsLiveSearchRetrieveRequestRemoteFieldsTicketType               TicketsLiveSearchRetrieveRequestRemoteFields = "ticket_type"
+)
+
+func NewTicketsLiveSearchRetrieveRequestRemoteFieldsFromString(s string) (TicketsLiveSearchRetrieveRequestRemoteFields, error) {
+	switch s {
+	case "priority":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsPriority, nil
+	case "priority,status":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsPriorityStatus, nil
+	case "priority,status,ticket_type":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsPriorityStatusTicketType, nil
+	case "priority,ticket_type":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsPriorityTicketType, nil
+	case "status":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsStatus, nil
+	case "status,ticket_type":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsStatusTicketType, nil
+	case "ticket_type":
+		return TicketsLiveSearchRetrieveRequestRemoteFieldsTicketType, nil
+	}
+	var t TicketsLiveSearchRetrieveRequestRemoteFields
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsLiveSearchRetrieveRequestRemoteFields) Ptr() *TicketsLiveSearchRetrieveRequestRemoteFields {
+	return &t
+}
+
+type TicketsLiveSearchRetrieveRequestShowEnumOrigins string
+
+const (
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsPriority                 TicketsLiveSearchRetrieveRequestShowEnumOrigins = "priority"
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsPriorityStatus           TicketsLiveSearchRetrieveRequestShowEnumOrigins = "priority,status"
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsPriorityStatusTicketType TicketsLiveSearchRetrieveRequestShowEnumOrigins = "priority,status,ticket_type"
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsPriorityTicketType       TicketsLiveSearchRetrieveRequestShowEnumOrigins = "priority,ticket_type"
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsStatus                   TicketsLiveSearchRetrieveRequestShowEnumOrigins = "status"
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsStatusTicketType         TicketsLiveSearchRetrieveRequestShowEnumOrigins = "status,ticket_type"
+	TicketsLiveSearchRetrieveRequestShowEnumOriginsTicketType               TicketsLiveSearchRetrieveRequestShowEnumOrigins = "ticket_type"
+)
+
+func NewTicketsLiveSearchRetrieveRequestShowEnumOriginsFromString(s string) (TicketsLiveSearchRetrieveRequestShowEnumOrigins, error) {
+	switch s {
+	case "priority":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsPriority, nil
+	case "priority,status":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsPriorityStatus, nil
+	case "priority,status,ticket_type":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsPriorityStatusTicketType, nil
+	case "priority,ticket_type":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsPriorityTicketType, nil
+	case "status":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsStatus, nil
+	case "status,ticket_type":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsStatusTicketType, nil
+	case "ticket_type":
+		return TicketsLiveSearchRetrieveRequestShowEnumOriginsTicketType, nil
+	}
+	var t TicketsLiveSearchRetrieveRequestShowEnumOrigins
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TicketsLiveSearchRetrieveRequestShowEnumOrigins) Ptr() *TicketsLiveSearchRetrieveRequestShowEnumOrigins {
+	return &t
+}
+
 type TicketsRetrieveRequestExpandItem string
 
 const (
@@ -863,6 +1096,7 @@ const (
 	TicketsRetrieveRequestExpandItemContact       TicketsRetrieveRequestExpandItem = "contact"
 	TicketsRetrieveRequestExpandItemCreator       TicketsRetrieveRequestExpandItem = "creator"
 	TicketsRetrieveRequestExpandItemParentTicket  TicketsRetrieveRequestExpandItem = "parent_ticket"
+	TicketsRetrieveRequestExpandItemPermissions   TicketsRetrieveRequestExpandItem = "permissions"
 )
 
 func NewTicketsRetrieveRequestExpandItemFromString(s string) (TicketsRetrieveRequestExpandItem, error) {
@@ -883,6 +1117,8 @@ func NewTicketsRetrieveRequestExpandItemFromString(s string) (TicketsRetrieveReq
 		return TicketsRetrieveRequestExpandItemCreator, nil
 	case "parent_ticket":
 		return TicketsRetrieveRequestExpandItemParentTicket, nil
+	case "permissions":
+		return TicketsRetrieveRequestExpandItemPermissions, nil
 	}
 	var t TicketsRetrieveRequestExpandItem
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -3258,7 +3494,7 @@ type TicketsViewersListRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted

@@ -118,7 +118,7 @@ func TestTicketing_Collections_List(t *testing.T) {
 func TestTicketing_Collections_ListExpandParentCollection(t *testing.T) {
 	c := newTicketingClient(t)
 	response, err := c.Ticketing.Collections.List(context.Background(), &ticketing.CollectionsListRequest{
-		Expand: []*string{strPtr("parent_collection")},
+		Expand: []*ticketing.CollectionsListRequestExpandItem{ticketing.CollectionsListRequestExpandItemParentCollection.Ptr()},
 	})
 	require.NoError(t, err)
 	assert.NotNil(t, response)
@@ -128,7 +128,7 @@ func TestTicketing_Collections_ListExpandParentCollection(t *testing.T) {
 func TestTicketing_Collections_ListExpandPermissions(t *testing.T) {
 	c := newTicketingClient(t)
 	response, err := c.Ticketing.Collections.List(context.Background(), &ticketing.CollectionsListRequest{
-		Expand: []*string{strPtr("permissions")},
+		Expand: []*ticketing.CollectionsListRequestExpandItem{ticketing.CollectionsListRequestExpandItemPermissions.Ptr()},
 	})
 	require.NoError(t, err)
 	assert.NotNil(t, response)

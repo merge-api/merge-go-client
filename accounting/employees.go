@@ -7,18 +7,31 @@ import (
 	fmt "fmt"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	big "math/big"
+	time "time"
 )
 
 var (
-	employeesListRequestFieldCursor             = big.NewInt(1 << 0)
-	employeesListRequestFieldExpand             = big.NewInt(1 << 1)
-	employeesListRequestFieldIncludeDeletedData = big.NewInt(1 << 2)
-	employeesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 3)
-	employeesListRequestFieldIncludeShellData   = big.NewInt(1 << 4)
-	employeesListRequestFieldPageSize           = big.NewInt(1 << 5)
+	employeesListRequestFieldCompanyId          = big.NewInt(1 << 0)
+	employeesListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	employeesListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	employeesListRequestFieldCursor             = big.NewInt(1 << 3)
+	employeesListRequestFieldExpand             = big.NewInt(1 << 4)
+	employeesListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
+	employeesListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
+	employeesListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
+	employeesListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	employeesListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	employeesListRequestFieldPageSize           = big.NewInt(1 << 10)
+	employeesListRequestFieldRemoteId           = big.NewInt(1 << 11)
 )
 
 type EmployeesListRequest struct {
+	// If provided, will only return employees for this company.
+	CompanyId *string `json:"-" url:"company_id,omitempty"`
+	// If provided, will only return objects created after this datetime.
+	CreatedAfter *time.Time `json:"-" url:"created_after,omitempty"`
+	// If provided, will only return objects created before this datetime.
+	CreatedBefore *time.Time `json:"-" url:"created_before,omitempty"`
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
@@ -29,8 +42,14 @@ type EmployeesListRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// Number of results to return per page.
+	// If provided, only objects synced by Merge after this date time will be returned.
+	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
+	// If provided, only objects synced by Merge before this date time will be returned.
+	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
+	// The API provider's ID for the given object.
+	RemoteId *string `json:"-" url:"remote_id,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -41,6 +60,27 @@ func (e *EmployeesListRequest) require(field *big.Int) {
 		e.explicitFields = big.NewInt(0)
 	}
 	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetCompanyId sets the CompanyId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCompanyId(companyId *string) {
+	e.CompanyId = companyId
+	e.require(employeesListRequestFieldCompanyId)
+}
+
+// SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCreatedAfter(createdAfter *time.Time) {
+	e.CreatedAfter = createdAfter
+	e.require(employeesListRequestFieldCreatedAfter)
+}
+
+// SetCreatedBefore sets the CreatedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetCreatedBefore(createdBefore *time.Time) {
+	e.CreatedBefore = createdBefore
+	e.require(employeesListRequestFieldCreatedBefore)
 }
 
 // SetCursor sets the Cursor field and marks it as non-optional;
@@ -78,11 +118,32 @@ func (e *EmployeesListRequest) SetIncludeShellData(includeShellData *bool) {
 	e.require(employeesListRequestFieldIncludeShellData)
 }
 
+// SetModifiedAfter sets the ModifiedAfter field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
+	e.ModifiedAfter = modifiedAfter
+	e.require(employeesListRequestFieldModifiedAfter)
+}
+
+// SetModifiedBefore sets the ModifiedBefore field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
+	e.ModifiedBefore = modifiedBefore
+	e.require(employeesListRequestFieldModifiedBefore)
+}
+
 // SetPageSize sets the PageSize field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (e *EmployeesListRequest) SetPageSize(pageSize *int) {
 	e.PageSize = pageSize
 	e.require(employeesListRequestFieldPageSize)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EmployeesListRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(employeesListRequestFieldRemoteId)
 }
 
 var (

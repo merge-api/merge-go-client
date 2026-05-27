@@ -199,6 +199,54 @@ func TestAccountingContactsRetrieveWithWireMock(
 	VerifyRequestCount(t, "GET", "/accounting/v1/contacts/id", map[string]string{"include_remote_data": "true", "include_remote_fields": "true", "include_shell_data": "true", "remote_fields": "status", "show_enum_origins": "status"}, 1)
 }
 
+func TestAccountingContactsPartialUpdateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.PatchedContactEndpointRequest{
+		IsDebugMode: merge.Bool(
+			true,
+		),
+		RunAsync: merge.Bool(
+			true,
+		),
+		Model: &accounting.PatchedContactRequest{},
+	}
+	_, invocationErr := client.Accounting.Contacts.PartialUpdate(
+		context.TODO(),
+		"id",
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "PATCH", "/accounting/v1/contacts/id", map[string]string{"is_debug_mode": "true", "run_async": "true"}, 1)
+}
+
+func TestAccountingContactsMetaPatchRetrieveWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	_, invocationErr := client.Accounting.Contacts.MetaPatchRetrieve(
+		context.TODO(),
+		"id",
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "GET", "/accounting/v1/contacts/meta/patch/id", nil, 1)
+}
+
 func TestAccountingContactsMetaPostRetrieveWithWireMock(
 	t *testing.T,
 ) {
