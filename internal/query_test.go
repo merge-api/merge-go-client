@@ -237,5 +237,3 @@ func TestQueryValues(t *testing.T) {
 		assert.Equal(t, "metadata%5Binner%5D=one&metadata%5Binner%5D=two&metadata%5Binner%5D=three", values.Encode())
 	})
 }
-
-}

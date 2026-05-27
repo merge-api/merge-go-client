@@ -16,6 +16,7 @@ integration/datetime_filters_test.go
 .fern/replay.lock
 .fern/replay.yml
 .gitattributes
+.github/workflows/ci.yml
 accounting/fieldmapping/accounting_field_mapping_test/accounting_field_mapping_test.go
 ats/fieldmapping/ats_field_mapping_test/ats_field_mapping_test.go
 crm/fieldmapping/crm_field_mapping_test/crm_field_mapping_test.go
