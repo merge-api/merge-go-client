@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.IssuesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.Issue], error) {
+) (*core.Page[*string, *accounting.Issue, *accounting.PaginatedIssueList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/issues"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedIssueList) *core.PageResponse[*string, *accounting.Issue] {
+	readPageResponse := func(response *accounting.PaginatedIssueList) *core.PageResponse[*string, *accounting.Issue, *accounting.PaginatedIssueList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.Issue]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.Issue, *accounting.PaginatedIssueList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

@@ -39,7 +39,7 @@ func (r *RawClient) Create(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/employees"
 	queryParams, err := internal.QueryValues(request)
@@ -89,7 +89,7 @@ func (r *RawClient) Retrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/hris/v1/employees/%v",
@@ -140,7 +140,7 @@ func (r *RawClient) IgnoreCreate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/hris/v1/employees/ignore/%v",
@@ -181,7 +181,7 @@ func (r *RawClient) MetaPostRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/employees/meta/post"
 	headers := internal.MergeHeaders(

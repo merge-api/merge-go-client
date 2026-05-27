@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *hris.PayGroupsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *hris.PayGroup], error) {
+) (*core.Page[*string, *hris.PayGroup, *hris.PaginatedPayGroupList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/pay-groups"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *hris.PaginatedPayGroupList) *core.PageResponse[*string, *hris.PayGroup] {
+	readPageResponse := func(response *hris.PaginatedPayGroupList) *core.PageResponse[*string, *hris.PayGroup, *hris.PaginatedPayGroupList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *hris.PayGroup]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *hris.PayGroup, *hris.PaginatedPayGroupList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

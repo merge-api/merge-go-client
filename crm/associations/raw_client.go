@@ -44,7 +44,7 @@ func (r *RawClient) CustomObjectClassesCustomObjectsAssociationsUpdate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/crm/v1/custom-object-classes/%v/custom-objects/%v/associations/%v/%v/%v",

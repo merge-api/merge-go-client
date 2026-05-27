@@ -46,7 +46,7 @@ type BenefitsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -210,8 +210,8 @@ var (
 	benefitFieldCompanyContribution  = big.NewInt(1 << 8)
 	benefitFieldStartDate            = big.NewInt(1 << 9)
 	benefitFieldEndDate              = big.NewInt(1 << 10)
-	benefitFieldRemoteWasDeleted     = big.NewInt(1 << 11)
-	benefitFieldEmployerBenefit      = big.NewInt(1 << 12)
+	benefitFieldEmployerBenefit      = big.NewInt(1 << 11)
+	benefitFieldRemoteWasDeleted     = big.NewInt(1 << 12)
 	benefitFieldFieldMappings        = big.NewInt(1 << 13)
 	benefitFieldRemoteData           = big.NewInt(1 << 14)
 )
@@ -238,12 +238,12 @@ type Benefit struct {
 	StartDate *time.Time `json:"start_date,omitempty" url:"start_date,omitempty"`
 	// The day and time the benefit ended.
 	EndDate *time.Time `json:"end_date,omitempty" url:"end_date,omitempty"`
-	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
-	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	// The employer benefit plan the employee is enrolled in.
-	EmployerBenefit *string                `json:"employer_benefit,omitempty" url:"employer_benefit,omitempty"`
-	FieldMappings   map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
-	RemoteData      []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+	EmployerBenefit *string `json:"employer_benefit,omitempty" url:"employer_benefit,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -329,18 +329,18 @@ func (b *Benefit) GetEndDate() *time.Time {
 	return b.EndDate
 }
 
-func (b *Benefit) GetRemoteWasDeleted() *bool {
-	if b == nil {
-		return nil
-	}
-	return b.RemoteWasDeleted
-}
-
 func (b *Benefit) GetEmployerBenefit() *string {
 	if b == nil {
 		return nil
 	}
 	return b.EmployerBenefit
+}
+
+func (b *Benefit) GetRemoteWasDeleted() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.RemoteWasDeleted
 }
 
 func (b *Benefit) GetFieldMappings() map[string]interface{} {
@@ -445,18 +445,18 @@ func (b *Benefit) SetEndDate(endDate *time.Time) {
 	b.require(benefitFieldEndDate)
 }
 
-// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (b *Benefit) SetRemoteWasDeleted(remoteWasDeleted *bool) {
-	b.RemoteWasDeleted = remoteWasDeleted
-	b.require(benefitFieldRemoteWasDeleted)
-}
-
 // SetEmployerBenefit sets the EmployerBenefit field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (b *Benefit) SetEmployerBenefit(employerBenefit *string) {
 	b.EmployerBenefit = employerBenefit
 	b.require(benefitFieldEmployerBenefit)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *Benefit) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	b.RemoteWasDeleted = remoteWasDeleted
+	b.require(benefitFieldRemoteWasDeleted)
 }
 
 // SetFieldMappings sets the FieldMappings field and marks it as non-optional;

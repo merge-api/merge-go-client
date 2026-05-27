@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.PurchaseOrdersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.PurchaseOrder], error) {
+) (*core.Page[*string, *accounting.PurchaseOrder, *accounting.PaginatedPurchaseOrderList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/purchase-orders"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedPurchaseOrderList) *core.PageResponse[*string, *accounting.PurchaseOrder] {
+	readPageResponse := func(response *accounting.PaginatedPurchaseOrderList) *core.PageResponse[*string, *accounting.PurchaseOrder, *accounting.PaginatedPurchaseOrderList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.PurchaseOrder]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.PurchaseOrder, *accounting.PaginatedPurchaseOrderList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -132,12 +133,12 @@ func (c *Client) LineItemsRemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.PurchaseOrdersLineItemsRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/purchase-orders/line-items/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -167,14 +168,15 @@ func (c *Client) LineItemsRemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -205,12 +207,12 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.PurchaseOrdersRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/purchase-orders/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -240,14 +242,15 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

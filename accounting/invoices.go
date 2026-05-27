@@ -11,6 +11,31 @@ import (
 )
 
 var (
+	invoiceBulkRequestFieldBatchItems = big.NewInt(1 << 0)
+)
+
+type InvoiceBulkRequest struct {
+	BatchItems []*InvoiceBatchItemRequest `json:"batch_items,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (i *InvoiceBulkRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetBatchItems sets the BatchItems field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceBulkRequest) SetBatchItems(batchItems []*InvoiceBatchItemRequest) {
+	i.BatchItems = batchItems
+	i.require(invoiceBulkRequestFieldBatchItems)
+}
+
+var (
 	invoiceEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
 	invoiceEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
 	invoiceEndpointRequestFieldModel       = big.NewInt(1 << 2)
@@ -78,7 +103,7 @@ type InvoicesLineItemsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -196,7 +221,7 @@ type InvoicesListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return Invoices with this number.
 	Number *string `json:"-" url:"number,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
@@ -445,7 +470,7 @@ type InvoicesRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -598,6 +623,7 @@ const (
 	InvoicesListRequestExpandItemPaymentTerm          InvoicesListRequestExpandItem = "payment_term"
 	InvoicesListRequestExpandItemPayments             InvoicesListRequestExpandItem = "payments"
 	InvoicesListRequestExpandItemPurchaseOrders       InvoicesListRequestExpandItem = "purchase_orders"
+	InvoicesListRequestExpandItemSalesOrders          InvoicesListRequestExpandItem = "sales_orders"
 	InvoicesListRequestExpandItemTrackingCategories   InvoicesListRequestExpandItem = "tracking_categories"
 )
 
@@ -625,6 +651,8 @@ func NewInvoicesListRequestExpandItemFromString(s string) (InvoicesListRequestEx
 		return InvoicesListRequestExpandItemPayments, nil
 	case "purchase_orders":
 		return InvoicesListRequestExpandItemPurchaseOrders, nil
+	case "sales_orders":
+		return InvoicesListRequestExpandItemSalesOrders, nil
 	case "tracking_categories":
 		return InvoicesListRequestExpandItemTrackingCategories, nil
 	}
@@ -706,6 +734,7 @@ const (
 	InvoicesRetrieveRequestExpandItemPaymentTerm          InvoicesRetrieveRequestExpandItem = "payment_term"
 	InvoicesRetrieveRequestExpandItemPayments             InvoicesRetrieveRequestExpandItem = "payments"
 	InvoicesRetrieveRequestExpandItemPurchaseOrders       InvoicesRetrieveRequestExpandItem = "purchase_orders"
+	InvoicesRetrieveRequestExpandItemSalesOrders          InvoicesRetrieveRequestExpandItem = "sales_orders"
 	InvoicesRetrieveRequestExpandItemTrackingCategories   InvoicesRetrieveRequestExpandItem = "tracking_categories"
 )
 
@@ -733,6 +762,8 @@ func NewInvoicesRetrieveRequestExpandItemFromString(s string) (InvoicesRetrieveR
 		return InvoicesRetrieveRequestExpandItemPayments, nil
 	case "purchase_orders":
 		return InvoicesRetrieveRequestExpandItemPurchaseOrders, nil
+	case "sales_orders":
+		return InvoicesRetrieveRequestExpandItemSalesOrders, nil
 	case "tracking_categories":
 		return InvoicesRetrieveRequestExpandItemTrackingCategories, nil
 	}
@@ -742,6 +773,101 @@ func NewInvoicesRetrieveRequestExpandItemFromString(s string) (InvoicesRetrieveR
 
 func (i InvoicesRetrieveRequestExpandItem) Ptr() *InvoicesRetrieveRequestExpandItem {
 	return &i
+}
+
+var (
+	invoiceBatchItemRequestFieldItemId  = big.NewInt(1 << 0)
+	invoiceBatchItemRequestFieldPayload = big.NewInt(1 << 1)
+)
+
+type InvoiceBatchItemRequest struct {
+	// The third-party item ID for this model in the bulk create request
+	ItemId  string          `json:"item_id" url:"item_id"`
+	Payload *InvoiceRequest `json:"payload" url:"payload"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (i *InvoiceBatchItemRequest) GetItemId() string {
+	if i == nil {
+		return ""
+	}
+	return i.ItemId
+}
+
+func (i *InvoiceBatchItemRequest) GetPayload() *InvoiceRequest {
+	if i == nil {
+		return nil
+	}
+	return i.Payload
+}
+
+func (i *InvoiceBatchItemRequest) GetExtraProperties() map[string]interface{} {
+	return i.extraProperties
+}
+
+func (i *InvoiceBatchItemRequest) require(field *big.Int) {
+	if i.explicitFields == nil {
+		i.explicitFields = big.NewInt(0)
+	}
+	i.explicitFields.Or(i.explicitFields, field)
+}
+
+// SetItemId sets the ItemId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceBatchItemRequest) SetItemId(itemId string) {
+	i.ItemId = itemId
+	i.require(invoiceBatchItemRequestFieldItemId)
+}
+
+// SetPayload sets the Payload field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceBatchItemRequest) SetPayload(payload *InvoiceRequest) {
+	i.Payload = payload
+	i.require(invoiceBatchItemRequestFieldPayload)
+}
+
+func (i *InvoiceBatchItemRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler InvoiceBatchItemRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = InvoiceBatchItemRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *i)
+	if err != nil {
+		return err
+	}
+	i.extraProperties = extraProperties
+	i.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *InvoiceBatchItemRequest) MarshalJSON() ([]byte, error) {
+	type embed InvoiceBatchItemRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*i),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, i.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (i *InvoiceBatchItemRequest) String() string {
+	if len(i.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 // # The InvoiceLineItem Object
@@ -767,9 +893,10 @@ var (
 	invoiceLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 13)
 	invoiceLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 14)
 	invoiceLineItemRequestFieldCompany             = big.NewInt(1 << 15)
-	invoiceLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 16)
-	invoiceLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 17)
-	invoiceLineItemRequestFieldRemoteFields        = big.NewInt(1 << 18)
+	invoiceLineItemRequestFieldIsBillable          = big.NewInt(1 << 16)
+	invoiceLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 17)
+	invoiceLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 18)
+	invoiceLineItemRequestFieldRemoteFields        = big.NewInt(1 << 19)
 )
 
 type InvoiceLineItemRequest struct {
@@ -784,8 +911,8 @@ type InvoiceLineItemRequest struct {
 	// The line item's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty" url:"total_amount,omitempty"`
 	// The employee this overall transaction relates to.
-	Employee *InvoiceLineItemRequestEmployee `json:"employee,omitempty" url:"employee,omitempty"`
-	Project  *InvoiceLineItemRequestProject  `json:"project,omitempty" url:"project,omitempty"`
+	Employee *string                        `json:"employee,omitempty" url:"employee,omitempty"`
+	Project  *InvoiceLineItemRequestProject `json:"project,omitempty" url:"project,omitempty"`
 	// The invoice's contact.
 	Contact *InvoiceLineItemRequestContact `json:"contact,omitempty" url:"contact,omitempty"`
 	// The line item's currency.
@@ -1107,7 +1234,9 @@ type InvoiceLineItemRequest struct {
 	// The invoice line item's associated tracking categories.
 	TrackingCategories []*InvoiceLineItemRequestTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
 	// The company the invoice belongs to.
-	Company             *string                `json:"company,omitempty" url:"company,omitempty"`
+	Company *string `json:"company,omitempty" url:"company,omitempty"`
+	// Indicates if the line item can be charged to the client/customer.
+	IsBillable          *bool                  `json:"is_billable,omitempty" url:"is_billable,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
@@ -1154,7 +1283,7 @@ func (i *InvoiceLineItemRequest) GetTotalAmount() *float64 {
 	return i.TotalAmount
 }
 
-func (i *InvoiceLineItemRequest) GetEmployee() *InvoiceLineItemRequestEmployee {
+func (i *InvoiceLineItemRequest) GetEmployee() *string {
 	if i == nil {
 		return nil
 	}
@@ -1231,6 +1360,13 @@ func (i *InvoiceLineItemRequest) GetCompany() *string {
 	return i.Company
 }
 
+func (i *InvoiceLineItemRequest) GetIsBillable() *bool {
+	if i == nil {
+		return nil
+	}
+	return i.IsBillable
+}
+
 func (i *InvoiceLineItemRequest) GetIntegrationParams() map[string]interface{} {
 	if i == nil {
 		return nil
@@ -1300,7 +1436,7 @@ func (i *InvoiceLineItemRequest) SetTotalAmount(totalAmount *float64) {
 
 // SetEmployee sets the Employee field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (i *InvoiceLineItemRequest) SetEmployee(employee *InvoiceLineItemRequestEmployee) {
+func (i *InvoiceLineItemRequest) SetEmployee(employee *string) {
 	i.Employee = employee
 	i.require(invoiceLineItemRequestFieldEmployee)
 }
@@ -1373,6 +1509,13 @@ func (i *InvoiceLineItemRequest) SetTrackingCategories(trackingCategories []*Inv
 func (i *InvoiceLineItemRequest) SetCompany(company *string) {
 	i.Company = company
 	i.require(invoiceLineItemRequestFieldCompany)
+}
+
+// SetIsBillable sets the IsBillable field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItemRequest) SetIsBillable(isBillable *bool) {
+	i.IsBillable = isBillable
+	i.require(invoiceLineItemRequestFieldIsBillable)
 }
 
 // SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
@@ -1930,69 +2073,6 @@ func (i *InvoiceLineItemRequestCurrency) Accept(visitor InvoiceLineItemRequestCu
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
-// The employee this overall transaction relates to.
-type InvoiceLineItemRequestEmployee struct {
-	String   string
-	Employee *Employee
-
-	typ string
-}
-
-func (i *InvoiceLineItemRequestEmployee) GetString() string {
-	if i == nil {
-		return ""
-	}
-	return i.String
-}
-
-func (i *InvoiceLineItemRequestEmployee) GetEmployee() *Employee {
-	if i == nil {
-		return nil
-	}
-	return i.Employee
-}
-
-func (i *InvoiceLineItemRequestEmployee) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		i.typ = "String"
-		i.String = valueString
-		return nil
-	}
-	valueEmployee := new(Employee)
-	if err := json.Unmarshal(data, &valueEmployee); err == nil {
-		i.typ = "Employee"
-		i.Employee = valueEmployee
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
-}
-
-func (i InvoiceLineItemRequestEmployee) MarshalJSON() ([]byte, error) {
-	if i.typ == "String" || i.String != "" {
-		return json.Marshal(i.String)
-	}
-	if i.typ == "Employee" || i.Employee != nil {
-		return json.Marshal(i.Employee)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
-}
-
-type InvoiceLineItemRequestEmployeeVisitor interface {
-	VisitString(string) error
-	VisitEmployee(*Employee) error
-}
-
-func (i *InvoiceLineItemRequestEmployee) Accept(visitor InvoiceLineItemRequestEmployeeVisitor) error {
-	if i.typ == "String" || i.String != "" {
-		return visitor.VisitString(i.String)
-	}
-	if i.typ == "Employee" || i.Employee != nil {
-		return visitor.VisitEmployee(i.Employee)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", i)
-}
-
 type InvoiceLineItemRequestItem struct {
 	String string
 	Item   *Item
@@ -2271,11 +2351,12 @@ var (
 	invoiceRequestFieldBalance             = big.NewInt(1 << 18)
 	invoiceRequestFieldPayments            = big.NewInt(1 << 19)
 	invoiceRequestFieldTrackingCategories  = big.NewInt(1 << 20)
-	invoiceRequestFieldLineItems           = big.NewInt(1 << 21)
-	invoiceRequestFieldPurchaseOrders      = big.NewInt(1 << 22)
-	invoiceRequestFieldIntegrationParams   = big.NewInt(1 << 23)
-	invoiceRequestFieldLinkedAccountParams = big.NewInt(1 << 24)
-	invoiceRequestFieldRemoteFields        = big.NewInt(1 << 25)
+	invoiceRequestFieldAccountingPeriod    = big.NewInt(1 << 21)
+	invoiceRequestFieldLineItems           = big.NewInt(1 << 22)
+	invoiceRequestFieldPurchaseOrders      = big.NewInt(1 << 23)
+	invoiceRequestFieldIntegrationParams   = big.NewInt(1 << 24)
+	invoiceRequestFieldLinkedAccountParams = big.NewInt(1 << 25)
+	invoiceRequestFieldRemoteFields        = big.NewInt(1 << 26)
 )
 
 type InvoiceRequest struct {
@@ -2635,13 +2716,15 @@ type InvoiceRequest struct {
 	// The invoice's remaining balance.
 	Balance *float64 `json:"balance,omitempty" url:"balance,omitempty"`
 	// Array of `Payment` object IDs.
-	Payments            []*InvoiceRequestPaymentsItem           `json:"payments,omitempty" url:"payments,omitempty"`
-	TrackingCategories  []*InvoiceRequestTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
-	LineItems           []*InvoiceLineItemRequest               `json:"line_items,omitempty" url:"line_items,omitempty"`
-	PurchaseOrders      []*InvoiceRequestPurchaseOrdersItem     `json:"purchase_orders,omitempty" url:"purchase_orders,omitempty"`
-	IntegrationParams   map[string]interface{}                  `json:"integration_params,omitempty" url:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{}                  `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest                   `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+	Payments           []*InvoiceRequestPaymentsItem           `json:"payments,omitempty" url:"payments,omitempty"`
+	TrackingCategories []*InvoiceRequestTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	// The accounting period that the Invoice was generated in.
+	AccountingPeriod    *InvoiceRequestAccountingPeriod     `json:"accounting_period,omitempty" url:"accounting_period,omitempty"`
+	LineItems           []*InvoiceRequestLineItemsItem      `json:"line_items,omitempty" url:"line_items,omitempty"`
+	PurchaseOrders      []*InvoiceRequestPurchaseOrdersItem `json:"purchase_orders,omitempty" url:"purchase_orders,omitempty"`
+	IntegrationParams   map[string]interface{}              `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}              `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest               `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -2797,7 +2880,14 @@ func (i *InvoiceRequest) GetTrackingCategories() []*InvoiceRequestTrackingCatego
 	return i.TrackingCategories
 }
 
-func (i *InvoiceRequest) GetLineItems() []*InvoiceLineItemRequest {
+func (i *InvoiceRequest) GetAccountingPeriod() *InvoiceRequestAccountingPeriod {
+	if i == nil {
+		return nil
+	}
+	return i.AccountingPeriod
+}
+
+func (i *InvoiceRequest) GetLineItems() []*InvoiceRequestLineItemsItem {
 	if i == nil {
 		return nil
 	}
@@ -2990,9 +3080,16 @@ func (i *InvoiceRequest) SetTrackingCategories(trackingCategories []*InvoiceRequ
 	i.require(invoiceRequestFieldTrackingCategories)
 }
 
+// SetAccountingPeriod sets the AccountingPeriod field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceRequest) SetAccountingPeriod(accountingPeriod *InvoiceRequestAccountingPeriod) {
+	i.AccountingPeriod = accountingPeriod
+	i.require(invoiceRequestFieldAccountingPeriod)
+}
+
 // SetLineItems sets the LineItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (i *InvoiceRequest) SetLineItems(lineItems []*InvoiceLineItemRequest) {
+func (i *InvoiceRequest) SetLineItems(lineItems []*InvoiceRequestLineItemsItem) {
 	i.LineItems = lineItems
 	i.require(invoiceRequestFieldLineItems)
 }
@@ -3078,6 +3175,69 @@ func (i *InvoiceRequest) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", i)
+}
+
+// The accounting period that the Invoice was generated in.
+type InvoiceRequestAccountingPeriod struct {
+	String           string
+	AccountingPeriod *AccountingPeriod
+
+	typ string
+}
+
+func (i *InvoiceRequestAccountingPeriod) GetString() string {
+	if i == nil {
+		return ""
+	}
+	return i.String
+}
+
+func (i *InvoiceRequestAccountingPeriod) GetAccountingPeriod() *AccountingPeriod {
+	if i == nil {
+		return nil
+	}
+	return i.AccountingPeriod
+}
+
+func (i *InvoiceRequestAccountingPeriod) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typ = "String"
+		i.String = valueString
+		return nil
+	}
+	valueAccountingPeriod := new(AccountingPeriod)
+	if err := json.Unmarshal(data, &valueAccountingPeriod); err == nil {
+		i.typ = "AccountingPeriod"
+		i.AccountingPeriod = valueAccountingPeriod
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestAccountingPeriod) MarshalJSON() ([]byte, error) {
+	if i.typ == "String" || i.String != "" {
+		return json.Marshal(i.String)
+	}
+	if i.typ == "AccountingPeriod" || i.AccountingPeriod != nil {
+		return json.Marshal(i.AccountingPeriod)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
+type InvoiceRequestAccountingPeriodVisitor interface {
+	VisitString(string) error
+	VisitAccountingPeriod(*AccountingPeriod) error
+}
+
+func (i *InvoiceRequestAccountingPeriod) Accept(visitor InvoiceRequestAccountingPeriodVisitor) error {
+	if i.typ == "String" || i.String != "" {
+		return visitor.VisitString(i.String)
+	}
+	if i.typ == "AccountingPeriod" || i.AccountingPeriod != nil {
+		return visitor.VisitAccountingPeriod(i.AccountingPeriod)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
 // The company the invoice belongs to.
@@ -3635,6 +3795,68 @@ func (i *InvoiceRequestEmployee) Accept(visitor InvoiceRequestEmployeeVisitor) e
 	}
 	if i.typ == "Employee" || i.Employee != nil {
 		return visitor.VisitEmployee(i.Employee)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
+type InvoiceRequestLineItemsItem struct {
+	String                 string
+	InvoiceLineItemRequest *InvoiceLineItemRequest
+
+	typ string
+}
+
+func (i *InvoiceRequestLineItemsItem) GetString() string {
+	if i == nil {
+		return ""
+	}
+	return i.String
+}
+
+func (i *InvoiceRequestLineItemsItem) GetInvoiceLineItemRequest() *InvoiceLineItemRequest {
+	if i == nil {
+		return nil
+	}
+	return i.InvoiceLineItemRequest
+}
+
+func (i *InvoiceRequestLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typ = "String"
+		i.String = valueString
+		return nil
+	}
+	valueInvoiceLineItemRequest := new(InvoiceLineItemRequest)
+	if err := json.Unmarshal(data, &valueInvoiceLineItemRequest); err == nil {
+		i.typ = "InvoiceLineItemRequest"
+		i.InvoiceLineItemRequest = valueInvoiceLineItemRequest
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceRequestLineItemsItem) MarshalJSON() ([]byte, error) {
+	if i.typ == "String" || i.String != "" {
+		return json.Marshal(i.String)
+	}
+	if i.typ == "InvoiceLineItemRequest" || i.InvoiceLineItemRequest != nil {
+		return json.Marshal(i.InvoiceLineItemRequest)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
+type InvoiceRequestLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitInvoiceLineItemRequest(*InvoiceLineItemRequest) error
+}
+
+func (i *InvoiceRequestLineItemsItem) Accept(visitor InvoiceRequestLineItemsItemVisitor) error {
+	if i.typ == "String" || i.String != "" {
+		return visitor.VisitString(i.String)
+	}
+	if i.typ == "InvoiceLineItemRequest" || i.InvoiceLineItemRequest != nil {
+		return visitor.VisitInvoiceLineItemRequest(i.InvoiceLineItemRequest)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }

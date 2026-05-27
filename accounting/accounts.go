@@ -103,7 +103,7 @@ type AccountsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return Accounts with this name.
 	Name *string `json:"-" url:"name,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *AccountsListRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
@@ -493,22 +493,25 @@ func (a AccountsRetrieveRequestShowEnumOrigins) Ptr() *AccountsRetrieveRequestSh
 // ### Usage Example
 // Fetch from the `LIST Accounts` endpoint and view a company's accounts.
 var (
-	accountRequestFieldName                = big.NewInt(1 << 0)
-	accountRequestFieldDescription         = big.NewInt(1 << 1)
-	accountRequestFieldClassification      = big.NewInt(1 << 2)
-	accountRequestFieldType                = big.NewInt(1 << 3)
-	accountRequestFieldAccountType         = big.NewInt(1 << 4)
-	accountRequestFieldStatus              = big.NewInt(1 << 5)
-	accountRequestFieldCurrentBalance      = big.NewInt(1 << 6)
-	accountRequestFieldCurrency            = big.NewInt(1 << 7)
-	accountRequestFieldAccountNumber       = big.NewInt(1 << 8)
-	accountRequestFieldParentAccount       = big.NewInt(1 << 9)
-	accountRequestFieldCompany             = big.NewInt(1 << 10)
-	accountRequestFieldIntegrationParams   = big.NewInt(1 << 11)
-	accountRequestFieldLinkedAccountParams = big.NewInt(1 << 12)
+	accountRequestFieldAccountUrl          = big.NewInt(1 << 0)
+	accountRequestFieldName                = big.NewInt(1 << 1)
+	accountRequestFieldDescription         = big.NewInt(1 << 2)
+	accountRequestFieldClassification      = big.NewInt(1 << 3)
+	accountRequestFieldType                = big.NewInt(1 << 4)
+	accountRequestFieldAccountType         = big.NewInt(1 << 5)
+	accountRequestFieldStatus              = big.NewInt(1 << 6)
+	accountRequestFieldCurrentBalance      = big.NewInt(1 << 7)
+	accountRequestFieldCurrency            = big.NewInt(1 << 8)
+	accountRequestFieldAccountNumber       = big.NewInt(1 << 9)
+	accountRequestFieldParentAccount       = big.NewInt(1 << 10)
+	accountRequestFieldCompany             = big.NewInt(1 << 11)
+	accountRequestFieldIntegrationParams   = big.NewInt(1 << 12)
+	accountRequestFieldLinkedAccountParams = big.NewInt(1 << 13)
 )
 
 type AccountRequest struct {
+	// The 3rd party URL of the account.
+	AccountUrl *string `json:"account_url,omitempty" url:"account_url,omitempty"`
 	// The account's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// The account's description.
@@ -861,7 +864,7 @@ type AccountRequest struct {
 	// ID of the parent account.
 	ParentAccount *string `json:"parent_account,omitempty" url:"parent_account,omitempty"`
 	// The company the account belongs to.
-	Company             *string                `json:"company,omitempty" url:"company,omitempty"`
+	Company             *AccountRequestCompany `json:"company,omitempty" url:"company,omitempty"`
 	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 
@@ -870,6 +873,13 @@ type AccountRequest struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (a *AccountRequest) GetAccountUrl() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AccountUrl
 }
 
 func (a *AccountRequest) GetName() *string {
@@ -942,7 +952,7 @@ func (a *AccountRequest) GetParentAccount() *string {
 	return a.ParentAccount
 }
 
-func (a *AccountRequest) GetCompany() *string {
+func (a *AccountRequest) GetCompany() *AccountRequestCompany {
 	if a == nil {
 		return nil
 	}
@@ -972,6 +982,13 @@ func (a *AccountRequest) require(field *big.Int) {
 		a.explicitFields = big.NewInt(0)
 	}
 	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetAccountUrl sets the AccountUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountRequest) SetAccountUrl(accountUrl *string) {
+	a.AccountUrl = accountUrl
+	a.require(accountRequestFieldAccountUrl)
 }
 
 // SetName sets the Name field and marks it as non-optional;
@@ -1046,7 +1063,7 @@ func (a *AccountRequest) SetParentAccount(parentAccount *string) {
 
 // SetCompany sets the Company field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AccountRequest) SetCompany(company *string) {
+func (a *AccountRequest) SetCompany(company *AccountRequestCompany) {
 	a.Company = company
 	a.require(accountRequestFieldCompany)
 }
@@ -1246,6 +1263,69 @@ func (a *AccountRequestClassification) Accept(visitor AccountRequestClassificati
 	}
 	if a.typ == "String" || a.String != "" {
 		return visitor.VisitString(a.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+// The company the account belongs to.
+type AccountRequestCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (a *AccountRequestCompany) GetString() string {
+	if a == nil {
+		return ""
+	}
+	return a.String
+}
+
+func (a *AccountRequestCompany) GetCompanyInfo() *CompanyInfo {
+	if a == nil {
+		return nil
+	}
+	return a.CompanyInfo
+}
+
+func (a *AccountRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typ = "String"
+		a.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		a.typ = "CompanyInfo"
+		a.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountRequestCompany) MarshalJSON() ([]byte, error) {
+	if a.typ == "String" || a.String != "" {
+		return json.Marshal(a.String)
+	}
+	if a.typ == "CompanyInfo" || a.CompanyInfo != nil {
+		return json.Marshal(a.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+type AccountRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (a *AccountRequestCompany) Accept(visitor AccountRequestCompanyVisitor) error {
+	if a.typ == "String" || a.String != "" {
+		return visitor.VisitString(a.String)
+	}
+	if a.typ == "CompanyInfo" || a.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(a.CompanyInfo)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }

@@ -39,7 +39,7 @@ type LocationsListRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// If provided, will only return locations with this location_type
+	// If provided, will only return locations with this location type
 	//
 	// * `HOME` - HOME
 	// * `WORK` - WORK
@@ -48,7 +48,7 @@ type LocationsListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *LocationsListRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`

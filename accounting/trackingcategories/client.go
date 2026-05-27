@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.TrackingCategoriesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.TrackingCategory], error) {
+) (*core.Page[*string, *accounting.TrackingCategory, *accounting.PaginatedTrackingCategoryList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/tracking-categories"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedTrackingCategoryList) *core.PageResponse[*string, *accounting.TrackingCategory] {
+	readPageResponse := func(response *accounting.PaginatedTrackingCategoryList) *core.PageResponse[*string, *accounting.TrackingCategory, *accounting.PaginatedTrackingCategoryList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.TrackingCategory]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.TrackingCategory, *accounting.PaginatedTrackingCategoryList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

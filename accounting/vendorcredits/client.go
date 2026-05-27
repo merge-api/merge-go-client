@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.VendorCreditsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.VendorCredit], error) {
+) (*core.Page[*string, *accounting.VendorCredit, *accounting.PaginatedVendorCreditList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/vendor-credits"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedVendorCreditList) *core.PageResponse[*string, *accounting.VendorCredit] {
+	readPageResponse := func(response *accounting.PaginatedVendorCreditList) *core.PageResponse[*string, *accounting.VendorCredit, *accounting.PaginatedVendorCreditList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.VendorCredit]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.VendorCredit, *accounting.PaginatedVendorCreditList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -119,6 +120,61 @@ func (c *Client) Retrieve(
 		ctx,
 		id,
 		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Updates a `VendorCredit` object with the given `id`.
+func (c *Client) PartialUpdate(
+	ctx context.Context,
+	id string,
+	request *accounting.PatchedVendorCreditEndpointRequest,
+	opts ...option.RequestOption,
+) (*accounting.VendorCreditResponse, error) {
+	response, err := c.WithRawResponse.PartialUpdate(
+		ctx,
+		id,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Creates a new VendorCreditApplyLine to apply a vendor credit to an invoice
+func (c *Client) ApplicationCreate(
+	ctx context.Context,
+	id string,
+	request *accounting.ApplyVendorCreditRequest,
+	opts ...option.RequestOption,
+) (*accounting.VendorCreditResponse, error) {
+	response, err := c.WithRawResponse.ApplicationCreate(
+		ctx,
+		id,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Returns metadata for `VendorCredit` PATCHs.
+func (c *Client) MetaPatchRetrieve(
+	ctx context.Context,
+	id string,
+	opts ...option.RequestOption,
+) (*accounting.MetaResponse, error) {
+	response, err := c.WithRawResponse.MetaPatchRetrieve(
+		ctx,
+		id,
 		opts...,
 	)
 	if err != nil {

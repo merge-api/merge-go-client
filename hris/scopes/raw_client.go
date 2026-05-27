@@ -38,7 +38,7 @@ func (r *RawClient) DefaultScopesRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/default-scopes"
 	headers := internal.MergeHeaders(
@@ -77,7 +77,7 @@ func (r *RawClient) LinkedAccountScopesRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/linked-account-scopes"
 	headers := internal.MergeHeaders(
@@ -117,7 +117,7 @@ func (r *RawClient) LinkedAccountScopesCreate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/linked-account-scopes"
 	headers := internal.MergeHeaders(

@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.TagsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.Tag], error) {
+) (*core.Page[*string, *ats.Tag, *ats.PaginatedTagList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/tags"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedTagList) *core.PageResponse[*string, *ats.Tag] {
+	readPageResponse := func(response *ats.PaginatedTagList) *core.PageResponse[*string, *ats.Tag, *ats.PaginatedTagList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.Tag]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.Tag, *ats.PaginatedTagList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

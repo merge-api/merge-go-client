@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *crm.EngagementTypesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *crm.EngagementType], error) {
+) (*core.Page[*string, *crm.EngagementType, *crm.PaginatedEngagementTypeList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/crm/v1/engagement-types"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedEngagementTypeList) *core.PageResponse[*string, *crm.EngagementType] {
+	readPageResponse := func(response *crm.PaginatedEngagementTypeList) *core.PageResponse[*string, *crm.EngagementType, *crm.PaginatedEngagementTypeList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *crm.EngagementType]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *crm.EngagementType, *crm.PaginatedEngagementTypeList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -115,12 +116,12 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *crm.EngagementTypesRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *crm.RemoteFieldClass], error) {
+) (*core.Page[*string, *crm.RemoteFieldClass, *crm.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/crm/v1/engagement-types/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -150,14 +151,15 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *crm.RemoteFieldClass] {
+	readPageResponse := func(response *crm.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *crm.RemoteFieldClass, *crm.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *crm.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *crm.RemoteFieldClass, *crm.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

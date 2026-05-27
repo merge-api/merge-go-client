@@ -14,14 +14,15 @@ var (
 	usersListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
 	usersListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
 	usersListRequestFieldCursor             = big.NewInt(1 << 2)
-	usersListRequestFieldIncludeDeletedData = big.NewInt(1 << 3)
-	usersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 4)
-	usersListRequestFieldIncludeShellData   = big.NewInt(1 << 5)
-	usersListRequestFieldIsMe               = big.NewInt(1 << 6)
-	usersListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
-	usersListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
-	usersListRequestFieldPageSize           = big.NewInt(1 << 9)
-	usersListRequestFieldRemoteId           = big.NewInt(1 << 10)
+	usersListRequestFieldEmailAddress       = big.NewInt(1 << 3)
+	usersListRequestFieldIncludeDeletedData = big.NewInt(1 << 4)
+	usersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 5)
+	usersListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
+	usersListRequestFieldIsMe               = big.NewInt(1 << 7)
+	usersListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
+	usersListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
+	usersListRequestFieldPageSize           = big.NewInt(1 << 10)
+	usersListRequestFieldRemoteId           = big.NewInt(1 << 11)
 )
 
 type UsersListRequest struct {
@@ -31,6 +32,8 @@ type UsersListRequest struct {
 	CreatedBefore *time.Time `json:"-" url:"created_before,omitempty"`
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
+	// If provided, will only return users with emails equal to this value (case insensitive).
+	EmailAddress *string `json:"-" url:"email_address,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-" url:"include_deleted_data,omitempty"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -43,7 +46,7 @@ type UsersListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -78,6 +81,13 @@ func (u *UsersListRequest) SetCreatedBefore(createdBefore *time.Time) {
 func (u *UsersListRequest) SetCursor(cursor *string) {
 	u.Cursor = cursor
 	u.require(usersListRequestFieldCursor)
+}
+
+// SetEmailAddress sets the EmailAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetEmailAddress(emailAddress *string) {
+	u.EmailAddress = emailAddress
+	u.require(usersListRequestFieldEmailAddress)
 }
 
 // SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;

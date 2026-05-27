@@ -11,17 +11,22 @@ import (
 
 var (
 	createFieldMappingRequestFieldExcludeRemoteFieldMetadata = big.NewInt(1 << 0)
-	createFieldMappingRequestFieldTargetFieldName            = big.NewInt(1 << 1)
-	createFieldMappingRequestFieldTargetFieldDescription     = big.NewInt(1 << 2)
-	createFieldMappingRequestFieldRemoteFieldTraversalPath   = big.NewInt(1 << 3)
-	createFieldMappingRequestFieldRemoteMethod               = big.NewInt(1 << 4)
-	createFieldMappingRequestFieldRemoteUrlPath              = big.NewInt(1 << 5)
-	createFieldMappingRequestFieldCommonModelName            = big.NewInt(1 << 6)
+	createFieldMappingRequestFieldRemoteDataIterationCount   = big.NewInt(1 << 1)
+	createFieldMappingRequestFieldTargetFieldName            = big.NewInt(1 << 2)
+	createFieldMappingRequestFieldTargetFieldDescription     = big.NewInt(1 << 3)
+	createFieldMappingRequestFieldRemoteFieldTraversalPath   = big.NewInt(1 << 4)
+	createFieldMappingRequestFieldRemoteMethod               = big.NewInt(1 << 5)
+	createFieldMappingRequestFieldRemoteUrlPath              = big.NewInt(1 << 6)
+	createFieldMappingRequestFieldCommonModelName            = big.NewInt(1 << 7)
+	createFieldMappingRequestFieldJmesPath                   = big.NewInt(1 << 8)
+	createFieldMappingRequestFieldAdvancedMappingExpression  = big.NewInt(1 << 9)
 )
 
 type CreateFieldMappingRequest struct {
 	// If `true`, remote fields metadata is excluded from each field mapping instance (i.e. `remote_fields.remote_key_name` and `remote_fields.schema` will be null). This will increase the speed of the request since these fields require some calculations.
 	ExcludeRemoteFieldMetadata *bool `json:"-" url:"exclude_remote_field_metadata,omitempty"`
+	// Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+	RemoteDataIterationCount *int `json:"-" url:"remote_data_iteration_count,omitempty"`
 	// The name of the target field you want this remote field to map to.
 	TargetFieldName string `json:"target_field_name" url:"-"`
 	// The description of the target field you want this remote field to map to.
@@ -34,6 +39,10 @@ type CreateFieldMappingRequest struct {
 	RemoteUrlPath string `json:"remote_url_path" url:"-"`
 	// The name of the Common Model that the remote field corresponds to in a given category.
 	CommonModelName string `json:"common_model_name" url:"-"`
+	// DEPRECATED: Use 'advanced_mapping_expression' instead.
+	JmesPath *string `json:"jmes_path,omitempty" url:"-"`
+	// A JSONata expression used to transform the remote field data.
+	AdvancedMappingExpression *string `json:"advanced_mapping_expression,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -51,6 +60,13 @@ func (c *CreateFieldMappingRequest) require(field *big.Int) {
 func (c *CreateFieldMappingRequest) SetExcludeRemoteFieldMetadata(excludeRemoteFieldMetadata *bool) {
 	c.ExcludeRemoteFieldMetadata = excludeRemoteFieldMetadata
 	c.require(createFieldMappingRequestFieldExcludeRemoteFieldMetadata)
+}
+
+// SetRemoteDataIterationCount sets the RemoteDataIterationCount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetRemoteDataIterationCount(remoteDataIterationCount *int) {
+	c.RemoteDataIterationCount = remoteDataIterationCount
+	c.require(createFieldMappingRequestFieldRemoteDataIterationCount)
 }
 
 // SetTargetFieldName sets the TargetFieldName field and marks it as non-optional;
@@ -95,19 +111,42 @@ func (c *CreateFieldMappingRequest) SetCommonModelName(commonModelName string) {
 	c.require(createFieldMappingRequestFieldCommonModelName)
 }
 
+// SetJmesPath sets the JmesPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetJmesPath(jmesPath *string) {
+	c.JmesPath = jmesPath
+	c.require(createFieldMappingRequestFieldJmesPath)
+}
+
+// SetAdvancedMappingExpression sets the AdvancedMappingExpression field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateFieldMappingRequest) SetAdvancedMappingExpression(advancedMappingExpression *string) {
+	c.AdvancedMappingExpression = advancedMappingExpression
+	c.require(createFieldMappingRequestFieldAdvancedMappingExpression)
+}
+
 var (
-	patchedEditFieldMappingRequestFieldRemoteFieldTraversalPath = big.NewInt(1 << 0)
-	patchedEditFieldMappingRequestFieldRemoteMethod             = big.NewInt(1 << 1)
-	patchedEditFieldMappingRequestFieldRemoteUrlPath            = big.NewInt(1 << 2)
+	patchedEditFieldMappingRequestFieldRemoteDataIterationCount  = big.NewInt(1 << 0)
+	patchedEditFieldMappingRequestFieldRemoteFieldTraversalPath  = big.NewInt(1 << 1)
+	patchedEditFieldMappingRequestFieldRemoteMethod              = big.NewInt(1 << 2)
+	patchedEditFieldMappingRequestFieldRemoteUrlPath             = big.NewInt(1 << 3)
+	patchedEditFieldMappingRequestFieldJmesPath                  = big.NewInt(1 << 4)
+	patchedEditFieldMappingRequestFieldAdvancedMappingExpression = big.NewInt(1 << 5)
 )
 
 type PatchedEditFieldMappingRequest struct {
+	// Number of common model instances to iterate through when fetching remote data for field mappings. Defaults to 250 if not provided.
+	RemoteDataIterationCount *int `json:"-" url:"remote_data_iteration_count,omitempty"`
 	// The field traversal path of the remote field listed when you hit the GET /remote-fields endpoint.
 	RemoteFieldTraversalPath []interface{} `json:"remote_field_traversal_path,omitempty" url:"-"`
 	// The method of the remote endpoint where the remote field is coming from.
 	RemoteMethod *string `json:"remote_method,omitempty" url:"-"`
 	// The path of the remote endpoint where the remote field is coming from.
 	RemoteUrlPath *string `json:"remote_url_path,omitempty" url:"-"`
+	// DEPRECATED: Use 'advanced_mapping_expression' instead.
+	JmesPath *string `json:"jmes_path,omitempty" url:"-"`
+	// A JSONata expression used to transform the remote field data.
+	AdvancedMappingExpression *string `json:"advanced_mapping_expression,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -118,6 +157,13 @@ func (p *PatchedEditFieldMappingRequest) require(field *big.Int) {
 		p.explicitFields = big.NewInt(0)
 	}
 	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteDataIterationCount sets the RemoteDataIterationCount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetRemoteDataIterationCount(remoteDataIterationCount *int) {
+	p.RemoteDataIterationCount = remoteDataIterationCount
+	p.require(patchedEditFieldMappingRequestFieldRemoteDataIterationCount)
 }
 
 // SetRemoteFieldTraversalPath sets the RemoteFieldTraversalPath field and marks it as non-optional;
@@ -139,6 +185,20 @@ func (p *PatchedEditFieldMappingRequest) SetRemoteMethod(remoteMethod *string) {
 func (p *PatchedEditFieldMappingRequest) SetRemoteUrlPath(remoteUrlPath *string) {
 	p.RemoteUrlPath = remoteUrlPath
 	p.require(patchedEditFieldMappingRequestFieldRemoteUrlPath)
+}
+
+// SetJmesPath sets the JmesPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetJmesPath(jmesPath *string) {
+	p.JmesPath = jmesPath
+	p.require(patchedEditFieldMappingRequestFieldJmesPath)
+}
+
+// SetAdvancedMappingExpression sets the AdvancedMappingExpression field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedEditFieldMappingRequest) SetAdvancedMappingExpression(advancedMappingExpression *string) {
+	p.AdvancedMappingExpression = advancedMappingExpression
+	p.require(patchedEditFieldMappingRequestFieldAdvancedMappingExpression)
 }
 
 var (
@@ -482,21 +542,24 @@ var (
 	externalTargetFieldApiResponseFieldCreditNote               = big.NewInt(1 << 7)
 	externalTargetFieldApiResponseFieldItem                     = big.NewInt(1 << 8)
 	externalTargetFieldApiResponseFieldPurchaseOrder            = big.NewInt(1 << 9)
-	externalTargetFieldApiResponseFieldTrackingCategory         = big.NewInt(1 << 10)
-	externalTargetFieldApiResponseFieldJournalEntry             = big.NewInt(1 << 11)
-	externalTargetFieldApiResponseFieldTaxRate                  = big.NewInt(1 << 12)
-	externalTargetFieldApiResponseFieldInvoice                  = big.NewInt(1 << 13)
-	externalTargetFieldApiResponseFieldPayment                  = big.NewInt(1 << 14)
-	externalTargetFieldApiResponseFieldExpense                  = big.NewInt(1 << 15)
-	externalTargetFieldApiResponseFieldVendorCredit             = big.NewInt(1 << 16)
-	externalTargetFieldApiResponseFieldTransaction              = big.NewInt(1 << 17)
-	externalTargetFieldApiResponseFieldAccountingPeriod         = big.NewInt(1 << 18)
-	externalTargetFieldApiResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 19)
-	externalTargetFieldApiResponseFieldBankFeedAccount          = big.NewInt(1 << 20)
-	externalTargetFieldApiResponseFieldEmployee                 = big.NewInt(1 << 21)
-	externalTargetFieldApiResponseFieldPaymentMethod            = big.NewInt(1 << 22)
-	externalTargetFieldApiResponseFieldProject                  = big.NewInt(1 << 23)
-	externalTargetFieldApiResponseFieldPaymentTerm              = big.NewInt(1 << 24)
+	externalTargetFieldApiResponseFieldSalesOrder               = big.NewInt(1 << 10)
+	externalTargetFieldApiResponseFieldItemFulfillment          = big.NewInt(1 << 11)
+	externalTargetFieldApiResponseFieldExpenseReport            = big.NewInt(1 << 12)
+	externalTargetFieldApiResponseFieldTrackingCategory         = big.NewInt(1 << 13)
+	externalTargetFieldApiResponseFieldJournalEntry             = big.NewInt(1 << 14)
+	externalTargetFieldApiResponseFieldTaxRate                  = big.NewInt(1 << 15)
+	externalTargetFieldApiResponseFieldInvoice                  = big.NewInt(1 << 16)
+	externalTargetFieldApiResponseFieldPayment                  = big.NewInt(1 << 17)
+	externalTargetFieldApiResponseFieldExpense                  = big.NewInt(1 << 18)
+	externalTargetFieldApiResponseFieldVendorCredit             = big.NewInt(1 << 19)
+	externalTargetFieldApiResponseFieldTransaction              = big.NewInt(1 << 20)
+	externalTargetFieldApiResponseFieldAccountingPeriod         = big.NewInt(1 << 21)
+	externalTargetFieldApiResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 22)
+	externalTargetFieldApiResponseFieldBankFeedAccount          = big.NewInt(1 << 23)
+	externalTargetFieldApiResponseFieldEmployee                 = big.NewInt(1 << 24)
+	externalTargetFieldApiResponseFieldPaymentMethod            = big.NewInt(1 << 25)
+	externalTargetFieldApiResponseFieldProject                  = big.NewInt(1 << 26)
+	externalTargetFieldApiResponseFieldPaymentTerm              = big.NewInt(1 << 27)
 )
 
 type ExternalTargetFieldApiResponse struct {
@@ -510,6 +573,9 @@ type ExternalTargetFieldApiResponse struct {
 	CreditNote               []*ExternalTargetFieldApi `json:"CreditNote,omitempty" url:"CreditNote,omitempty"`
 	Item                     []*ExternalTargetFieldApi `json:"Item,omitempty" url:"Item,omitempty"`
 	PurchaseOrder            []*ExternalTargetFieldApi `json:"PurchaseOrder,omitempty" url:"PurchaseOrder,omitempty"`
+	SalesOrder               []*ExternalTargetFieldApi `json:"SalesOrder,omitempty" url:"SalesOrder,omitempty"`
+	ItemFulfillment          []*ExternalTargetFieldApi `json:"ItemFulfillment,omitempty" url:"ItemFulfillment,omitempty"`
+	ExpenseReport            []*ExternalTargetFieldApi `json:"ExpenseReport,omitempty" url:"ExpenseReport,omitempty"`
 	TrackingCategory         []*ExternalTargetFieldApi `json:"TrackingCategory,omitempty" url:"TrackingCategory,omitempty"`
 	JournalEntry             []*ExternalTargetFieldApi `json:"JournalEntry,omitempty" url:"JournalEntry,omitempty"`
 	TaxRate                  []*ExternalTargetFieldApi `json:"TaxRate,omitempty" url:"TaxRate,omitempty"`
@@ -601,6 +667,27 @@ func (e *ExternalTargetFieldApiResponse) GetPurchaseOrder() []*ExternalTargetFie
 		return nil
 	}
 	return e.PurchaseOrder
+}
+
+func (e *ExternalTargetFieldApiResponse) GetSalesOrder() []*ExternalTargetFieldApi {
+	if e == nil {
+		return nil
+	}
+	return e.SalesOrder
+}
+
+func (e *ExternalTargetFieldApiResponse) GetItemFulfillment() []*ExternalTargetFieldApi {
+	if e == nil {
+		return nil
+	}
+	return e.ItemFulfillment
+}
+
+func (e *ExternalTargetFieldApiResponse) GetExpenseReport() []*ExternalTargetFieldApi {
+	if e == nil {
+		return nil
+	}
+	return e.ExpenseReport
 }
 
 func (e *ExternalTargetFieldApiResponse) GetTrackingCategory() []*ExternalTargetFieldApi {
@@ -789,6 +876,27 @@ func (e *ExternalTargetFieldApiResponse) SetPurchaseOrder(purchaseOrder []*Exter
 	e.require(externalTargetFieldApiResponseFieldPurchaseOrder)
 }
 
+// SetSalesOrder sets the SalesOrder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetSalesOrder(salesOrder []*ExternalTargetFieldApi) {
+	e.SalesOrder = salesOrder
+	e.require(externalTargetFieldApiResponseFieldSalesOrder)
+}
+
+// SetItemFulfillment sets the ItemFulfillment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetItemFulfillment(itemFulfillment []*ExternalTargetFieldApi) {
+	e.ItemFulfillment = itemFulfillment
+	e.require(externalTargetFieldApiResponseFieldItemFulfillment)
+}
+
+// SetExpenseReport sets the ExpenseReport field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExternalTargetFieldApiResponse) SetExpenseReport(expenseReport []*ExternalTargetFieldApi) {
+	e.ExpenseReport = expenseReport
+	e.require(externalTargetFieldApiResponseFieldExpenseReport)
+}
+
 // SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (e *ExternalTargetFieldApiResponse) SetTrackingCategory(trackingCategory []*ExternalTargetFieldApi) {
@@ -934,17 +1042,21 @@ func (e *ExternalTargetFieldApiResponse) String() string {
 }
 
 var (
-	fieldMappingApiInstanceFieldId                = big.NewInt(1 << 0)
-	fieldMappingApiInstanceFieldIsIntegrationWide = big.NewInt(1 << 1)
-	fieldMappingApiInstanceFieldTargetField       = big.NewInt(1 << 2)
-	fieldMappingApiInstanceFieldRemoteField       = big.NewInt(1 << 3)
+	fieldMappingApiInstanceFieldId                        = big.NewInt(1 << 0)
+	fieldMappingApiInstanceFieldIsIntegrationWide         = big.NewInt(1 << 1)
+	fieldMappingApiInstanceFieldTargetField               = big.NewInt(1 << 2)
+	fieldMappingApiInstanceFieldRemoteField               = big.NewInt(1 << 3)
+	fieldMappingApiInstanceFieldJmesPath                  = big.NewInt(1 << 4)
+	fieldMappingApiInstanceFieldAdvancedMappingExpression = big.NewInt(1 << 5)
 )
 
 type FieldMappingApiInstance struct {
-	Id                *string                             `json:"id,omitempty" url:"id,omitempty"`
-	IsIntegrationWide *bool                               `json:"is_integration_wide,omitempty" url:"is_integration_wide,omitempty"`
-	TargetField       *FieldMappingApiInstanceTargetField `json:"target_field,omitempty" url:"target_field,omitempty"`
-	RemoteField       *FieldMappingApiInstanceRemoteField `json:"remote_field,omitempty" url:"remote_field,omitempty"`
+	Id                        *string                             `json:"id,omitempty" url:"id,omitempty"`
+	IsIntegrationWide         *bool                               `json:"is_integration_wide,omitempty" url:"is_integration_wide,omitempty"`
+	TargetField               *FieldMappingApiInstanceTargetField `json:"target_field,omitempty" url:"target_field,omitempty"`
+	RemoteField               *FieldMappingApiInstanceRemoteField `json:"remote_field,omitempty" url:"remote_field,omitempty"`
+	JmesPath                  *string                             `json:"jmes_path,omitempty" url:"jmes_path,omitempty"`
+	AdvancedMappingExpression *string                             `json:"advanced_mapping_expression,omitempty" url:"advanced_mapping_expression,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -979,6 +1091,20 @@ func (f *FieldMappingApiInstance) GetRemoteField() *FieldMappingApiInstanceRemot
 		return nil
 	}
 	return f.RemoteField
+}
+
+func (f *FieldMappingApiInstance) GetJmesPath() *string {
+	if f == nil {
+		return nil
+	}
+	return f.JmesPath
+}
+
+func (f *FieldMappingApiInstance) GetAdvancedMappingExpression() *string {
+	if f == nil {
+		return nil
+	}
+	return f.AdvancedMappingExpression
 }
 
 func (f *FieldMappingApiInstance) GetExtraProperties() map[string]interface{} {
@@ -1018,6 +1144,20 @@ func (f *FieldMappingApiInstance) SetTargetField(targetField *FieldMappingApiIns
 func (f *FieldMappingApiInstance) SetRemoteField(remoteField *FieldMappingApiInstanceRemoteField) {
 	f.RemoteField = remoteField
 	f.require(fieldMappingApiInstanceFieldRemoteField)
+}
+
+// SetJmesPath sets the JmesPath field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetJmesPath(jmesPath *string) {
+	f.JmesPath = jmesPath
+	f.require(fieldMappingApiInstanceFieldJmesPath)
+}
+
+// SetAdvancedMappingExpression sets the AdvancedMappingExpression field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstance) SetAdvancedMappingExpression(advancedMappingExpression *string) {
+	f.AdvancedMappingExpression = advancedMappingExpression
+	f.require(fieldMappingApiInstanceFieldAdvancedMappingExpression)
 }
 
 func (f *FieldMappingApiInstance) UnmarshalJSON(data []byte) error {
@@ -1290,21 +1430,24 @@ var (
 	fieldMappingApiInstanceResponseFieldCreditNote               = big.NewInt(1 << 7)
 	fieldMappingApiInstanceResponseFieldItem                     = big.NewInt(1 << 8)
 	fieldMappingApiInstanceResponseFieldPurchaseOrder            = big.NewInt(1 << 9)
-	fieldMappingApiInstanceResponseFieldTrackingCategory         = big.NewInt(1 << 10)
-	fieldMappingApiInstanceResponseFieldJournalEntry             = big.NewInt(1 << 11)
-	fieldMappingApiInstanceResponseFieldTaxRate                  = big.NewInt(1 << 12)
-	fieldMappingApiInstanceResponseFieldInvoice                  = big.NewInt(1 << 13)
-	fieldMappingApiInstanceResponseFieldPayment                  = big.NewInt(1 << 14)
-	fieldMappingApiInstanceResponseFieldExpense                  = big.NewInt(1 << 15)
-	fieldMappingApiInstanceResponseFieldVendorCredit             = big.NewInt(1 << 16)
-	fieldMappingApiInstanceResponseFieldTransaction              = big.NewInt(1 << 17)
-	fieldMappingApiInstanceResponseFieldAccountingPeriod         = big.NewInt(1 << 18)
-	fieldMappingApiInstanceResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 19)
-	fieldMappingApiInstanceResponseFieldBankFeedAccount          = big.NewInt(1 << 20)
-	fieldMappingApiInstanceResponseFieldEmployee                 = big.NewInt(1 << 21)
-	fieldMappingApiInstanceResponseFieldPaymentMethod            = big.NewInt(1 << 22)
-	fieldMappingApiInstanceResponseFieldProject                  = big.NewInt(1 << 23)
-	fieldMappingApiInstanceResponseFieldPaymentTerm              = big.NewInt(1 << 24)
+	fieldMappingApiInstanceResponseFieldSalesOrder               = big.NewInt(1 << 10)
+	fieldMappingApiInstanceResponseFieldItemFulfillment          = big.NewInt(1 << 11)
+	fieldMappingApiInstanceResponseFieldExpenseReport            = big.NewInt(1 << 12)
+	fieldMappingApiInstanceResponseFieldTrackingCategory         = big.NewInt(1 << 13)
+	fieldMappingApiInstanceResponseFieldJournalEntry             = big.NewInt(1 << 14)
+	fieldMappingApiInstanceResponseFieldTaxRate                  = big.NewInt(1 << 15)
+	fieldMappingApiInstanceResponseFieldInvoice                  = big.NewInt(1 << 16)
+	fieldMappingApiInstanceResponseFieldPayment                  = big.NewInt(1 << 17)
+	fieldMappingApiInstanceResponseFieldExpense                  = big.NewInt(1 << 18)
+	fieldMappingApiInstanceResponseFieldVendorCredit             = big.NewInt(1 << 19)
+	fieldMappingApiInstanceResponseFieldTransaction              = big.NewInt(1 << 20)
+	fieldMappingApiInstanceResponseFieldAccountingPeriod         = big.NewInt(1 << 21)
+	fieldMappingApiInstanceResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 22)
+	fieldMappingApiInstanceResponseFieldBankFeedAccount          = big.NewInt(1 << 23)
+	fieldMappingApiInstanceResponseFieldEmployee                 = big.NewInt(1 << 24)
+	fieldMappingApiInstanceResponseFieldPaymentMethod            = big.NewInt(1 << 25)
+	fieldMappingApiInstanceResponseFieldProject                  = big.NewInt(1 << 26)
+	fieldMappingApiInstanceResponseFieldPaymentTerm              = big.NewInt(1 << 27)
 )
 
 type FieldMappingApiInstanceResponse struct {
@@ -1318,6 +1461,9 @@ type FieldMappingApiInstanceResponse struct {
 	CreditNote               []*FieldMappingApiInstance `json:"CreditNote,omitempty" url:"CreditNote,omitempty"`
 	Item                     []*FieldMappingApiInstance `json:"Item,omitempty" url:"Item,omitempty"`
 	PurchaseOrder            []*FieldMappingApiInstance `json:"PurchaseOrder,omitempty" url:"PurchaseOrder,omitempty"`
+	SalesOrder               []*FieldMappingApiInstance `json:"SalesOrder,omitempty" url:"SalesOrder,omitempty"`
+	ItemFulfillment          []*FieldMappingApiInstance `json:"ItemFulfillment,omitempty" url:"ItemFulfillment,omitempty"`
+	ExpenseReport            []*FieldMappingApiInstance `json:"ExpenseReport,omitempty" url:"ExpenseReport,omitempty"`
 	TrackingCategory         []*FieldMappingApiInstance `json:"TrackingCategory,omitempty" url:"TrackingCategory,omitempty"`
 	JournalEntry             []*FieldMappingApiInstance `json:"JournalEntry,omitempty" url:"JournalEntry,omitempty"`
 	TaxRate                  []*FieldMappingApiInstance `json:"TaxRate,omitempty" url:"TaxRate,omitempty"`
@@ -1409,6 +1555,27 @@ func (f *FieldMappingApiInstanceResponse) GetPurchaseOrder() []*FieldMappingApiI
 		return nil
 	}
 	return f.PurchaseOrder
+}
+
+func (f *FieldMappingApiInstanceResponse) GetSalesOrder() []*FieldMappingApiInstance {
+	if f == nil {
+		return nil
+	}
+	return f.SalesOrder
+}
+
+func (f *FieldMappingApiInstanceResponse) GetItemFulfillment() []*FieldMappingApiInstance {
+	if f == nil {
+		return nil
+	}
+	return f.ItemFulfillment
+}
+
+func (f *FieldMappingApiInstanceResponse) GetExpenseReport() []*FieldMappingApiInstance {
+	if f == nil {
+		return nil
+	}
+	return f.ExpenseReport
 }
 
 func (f *FieldMappingApiInstanceResponse) GetTrackingCategory() []*FieldMappingApiInstance {
@@ -1595,6 +1762,27 @@ func (f *FieldMappingApiInstanceResponse) SetItem(item []*FieldMappingApiInstanc
 func (f *FieldMappingApiInstanceResponse) SetPurchaseOrder(purchaseOrder []*FieldMappingApiInstance) {
 	f.PurchaseOrder = purchaseOrder
 	f.require(fieldMappingApiInstanceResponseFieldPurchaseOrder)
+}
+
+// SetSalesOrder sets the SalesOrder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetSalesOrder(salesOrder []*FieldMappingApiInstance) {
+	f.SalesOrder = salesOrder
+	f.require(fieldMappingApiInstanceResponseFieldSalesOrder)
+}
+
+// SetItemFulfillment sets the ItemFulfillment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetItemFulfillment(itemFulfillment []*FieldMappingApiInstance) {
+	f.ItemFulfillment = itemFulfillment
+	f.require(fieldMappingApiInstanceResponseFieldItemFulfillment)
+}
+
+// SetExpenseReport sets the ExpenseReport field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (f *FieldMappingApiInstanceResponse) SetExpenseReport(expenseReport []*FieldMappingApiInstance) {
+	f.ExpenseReport = expenseReport
+	f.require(fieldMappingApiInstanceResponseFieldExpenseReport)
 }
 
 // SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
@@ -2318,21 +2506,24 @@ var (
 	remoteFieldApiResponseFieldCreditNote               = big.NewInt(1 << 7)
 	remoteFieldApiResponseFieldItem                     = big.NewInt(1 << 8)
 	remoteFieldApiResponseFieldPurchaseOrder            = big.NewInt(1 << 9)
-	remoteFieldApiResponseFieldTrackingCategory         = big.NewInt(1 << 10)
-	remoteFieldApiResponseFieldJournalEntry             = big.NewInt(1 << 11)
-	remoteFieldApiResponseFieldTaxRate                  = big.NewInt(1 << 12)
-	remoteFieldApiResponseFieldInvoice                  = big.NewInt(1 << 13)
-	remoteFieldApiResponseFieldPayment                  = big.NewInt(1 << 14)
-	remoteFieldApiResponseFieldExpense                  = big.NewInt(1 << 15)
-	remoteFieldApiResponseFieldVendorCredit             = big.NewInt(1 << 16)
-	remoteFieldApiResponseFieldTransaction              = big.NewInt(1 << 17)
-	remoteFieldApiResponseFieldAccountingPeriod         = big.NewInt(1 << 18)
-	remoteFieldApiResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 19)
-	remoteFieldApiResponseFieldBankFeedAccount          = big.NewInt(1 << 20)
-	remoteFieldApiResponseFieldEmployee                 = big.NewInt(1 << 21)
-	remoteFieldApiResponseFieldPaymentMethod            = big.NewInt(1 << 22)
-	remoteFieldApiResponseFieldProject                  = big.NewInt(1 << 23)
-	remoteFieldApiResponseFieldPaymentTerm              = big.NewInt(1 << 24)
+	remoteFieldApiResponseFieldSalesOrder               = big.NewInt(1 << 10)
+	remoteFieldApiResponseFieldItemFulfillment          = big.NewInt(1 << 11)
+	remoteFieldApiResponseFieldExpenseReport            = big.NewInt(1 << 12)
+	remoteFieldApiResponseFieldTrackingCategory         = big.NewInt(1 << 13)
+	remoteFieldApiResponseFieldJournalEntry             = big.NewInt(1 << 14)
+	remoteFieldApiResponseFieldTaxRate                  = big.NewInt(1 << 15)
+	remoteFieldApiResponseFieldInvoice                  = big.NewInt(1 << 16)
+	remoteFieldApiResponseFieldPayment                  = big.NewInt(1 << 17)
+	remoteFieldApiResponseFieldExpense                  = big.NewInt(1 << 18)
+	remoteFieldApiResponseFieldVendorCredit             = big.NewInt(1 << 19)
+	remoteFieldApiResponseFieldTransaction              = big.NewInt(1 << 20)
+	remoteFieldApiResponseFieldAccountingPeriod         = big.NewInt(1 << 21)
+	remoteFieldApiResponseFieldGeneralLedgerTransaction = big.NewInt(1 << 22)
+	remoteFieldApiResponseFieldBankFeedAccount          = big.NewInt(1 << 23)
+	remoteFieldApiResponseFieldEmployee                 = big.NewInt(1 << 24)
+	remoteFieldApiResponseFieldPaymentMethod            = big.NewInt(1 << 25)
+	remoteFieldApiResponseFieldProject                  = big.NewInt(1 << 26)
+	remoteFieldApiResponseFieldPaymentTerm              = big.NewInt(1 << 27)
 )
 
 type RemoteFieldApiResponse struct {
@@ -2346,6 +2537,9 @@ type RemoteFieldApiResponse struct {
 	CreditNote               []*RemoteFieldApi `json:"CreditNote,omitempty" url:"CreditNote,omitempty"`
 	Item                     []*RemoteFieldApi `json:"Item,omitempty" url:"Item,omitempty"`
 	PurchaseOrder            []*RemoteFieldApi `json:"PurchaseOrder,omitempty" url:"PurchaseOrder,omitempty"`
+	SalesOrder               []*RemoteFieldApi `json:"SalesOrder,omitempty" url:"SalesOrder,omitempty"`
+	ItemFulfillment          []*RemoteFieldApi `json:"ItemFulfillment,omitempty" url:"ItemFulfillment,omitempty"`
+	ExpenseReport            []*RemoteFieldApi `json:"ExpenseReport,omitempty" url:"ExpenseReport,omitempty"`
 	TrackingCategory         []*RemoteFieldApi `json:"TrackingCategory,omitempty" url:"TrackingCategory,omitempty"`
 	JournalEntry             []*RemoteFieldApi `json:"JournalEntry,omitempty" url:"JournalEntry,omitempty"`
 	TaxRate                  []*RemoteFieldApi `json:"TaxRate,omitempty" url:"TaxRate,omitempty"`
@@ -2437,6 +2631,27 @@ func (r *RemoteFieldApiResponse) GetPurchaseOrder() []*RemoteFieldApi {
 		return nil
 	}
 	return r.PurchaseOrder
+}
+
+func (r *RemoteFieldApiResponse) GetSalesOrder() []*RemoteFieldApi {
+	if r == nil {
+		return nil
+	}
+	return r.SalesOrder
+}
+
+func (r *RemoteFieldApiResponse) GetItemFulfillment() []*RemoteFieldApi {
+	if r == nil {
+		return nil
+	}
+	return r.ItemFulfillment
+}
+
+func (r *RemoteFieldApiResponse) GetExpenseReport() []*RemoteFieldApi {
+	if r == nil {
+		return nil
+	}
+	return r.ExpenseReport
 }
 
 func (r *RemoteFieldApiResponse) GetTrackingCategory() []*RemoteFieldApi {
@@ -2623,6 +2838,27 @@ func (r *RemoteFieldApiResponse) SetItem(item []*RemoteFieldApi) {
 func (r *RemoteFieldApiResponse) SetPurchaseOrder(purchaseOrder []*RemoteFieldApi) {
 	r.PurchaseOrder = purchaseOrder
 	r.require(remoteFieldApiResponseFieldPurchaseOrder)
+}
+
+// SetSalesOrder sets the SalesOrder field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetSalesOrder(salesOrder []*RemoteFieldApi) {
+	r.SalesOrder = salesOrder
+	r.require(remoteFieldApiResponseFieldSalesOrder)
+}
+
+// SetItemFulfillment sets the ItemFulfillment field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetItemFulfillment(itemFulfillment []*RemoteFieldApi) {
+	r.ItemFulfillment = itemFulfillment
+	r.require(remoteFieldApiResponseFieldItemFulfillment)
+}
+
+// SetExpenseReport sets the ExpenseReport field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldApiResponse) SetExpenseReport(expenseReport []*RemoteFieldApi) {
+	r.ExpenseReport = expenseReport
+	r.require(remoteFieldApiResponseFieldExpenseReport)
 }
 
 // SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;

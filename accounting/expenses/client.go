@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.ExpensesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.Expense], error) {
+) (*core.Page[*string, *accounting.Expense, *accounting.PaginatedExpenseList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/expenses"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedExpenseList) *core.PageResponse[*string, *accounting.Expense] {
+	readPageResponse := func(response *accounting.PaginatedExpenseList) *core.PageResponse[*string, *accounting.Expense, *accounting.PaginatedExpenseList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.Expense]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.Expense, *accounting.PaginatedExpenseList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -127,17 +128,51 @@ func (c *Client) Retrieve(
 	return response.Body, nil
 }
 
+// Creates multiple `Expense` objects with the given values.
+func (c *Client) BulkCreate(
+	ctx context.Context,
+	request *accounting.ExpenseBulkRequest,
+	opts ...option.RequestOption,
+) (*accounting.AsyncBulkCreateResponse, error) {
+	response, err := c.WithRawResponse.BulkCreate(
+		ctx,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Returns the status and results of an `Expense` bulk create batch.
+func (c *Client) BulkRetrieve(
+	ctx context.Context,
+	batchId string,
+	opts ...option.RequestOption,
+) (*accounting.BatchObjectsResponse, error) {
+	response, err := c.WithRawResponse.BulkRetrieve(
+		ctx,
+		batchId,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
 // Returns a list of `RemoteFieldClass` objects.
 func (c *Client) LinesRemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.ExpensesLinesRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/expenses/lines/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -167,14 +202,15 @@ func (c *Client) LinesRemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -205,12 +241,12 @@ func (c *Client) RemoteFieldClassesList(
 	ctx context.Context,
 	request *accounting.ExpensesRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.RemoteFieldClass], error) {
+) (*core.Page[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/expenses/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -240,14 +276,15 @@ func (c *Client) RemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass] {
+	readPageResponse := func(response *accounting.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.RemoteFieldClass, *accounting.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

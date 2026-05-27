@@ -104,7 +104,7 @@ type LeadsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return leads with this owner.
 	OwnerId *string `json:"-" url:"owner_id,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If provided, will only return contacts matching the phone numbers; multiple phone numbers can be separated by commas.
 	PhoneNumbers *string `json:"-" url:"phone_numbers,omitempty"`
@@ -267,7 +267,7 @@ type LeadsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -467,10 +467,11 @@ var (
 	leadFieldConvertedDate    = big.NewInt(1 << 15)
 	leadFieldConvertedContact = big.NewInt(1 << 16)
 	leadFieldConvertedAccount = big.NewInt(1 << 17)
-	leadFieldRemoteWasDeleted = big.NewInt(1 << 18)
-	leadFieldFieldMappings    = big.NewInt(1 << 19)
-	leadFieldRemoteData       = big.NewInt(1 << 20)
-	leadFieldRemoteFields     = big.NewInt(1 << 21)
+	leadFieldStatus           = big.NewInt(1 << 18)
+	leadFieldRemoteWasDeleted = big.NewInt(1 << 19)
+	leadFieldFieldMappings    = big.NewInt(1 << 20)
+	leadFieldRemoteData       = big.NewInt(1 << 21)
+	leadFieldRemoteFields     = big.NewInt(1 << 22)
 )
 
 type Lead struct {
@@ -506,6 +507,13 @@ type Lead struct {
 	ConvertedContact *LeadConvertedContact `json:"converted_contact,omitempty" url:"converted_contact,omitempty"`
 	// The account of the converted lead.
 	ConvertedAccount *LeadConvertedAccount `json:"converted_account,omitempty" url:"converted_account,omitempty"`
+	// The lead's status.
+	//
+	// * `OPEN` - OPEN
+	// * `CLOSED` - CLOSED
+	// * `UNQUALIFIED` - UNQUALIFIED
+	// * `QUALIFIED` - QUALIFIED
+	Status *LeadStatus `json:"status,omitempty" url:"status,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
@@ -643,6 +651,13 @@ func (l *Lead) GetConvertedAccount() *LeadConvertedAccount {
 		return nil
 	}
 	return l.ConvertedAccount
+}
+
+func (l *Lead) GetStatus() *LeadStatus {
+	if l == nil {
+		return nil
+	}
+	return l.Status
 }
 
 func (l *Lead) GetRemoteWasDeleted() *bool {
@@ -808,6 +823,13 @@ func (l *Lead) SetConvertedContact(convertedContact *LeadConvertedContact) {
 func (l *Lead) SetConvertedAccount(convertedAccount *LeadConvertedAccount) {
 	l.ConvertedAccount = convertedAccount
 	l.require(leadFieldConvertedAccount)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *Lead) SetStatus(status *LeadStatus) {
+	l.Status = status
+	l.require(leadFieldStatus)
 }
 
 // SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
@@ -1727,6 +1749,106 @@ func (l *LeadResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", l)
+}
+
+// The lead's status.
+//
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
+// * `UNQUALIFIED` - UNQUALIFIED
+// * `QUALIFIED` - QUALIFIED
+type LeadStatus struct {
+	LeadStatusEnum LeadStatusEnum
+	String         string
+
+	typ string
+}
+
+func (l *LeadStatus) GetLeadStatusEnum() LeadStatusEnum {
+	if l == nil {
+		return ""
+	}
+	return l.LeadStatusEnum
+}
+
+func (l *LeadStatus) GetString() string {
+	if l == nil {
+		return ""
+	}
+	return l.String
+}
+
+func (l *LeadStatus) UnmarshalJSON(data []byte) error {
+	var valueLeadStatusEnum LeadStatusEnum
+	if err := json.Unmarshal(data, &valueLeadStatusEnum); err == nil {
+		l.typ = "LeadStatusEnum"
+		l.LeadStatusEnum = valueLeadStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		l.typ = "String"
+		l.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, l)
+}
+
+func (l LeadStatus) MarshalJSON() ([]byte, error) {
+	if l.typ == "LeadStatusEnum" || l.LeadStatusEnum != "" {
+		return json.Marshal(l.LeadStatusEnum)
+	}
+	if l.typ == "String" || l.String != "" {
+		return json.Marshal(l.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", l)
+}
+
+type LeadStatusVisitor interface {
+	VisitLeadStatusEnum(LeadStatusEnum) error
+	VisitString(string) error
+}
+
+func (l *LeadStatus) Accept(visitor LeadStatusVisitor) error {
+	if l.typ == "LeadStatusEnum" || l.LeadStatusEnum != "" {
+		return visitor.VisitLeadStatusEnum(l.LeadStatusEnum)
+	}
+	if l.typ == "String" || l.String != "" {
+		return visitor.VisitString(l.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", l)
+}
+
+// * `OPEN` - OPEN
+// * `CLOSED` - CLOSED
+// * `UNQUALIFIED` - UNQUALIFIED
+// * `QUALIFIED` - QUALIFIED
+type LeadStatusEnum string
+
+const (
+	LeadStatusEnumOpen        LeadStatusEnum = "OPEN"
+	LeadStatusEnumClosed      LeadStatusEnum = "CLOSED"
+	LeadStatusEnumUnqualified LeadStatusEnum = "UNQUALIFIED"
+	LeadStatusEnumQualified   LeadStatusEnum = "QUALIFIED"
+)
+
+func NewLeadStatusEnumFromString(s string) (LeadStatusEnum, error) {
+	switch s {
+	case "OPEN":
+		return LeadStatusEnumOpen, nil
+	case "CLOSED":
+		return LeadStatusEnumClosed, nil
+	case "UNQUALIFIED":
+		return LeadStatusEnumUnqualified, nil
+	case "QUALIFIED":
+		return LeadStatusEnumQualified, nil
+	}
+	var t LeadStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (l LeadStatusEnum) Ptr() *LeadStatusEnum {
+	return &l
 }
 
 var (

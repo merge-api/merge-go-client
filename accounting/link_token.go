@@ -10,19 +10,22 @@ import (
 )
 
 var (
-	endUserDetailsRequestFieldEndUserEmailAddress       = big.NewInt(1 << 0)
-	endUserDetailsRequestFieldEndUserOrganizationName   = big.NewInt(1 << 1)
-	endUserDetailsRequestFieldEndUserOriginId           = big.NewInt(1 << 2)
-	endUserDetailsRequestFieldCategories                = big.NewInt(1 << 3)
-	endUserDetailsRequestFieldIntegration               = big.NewInt(1 << 4)
-	endUserDetailsRequestFieldLinkExpiryMins            = big.NewInt(1 << 5)
-	endUserDetailsRequestFieldShouldCreateMagicLinkUrl  = big.NewInt(1 << 6)
-	endUserDetailsRequestFieldHideAdminMagicLink        = big.NewInt(1 << 7)
-	endUserDetailsRequestFieldCommonModels              = big.NewInt(1 << 8)
-	endUserDetailsRequestFieldCategoryCommonModelScopes = big.NewInt(1 << 9)
-	endUserDetailsRequestFieldLanguage                  = big.NewInt(1 << 10)
-	endUserDetailsRequestFieldAreSyncsDisabled          = big.NewInt(1 << 11)
-	endUserDetailsRequestFieldIntegrationSpecificConfig = big.NewInt(1 << 12)
+	endUserDetailsRequestFieldEndUserEmailAddress           = big.NewInt(1 << 0)
+	endUserDetailsRequestFieldEndUserOrganizationName       = big.NewInt(1 << 1)
+	endUserDetailsRequestFieldEndUserOriginId               = big.NewInt(1 << 2)
+	endUserDetailsRequestFieldCategories                    = big.NewInt(1 << 3)
+	endUserDetailsRequestFieldIntegration                   = big.NewInt(1 << 4)
+	endUserDetailsRequestFieldLinkExpiryMins                = big.NewInt(1 << 5)
+	endUserDetailsRequestFieldShouldCreateMagicLinkUrl      = big.NewInt(1 << 6)
+	endUserDetailsRequestFieldHideAdminMagicLink            = big.NewInt(1 << 7)
+	endUserDetailsRequestFieldCommonModels                  = big.NewInt(1 << 8)
+	endUserDetailsRequestFieldCategoryCommonModelScopes     = big.NewInt(1 << 9)
+	endUserDetailsRequestFieldLanguage                      = big.NewInt(1 << 10)
+	endUserDetailsRequestFieldAreSyncsDisabled              = big.NewInt(1 << 11)
+	endUserDetailsRequestFieldIntegrationSpecificConfig     = big.NewInt(1 << 12)
+	endUserDetailsRequestFieldCompletedAccountInitialScreen = big.NewInt(1 << 13)
+	endUserDetailsRequestFieldLinkedDestinationId           = big.NewInt(1 << 14)
+	endUserDetailsRequestFieldCredentialId                  = big.NewInt(1 << 15)
 )
 
 type EndUserDetailsRequest struct {
@@ -55,6 +58,14 @@ type EndUserDetailsRequest struct {
 	AreSyncsDisabled *bool `json:"are_syncs_disabled,omitempty" url:"-"`
 	// A JSON object containing integration-specific configuration options.
 	IntegrationSpecificConfig map[string]interface{} `json:"integration_specific_config,omitempty" url:"-"`
+	// When creating a Link token, you can specifiy the initial screen of Linking Flow for a completed Linked Account.
+	//
+	// * `SELECTIVE_SYNC` - SELECTIVE_SYNC
+	CompletedAccountInitialScreen *EndUserDetailsRequestCompletedAccountInitialScreen `json:"completed_account_initial_screen,omitempty" url:"-"`
+	// The UUID of the linked destination that you want this Linked Account to be tied to.
+	LinkedDestinationId *string `json:"linked_destination_id,omitempty" url:"-"`
+	// The id of the credential that you want this Linked Account to be tied to.
+	CredentialId *string `json:"credential_id,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -156,6 +167,92 @@ func (e *EndUserDetailsRequest) SetAreSyncsDisabled(areSyncsDisabled *bool) {
 func (e *EndUserDetailsRequest) SetIntegrationSpecificConfig(integrationSpecificConfig map[string]interface{}) {
 	e.IntegrationSpecificConfig = integrationSpecificConfig
 	e.require(endUserDetailsRequestFieldIntegrationSpecificConfig)
+}
+
+// SetCompletedAccountInitialScreen sets the CompletedAccountInitialScreen field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetCompletedAccountInitialScreen(completedAccountInitialScreen *EndUserDetailsRequestCompletedAccountInitialScreen) {
+	e.CompletedAccountInitialScreen = completedAccountInitialScreen
+	e.require(endUserDetailsRequestFieldCompletedAccountInitialScreen)
+}
+
+// SetLinkedDestinationId sets the LinkedDestinationId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetLinkedDestinationId(linkedDestinationId *string) {
+	e.LinkedDestinationId = linkedDestinationId
+	e.require(endUserDetailsRequestFieldLinkedDestinationId)
+}
+
+// SetCredentialId sets the CredentialId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *EndUserDetailsRequest) SetCredentialId(credentialId *string) {
+	e.CredentialId = credentialId
+	e.require(endUserDetailsRequestFieldCredentialId)
+}
+
+// When creating a Link token, you can specifiy the initial screen of Linking Flow for a completed Linked Account.
+//
+// * `SELECTIVE_SYNC` - SELECTIVE_SYNC
+type EndUserDetailsRequestCompletedAccountInitialScreen struct {
+	CompletedAccountInitialScreenEnum CompletedAccountInitialScreenEnum
+	String                            string
+
+	typ string
+}
+
+func NewEndUserDetailsRequestCompletedAccountInitialScreenWithCompletedAccountInitialScreenEnum() *EndUserDetailsRequestCompletedAccountInitialScreen {
+	return &EndUserDetailsRequestCompletedAccountInitialScreen{typ: "CompletedAccountInitialScreenEnum", CompletedAccountInitialScreenEnum: "SELECTIVE_SYNC"}
+}
+
+func (e *EndUserDetailsRequestCompletedAccountInitialScreen) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *EndUserDetailsRequestCompletedAccountInitialScreen) UnmarshalJSON(data []byte) error {
+	var valueCompletedAccountInitialScreenEnum CompletedAccountInitialScreenEnum
+	if err := json.Unmarshal(data, &valueCompletedAccountInitialScreenEnum); err == nil {
+		e.typ = "CompletedAccountInitialScreenEnum"
+		e.CompletedAccountInitialScreenEnum = valueCompletedAccountInitialScreenEnum
+		if e.CompletedAccountInitialScreenEnum != "SELECTIVE_SYNC" {
+			return fmt.Errorf("unexpected value for literal on type %T; expected %v got %v", e, "SELECTIVE_SYNC", valueCompletedAccountInitialScreenEnum)
+		}
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e EndUserDetailsRequestCompletedAccountInitialScreen) MarshalJSON() ([]byte, error) {
+	if e.typ == "CompletedAccountInitialScreenEnum" || e.CompletedAccountInitialScreenEnum != "" {
+		return json.Marshal("SELECTIVE_SYNC")
+	}
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type EndUserDetailsRequestCompletedAccountInitialScreenVisitor interface {
+	VisitCompletedAccountInitialScreenEnum(CompletedAccountInitialScreenEnum) error
+	VisitString(string) error
+}
+
+func (e *EndUserDetailsRequestCompletedAccountInitialScreen) Accept(visitor EndUserDetailsRequestCompletedAccountInitialScreenVisitor) error {
+	if e.typ == "CompletedAccountInitialScreenEnum" || e.CompletedAccountInitialScreenEnum != "" {
+		return visitor.VisitCompletedAccountInitialScreenEnum(e.CompletedAccountInitialScreenEnum)
+	}
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
 // The following subset of IETF language tags can be used to configure localization.
@@ -333,6 +430,9 @@ func (c *CommonModelScopesBodyRequest) String() string {
 	}
 	return fmt.Sprintf("%#v", c)
 }
+
+// * `SELECTIVE_SYNC` - SELECTIVE_SYNC
+type CompletedAccountInitialScreenEnum = string
 
 // * `READ` - READ
 // * `WRITE` - WRITE

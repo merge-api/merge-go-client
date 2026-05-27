@@ -39,7 +39,7 @@ func (r *RawClient) Create(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/folders"
 	queryParams, err := internal.QueryValues(request)
@@ -89,7 +89,7 @@ func (r *RawClient) Retrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/filestorage/v1/folders/%v",
@@ -138,7 +138,7 @@ func (r *RawClient) MetaPostRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/folders/meta/post"
 	headers := internal.MergeHeaders(

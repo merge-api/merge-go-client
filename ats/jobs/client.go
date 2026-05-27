@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.JobsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.Job], error) {
+) (*core.Page[*string, *ats.Job, *ats.PaginatedJobList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/jobs"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedJobList) *core.PageResponse[*string, *ats.Job] {
+	readPageResponse := func(response *ats.PaginatedJobList) *core.PageResponse[*string, *ats.Job, *ats.PaginatedJobList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.Job]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.Job, *ats.PaginatedJobList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -116,12 +117,12 @@ func (c *Client) ScreeningQuestionsList(
 	jobId string,
 	request *ats.JobsScreeningQuestionsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.ScreeningQuestion], error) {
+) (*core.Page[*string, *ats.ScreeningQuestion, *ats.PaginatedScreeningQuestionList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ats/v1/jobs/%v/screening-questions",
@@ -154,14 +155,15 @@ func (c *Client) ScreeningQuestionsList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedScreeningQuestionList) *core.PageResponse[*string, *ats.ScreeningQuestion] {
+	readPageResponse := func(response *ats.PaginatedScreeningQuestionList) *core.PageResponse[*string, *ats.ScreeningQuestion, *ats.PaginatedScreeningQuestionList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.ScreeningQuestion]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.ScreeningQuestion, *ats.PaginatedScreeningQuestionList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

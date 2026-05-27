@@ -8,6 +8,7 @@ import (
 	crm "github.com/merge-api/merge-go-client/v2/crm"
 	internal "github.com/merge-api/merge-go-client/v2/internal"
 	option "github.com/merge-api/merge-go-client/v2/option"
+	http "net/http"
 )
 
 type Client struct {
@@ -37,14 +38,56 @@ func (c *Client) List(
 	ctx context.Context,
 	request *crm.SyncStatusListRequest,
 	opts ...option.RequestOption,
-) (*crm.PaginatedSyncStatusList, error) {
-	response, err := c.WithRawResponse.List(
-		ctx,
-		request,
-		opts...,
+) (*core.Page[*string, *crm.SyncStatus, *crm.PaginatedSyncStatusList], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.merge.dev/api",
 	)
+	endpointURL := baseURL + "/crm/v1/sync-status"
+	queryParams, err := internal.QueryValues(request)
 	if err != nil {
 		return nil, err
 	}
-	return response.Body, nil
+	headers := internal.MergeHeaders(
+		c.options.ToHeader(),
+		options.ToHeader(),
+	)
+	prepareCall := func(pageRequest *core.PageRequest[*string]) *internal.CallParams {
+		if pageRequest.Cursor != nil {
+			queryParams.Set("cursor", *pageRequest.Cursor)
+		}
+		nextURL := endpointURL
+		if len(queryParams) > 0 {
+			nextURL += "?" + queryParams.Encode()
+		}
+		return &internal.CallParams{
+			URL:             nextURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        pageRequest.Response,
+		}
+	}
+	readPageResponse := func(response *crm.PaginatedSyncStatusList) *core.PageResponse[*string, *crm.SyncStatus, *crm.PaginatedSyncStatusList] {
+		var zeroValue *string
+		next := response.GetNext()
+		results := response.GetResults()
+		return &core.PageResponse[*string, *crm.SyncStatus, *crm.PaginatedSyncStatusList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
+		}
+	}
+	pager := internal.NewCursorPager(
+		c.caller,
+		prepareCall,
+		readPageResponse,
+	)
+	return pager.GetPage(ctx, request.Cursor)
 }

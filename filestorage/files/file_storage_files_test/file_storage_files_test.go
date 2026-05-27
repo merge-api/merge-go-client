@@ -121,6 +121,16 @@ func TestFileStorageFilesListWithWireMock(
 		PageSize: merge.Int(
 			1,
 		),
+		RemoteCreatedAfter: merge.Time(
+			merge.MustParseDateTime(
+				"2024-01-15T09:30:00Z",
+			),
+		),
+		RemoteCreatedBefore: merge.Time(
+			merge.MustParseDateTime(
+				"2024-01-15T09:30:00Z",
+			),
+		),
 		RemoteId: merge.String(
 			"remote_id",
 		),
@@ -131,7 +141,7 @@ func TestFileStorageFilesListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/filestorage/v1/files", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "drive_id": "drive_id", "folder_id": "folder_id", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "mime_type": "mime_type", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "name": "name", "order_by": "-created_at", "page_size": "1", "remote_id": "remote_id"}, 1)
+	VerifyRequestCount(t, "GET", "/filestorage/v1/files", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "drive_id": "drive_id", "folder_id": "folder_id", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "mime_type": "mime_type", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "name": "name", "order_by": "-created_at", "page_size": "1", "remote_created_after": "2024-01-15T09:30:00Z", "remote_created_before": "2024-01-15T09:30:00Z", "remote_id": "remote_id"}, 1)
 }
 
 func TestFileStorageFilesCreateWithWireMock(

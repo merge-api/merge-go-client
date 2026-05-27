@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *hris.GroupsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *hris.Group], error) {
+) (*core.Page[*string, *hris.Group, *hris.PaginatedGroupList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/groups"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *hris.PaginatedGroupList) *core.PageResponse[*string, *hris.Group] {
+	readPageResponse := func(response *hris.PaginatedGroupList) *core.PageResponse[*string, *hris.Group, *hris.PaginatedGroupList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *hris.Group]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *hris.Group, *hris.PaginatedGroupList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -101,6 +102,23 @@ func (c *Client) Retrieve(
 	response, err := c.WithRawResponse.Retrieve(
 		ctx,
 		id,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Returns a list of distinct group type values from the Groups common model.
+func (c *Client) TypesList(
+	ctx context.Context,
+	request *hris.GroupsTypesListRequest,
+	opts ...option.RequestOption,
+) (*hris.GroupsTypesListResponse, error) {
+	response, err := c.WithRawResponse.TypesList(
+		ctx,
 		request,
 		opts...,
 	)

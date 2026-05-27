@@ -72,7 +72,7 @@ type BankFeedAccountsListRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -164,21 +164,24 @@ func (b *BankFeedAccountsRetrieveRequest) SetIncludeShellData(includeShellData *
 // ### Usage Example
 // Fetch from the `GET BankFeedAccount` endpoint to view details of a bank feed account.
 var (
-	bankFeedAccountRequestFieldSourceAccountId      = big.NewInt(1 << 0)
-	bankFeedAccountRequestFieldTargetAccountId      = big.NewInt(1 << 1)
-	bankFeedAccountRequestFieldSourceAccountName    = big.NewInt(1 << 2)
-	bankFeedAccountRequestFieldSourceAccountNumber  = big.NewInt(1 << 3)
-	bankFeedAccountRequestFieldTargetAccountName    = big.NewInt(1 << 4)
-	bankFeedAccountRequestFieldCurrency             = big.NewInt(1 << 5)
-	bankFeedAccountRequestFieldFeedStatus           = big.NewInt(1 << 6)
-	bankFeedAccountRequestFieldFeedStartDate        = big.NewInt(1 << 7)
-	bankFeedAccountRequestFieldSourceAccountBalance = big.NewInt(1 << 8)
-	bankFeedAccountRequestFieldAccountType          = big.NewInt(1 << 9)
-	bankFeedAccountRequestFieldIntegrationParams    = big.NewInt(1 << 10)
-	bankFeedAccountRequestFieldLinkedAccountParams  = big.NewInt(1 << 11)
+	bankFeedAccountRequestFieldBankFeedAccountUrl   = big.NewInt(1 << 0)
+	bankFeedAccountRequestFieldSourceAccountId      = big.NewInt(1 << 1)
+	bankFeedAccountRequestFieldTargetAccountId      = big.NewInt(1 << 2)
+	bankFeedAccountRequestFieldSourceAccountName    = big.NewInt(1 << 3)
+	bankFeedAccountRequestFieldSourceAccountNumber  = big.NewInt(1 << 4)
+	bankFeedAccountRequestFieldTargetAccountName    = big.NewInt(1 << 5)
+	bankFeedAccountRequestFieldCurrency             = big.NewInt(1 << 6)
+	bankFeedAccountRequestFieldFeedStatus           = big.NewInt(1 << 7)
+	bankFeedAccountRequestFieldFeedStartDate        = big.NewInt(1 << 8)
+	bankFeedAccountRequestFieldSourceAccountBalance = big.NewInt(1 << 9)
+	bankFeedAccountRequestFieldAccountType          = big.NewInt(1 << 10)
+	bankFeedAccountRequestFieldIntegrationParams    = big.NewInt(1 << 11)
+	bankFeedAccountRequestFieldLinkedAccountParams  = big.NewInt(1 << 12)
 )
 
 type BankFeedAccountRequest struct {
+	// The 3rd party URL of the bank feed account.
+	BankFeedAccountUrl *string `json:"bank_feed_account_url,omitempty" url:"bank_feed_account_url,omitempty"`
 	// The unique identifier of the source account from our customer’s platform.
 	SourceAccountId *string `json:"source_account_id,omitempty" url:"source_account_id,omitempty"`
 	// The unique identifier of the target account from the third party software.
@@ -522,6 +525,13 @@ type BankFeedAccountRequest struct {
 	rawJSON         json.RawMessage
 }
 
+func (b *BankFeedAccountRequest) GetBankFeedAccountUrl() *string {
+	if b == nil {
+		return nil
+	}
+	return b.BankFeedAccountUrl
+}
+
 func (b *BankFeedAccountRequest) GetSourceAccountId() *string {
 	if b == nil {
 		return nil
@@ -615,6 +625,13 @@ func (b *BankFeedAccountRequest) require(field *big.Int) {
 		b.explicitFields = big.NewInt(0)
 	}
 	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetBankFeedAccountUrl sets the BankFeedAccountUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccountRequest) SetBankFeedAccountUrl(bankFeedAccountUrl *string) {
+	b.BankFeedAccountUrl = bankFeedAccountUrl
+	b.require(bankFeedAccountRequestFieldBankFeedAccountUrl)
 }
 
 // SetSourceAccountId sets the SourceAccountId field and marks it as non-optional;

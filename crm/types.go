@@ -8169,7 +8169,8 @@ var (
 
 type RemoteData struct {
 	// The third-party API path that is being called.
-	Path string      `json:"path" url:"path"`
+	Path string `json:"path" url:"path"`
+	// The data returned from the third-party for this object in its original, unnormalized format.
 	Data interface{} `json:"data,omitempty" url:"data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -8352,29 +8353,31 @@ func (r *RemoteField) String() string {
 }
 
 var (
-	remoteFieldClassFieldId            = big.NewInt(1 << 0)
-	remoteFieldClassFieldDisplayName   = big.NewInt(1 << 1)
-	remoteFieldClassFieldRemoteKeyName = big.NewInt(1 << 2)
-	remoteFieldClassFieldDescription   = big.NewInt(1 << 3)
-	remoteFieldClassFieldIsCustom      = big.NewInt(1 << 4)
-	remoteFieldClassFieldIsRequired    = big.NewInt(1 << 5)
-	remoteFieldClassFieldFieldType     = big.NewInt(1 << 6)
-	remoteFieldClassFieldFieldFormat   = big.NewInt(1 << 7)
-	remoteFieldClassFieldFieldChoices  = big.NewInt(1 << 8)
-	remoteFieldClassFieldItemSchema    = big.NewInt(1 << 9)
+	remoteFieldClassFieldId                 = big.NewInt(1 << 0)
+	remoteFieldClassFieldDisplayName        = big.NewInt(1 << 1)
+	remoteFieldClassFieldRemoteKeyName      = big.NewInt(1 << 2)
+	remoteFieldClassFieldDescription        = big.NewInt(1 << 3)
+	remoteFieldClassFieldIsCustom           = big.NewInt(1 << 4)
+	remoteFieldClassFieldIsCommonModelField = big.NewInt(1 << 5)
+	remoteFieldClassFieldIsRequired         = big.NewInt(1 << 6)
+	remoteFieldClassFieldFieldType          = big.NewInt(1 << 7)
+	remoteFieldClassFieldFieldFormat        = big.NewInt(1 << 8)
+	remoteFieldClassFieldFieldChoices       = big.NewInt(1 << 9)
+	remoteFieldClassFieldItemSchema         = big.NewInt(1 << 10)
 )
 
 type RemoteFieldClass struct {
-	Id            *string                             `json:"id,omitempty" url:"id,omitempty"`
-	DisplayName   *string                             `json:"display_name,omitempty" url:"display_name,omitempty"`
-	RemoteKeyName *string                             `json:"remote_key_name,omitempty" url:"remote_key_name,omitempty"`
-	Description   *string                             `json:"description,omitempty" url:"description,omitempty"`
-	IsCustom      *bool                               `json:"is_custom,omitempty" url:"is_custom,omitempty"`
-	IsRequired    *bool                               `json:"is_required,omitempty" url:"is_required,omitempty"`
-	FieldType     *FieldTypeEnum                      `json:"field_type,omitempty" url:"field_type,omitempty"`
-	FieldFormat   *FieldFormatEnum                    `json:"field_format,omitempty" url:"field_format,omitempty"`
-	FieldChoices  []*RemoteFieldClassFieldChoicesItem `json:"field_choices,omitempty" url:"field_choices,omitempty"`
-	ItemSchema    *ItemSchema                         `json:"item_schema,omitempty" url:"item_schema,omitempty"`
+	Id                 *string                             `json:"id,omitempty" url:"id,omitempty"`
+	DisplayName        *string                             `json:"display_name,omitempty" url:"display_name,omitempty"`
+	RemoteKeyName      *string                             `json:"remote_key_name,omitempty" url:"remote_key_name,omitempty"`
+	Description        *string                             `json:"description,omitempty" url:"description,omitempty"`
+	IsCustom           *bool                               `json:"is_custom,omitempty" url:"is_custom,omitempty"`
+	IsCommonModelField *bool                               `json:"is_common_model_field,omitempty" url:"is_common_model_field,omitempty"`
+	IsRequired         *bool                               `json:"is_required,omitempty" url:"is_required,omitempty"`
+	FieldType          *FieldTypeEnum                      `json:"field_type,omitempty" url:"field_type,omitempty"`
+	FieldFormat        *FieldFormatEnum                    `json:"field_format,omitempty" url:"field_format,omitempty"`
+	FieldChoices       []*RemoteFieldClassFieldChoicesItem `json:"field_choices,omitempty" url:"field_choices,omitempty"`
+	ItemSchema         *ItemSchema                         `json:"item_schema,omitempty" url:"item_schema,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -8416,6 +8419,13 @@ func (r *RemoteFieldClass) GetIsCustom() *bool {
 		return nil
 	}
 	return r.IsCustom
+}
+
+func (r *RemoteFieldClass) GetIsCommonModelField() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.IsCommonModelField
 }
 
 func (r *RemoteFieldClass) GetIsRequired() *bool {
@@ -8497,6 +8507,13 @@ func (r *RemoteFieldClass) SetDescription(description *string) {
 func (r *RemoteFieldClass) SetIsCustom(isCustom *bool) {
 	r.IsCustom = isCustom
 	r.require(remoteFieldClassFieldIsCustom)
+}
+
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldClass) SetIsCommonModelField(isCommonModelField *bool) {
+	r.IsCommonModelField = isCommonModelField
+	r.require(remoteFieldClassFieldIsCommonModelField)
 }
 
 // SetIsRequired sets the IsRequired field and marks it as non-optional;

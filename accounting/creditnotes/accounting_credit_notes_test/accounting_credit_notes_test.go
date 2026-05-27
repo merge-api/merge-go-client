@@ -194,6 +194,86 @@ func TestAccountingCreditNotesRetrieveWithWireMock(
 	VerifyRequestCount(t, "GET", "/accounting/v1/credit-notes/id", map[string]string{"include_remote_data": "true", "include_shell_data": "true", "remote_fields": "status", "show_enum_origins": "status"}, 1)
 }
 
+func TestAccountingCreditNotesPartialUpdateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.PatchedCreditNoteEndpointRequest{
+		IsDebugMode: merge.Bool(
+			true,
+		),
+		RunAsync: merge.Bool(
+			true,
+		),
+		Model: &accounting.CreditNoteRequest{},
+	}
+	_, invocationErr := client.Accounting.CreditNotes.PartialUpdate(
+		context.TODO(),
+		"id",
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "PATCH", "/accounting/v1/credit-notes/id", map[string]string{"is_debug_mode": "true", "run_async": "true"}, 1)
+}
+
+func TestAccountingCreditNotesApplicationCreateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.ApplyCreditNoteRequest{
+		IsDebugMode: merge.Bool(
+			true,
+		),
+		RunAsync: merge.Bool(
+			true,
+		),
+		AppliedDate: merge.MustParseDateTime(
+			"2024-01-15T09:30:00Z",
+		),
+		AppliedAmount: "applied_amount",
+	}
+	_, invocationErr := client.Accounting.CreditNotes.ApplicationCreate(
+		context.TODO(),
+		"id",
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "POST", "/accounting/v1/credit-notes/id/application", map[string]string{"is_debug_mode": "true", "run_async": "true"}, 1)
+}
+
+func TestAccountingCreditNotesMetaPatchRetrieveWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	_, invocationErr := client.Accounting.CreditNotes.MetaPatchRetrieve(
+		context.TODO(),
+		"id",
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "GET", "/accounting/v1/credit-notes/meta/patch/id", nil, 1)
+}
+
 func TestAccountingCreditNotesMetaPostRetrieveWithWireMock(
 	t *testing.T,
 ) {
