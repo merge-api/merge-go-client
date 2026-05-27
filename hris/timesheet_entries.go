@@ -102,7 +102,7 @@ type TimesheetEntriesListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// Overrides the default ordering for this endpoint. Possible values include: start_time, -start_time.
 	OrderBy *TimesheetEntriesListRequestOrderBy `json:"-" url:"order_by,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`

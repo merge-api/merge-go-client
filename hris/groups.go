@@ -49,7 +49,7 @@ type GroupsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return groups with these names. Multiple values can be separated by commas.
 	Names *string `json:"-" url:"names,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
@@ -233,6 +233,85 @@ func (g *GroupsRetrieveRequest) SetShowEnumOrigins(showEnumOrigins *string) {
 }
 
 var (
+	groupsTypesListResponseFieldTypes = big.NewInt(1 << 0)
+)
+
+type GroupsTypesListResponse struct {
+	// List of distinct group types
+	Types []string `json:"types,omitempty" url:"types,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GroupsTypesListResponse) GetTypes() []string {
+	if g == nil {
+		return nil
+	}
+	return g.Types
+}
+
+func (g *GroupsTypesListResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GroupsTypesListResponse) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetTypes sets the Types field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsTypesListResponse) SetTypes(types []string) {
+	g.Types = types
+	g.require(groupsTypesListResponseFieldTypes)
+}
+
+func (g *GroupsTypesListResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GroupsTypesListResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GroupsTypesListResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GroupsTypesListResponse) MarshalJSON() ([]byte, error) {
+	type embed GroupsTypesListResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*g),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, g.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (g *GroupsTypesListResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+var (
 	paginatedGroupListFieldNext     = big.NewInt(1 << 0)
 	paginatedGroupListFieldPrevious = big.NewInt(1 << 1)
 	paginatedGroupListFieldResults  = big.NewInt(1 << 2)
@@ -340,4 +419,40 @@ func (p *PaginatedGroupList) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", p)
+}
+
+var (
+	groupsTypesListRequestFieldIncludeDeletedData = big.NewInt(1 << 0)
+	groupsTypesListRequestFieldShowEnumOrigins    = big.NewInt(1 << 1)
+)
+
+type GroupsTypesListRequest struct {
+	// Whether to include data that was marked as deleted by third party webhooks.
+	IncludeDeletedData *bool `json:"-" url:"include_deleted_data,omitempty"`
+	// A comma separated list of enum field names for which you'd like the original values instead of Merge's normalized enum values. [Learn more](https://help.merge.dev/en/articles/8950958-show_enum_origins)
+	ShowEnumOrigins *string `json:"-" url:"show_enum_origins,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (g *GroupsTypesListRequest) require(field *big.Int) {
+	if g.explicitFields == nil {
+		g.explicitFields = big.NewInt(0)
+	}
+	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetIncludeDeletedData sets the IncludeDeletedData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsTypesListRequest) SetIncludeDeletedData(includeDeletedData *bool) {
+	g.IncludeDeletedData = includeDeletedData
+	g.require(groupsTypesListRequestFieldIncludeDeletedData)
+}
+
+// SetShowEnumOrigins sets the ShowEnumOrigins field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *GroupsTypesListRequest) SetShowEnumOrigins(showEnumOrigins *string) {
+	g.ShowEnumOrigins = showEnumOrigins
+	g.require(groupsTypesListRequestFieldShowEnumOrigins)
 }

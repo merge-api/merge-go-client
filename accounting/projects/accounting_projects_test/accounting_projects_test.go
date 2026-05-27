@@ -73,6 +73,19 @@ func TestAccountingProjectsListWithWireMock(
 		),
 	)
 	request := &accounting.ProjectsListRequest{
+		CompanyId: merge.String(
+			"company_id",
+		),
+		CreatedAfter: merge.Time(
+			merge.MustParseDateTime(
+				"2024-01-15T09:30:00Z",
+			),
+		),
+		CreatedBefore: merge.Time(
+			merge.MustParseDateTime(
+				"2024-01-15T09:30:00Z",
+			),
+		),
 		Cursor: merge.String(
 			"cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
 		),
@@ -85,8 +98,24 @@ func TestAccountingProjectsListWithWireMock(
 		IncludeShellData: merge.Bool(
 			true,
 		),
+		IsActive: merge.String(
+			"is_active",
+		),
+		ModifiedAfter: merge.Time(
+			merge.MustParseDateTime(
+				"2024-01-15T09:30:00Z",
+			),
+		),
+		ModifiedBefore: merge.Time(
+			merge.MustParseDateTime(
+				"2024-01-15T09:30:00Z",
+			),
+		),
 		PageSize: merge.Int(
 			1,
+		),
+		RemoteId: merge.String(
+			"remote_id",
 		),
 	}
 	_, invocationErr := client.Accounting.Projects.List(
@@ -95,7 +124,7 @@ func TestAccountingProjectsListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/accounting/v1/projects", map[string]string{"cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "page_size": "1"}, 1)
+	VerifyRequestCount(t, "GET", "/accounting/v1/projects", map[string]string{"company_id": "company_id", "created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "is_active": "is_active", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id"}, 1)
 }
 
 func TestAccountingProjectsRetrieveWithWireMock(

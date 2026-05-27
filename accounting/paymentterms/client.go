@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.PaymentTermsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.PaymentTerm], error) {
+) (*core.Page[*string, *accounting.PaymentTerm, *accounting.PaginatedPaymentTermList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/payment-terms"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedPaymentTermList) *core.PageResponse[*string, *accounting.PaymentTerm] {
+	readPageResponse := func(response *accounting.PaginatedPaymentTermList) *core.PageResponse[*string, *accounting.PaymentTerm, *accounting.PaginatedPaymentTermList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.PaymentTerm]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.PaymentTerm, *accounting.PaginatedPaymentTermList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

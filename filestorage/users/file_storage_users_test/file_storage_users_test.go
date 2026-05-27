@@ -86,6 +86,9 @@ func TestFileStorageUsersListWithWireMock(
 		Cursor: merge.String(
 			"cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
 		),
+		EmailAddress: merge.String(
+			"email_address",
+		),
 		IncludeDeletedData: merge.Bool(
 			true,
 		),
@@ -121,7 +124,7 @@ func TestFileStorageUsersListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/filestorage/v1/users", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "is_me": "is_me", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id"}, 1)
+	VerifyRequestCount(t, "GET", "/filestorage/v1/users", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "email_address": "email_address", "include_deleted_data": "true", "include_remote_data": "true", "include_shell_data": "true", "is_me": "is_me", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id"}, 1)
 }
 
 func TestFileStorageUsersRetrieveWithWireMock(

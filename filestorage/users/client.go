@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.UsersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *filestorage.User], error) {
+) (*core.Page[*string, *filestorage.User, *filestorage.PaginatedUserList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/users"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedUserList) *core.PageResponse[*string, *filestorage.User] {
+	readPageResponse := func(response *filestorage.PaginatedUserList) *core.PageResponse[*string, *filestorage.User, *filestorage.PaginatedUserList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *filestorage.User]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *filestorage.User, *filestorage.PaginatedUserList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

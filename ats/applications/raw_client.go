@@ -39,7 +39,7 @@ func (r *RawClient) Create(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/applications"
 	queryParams, err := internal.QueryValues(request)
@@ -89,7 +89,7 @@ func (r *RawClient) Retrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ats/v1/applications/%v",
@@ -140,7 +140,7 @@ func (r *RawClient) ChangeStageCreate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ats/v1/applications/%v/change-stage",
@@ -192,7 +192,7 @@ func (r *RawClient) MetaPostRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/applications/meta/post"
 	queryParams, err := internal.QueryValues(request)

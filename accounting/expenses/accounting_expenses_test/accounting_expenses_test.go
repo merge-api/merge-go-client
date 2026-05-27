@@ -196,6 +196,52 @@ func TestAccountingExpensesRetrieveWithWireMock(
 	VerifyRequestCount(t, "GET", "/accounting/v1/expenses/id", map[string]string{"include_remote_data": "true", "include_remote_fields": "true", "include_shell_data": "true"}, 1)
 }
 
+func TestAccountingExpensesBulkCreateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.ExpenseBulkRequest{
+		BatchItems: []*accounting.ExpenseBatchItemRequest{
+			&accounting.ExpenseBatchItemRequest{
+				ItemId:  "item_id",
+				Payload: &accounting.ExpenseRequest{},
+			},
+		},
+	}
+	_, invocationErr := client.Accounting.Expenses.BulkCreate(
+		context.TODO(),
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "POST", "/accounting/v1/expenses/bulk", nil, 1)
+}
+
+func TestAccountingExpensesBulkRetrieveWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	_, invocationErr := client.Accounting.Expenses.BulkRetrieve(
+		context.TODO(),
+		"batch_id",
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "GET", "/accounting/v1/expenses/bulk/batch_id", nil, 1)
+}
+
 func TestAccountingExpensesLinesRemoteFieldClassesListWithWireMock(
 	t *testing.T,
 ) {

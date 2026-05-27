@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.AccountingPeriodsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.AccountingPeriod], error) {
+) (*core.Page[*string, *accounting.AccountingPeriod, *accounting.PaginatedAccountingPeriodList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/accounting-periods"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedAccountingPeriodList) *core.PageResponse[*string, *accounting.AccountingPeriod] {
+	readPageResponse := func(response *accounting.PaginatedAccountingPeriodList) *core.PageResponse[*string, *accounting.AccountingPeriod, *accounting.PaginatedAccountingPeriodList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.AccountingPeriod]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.AccountingPeriod, *accounting.PaginatedAccountingPeriodList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.AuditTrailListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.AuditLogEvent], error) {
+) (*core.Page[*string, *accounting.AuditLogEvent, *accounting.PaginatedAuditLogEventList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/audit-trail"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedAuditLogEventList) *core.PageResponse[*string, *accounting.AuditLogEvent] {
+	readPageResponse := func(response *accounting.PaginatedAuditLogEventList) *core.PageResponse[*string, *accounting.AuditLogEvent, *accounting.PaginatedAuditLogEventList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.AuditLogEvent]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.AuditLogEvent, *accounting.PaginatedAuditLogEventList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

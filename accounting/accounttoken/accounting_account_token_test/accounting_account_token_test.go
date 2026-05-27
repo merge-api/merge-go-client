@@ -78,3 +78,21 @@ func TestAccountingAccountTokenRetrieveWithWireMock(
 	require.NoError(t, invocationErr, "Client method call should succeed")
 	VerifyRequestCount(t, "GET", "/accounting/v1/account-token/public_token", nil, 1)
 }
+
+func TestAccountingAccountTokenRegenerateCreateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	_, invocationErr := client.Accounting.AccountToken.RegenerateCreate(
+		context.TODO(),
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "POST", "/accounting/v1/account-token/regenerate", nil, 1)
+}

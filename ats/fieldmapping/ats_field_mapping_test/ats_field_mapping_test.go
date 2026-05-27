@@ -128,18 +128,12 @@ func TestAtsFieldMappingFieldMappingsDestroyWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	response, invocationErr := client.Ats.FieldMapping.FieldMappingsDestroy(
+	_, invocationErr := client.Ats.FieldMapping.FieldMappingsDestroy(
 		context.TODO(),
 		"field_mapping_id",
 	)
 
-	// DELETE operations may return nil response body, which is acceptable
-	if invocationErr != nil && response == nil {
-		// This is expected for DELETE operations that return 204 No Content
-		require.Contains(t, invocationErr.Error(), "but the server responded with nothing", "Expected empty response error")
-	} else {
-		require.NoError(t, invocationErr, "Client method call should succeed")
-	}
+	require.NoError(t, invocationErr, "Client method call should succeed")
 	VerifyRequestCount(t, "DELETE", "/ats/v1/field-mappings/field_mapping_id", nil, 1)
 }
 
@@ -153,7 +147,11 @@ func TestAtsFieldMappingFieldMappingsPartialUpdateWithWireMock(
 			WireMockBaseURL,
 		),
 	)
-	request := &ats.PatchedEditFieldMappingRequest{}
+	request := &ats.PatchedEditFieldMappingRequest{
+		RemoteDataIterationCount: merge.Int(
+			1,
+		),
+	}
 	_, invocationErr := client.Ats.FieldMapping.FieldMappingsPartialUpdate(
 		context.TODO(),
 		"field_mapping_id",
@@ -161,7 +159,7 @@ func TestAtsFieldMappingFieldMappingsPartialUpdateWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "PATCH", "/ats/v1/field-mappings/field_mapping_id", nil, 1)
+	VerifyRequestCount(t, "PATCH", "/ats/v1/field-mappings/field_mapping_id", map[string]string{"remote_data_iteration_count": "1"}, 1)
 }
 
 func TestAtsFieldMappingRemoteFieldsRetrieveWithWireMock(

@@ -23,23 +23,27 @@ var (
 	accountDetailsFieldIsDuplicate             = big.NewInt(1 << 9)
 	accountDetailsFieldAccountType             = big.NewInt(1 << 10)
 	accountDetailsFieldCompletedAt             = big.NewInt(1 << 11)
+	accountDetailsFieldInstanceId              = big.NewInt(1 << 12)
+	accountDetailsFieldInstanceDisplayValue    = big.NewInt(1 << 13)
 )
 
 type AccountDetails struct {
-	Id                      *string       `json:"id,omitempty" url:"id,omitempty"`
-	Integration             *string       `json:"integration,omitempty" url:"integration,omitempty"`
-	IntegrationSlug         *string       `json:"integration_slug,omitempty" url:"integration_slug,omitempty"`
-	Category                *CategoryEnum `json:"category,omitempty" url:"category,omitempty"`
-	EndUserOriginId         *string       `json:"end_user_origin_id,omitempty" url:"end_user_origin_id,omitempty"`
-	EndUserOrganizationName *string       `json:"end_user_organization_name,omitempty" url:"end_user_organization_name,omitempty"`
-	EndUserEmailAddress     *string       `json:"end_user_email_address,omitempty" url:"end_user_email_address,omitempty"`
-	Status                  *string       `json:"status,omitempty" url:"status,omitempty"`
-	WebhookListenerUrl      *string       `json:"webhook_listener_url,omitempty" url:"webhook_listener_url,omitempty"`
+	Id                      *string                 `json:"id,omitempty" url:"id,omitempty"`
+	Integration             *string                 `json:"integration,omitempty" url:"integration,omitempty"`
+	IntegrationSlug         *string                 `json:"integration_slug,omitempty" url:"integration_slug,omitempty"`
+	Category                *AccountDetailsCategory `json:"category,omitempty" url:"category,omitempty"`
+	EndUserOriginId         *string                 `json:"end_user_origin_id,omitempty" url:"end_user_origin_id,omitempty"`
+	EndUserOrganizationName *string                 `json:"end_user_organization_name,omitempty" url:"end_user_organization_name,omitempty"`
+	EndUserEmailAddress     *string                 `json:"end_user_email_address,omitempty" url:"end_user_email_address,omitempty"`
+	Status                  *string                 `json:"status,omitempty" url:"status,omitempty"`
+	WebhookListenerUrl      *string                 `json:"webhook_listener_url,omitempty" url:"webhook_listener_url,omitempty"`
 	// Whether a Production Linked Account's credentials match another existing Production Linked Account. This field is `null` for Test Linked Accounts, incomplete Production Linked Accounts, and ignored duplicate Production Linked Account sets.
 	IsDuplicate *bool   `json:"is_duplicate,omitempty" url:"is_duplicate,omitempty"`
 	AccountType *string `json:"account_type,omitempty" url:"account_type,omitempty"`
 	// The time at which account completes the linking flow.
-	CompletedAt *time.Time `json:"completed_at,omitempty" url:"completed_at,omitempty"`
+	CompletedAt          *time.Time `json:"completed_at,omitempty" url:"completed_at,omitempty"`
+	InstanceId           *string    `json:"instance_id,omitempty" url:"instance_id,omitempty"`
+	InstanceDisplayValue *string    `json:"instance_display_value,omitempty" url:"instance_display_value,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -69,7 +73,7 @@ func (a *AccountDetails) GetIntegrationSlug() *string {
 	return a.IntegrationSlug
 }
 
-func (a *AccountDetails) GetCategory() *CategoryEnum {
+func (a *AccountDetails) GetCategory() *AccountDetailsCategory {
 	if a == nil {
 		return nil
 	}
@@ -132,6 +136,20 @@ func (a *AccountDetails) GetCompletedAt() *time.Time {
 	return a.CompletedAt
 }
 
+func (a *AccountDetails) GetInstanceId() *string {
+	if a == nil {
+		return nil
+	}
+	return a.InstanceId
+}
+
+func (a *AccountDetails) GetInstanceDisplayValue() *string {
+	if a == nil {
+		return nil
+	}
+	return a.InstanceDisplayValue
+}
+
 func (a *AccountDetails) GetExtraProperties() map[string]interface{} {
 	return a.extraProperties
 }
@@ -166,7 +184,7 @@ func (a *AccountDetails) SetIntegrationSlug(integrationSlug *string) {
 
 // SetCategory sets the Category field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AccountDetails) SetCategory(category *CategoryEnum) {
+func (a *AccountDetails) SetCategory(category *AccountDetailsCategory) {
 	a.Category = category
 	a.require(accountDetailsFieldCategory)
 }
@@ -227,6 +245,20 @@ func (a *AccountDetails) SetCompletedAt(completedAt *time.Time) {
 	a.require(accountDetailsFieldCompletedAt)
 }
 
+// SetInstanceId sets the InstanceId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetInstanceId(instanceId *string) {
+	a.InstanceId = instanceId
+	a.require(accountDetailsFieldInstanceId)
+}
+
+// SetInstanceDisplayValue sets the InstanceDisplayValue field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountDetails) SetInstanceDisplayValue(instanceDisplayValue *string) {
+	a.InstanceDisplayValue = instanceDisplayValue
+	a.require(accountDetailsFieldInstanceDisplayValue)
+}
+
 func (a *AccountDetails) UnmarshalJSON(data []byte) error {
 	type embed AccountDetails
 	var unmarshaler = struct {
@@ -272,4 +304,66 @@ func (a *AccountDetails) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", a)
+}
+
+type AccountDetailsCategory struct {
+	CategoryEnum CategoryEnum
+	String       string
+
+	typ string
+}
+
+func (a *AccountDetailsCategory) GetCategoryEnum() CategoryEnum {
+	if a == nil {
+		return ""
+	}
+	return a.CategoryEnum
+}
+
+func (a *AccountDetailsCategory) GetString() string {
+	if a == nil {
+		return ""
+	}
+	return a.String
+}
+
+func (a *AccountDetailsCategory) UnmarshalJSON(data []byte) error {
+	var valueCategoryEnum CategoryEnum
+	if err := json.Unmarshal(data, &valueCategoryEnum); err == nil {
+		a.typ = "CategoryEnum"
+		a.CategoryEnum = valueCategoryEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typ = "String"
+		a.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountDetailsCategory) MarshalJSON() ([]byte, error) {
+	if a.typ == "CategoryEnum" || a.CategoryEnum != "" {
+		return json.Marshal(a.CategoryEnum)
+	}
+	if a.typ == "String" || a.String != "" {
+		return json.Marshal(a.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+type AccountDetailsCategoryVisitor interface {
+	VisitCategoryEnum(CategoryEnum) error
+	VisitString(string) error
+}
+
+func (a *AccountDetailsCategory) Accept(visitor AccountDetailsCategoryVisitor) error {
+	if a.typ == "CategoryEnum" || a.CategoryEnum != "" {
+		return visitor.VisitCategoryEnum(a.CategoryEnum)
+	}
+	if a.typ == "String" || a.String != "" {
+		return visitor.VisitString(a.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }

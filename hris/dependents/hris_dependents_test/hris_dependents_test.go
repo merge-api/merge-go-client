@@ -86,6 +86,9 @@ func TestHrisDependentsListWithWireMock(
 		Cursor: merge.String(
 			"cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw",
 		),
+		EmployeeId: merge.String(
+			"employee_id",
+		),
 		IncludeDeletedData: merge.Bool(
 			true,
 		),
@@ -121,7 +124,7 @@ func TestHrisDependentsListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/hris/v1/dependents", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "include_deleted_data": "true", "include_remote_data": "true", "include_sensitive_fields": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id"}, 1)
+	VerifyRequestCount(t, "GET", "/hris/v1/dependents", map[string]string{"created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "employee_id": "employee_id", "include_deleted_data": "true", "include_remote_data": "true", "include_sensitive_fields": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "page_size": "1", "remote_id": "remote_id"}, 1)
 }
 
 func TestHrisDependentsRetrieveWithWireMock(

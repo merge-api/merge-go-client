@@ -32,7 +32,7 @@ func NewClient(options *core.RequestOptions) *Client {
 	}
 }
 
-// Creates a link token to be used when linking a new end user.
+// Creates a link token to be used when linking a new end user. The link token expires after single use.
 func (c *Client) Create(
 	ctx context.Context,
 	request *ats.EndUserDetailsRequest,

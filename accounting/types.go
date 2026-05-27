@@ -24,28 +24,31 @@ import (
 // ### Usage Example
 // Fetch from the `LIST Accounts` endpoint and view a company's accounts.
 var (
-	accountFieldId               = big.NewInt(1 << 0)
-	accountFieldRemoteId         = big.NewInt(1 << 1)
-	accountFieldCreatedAt        = big.NewInt(1 << 2)
-	accountFieldModifiedAt       = big.NewInt(1 << 3)
-	accountFieldName             = big.NewInt(1 << 4)
-	accountFieldDescription      = big.NewInt(1 << 5)
-	accountFieldClassification   = big.NewInt(1 << 6)
-	accountFieldType             = big.NewInt(1 << 7)
-	accountFieldAccountType      = big.NewInt(1 << 8)
-	accountFieldStatus           = big.NewInt(1 << 9)
-	accountFieldCurrentBalance   = big.NewInt(1 << 10)
-	accountFieldCurrency         = big.NewInt(1 << 11)
-	accountFieldAccountNumber    = big.NewInt(1 << 12)
-	accountFieldParentAccount    = big.NewInt(1 << 13)
-	accountFieldCompany          = big.NewInt(1 << 14)
-	accountFieldRemoteWasDeleted = big.NewInt(1 << 15)
-	accountFieldFieldMappings    = big.NewInt(1 << 16)
-	accountFieldRemoteData       = big.NewInt(1 << 17)
+	accountFieldAccountUrl       = big.NewInt(1 << 0)
+	accountFieldId               = big.NewInt(1 << 1)
+	accountFieldRemoteId         = big.NewInt(1 << 2)
+	accountFieldCreatedAt        = big.NewInt(1 << 3)
+	accountFieldModifiedAt       = big.NewInt(1 << 4)
+	accountFieldName             = big.NewInt(1 << 5)
+	accountFieldDescription      = big.NewInt(1 << 6)
+	accountFieldClassification   = big.NewInt(1 << 7)
+	accountFieldType             = big.NewInt(1 << 8)
+	accountFieldAccountType      = big.NewInt(1 << 9)
+	accountFieldStatus           = big.NewInt(1 << 10)
+	accountFieldCurrentBalance   = big.NewInt(1 << 11)
+	accountFieldCurrency         = big.NewInt(1 << 12)
+	accountFieldAccountNumber    = big.NewInt(1 << 13)
+	accountFieldParentAccount    = big.NewInt(1 << 14)
+	accountFieldCompany          = big.NewInt(1 << 15)
+	accountFieldRemoteWasDeleted = big.NewInt(1 << 16)
+	accountFieldFieldMappings    = big.NewInt(1 << 17)
+	accountFieldRemoteData       = big.NewInt(1 << 18)
 )
 
 type Account struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the account.
+	AccountUrl *string `json:"account_url,omitempty" url:"account_url,omitempty"`
+	Id         *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -404,7 +407,7 @@ type Account struct {
 	// ID of the parent account.
 	ParentAccount *string `json:"parent_account,omitempty" url:"parent_account,omitempty"`
 	// The company the account belongs to.
-	Company *string `json:"company,omitempty" url:"company,omitempty"`
+	Company *AccountCompany `json:"company,omitempty" url:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
@@ -415,6 +418,13 @@ type Account struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (a *Account) GetAccountUrl() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AccountUrl
 }
 
 func (a *Account) GetId() *string {
@@ -515,7 +525,7 @@ func (a *Account) GetParentAccount() *string {
 	return a.ParentAccount
 }
 
-func (a *Account) GetCompany() *string {
+func (a *Account) GetCompany() *AccountCompany {
 	if a == nil {
 		return nil
 	}
@@ -552,6 +562,13 @@ func (a *Account) require(field *big.Int) {
 		a.explicitFields = big.NewInt(0)
 	}
 	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetAccountUrl sets the AccountUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *Account) SetAccountUrl(accountUrl *string) {
+	a.AccountUrl = accountUrl
+	a.require(accountFieldAccountUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -654,7 +671,7 @@ func (a *Account) SetParentAccount(parentAccount *string) {
 
 // SetCompany sets the Company field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (a *Account) SetCompany(company *string) {
+func (a *Account) SetCompany(company *AccountCompany) {
 	a.Company = company
 	a.require(accountFieldCompany)
 }
@@ -941,6 +958,69 @@ func (a *AccountClassification) Accept(visitor AccountClassificationVisitor) err
 	}
 	if a.typ == "String" || a.String != "" {
 		return visitor.VisitString(a.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+// The company the account belongs to.
+type AccountCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (a *AccountCompany) GetString() string {
+	if a == nil {
+		return ""
+	}
+	return a.String
+}
+
+func (a *AccountCompany) GetCompanyInfo() *CompanyInfo {
+	if a == nil {
+		return nil
+	}
+	return a.CompanyInfo
+}
+
+func (a *AccountCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		a.typ = "String"
+		a.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		a.typ = "CompanyInfo"
+		a.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
+}
+
+func (a AccountCompany) MarshalJSON() ([]byte, error) {
+	if a.typ == "String" || a.String != "" {
+		return json.Marshal(a.String)
+	}
+	if a.typ == "CompanyInfo" || a.CompanyInfo != nil {
+		return json.Marshal(a.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
+}
+
+type AccountCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (a *AccountCompany) Accept(visitor AccountCompanyVisitor) error {
+	if a.typ == "String" || a.String != "" {
+		return visitor.VisitString(a.String)
+	}
+	if a.typ == "CompanyInfo" || a.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(a.CompanyInfo)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
@@ -1648,20 +1728,23 @@ func (a AccountStatusEnum) Ptr() *AccountStatusEnum {
 // ### Usage Example
 // Common models like `Invoice` and `Transaction` will have `AccountingPeriod` objects which will denote when they occurred.
 var (
-	accountingPeriodFieldId            = big.NewInt(1 << 0)
-	accountingPeriodFieldRemoteId      = big.NewInt(1 << 1)
-	accountingPeriodFieldCreatedAt     = big.NewInt(1 << 2)
-	accountingPeriodFieldModifiedAt    = big.NewInt(1 << 3)
-	accountingPeriodFieldName          = big.NewInt(1 << 4)
-	accountingPeriodFieldStatus        = big.NewInt(1 << 5)
-	accountingPeriodFieldStartDate     = big.NewInt(1 << 6)
-	accountingPeriodFieldEndDate       = big.NewInt(1 << 7)
-	accountingPeriodFieldFieldMappings = big.NewInt(1 << 8)
-	accountingPeriodFieldRemoteData    = big.NewInt(1 << 9)
+	accountingPeriodFieldAccountingPeriodUrl = big.NewInt(1 << 0)
+	accountingPeriodFieldId                  = big.NewInt(1 << 1)
+	accountingPeriodFieldRemoteId            = big.NewInt(1 << 2)
+	accountingPeriodFieldCreatedAt           = big.NewInt(1 << 3)
+	accountingPeriodFieldModifiedAt          = big.NewInt(1 << 4)
+	accountingPeriodFieldName                = big.NewInt(1 << 5)
+	accountingPeriodFieldStatus              = big.NewInt(1 << 6)
+	accountingPeriodFieldStartDate           = big.NewInt(1 << 7)
+	accountingPeriodFieldEndDate             = big.NewInt(1 << 8)
+	accountingPeriodFieldFieldMappings       = big.NewInt(1 << 9)
+	accountingPeriodFieldRemoteData          = big.NewInt(1 << 10)
 )
 
 type AccountingPeriod struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the accounting period.
+	AccountingPeriodUrl *string `json:"accounting_period_url,omitempty" url:"accounting_period_url,omitempty"`
+	Id                  *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -1683,6 +1766,13 @@ type AccountingPeriod struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (a *AccountingPeriod) GetAccountingPeriodUrl() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AccountingPeriodUrl
 }
 
 func (a *AccountingPeriod) GetId() *string {
@@ -1764,6 +1854,13 @@ func (a *AccountingPeriod) require(field *big.Int) {
 		a.explicitFields = big.NewInt(0)
 	}
 	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetAccountingPeriodUrl sets the AccountingPeriodUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AccountingPeriod) SetAccountingPeriodUrl(accountingPeriodUrl *string) {
+	a.AccountingPeriodUrl = accountingPeriodUrl
+	a.require(accountingPeriodFieldAccountingPeriodUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -2139,7 +2236,8 @@ type Address struct {
 	// Line 2 of the address's street.
 	Street2 *string `json:"street_2,omitempty" url:"street_2,omitempty"`
 	// The address's city.
-	City  *string     `json:"city,omitempty" url:"city,omitempty"`
+	City *string `json:"city,omitempty" url:"city,omitempty"`
+	// The address's state or region.
 	State interface{} `json:"state,omitempty" url:"state,omitempty"`
 	// The address's state or region.
 	CountrySubdivision *string `json:"country_subdivision,omitempty" url:"country_subdivision,omitempty"`
@@ -2920,857 +3018,6 @@ func (a *AddressCountry) Accept(visitor AddressCountryVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", a)
 }
 
-// # The Address Object
-// ### Description
-// The `Address` object is used to represent a contact's or company's address.
-//
-// ### Usage Example
-// Fetch from the `GET CompanyInfo` endpoint and view the company's addresses.
-var (
-	addressRequestFieldType                = big.NewInt(1 << 0)
-	addressRequestFieldStreet1             = big.NewInt(1 << 1)
-	addressRequestFieldStreet2             = big.NewInt(1 << 2)
-	addressRequestFieldCity                = big.NewInt(1 << 3)
-	addressRequestFieldCountrySubdivision  = big.NewInt(1 << 4)
-	addressRequestFieldCountry             = big.NewInt(1 << 5)
-	addressRequestFieldZipCode             = big.NewInt(1 << 6)
-	addressRequestFieldIntegrationParams   = big.NewInt(1 << 7)
-	addressRequestFieldLinkedAccountParams = big.NewInt(1 << 8)
-)
-
-type AddressRequest struct {
-	// The address type.
-	//
-	// * `BILLING` - BILLING
-	// * `SHIPPING` - SHIPPING
-	Type *AddressRequestType `json:"type,omitempty" url:"type,omitempty"`
-	// Line 1 of the address's street.
-	Street1 *string `json:"street_1,omitempty" url:"street_1,omitempty"`
-	// Line 2 of the address's street.
-	Street2 *string `json:"street_2,omitempty" url:"street_2,omitempty"`
-	// The address's city.
-	City *string `json:"city,omitempty" url:"city,omitempty"`
-	// The address's state or region.
-	CountrySubdivision *string `json:"country_subdivision,omitempty" url:"country_subdivision,omitempty"`
-	// The address's country.
-	//
-	// * `AF` - Afghanistan
-	// * `AX` - Åland Islands
-	// * `AL` - Albania
-	// * `DZ` - Algeria
-	// * `AS` - American Samoa
-	// * `AD` - Andorra
-	// * `AO` - Angola
-	// * `AI` - Anguilla
-	// * `AQ` - Antarctica
-	// * `AG` - Antigua and Barbuda
-	// * `AR` - Argentina
-	// * `AM` - Armenia
-	// * `AW` - Aruba
-	// * `AU` - Australia
-	// * `AT` - Austria
-	// * `AZ` - Azerbaijan
-	// * `BS` - Bahamas
-	// * `BH` - Bahrain
-	// * `BD` - Bangladesh
-	// * `BB` - Barbados
-	// * `BY` - Belarus
-	// * `BE` - Belgium
-	// * `BZ` - Belize
-	// * `BJ` - Benin
-	// * `BM` - Bermuda
-	// * `BT` - Bhutan
-	// * `BO` - Bolivia
-	// * `BQ` - Bonaire, Sint Eustatius and Saba
-	// * `BA` - Bosnia and Herzegovina
-	// * `BW` - Botswana
-	// * `BV` - Bouvet Island
-	// * `BR` - Brazil
-	// * `IO` - British Indian Ocean Territory
-	// * `BN` - Brunei
-	// * `BG` - Bulgaria
-	// * `BF` - Burkina Faso
-	// * `BI` - Burundi
-	// * `CV` - Cabo Verde
-	// * `KH` - Cambodia
-	// * `CM` - Cameroon
-	// * `CA` - Canada
-	// * `KY` - Cayman Islands
-	// * `CF` - Central African Republic
-	// * `TD` - Chad
-	// * `CL` - Chile
-	// * `CN` - China
-	// * `CX` - Christmas Island
-	// * `CC` - Cocos (Keeling) Islands
-	// * `CO` - Colombia
-	// * `KM` - Comoros
-	// * `CG` - Congo
-	// * `CD` - Congo (the Democratic Republic of the)
-	// * `CK` - Cook Islands
-	// * `CR` - Costa Rica
-	// * `CI` - Côte d'Ivoire
-	// * `HR` - Croatia
-	// * `CU` - Cuba
-	// * `CW` - Curaçao
-	// * `CY` - Cyprus
-	// * `CZ` - Czechia
-	// * `DK` - Denmark
-	// * `DJ` - Djibouti
-	// * `DM` - Dominica
-	// * `DO` - Dominican Republic
-	// * `EC` - Ecuador
-	// * `EG` - Egypt
-	// * `SV` - El Salvador
-	// * `GQ` - Equatorial Guinea
-	// * `ER` - Eritrea
-	// * `EE` - Estonia
-	// * `SZ` - Eswatini
-	// * `ET` - Ethiopia
-	// * `FK` - Falkland Islands (Malvinas)
-	// * `FO` - Faroe Islands
-	// * `FJ` - Fiji
-	// * `FI` - Finland
-	// * `FR` - France
-	// * `GF` - French Guiana
-	// * `PF` - French Polynesia
-	// * `TF` - French Southern Territories
-	// * `GA` - Gabon
-	// * `GM` - Gambia
-	// * `GE` - Georgia
-	// * `DE` - Germany
-	// * `GH` - Ghana
-	// * `GI` - Gibraltar
-	// * `GR` - Greece
-	// * `GL` - Greenland
-	// * `GD` - Grenada
-	// * `GP` - Guadeloupe
-	// * `GU` - Guam
-	// * `GT` - Guatemala
-	// * `GG` - Guernsey
-	// * `GN` - Guinea
-	// * `GW` - Guinea-Bissau
-	// * `GY` - Guyana
-	// * `HT` - Haiti
-	// * `HM` - Heard Island and McDonald Islands
-	// * `VA` - Holy See
-	// * `HN` - Honduras
-	// * `HK` - Hong Kong
-	// * `HU` - Hungary
-	// * `IS` - Iceland
-	// * `IN` - India
-	// * `ID` - Indonesia
-	// * `IR` - Iran
-	// * `IQ` - Iraq
-	// * `IE` - Ireland
-	// * `IM` - Isle of Man
-	// * `IL` - Israel
-	// * `IT` - Italy
-	// * `JM` - Jamaica
-	// * `JP` - Japan
-	// * `JE` - Jersey
-	// * `JO` - Jordan
-	// * `KZ` - Kazakhstan
-	// * `KE` - Kenya
-	// * `KI` - Kiribati
-	// * `KW` - Kuwait
-	// * `KG` - Kyrgyzstan
-	// * `LA` - Laos
-	// * `LV` - Latvia
-	// * `LB` - Lebanon
-	// * `LS` - Lesotho
-	// * `LR` - Liberia
-	// * `LY` - Libya
-	// * `LI` - Liechtenstein
-	// * `LT` - Lithuania
-	// * `LU` - Luxembourg
-	// * `MO` - Macao
-	// * `MG` - Madagascar
-	// * `MW` - Malawi
-	// * `MY` - Malaysia
-	// * `MV` - Maldives
-	// * `ML` - Mali
-	// * `MT` - Malta
-	// * `MH` - Marshall Islands
-	// * `MQ` - Martinique
-	// * `MR` - Mauritania
-	// * `MU` - Mauritius
-	// * `YT` - Mayotte
-	// * `MX` - Mexico
-	// * `FM` - Micronesia (Federated States of)
-	// * `MD` - Moldova
-	// * `MC` - Monaco
-	// * `MN` - Mongolia
-	// * `ME` - Montenegro
-	// * `MS` - Montserrat
-	// * `MA` - Morocco
-	// * `MZ` - Mozambique
-	// * `MM` - Myanmar
-	// * `NA` - Namibia
-	// * `NR` - Nauru
-	// * `NP` - Nepal
-	// * `NL` - Netherlands
-	// * `NC` - New Caledonia
-	// * `NZ` - New Zealand
-	// * `NI` - Nicaragua
-	// * `NE` - Niger
-	// * `NG` - Nigeria
-	// * `NU` - Niue
-	// * `NF` - Norfolk Island
-	// * `KP` - North Korea
-	// * `MK` - North Macedonia
-	// * `MP` - Northern Mariana Islands
-	// * `NO` - Norway
-	// * `OM` - Oman
-	// * `PK` - Pakistan
-	// * `PW` - Palau
-	// * `PS` - Palestine, State of
-	// * `PA` - Panama
-	// * `PG` - Papua New Guinea
-	// * `PY` - Paraguay
-	// * `PE` - Peru
-	// * `PH` - Philippines
-	// * `PN` - Pitcairn
-	// * `PL` - Poland
-	// * `PT` - Portugal
-	// * `PR` - Puerto Rico
-	// * `QA` - Qatar
-	// * `RE` - Réunion
-	// * `RO` - Romania
-	// * `RU` - Russia
-	// * `RW` - Rwanda
-	// * `BL` - Saint Barthélemy
-	// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-	// * `KN` - Saint Kitts and Nevis
-	// * `LC` - Saint Lucia
-	// * `MF` - Saint Martin (French part)
-	// * `PM` - Saint Pierre and Miquelon
-	// * `VC` - Saint Vincent and the Grenadines
-	// * `WS` - Samoa
-	// * `SM` - San Marino
-	// * `ST` - Sao Tome and Principe
-	// * `SA` - Saudi Arabia
-	// * `SN` - Senegal
-	// * `RS` - Serbia
-	// * `SC` - Seychelles
-	// * `SL` - Sierra Leone
-	// * `SG` - Singapore
-	// * `SX` - Sint Maarten (Dutch part)
-	// * `SK` - Slovakia
-	// * `SI` - Slovenia
-	// * `SB` - Solomon Islands
-	// * `SO` - Somalia
-	// * `ZA` - South Africa
-	// * `GS` - South Georgia and the South Sandwich Islands
-	// * `KR` - South Korea
-	// * `SS` - South Sudan
-	// * `ES` - Spain
-	// * `LK` - Sri Lanka
-	// * `SD` - Sudan
-	// * `SR` - Suriname
-	// * `SJ` - Svalbard and Jan Mayen
-	// * `SE` - Sweden
-	// * `CH` - Switzerland
-	// * `SY` - Syria
-	// * `TW` - Taiwan
-	// * `TJ` - Tajikistan
-	// * `TZ` - Tanzania
-	// * `TH` - Thailand
-	// * `TL` - Timor-Leste
-	// * `TG` - Togo
-	// * `TK` - Tokelau
-	// * `TO` - Tonga
-	// * `TT` - Trinidad and Tobago
-	// * `TN` - Tunisia
-	// * `TR` - Turkey
-	// * `TM` - Turkmenistan
-	// * `TC` - Turks and Caicos Islands
-	// * `TV` - Tuvalu
-	// * `UG` - Uganda
-	// * `UA` - Ukraine
-	// * `AE` - United Arab Emirates
-	// * `GB` - United Kingdom
-	// * `UM` - United States Minor Outlying Islands
-	// * `US` - United States of America
-	// * `UY` - Uruguay
-	// * `UZ` - Uzbekistan
-	// * `VU` - Vanuatu
-	// * `VE` - Venezuela
-	// * `VN` - Vietnam
-	// * `VG` - Virgin Islands (British)
-	// * `VI` - Virgin Islands (U.S.)
-	// * `WF` - Wallis and Futuna
-	// * `EH` - Western Sahara
-	// * `YE` - Yemen
-	// * `ZM` - Zambia
-	// * `ZW` - Zimbabwe
-	Country *AddressRequestCountry `json:"country,omitempty" url:"country,omitempty"`
-	// The address's zip code.
-	ZipCode             *string                `json:"zip_code,omitempty" url:"zip_code,omitempty"`
-	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (a *AddressRequest) GetType() *AddressRequestType {
-	if a == nil {
-		return nil
-	}
-	return a.Type
-}
-
-func (a *AddressRequest) GetStreet1() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Street1
-}
-
-func (a *AddressRequest) GetStreet2() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Street2
-}
-
-func (a *AddressRequest) GetCity() *string {
-	if a == nil {
-		return nil
-	}
-	return a.City
-}
-
-func (a *AddressRequest) GetCountrySubdivision() *string {
-	if a == nil {
-		return nil
-	}
-	return a.CountrySubdivision
-}
-
-func (a *AddressRequest) GetCountry() *AddressRequestCountry {
-	if a == nil {
-		return nil
-	}
-	return a.Country
-}
-
-func (a *AddressRequest) GetZipCode() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ZipCode
-}
-
-func (a *AddressRequest) GetIntegrationParams() map[string]interface{} {
-	if a == nil {
-		return nil
-	}
-	return a.IntegrationParams
-}
-
-func (a *AddressRequest) GetLinkedAccountParams() map[string]interface{} {
-	if a == nil {
-		return nil
-	}
-	return a.LinkedAccountParams
-}
-
-func (a *AddressRequest) GetExtraProperties() map[string]interface{} {
-	return a.extraProperties
-}
-
-func (a *AddressRequest) require(field *big.Int) {
-	if a.explicitFields == nil {
-		a.explicitFields = big.NewInt(0)
-	}
-	a.explicitFields.Or(a.explicitFields, field)
-}
-
-// SetType sets the Type field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetType(type_ *AddressRequestType) {
-	a.Type = type_
-	a.require(addressRequestFieldType)
-}
-
-// SetStreet1 sets the Street1 field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetStreet1(street1 *string) {
-	a.Street1 = street1
-	a.require(addressRequestFieldStreet1)
-}
-
-// SetStreet2 sets the Street2 field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetStreet2(street2 *string) {
-	a.Street2 = street2
-	a.require(addressRequestFieldStreet2)
-}
-
-// SetCity sets the City field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetCity(city *string) {
-	a.City = city
-	a.require(addressRequestFieldCity)
-}
-
-// SetCountrySubdivision sets the CountrySubdivision field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetCountrySubdivision(countrySubdivision *string) {
-	a.CountrySubdivision = countrySubdivision
-	a.require(addressRequestFieldCountrySubdivision)
-}
-
-// SetCountry sets the Country field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetCountry(country *AddressRequestCountry) {
-	a.Country = country
-	a.require(addressRequestFieldCountry)
-}
-
-// SetZipCode sets the ZipCode field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetZipCode(zipCode *string) {
-	a.ZipCode = zipCode
-	a.require(addressRequestFieldZipCode)
-}
-
-// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
-	a.IntegrationParams = integrationParams
-	a.require(addressRequestFieldIntegrationParams)
-}
-
-// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AddressRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
-	a.LinkedAccountParams = linkedAccountParams
-	a.require(addressRequestFieldLinkedAccountParams)
-}
-
-func (a *AddressRequest) UnmarshalJSON(data []byte) error {
-	type unmarshaler AddressRequest
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*a = AddressRequest(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *a)
-	if err != nil {
-		return err
-	}
-	a.extraProperties = extraProperties
-	a.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (a *AddressRequest) MarshalJSON() ([]byte, error) {
-	type embed AddressRequest
-	var marshaler = struct {
-		embed
-	}{
-		embed: embed(*a),
-	}
-	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
-	return json.Marshal(explicitMarshaler)
-}
-
-func (a *AddressRequest) String() string {
-	if len(a.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(a); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", a)
-}
-
-// The address's country.
-//
-// * `AF` - Afghanistan
-// * `AX` - Åland Islands
-// * `AL` - Albania
-// * `DZ` - Algeria
-// * `AS` - American Samoa
-// * `AD` - Andorra
-// * `AO` - Angola
-// * `AI` - Anguilla
-// * `AQ` - Antarctica
-// * `AG` - Antigua and Barbuda
-// * `AR` - Argentina
-// * `AM` - Armenia
-// * `AW` - Aruba
-// * `AU` - Australia
-// * `AT` - Austria
-// * `AZ` - Azerbaijan
-// * `BS` - Bahamas
-// * `BH` - Bahrain
-// * `BD` - Bangladesh
-// * `BB` - Barbados
-// * `BY` - Belarus
-// * `BE` - Belgium
-// * `BZ` - Belize
-// * `BJ` - Benin
-// * `BM` - Bermuda
-// * `BT` - Bhutan
-// * `BO` - Bolivia
-// * `BQ` - Bonaire, Sint Eustatius and Saba
-// * `BA` - Bosnia and Herzegovina
-// * `BW` - Botswana
-// * `BV` - Bouvet Island
-// * `BR` - Brazil
-// * `IO` - British Indian Ocean Territory
-// * `BN` - Brunei
-// * `BG` - Bulgaria
-// * `BF` - Burkina Faso
-// * `BI` - Burundi
-// * `CV` - Cabo Verde
-// * `KH` - Cambodia
-// * `CM` - Cameroon
-// * `CA` - Canada
-// * `KY` - Cayman Islands
-// * `CF` - Central African Republic
-// * `TD` - Chad
-// * `CL` - Chile
-// * `CN` - China
-// * `CX` - Christmas Island
-// * `CC` - Cocos (Keeling) Islands
-// * `CO` - Colombia
-// * `KM` - Comoros
-// * `CG` - Congo
-// * `CD` - Congo (the Democratic Republic of the)
-// * `CK` - Cook Islands
-// * `CR` - Costa Rica
-// * `CI` - Côte d'Ivoire
-// * `HR` - Croatia
-// * `CU` - Cuba
-// * `CW` - Curaçao
-// * `CY` - Cyprus
-// * `CZ` - Czechia
-// * `DK` - Denmark
-// * `DJ` - Djibouti
-// * `DM` - Dominica
-// * `DO` - Dominican Republic
-// * `EC` - Ecuador
-// * `EG` - Egypt
-// * `SV` - El Salvador
-// * `GQ` - Equatorial Guinea
-// * `ER` - Eritrea
-// * `EE` - Estonia
-// * `SZ` - Eswatini
-// * `ET` - Ethiopia
-// * `FK` - Falkland Islands (Malvinas)
-// * `FO` - Faroe Islands
-// * `FJ` - Fiji
-// * `FI` - Finland
-// * `FR` - France
-// * `GF` - French Guiana
-// * `PF` - French Polynesia
-// * `TF` - French Southern Territories
-// * `GA` - Gabon
-// * `GM` - Gambia
-// * `GE` - Georgia
-// * `DE` - Germany
-// * `GH` - Ghana
-// * `GI` - Gibraltar
-// * `GR` - Greece
-// * `GL` - Greenland
-// * `GD` - Grenada
-// * `GP` - Guadeloupe
-// * `GU` - Guam
-// * `GT` - Guatemala
-// * `GG` - Guernsey
-// * `GN` - Guinea
-// * `GW` - Guinea-Bissau
-// * `GY` - Guyana
-// * `HT` - Haiti
-// * `HM` - Heard Island and McDonald Islands
-// * `VA` - Holy See
-// * `HN` - Honduras
-// * `HK` - Hong Kong
-// * `HU` - Hungary
-// * `IS` - Iceland
-// * `IN` - India
-// * `ID` - Indonesia
-// * `IR` - Iran
-// * `IQ` - Iraq
-// * `IE` - Ireland
-// * `IM` - Isle of Man
-// * `IL` - Israel
-// * `IT` - Italy
-// * `JM` - Jamaica
-// * `JP` - Japan
-// * `JE` - Jersey
-// * `JO` - Jordan
-// * `KZ` - Kazakhstan
-// * `KE` - Kenya
-// * `KI` - Kiribati
-// * `KW` - Kuwait
-// * `KG` - Kyrgyzstan
-// * `LA` - Laos
-// * `LV` - Latvia
-// * `LB` - Lebanon
-// * `LS` - Lesotho
-// * `LR` - Liberia
-// * `LY` - Libya
-// * `LI` - Liechtenstein
-// * `LT` - Lithuania
-// * `LU` - Luxembourg
-// * `MO` - Macao
-// * `MG` - Madagascar
-// * `MW` - Malawi
-// * `MY` - Malaysia
-// * `MV` - Maldives
-// * `ML` - Mali
-// * `MT` - Malta
-// * `MH` - Marshall Islands
-// * `MQ` - Martinique
-// * `MR` - Mauritania
-// * `MU` - Mauritius
-// * `YT` - Mayotte
-// * `MX` - Mexico
-// * `FM` - Micronesia (Federated States of)
-// * `MD` - Moldova
-// * `MC` - Monaco
-// * `MN` - Mongolia
-// * `ME` - Montenegro
-// * `MS` - Montserrat
-// * `MA` - Morocco
-// * `MZ` - Mozambique
-// * `MM` - Myanmar
-// * `NA` - Namibia
-// * `NR` - Nauru
-// * `NP` - Nepal
-// * `NL` - Netherlands
-// * `NC` - New Caledonia
-// * `NZ` - New Zealand
-// * `NI` - Nicaragua
-// * `NE` - Niger
-// * `NG` - Nigeria
-// * `NU` - Niue
-// * `NF` - Norfolk Island
-// * `KP` - North Korea
-// * `MK` - North Macedonia
-// * `MP` - Northern Mariana Islands
-// * `NO` - Norway
-// * `OM` - Oman
-// * `PK` - Pakistan
-// * `PW` - Palau
-// * `PS` - Palestine, State of
-// * `PA` - Panama
-// * `PG` - Papua New Guinea
-// * `PY` - Paraguay
-// * `PE` - Peru
-// * `PH` - Philippines
-// * `PN` - Pitcairn
-// * `PL` - Poland
-// * `PT` - Portugal
-// * `PR` - Puerto Rico
-// * `QA` - Qatar
-// * `RE` - Réunion
-// * `RO` - Romania
-// * `RU` - Russia
-// * `RW` - Rwanda
-// * `BL` - Saint Barthélemy
-// * `SH` - Saint Helena, Ascension and Tristan da Cunha
-// * `KN` - Saint Kitts and Nevis
-// * `LC` - Saint Lucia
-// * `MF` - Saint Martin (French part)
-// * `PM` - Saint Pierre and Miquelon
-// * `VC` - Saint Vincent and the Grenadines
-// * `WS` - Samoa
-// * `SM` - San Marino
-// * `ST` - Sao Tome and Principe
-// * `SA` - Saudi Arabia
-// * `SN` - Senegal
-// * `RS` - Serbia
-// * `SC` - Seychelles
-// * `SL` - Sierra Leone
-// * `SG` - Singapore
-// * `SX` - Sint Maarten (Dutch part)
-// * `SK` - Slovakia
-// * `SI` - Slovenia
-// * `SB` - Solomon Islands
-// * `SO` - Somalia
-// * `ZA` - South Africa
-// * `GS` - South Georgia and the South Sandwich Islands
-// * `KR` - South Korea
-// * `SS` - South Sudan
-// * `ES` - Spain
-// * `LK` - Sri Lanka
-// * `SD` - Sudan
-// * `SR` - Suriname
-// * `SJ` - Svalbard and Jan Mayen
-// * `SE` - Sweden
-// * `CH` - Switzerland
-// * `SY` - Syria
-// * `TW` - Taiwan
-// * `TJ` - Tajikistan
-// * `TZ` - Tanzania
-// * `TH` - Thailand
-// * `TL` - Timor-Leste
-// * `TG` - Togo
-// * `TK` - Tokelau
-// * `TO` - Tonga
-// * `TT` - Trinidad and Tobago
-// * `TN` - Tunisia
-// * `TR` - Turkey
-// * `TM` - Turkmenistan
-// * `TC` - Turks and Caicos Islands
-// * `TV` - Tuvalu
-// * `UG` - Uganda
-// * `UA` - Ukraine
-// * `AE` - United Arab Emirates
-// * `GB` - United Kingdom
-// * `UM` - United States Minor Outlying Islands
-// * `US` - United States of America
-// * `UY` - Uruguay
-// * `UZ` - Uzbekistan
-// * `VU` - Vanuatu
-// * `VE` - Venezuela
-// * `VN` - Vietnam
-// * `VG` - Virgin Islands (British)
-// * `VI` - Virgin Islands (U.S.)
-// * `WF` - Wallis and Futuna
-// * `EH` - Western Sahara
-// * `YE` - Yemen
-// * `ZM` - Zambia
-// * `ZW` - Zimbabwe
-type AddressRequestCountry struct {
-	CountryEnum CountryEnum
-	String      string
-
-	typ string
-}
-
-func (a *AddressRequestCountry) GetCountryEnum() CountryEnum {
-	if a == nil {
-		return ""
-	}
-	return a.CountryEnum
-}
-
-func (a *AddressRequestCountry) GetString() string {
-	if a == nil {
-		return ""
-	}
-	return a.String
-}
-
-func (a *AddressRequestCountry) UnmarshalJSON(data []byte) error {
-	var valueCountryEnum CountryEnum
-	if err := json.Unmarshal(data, &valueCountryEnum); err == nil {
-		a.typ = "CountryEnum"
-		a.CountryEnum = valueCountryEnum
-		return nil
-	}
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		a.typ = "String"
-		a.String = valueString
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
-}
-
-func (a AddressRequestCountry) MarshalJSON() ([]byte, error) {
-	if a.typ == "CountryEnum" || a.CountryEnum != "" {
-		return json.Marshal(a.CountryEnum)
-	}
-	if a.typ == "String" || a.String != "" {
-		return json.Marshal(a.String)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
-}
-
-type AddressRequestCountryVisitor interface {
-	VisitCountryEnum(CountryEnum) error
-	VisitString(string) error
-}
-
-func (a *AddressRequestCountry) Accept(visitor AddressRequestCountryVisitor) error {
-	if a.typ == "CountryEnum" || a.CountryEnum != "" {
-		return visitor.VisitCountryEnum(a.CountryEnum)
-	}
-	if a.typ == "String" || a.String != "" {
-		return visitor.VisitString(a.String)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", a)
-}
-
-// The address type.
-//
-// * `BILLING` - BILLING
-// * `SHIPPING` - SHIPPING
-type AddressRequestType struct {
-	AddressTypeEnum AddressTypeEnum
-	String          string
-
-	typ string
-}
-
-func (a *AddressRequestType) GetAddressTypeEnum() AddressTypeEnum {
-	if a == nil {
-		return ""
-	}
-	return a.AddressTypeEnum
-}
-
-func (a *AddressRequestType) GetString() string {
-	if a == nil {
-		return ""
-	}
-	return a.String
-}
-
-func (a *AddressRequestType) UnmarshalJSON(data []byte) error {
-	var valueAddressTypeEnum AddressTypeEnum
-	if err := json.Unmarshal(data, &valueAddressTypeEnum); err == nil {
-		a.typ = "AddressTypeEnum"
-		a.AddressTypeEnum = valueAddressTypeEnum
-		return nil
-	}
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		a.typ = "String"
-		a.String = valueString
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, a)
-}
-
-func (a AddressRequestType) MarshalJSON() ([]byte, error) {
-	if a.typ == "AddressTypeEnum" || a.AddressTypeEnum != "" {
-		return json.Marshal(a.AddressTypeEnum)
-	}
-	if a.typ == "String" || a.String != "" {
-		return json.Marshal(a.String)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", a)
-}
-
-type AddressRequestTypeVisitor interface {
-	VisitAddressTypeEnum(AddressTypeEnum) error
-	VisitString(string) error
-}
-
-func (a *AddressRequestType) Accept(visitor AddressRequestTypeVisitor) error {
-	if a.typ == "AddressTypeEnum" || a.AddressTypeEnum != "" {
-		return visitor.VisitAddressTypeEnum(a.AddressTypeEnum)
-	}
-	if a.typ == "String" || a.String != "" {
-		return visitor.VisitString(a.String)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", a)
-}
-
 // The address type.
 //
 // * `BILLING` - BILLING
@@ -3861,6 +3108,86 @@ func (a AddressTypeEnum) Ptr() *AddressTypeEnum {
 	return &a
 }
 
+// Response serializer for POST bulk create - returns only batch_id
+var (
+	asyncBulkCreateResponseFieldBatchId = big.NewInt(1 << 0)
+)
+
+type AsyncBulkCreateResponse struct {
+	// The ID of the batch.
+	BatchId string `json:"batch_id" url:"batch_id"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (a *AsyncBulkCreateResponse) GetBatchId() string {
+	if a == nil {
+		return ""
+	}
+	return a.BatchId
+}
+
+func (a *AsyncBulkCreateResponse) GetExtraProperties() map[string]interface{} {
+	return a.extraProperties
+}
+
+func (a *AsyncBulkCreateResponse) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetBatchId sets the BatchId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *AsyncBulkCreateResponse) SetBatchId(batchId string) {
+	a.BatchId = batchId
+	a.require(asyncBulkCreateResponseFieldBatchId)
+}
+
+func (a *AsyncBulkCreateResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler AsyncBulkCreateResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*a = AsyncBulkCreateResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *a)
+	if err != nil {
+		return err
+	}
+	a.extraProperties = extraProperties
+	a.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (a *AsyncBulkCreateResponse) MarshalJSON() ([]byte, error) {
+	type embed AsyncBulkCreateResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*a),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (a *AsyncBulkCreateResponse) String() string {
+	if len(a.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(a.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(a); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", a)
+}
+
 // # The BankFeedAccount Object
 // ### Description
 // The `BankFeedAccount` object represents a bank feed account, detailing various attributes including account identifiers, names, currency, and balance information. This object is central to managing and tracking bank feed accounts within the system.
@@ -3868,27 +3195,30 @@ func (a AddressTypeEnum) Ptr() *AddressTypeEnum {
 // ### Usage Example
 // Fetch from the `GET BankFeedAccount` endpoint to view details of a bank feed account.
 var (
-	bankFeedAccountFieldId                   = big.NewInt(1 << 0)
-	bankFeedAccountFieldRemoteId             = big.NewInt(1 << 1)
-	bankFeedAccountFieldCreatedAt            = big.NewInt(1 << 2)
-	bankFeedAccountFieldModifiedAt           = big.NewInt(1 << 3)
-	bankFeedAccountFieldSourceAccountId      = big.NewInt(1 << 4)
-	bankFeedAccountFieldTargetAccountId      = big.NewInt(1 << 5)
-	bankFeedAccountFieldSourceAccountName    = big.NewInt(1 << 6)
-	bankFeedAccountFieldSourceAccountNumber  = big.NewInt(1 << 7)
-	bankFeedAccountFieldTargetAccountName    = big.NewInt(1 << 8)
-	bankFeedAccountFieldCurrency             = big.NewInt(1 << 9)
-	bankFeedAccountFieldFeedStatus           = big.NewInt(1 << 10)
-	bankFeedAccountFieldFeedStartDate        = big.NewInt(1 << 11)
-	bankFeedAccountFieldSourceAccountBalance = big.NewInt(1 << 12)
-	bankFeedAccountFieldAccountType          = big.NewInt(1 << 13)
-	bankFeedAccountFieldRemoteWasDeleted     = big.NewInt(1 << 14)
-	bankFeedAccountFieldFieldMappings        = big.NewInt(1 << 15)
-	bankFeedAccountFieldRemoteData           = big.NewInt(1 << 16)
+	bankFeedAccountFieldBankFeedAccountUrl   = big.NewInt(1 << 0)
+	bankFeedAccountFieldId                   = big.NewInt(1 << 1)
+	bankFeedAccountFieldRemoteId             = big.NewInt(1 << 2)
+	bankFeedAccountFieldCreatedAt            = big.NewInt(1 << 3)
+	bankFeedAccountFieldModifiedAt           = big.NewInt(1 << 4)
+	bankFeedAccountFieldSourceAccountId      = big.NewInt(1 << 5)
+	bankFeedAccountFieldTargetAccountId      = big.NewInt(1 << 6)
+	bankFeedAccountFieldSourceAccountName    = big.NewInt(1 << 7)
+	bankFeedAccountFieldSourceAccountNumber  = big.NewInt(1 << 8)
+	bankFeedAccountFieldTargetAccountName    = big.NewInt(1 << 9)
+	bankFeedAccountFieldCurrency             = big.NewInt(1 << 10)
+	bankFeedAccountFieldFeedStatus           = big.NewInt(1 << 11)
+	bankFeedAccountFieldFeedStartDate        = big.NewInt(1 << 12)
+	bankFeedAccountFieldSourceAccountBalance = big.NewInt(1 << 13)
+	bankFeedAccountFieldAccountType          = big.NewInt(1 << 14)
+	bankFeedAccountFieldRemoteWasDeleted     = big.NewInt(1 << 15)
+	bankFeedAccountFieldFieldMappings        = big.NewInt(1 << 16)
+	bankFeedAccountFieldRemoteData           = big.NewInt(1 << 17)
 )
 
 type BankFeedAccount struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the bank feed account.
+	BankFeedAccountUrl *string `json:"bank_feed_account_url,omitempty" url:"bank_feed_account_url,omitempty"`
+	Id                 *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -4229,15 +3559,22 @@ type BankFeedAccount struct {
 	// * `CREDIT_CARD` - CREDIT_CARD
 	AccountType *BankFeedAccountAccountType `json:"account_type,omitempty" url:"account_type,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
-	RemoteWasDeleted *bool                    `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{}   `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
-	RemoteData       []map[string]interface{} `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (b *BankFeedAccount) GetBankFeedAccountUrl() *string {
+	if b == nil {
+		return nil
+	}
+	return b.BankFeedAccountUrl
 }
 
 func (b *BankFeedAccount) GetId() *string {
@@ -4352,7 +3689,7 @@ func (b *BankFeedAccount) GetFieldMappings() map[string]interface{} {
 	return b.FieldMappings
 }
 
-func (b *BankFeedAccount) GetRemoteData() []map[string]interface{} {
+func (b *BankFeedAccount) GetRemoteData() []*RemoteData {
 	if b == nil {
 		return nil
 	}
@@ -4368,6 +3705,13 @@ func (b *BankFeedAccount) require(field *big.Int) {
 		b.explicitFields = big.NewInt(0)
 	}
 	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetBankFeedAccountUrl sets the BankFeedAccountUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BankFeedAccount) SetBankFeedAccountUrl(bankFeedAccountUrl *string) {
+	b.BankFeedAccountUrl = bankFeedAccountUrl
+	b.require(bankFeedAccountFieldBankFeedAccountUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -4484,7 +3828,7 @@ func (b *BankFeedAccount) SetFieldMappings(fieldMappings map[string]interface{})
 
 // SetRemoteData sets the RemoteData field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (b *BankFeedAccount) SetRemoteData(remoteData []map[string]interface{}) {
+func (b *BankFeedAccount) SetRemoteData(remoteData []*RemoteData) {
 	b.RemoteData = remoteData
 	b.require(bankFeedAccountFieldRemoteData)
 }
@@ -5070,6 +4414,592 @@ func (b *BankFeedAccountFeedStatus) Accept(visitor BankFeedAccountFeedStatusVisi
 	return fmt.Errorf("type %T does not include a non-empty union type", b)
 }
 
+// Individual batch object with status
+var (
+	batchObjectFieldItemId   = big.NewInt(1 << 0)
+	batchObjectFieldStatus   = big.NewInt(1 << 1)
+	batchObjectFieldResponse = big.NewInt(1 << 2)
+)
+
+type BatchObject struct {
+	ItemId string `json:"item_id" url:"item_id"`
+	// Possible per-object statuses:
+	//
+	// * `PENDING` - This object has not been processed yet
+	// * `SUCCESS` - This object was successfully POSTed
+	// * `FAILURE` - This object was not successfully POSTed
+	//
+	// * `PENDING` - PENDING
+	// * `SUCCESS` - SUCCESS
+	// * `FAILURE` - FAILURE
+	Status   *BatchObjectStatus       `json:"status" url:"status"`
+	Response *BatchObjectItemResponse `json:"response,omitempty" url:"response,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (b *BatchObject) GetItemId() string {
+	if b == nil {
+		return ""
+	}
+	return b.ItemId
+}
+
+func (b *BatchObject) GetStatus() *BatchObjectStatus {
+	if b == nil {
+		return nil
+	}
+	return b.Status
+}
+
+func (b *BatchObject) GetResponse() *BatchObjectItemResponse {
+	if b == nil {
+		return nil
+	}
+	return b.Response
+}
+
+func (b *BatchObject) GetExtraProperties() map[string]interface{} {
+	return b.extraProperties
+}
+
+func (b *BatchObject) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetItemId sets the ItemId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObject) SetItemId(itemId string) {
+	b.ItemId = itemId
+	b.require(batchObjectFieldItemId)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObject) SetStatus(status *BatchObjectStatus) {
+	b.Status = status
+	b.require(batchObjectFieldStatus)
+}
+
+// SetResponse sets the Response field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObject) SetResponse(response *BatchObjectItemResponse) {
+	b.Response = response
+	b.require(batchObjectFieldResponse)
+}
+
+func (b *BatchObject) UnmarshalJSON(data []byte) error {
+	type unmarshaler BatchObject
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BatchObject(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *b)
+	if err != nil {
+		return err
+	}
+	b.extraProperties = extraProperties
+	b.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BatchObject) MarshalJSON() ([]byte, error) {
+	type embed BatchObject
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*b),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (b *BatchObject) String() string {
+	if len(b.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(b.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// Response for individual items within a batch
+var (
+	batchObjectItemResponseFieldMergeCommonModelId = big.NewInt(1 << 0)
+	batchObjectItemResponseFieldErrorMessage       = big.NewInt(1 << 1)
+)
+
+type BatchObjectItemResponse struct {
+	MergeCommonModelId *string `json:"merge_common_model_id,omitempty" url:"merge_common_model_id,omitempty"`
+	ErrorMessage       *string `json:"error_message,omitempty" url:"error_message,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (b *BatchObjectItemResponse) GetMergeCommonModelId() *string {
+	if b == nil {
+		return nil
+	}
+	return b.MergeCommonModelId
+}
+
+func (b *BatchObjectItemResponse) GetErrorMessage() *string {
+	if b == nil {
+		return nil
+	}
+	return b.ErrorMessage
+}
+
+func (b *BatchObjectItemResponse) GetExtraProperties() map[string]interface{} {
+	return b.extraProperties
+}
+
+func (b *BatchObjectItemResponse) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetMergeCommonModelId sets the MergeCommonModelId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObjectItemResponse) SetMergeCommonModelId(mergeCommonModelId *string) {
+	b.MergeCommonModelId = mergeCommonModelId
+	b.require(batchObjectItemResponseFieldMergeCommonModelId)
+}
+
+// SetErrorMessage sets the ErrorMessage field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObjectItemResponse) SetErrorMessage(errorMessage *string) {
+	b.ErrorMessage = errorMessage
+	b.require(batchObjectItemResponseFieldErrorMessage)
+}
+
+func (b *BatchObjectItemResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler BatchObjectItemResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BatchObjectItemResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *b)
+	if err != nil {
+		return err
+	}
+	b.extraProperties = extraProperties
+	b.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BatchObjectItemResponse) MarshalJSON() ([]byte, error) {
+	type embed BatchObjectItemResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*b),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (b *BatchObjectItemResponse) String() string {
+	if len(b.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(b.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// Possible per-object statuses:
+//
+// * `PENDING` - This object has not been processed yet
+// * `SUCCESS` - This object was successfully POSTed
+// * `FAILURE` - This object was not successfully POSTed
+//
+// * `PENDING` - PENDING
+// * `SUCCESS` - SUCCESS
+// * `FAILURE` - FAILURE
+type BatchObjectStatus struct {
+	BatchObjectStatusEnum BatchObjectStatusEnum
+	String                string
+
+	typ string
+}
+
+func (b *BatchObjectStatus) GetBatchObjectStatusEnum() BatchObjectStatusEnum {
+	if b == nil {
+		return ""
+	}
+	return b.BatchObjectStatusEnum
+}
+
+func (b *BatchObjectStatus) GetString() string {
+	if b == nil {
+		return ""
+	}
+	return b.String
+}
+
+func (b *BatchObjectStatus) UnmarshalJSON(data []byte) error {
+	var valueBatchObjectStatusEnum BatchObjectStatusEnum
+	if err := json.Unmarshal(data, &valueBatchObjectStatusEnum); err == nil {
+		b.typ = "BatchObjectStatusEnum"
+		b.BatchObjectStatusEnum = valueBatchObjectStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typ = "String"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BatchObjectStatus) MarshalJSON() ([]byte, error) {
+	if b.typ == "BatchObjectStatusEnum" || b.BatchObjectStatusEnum != "" {
+		return json.Marshal(b.BatchObjectStatusEnum)
+	}
+	if b.typ == "String" || b.String != "" {
+		return json.Marshal(b.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", b)
+}
+
+type BatchObjectStatusVisitor interface {
+	VisitBatchObjectStatusEnum(BatchObjectStatusEnum) error
+	VisitString(string) error
+}
+
+func (b *BatchObjectStatus) Accept(visitor BatchObjectStatusVisitor) error {
+	if b.typ == "BatchObjectStatusEnum" || b.BatchObjectStatusEnum != "" {
+		return visitor.VisitBatchObjectStatusEnum(b.BatchObjectStatusEnum)
+	}
+	if b.typ == "String" || b.String != "" {
+		return visitor.VisitString(b.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", b)
+}
+
+// * `PENDING` - This object has not been processed yet
+// * `SUCCESS` - This object was successfully POSTed
+// * `FAILURE` - This object was not successfully POSTed
+//
+// * `PENDING` - PENDING
+// * `SUCCESS` - SUCCESS
+// * `FAILURE` - FAILURE
+type BatchObjectStatusEnum string
+
+const (
+	BatchObjectStatusEnumPending BatchObjectStatusEnum = "PENDING"
+	BatchObjectStatusEnumSuccess BatchObjectStatusEnum = "SUCCESS"
+	BatchObjectStatusEnumFailure BatchObjectStatusEnum = "FAILURE"
+)
+
+func NewBatchObjectStatusEnumFromString(s string) (BatchObjectStatusEnum, error) {
+	switch s {
+	case "PENDING":
+		return BatchObjectStatusEnumPending, nil
+	case "SUCCESS":
+		return BatchObjectStatusEnumSuccess, nil
+	case "FAILURE":
+		return BatchObjectStatusEnumFailure, nil
+	}
+	var t BatchObjectStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (b BatchObjectStatusEnum) Ptr() *BatchObjectStatusEnum {
+	return &b
+}
+
+// Response serializer for GET bulk/{batch_id} - returns batch status and objects
+var (
+	batchObjectsResponseFieldBatchId    = big.NewInt(1 << 0)
+	batchObjectsResponseFieldStatus     = big.NewInt(1 << 1)
+	batchObjectsResponseFieldTotalCount = big.NewInt(1 << 2)
+	batchObjectsResponseFieldObjects    = big.NewInt(1 << 3)
+)
+
+type BatchObjectsResponse struct {
+	// The ID of the batch.
+	BatchId string `json:"batch_id" url:"batch_id"`
+	// Possible overall statuses:
+	//
+	// * `ENQUEUED` - The request has been received and a task has been enqueued for processing
+	// * `IN_PROGRESS` - The enqueued task is being processed
+	// * `PARTIAL_SUCCESS` - The task has been processed, but not all objects were written successfully
+	// * `SUCCESS` - The task has been processed, and all objects were written successfully
+	// * `FAILED` - The task has been processed, but ran into an error while processing
+	// * `RATE_LIMITED` - The request was received but ran into rate limits while processing. The rate limited objects are being retried.
+	//
+	// * `ENQUEUED` - ENQUEUED
+	// * `IN_PROGRESS` - IN_PROGRESS
+	// * `PARTIAL_SUCCESS` - PARTIAL_SUCCESS
+	// * `SUCCESS` - SUCCESS
+	// * `FAILED` - FAILED
+	// * `RATE_LIMITED` - RATE_LIMITED
+	Status *BatchObjectsResponseStatus `json:"status" url:"status"`
+	// The total number of objects in the batch.
+	TotalCount int            `json:"total_count" url:"total_count"`
+	Objects    []*BatchObject `json:"objects" url:"objects"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (b *BatchObjectsResponse) GetBatchId() string {
+	if b == nil {
+		return ""
+	}
+	return b.BatchId
+}
+
+func (b *BatchObjectsResponse) GetStatus() *BatchObjectsResponseStatus {
+	if b == nil {
+		return nil
+	}
+	return b.Status
+}
+
+func (b *BatchObjectsResponse) GetTotalCount() int {
+	if b == nil {
+		return 0
+	}
+	return b.TotalCount
+}
+
+func (b *BatchObjectsResponse) GetObjects() []*BatchObject {
+	if b == nil {
+		return nil
+	}
+	return b.Objects
+}
+
+func (b *BatchObjectsResponse) GetExtraProperties() map[string]interface{} {
+	return b.extraProperties
+}
+
+func (b *BatchObjectsResponse) require(field *big.Int) {
+	if b.explicitFields == nil {
+		b.explicitFields = big.NewInt(0)
+	}
+	b.explicitFields.Or(b.explicitFields, field)
+}
+
+// SetBatchId sets the BatchId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObjectsResponse) SetBatchId(batchId string) {
+	b.BatchId = batchId
+	b.require(batchObjectsResponseFieldBatchId)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObjectsResponse) SetStatus(status *BatchObjectsResponseStatus) {
+	b.Status = status
+	b.require(batchObjectsResponseFieldStatus)
+}
+
+// SetTotalCount sets the TotalCount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObjectsResponse) SetTotalCount(totalCount int) {
+	b.TotalCount = totalCount
+	b.require(batchObjectsResponseFieldTotalCount)
+}
+
+// SetObjects sets the Objects field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (b *BatchObjectsResponse) SetObjects(objects []*BatchObject) {
+	b.Objects = objects
+	b.require(batchObjectsResponseFieldObjects)
+}
+
+func (b *BatchObjectsResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler BatchObjectsResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*b = BatchObjectsResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *b)
+	if err != nil {
+		return err
+	}
+	b.extraProperties = extraProperties
+	b.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (b *BatchObjectsResponse) MarshalJSON() ([]byte, error) {
+	type embed BatchObjectsResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*b),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, b.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (b *BatchObjectsResponse) String() string {
+	if len(b.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(b.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(b); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", b)
+}
+
+// Possible overall statuses:
+//
+// * `ENQUEUED` - The request has been received and a task has been enqueued for processing
+// * `IN_PROGRESS` - The enqueued task is being processed
+// * `PARTIAL_SUCCESS` - The task has been processed, but not all objects were written successfully
+// * `SUCCESS` - The task has been processed, and all objects were written successfully
+// * `FAILED` - The task has been processed, but ran into an error while processing
+// * `RATE_LIMITED` - The request was received but ran into rate limits while processing. The rate limited objects are being retried.
+//
+// * `ENQUEUED` - ENQUEUED
+// * `IN_PROGRESS` - IN_PROGRESS
+// * `PARTIAL_SUCCESS` - PARTIAL_SUCCESS
+// * `SUCCESS` - SUCCESS
+// * `FAILED` - FAILED
+// * `RATE_LIMITED` - RATE_LIMITED
+type BatchObjectsResponseStatus struct {
+	BatchObjectsResponseStatusEnum BatchObjectsResponseStatusEnum
+	String                         string
+
+	typ string
+}
+
+func (b *BatchObjectsResponseStatus) GetBatchObjectsResponseStatusEnum() BatchObjectsResponseStatusEnum {
+	if b == nil {
+		return ""
+	}
+	return b.BatchObjectsResponseStatusEnum
+}
+
+func (b *BatchObjectsResponseStatus) GetString() string {
+	if b == nil {
+		return ""
+	}
+	return b.String
+}
+
+func (b *BatchObjectsResponseStatus) UnmarshalJSON(data []byte) error {
+	var valueBatchObjectsResponseStatusEnum BatchObjectsResponseStatusEnum
+	if err := json.Unmarshal(data, &valueBatchObjectsResponseStatusEnum); err == nil {
+		b.typ = "BatchObjectsResponseStatusEnum"
+		b.BatchObjectsResponseStatusEnum = valueBatchObjectsResponseStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		b.typ = "String"
+		b.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, b)
+}
+
+func (b BatchObjectsResponseStatus) MarshalJSON() ([]byte, error) {
+	if b.typ == "BatchObjectsResponseStatusEnum" || b.BatchObjectsResponseStatusEnum != "" {
+		return json.Marshal(b.BatchObjectsResponseStatusEnum)
+	}
+	if b.typ == "String" || b.String != "" {
+		return json.Marshal(b.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", b)
+}
+
+type BatchObjectsResponseStatusVisitor interface {
+	VisitBatchObjectsResponseStatusEnum(BatchObjectsResponseStatusEnum) error
+	VisitString(string) error
+}
+
+func (b *BatchObjectsResponseStatus) Accept(visitor BatchObjectsResponseStatusVisitor) error {
+	if b.typ == "BatchObjectsResponseStatusEnum" || b.BatchObjectsResponseStatusEnum != "" {
+		return visitor.VisitBatchObjectsResponseStatusEnum(b.BatchObjectsResponseStatusEnum)
+	}
+	if b.typ == "String" || b.String != "" {
+		return visitor.VisitString(b.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", b)
+}
+
+// * `ENQUEUED` - The request has been received and a task has been enqueued for processing
+// * `IN_PROGRESS` - The enqueued task is being processed
+// * `PARTIAL_SUCCESS` - The task has been processed, but not all objects were written successfully
+// * `SUCCESS` - The task has been processed, and all objects were written successfully
+// * `FAILED` - The task has been processed, but ran into an error while processing
+// * `RATE_LIMITED` - The request was received but ran into rate limits while processing. The rate limited objects are being retried.
+//
+// * `ENQUEUED` - ENQUEUED
+// * `IN_PROGRESS` - IN_PROGRESS
+// * `PARTIAL_SUCCESS` - PARTIAL_SUCCESS
+// * `SUCCESS` - SUCCESS
+// * `FAILED` - FAILED
+// * `RATE_LIMITED` - RATE_LIMITED
+type BatchObjectsResponseStatusEnum string
+
+const (
+	BatchObjectsResponseStatusEnumEnqueued       BatchObjectsResponseStatusEnum = "ENQUEUED"
+	BatchObjectsResponseStatusEnumInProgress     BatchObjectsResponseStatusEnum = "IN_PROGRESS"
+	BatchObjectsResponseStatusEnumPartialSuccess BatchObjectsResponseStatusEnum = "PARTIAL_SUCCESS"
+	BatchObjectsResponseStatusEnumSuccess        BatchObjectsResponseStatusEnum = "SUCCESS"
+	BatchObjectsResponseStatusEnumFailed         BatchObjectsResponseStatusEnum = "FAILED"
+	BatchObjectsResponseStatusEnumRateLimited    BatchObjectsResponseStatusEnum = "RATE_LIMITED"
+)
+
+func NewBatchObjectsResponseStatusEnumFromString(s string) (BatchObjectsResponseStatusEnum, error) {
+	switch s {
+	case "ENQUEUED":
+		return BatchObjectsResponseStatusEnumEnqueued, nil
+	case "IN_PROGRESS":
+		return BatchObjectsResponseStatusEnumInProgress, nil
+	case "PARTIAL_SUCCESS":
+		return BatchObjectsResponseStatusEnumPartialSuccess, nil
+	case "SUCCESS":
+		return BatchObjectsResponseStatusEnumSuccess, nil
+	case "FAILED":
+		return BatchObjectsResponseStatusEnumFailed, nil
+	case "RATE_LIMITED":
+		return BatchObjectsResponseStatusEnumRateLimited, nil
+	}
+	var t BatchObjectsResponseStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (b BatchObjectsResponseStatusEnum) Ptr() *BatchObjectsResponseStatusEnum {
+	return &b
+}
+
 // * `hris` - hris
 // * `ats` - ats
 // * `accounting` - accounting
@@ -5077,16 +5007,18 @@ func (b *BankFeedAccountFeedStatus) Accept(visitor BankFeedAccountFeedStatusVisi
 // * `crm` - crm
 // * `mktg` - mktg
 // * `filestorage` - filestorage
+// * `knowledgebase` - knowledgebase
 type CategoriesEnum string
 
 const (
-	CategoriesEnumHris        CategoriesEnum = "hris"
-	CategoriesEnumAts         CategoriesEnum = "ats"
-	CategoriesEnumAccounting  CategoriesEnum = "accounting"
-	CategoriesEnumTicketing   CategoriesEnum = "ticketing"
-	CategoriesEnumCrm         CategoriesEnum = "crm"
-	CategoriesEnumMktg        CategoriesEnum = "mktg"
-	CategoriesEnumFilestorage CategoriesEnum = "filestorage"
+	CategoriesEnumHris          CategoriesEnum = "hris"
+	CategoriesEnumAts           CategoriesEnum = "ats"
+	CategoriesEnumAccounting    CategoriesEnum = "accounting"
+	CategoriesEnumTicketing     CategoriesEnum = "ticketing"
+	CategoriesEnumCrm           CategoriesEnum = "crm"
+	CategoriesEnumMktg          CategoriesEnum = "mktg"
+	CategoriesEnumFilestorage   CategoriesEnum = "filestorage"
+	CategoriesEnumKnowledgebase CategoriesEnum = "knowledgebase"
 )
 
 func NewCategoriesEnumFromString(s string) (CategoriesEnum, error) {
@@ -5105,6 +5037,8 @@ func NewCategoriesEnumFromString(s string) (CategoriesEnum, error) {
 		return CategoriesEnumMktg, nil
 	case "filestorage":
 		return CategoriesEnumFilestorage, nil
+	case "knowledgebase":
+		return CategoriesEnumKnowledgebase, nil
 	}
 	var t CategoriesEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -5121,16 +5055,18 @@ func (c CategoriesEnum) Ptr() *CategoriesEnum {
 // * `crm` - crm
 // * `mktg` - mktg
 // * `filestorage` - filestorage
+// * `knowledgebase` - knowledgebase
 type CategoryEnum string
 
 const (
-	CategoryEnumHris        CategoryEnum = "hris"
-	CategoryEnumAts         CategoryEnum = "ats"
-	CategoryEnumAccounting  CategoryEnum = "accounting"
-	CategoryEnumTicketing   CategoryEnum = "ticketing"
-	CategoryEnumCrm         CategoryEnum = "crm"
-	CategoryEnumMktg        CategoryEnum = "mktg"
-	CategoryEnumFilestorage CategoryEnum = "filestorage"
+	CategoryEnumHris          CategoryEnum = "hris"
+	CategoryEnumAts           CategoryEnum = "ats"
+	CategoryEnumAccounting    CategoryEnum = "accounting"
+	CategoryEnumTicketing     CategoryEnum = "ticketing"
+	CategoryEnumCrm           CategoryEnum = "crm"
+	CategoryEnumMktg          CategoryEnum = "mktg"
+	CategoryEnumFilestorage   CategoryEnum = "filestorage"
+	CategoryEnumKnowledgebase CategoryEnum = "knowledgebase"
 )
 
 func NewCategoryEnumFromString(s string) (CategoryEnum, error) {
@@ -5149,6 +5085,8 @@ func NewCategoryEnumFromString(s string) (CategoryEnum, error) {
 		return CategoryEnumMktg, nil
 	case "filestorage":
 		return CategoryEnumFilestorage, nil
+	case "knowledgebase":
+		return CategoryEnumKnowledgebase, nil
 	}
 	var t CategoryEnum
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -5225,27 +5163,30 @@ func (c ClassificationEnum) Ptr() *ClassificationEnum {
 // ### Usage Example
 // Fetch from the `GET CompanyInfo` endpoint and view a company's information.
 var (
-	companyInfoFieldId                 = big.NewInt(1 << 0)
-	companyInfoFieldRemoteId           = big.NewInt(1 << 1)
-	companyInfoFieldCreatedAt          = big.NewInt(1 << 2)
-	companyInfoFieldModifiedAt         = big.NewInt(1 << 3)
-	companyInfoFieldName               = big.NewInt(1 << 4)
-	companyInfoFieldLegalName          = big.NewInt(1 << 5)
-	companyInfoFieldTaxNumber          = big.NewInt(1 << 6)
-	companyInfoFieldFiscalYearEndMonth = big.NewInt(1 << 7)
-	companyInfoFieldFiscalYearEndDay   = big.NewInt(1 << 8)
-	companyInfoFieldCurrency           = big.NewInt(1 << 9)
-	companyInfoFieldRemoteCreatedAt    = big.NewInt(1 << 10)
-	companyInfoFieldUrls               = big.NewInt(1 << 11)
-	companyInfoFieldAddresses          = big.NewInt(1 << 12)
-	companyInfoFieldPhoneNumbers       = big.NewInt(1 << 13)
-	companyInfoFieldRemoteWasDeleted   = big.NewInt(1 << 14)
-	companyInfoFieldFieldMappings      = big.NewInt(1 << 15)
-	companyInfoFieldRemoteData         = big.NewInt(1 << 16)
+	companyInfoFieldCompanyInfoUrl     = big.NewInt(1 << 0)
+	companyInfoFieldId                 = big.NewInt(1 << 1)
+	companyInfoFieldRemoteId           = big.NewInt(1 << 2)
+	companyInfoFieldCreatedAt          = big.NewInt(1 << 3)
+	companyInfoFieldModifiedAt         = big.NewInt(1 << 4)
+	companyInfoFieldName               = big.NewInt(1 << 5)
+	companyInfoFieldLegalName          = big.NewInt(1 << 6)
+	companyInfoFieldTaxNumber          = big.NewInt(1 << 7)
+	companyInfoFieldFiscalYearEndMonth = big.NewInt(1 << 8)
+	companyInfoFieldFiscalYearEndDay   = big.NewInt(1 << 9)
+	companyInfoFieldCurrency           = big.NewInt(1 << 10)
+	companyInfoFieldRemoteCreatedAt    = big.NewInt(1 << 11)
+	companyInfoFieldUrls               = big.NewInt(1 << 12)
+	companyInfoFieldAddresses          = big.NewInt(1 << 13)
+	companyInfoFieldPhoneNumbers       = big.NewInt(1 << 14)
+	companyInfoFieldRemoteWasDeleted   = big.NewInt(1 << 15)
+	companyInfoFieldFieldMappings      = big.NewInt(1 << 16)
+	companyInfoFieldRemoteData         = big.NewInt(1 << 17)
 )
 
 type CompanyInfo struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the company info.
+	CompanyInfoUrl *string `json:"company_info_url,omitempty" url:"company_info_url,omitempty"`
+	Id             *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -5261,14 +5202,322 @@ type CompanyInfo struct {
 	// The company's fiscal year end month.
 	FiscalYearEndMonth *int `json:"fiscal_year_end_month,omitempty" url:"fiscal_year_end_month,omitempty"`
 	// The company's fiscal year end day.
-	FiscalYearEndDay *int        `json:"fiscal_year_end_day,omitempty" url:"fiscal_year_end_day,omitempty"`
-	Currency         interface{} `json:"currency,omitempty" url:"currency,omitempty"`
+	FiscalYearEndDay *int `json:"fiscal_year_end_day,omitempty" url:"fiscal_year_end_day,omitempty"`
+	// The currency set in the company's accounting platform.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *CompanyInfoCurrency `json:"currency,omitempty" url:"currency,omitempty"`
 	// When the third party's company was created.
 	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty" url:"remote_created_at,omitempty"`
 	// The company's urls.
-	Urls         []*string                `json:"urls,omitempty" url:"urls,omitempty"`
-	Addresses    []*Address               `json:"addresses,omitempty" url:"addresses,omitempty"`
-	PhoneNumbers []*AccountingPhoneNumber `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
+	Urls         []*string                      `json:"urls,omitempty" url:"urls,omitempty"`
+	Addresses    []*CompanyInfoAddressesItem    `json:"addresses,omitempty" url:"addresses,omitempty"`
+	PhoneNumbers []*CompanyInfoPhoneNumbersItem `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
@@ -5279,6 +5528,13 @@ type CompanyInfo struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (c *CompanyInfo) GetCompanyInfoUrl() *string {
+	if c == nil {
+		return nil
+	}
+	return c.CompanyInfoUrl
 }
 
 func (c *CompanyInfo) GetId() *string {
@@ -5344,7 +5600,7 @@ func (c *CompanyInfo) GetFiscalYearEndDay() *int {
 	return c.FiscalYearEndDay
 }
 
-func (c *CompanyInfo) GetCurrency() interface{} {
+func (c *CompanyInfo) GetCurrency() *CompanyInfoCurrency {
 	if c == nil {
 		return nil
 	}
@@ -5365,14 +5621,14 @@ func (c *CompanyInfo) GetUrls() []*string {
 	return c.Urls
 }
 
-func (c *CompanyInfo) GetAddresses() []*Address {
+func (c *CompanyInfo) GetAddresses() []*CompanyInfoAddressesItem {
 	if c == nil {
 		return nil
 	}
 	return c.Addresses
 }
 
-func (c *CompanyInfo) GetPhoneNumbers() []*AccountingPhoneNumber {
+func (c *CompanyInfo) GetPhoneNumbers() []*CompanyInfoPhoneNumbersItem {
 	if c == nil {
 		return nil
 	}
@@ -5409,6 +5665,13 @@ func (c *CompanyInfo) require(field *big.Int) {
 		c.explicitFields = big.NewInt(0)
 	}
 	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCompanyInfoUrl sets the CompanyInfoUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompanyInfo) SetCompanyInfoUrl(companyInfoUrl *string) {
+	c.CompanyInfoUrl = companyInfoUrl
+	c.require(companyInfoFieldCompanyInfoUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -5476,7 +5739,7 @@ func (c *CompanyInfo) SetFiscalYearEndDay(fiscalYearEndDay *int) {
 
 // SetCurrency sets the Currency field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CompanyInfo) SetCurrency(currency interface{}) {
+func (c *CompanyInfo) SetCurrency(currency *CompanyInfoCurrency) {
 	c.Currency = currency
 	c.require(companyInfoFieldCurrency)
 }
@@ -5497,14 +5760,14 @@ func (c *CompanyInfo) SetUrls(urls []*string) {
 
 // SetAddresses sets the Addresses field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CompanyInfo) SetAddresses(addresses []*Address) {
+func (c *CompanyInfo) SetAddresses(addresses []*CompanyInfoAddressesItem) {
 	c.Addresses = addresses
 	c.require(companyInfoFieldAddresses)
 }
 
 // SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CompanyInfo) SetPhoneNumbers(phoneNumbers []*AccountingPhoneNumber) {
+func (c *CompanyInfo) SetPhoneNumbers(phoneNumbers []*CompanyInfoPhoneNumbersItem) {
 	c.PhoneNumbers = phoneNumbers
 	c.require(companyInfoFieldPhoneNumbers)
 }
@@ -5585,6 +5848,500 @@ func (c *CompanyInfo) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+type CompanyInfoAddressesItem struct {
+	String  string
+	Address *Address
+
+	typ string
+}
+
+func (c *CompanyInfoAddressesItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CompanyInfoAddressesItem) GetAddress() *Address {
+	if c == nil {
+		return nil
+	}
+	return c.Address
+}
+
+func (c *CompanyInfoAddressesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueAddress := new(Address)
+	if err := json.Unmarshal(data, &valueAddress); err == nil {
+		c.typ = "Address"
+		c.Address = valueAddress
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CompanyInfoAddressesItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "Address" || c.Address != nil {
+		return json.Marshal(c.Address)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CompanyInfoAddressesItemVisitor interface {
+	VisitString(string) error
+	VisitAddress(*Address) error
+}
+
+func (c *CompanyInfoAddressesItem) Accept(visitor CompanyInfoAddressesItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "Address" || c.Address != nil {
+		return visitor.VisitAddress(c.Address)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+// The currency set in the company's accounting platform.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type CompanyInfoCurrency struct {
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+
+	typ string
+}
+
+func (c *CompanyInfoCurrency) GetTransactionCurrencyEnum() TransactionCurrencyEnum {
+	if c == nil {
+		return ""
+	}
+	return c.TransactionCurrencyEnum
+}
+
+func (c *CompanyInfoCurrency) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CompanyInfoCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		c.typ = "TransactionCurrencyEnum"
+		c.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CompanyInfoCurrency) MarshalJSON() ([]byte, error) {
+	if c.typ == "TransactionCurrencyEnum" || c.TransactionCurrencyEnum != "" {
+		return json.Marshal(c.TransactionCurrencyEnum)
+	}
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CompanyInfoCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (c *CompanyInfoCurrency) Accept(visitor CompanyInfoCurrencyVisitor) error {
+	if c.typ == "TransactionCurrencyEnum" || c.TransactionCurrencyEnum != "" {
+		return visitor.VisitTransactionCurrencyEnum(c.TransactionCurrencyEnum)
+	}
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CompanyInfoPhoneNumbersItem struct {
+	String                string
+	AccountingPhoneNumber *AccountingPhoneNumber
+
+	typ string
+}
+
+func (c *CompanyInfoPhoneNumbersItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CompanyInfoPhoneNumbersItem) GetAccountingPhoneNumber() *AccountingPhoneNumber {
+	if c == nil {
+		return nil
+	}
+	return c.AccountingPhoneNumber
+}
+
+func (c *CompanyInfoPhoneNumbersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueAccountingPhoneNumber := new(AccountingPhoneNumber)
+	if err := json.Unmarshal(data, &valueAccountingPhoneNumber); err == nil {
+		c.typ = "AccountingPhoneNumber"
+		c.AccountingPhoneNumber = valueAccountingPhoneNumber
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CompanyInfoPhoneNumbersItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "AccountingPhoneNumber" || c.AccountingPhoneNumber != nil {
+		return json.Marshal(c.AccountingPhoneNumber)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CompanyInfoPhoneNumbersItemVisitor interface {
+	VisitString(string) error
+	VisitAccountingPhoneNumber(*AccountingPhoneNumber) error
+}
+
+func (c *CompanyInfoPhoneNumbersItem) Accept(visitor CompanyInfoPhoneNumbersItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "AccountingPhoneNumber" || c.AccountingPhoneNumber != nil {
+		return visitor.VisitAccountingPhoneNumber(c.AccountingPhoneNumber)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
 // * `SALES` - SALES
 // * `PURCHASE` - PURCHASE
 type ComponentTypeEnum string
@@ -5618,29 +6375,32 @@ func (c ComponentTypeEnum) Ptr() *ComponentTypeEnum {
 // ### Usage Example
 // Fetch from the `LIST Contacts` endpoint and view a company's contacts.
 var (
-	contactFieldId               = big.NewInt(1 << 0)
-	contactFieldRemoteId         = big.NewInt(1 << 1)
-	contactFieldCreatedAt        = big.NewInt(1 << 2)
-	contactFieldModifiedAt       = big.NewInt(1 << 3)
-	contactFieldName             = big.NewInt(1 << 4)
-	contactFieldIsSupplier       = big.NewInt(1 << 5)
-	contactFieldIsCustomer       = big.NewInt(1 << 6)
-	contactFieldEmailAddress     = big.NewInt(1 << 7)
-	contactFieldTaxNumber        = big.NewInt(1 << 8)
-	contactFieldStatus           = big.NewInt(1 << 9)
-	contactFieldCurrency         = big.NewInt(1 << 10)
-	contactFieldRemoteUpdatedAt  = big.NewInt(1 << 11)
-	contactFieldCompany          = big.NewInt(1 << 12)
-	contactFieldAddresses        = big.NewInt(1 << 13)
-	contactFieldPhoneNumbers     = big.NewInt(1 << 14)
-	contactFieldRemoteWasDeleted = big.NewInt(1 << 15)
-	contactFieldFieldMappings    = big.NewInt(1 << 16)
-	contactFieldRemoteData       = big.NewInt(1 << 17)
-	contactFieldRemoteFields     = big.NewInt(1 << 18)
+	contactFieldContactUrl       = big.NewInt(1 << 0)
+	contactFieldId               = big.NewInt(1 << 1)
+	contactFieldRemoteId         = big.NewInt(1 << 2)
+	contactFieldCreatedAt        = big.NewInt(1 << 3)
+	contactFieldModifiedAt       = big.NewInt(1 << 4)
+	contactFieldName             = big.NewInt(1 << 5)
+	contactFieldIsSupplier       = big.NewInt(1 << 6)
+	contactFieldIsCustomer       = big.NewInt(1 << 7)
+	contactFieldEmailAddress     = big.NewInt(1 << 8)
+	contactFieldTaxNumber        = big.NewInt(1 << 9)
+	contactFieldStatus           = big.NewInt(1 << 10)
+	contactFieldCurrency         = big.NewInt(1 << 11)
+	contactFieldRemoteUpdatedAt  = big.NewInt(1 << 12)
+	contactFieldCompany          = big.NewInt(1 << 13)
+	contactFieldAddresses        = big.NewInt(1 << 14)
+	contactFieldPhoneNumbers     = big.NewInt(1 << 15)
+	contactFieldRemoteWasDeleted = big.NewInt(1 << 16)
+	contactFieldFieldMappings    = big.NewInt(1 << 17)
+	contactFieldRemoteData       = big.NewInt(1 << 18)
+	contactFieldRemoteFields     = big.NewInt(1 << 19)
 )
 
 type Contact struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the contact.
+	ContactUrl *string `json:"contact_url,omitempty" url:"contact_url,omitempty"`
+	Id         *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -5667,11 +6427,11 @@ type Contact struct {
 	// When the third party's contact was updated.
 	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty" url:"remote_updated_at,omitempty"`
 	// The company the contact belongs to.
-	Company *string `json:"company,omitempty" url:"company,omitempty"`
+	Company *ContactCompany `json:"company,omitempty" url:"company,omitempty"`
 	// `Address` object IDs for the given `Contacts` object.
 	Addresses []*ContactAddressesItem `json:"addresses,omitempty" url:"addresses,omitempty"`
 	// `AccountingPhoneNumber` object for the given `Contacts` object.
-	PhoneNumbers []*AccountingPhoneNumber `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
+	PhoneNumbers []*ContactPhoneNumbersItem `json:"phone_numbers,omitempty" url:"phone_numbers,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
@@ -5683,6 +6443,13 @@ type Contact struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (c *Contact) GetContactUrl() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ContactUrl
 }
 
 func (c *Contact) GetId() *string {
@@ -5769,7 +6536,7 @@ func (c *Contact) GetRemoteUpdatedAt() *time.Time {
 	return c.RemoteUpdatedAt
 }
 
-func (c *Contact) GetCompany() *string {
+func (c *Contact) GetCompany() *ContactCompany {
 	if c == nil {
 		return nil
 	}
@@ -5783,7 +6550,7 @@ func (c *Contact) GetAddresses() []*ContactAddressesItem {
 	return c.Addresses
 }
 
-func (c *Contact) GetPhoneNumbers() []*AccountingPhoneNumber {
+func (c *Contact) GetPhoneNumbers() []*ContactPhoneNumbersItem {
 	if c == nil {
 		return nil
 	}
@@ -5827,6 +6594,13 @@ func (c *Contact) require(field *big.Int) {
 		c.explicitFields = big.NewInt(0)
 	}
 	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetContactUrl sets the ContactUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Contact) SetContactUrl(contactUrl *string) {
+	c.ContactUrl = contactUrl
+	c.require(contactFieldContactUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -5915,7 +6689,7 @@ func (c *Contact) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
 
 // SetCompany sets the Company field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *Contact) SetCompany(company *string) {
+func (c *Contact) SetCompany(company *ContactCompany) {
 	c.Company = company
 	c.require(contactFieldCompany)
 }
@@ -5929,7 +6703,7 @@ func (c *Contact) SetAddresses(addresses []*ContactAddressesItem) {
 
 // SetPhoneNumbers sets the PhoneNumbers field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *Contact) SetPhoneNumbers(phoneNumbers []*AccountingPhoneNumber) {
+func (c *Contact) SetPhoneNumbers(phoneNumbers []*ContactPhoneNumbersItem) {
 	c.PhoneNumbers = phoneNumbers
 	c.require(contactFieldPhoneNumbers)
 }
@@ -6075,6 +6849,131 @@ func (c *ContactAddressesItem) Accept(visitor ContactAddressesItemVisitor) error
 	}
 	if c.typ == "Address" || c.Address != nil {
 		return visitor.VisitAddress(c.Address)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+// The company the contact belongs to.
+type ContactCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (c *ContactCompany) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *ContactCompany) GetCompanyInfo() *CompanyInfo {
+	if c == nil {
+		return nil
+	}
+	return c.CompanyInfo
+}
+
+func (c *ContactCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typ = "CompanyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactCompany) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
+		return json.Marshal(c.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type ContactCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *ContactCompany) Accept(visitor ContactCompanyVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type ContactPhoneNumbersItem struct {
+	String                string
+	AccountingPhoneNumber *AccountingPhoneNumber
+
+	typ string
+}
+
+func (c *ContactPhoneNumbersItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *ContactPhoneNumbersItem) GetAccountingPhoneNumber() *AccountingPhoneNumber {
+	if c == nil {
+		return nil
+	}
+	return c.AccountingPhoneNumber
+}
+
+func (c *ContactPhoneNumbersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueAccountingPhoneNumber := new(AccountingPhoneNumber)
+	if err := json.Unmarshal(data, &valueAccountingPhoneNumber); err == nil {
+		c.typ = "AccountingPhoneNumber"
+		c.AccountingPhoneNumber = valueAccountingPhoneNumber
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c ContactPhoneNumbersItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "AccountingPhoneNumber" || c.AccountingPhoneNumber != nil {
+		return json.Marshal(c.AccountingPhoneNumber)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type ContactPhoneNumbersItemVisitor interface {
+	VisitString(string) error
+	VisitAccountingPhoneNumber(*AccountingPhoneNumber) error
+}
+
+func (c *ContactPhoneNumbersItem) Accept(visitor ContactPhoneNumbersItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "AccountingPhoneNumber" || c.AccountingPhoneNumber != nil {
+		return visitor.VisitAccountingPhoneNumber(c.AccountingPhoneNumber)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
@@ -7164,35 +8063,38 @@ func (c CountryEnum) Ptr() *CountryEnum {
 // ### Usage Example
 // Fetch from the `LIST CreditNotes` endpoint and view a company's credit notes.
 var (
-	creditNoteFieldId                 = big.NewInt(1 << 0)
-	creditNoteFieldRemoteId           = big.NewInt(1 << 1)
-	creditNoteFieldCreatedAt          = big.NewInt(1 << 2)
-	creditNoteFieldModifiedAt         = big.NewInt(1 << 3)
-	creditNoteFieldTransactionDate    = big.NewInt(1 << 4)
-	creditNoteFieldStatus             = big.NewInt(1 << 5)
-	creditNoteFieldNumber             = big.NewInt(1 << 6)
-	creditNoteFieldContact            = big.NewInt(1 << 7)
-	creditNoteFieldCompany            = big.NewInt(1 << 8)
-	creditNoteFieldExchangeRate       = big.NewInt(1 << 9)
-	creditNoteFieldTotalAmount        = big.NewInt(1 << 10)
-	creditNoteFieldRemainingCredit    = big.NewInt(1 << 11)
-	creditNoteFieldInclusiveOfTax     = big.NewInt(1 << 12)
-	creditNoteFieldLineItems          = big.NewInt(1 << 13)
-	creditNoteFieldTrackingCategories = big.NewInt(1 << 14)
-	creditNoteFieldCurrency           = big.NewInt(1 << 15)
-	creditNoteFieldRemoteCreatedAt    = big.NewInt(1 << 16)
-	creditNoteFieldRemoteUpdatedAt    = big.NewInt(1 << 17)
-	creditNoteFieldPayments           = big.NewInt(1 << 18)
-	creditNoteFieldAppliedPayments    = big.NewInt(1 << 19)
-	creditNoteFieldAccountingPeriod   = big.NewInt(1 << 20)
-	creditNoteFieldAppliedToLines     = big.NewInt(1 << 21)
-	creditNoteFieldRemoteWasDeleted   = big.NewInt(1 << 22)
-	creditNoteFieldFieldMappings      = big.NewInt(1 << 23)
-	creditNoteFieldRemoteData         = big.NewInt(1 << 24)
+	creditNoteFieldCreditNoteUrl      = big.NewInt(1 << 0)
+	creditNoteFieldId                 = big.NewInt(1 << 1)
+	creditNoteFieldRemoteId           = big.NewInt(1 << 2)
+	creditNoteFieldCreatedAt          = big.NewInt(1 << 3)
+	creditNoteFieldModifiedAt         = big.NewInt(1 << 4)
+	creditNoteFieldTransactionDate    = big.NewInt(1 << 5)
+	creditNoteFieldStatus             = big.NewInt(1 << 6)
+	creditNoteFieldNumber             = big.NewInt(1 << 7)
+	creditNoteFieldContact            = big.NewInt(1 << 8)
+	creditNoteFieldCompany            = big.NewInt(1 << 9)
+	creditNoteFieldExchangeRate       = big.NewInt(1 << 10)
+	creditNoteFieldTotalAmount        = big.NewInt(1 << 11)
+	creditNoteFieldRemainingCredit    = big.NewInt(1 << 12)
+	creditNoteFieldInclusiveOfTax     = big.NewInt(1 << 13)
+	creditNoteFieldLineItems          = big.NewInt(1 << 14)
+	creditNoteFieldTrackingCategories = big.NewInt(1 << 15)
+	creditNoteFieldCurrency           = big.NewInt(1 << 16)
+	creditNoteFieldRemoteCreatedAt    = big.NewInt(1 << 17)
+	creditNoteFieldRemoteUpdatedAt    = big.NewInt(1 << 18)
+	creditNoteFieldPayments           = big.NewInt(1 << 19)
+	creditNoteFieldAppliedPayments    = big.NewInt(1 << 20)
+	creditNoteFieldAccountingPeriod   = big.NewInt(1 << 21)
+	creditNoteFieldAppliedToLines     = big.NewInt(1 << 22)
+	creditNoteFieldRemoteWasDeleted   = big.NewInt(1 << 23)
+	creditNoteFieldFieldMappings      = big.NewInt(1 << 24)
+	creditNoteFieldRemoteData         = big.NewInt(1 << 25)
 )
 
 type CreditNote struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the credit note.
+	CreditNoteUrl *string `json:"credit_note_url,omitempty" url:"credit_note_url,omitempty"`
+	Id            *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -7221,7 +8123,7 @@ type CreditNote struct {
 	RemainingCredit *float64 `json:"remaining_credit,omitempty" url:"remaining_credit,omitempty"`
 	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
 	InclusiveOfTax     *bool                               `json:"inclusive_of_tax,omitempty" url:"inclusive_of_tax,omitempty"`
-	LineItems          []*CreditNoteLineItem               `json:"line_items,omitempty" url:"line_items,omitempty"`
+	LineItems          []*CreditNoteLineItemsItem          `json:"line_items,omitempty" url:"line_items,omitempty"`
 	TrackingCategories []*CreditNoteTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
 	// The credit note's currency.
 	//
@@ -7556,6 +8458,13 @@ type CreditNote struct {
 	rawJSON         json.RawMessage
 }
 
+func (c *CreditNote) GetCreditNoteUrl() *string {
+	if c == nil {
+		return nil
+	}
+	return c.CreditNoteUrl
+}
+
 func (c *CreditNote) GetId() *string {
 	if c == nil {
 		return nil
@@ -7647,7 +8556,7 @@ func (c *CreditNote) GetInclusiveOfTax() *bool {
 	return c.InclusiveOfTax
 }
 
-func (c *CreditNote) GetLineItems() []*CreditNoteLineItem {
+func (c *CreditNote) GetLineItems() []*CreditNoteLineItemsItem {
 	if c == nil {
 		return nil
 	}
@@ -7740,6 +8649,13 @@ func (c *CreditNote) require(field *big.Int) {
 		c.explicitFields = big.NewInt(0)
 	}
 	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetCreditNoteUrl sets the CreditNoteUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNote) SetCreditNoteUrl(creditNoteUrl *string) {
+	c.CreditNoteUrl = creditNoteUrl
+	c.require(creditNoteFieldCreditNoteUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -7835,7 +8751,7 @@ func (c *CreditNote) SetInclusiveOfTax(inclusiveOfTax *bool) {
 
 // SetLineItems sets the LineItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNote) SetLineItems(lineItems []*CreditNoteLineItem) {
+func (c *CreditNote) SetLineItems(lineItems []*CreditNoteLineItemsItem) {
 	c.LineItems = lineItems
 	c.require(creditNoteFieldLineItems)
 }
@@ -9779,6 +10695,671 @@ func (c *CreditNoteLineItemProject) Accept(visitor CreditNoteLineItemProjectVisi
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+// # The CreditNoteLineItem Object
+// ### Description
+// The `CreditNoteLineItem` object is used to represent a credit note's line items.
+//
+// ### Usage Example
+// Fetch from the `GET CreditNote` endpoint and view the credit note's line items.
+var (
+	creditNoteLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
+	creditNoteLineItemRequestFieldItem                = big.NewInt(1 << 1)
+	creditNoteLineItemRequestFieldName                = big.NewInt(1 << 2)
+	creditNoteLineItemRequestFieldDescription         = big.NewInt(1 << 3)
+	creditNoteLineItemRequestFieldQuantity            = big.NewInt(1 << 4)
+	creditNoteLineItemRequestFieldMemo                = big.NewInt(1 << 5)
+	creditNoteLineItemRequestFieldUnitPrice           = big.NewInt(1 << 6)
+	creditNoteLineItemRequestFieldTaxRate             = big.NewInt(1 << 7)
+	creditNoteLineItemRequestFieldTotalLineAmount     = big.NewInt(1 << 8)
+	creditNoteLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 9)
+	creditNoteLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 10)
+	creditNoteLineItemRequestFieldAccount             = big.NewInt(1 << 11)
+	creditNoteLineItemRequestFieldCompany             = big.NewInt(1 << 12)
+	creditNoteLineItemRequestFieldContact             = big.NewInt(1 << 13)
+	creditNoteLineItemRequestFieldProject             = big.NewInt(1 << 14)
+	creditNoteLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 15)
+	creditNoteLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 16)
+)
+
+type CreditNoteLineItemRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string                        `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	Item     *CreditNoteLineItemRequestItem `json:"item,omitempty" url:"item,omitempty"`
+	// The credit note line item's name.
+	Name *string `json:"name,omitempty" url:"name,omitempty"`
+	// The description of the item that is owed.
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+	// The credit note line item's quantity.
+	Quantity *string `json:"quantity,omitempty" url:"quantity,omitempty"`
+	// The credit note line item's memo.
+	Memo *string `json:"memo,omitempty" url:"memo,omitempty"`
+	// The credit note line item's unit price.
+	UnitPrice *string `json:"unit_price,omitempty" url:"unit_price,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
+	// The credit note line item's total.
+	TotalLineAmount *string `json:"total_line_amount,omitempty" url:"total_line_amount,omitempty"`
+	// The credit note line item's associated tracking category.
+	TrackingCategory *string `json:"tracking_category,omitempty" url:"tracking_category,omitempty"`
+	// The credit note line item's associated tracking categories.
+	TrackingCategories []*string `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	// The credit note line item's account.
+	Account *string `json:"account,omitempty" url:"account,omitempty"`
+	// The company the credit note belongs to.
+	Company *CreditNoteLineItemRequestCompany `json:"company,omitempty" url:"company,omitempty"`
+	// The credit note's contact.
+	Contact             *CreditNoteLineItemRequestContact `json:"contact,omitempty" url:"contact,omitempty"`
+	Project             *CreditNoteLineItemRequestProject `json:"project,omitempty" url:"project,omitempty"`
+	IntegrationParams   map[string]interface{}            `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (c *CreditNoteLineItemRequest) GetRemoteId() *string {
+	if c == nil {
+		return nil
+	}
+	return c.RemoteId
+}
+
+func (c *CreditNoteLineItemRequest) GetItem() *CreditNoteLineItemRequestItem {
+	if c == nil {
+		return nil
+	}
+	return c.Item
+}
+
+func (c *CreditNoteLineItemRequest) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *CreditNoteLineItemRequest) GetDescription() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Description
+}
+
+func (c *CreditNoteLineItemRequest) GetQuantity() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Quantity
+}
+
+func (c *CreditNoteLineItemRequest) GetMemo() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Memo
+}
+
+func (c *CreditNoteLineItemRequest) GetUnitPrice() *string {
+	if c == nil {
+		return nil
+	}
+	return c.UnitPrice
+}
+
+func (c *CreditNoteLineItemRequest) GetTaxRate() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TaxRate
+}
+
+func (c *CreditNoteLineItemRequest) GetTotalLineAmount() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TotalLineAmount
+}
+
+func (c *CreditNoteLineItemRequest) GetTrackingCategory() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TrackingCategory
+}
+
+func (c *CreditNoteLineItemRequest) GetTrackingCategories() []*string {
+	if c == nil {
+		return nil
+	}
+	return c.TrackingCategories
+}
+
+func (c *CreditNoteLineItemRequest) GetAccount() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Account
+}
+
+func (c *CreditNoteLineItemRequest) GetCompany() *CreditNoteLineItemRequestCompany {
+	if c == nil {
+		return nil
+	}
+	return c.Company
+}
+
+func (c *CreditNoteLineItemRequest) GetContact() *CreditNoteLineItemRequestContact {
+	if c == nil {
+		return nil
+	}
+	return c.Contact
+}
+
+func (c *CreditNoteLineItemRequest) GetProject() *CreditNoteLineItemRequestProject {
+	if c == nil {
+		return nil
+	}
+	return c.Project
+}
+
+func (c *CreditNoteLineItemRequest) GetIntegrationParams() map[string]interface{} {
+	if c == nil {
+		return nil
+	}
+	return c.IntegrationParams
+}
+
+func (c *CreditNoteLineItemRequest) GetLinkedAccountParams() map[string]interface{} {
+	if c == nil {
+		return nil
+	}
+	return c.LinkedAccountParams
+}
+
+func (c *CreditNoteLineItemRequest) GetExtraProperties() map[string]interface{} {
+	return c.extraProperties
+}
+
+func (c *CreditNoteLineItemRequest) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetRemoteId(remoteId *string) {
+	c.RemoteId = remoteId
+	c.require(creditNoteLineItemRequestFieldRemoteId)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetItem(item *CreditNoteLineItemRequestItem) {
+	c.Item = item
+	c.require(creditNoteLineItemRequestFieldItem)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetName(name *string) {
+	c.Name = name
+	c.require(creditNoteLineItemRequestFieldName)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetDescription(description *string) {
+	c.Description = description
+	c.require(creditNoteLineItemRequestFieldDescription)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetQuantity(quantity *string) {
+	c.Quantity = quantity
+	c.require(creditNoteLineItemRequestFieldQuantity)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetMemo(memo *string) {
+	c.Memo = memo
+	c.require(creditNoteLineItemRequestFieldMemo)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetUnitPrice(unitPrice *string) {
+	c.UnitPrice = unitPrice
+	c.require(creditNoteLineItemRequestFieldUnitPrice)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTaxRate(taxRate *string) {
+	c.TaxRate = taxRate
+	c.require(creditNoteLineItemRequestFieldTaxRate)
+}
+
+// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTotalLineAmount(totalLineAmount *string) {
+	c.TotalLineAmount = totalLineAmount
+	c.require(creditNoteLineItemRequestFieldTotalLineAmount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTrackingCategory(trackingCategory *string) {
+	c.TrackingCategory = trackingCategory
+	c.require(creditNoteLineItemRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetTrackingCategories(trackingCategories []*string) {
+	c.TrackingCategories = trackingCategories
+	c.require(creditNoteLineItemRequestFieldTrackingCategories)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetAccount(account *string) {
+	c.Account = account
+	c.require(creditNoteLineItemRequestFieldAccount)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetCompany(company *CreditNoteLineItemRequestCompany) {
+	c.Company = company
+	c.require(creditNoteLineItemRequestFieldCompany)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetContact(contact *CreditNoteLineItemRequestContact) {
+	c.Contact = contact
+	c.require(creditNoteLineItemRequestFieldContact)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetProject(project *CreditNoteLineItemRequestProject) {
+	c.Project = project
+	c.require(creditNoteLineItemRequestFieldProject)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	c.IntegrationParams = integrationParams
+	c.require(creditNoteLineItemRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreditNoteLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	c.LinkedAccountParams = linkedAccountParams
+	c.require(creditNoteLineItemRequestFieldLinkedAccountParams)
+}
+
+func (c *CreditNoteLineItemRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler CreditNoteLineItemRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CreditNoteLineItemRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *c)
+	if err != nil {
+		return err
+	}
+	c.extraProperties = extraProperties
+	c.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreditNoteLineItemRequest) MarshalJSON() ([]byte, error) {
+	type embed CreditNoteLineItemRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*c),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (c *CreditNoteLineItemRequest) String() string {
+	if len(c.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+// The company the credit note belongs to.
+type CreditNoteLineItemRequestCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (c *CreditNoteLineItemRequestCompany) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CreditNoteLineItemRequestCompany) GetCompanyInfo() *CompanyInfo {
+	if c == nil {
+		return nil
+	}
+	return c.CompanyInfo
+}
+
+func (c *CreditNoteLineItemRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		c.typ = "CompanyInfo"
+		c.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemRequestCompany) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
+		return json.Marshal(c.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (c *CreditNoteLineItemRequestCompany) Accept(visitor CreditNoteLineItemRequestCompanyVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(c.CompanyInfo)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+// The credit note's contact.
+type CreditNoteLineItemRequestContact struct {
+	String  string
+	Contact *Contact
+
+	typ string
+}
+
+func (c *CreditNoteLineItemRequestContact) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CreditNoteLineItemRequestContact) GetContact() *Contact {
+	if c == nil {
+		return nil
+	}
+	return c.Contact
+}
+
+func (c *CreditNoteLineItemRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		c.typ = "Contact"
+		c.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemRequestContact) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "Contact" || c.Contact != nil {
+		return json.Marshal(c.Contact)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (c *CreditNoteLineItemRequestContact) Accept(visitor CreditNoteLineItemRequestContactVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "Contact" || c.Contact != nil {
+		return visitor.VisitContact(c.Contact)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemRequestItem struct {
+	String string
+	Item   *Item
+
+	typ string
+}
+
+func (c *CreditNoteLineItemRequestItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CreditNoteLineItemRequestItem) GetItem() *Item {
+	if c == nil {
+		return nil
+	}
+	return c.Item
+}
+
+func (c *CreditNoteLineItemRequestItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		c.typ = "Item"
+		c.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemRequestItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "Item" || c.Item != nil {
+		return json.Marshal(c.Item)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemRequestItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (c *CreditNoteLineItemRequestItem) Accept(visitor CreditNoteLineItemRequestItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "Item" || c.Item != nil {
+		return visitor.VisitItem(c.Item)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemRequestProject struct {
+	String  string
+	Project *Project
+
+	typ string
+}
+
+func (c *CreditNoteLineItemRequestProject) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CreditNoteLineItemRequestProject) GetProject() *Project {
+	if c == nil {
+		return nil
+	}
+	return c.Project
+}
+
+func (c *CreditNoteLineItemRequestProject) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueProject := new(Project)
+	if err := json.Unmarshal(data, &valueProject); err == nil {
+		c.typ = "Project"
+		c.Project = valueProject
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemRequestProject) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "Project" || c.Project != nil {
+		return json.Marshal(c.Project)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemRequestProjectVisitor interface {
+	VisitString(string) error
+	VisitProject(*Project) error
+}
+
+func (c *CreditNoteLineItemRequestProject) Accept(visitor CreditNoteLineItemRequestProjectVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "Project" || c.Project != nil {
+		return visitor.VisitProject(c.Project)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemsItem struct {
+	String             string
+	CreditNoteLineItem *CreditNoteLineItem
+
+	typ string
+}
+
+func (c *CreditNoteLineItemsItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CreditNoteLineItemsItem) GetCreditNoteLineItem() *CreditNoteLineItem {
+	if c == nil {
+		return nil
+	}
+	return c.CreditNoteLineItem
+}
+
+func (c *CreditNoteLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valueCreditNoteLineItem := new(CreditNoteLineItem)
+	if err := json.Unmarshal(data, &valueCreditNoteLineItem); err == nil {
+		c.typ = "CreditNoteLineItem"
+		c.CreditNoteLineItem = valueCreditNoteLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreditNoteLineItemsItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "CreditNoteLineItem" || c.CreditNoteLineItem != nil {
+		return json.Marshal(c.CreditNoteLineItem)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreditNoteLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitCreditNoteLineItem(*CreditNoteLineItem) error
+}
+
+func (c *CreditNoteLineItemsItem) Accept(visitor CreditNoteLineItemsItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "CreditNoteLineItem" || c.CreditNoteLineItem != nil {
+		return visitor.VisitCreditNoteLineItem(c.CreditNoteLineItem)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
 type CreditNotePaymentsItem struct {
 	String  string
 	Payment *Payment
@@ -10429,24 +12010,27 @@ func (d *DebugModelLogSummary) String() string {
 // ### Usage Example
 // Fetch from the `LIST Employees` endpoint and view a company's employees.
 var (
-	employeeFieldId               = big.NewInt(1 << 0)
-	employeeFieldRemoteId         = big.NewInt(1 << 1)
-	employeeFieldCreatedAt        = big.NewInt(1 << 2)
-	employeeFieldModifiedAt       = big.NewInt(1 << 3)
-	employeeFieldFirstName        = big.NewInt(1 << 4)
-	employeeFieldLastName         = big.NewInt(1 << 5)
-	employeeFieldIsContractor     = big.NewInt(1 << 6)
-	employeeFieldEmployeeNumber   = big.NewInt(1 << 7)
-	employeeFieldEmailAddress     = big.NewInt(1 << 8)
-	employeeFieldCompany          = big.NewInt(1 << 9)
-	employeeFieldStatus           = big.NewInt(1 << 10)
-	employeeFieldRemoteWasDeleted = big.NewInt(1 << 11)
-	employeeFieldFieldMappings    = big.NewInt(1 << 12)
-	employeeFieldRemoteData       = big.NewInt(1 << 13)
+	employeeFieldEmployeeUrl      = big.NewInt(1 << 0)
+	employeeFieldId               = big.NewInt(1 << 1)
+	employeeFieldRemoteId         = big.NewInt(1 << 2)
+	employeeFieldCreatedAt        = big.NewInt(1 << 3)
+	employeeFieldModifiedAt       = big.NewInt(1 << 4)
+	employeeFieldFirstName        = big.NewInt(1 << 5)
+	employeeFieldLastName         = big.NewInt(1 << 6)
+	employeeFieldIsContractor     = big.NewInt(1 << 7)
+	employeeFieldEmployeeNumber   = big.NewInt(1 << 8)
+	employeeFieldEmailAddress     = big.NewInt(1 << 9)
+	employeeFieldCompany          = big.NewInt(1 << 10)
+	employeeFieldStatus           = big.NewInt(1 << 11)
+	employeeFieldRemoteWasDeleted = big.NewInt(1 << 12)
+	employeeFieldFieldMappings    = big.NewInt(1 << 13)
+	employeeFieldRemoteData       = big.NewInt(1 << 14)
 )
 
 type Employee struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the employee.
+	EmployeeUrl *string `json:"employee_url,omitempty" url:"employee_url,omitempty"`
+	Id          *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -10480,6 +12064,13 @@ type Employee struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (e *Employee) GetEmployeeUrl() *string {
+	if e == nil {
+		return nil
+	}
+	return e.EmployeeUrl
 }
 
 func (e *Employee) GetId() *string {
@@ -10589,6 +12180,13 @@ func (e *Employee) require(field *big.Int) {
 		e.explicitFields = big.NewInt(0)
 	}
 	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetEmployeeUrl sets the EmployeeUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Employee) SetEmployeeUrl(employeeUrl *string) {
+	e.EmployeeUrl = employeeUrl
+	e.require(employeeFieldEmployeeUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -10898,17 +12496,23 @@ func (e EncodingEnum) Ptr() *EncodingEnum {
 }
 
 var (
-	errorValidationProblemFieldSource      = big.NewInt(1 << 0)
-	errorValidationProblemFieldTitle       = big.NewInt(1 << 1)
-	errorValidationProblemFieldDetail      = big.NewInt(1 << 2)
-	errorValidationProblemFieldProblemType = big.NewInt(1 << 3)
+	errorValidationProblemFieldSource         = big.NewInt(1 << 0)
+	errorValidationProblemFieldTitle          = big.NewInt(1 << 1)
+	errorValidationProblemFieldDetail         = big.NewInt(1 << 2)
+	errorValidationProblemFieldProblemType    = big.NewInt(1 << 3)
+	errorValidationProblemFieldBlockMergeLink = big.NewInt(1 << 4)
+	errorValidationProblemFieldRawError       = big.NewInt(1 << 5)
+	errorValidationProblemFieldErrorCode      = big.NewInt(1 << 6)
 )
 
 type ErrorValidationProblem struct {
-	Source      *ValidationProblemSource `json:"source,omitempty" url:"source,omitempty"`
-	Title       string                   `json:"title" url:"title"`
-	Detail      string                   `json:"detail" url:"detail"`
-	ProblemType string                   `json:"problem_type" url:"problem_type"`
+	Source         *ValidationProblemSource `json:"source,omitempty" url:"source,omitempty"`
+	Title          string                   `json:"title" url:"title"`
+	Detail         string                   `json:"detail" url:"detail"`
+	ProblemType    string                   `json:"problem_type" url:"problem_type"`
+	BlockMergeLink *bool                    `json:"block_merge_link,omitempty" url:"block_merge_link,omitempty"`
+	RawError       *string                  `json:"raw_error,omitempty" url:"raw_error,omitempty"`
+	ErrorCode      *int                     `json:"error_code,omitempty" url:"error_code,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -10943,6 +12547,27 @@ func (e *ErrorValidationProblem) GetProblemType() string {
 		return ""
 	}
 	return e.ProblemType
+}
+
+func (e *ErrorValidationProblem) GetBlockMergeLink() *bool {
+	if e == nil {
+		return nil
+	}
+	return e.BlockMergeLink
+}
+
+func (e *ErrorValidationProblem) GetRawError() *string {
+	if e == nil {
+		return nil
+	}
+	return e.RawError
+}
+
+func (e *ErrorValidationProblem) GetErrorCode() *int {
+	if e == nil {
+		return nil
+	}
+	return e.ErrorCode
 }
 
 func (e *ErrorValidationProblem) GetExtraProperties() map[string]interface{} {
@@ -10984,6 +12609,27 @@ func (e *ErrorValidationProblem) SetProblemType(problemType string) {
 	e.require(errorValidationProblemFieldProblemType)
 }
 
+// SetBlockMergeLink sets the BlockMergeLink field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ErrorValidationProblem) SetBlockMergeLink(blockMergeLink *bool) {
+	e.BlockMergeLink = blockMergeLink
+	e.require(errorValidationProblemFieldBlockMergeLink)
+}
+
+// SetRawError sets the RawError field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ErrorValidationProblem) SetRawError(rawError *string) {
+	e.RawError = rawError
+	e.require(errorValidationProblemFieldRawError)
+}
+
+// SetErrorCode sets the ErrorCode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ErrorValidationProblem) SetErrorCode(errorCode *int) {
+	e.ErrorCode = errorCode
+	e.require(errorValidationProblemFieldErrorCode)
+}
+
 func (e *ErrorValidationProblem) UnmarshalJSON(data []byte) error {
 	type unmarshaler ErrorValidationProblem
 	var value unmarshaler
@@ -11021,6 +12667,1501 @@ func (e *ErrorValidationProblem) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", e)
+}
+
+// # The ExpenseReportLine Object
+// ### Description
+// The `ExpenseReportLine` object represents an individual line item within an expense report, containing details about
+// a specific expense such as amount, description, and associated metadata.
+//
+// ### Usage Example
+// Fetch from the `GET ExpenseReport` endpoint and expand the lines field to view all line items in the expense report.
+var (
+	expenseReportLineRequestFieldRemoteId            = big.NewInt(1 << 0)
+	expenseReportLineRequestFieldAccount             = big.NewInt(1 << 1)
+	expenseReportLineRequestFieldDescription         = big.NewInt(1 << 2)
+	expenseReportLineRequestFieldExpenseDate         = big.NewInt(1 << 3)
+	expenseReportLineRequestFieldAmount              = big.NewInt(1 << 4)
+	expenseReportLineRequestFieldCurrency            = big.NewInt(1 << 5)
+	expenseReportLineRequestFieldExchangeRate        = big.NewInt(1 << 6)
+	expenseReportLineRequestFieldIsBillable          = big.NewInt(1 << 7)
+	expenseReportLineRequestFieldTrackingCategories  = big.NewInt(1 << 8)
+	expenseReportLineRequestFieldEmployee            = big.NewInt(1 << 9)
+	expenseReportLineRequestFieldProject             = big.NewInt(1 << 10)
+	expenseReportLineRequestFieldCompany             = big.NewInt(1 << 11)
+	expenseReportLineRequestFieldContact             = big.NewInt(1 << 12)
+	expenseReportLineRequestFieldQuantity            = big.NewInt(1 << 13)
+	expenseReportLineRequestFieldUnitPrice           = big.NewInt(1 << 14)
+	expenseReportLineRequestFieldNonReimbursable     = big.NewInt(1 << 15)
+	expenseReportLineRequestFieldTaxAmount           = big.NewInt(1 << 16)
+	expenseReportLineRequestFieldInclusiveOfTax      = big.NewInt(1 << 17)
+	expenseReportLineRequestFieldTaxRate             = big.NewInt(1 << 18)
+	expenseReportLineRequestFieldIntegrationParams   = big.NewInt(1 << 19)
+	expenseReportLineRequestFieldLinkedAccountParams = big.NewInt(1 << 20)
+	expenseReportLineRequestFieldRemoteFields        = big.NewInt(1 << 21)
+)
+
+type ExpenseReportLineRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string                          `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	Account  *ExpenseReportLineRequestAccount `json:"account,omitempty" url:"account,omitempty"`
+	// Description of the individual expense.
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+	// The date the individual expense was incurred.
+	ExpenseDate *time.Time `json:"expense_date,omitempty" url:"expense_date,omitempty"`
+	// The amount of the expense for the line item.
+	Amount *float64 `json:"amount,omitempty" url:"amount,omitempty"`
+	// Currency of the expense line (if different from the report currency).
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *ExpenseReportLineRequestCurrency `json:"currency,omitempty" url:"currency,omitempty"`
+	// Exchange rate used if the line item is in a foreign currency.
+	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
+	// Whether the expense line is billable to a client or project.
+	IsBillable *bool `json:"is_billable,omitempty" url:"is_billable,omitempty"`
+	// The related tracking categories associated with the expense report (Department, Location, Class, Expense Category)
+	TrackingCategories []string `json:"tracking_categories" url:"tracking_categories"`
+	// Identifier for the employee who submitted or is associated with the expense report
+	Employee *ExpenseReportLineRequestEmployee `json:"employee,omitempty" url:"employee,omitempty"`
+	Project  *ExpenseReportLineRequestProject  `json:"project,omitempty" url:"project,omitempty"`
+	// The subsidiary that the expense report is created in
+	Company *ExpenseReportLineRequestCompany `json:"company,omitempty" url:"company,omitempty"`
+	Contact *ExpenseReportLineRequestContact `json:"contact,omitempty" url:"contact,omitempty"`
+	// Quantity for the expense line (e.g., miles driven, items purchased).
+	Quantity *float64 `json:"quantity,omitempty" url:"quantity,omitempty"`
+	// Price per unit for the expense line (if applicable).
+	UnitPrice *float64 `json:"unit_price,omitempty" url:"unit_price,omitempty"`
+	// Whether the expense line is non-reimbursable (e.g., paid via company card).
+	NonReimbursable *bool `json:"non_reimbursable,omitempty" url:"non_reimbursable,omitempty"`
+	// Tax amount applicable for the line item.
+	TaxAmount *float64 `json:"tax_amount,omitempty" url:"tax_amount,omitempty"`
+	// Whether the amount is inclusive of tax.
+	InclusiveOfTax      *bool                            `json:"inclusive_of_tax,omitempty" url:"inclusive_of_tax,omitempty"`
+	TaxRate             *ExpenseReportLineRequestTaxRate `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
+	IntegrationParams   map[string]interface{}           `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{}           `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest            `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (e *ExpenseReportLineRequest) GetRemoteId() *string {
+	if e == nil {
+		return nil
+	}
+	return e.RemoteId
+}
+
+func (e *ExpenseReportLineRequest) GetAccount() *ExpenseReportLineRequestAccount {
+	if e == nil {
+		return nil
+	}
+	return e.Account
+}
+
+func (e *ExpenseReportLineRequest) GetDescription() *string {
+	if e == nil {
+		return nil
+	}
+	return e.Description
+}
+
+func (e *ExpenseReportLineRequest) GetExpenseDate() *time.Time {
+	if e == nil {
+		return nil
+	}
+	return e.ExpenseDate
+}
+
+func (e *ExpenseReportLineRequest) GetAmount() *float64 {
+	if e == nil {
+		return nil
+	}
+	return e.Amount
+}
+
+func (e *ExpenseReportLineRequest) GetCurrency() *ExpenseReportLineRequestCurrency {
+	if e == nil {
+		return nil
+	}
+	return e.Currency
+}
+
+func (e *ExpenseReportLineRequest) GetExchangeRate() *string {
+	if e == nil {
+		return nil
+	}
+	return e.ExchangeRate
+}
+
+func (e *ExpenseReportLineRequest) GetIsBillable() *bool {
+	if e == nil {
+		return nil
+	}
+	return e.IsBillable
+}
+
+func (e *ExpenseReportLineRequest) GetTrackingCategories() []string {
+	if e == nil {
+		return nil
+	}
+	return e.TrackingCategories
+}
+
+func (e *ExpenseReportLineRequest) GetEmployee() *ExpenseReportLineRequestEmployee {
+	if e == nil {
+		return nil
+	}
+	return e.Employee
+}
+
+func (e *ExpenseReportLineRequest) GetProject() *ExpenseReportLineRequestProject {
+	if e == nil {
+		return nil
+	}
+	return e.Project
+}
+
+func (e *ExpenseReportLineRequest) GetCompany() *ExpenseReportLineRequestCompany {
+	if e == nil {
+		return nil
+	}
+	return e.Company
+}
+
+func (e *ExpenseReportLineRequest) GetContact() *ExpenseReportLineRequestContact {
+	if e == nil {
+		return nil
+	}
+	return e.Contact
+}
+
+func (e *ExpenseReportLineRequest) GetQuantity() *float64 {
+	if e == nil {
+		return nil
+	}
+	return e.Quantity
+}
+
+func (e *ExpenseReportLineRequest) GetUnitPrice() *float64 {
+	if e == nil {
+		return nil
+	}
+	return e.UnitPrice
+}
+
+func (e *ExpenseReportLineRequest) GetNonReimbursable() *bool {
+	if e == nil {
+		return nil
+	}
+	return e.NonReimbursable
+}
+
+func (e *ExpenseReportLineRequest) GetTaxAmount() *float64 {
+	if e == nil {
+		return nil
+	}
+	return e.TaxAmount
+}
+
+func (e *ExpenseReportLineRequest) GetInclusiveOfTax() *bool {
+	if e == nil {
+		return nil
+	}
+	return e.InclusiveOfTax
+}
+
+func (e *ExpenseReportLineRequest) GetTaxRate() *ExpenseReportLineRequestTaxRate {
+	if e == nil {
+		return nil
+	}
+	return e.TaxRate
+}
+
+func (e *ExpenseReportLineRequest) GetIntegrationParams() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
+	return e.IntegrationParams
+}
+
+func (e *ExpenseReportLineRequest) GetLinkedAccountParams() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
+	return e.LinkedAccountParams
+}
+
+func (e *ExpenseReportLineRequest) GetRemoteFields() []*RemoteFieldRequest {
+	if e == nil {
+		return nil
+	}
+	return e.RemoteFields
+}
+
+func (e *ExpenseReportLineRequest) GetExtraProperties() map[string]interface{} {
+	return e.extraProperties
+}
+
+func (e *ExpenseReportLineRequest) require(field *big.Int) {
+	if e.explicitFields == nil {
+		e.explicitFields = big.NewInt(0)
+	}
+	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetRemoteId(remoteId *string) {
+	e.RemoteId = remoteId
+	e.require(expenseReportLineRequestFieldRemoteId)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetAccount(account *ExpenseReportLineRequestAccount) {
+	e.Account = account
+	e.require(expenseReportLineRequestFieldAccount)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetDescription(description *string) {
+	e.Description = description
+	e.require(expenseReportLineRequestFieldDescription)
+}
+
+// SetExpenseDate sets the ExpenseDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetExpenseDate(expenseDate *time.Time) {
+	e.ExpenseDate = expenseDate
+	e.require(expenseReportLineRequestFieldExpenseDate)
+}
+
+// SetAmount sets the Amount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetAmount(amount *float64) {
+	e.Amount = amount
+	e.require(expenseReportLineRequestFieldAmount)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetCurrency(currency *ExpenseReportLineRequestCurrency) {
+	e.Currency = currency
+	e.require(expenseReportLineRequestFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetExchangeRate(exchangeRate *string) {
+	e.ExchangeRate = exchangeRate
+	e.require(expenseReportLineRequestFieldExchangeRate)
+}
+
+// SetIsBillable sets the IsBillable field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetIsBillable(isBillable *bool) {
+	e.IsBillable = isBillable
+	e.require(expenseReportLineRequestFieldIsBillable)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetTrackingCategories(trackingCategories []string) {
+	e.TrackingCategories = trackingCategories
+	e.require(expenseReportLineRequestFieldTrackingCategories)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetEmployee(employee *ExpenseReportLineRequestEmployee) {
+	e.Employee = employee
+	e.require(expenseReportLineRequestFieldEmployee)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetProject(project *ExpenseReportLineRequestProject) {
+	e.Project = project
+	e.require(expenseReportLineRequestFieldProject)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetCompany(company *ExpenseReportLineRequestCompany) {
+	e.Company = company
+	e.require(expenseReportLineRequestFieldCompany)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetContact(contact *ExpenseReportLineRequestContact) {
+	e.Contact = contact
+	e.require(expenseReportLineRequestFieldContact)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetQuantity(quantity *float64) {
+	e.Quantity = quantity
+	e.require(expenseReportLineRequestFieldQuantity)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetUnitPrice(unitPrice *float64) {
+	e.UnitPrice = unitPrice
+	e.require(expenseReportLineRequestFieldUnitPrice)
+}
+
+// SetNonReimbursable sets the NonReimbursable field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetNonReimbursable(nonReimbursable *bool) {
+	e.NonReimbursable = nonReimbursable
+	e.require(expenseReportLineRequestFieldNonReimbursable)
+}
+
+// SetTaxAmount sets the TaxAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetTaxAmount(taxAmount *float64) {
+	e.TaxAmount = taxAmount
+	e.require(expenseReportLineRequestFieldTaxAmount)
+}
+
+// SetInclusiveOfTax sets the InclusiveOfTax field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetInclusiveOfTax(inclusiveOfTax *bool) {
+	e.InclusiveOfTax = inclusiveOfTax
+	e.require(expenseReportLineRequestFieldInclusiveOfTax)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetTaxRate(taxRate *ExpenseReportLineRequestTaxRate) {
+	e.TaxRate = taxRate
+	e.require(expenseReportLineRequestFieldTaxRate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	e.IntegrationParams = integrationParams
+	e.require(expenseReportLineRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	e.LinkedAccountParams = linkedAccountParams
+	e.require(expenseReportLineRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *ExpenseReportLineRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	e.RemoteFields = remoteFields
+	e.require(expenseReportLineRequestFieldRemoteFields)
+}
+
+func (e *ExpenseReportLineRequest) UnmarshalJSON(data []byte) error {
+	type embed ExpenseReportLineRequest
+	var unmarshaler = struct {
+		embed
+		ExpenseDate *internal.DateTime `json:"expense_date,omitempty"`
+	}{
+		embed: embed(*e),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*e = ExpenseReportLineRequest(unmarshaler.embed)
+	e.ExpenseDate = unmarshaler.ExpenseDate.TimePtr()
+	extraProperties, err := internal.ExtractExtraProperties(data, *e)
+	if err != nil {
+		return err
+	}
+	e.extraProperties = extraProperties
+	e.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (e *ExpenseReportLineRequest) MarshalJSON() ([]byte, error) {
+	type embed ExpenseReportLineRequest
+	var marshaler = struct {
+		embed
+		ExpenseDate *internal.DateTime `json:"expense_date,omitempty"`
+	}{
+		embed:       embed(*e),
+		ExpenseDate: internal.NewOptionalDateTime(e.ExpenseDate),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (e *ExpenseReportLineRequest) String() string {
+	if len(e.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(e); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", e)
+}
+
+type ExpenseReportLineRequestAccount struct {
+	String  string
+	Account *Account
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestAccount) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestAccount) GetAccount() *Account {
+	if e == nil {
+		return nil
+	}
+	return e.Account
+}
+
+func (e *ExpenseReportLineRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		e.typ = "Account"
+		e.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestAccount) MarshalJSON() ([]byte, error) {
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	if e.typ == "Account" || e.Account != nil {
+		return json.Marshal(e.Account)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (e *ExpenseReportLineRequestAccount) Accept(visitor ExpenseReportLineRequestAccountVisitor) error {
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	if e.typ == "Account" || e.Account != nil {
+		return visitor.VisitAccount(e.Account)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+// The subsidiary that the expense report is created in
+type ExpenseReportLineRequestCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestCompany) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestCompany) GetCompanyInfo() *CompanyInfo {
+	if e == nil {
+		return nil
+	}
+	return e.CompanyInfo
+}
+
+func (e *ExpenseReportLineRequestCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		e.typ = "CompanyInfo"
+		e.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestCompany) MarshalJSON() ([]byte, error) {
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	if e.typ == "CompanyInfo" || e.CompanyInfo != nil {
+		return json.Marshal(e.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (e *ExpenseReportLineRequestCompany) Accept(visitor ExpenseReportLineRequestCompanyVisitor) error {
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	if e.typ == "CompanyInfo" || e.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(e.CompanyInfo)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestContact struct {
+	String  string
+	Contact *Contact
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestContact) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestContact) GetContact() *Contact {
+	if e == nil {
+		return nil
+	}
+	return e.Contact
+}
+
+func (e *ExpenseReportLineRequestContact) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		e.typ = "Contact"
+		e.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestContact) MarshalJSON() ([]byte, error) {
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	if e.typ == "Contact" || e.Contact != nil {
+		return json.Marshal(e.Contact)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestContactVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (e *ExpenseReportLineRequestContact) Accept(visitor ExpenseReportLineRequestContactVisitor) error {
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	if e.typ == "Contact" || e.Contact != nil {
+		return visitor.VisitContact(e.Contact)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+// Currency of the expense line (if different from the report currency).
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type ExpenseReportLineRequestCurrency struct {
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestCurrency) GetTransactionCurrencyEnum() TransactionCurrencyEnum {
+	if e == nil {
+		return ""
+	}
+	return e.TransactionCurrencyEnum
+}
+
+func (e *ExpenseReportLineRequestCurrency) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		e.typ = "TransactionCurrencyEnum"
+		e.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestCurrency) MarshalJSON() ([]byte, error) {
+	if e.typ == "TransactionCurrencyEnum" || e.TransactionCurrencyEnum != "" {
+		return json.Marshal(e.TransactionCurrencyEnum)
+	}
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (e *ExpenseReportLineRequestCurrency) Accept(visitor ExpenseReportLineRequestCurrencyVisitor) error {
+	if e.typ == "TransactionCurrencyEnum" || e.TransactionCurrencyEnum != "" {
+		return visitor.VisitTransactionCurrencyEnum(e.TransactionCurrencyEnum)
+	}
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+// Identifier for the employee who submitted or is associated with the expense report
+type ExpenseReportLineRequestEmployee struct {
+	String   string
+	Employee *Employee
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestEmployee) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestEmployee) GetEmployee() *Employee {
+	if e == nil {
+		return nil
+	}
+	return e.Employee
+}
+
+func (e *ExpenseReportLineRequestEmployee) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	valueEmployee := new(Employee)
+	if err := json.Unmarshal(data, &valueEmployee); err == nil {
+		e.typ = "Employee"
+		e.Employee = valueEmployee
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestEmployee) MarshalJSON() ([]byte, error) {
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	if e.typ == "Employee" || e.Employee != nil {
+		return json.Marshal(e.Employee)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestEmployeeVisitor interface {
+	VisitString(string) error
+	VisitEmployee(*Employee) error
+}
+
+func (e *ExpenseReportLineRequestEmployee) Accept(visitor ExpenseReportLineRequestEmployeeVisitor) error {
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	if e.typ == "Employee" || e.Employee != nil {
+		return visitor.VisitEmployee(e.Employee)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestProject struct {
+	String  string
+	Project *Project
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestProject) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestProject) GetProject() *Project {
+	if e == nil {
+		return nil
+	}
+	return e.Project
+}
+
+func (e *ExpenseReportLineRequestProject) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	valueProject := new(Project)
+	if err := json.Unmarshal(data, &valueProject); err == nil {
+		e.typ = "Project"
+		e.Project = valueProject
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestProject) MarshalJSON() ([]byte, error) {
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	if e.typ == "Project" || e.Project != nil {
+		return json.Marshal(e.Project)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestProjectVisitor interface {
+	VisitString(string) error
+	VisitProject(*Project) error
+}
+
+func (e *ExpenseReportLineRequestProject) Accept(visitor ExpenseReportLineRequestProjectVisitor) error {
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	if e.typ == "Project" || e.Project != nil {
+		return visitor.VisitProject(e.Project)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestTaxRate struct {
+	String  string
+	TaxRate *TaxRate
+
+	typ string
+}
+
+func (e *ExpenseReportLineRequestTaxRate) GetString() string {
+	if e == nil {
+		return ""
+	}
+	return e.String
+}
+
+func (e *ExpenseReportLineRequestTaxRate) GetTaxRate() *TaxRate {
+	if e == nil {
+		return nil
+	}
+	return e.TaxRate
+}
+
+func (e *ExpenseReportLineRequestTaxRate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		e.typ = "String"
+		e.String = valueString
+		return nil
+	}
+	valueTaxRate := new(TaxRate)
+	if err := json.Unmarshal(data, &valueTaxRate); err == nil {
+		e.typ = "TaxRate"
+		e.TaxRate = valueTaxRate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, e)
+}
+
+func (e ExpenseReportLineRequestTaxRate) MarshalJSON() ([]byte, error) {
+	if e.typ == "String" || e.String != "" {
+		return json.Marshal(e.String)
+	}
+	if e.typ == "TaxRate" || e.TaxRate != nil {
+		return json.Marshal(e.TaxRate)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", e)
+}
+
+type ExpenseReportLineRequestTaxRateVisitor interface {
+	VisitString(string) error
+	VisitTaxRate(*TaxRate) error
+}
+
+func (e *ExpenseReportLineRequestTaxRate) Accept(visitor ExpenseReportLineRequestTaxRateVisitor) error {
+	if e.typ == "String" || e.String != "" {
+		return visitor.VisitString(e.String)
+	}
+	if e.typ == "TaxRate" || e.TaxRate != nil {
+		return visitor.VisitTaxRate(e.TaxRate)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", e)
 }
 
 // * `ACTIVE` - ACTIVE
@@ -11341,45 +14482,49 @@ func (i *IndividualCommonModelScopeDeserializerRequest) String() string {
 // Fetch from the `LIST Invoices` endpoint and view a company's invoices.
 var (
 	invoiceFieldId                   = big.NewInt(1 << 0)
-	invoiceFieldRemoteId             = big.NewInt(1 << 1)
-	invoiceFieldCreatedAt            = big.NewInt(1 << 2)
-	invoiceFieldModifiedAt           = big.NewInt(1 << 3)
-	invoiceFieldType                 = big.NewInt(1 << 4)
-	invoiceFieldContact              = big.NewInt(1 << 5)
-	invoiceFieldNumber               = big.NewInt(1 << 6)
-	invoiceFieldIssueDate            = big.NewInt(1 << 7)
-	invoiceFieldDueDate              = big.NewInt(1 << 8)
-	invoiceFieldPaidOnDate           = big.NewInt(1 << 9)
-	invoiceFieldMemo                 = big.NewInt(1 << 10)
-	invoiceFieldCompany              = big.NewInt(1 << 11)
-	invoiceFieldEmployee             = big.NewInt(1 << 12)
-	invoiceFieldCurrency             = big.NewInt(1 << 13)
-	invoiceFieldExchangeRate         = big.NewInt(1 << 14)
-	invoiceFieldPaymentTerm          = big.NewInt(1 << 15)
-	invoiceFieldTotalDiscount        = big.NewInt(1 << 16)
-	invoiceFieldSubTotal             = big.NewInt(1 << 17)
-	invoiceFieldStatus               = big.NewInt(1 << 18)
-	invoiceFieldTotalTaxAmount       = big.NewInt(1 << 19)
-	invoiceFieldTotalAmount          = big.NewInt(1 << 20)
-	invoiceFieldBalance              = big.NewInt(1 << 21)
-	invoiceFieldRemoteUpdatedAt      = big.NewInt(1 << 22)
-	invoiceFieldTrackingCategories   = big.NewInt(1 << 23)
-	invoiceFieldAccountingPeriod     = big.NewInt(1 << 24)
-	invoiceFieldPurchaseOrders       = big.NewInt(1 << 25)
-	invoiceFieldPayments             = big.NewInt(1 << 26)
-	invoiceFieldAppliedPayments      = big.NewInt(1 << 27)
-	invoiceFieldLineItems            = big.NewInt(1 << 28)
-	invoiceFieldAppliedCreditNotes   = big.NewInt(1 << 29)
-	invoiceFieldAppliedVendorCredits = big.NewInt(1 << 30)
-	invoiceFieldInclusiveOfTax       = big.NewInt(1 << 31)
-	invoiceFieldRemoteWasDeleted     = big.NewInt(1 << 32)
-	invoiceFieldFieldMappings        = big.NewInt(1 << 33)
-	invoiceFieldRemoteData           = big.NewInt(1 << 34)
-	invoiceFieldRemoteFields         = big.NewInt(1 << 35)
+	invoiceFieldInvoiceUrl           = big.NewInt(1 << 1)
+	invoiceFieldRemoteId             = big.NewInt(1 << 2)
+	invoiceFieldCreatedAt            = big.NewInt(1 << 3)
+	invoiceFieldModifiedAt           = big.NewInt(1 << 4)
+	invoiceFieldType                 = big.NewInt(1 << 5)
+	invoiceFieldContact              = big.NewInt(1 << 6)
+	invoiceFieldNumber               = big.NewInt(1 << 7)
+	invoiceFieldIssueDate            = big.NewInt(1 << 8)
+	invoiceFieldDueDate              = big.NewInt(1 << 9)
+	invoiceFieldPaidOnDate           = big.NewInt(1 << 10)
+	invoiceFieldMemo                 = big.NewInt(1 << 11)
+	invoiceFieldCompany              = big.NewInt(1 << 12)
+	invoiceFieldEmployee             = big.NewInt(1 << 13)
+	invoiceFieldCurrency             = big.NewInt(1 << 14)
+	invoiceFieldExchangeRate         = big.NewInt(1 << 15)
+	invoiceFieldPaymentTerm          = big.NewInt(1 << 16)
+	invoiceFieldTotalDiscount        = big.NewInt(1 << 17)
+	invoiceFieldSubTotal             = big.NewInt(1 << 18)
+	invoiceFieldStatus               = big.NewInt(1 << 19)
+	invoiceFieldTotalTaxAmount       = big.NewInt(1 << 20)
+	invoiceFieldTotalAmount          = big.NewInt(1 << 21)
+	invoiceFieldBalance              = big.NewInt(1 << 22)
+	invoiceFieldRemoteUpdatedAt      = big.NewInt(1 << 23)
+	invoiceFieldTrackingCategories   = big.NewInt(1 << 24)
+	invoiceFieldAccountingPeriod     = big.NewInt(1 << 25)
+	invoiceFieldPurchaseOrders       = big.NewInt(1 << 26)
+	invoiceFieldSalesOrders          = big.NewInt(1 << 27)
+	invoiceFieldPayments             = big.NewInt(1 << 28)
+	invoiceFieldAppliedPayments      = big.NewInt(1 << 29)
+	invoiceFieldLineItems            = big.NewInt(1 << 30)
+	invoiceFieldAppliedCreditNotes   = big.NewInt(1 << 31)
+	invoiceFieldAppliedVendorCredits = big.NewInt(1 << 32)
+	invoiceFieldInclusiveOfTax       = big.NewInt(1 << 33)
+	invoiceFieldRemoteWasDeleted     = big.NewInt(1 << 34)
+	invoiceFieldFieldMappings        = big.NewInt(1 << 35)
+	invoiceFieldRemoteData           = big.NewInt(1 << 36)
+	invoiceFieldRemoteFields         = big.NewInt(1 << 37)
 )
 
 type Invoice struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the invoice.
+	InvoiceUrl *string `json:"invoice_url,omitempty" url:"invoice_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -11390,7 +14535,7 @@ type Invoice struct {
 	//
 	// * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 	// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
-	Type *InvoiceTypeEnum `json:"type,omitempty" url:"type,omitempty"`
+	Type *InvoiceType `json:"type,omitempty" url:"type,omitempty"`
 	// The invoice's contact.
 	Contact *InvoiceContact `json:"contact,omitempty" url:"contact,omitempty"`
 	// The invoice's number.
@@ -11745,11 +14890,12 @@ type Invoice struct {
 	// The accounting period that the Invoice was generated in.
 	AccountingPeriod *InvoiceAccountingPeriod     `json:"accounting_period,omitempty" url:"accounting_period,omitempty"`
 	PurchaseOrders   []*InvoicePurchaseOrdersItem `json:"purchase_orders,omitempty" url:"purchase_orders,omitempty"`
+	SalesOrders      []*InvoiceSalesOrdersItem    `json:"sales_orders,omitempty" url:"sales_orders,omitempty"`
 	// Array of `Payment` object IDs.
 	Payments []*InvoicePaymentsItem `json:"payments,omitempty" url:"payments,omitempty"`
 	// A list of the Payment Applied to Lines common models related to a given Invoice, Credit Note, or Journal Entry.
 	AppliedPayments []*InvoiceAppliedPaymentsItem `json:"applied_payments,omitempty" url:"applied_payments,omitempty"`
-	LineItems       []*InvoiceLineItem            `json:"line_items,omitempty" url:"line_items,omitempty"`
+	LineItems       []*InvoiceLineItemsItem       `json:"line_items,omitempty" url:"line_items,omitempty"`
 	// `CreditNoteApplyLines` applied to the Invoice.
 	AppliedCreditNotes []*InvoiceAppliedCreditNotesItem `json:"applied_credit_notes,omitempty" url:"applied_credit_notes,omitempty"`
 	// `VendorCreditApplyLines` applied to the Invoice.
@@ -11776,6 +14922,13 @@ func (i *Invoice) GetId() *string {
 	return i.Id
 }
 
+func (i *Invoice) GetInvoiceUrl() *string {
+	if i == nil {
+		return nil
+	}
+	return i.InvoiceUrl
+}
+
 func (i *Invoice) GetRemoteId() *string {
 	if i == nil {
 		return nil
@@ -11797,7 +14950,7 @@ func (i *Invoice) GetModifiedAt() *time.Time {
 	return i.ModifiedAt
 }
 
-func (i *Invoice) GetType() *InvoiceTypeEnum {
+func (i *Invoice) GetType() *InvoiceType {
 	if i == nil {
 		return nil
 	}
@@ -11951,6 +15104,13 @@ func (i *Invoice) GetPurchaseOrders() []*InvoicePurchaseOrdersItem {
 	return i.PurchaseOrders
 }
 
+func (i *Invoice) GetSalesOrders() []*InvoiceSalesOrdersItem {
+	if i == nil {
+		return nil
+	}
+	return i.SalesOrders
+}
+
 func (i *Invoice) GetPayments() []*InvoicePaymentsItem {
 	if i == nil {
 		return nil
@@ -11965,7 +15125,7 @@ func (i *Invoice) GetAppliedPayments() []*InvoiceAppliedPaymentsItem {
 	return i.AppliedPayments
 }
 
-func (i *Invoice) GetLineItems() []*InvoiceLineItem {
+func (i *Invoice) GetLineItems() []*InvoiceLineItemsItem {
 	if i == nil {
 		return nil
 	}
@@ -12039,6 +15199,13 @@ func (i *Invoice) SetId(id *string) {
 	i.require(invoiceFieldId)
 }
 
+// SetInvoiceUrl sets the InvoiceUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Invoice) SetInvoiceUrl(invoiceUrl *string) {
+	i.InvoiceUrl = invoiceUrl
+	i.require(invoiceFieldInvoiceUrl)
+}
+
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (i *Invoice) SetRemoteId(remoteId *string) {
@@ -12062,7 +15229,7 @@ func (i *Invoice) SetModifiedAt(modifiedAt *time.Time) {
 
 // SetType sets the Type field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (i *Invoice) SetType(type_ *InvoiceTypeEnum) {
+func (i *Invoice) SetType(type_ *InvoiceType) {
 	i.Type = type_
 	i.require(invoiceFieldType)
 }
@@ -12214,6 +15381,13 @@ func (i *Invoice) SetPurchaseOrders(purchaseOrders []*InvoicePurchaseOrdersItem)
 	i.require(invoiceFieldPurchaseOrders)
 }
 
+// SetSalesOrders sets the SalesOrders field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Invoice) SetSalesOrders(salesOrders []*InvoiceSalesOrdersItem) {
+	i.SalesOrders = salesOrders
+	i.require(invoiceFieldSalesOrders)
+}
+
 // SetPayments sets the Payments field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (i *Invoice) SetPayments(payments []*InvoicePaymentsItem) {
@@ -12230,7 +15404,7 @@ func (i *Invoice) SetAppliedPayments(appliedPayments []*InvoiceAppliedPaymentsIt
 
 // SetLineItems sets the LineItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (i *Invoice) SetLineItems(lineItems []*InvoiceLineItem) {
+func (i *Invoice) SetLineItems(lineItems []*InvoiceLineItemsItem) {
 	i.LineItems = lineItems
 	i.require(invoiceFieldLineItems)
 }
@@ -13186,8 +16360,9 @@ var (
 	invoiceLineItemFieldTrackingCategories = big.NewInt(1 << 17)
 	invoiceLineItemFieldCompany            = big.NewInt(1 << 18)
 	invoiceLineItemFieldRemoteWasDeleted   = big.NewInt(1 << 19)
-	invoiceLineItemFieldFieldMappings      = big.NewInt(1 << 20)
-	invoiceLineItemFieldRemoteFields       = big.NewInt(1 << 21)
+	invoiceLineItemFieldIsBillable         = big.NewInt(1 << 20)
+	invoiceLineItemFieldFieldMappings      = big.NewInt(1 << 21)
+	invoiceLineItemFieldRemoteFields       = big.NewInt(1 << 22)
 )
 
 type InvoiceLineItem struct {
@@ -13207,8 +16382,8 @@ type InvoiceLineItem struct {
 	// The line item's total amount.
 	TotalAmount *float64 `json:"total_amount,omitempty" url:"total_amount,omitempty"`
 	// The employee this overall transaction relates to.
-	Employee *InvoiceLineItemEmployee `json:"employee,omitempty" url:"employee,omitempty"`
-	Project  *InvoiceLineItemProject  `json:"project,omitempty" url:"project,omitempty"`
+	Employee *string                 `json:"employee,omitempty" url:"employee,omitempty"`
+	Project  *InvoiceLineItemProject `json:"project,omitempty" url:"project,omitempty"`
 	// The invoice's contact.
 	Contact *InvoiceLineItemContact `json:"contact,omitempty" url:"contact,omitempty"`
 	// The line item's currency.
@@ -13532,9 +16707,11 @@ type InvoiceLineItem struct {
 	// The company the invoice belongs to.
 	Company *string `json:"company,omitempty" url:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
-	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
-	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
-	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+	RemoteWasDeleted *bool `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	// Indicates if the line item can be charged to the client/customer.
+	IsBillable    *bool                  `json:"is_billable,omitempty" url:"is_billable,omitempty"`
+	FieldMappings map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
+	RemoteFields  []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -13599,7 +16776,7 @@ func (i *InvoiceLineItem) GetTotalAmount() *float64 {
 	return i.TotalAmount
 }
 
-func (i *InvoiceLineItem) GetEmployee() *InvoiceLineItemEmployee {
+func (i *InvoiceLineItem) GetEmployee() *string {
 	if i == nil {
 		return nil
 	}
@@ -13681,6 +16858,13 @@ func (i *InvoiceLineItem) GetRemoteWasDeleted() *bool {
 		return nil
 	}
 	return i.RemoteWasDeleted
+}
+
+func (i *InvoiceLineItem) GetIsBillable() *bool {
+	if i == nil {
+		return nil
+	}
+	return i.IsBillable
 }
 
 func (i *InvoiceLineItem) GetFieldMappings() map[string]interface{} {
@@ -13766,7 +16950,7 @@ func (i *InvoiceLineItem) SetTotalAmount(totalAmount *float64) {
 
 // SetEmployee sets the Employee field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (i *InvoiceLineItem) SetEmployee(employee *InvoiceLineItemEmployee) {
+func (i *InvoiceLineItem) SetEmployee(employee *string) {
 	i.Employee = employee
 	i.require(invoiceLineItemFieldEmployee)
 }
@@ -13846,6 +17030,13 @@ func (i *InvoiceLineItem) SetCompany(company *string) {
 func (i *InvoiceLineItem) SetRemoteWasDeleted(remoteWasDeleted *bool) {
 	i.RemoteWasDeleted = remoteWasDeleted
 	i.require(invoiceLineItemFieldRemoteWasDeleted)
+}
+
+// SetIsBillable sets the IsBillable field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *InvoiceLineItem) SetIsBillable(isBillable *bool) {
+	i.IsBillable = isBillable
+	i.require(invoiceLineItemFieldIsBillable)
 }
 
 // SetFieldMappings sets the FieldMappings field and marks it as non-optional;
@@ -14408,69 +17599,6 @@ func (i *InvoiceLineItemCurrency) Accept(visitor InvoiceLineItemCurrencyVisitor)
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
-// The employee this overall transaction relates to.
-type InvoiceLineItemEmployee struct {
-	String   string
-	Employee *Employee
-
-	typ string
-}
-
-func (i *InvoiceLineItemEmployee) GetString() string {
-	if i == nil {
-		return ""
-	}
-	return i.String
-}
-
-func (i *InvoiceLineItemEmployee) GetEmployee() *Employee {
-	if i == nil {
-		return nil
-	}
-	return i.Employee
-}
-
-func (i *InvoiceLineItemEmployee) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		i.typ = "String"
-		i.String = valueString
-		return nil
-	}
-	valueEmployee := new(Employee)
-	if err := json.Unmarshal(data, &valueEmployee); err == nil {
-		i.typ = "Employee"
-		i.Employee = valueEmployee
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
-}
-
-func (i InvoiceLineItemEmployee) MarshalJSON() ([]byte, error) {
-	if i.typ == "String" || i.String != "" {
-		return json.Marshal(i.String)
-	}
-	if i.typ == "Employee" || i.Employee != nil {
-		return json.Marshal(i.Employee)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
-}
-
-type InvoiceLineItemEmployeeVisitor interface {
-	VisitString(string) error
-	VisitEmployee(*Employee) error
-}
-
-func (i *InvoiceLineItemEmployee) Accept(visitor InvoiceLineItemEmployeeVisitor) error {
-	if i.typ == "String" || i.String != "" {
-		return visitor.VisitString(i.String)
-	}
-	if i.typ == "Employee" || i.Employee != nil {
-		return visitor.VisitEmployee(i.Employee)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", i)
-}
-
 type InvoiceLineItemItem struct {
 	String string
 	Item   *Item
@@ -14719,6 +17847,68 @@ func (i *InvoiceLineItemTrackingCategory) Accept(visitor InvoiceLineItemTracking
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+type InvoiceLineItemsItem struct {
+	String          string
+	InvoiceLineItem *InvoiceLineItem
+
+	typ string
+}
+
+func (i *InvoiceLineItemsItem) GetString() string {
+	if i == nil {
+		return ""
+	}
+	return i.String
+}
+
+func (i *InvoiceLineItemsItem) GetInvoiceLineItem() *InvoiceLineItem {
+	if i == nil {
+		return nil
+	}
+	return i.InvoiceLineItem
+}
+
+func (i *InvoiceLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typ = "String"
+		i.String = valueString
+		return nil
+	}
+	valueInvoiceLineItem := new(InvoiceLineItem)
+	if err := json.Unmarshal(data, &valueInvoiceLineItem); err == nil {
+		i.typ = "InvoiceLineItem"
+		i.InvoiceLineItem = valueInvoiceLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceLineItemsItem) MarshalJSON() ([]byte, error) {
+	if i.typ == "String" || i.String != "" {
+		return json.Marshal(i.String)
+	}
+	if i.typ == "InvoiceLineItem" || i.InvoiceLineItem != nil {
+		return json.Marshal(i.InvoiceLineItem)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
+type InvoiceLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitInvoiceLineItem(*InvoiceLineItem) error
+}
+
+func (i *InvoiceLineItemsItem) Accept(visitor InvoiceLineItemsItemVisitor) error {
+	if i.typ == "String" || i.String != "" {
+		return visitor.VisitString(i.String)
+	}
+	if i.typ == "InvoiceLineItem" || i.InvoiceLineItem != nil {
+		return visitor.VisitInvoiceLineItem(i.InvoiceLineItem)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
 // The payment term that applies to this transaction.
 type InvoicePaymentTerm struct {
 	String      string
@@ -14906,6 +18096,68 @@ func (i *InvoicePurchaseOrdersItem) Accept(visitor InvoicePurchaseOrdersItemVisi
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+type InvoiceSalesOrdersItem struct {
+	String     string
+	SalesOrder *SalesOrder
+
+	typ string
+}
+
+func (i *InvoiceSalesOrdersItem) GetString() string {
+	if i == nil {
+		return ""
+	}
+	return i.String
+}
+
+func (i *InvoiceSalesOrdersItem) GetSalesOrder() *SalesOrder {
+	if i == nil {
+		return nil
+	}
+	return i.SalesOrder
+}
+
+func (i *InvoiceSalesOrdersItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typ = "String"
+		i.String = valueString
+		return nil
+	}
+	valueSalesOrder := new(SalesOrder)
+	if err := json.Unmarshal(data, &valueSalesOrder); err == nil {
+		i.typ = "SalesOrder"
+		i.SalesOrder = valueSalesOrder
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceSalesOrdersItem) MarshalJSON() ([]byte, error) {
+	if i.typ == "String" || i.String != "" {
+		return json.Marshal(i.String)
+	}
+	if i.typ == "SalesOrder" || i.SalesOrder != nil {
+		return json.Marshal(i.SalesOrder)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
+type InvoiceSalesOrdersItemVisitor interface {
+	VisitString(string) error
+	VisitSalesOrder(*SalesOrder) error
+}
+
+func (i *InvoiceSalesOrdersItem) Accept(visitor InvoiceSalesOrdersItemVisitor) error {
+	if i.typ == "String" || i.String != "" {
+		return visitor.VisitString(i.String)
+	}
+	if i.typ == "SalesOrder" || i.SalesOrder != nil {
+		return visitor.VisitSalesOrder(i.SalesOrder)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
 // The status of the invoice.
 //
 // * `PAID` - PAID
@@ -15078,6 +18330,72 @@ func (i *InvoiceTrackingCategoriesItem) Accept(visitor InvoiceTrackingCategories
 	return fmt.Errorf("type %T does not include a non-empty union type", i)
 }
 
+// Whether the invoice is an accounts receivable or accounts payable. If `type` is `ACCOUNTS_PAYABLE`, the invoice is a bill. If `type` is `ACCOUNTS_RECEIVABLE`, it is an invoice.
+//
+// * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
+// * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
+type InvoiceType struct {
+	InvoiceTypeEnum InvoiceTypeEnum
+	String          string
+
+	typ string
+}
+
+func (i *InvoiceType) GetInvoiceTypeEnum() InvoiceTypeEnum {
+	if i == nil {
+		return ""
+	}
+	return i.InvoiceTypeEnum
+}
+
+func (i *InvoiceType) GetString() string {
+	if i == nil {
+		return ""
+	}
+	return i.String
+}
+
+func (i *InvoiceType) UnmarshalJSON(data []byte) error {
+	var valueInvoiceTypeEnum InvoiceTypeEnum
+	if err := json.Unmarshal(data, &valueInvoiceTypeEnum); err == nil {
+		i.typ = "InvoiceTypeEnum"
+		i.InvoiceTypeEnum = valueInvoiceTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		i.typ = "String"
+		i.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, i)
+}
+
+func (i InvoiceType) MarshalJSON() ([]byte, error) {
+	if i.typ == "InvoiceTypeEnum" || i.InvoiceTypeEnum != "" {
+		return json.Marshal(i.InvoiceTypeEnum)
+	}
+	if i.typ == "String" || i.String != "" {
+		return json.Marshal(i.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
+type InvoiceTypeVisitor interface {
+	VisitInvoiceTypeEnum(InvoiceTypeEnum) error
+	VisitString(string) error
+}
+
+func (i *InvoiceType) Accept(visitor InvoiceTypeVisitor) error {
+	if i.typ == "InvoiceTypeEnum" || i.InvoiceTypeEnum != "" {
+		return visitor.VisitInvoiceTypeEnum(i.InvoiceTypeEnum)
+	}
+	if i.typ == "String" || i.String != "" {
+		return visitor.VisitString(i.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", i)
+}
+
 // * `ACCOUNTS_RECEIVABLE` - ACCOUNTS_RECEIVABLE
 // * `ACCOUNTS_PAYABLE` - ACCOUNTS_PAYABLE
 type InvoiceTypeEnum string
@@ -15110,27 +18428,30 @@ func (i InvoiceTypeEnum) Ptr() *InvoiceTypeEnum {
 // Fetch from the `LIST Items` endpoint and view a company's items.
 var (
 	itemFieldId               = big.NewInt(1 << 0)
-	itemFieldRemoteId         = big.NewInt(1 << 1)
-	itemFieldCreatedAt        = big.NewInt(1 << 2)
-	itemFieldModifiedAt       = big.NewInt(1 << 3)
-	itemFieldName             = big.NewInt(1 << 4)
-	itemFieldStatus           = big.NewInt(1 << 5)
-	itemFieldType             = big.NewInt(1 << 6)
-	itemFieldUnitPrice        = big.NewInt(1 << 7)
-	itemFieldPurchasePrice    = big.NewInt(1 << 8)
-	itemFieldPurchaseAccount  = big.NewInt(1 << 9)
-	itemFieldSalesAccount     = big.NewInt(1 << 10)
-	itemFieldCompany          = big.NewInt(1 << 11)
-	itemFieldPurchaseTaxRate  = big.NewInt(1 << 12)
-	itemFieldSalesTaxRate     = big.NewInt(1 << 13)
-	itemFieldRemoteUpdatedAt  = big.NewInt(1 << 14)
-	itemFieldRemoteWasDeleted = big.NewInt(1 << 15)
-	itemFieldFieldMappings    = big.NewInt(1 << 16)
-	itemFieldRemoteData       = big.NewInt(1 << 17)
+	itemFieldItemUrl          = big.NewInt(1 << 1)
+	itemFieldRemoteId         = big.NewInt(1 << 2)
+	itemFieldCreatedAt        = big.NewInt(1 << 3)
+	itemFieldModifiedAt       = big.NewInt(1 << 4)
+	itemFieldName             = big.NewInt(1 << 5)
+	itemFieldStatus           = big.NewInt(1 << 6)
+	itemFieldType             = big.NewInt(1 << 7)
+	itemFieldUnitPrice        = big.NewInt(1 << 8)
+	itemFieldPurchasePrice    = big.NewInt(1 << 9)
+	itemFieldPurchaseAccount  = big.NewInt(1 << 10)
+	itemFieldSalesAccount     = big.NewInt(1 << 11)
+	itemFieldCompany          = big.NewInt(1 << 12)
+	itemFieldPurchaseTaxRate  = big.NewInt(1 << 13)
+	itemFieldSalesTaxRate     = big.NewInt(1 << 14)
+	itemFieldRemoteUpdatedAt  = big.NewInt(1 << 15)
+	itemFieldRemoteWasDeleted = big.NewInt(1 << 16)
+	itemFieldFieldMappings    = big.NewInt(1 << 17)
+	itemFieldRemoteData       = big.NewInt(1 << 18)
 )
 
 type Item struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the item.
+	ItemUrl *string `json:"item_url,omitempty" url:"item_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -15184,6 +18505,13 @@ func (i *Item) GetId() *string {
 		return nil
 	}
 	return i.Id
+}
+
+func (i *Item) GetItemUrl() *string {
+	if i == nil {
+		return nil
+	}
+	return i.ItemUrl
 }
 
 func (i *Item) GetRemoteId() *string {
@@ -15321,6 +18649,13 @@ func (i *Item) require(field *big.Int) {
 func (i *Item) SetId(id *string) {
 	i.Id = id
 	i.require(itemFieldId)
+}
+
+// SetItemUrl sets the ItemUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (i *Item) SetItemUrl(itemUrl *string) {
+	i.ItemUrl = itemUrl
+	i.require(itemFieldItemUrl)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -16136,6 +19471,1263 @@ func (i ItemTypeEnum) Ptr() *ItemTypeEnum {
 	return &i
 }
 
+// # The JournalLine Object
+// ### Description
+// The `JournalLine` object is used to represent a journal entry's line items.
+//
+// ### Usage Example
+// Fetch from the `GET JournalEntry` endpoint and view the journal entry's line items.
+var (
+	journalLineRequestFieldRemoteId            = big.NewInt(1 << 0)
+	journalLineRequestFieldAccount             = big.NewInt(1 << 1)
+	journalLineRequestFieldNetAmount           = big.NewInt(1 << 2)
+	journalLineRequestFieldTrackingCategory    = big.NewInt(1 << 3)
+	journalLineRequestFieldTrackingCategories  = big.NewInt(1 << 4)
+	journalLineRequestFieldCurrency            = big.NewInt(1 << 5)
+	journalLineRequestFieldCompany             = big.NewInt(1 << 6)
+	journalLineRequestFieldEmployee            = big.NewInt(1 << 7)
+	journalLineRequestFieldProject             = big.NewInt(1 << 8)
+	journalLineRequestFieldContact             = big.NewInt(1 << 9)
+	journalLineRequestFieldTaxRate             = big.NewInt(1 << 10)
+	journalLineRequestFieldDescription         = big.NewInt(1 << 11)
+	journalLineRequestFieldExchangeRate        = big.NewInt(1 << 12)
+	journalLineRequestFieldIntegrationParams   = big.NewInt(1 << 13)
+	journalLineRequestFieldLinkedAccountParams = big.NewInt(1 << 14)
+	journalLineRequestFieldRemoteFields        = big.NewInt(1 << 15)
+)
+
+type JournalLineRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string                    `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	Account  *JournalLineRequestAccount `json:"account,omitempty" url:"account,omitempty"`
+	// The value of the line item including taxes and other fees.
+	NetAmount        *float64                            `json:"net_amount,omitempty" url:"net_amount,omitempty"`
+	TrackingCategory *JournalLineRequestTrackingCategory `json:"tracking_category,omitempty" url:"tracking_category,omitempty"`
+	// The journal line item's associated tracking categories.
+	TrackingCategories []*JournalLineRequestTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	// The journal line item's currency.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *JournalLineRequestCurrency `json:"currency,omitempty" url:"currency,omitempty"`
+	// The company the journal entry belongs to.
+	Company  *string                    `json:"company,omitempty" url:"company,omitempty"`
+	Employee *string                    `json:"employee,omitempty" url:"employee,omitempty"`
+	Project  *JournalLineRequestProject `json:"project,omitempty" url:"project,omitempty"`
+	Contact  *string                    `json:"contact,omitempty" url:"contact,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
+	// The line's description.
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+	// The journal line item's exchange rate.
+	ExchangeRate        *string                `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (j *JournalLineRequest) GetRemoteId() *string {
+	if j == nil {
+		return nil
+	}
+	return j.RemoteId
+}
+
+func (j *JournalLineRequest) GetAccount() *JournalLineRequestAccount {
+	if j == nil {
+		return nil
+	}
+	return j.Account
+}
+
+func (j *JournalLineRequest) GetNetAmount() *float64 {
+	if j == nil {
+		return nil
+	}
+	return j.NetAmount
+}
+
+func (j *JournalLineRequest) GetTrackingCategory() *JournalLineRequestTrackingCategory {
+	if j == nil {
+		return nil
+	}
+	return j.TrackingCategory
+}
+
+func (j *JournalLineRequest) GetTrackingCategories() []*JournalLineRequestTrackingCategoriesItem {
+	if j == nil {
+		return nil
+	}
+	return j.TrackingCategories
+}
+
+func (j *JournalLineRequest) GetCurrency() *JournalLineRequestCurrency {
+	if j == nil {
+		return nil
+	}
+	return j.Currency
+}
+
+func (j *JournalLineRequest) GetCompany() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Company
+}
+
+func (j *JournalLineRequest) GetEmployee() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Employee
+}
+
+func (j *JournalLineRequest) GetProject() *JournalLineRequestProject {
+	if j == nil {
+		return nil
+	}
+	return j.Project
+}
+
+func (j *JournalLineRequest) GetContact() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Contact
+}
+
+func (j *JournalLineRequest) GetTaxRate() *string {
+	if j == nil {
+		return nil
+	}
+	return j.TaxRate
+}
+
+func (j *JournalLineRequest) GetDescription() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Description
+}
+
+func (j *JournalLineRequest) GetExchangeRate() *string {
+	if j == nil {
+		return nil
+	}
+	return j.ExchangeRate
+}
+
+func (j *JournalLineRequest) GetIntegrationParams() map[string]interface{} {
+	if j == nil {
+		return nil
+	}
+	return j.IntegrationParams
+}
+
+func (j *JournalLineRequest) GetLinkedAccountParams() map[string]interface{} {
+	if j == nil {
+		return nil
+	}
+	return j.LinkedAccountParams
+}
+
+func (j *JournalLineRequest) GetRemoteFields() []*RemoteFieldRequest {
+	if j == nil {
+		return nil
+	}
+	return j.RemoteFields
+}
+
+func (j *JournalLineRequest) GetExtraProperties() map[string]interface{} {
+	return j.extraProperties
+}
+
+func (j *JournalLineRequest) require(field *big.Int) {
+	if j.explicitFields == nil {
+		j.explicitFields = big.NewInt(0)
+	}
+	j.explicitFields.Or(j.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetRemoteId(remoteId *string) {
+	j.RemoteId = remoteId
+	j.require(journalLineRequestFieldRemoteId)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetAccount(account *JournalLineRequestAccount) {
+	j.Account = account
+	j.require(journalLineRequestFieldAccount)
+}
+
+// SetNetAmount sets the NetAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetNetAmount(netAmount *float64) {
+	j.NetAmount = netAmount
+	j.require(journalLineRequestFieldNetAmount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetTrackingCategory(trackingCategory *JournalLineRequestTrackingCategory) {
+	j.TrackingCategory = trackingCategory
+	j.require(journalLineRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetTrackingCategories(trackingCategories []*JournalLineRequestTrackingCategoriesItem) {
+	j.TrackingCategories = trackingCategories
+	j.require(journalLineRequestFieldTrackingCategories)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetCurrency(currency *JournalLineRequestCurrency) {
+	j.Currency = currency
+	j.require(journalLineRequestFieldCurrency)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetCompany(company *string) {
+	j.Company = company
+	j.require(journalLineRequestFieldCompany)
+}
+
+// SetEmployee sets the Employee field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetEmployee(employee *string) {
+	j.Employee = employee
+	j.require(journalLineRequestFieldEmployee)
+}
+
+// SetProject sets the Project field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetProject(project *JournalLineRequestProject) {
+	j.Project = project
+	j.require(journalLineRequestFieldProject)
+}
+
+// SetContact sets the Contact field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetContact(contact *string) {
+	j.Contact = contact
+	j.require(journalLineRequestFieldContact)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetTaxRate(taxRate *string) {
+	j.TaxRate = taxRate
+	j.require(journalLineRequestFieldTaxRate)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetDescription(description *string) {
+	j.Description = description
+	j.require(journalLineRequestFieldDescription)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetExchangeRate(exchangeRate *string) {
+	j.ExchangeRate = exchangeRate
+	j.require(journalLineRequestFieldExchangeRate)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	j.IntegrationParams = integrationParams
+	j.require(journalLineRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	j.LinkedAccountParams = linkedAccountParams
+	j.require(journalLineRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (j *JournalLineRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	j.RemoteFields = remoteFields
+	j.require(journalLineRequestFieldRemoteFields)
+}
+
+func (j *JournalLineRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler JournalLineRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*j = JournalLineRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *j)
+	if err != nil {
+		return err
+	}
+	j.extraProperties = extraProperties
+	j.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (j *JournalLineRequest) MarshalJSON() ([]byte, error) {
+	type embed JournalLineRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*j),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, j.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (j *JournalLineRequest) String() string {
+	if len(j.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(j.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(j); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", j)
+}
+
+type JournalLineRequestAccount struct {
+	String  string
+	Account *Account
+
+	typ string
+}
+
+func (j *JournalLineRequestAccount) GetString() string {
+	if j == nil {
+		return ""
+	}
+	return j.String
+}
+
+func (j *JournalLineRequestAccount) GetAccount() *Account {
+	if j == nil {
+		return nil
+	}
+	return j.Account
+}
+
+func (j *JournalLineRequestAccount) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typ = "String"
+		j.String = valueString
+		return nil
+	}
+	valueAccount := new(Account)
+	if err := json.Unmarshal(data, &valueAccount); err == nil {
+		j.typ = "Account"
+		j.Account = valueAccount
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestAccount) MarshalJSON() ([]byte, error) {
+	if j.typ == "String" || j.String != "" {
+		return json.Marshal(j.String)
+	}
+	if j.typ == "Account" || j.Account != nil {
+		return json.Marshal(j.Account)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestAccountVisitor interface {
+	VisitString(string) error
+	VisitAccount(*Account) error
+}
+
+func (j *JournalLineRequestAccount) Accept(visitor JournalLineRequestAccountVisitor) error {
+	if j.typ == "String" || j.String != "" {
+		return visitor.VisitString(j.String)
+	}
+	if j.typ == "Account" || j.Account != nil {
+		return visitor.VisitAccount(j.Account)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+// The journal line item's currency.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type JournalLineRequestCurrency struct {
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+
+	typ string
+}
+
+func (j *JournalLineRequestCurrency) GetTransactionCurrencyEnum() TransactionCurrencyEnum {
+	if j == nil {
+		return ""
+	}
+	return j.TransactionCurrencyEnum
+}
+
+func (j *JournalLineRequestCurrency) GetString() string {
+	if j == nil {
+		return ""
+	}
+	return j.String
+}
+
+func (j *JournalLineRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		j.typ = "TransactionCurrencyEnum"
+		j.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typ = "String"
+		j.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestCurrency) MarshalJSON() ([]byte, error) {
+	if j.typ == "TransactionCurrencyEnum" || j.TransactionCurrencyEnum != "" {
+		return json.Marshal(j.TransactionCurrencyEnum)
+	}
+	if j.typ == "String" || j.String != "" {
+		return json.Marshal(j.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (j *JournalLineRequestCurrency) Accept(visitor JournalLineRequestCurrencyVisitor) error {
+	if j.typ == "TransactionCurrencyEnum" || j.TransactionCurrencyEnum != "" {
+		return visitor.VisitTransactionCurrencyEnum(j.TransactionCurrencyEnum)
+	}
+	if j.typ == "String" || j.String != "" {
+		return visitor.VisitString(j.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestProject struct {
+	String  string
+	Project *Project
+
+	typ string
+}
+
+func (j *JournalLineRequestProject) GetString() string {
+	if j == nil {
+		return ""
+	}
+	return j.String
+}
+
+func (j *JournalLineRequestProject) GetProject() *Project {
+	if j == nil {
+		return nil
+	}
+	return j.Project
+}
+
+func (j *JournalLineRequestProject) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typ = "String"
+		j.String = valueString
+		return nil
+	}
+	valueProject := new(Project)
+	if err := json.Unmarshal(data, &valueProject); err == nil {
+		j.typ = "Project"
+		j.Project = valueProject
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestProject) MarshalJSON() ([]byte, error) {
+	if j.typ == "String" || j.String != "" {
+		return json.Marshal(j.String)
+	}
+	if j.typ == "Project" || j.Project != nil {
+		return json.Marshal(j.Project)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestProjectVisitor interface {
+	VisitString(string) error
+	VisitProject(*Project) error
+}
+
+func (j *JournalLineRequestProject) Accept(visitor JournalLineRequestProjectVisitor) error {
+	if j.typ == "String" || j.String != "" {
+		return visitor.VisitString(j.String)
+	}
+	if j.typ == "Project" || j.Project != nil {
+		return visitor.VisitProject(j.Project)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestTrackingCategoriesItem struct {
+	String           string
+	TrackingCategory *TrackingCategory
+
+	typ string
+}
+
+func (j *JournalLineRequestTrackingCategoriesItem) GetString() string {
+	if j == nil {
+		return ""
+	}
+	return j.String
+}
+
+func (j *JournalLineRequestTrackingCategoriesItem) GetTrackingCategory() *TrackingCategory {
+	if j == nil {
+		return nil
+	}
+	return j.TrackingCategory
+}
+
+func (j *JournalLineRequestTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typ = "String"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typ = "TrackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	if j.typ == "String" || j.String != "" {
+		return json.Marshal(j.String)
+	}
+	if j.typ == "TrackingCategory" || j.TrackingCategory != nil {
+		return json.Marshal(j.TrackingCategory)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalLineRequestTrackingCategoriesItem) Accept(visitor JournalLineRequestTrackingCategoriesItemVisitor) error {
+	if j.typ == "String" || j.String != "" {
+		return visitor.VisitString(j.String)
+	}
+	if j.typ == "TrackingCategory" || j.TrackingCategory != nil {
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestTrackingCategory struct {
+	String           string
+	TrackingCategory *TrackingCategory
+
+	typ string
+}
+
+func (j *JournalLineRequestTrackingCategory) GetString() string {
+	if j == nil {
+		return ""
+	}
+	return j.String
+}
+
+func (j *JournalLineRequestTrackingCategory) GetTrackingCategory() *TrackingCategory {
+	if j == nil {
+		return nil
+	}
+	return j.TrackingCategory
+}
+
+func (j *JournalLineRequestTrackingCategory) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		j.typ = "String"
+		j.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		j.typ = "TrackingCategory"
+		j.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, j)
+}
+
+func (j JournalLineRequestTrackingCategory) MarshalJSON() ([]byte, error) {
+	if j.typ == "String" || j.String != "" {
+		return json.Marshal(j.String)
+	}
+	if j.typ == "TrackingCategory" || j.TrackingCategory != nil {
+		return json.Marshal(j.TrackingCategory)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
+type JournalLineRequestTrackingCategoryVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (j *JournalLineRequestTrackingCategory) Accept(visitor JournalLineRequestTrackingCategoryVisitor) error {
+	if j.typ == "String" || j.String != "" {
+		return visitor.VisitString(j.String)
+	}
+	if j.typ == "TrackingCategory" || j.TrackingCategory != nil {
+		return visitor.VisitTrackingCategory(j.TrackingCategory)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", j)
+}
+
 // * `SYNCING` - SYNCING
 // * `DONE` - DONE
 // * `FAILED` - FAILED
@@ -16272,18 +20864,19 @@ func (l *LinkedAccountStatus) String() string {
 
 var (
 	metaResponseFieldRequestSchema                  = big.NewInt(1 << 0)
-	metaResponseFieldRemoteFieldClasses             = big.NewInt(1 << 1)
-	metaResponseFieldStatus                         = big.NewInt(1 << 2)
-	metaResponseFieldHasConditionalParams           = big.NewInt(1 << 3)
-	metaResponseFieldHasRequiredLinkedAccountParams = big.NewInt(1 << 4)
+	metaResponseFieldStatus                         = big.NewInt(1 << 1)
+	metaResponseFieldHasConditionalParams           = big.NewInt(1 << 2)
+	metaResponseFieldHasRequiredLinkedAccountParams = big.NewInt(1 << 3)
+	metaResponseFieldRemoteFields                   = big.NewInt(1 << 4)
 )
 
 type MetaResponse struct {
 	RequestSchema                  map[string]interface{} `json:"request_schema" url:"request_schema"`
-	RemoteFieldClasses             map[string]interface{} `json:"remote_field_classes,omitempty" url:"remote_field_classes,omitempty"`
 	Status                         *LinkedAccountStatus   `json:"status,omitempty" url:"status,omitempty"`
 	HasConditionalParams           bool                   `json:"has_conditional_params" url:"has_conditional_params"`
 	HasRequiredLinkedAccountParams bool                   `json:"has_required_linked_account_params" url:"has_required_linked_account_params"`
+	// Remote field values to populate
+	RemoteFields []string `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -16297,13 +20890,6 @@ func (m *MetaResponse) GetRequestSchema() map[string]interface{} {
 		return nil
 	}
 	return m.RequestSchema
-}
-
-func (m *MetaResponse) GetRemoteFieldClasses() map[string]interface{} {
-	if m == nil {
-		return nil
-	}
-	return m.RemoteFieldClasses
 }
 
 func (m *MetaResponse) GetStatus() *LinkedAccountStatus {
@@ -16327,6 +20913,13 @@ func (m *MetaResponse) GetHasRequiredLinkedAccountParams() bool {
 	return m.HasRequiredLinkedAccountParams
 }
 
+func (m *MetaResponse) GetRemoteFields() []string {
+	if m == nil {
+		return nil
+	}
+	return m.RemoteFields
+}
+
 func (m *MetaResponse) GetExtraProperties() map[string]interface{} {
 	return m.extraProperties
 }
@@ -16343,13 +20936,6 @@ func (m *MetaResponse) require(field *big.Int) {
 func (m *MetaResponse) SetRequestSchema(requestSchema map[string]interface{}) {
 	m.RequestSchema = requestSchema
 	m.require(metaResponseFieldRequestSchema)
-}
-
-// SetRemoteFieldClasses sets the RemoteFieldClasses field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (m *MetaResponse) SetRemoteFieldClasses(remoteFieldClasses map[string]interface{}) {
-	m.RemoteFieldClasses = remoteFieldClasses
-	m.require(metaResponseFieldRemoteFieldClasses)
 }
 
 // SetStatus sets the Status field and marks it as non-optional;
@@ -16371,6 +20957,13 @@ func (m *MetaResponse) SetHasConditionalParams(hasConditionalParams bool) {
 func (m *MetaResponse) SetHasRequiredLinkedAccountParams(hasRequiredLinkedAccountParams bool) {
 	m.HasRequiredLinkedAccountParams = hasRequiredLinkedAccountParams
 	m.require(metaResponseFieldHasRequiredLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (m *MetaResponse) SetRemoteFields(remoteFields []string) {
+	m.RemoteFields = remoteFields
+	m.require(metaResponseFieldRemoteFields)
 }
 
 func (m *MetaResponse) UnmarshalJSON(data []byte) error {
@@ -16726,7 +21319,7 @@ type MultipartFormFieldRequest struct {
 	// * `RAW` - RAW
 	// * `BASE64` - BASE64
 	// * `GZIP_BASE64` - GZIP_BASE64
-	Encoding *EncodingEnum `json:"encoding,omitempty" url:"encoding,omitempty"`
+	Encoding *MultipartFormFieldRequestEncoding `json:"encoding,omitempty" url:"encoding,omitempty"`
 	// The file name of the form field, if the field is for a file.
 	FileName *string `json:"file_name,omitempty" url:"file_name,omitempty"`
 	// The MIME type of the file, if the field is for a file.
@@ -16753,7 +21346,7 @@ func (m *MultipartFormFieldRequest) GetData() string {
 	return m.Data
 }
 
-func (m *MultipartFormFieldRequest) GetEncoding() *EncodingEnum {
+func (m *MultipartFormFieldRequest) GetEncoding() *MultipartFormFieldRequestEncoding {
 	if m == nil {
 		return nil
 	}
@@ -16801,7 +21394,7 @@ func (m *MultipartFormFieldRequest) SetData(data string) {
 
 // SetEncoding sets the Encoding field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (m *MultipartFormFieldRequest) SetEncoding(encoding *EncodingEnum) {
+func (m *MultipartFormFieldRequest) SetEncoding(encoding *MultipartFormFieldRequestEncoding) {
 	m.Encoding = encoding
 	m.require(multipartFormFieldRequestFieldEncoding)
 }
@@ -16857,6 +21450,73 @@ func (m *MultipartFormFieldRequest) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", m)
+}
+
+// The encoding of the value of `data`. Defaults to `RAW` if not defined.
+//
+// * `RAW` - RAW
+// * `BASE64` - BASE64
+// * `GZIP_BASE64` - GZIP_BASE64
+type MultipartFormFieldRequestEncoding struct {
+	EncodingEnum EncodingEnum
+	String       string
+
+	typ string
+}
+
+func (m *MultipartFormFieldRequestEncoding) GetEncodingEnum() EncodingEnum {
+	if m == nil {
+		return ""
+	}
+	return m.EncodingEnum
+}
+
+func (m *MultipartFormFieldRequestEncoding) GetString() string {
+	if m == nil {
+		return ""
+	}
+	return m.String
+}
+
+func (m *MultipartFormFieldRequestEncoding) UnmarshalJSON(data []byte) error {
+	var valueEncodingEnum EncodingEnum
+	if err := json.Unmarshal(data, &valueEncodingEnum); err == nil {
+		m.typ = "EncodingEnum"
+		m.EncodingEnum = valueEncodingEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		m.typ = "String"
+		m.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, m)
+}
+
+func (m MultipartFormFieldRequestEncoding) MarshalJSON() ([]byte, error) {
+	if m.typ == "EncodingEnum" || m.EncodingEnum != "" {
+		return json.Marshal(m.EncodingEnum)
+	}
+	if m.typ == "String" || m.String != "" {
+		return json.Marshal(m.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", m)
+}
+
+type MultipartFormFieldRequestEncodingVisitor interface {
+	VisitEncodingEnum(EncodingEnum) error
+	VisitString(string) error
+}
+
+func (m *MultipartFormFieldRequestEncoding) Accept(visitor MultipartFormFieldRequestEncodingVisitor) error {
+	if m.typ == "EncodingEnum" || m.EncodingEnum != "" {
+		return visitor.VisitEncodingEnum(m.EncodingEnum)
+	}
+	if m.typ == "String" || m.String != "" {
+		return visitor.VisitString(m.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", m)
 }
 
 var (
@@ -16977,30 +21637,33 @@ func (p *PaginatedRemoteFieldClassList) String() string {
 // Fetch from the `GET Payment` endpoint and view an invoice's payment.
 var (
 	paymentFieldId                 = big.NewInt(1 << 0)
-	paymentFieldRemoteId           = big.NewInt(1 << 1)
-	paymentFieldCreatedAt          = big.NewInt(1 << 2)
-	paymentFieldModifiedAt         = big.NewInt(1 << 3)
-	paymentFieldTransactionDate    = big.NewInt(1 << 4)
-	paymentFieldContact            = big.NewInt(1 << 5)
-	paymentFieldAccount            = big.NewInt(1 << 6)
-	paymentFieldPaymentMethod      = big.NewInt(1 << 7)
-	paymentFieldCurrency           = big.NewInt(1 << 8)
-	paymentFieldExchangeRate       = big.NewInt(1 << 9)
-	paymentFieldCompany            = big.NewInt(1 << 10)
-	paymentFieldTotalAmount        = big.NewInt(1 << 11)
-	paymentFieldType               = big.NewInt(1 << 12)
-	paymentFieldTrackingCategories = big.NewInt(1 << 13)
-	paymentFieldAccountingPeriod   = big.NewInt(1 << 14)
-	paymentFieldAppliedToLines     = big.NewInt(1 << 15)
-	paymentFieldRemoteUpdatedAt    = big.NewInt(1 << 16)
-	paymentFieldRemoteWasDeleted   = big.NewInt(1 << 17)
-	paymentFieldFieldMappings      = big.NewInt(1 << 18)
-	paymentFieldRemoteData         = big.NewInt(1 << 19)
-	paymentFieldRemoteFields       = big.NewInt(1 << 20)
+	paymentFieldPaymentUrl         = big.NewInt(1 << 1)
+	paymentFieldRemoteId           = big.NewInt(1 << 2)
+	paymentFieldCreatedAt          = big.NewInt(1 << 3)
+	paymentFieldModifiedAt         = big.NewInt(1 << 4)
+	paymentFieldTransactionDate    = big.NewInt(1 << 5)
+	paymentFieldContact            = big.NewInt(1 << 6)
+	paymentFieldAccount            = big.NewInt(1 << 7)
+	paymentFieldPaymentMethod      = big.NewInt(1 << 8)
+	paymentFieldCurrency           = big.NewInt(1 << 9)
+	paymentFieldExchangeRate       = big.NewInt(1 << 10)
+	paymentFieldCompany            = big.NewInt(1 << 11)
+	paymentFieldTotalAmount        = big.NewInt(1 << 12)
+	paymentFieldType               = big.NewInt(1 << 13)
+	paymentFieldTrackingCategories = big.NewInt(1 << 14)
+	paymentFieldAccountingPeriod   = big.NewInt(1 << 15)
+	paymentFieldAppliedToLines     = big.NewInt(1 << 16)
+	paymentFieldRemoteUpdatedAt    = big.NewInt(1 << 17)
+	paymentFieldRemoteWasDeleted   = big.NewInt(1 << 18)
+	paymentFieldFieldMappings      = big.NewInt(1 << 19)
+	paymentFieldRemoteData         = big.NewInt(1 << 20)
+	paymentFieldRemoteFields       = big.NewInt(1 << 21)
 )
 
 type Payment struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the payment.
+	PaymentUrl *string `json:"payment_url,omitempty" url:"payment_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -17362,6 +22025,13 @@ func (p *Payment) GetId() *string {
 	return p.Id
 }
 
+func (p *Payment) GetPaymentUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PaymentUrl
+}
+
 func (p *Payment) GetRemoteId() *string {
 	if p == nil {
 		return nil
@@ -17518,6 +22188,13 @@ func (p *Payment) require(field *big.Int) {
 func (p *Payment) SetId(id *string) {
 	p.Id = id
 	p.require(paymentFieldId)
+}
+
+// SetPaymentUrl sets the PaymentUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Payment) SetPaymentUrl(paymentUrl *string) {
+	p.PaymentUrl = paymentUrl
+	p.require(paymentFieldPaymentUrl)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -18629,20 +23306,23 @@ func (p *PaymentLineItem) String() string {
 // ### Usage Example
 // Fetch from the `GET PaymentMethod` endpoint and view payment method information.
 var (
-	paymentMethodFieldId              = big.NewInt(1 << 0)
-	paymentMethodFieldRemoteId        = big.NewInt(1 << 1)
-	paymentMethodFieldCreatedAt       = big.NewInt(1 << 2)
-	paymentMethodFieldModifiedAt      = big.NewInt(1 << 3)
-	paymentMethodFieldMethodType      = big.NewInt(1 << 4)
-	paymentMethodFieldName            = big.NewInt(1 << 5)
-	paymentMethodFieldIsActive        = big.NewInt(1 << 6)
-	paymentMethodFieldRemoteUpdatedAt = big.NewInt(1 << 7)
-	paymentMethodFieldFieldMappings   = big.NewInt(1 << 8)
-	paymentMethodFieldRemoteData      = big.NewInt(1 << 9)
+	paymentMethodFieldId               = big.NewInt(1 << 0)
+	paymentMethodFieldPaymentMethodUrl = big.NewInt(1 << 1)
+	paymentMethodFieldRemoteId         = big.NewInt(1 << 2)
+	paymentMethodFieldCreatedAt        = big.NewInt(1 << 3)
+	paymentMethodFieldModifiedAt       = big.NewInt(1 << 4)
+	paymentMethodFieldMethodType       = big.NewInt(1 << 5)
+	paymentMethodFieldName             = big.NewInt(1 << 6)
+	paymentMethodFieldIsActive         = big.NewInt(1 << 7)
+	paymentMethodFieldRemoteUpdatedAt  = big.NewInt(1 << 8)
+	paymentMethodFieldFieldMappings    = big.NewInt(1 << 9)
+	paymentMethodFieldRemoteData       = big.NewInt(1 << 10)
 )
 
 type PaymentMethod struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the payment method.
+	PaymentMethodUrl *string `json:"payment_method_url,omitempty" url:"payment_method_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -18656,7 +23336,7 @@ type PaymentMethod struct {
 	// * `ACH` - ACH
 	// * `CASH` - CASH
 	// * `CHECK` - CHECK
-	MethodType *PaymentMethodMethodType `json:"method_type" url:"method_type"`
+	MethodType *PaymentMethodMethodType `json:"method_type,omitempty" url:"method_type,omitempty"`
 	// The payment method’s name
 	Name string `json:"name" url:"name"`
 	// `True` if the payment method is active, `False` if not.
@@ -18678,6 +23358,13 @@ func (p *PaymentMethod) GetId() *string {
 		return nil
 	}
 	return p.Id
+}
+
+func (p *PaymentMethod) GetPaymentMethodUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PaymentMethodUrl
 }
 
 func (p *PaymentMethod) GetRemoteId() *string {
@@ -18759,6 +23446,13 @@ func (p *PaymentMethod) require(field *big.Int) {
 func (p *PaymentMethod) SetId(id *string) {
 	p.Id = id
 	p.require(paymentMethodFieldId)
+}
+
+// SetPaymentMethodUrl sets the PaymentMethodUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentMethod) SetPaymentMethodUrl(paymentMethodUrl *string) {
+	p.PaymentMethodUrl = paymentMethodUrl
+	p.require(paymentMethodFieldPaymentMethodUrl)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -19020,21 +23714,24 @@ func (p *PaymentPaymentMethod) Accept(visitor PaymentPaymentMethodVisitor) error
 // Fetch from the `GET PaymentTerm` endpoint and view payment term information.
 var (
 	paymentTermFieldId                   = big.NewInt(1 << 0)
-	paymentTermFieldRemoteId             = big.NewInt(1 << 1)
-	paymentTermFieldCreatedAt            = big.NewInt(1 << 2)
-	paymentTermFieldModifiedAt           = big.NewInt(1 << 3)
-	paymentTermFieldName                 = big.NewInt(1 << 4)
-	paymentTermFieldIsActive             = big.NewInt(1 << 5)
-	paymentTermFieldCompany              = big.NewInt(1 << 6)
-	paymentTermFieldDaysUntilDue         = big.NewInt(1 << 7)
-	paymentTermFieldDiscountDays         = big.NewInt(1 << 8)
-	paymentTermFieldRemoteLastModifiedAt = big.NewInt(1 << 9)
-	paymentTermFieldFieldMappings        = big.NewInt(1 << 10)
-	paymentTermFieldRemoteData           = big.NewInt(1 << 11)
+	paymentTermFieldPaymentTermUrl       = big.NewInt(1 << 1)
+	paymentTermFieldRemoteId             = big.NewInt(1 << 2)
+	paymentTermFieldCreatedAt            = big.NewInt(1 << 3)
+	paymentTermFieldModifiedAt           = big.NewInt(1 << 4)
+	paymentTermFieldName                 = big.NewInt(1 << 5)
+	paymentTermFieldIsActive             = big.NewInt(1 << 6)
+	paymentTermFieldCompany              = big.NewInt(1 << 7)
+	paymentTermFieldDaysUntilDue         = big.NewInt(1 << 8)
+	paymentTermFieldDiscountDays         = big.NewInt(1 << 9)
+	paymentTermFieldRemoteLastModifiedAt = big.NewInt(1 << 10)
+	paymentTermFieldFieldMappings        = big.NewInt(1 << 11)
+	paymentTermFieldRemoteData           = big.NewInt(1 << 12)
 )
 
 type PaymentTerm struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the payment term.
+	PaymentTermUrl *string `json:"payment_term_url,omitempty" url:"payment_term_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -19068,6 +23765,13 @@ func (p *PaymentTerm) GetId() *string {
 		return nil
 	}
 	return p.Id
+}
+
+func (p *PaymentTerm) GetPaymentTermUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PaymentTermUrl
 }
 
 func (p *PaymentTerm) GetRemoteId() *string {
@@ -19163,6 +23867,13 @@ func (p *PaymentTerm) require(field *big.Int) {
 func (p *PaymentTerm) SetId(id *string) {
 	p.Id = id
 	p.require(paymentTermFieldId)
+}
+
+// SetPaymentTermUrl sets the PaymentTermUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PaymentTerm) SetPaymentTermUrl(paymentTermUrl *string) {
+	p.PaymentTermUrl = paymentTermUrl
+	p.require(paymentTermFieldPaymentTermUrl)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -19521,19 +24232,22 @@ func (p PaymentTypeEnum) Ptr() *PaymentTypeEnum {
 // Fetch from the `GET Project` endpoint and view project information.
 var (
 	projectFieldId            = big.NewInt(1 << 0)
-	projectFieldRemoteId      = big.NewInt(1 << 1)
-	projectFieldCreatedAt     = big.NewInt(1 << 2)
-	projectFieldModifiedAt    = big.NewInt(1 << 3)
-	projectFieldName          = big.NewInt(1 << 4)
-	projectFieldIsActive      = big.NewInt(1 << 5)
-	projectFieldCompany       = big.NewInt(1 << 6)
-	projectFieldContact       = big.NewInt(1 << 7)
-	projectFieldFieldMappings = big.NewInt(1 << 8)
-	projectFieldRemoteData    = big.NewInt(1 << 9)
+	projectFieldProjectUrl    = big.NewInt(1 << 1)
+	projectFieldRemoteId      = big.NewInt(1 << 2)
+	projectFieldCreatedAt     = big.NewInt(1 << 3)
+	projectFieldModifiedAt    = big.NewInt(1 << 4)
+	projectFieldName          = big.NewInt(1 << 5)
+	projectFieldIsActive      = big.NewInt(1 << 6)
+	projectFieldCompany       = big.NewInt(1 << 7)
+	projectFieldContact       = big.NewInt(1 << 8)
+	projectFieldFieldMappings = big.NewInt(1 << 9)
+	projectFieldRemoteData    = big.NewInt(1 << 10)
 )
 
 type Project struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the project.
+	ProjectUrl *string `json:"project_url,omitempty" url:"project_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -19563,6 +24277,13 @@ func (p *Project) GetId() *string {
 		return nil
 	}
 	return p.Id
+}
+
+func (p *Project) GetProjectUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ProjectUrl
 }
 
 func (p *Project) GetRemoteId() *string {
@@ -19644,6 +24365,13 @@ func (p *Project) require(field *big.Int) {
 func (p *Project) SetId(id *string) {
 	p.Id = id
 	p.require(projectFieldId)
+}
+
+// SetProjectUrl sets the ProjectUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Project) SetProjectUrl(projectUrl *string) {
+	p.ProjectUrl = projectUrl
+	p.require(projectFieldProjectUrl)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -19896,36 +24624,39 @@ func (p *ProjectContact) Accept(visitor ProjectContactVisitor) error {
 // Fetch from the `LIST PurchaseOrders` endpoint and view a company's purchase orders.
 var (
 	purchaseOrderFieldId                  = big.NewInt(1 << 0)
-	purchaseOrderFieldRemoteId            = big.NewInt(1 << 1)
-	purchaseOrderFieldCreatedAt           = big.NewInt(1 << 2)
-	purchaseOrderFieldModifiedAt          = big.NewInt(1 << 3)
-	purchaseOrderFieldStatus              = big.NewInt(1 << 4)
-	purchaseOrderFieldIssueDate           = big.NewInt(1 << 5)
-	purchaseOrderFieldPurchaseOrderNumber = big.NewInt(1 << 6)
-	purchaseOrderFieldDeliveryDate        = big.NewInt(1 << 7)
-	purchaseOrderFieldDeliveryAddress     = big.NewInt(1 << 8)
-	purchaseOrderFieldCustomer            = big.NewInt(1 << 9)
-	purchaseOrderFieldVendor              = big.NewInt(1 << 10)
-	purchaseOrderFieldMemo                = big.NewInt(1 << 11)
-	purchaseOrderFieldCompany             = big.NewInt(1 << 12)
-	purchaseOrderFieldTotalAmount         = big.NewInt(1 << 13)
-	purchaseOrderFieldCurrency            = big.NewInt(1 << 14)
-	purchaseOrderFieldExchangeRate        = big.NewInt(1 << 15)
-	purchaseOrderFieldPaymentTerm         = big.NewInt(1 << 16)
-	purchaseOrderFieldLineItems           = big.NewInt(1 << 17)
-	purchaseOrderFieldInclusiveOfTax      = big.NewInt(1 << 18)
-	purchaseOrderFieldTrackingCategories  = big.NewInt(1 << 19)
-	purchaseOrderFieldAccountingPeriod    = big.NewInt(1 << 20)
-	purchaseOrderFieldRemoteCreatedAt     = big.NewInt(1 << 21)
-	purchaseOrderFieldRemoteUpdatedAt     = big.NewInt(1 << 22)
-	purchaseOrderFieldRemoteWasDeleted    = big.NewInt(1 << 23)
-	purchaseOrderFieldFieldMappings       = big.NewInt(1 << 24)
-	purchaseOrderFieldRemoteData          = big.NewInt(1 << 25)
-	purchaseOrderFieldRemoteFields        = big.NewInt(1 << 26)
+	purchaseOrderFieldPurchaseOrderUrl    = big.NewInt(1 << 1)
+	purchaseOrderFieldRemoteId            = big.NewInt(1 << 2)
+	purchaseOrderFieldCreatedAt           = big.NewInt(1 << 3)
+	purchaseOrderFieldModifiedAt          = big.NewInt(1 << 4)
+	purchaseOrderFieldStatus              = big.NewInt(1 << 5)
+	purchaseOrderFieldIssueDate           = big.NewInt(1 << 6)
+	purchaseOrderFieldPurchaseOrderNumber = big.NewInt(1 << 7)
+	purchaseOrderFieldDeliveryDate        = big.NewInt(1 << 8)
+	purchaseOrderFieldDeliveryAddress     = big.NewInt(1 << 9)
+	purchaseOrderFieldCustomer            = big.NewInt(1 << 10)
+	purchaseOrderFieldVendor              = big.NewInt(1 << 11)
+	purchaseOrderFieldMemo                = big.NewInt(1 << 12)
+	purchaseOrderFieldCompany             = big.NewInt(1 << 13)
+	purchaseOrderFieldTotalAmount         = big.NewInt(1 << 14)
+	purchaseOrderFieldCurrency            = big.NewInt(1 << 15)
+	purchaseOrderFieldExchangeRate        = big.NewInt(1 << 16)
+	purchaseOrderFieldPaymentTerm         = big.NewInt(1 << 17)
+	purchaseOrderFieldLineItems           = big.NewInt(1 << 18)
+	purchaseOrderFieldInclusiveOfTax      = big.NewInt(1 << 19)
+	purchaseOrderFieldTrackingCategories  = big.NewInt(1 << 20)
+	purchaseOrderFieldAccountingPeriod    = big.NewInt(1 << 21)
+	purchaseOrderFieldRemoteCreatedAt     = big.NewInt(1 << 22)
+	purchaseOrderFieldRemoteUpdatedAt     = big.NewInt(1 << 23)
+	purchaseOrderFieldRemoteWasDeleted    = big.NewInt(1 << 24)
+	purchaseOrderFieldFieldMappings       = big.NewInt(1 << 25)
+	purchaseOrderFieldRemoteData          = big.NewInt(1 << 26)
+	purchaseOrderFieldRemoteFields        = big.NewInt(1 << 27)
 )
 
 type PurchaseOrder struct {
 	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the purchase order.
+	PurchaseOrderUrl *string `json:"purchase_order_url,omitempty" url:"purchase_order_url,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -20270,8 +25001,8 @@ type PurchaseOrder struct {
 	// The purchase order's exchange rate.
 	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
 	// The payment term that applies to this transaction.
-	PaymentTerm *PurchaseOrderPaymentTerm `json:"payment_term,omitempty" url:"payment_term,omitempty"`
-	LineItems   []*PurchaseOrderLineItem  `json:"line_items,omitempty" url:"line_items,omitempty"`
+	PaymentTerm *PurchaseOrderPaymentTerm     `json:"payment_term,omitempty" url:"payment_term,omitempty"`
+	LineItems   []*PurchaseOrderLineItemsItem `json:"line_items,omitempty" url:"line_items,omitempty"`
 	// If the transaction is inclusive or exclusive of tax. `True` if inclusive, `False` if exclusive.
 	InclusiveOfTax     *bool                                  `json:"inclusive_of_tax,omitempty" url:"inclusive_of_tax,omitempty"`
 	TrackingCategories []*PurchaseOrderTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
@@ -20299,6 +25030,13 @@ func (p *PurchaseOrder) GetId() *string {
 		return nil
 	}
 	return p.Id
+}
+
+func (p *PurchaseOrder) GetPurchaseOrderUrl() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PurchaseOrderUrl
 }
 
 func (p *PurchaseOrder) GetRemoteId() *string {
@@ -20413,7 +25151,7 @@ func (p *PurchaseOrder) GetPaymentTerm() *PurchaseOrderPaymentTerm {
 	return p.PaymentTerm
 }
 
-func (p *PurchaseOrder) GetLineItems() []*PurchaseOrderLineItem {
+func (p *PurchaseOrder) GetLineItems() []*PurchaseOrderLineItemsItem {
 	if p == nil {
 		return nil
 	}
@@ -20499,6 +25237,13 @@ func (p *PurchaseOrder) require(field *big.Int) {
 func (p *PurchaseOrder) SetId(id *string) {
 	p.Id = id
 	p.require(purchaseOrderFieldId)
+}
+
+// SetPurchaseOrderUrl sets the PurchaseOrderUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrder) SetPurchaseOrderUrl(purchaseOrderUrl *string) {
+	p.PurchaseOrderUrl = purchaseOrderUrl
+	p.require(purchaseOrderFieldPurchaseOrderUrl)
 }
 
 // SetRemoteId sets the RemoteId field and marks it as non-optional;
@@ -20615,7 +25360,7 @@ func (p *PurchaseOrder) SetPaymentTerm(paymentTerm *PurchaseOrderPaymentTerm) {
 
 // SetLineItems sets the LineItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrder) SetLineItems(lineItems []*PurchaseOrderLineItem) {
+func (p *PurchaseOrder) SetLineItems(lineItems []*PurchaseOrderLineItemsItem) {
 	p.LineItems = lineItems
 	p.require(purchaseOrderFieldLineItems)
 }
@@ -22448,6 +27193,1160 @@ func (p *PurchaseOrderLineItemItem) Accept(visitor PurchaseOrderLineItemItemVisi
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
+// # The PurchaseOrderLineItem Object
+// ### Description
+// The `PurchaseOrderLineItem` object is used to represent a purchase order's line item.
+//
+// ### Usage Example
+// Fetch from the `GET PurchaseOrder` endpoint and view a company's purchase orders.
+var (
+	purchaseOrderLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
+	purchaseOrderLineItemRequestFieldDescription         = big.NewInt(1 << 1)
+	purchaseOrderLineItemRequestFieldUnitPrice           = big.NewInt(1 << 2)
+	purchaseOrderLineItemRequestFieldQuantity            = big.NewInt(1 << 3)
+	purchaseOrderLineItemRequestFieldItem                = big.NewInt(1 << 4)
+	purchaseOrderLineItemRequestFieldAccount             = big.NewInt(1 << 5)
+	purchaseOrderLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 6)
+	purchaseOrderLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 7)
+	purchaseOrderLineItemRequestFieldTaxAmount           = big.NewInt(1 << 8)
+	purchaseOrderLineItemRequestFieldTotalLineAmount     = big.NewInt(1 << 9)
+	purchaseOrderLineItemRequestFieldCurrency            = big.NewInt(1 << 10)
+	purchaseOrderLineItemRequestFieldTaxRate             = big.NewInt(1 << 11)
+	purchaseOrderLineItemRequestFieldExchangeRate        = big.NewInt(1 << 12)
+	purchaseOrderLineItemRequestFieldCompany             = big.NewInt(1 << 13)
+	purchaseOrderLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 14)
+	purchaseOrderLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 15)
+	purchaseOrderLineItemRequestFieldRemoteFields        = big.NewInt(1 << 16)
+)
+
+type PurchaseOrderLineItemRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	// A description of the good being purchased.
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+	// The line item's unit price.
+	UnitPrice *float64 `json:"unit_price,omitempty" url:"unit_price,omitempty"`
+	// The line item's quantity.
+	Quantity *float64                          `json:"quantity,omitempty" url:"quantity,omitempty"`
+	Item     *PurchaseOrderLineItemRequestItem `json:"item,omitempty" url:"item,omitempty"`
+	// The purchase order line item's account.
+	Account *string `json:"account,omitempty" url:"account,omitempty"`
+	// The purchase order line item's associated tracking category.
+	TrackingCategory *string `json:"tracking_category,omitempty" url:"tracking_category,omitempty"`
+	// The purchase order line item's associated tracking categories.
+	TrackingCategories []*string `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	// The purchase order line item's tax amount.
+	TaxAmount *string `json:"tax_amount,omitempty" url:"tax_amount,omitempty"`
+	// The purchase order line item's total amount.
+	TotalLineAmount *string `json:"total_line_amount,omitempty" url:"total_line_amount,omitempty"`
+	// The purchase order line item's currency.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *PurchaseOrderLineItemRequestCurrency `json:"currency,omitempty" url:"currency,omitempty"`
+	// The tax rate that applies to this line item.
+	TaxRate *string `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
+	// The purchase order line item's exchange rate.
+	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
+	// The company the purchase order line item belongs to.
+	Company             *string                `json:"company,omitempty" url:"company,omitempty"`
+	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (p *PurchaseOrderLineItemRequest) GetRemoteId() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteId
+}
+
+func (p *PurchaseOrderLineItemRequest) GetDescription() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Description
+}
+
+func (p *PurchaseOrderLineItemRequest) GetUnitPrice() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.UnitPrice
+}
+
+func (p *PurchaseOrderLineItemRequest) GetQuantity() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.Quantity
+}
+
+func (p *PurchaseOrderLineItemRequest) GetItem() *PurchaseOrderLineItemRequestItem {
+	if p == nil {
+		return nil
+	}
+	return p.Item
+}
+
+func (p *PurchaseOrderLineItemRequest) GetAccount() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Account
+}
+
+func (p *PurchaseOrderLineItemRequest) GetTrackingCategory() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TrackingCategory
+}
+
+func (p *PurchaseOrderLineItemRequest) GetTrackingCategories() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.TrackingCategories
+}
+
+func (p *PurchaseOrderLineItemRequest) GetTaxAmount() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TaxAmount
+}
+
+func (p *PurchaseOrderLineItemRequest) GetTotalLineAmount() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TotalLineAmount
+}
+
+func (p *PurchaseOrderLineItemRequest) GetCurrency() *PurchaseOrderLineItemRequestCurrency {
+	if p == nil {
+		return nil
+	}
+	return p.Currency
+}
+
+func (p *PurchaseOrderLineItemRequest) GetTaxRate() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TaxRate
+}
+
+func (p *PurchaseOrderLineItemRequest) GetExchangeRate() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ExchangeRate
+}
+
+func (p *PurchaseOrderLineItemRequest) GetCompany() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Company
+}
+
+func (p *PurchaseOrderLineItemRequest) GetIntegrationParams() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.IntegrationParams
+}
+
+func (p *PurchaseOrderLineItemRequest) GetLinkedAccountParams() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.LinkedAccountParams
+}
+
+func (p *PurchaseOrderLineItemRequest) GetRemoteFields() []*RemoteFieldRequest {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteFields
+}
+
+func (p *PurchaseOrderLineItemRequest) GetExtraProperties() map[string]interface{} {
+	return p.extraProperties
+}
+
+func (p *PurchaseOrderLineItemRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(purchaseOrderLineItemRequestFieldRemoteId)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetDescription(description *string) {
+	p.Description = description
+	p.require(purchaseOrderLineItemRequestFieldDescription)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetUnitPrice(unitPrice *float64) {
+	p.UnitPrice = unitPrice
+	p.require(purchaseOrderLineItemRequestFieldUnitPrice)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetQuantity(quantity *float64) {
+	p.Quantity = quantity
+	p.require(purchaseOrderLineItemRequestFieldQuantity)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetItem(item *PurchaseOrderLineItemRequestItem) {
+	p.Item = item
+	p.require(purchaseOrderLineItemRequestFieldItem)
+}
+
+// SetAccount sets the Account field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetAccount(account *string) {
+	p.Account = account
+	p.require(purchaseOrderLineItemRequestFieldAccount)
+}
+
+// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTrackingCategory(trackingCategory *string) {
+	p.TrackingCategory = trackingCategory
+	p.require(purchaseOrderLineItemRequestFieldTrackingCategory)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTrackingCategories(trackingCategories []*string) {
+	p.TrackingCategories = trackingCategories
+	p.require(purchaseOrderLineItemRequestFieldTrackingCategories)
+}
+
+// SetTaxAmount sets the TaxAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTaxAmount(taxAmount *string) {
+	p.TaxAmount = taxAmount
+	p.require(purchaseOrderLineItemRequestFieldTaxAmount)
+}
+
+// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTotalLineAmount(totalLineAmount *string) {
+	p.TotalLineAmount = totalLineAmount
+	p.require(purchaseOrderLineItemRequestFieldTotalLineAmount)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetCurrency(currency *PurchaseOrderLineItemRequestCurrency) {
+	p.Currency = currency
+	p.require(purchaseOrderLineItemRequestFieldCurrency)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetTaxRate(taxRate *string) {
+	p.TaxRate = taxRate
+	p.require(purchaseOrderLineItemRequestFieldTaxRate)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetExchangeRate(exchangeRate *string) {
+	p.ExchangeRate = exchangeRate
+	p.require(purchaseOrderLineItemRequestFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetCompany(company *string) {
+	p.Company = company
+	p.require(purchaseOrderLineItemRequestFieldCompany)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(purchaseOrderLineItemRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(purchaseOrderLineItemRequestFieldLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PurchaseOrderLineItemRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
+	p.RemoteFields = remoteFields
+	p.require(purchaseOrderLineItemRequestFieldRemoteFields)
+}
+
+func (p *PurchaseOrderLineItemRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PurchaseOrderLineItemRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PurchaseOrderLineItemRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *p)
+	if err != nil {
+		return err
+	}
+	p.extraProperties = extraProperties
+	p.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PurchaseOrderLineItemRequest) MarshalJSON() ([]byte, error) {
+	type embed PurchaseOrderLineItemRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (p *PurchaseOrderLineItemRequest) String() string {
+	if len(p.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// The purchase order line item's currency.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type PurchaseOrderLineItemRequestCurrency struct {
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+
+	typ string
+}
+
+func (p *PurchaseOrderLineItemRequestCurrency) GetTransactionCurrencyEnum() TransactionCurrencyEnum {
+	if p == nil {
+		return ""
+	}
+	return p.TransactionCurrencyEnum
+}
+
+func (p *PurchaseOrderLineItemRequestCurrency) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PurchaseOrderLineItemRequestCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		p.typ = "TransactionCurrencyEnum"
+		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderLineItemRequestCurrency) MarshalJSON() ([]byte, error) {
+	if p.typ == "TransactionCurrencyEnum" || p.TransactionCurrencyEnum != "" {
+		return json.Marshal(p.TransactionCurrencyEnum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderLineItemRequestCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (p *PurchaseOrderLineItemRequestCurrency) Accept(visitor PurchaseOrderLineItemRequestCurrencyVisitor) error {
+	if p.typ == "TransactionCurrencyEnum" || p.TransactionCurrencyEnum != "" {
+		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderLineItemRequestItem struct {
+	String string
+	Item   *Item
+
+	typ string
+}
+
+func (p *PurchaseOrderLineItemRequestItem) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PurchaseOrderLineItemRequestItem) GetItem() *Item {
+	if p == nil {
+		return nil
+	}
+	return p.Item
+}
+
+func (p *PurchaseOrderLineItemRequestItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		p.typ = "Item"
+		p.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderLineItemRequestItem) MarshalJSON() ([]byte, error) {
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	if p.typ == "Item" || p.Item != nil {
+		return json.Marshal(p.Item)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderLineItemRequestItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (p *PurchaseOrderLineItemRequestItem) Accept(visitor PurchaseOrderLineItemRequestItemVisitor) error {
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	if p.typ == "Item" || p.Item != nil {
+		return visitor.VisitItem(p.Item)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderLineItemsItem struct {
+	String                string
+	PurchaseOrderLineItem *PurchaseOrderLineItem
+
+	typ string
+}
+
+func (p *PurchaseOrderLineItemsItem) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PurchaseOrderLineItemsItem) GetPurchaseOrderLineItem() *PurchaseOrderLineItem {
+	if p == nil {
+		return nil
+	}
+	return p.PurchaseOrderLineItem
+}
+
+func (p *PurchaseOrderLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	valuePurchaseOrderLineItem := new(PurchaseOrderLineItem)
+	if err := json.Unmarshal(data, &valuePurchaseOrderLineItem); err == nil {
+		p.typ = "PurchaseOrderLineItem"
+		p.PurchaseOrderLineItem = valuePurchaseOrderLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderLineItemsItem) MarshalJSON() ([]byte, error) {
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	if p.typ == "PurchaseOrderLineItem" || p.PurchaseOrderLineItem != nil {
+		return json.Marshal(p.PurchaseOrderLineItem)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitPurchaseOrderLineItem(*PurchaseOrderLineItem) error
+}
+
+func (p *PurchaseOrderLineItemsItem) Accept(visitor PurchaseOrderLineItemsItemVisitor) error {
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	if p.typ == "PurchaseOrderLineItem" || p.PurchaseOrderLineItem != nil {
+		return visitor.VisitPurchaseOrderLineItem(p.PurchaseOrderLineItem)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
 // The payment term that applies to this transaction.
 type PurchaseOrderPaymentTerm struct {
 	String      string
@@ -22754,7 +28653,8 @@ var (
 
 type RemoteData struct {
 	// The third-party API path that is being called.
-	Path string      `json:"path" url:"path"`
+	Path string `json:"path" url:"path"`
+	// The data returned from the third-party for this object in its original, unnormalized format.
 	Data interface{} `json:"data,omitempty" url:"data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -22848,8 +28748,8 @@ var (
 )
 
 type RemoteField struct {
-	RemoteFieldClass *RemoteFieldRemoteFieldClass `json:"remote_field_class" url:"remote_field_class"`
-	Value            interface{}                  `json:"value,omitempty" url:"value,omitempty"`
+	RemoteFieldClass *RemoteFieldClass `json:"remote_field_class" url:"remote_field_class"`
+	Value            interface{}       `json:"value,omitempty" url:"value,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -22858,7 +28758,7 @@ type RemoteField struct {
 	rawJSON         json.RawMessage
 }
 
-func (r *RemoteField) GetRemoteFieldClass() *RemoteFieldRemoteFieldClass {
+func (r *RemoteField) GetRemoteFieldClass() *RemoteFieldClass {
 	if r == nil {
 		return nil
 	}
@@ -22885,7 +28785,7 @@ func (r *RemoteField) require(field *big.Int) {
 
 // SetRemoteFieldClass sets the RemoteFieldClass field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (r *RemoteField) SetRemoteFieldClass(remoteFieldClass *RemoteFieldRemoteFieldClass) {
+func (r *RemoteField) SetRemoteFieldClass(remoteFieldClass *RemoteFieldClass) {
 	r.RemoteFieldClass = remoteFieldClass
 	r.require(remoteFieldFieldRemoteFieldClass)
 }
@@ -22937,29 +28837,31 @@ func (r *RemoteField) String() string {
 }
 
 var (
-	remoteFieldClassFieldId            = big.NewInt(1 << 0)
-	remoteFieldClassFieldDisplayName   = big.NewInt(1 << 1)
-	remoteFieldClassFieldRemoteKeyName = big.NewInt(1 << 2)
-	remoteFieldClassFieldDescription   = big.NewInt(1 << 3)
-	remoteFieldClassFieldIsCustom      = big.NewInt(1 << 4)
-	remoteFieldClassFieldIsRequired    = big.NewInt(1 << 5)
-	remoteFieldClassFieldFieldType     = big.NewInt(1 << 6)
-	remoteFieldClassFieldFieldFormat   = big.NewInt(1 << 7)
-	remoteFieldClassFieldFieldChoices  = big.NewInt(1 << 8)
-	remoteFieldClassFieldItemSchema    = big.NewInt(1 << 9)
+	remoteFieldClassFieldId                 = big.NewInt(1 << 0)
+	remoteFieldClassFieldDisplayName        = big.NewInt(1 << 1)
+	remoteFieldClassFieldRemoteKeyName      = big.NewInt(1 << 2)
+	remoteFieldClassFieldDescription        = big.NewInt(1 << 3)
+	remoteFieldClassFieldIsCustom           = big.NewInt(1 << 4)
+	remoteFieldClassFieldIsCommonModelField = big.NewInt(1 << 5)
+	remoteFieldClassFieldIsRequired         = big.NewInt(1 << 6)
+	remoteFieldClassFieldFieldType          = big.NewInt(1 << 7)
+	remoteFieldClassFieldFieldFormat        = big.NewInt(1 << 8)
+	remoteFieldClassFieldFieldChoices       = big.NewInt(1 << 9)
+	remoteFieldClassFieldItemSchema         = big.NewInt(1 << 10)
 )
 
 type RemoteFieldClass struct {
-	Id            *string          `json:"id,omitempty" url:"id,omitempty"`
-	DisplayName   *string          `json:"display_name,omitempty" url:"display_name,omitempty"`
-	RemoteKeyName *string          `json:"remote_key_name,omitempty" url:"remote_key_name,omitempty"`
-	Description   *string          `json:"description,omitempty" url:"description,omitempty"`
-	IsCustom      *bool            `json:"is_custom,omitempty" url:"is_custom,omitempty"`
-	IsRequired    *bool            `json:"is_required,omitempty" url:"is_required,omitempty"`
-	FieldType     *FieldTypeEnum   `json:"field_type,omitempty" url:"field_type,omitempty"`
-	FieldFormat   *FieldFormatEnum `json:"field_format,omitempty" url:"field_format,omitempty"`
-	FieldChoices  []string         `json:"field_choices,omitempty" url:"field_choices,omitempty"`
-	ItemSchema    *ItemSchema      `json:"item_schema,omitempty" url:"item_schema,omitempty"`
+	Id                 *string          `json:"id,omitempty" url:"id,omitempty"`
+	DisplayName        *string          `json:"display_name,omitempty" url:"display_name,omitempty"`
+	RemoteKeyName      *string          `json:"remote_key_name,omitempty" url:"remote_key_name,omitempty"`
+	Description        *string          `json:"description,omitempty" url:"description,omitempty"`
+	IsCustom           *bool            `json:"is_custom,omitempty" url:"is_custom,omitempty"`
+	IsCommonModelField *bool            `json:"is_common_model_field,omitempty" url:"is_common_model_field,omitempty"`
+	IsRequired         *bool            `json:"is_required,omitempty" url:"is_required,omitempty"`
+	FieldType          *FieldTypeEnum   `json:"field_type,omitempty" url:"field_type,omitempty"`
+	FieldFormat        *FieldFormatEnum `json:"field_format,omitempty" url:"field_format,omitempty"`
+	FieldChoices       []string         `json:"field_choices,omitempty" url:"field_choices,omitempty"`
+	ItemSchema         *ItemSchema      `json:"item_schema,omitempty" url:"item_schema,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -23001,6 +28903,13 @@ func (r *RemoteFieldClass) GetIsCustom() *bool {
 		return nil
 	}
 	return r.IsCustom
+}
+
+func (r *RemoteFieldClass) GetIsCommonModelField() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.IsCommonModelField
 }
 
 func (r *RemoteFieldClass) GetIsRequired() *bool {
@@ -23084,6 +28993,13 @@ func (r *RemoteFieldClass) SetIsCustom(isCustom *bool) {
 	r.require(remoteFieldClassFieldIsCustom)
 }
 
+// SetIsCommonModelField sets the IsCommonModelField field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (r *RemoteFieldClass) SetIsCommonModelField(isCommonModelField *bool) {
+	r.IsCommonModelField = isCommonModelField
+	r.require(remoteFieldClassFieldIsCommonModelField)
+}
+
 // SetIsRequired sets the IsRequired field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (r *RemoteFieldClass) SetIsRequired(isRequired *bool) {
@@ -23158,76 +29074,14 @@ func (r *RemoteFieldClass) String() string {
 	return fmt.Sprintf("%#v", r)
 }
 
-type RemoteFieldRemoteFieldClass struct {
-	String           string
-	RemoteFieldClass *RemoteFieldClass
-
-	typ string
-}
-
-func (r *RemoteFieldRemoteFieldClass) GetString() string {
-	if r == nil {
-		return ""
-	}
-	return r.String
-}
-
-func (r *RemoteFieldRemoteFieldClass) GetRemoteFieldClass() *RemoteFieldClass {
-	if r == nil {
-		return nil
-	}
-	return r.RemoteFieldClass
-}
-
-func (r *RemoteFieldRemoteFieldClass) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		r.typ = "String"
-		r.String = valueString
-		return nil
-	}
-	valueRemoteFieldClass := new(RemoteFieldClass)
-	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
-		r.typ = "RemoteFieldClass"
-		r.RemoteFieldClass = valueRemoteFieldClass
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
-}
-
-func (r RemoteFieldRemoteFieldClass) MarshalJSON() ([]byte, error) {
-	if r.typ == "String" || r.String != "" {
-		return json.Marshal(r.String)
-	}
-	if r.typ == "RemoteFieldClass" || r.RemoteFieldClass != nil {
-		return json.Marshal(r.RemoteFieldClass)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", r)
-}
-
-type RemoteFieldRemoteFieldClassVisitor interface {
-	VisitString(string) error
-	VisitRemoteFieldClass(*RemoteFieldClass) error
-}
-
-func (r *RemoteFieldRemoteFieldClass) Accept(visitor RemoteFieldRemoteFieldClassVisitor) error {
-	if r.typ == "String" || r.String != "" {
-		return visitor.VisitString(r.String)
-	}
-	if r.typ == "RemoteFieldClass" || r.RemoteFieldClass != nil {
-		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", r)
-}
-
 var (
 	remoteFieldRequestFieldRemoteFieldClass = big.NewInt(1 << 0)
 	remoteFieldRequestFieldValue            = big.NewInt(1 << 1)
 )
 
 type RemoteFieldRequest struct {
-	RemoteFieldClass *RemoteFieldRequestRemoteFieldClass `json:"remote_field_class" url:"remote_field_class"`
-	Value            interface{}                         `json:"value,omitempty" url:"value,omitempty"`
+	RemoteFieldClass string      `json:"remote_field_class" url:"remote_field_class"`
+	Value            interface{} `json:"value,omitempty" url:"value,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -23236,9 +29090,9 @@ type RemoteFieldRequest struct {
 	rawJSON         json.RawMessage
 }
 
-func (r *RemoteFieldRequest) GetRemoteFieldClass() *RemoteFieldRequestRemoteFieldClass {
+func (r *RemoteFieldRequest) GetRemoteFieldClass() string {
 	if r == nil {
-		return nil
+		return ""
 	}
 	return r.RemoteFieldClass
 }
@@ -23263,7 +29117,7 @@ func (r *RemoteFieldRequest) require(field *big.Int) {
 
 // SetRemoteFieldClass sets the RemoteFieldClass field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (r *RemoteFieldRequest) SetRemoteFieldClass(remoteFieldClass *RemoteFieldRequestRemoteFieldClass) {
+func (r *RemoteFieldRequest) SetRemoteFieldClass(remoteFieldClass string) {
 	r.RemoteFieldClass = remoteFieldClass
 	r.require(remoteFieldRequestFieldRemoteFieldClass)
 }
@@ -23312,68 +29166,6 @@ func (r *RemoteFieldRequest) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", r)
-}
-
-type RemoteFieldRequestRemoteFieldClass struct {
-	String           string
-	RemoteFieldClass *RemoteFieldClass
-
-	typ string
-}
-
-func (r *RemoteFieldRequestRemoteFieldClass) GetString() string {
-	if r == nil {
-		return ""
-	}
-	return r.String
-}
-
-func (r *RemoteFieldRequestRemoteFieldClass) GetRemoteFieldClass() *RemoteFieldClass {
-	if r == nil {
-		return nil
-	}
-	return r.RemoteFieldClass
-}
-
-func (r *RemoteFieldRequestRemoteFieldClass) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		r.typ = "String"
-		r.String = valueString
-		return nil
-	}
-	valueRemoteFieldClass := new(RemoteFieldClass)
-	if err := json.Unmarshal(data, &valueRemoteFieldClass); err == nil {
-		r.typ = "RemoteFieldClass"
-		r.RemoteFieldClass = valueRemoteFieldClass
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
-}
-
-func (r RemoteFieldRequestRemoteFieldClass) MarshalJSON() ([]byte, error) {
-	if r.typ == "String" || r.String != "" {
-		return json.Marshal(r.String)
-	}
-	if r.typ == "RemoteFieldClass" || r.RemoteFieldClass != nil {
-		return json.Marshal(r.RemoteFieldClass)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", r)
-}
-
-type RemoteFieldRequestRemoteFieldClassVisitor interface {
-	VisitString(string) error
-	VisitRemoteFieldClass(*RemoteFieldClass) error
-}
-
-func (r *RemoteFieldRequestRemoteFieldClass) Accept(visitor RemoteFieldRequestRemoteFieldClassVisitor) error {
-	if r.typ == "String" || r.String != "" {
-		return visitor.VisitString(r.String)
-	}
-	if r.typ == "RemoteFieldClass" || r.RemoteFieldClass != nil {
-		return visitor.VisitRemoteFieldClass(r.RemoteFieldClass)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", r)
 }
 
 // # The RemoteKey Object
@@ -23493,13 +29285,13 @@ var (
 )
 
 type RemoteResponse struct {
-	Method          string                 `json:"method" url:"method"`
-	Path            string                 `json:"path" url:"path"`
-	Status          int                    `json:"status" url:"status"`
-	Response        interface{}            `json:"response" url:"response"`
-	ResponseHeaders map[string]interface{} `json:"response_headers,omitempty" url:"response_headers,omitempty"`
-	ResponseType    *ResponseTypeEnum      `json:"response_type,omitempty" url:"response_type,omitempty"`
-	Headers         map[string]interface{} `json:"headers,omitempty" url:"headers,omitempty"`
+	Method          string                      `json:"method" url:"method"`
+	Path            string                      `json:"path" url:"path"`
+	Status          int                         `json:"status" url:"status"`
+	Response        interface{}                 `json:"response" url:"response"`
+	ResponseHeaders map[string]interface{}      `json:"response_headers,omitempty" url:"response_headers,omitempty"`
+	ResponseType    *RemoteResponseResponseType `json:"response_type,omitempty" url:"response_type,omitempty"`
+	Headers         map[string]interface{}      `json:"headers,omitempty" url:"headers,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -23543,7 +29335,7 @@ func (r *RemoteResponse) GetResponseHeaders() map[string]interface{} {
 	return r.ResponseHeaders
 }
 
-func (r *RemoteResponse) GetResponseType() *ResponseTypeEnum {
+func (r *RemoteResponse) GetResponseType() *RemoteResponseResponseType {
 	if r == nil {
 		return nil
 	}
@@ -23605,7 +29397,7 @@ func (r *RemoteResponse) SetResponseHeaders(responseHeaders map[string]interface
 
 // SetResponseType sets the ResponseType field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (r *RemoteResponse) SetResponseType(responseType *ResponseTypeEnum) {
+func (r *RemoteResponse) SetResponseType(responseType *RemoteResponseResponseType) {
 	r.ResponseType = responseType
 	r.require(remoteResponseFieldResponseType)
 }
@@ -23656,6 +29448,68 @@ func (r *RemoteResponse) String() string {
 	return fmt.Sprintf("%#v", r)
 }
 
+type RemoteResponseResponseType struct {
+	ResponseTypeEnum ResponseTypeEnum
+	String           string
+
+	typ string
+}
+
+func (r *RemoteResponseResponseType) GetResponseTypeEnum() ResponseTypeEnum {
+	if r == nil {
+		return ""
+	}
+	return r.ResponseTypeEnum
+}
+
+func (r *RemoteResponseResponseType) GetString() string {
+	if r == nil {
+		return ""
+	}
+	return r.String
+}
+
+func (r *RemoteResponseResponseType) UnmarshalJSON(data []byte) error {
+	var valueResponseTypeEnum ResponseTypeEnum
+	if err := json.Unmarshal(data, &valueResponseTypeEnum); err == nil {
+		r.typ = "ResponseTypeEnum"
+		r.ResponseTypeEnum = valueResponseTypeEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		r.typ = "String"
+		r.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, r)
+}
+
+func (r RemoteResponseResponseType) MarshalJSON() ([]byte, error) {
+	if r.typ == "ResponseTypeEnum" || r.ResponseTypeEnum != "" {
+		return json.Marshal(r.ResponseTypeEnum)
+	}
+	if r.typ == "String" || r.String != "" {
+		return json.Marshal(r.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", r)
+}
+
+type RemoteResponseResponseTypeVisitor interface {
+	VisitResponseTypeEnum(ResponseTypeEnum) error
+	VisitString(string) error
+}
+
+func (r *RemoteResponseResponseType) Accept(visitor RemoteResponseResponseTypeVisitor) error {
+	if r.typ == "ResponseTypeEnum" || r.ResponseTypeEnum != "" {
+		return visitor.VisitResponseTypeEnum(r.ResponseTypeEnum)
+	}
+	if r.typ == "String" || r.String != "" {
+		return visitor.VisitString(r.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", r)
+}
+
 // # The ReportItem Object
 // ### Description
 // The `ReportItem` object is used to represent a report item for a Balance Sheet, Cash Flow Statement or Profit and Loss Report.
@@ -23683,8 +29537,8 @@ type ReportItem struct {
 	// The report item's name.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// The report item's value.
-	Value    *float64                 `json:"value,omitempty" url:"value,omitempty"`
-	SubItems []map[string]interface{} `json:"sub_items,omitempty" url:"sub_items,omitempty"`
+	Value    *float64               `json:"value,omitempty" url:"value,omitempty"`
+	SubItems map[string]interface{} `json:"sub_items,omitempty" url:"sub_items,omitempty"`
 	// The company the report item belongs to.
 	Company *string `json:"company,omitempty" url:"company,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
@@ -23732,7 +29586,7 @@ func (r *ReportItem) GetValue() *float64 {
 	return r.Value
 }
 
-func (r *ReportItem) GetSubItems() []map[string]interface{} {
+func (r *ReportItem) GetSubItems() map[string]interface{} {
 	if r == nil {
 		return nil
 	}
@@ -23801,7 +29655,7 @@ func (r *ReportItem) SetValue(value *float64) {
 
 // SetSubItems sets the SubItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (r *ReportItem) SetSubItems(subItems []map[string]interface{}) {
+func (r *ReportItem) SetSubItems(subItems map[string]interface{}) {
 	r.SubItems = subItems
 	r.require(reportItemFieldSubItems)
 }
@@ -23921,6 +29775,2260 @@ func NewResponseTypeEnumFromString(s string) (ResponseTypeEnum, error) {
 
 func (r ResponseTypeEnum) Ptr() *ResponseTypeEnum {
 	return &r
+}
+
+// # The SalesOrder Object
+// ### Description
+// The `SalesOrder` object represents a seller's formal record and confirmation of a customer's purchase request.
+//
+// ### Usage Example
+// Fetch from the `LIST SalesOrders` endpoint and view a company's sales orders.
+var (
+	salesOrderFieldId                 = big.NewInt(1 << 0)
+	salesOrderFieldRemoteId           = big.NewInt(1 << 1)
+	salesOrderFieldCreatedAt          = big.NewInt(1 << 2)
+	salesOrderFieldModifiedAt         = big.NewInt(1 << 3)
+	salesOrderFieldCustomer           = big.NewInt(1 << 4)
+	salesOrderFieldCurrency           = big.NewInt(1 << 5)
+	salesOrderFieldExchangeRate       = big.NewInt(1 << 6)
+	salesOrderFieldCompany            = big.NewInt(1 << 7)
+	salesOrderFieldSalesOrderUrl      = big.NewInt(1 << 8)
+	salesOrderFieldStatus             = big.NewInt(1 << 9)
+	salesOrderFieldPaymentTerm        = big.NewInt(1 << 10)
+	salesOrderFieldMemo               = big.NewInt(1 << 11)
+	salesOrderFieldShippingAddress    = big.NewInt(1 << 12)
+	salesOrderFieldTrackingCategories = big.NewInt(1 << 13)
+	salesOrderFieldIssueDate          = big.NewInt(1 << 14)
+	salesOrderFieldTransactionNumber  = big.NewInt(1 << 15)
+	salesOrderFieldTotal              = big.NewInt(1 << 16)
+	salesOrderFieldLines              = big.NewInt(1 << 17)
+	salesOrderFieldRemoteCreatedAt    = big.NewInt(1 << 18)
+	salesOrderFieldRemoteUpdatedAt    = big.NewInt(1 << 19)
+	salesOrderFieldRemoteWasDeleted   = big.NewInt(1 << 20)
+	salesOrderFieldFieldMappings      = big.NewInt(1 << 21)
+	salesOrderFieldRemoteData         = big.NewInt(1 << 22)
+	salesOrderFieldRemoteFields       = big.NewInt(1 << 23)
+)
+
+type SalesOrder struct {
+	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty" url:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty" url:"modified_at,omitempty"`
+	// The customer associated with the sales order.
+	Customer *SalesOrderCustomer `json:"customer,omitempty" url:"customer,omitempty"`
+	// The currency code for the order.
+	//
+	// * `XUA` - ADB Unit of Account
+	// * `AFN` - Afghan Afghani
+	// * `AFA` - Afghan Afghani (1927–2002)
+	// * `ALL` - Albanian Lek
+	// * `ALK` - Albanian Lek (1946–1965)
+	// * `DZD` - Algerian Dinar
+	// * `ADP` - Andorran Peseta
+	// * `AOA` - Angolan Kwanza
+	// * `AOK` - Angolan Kwanza (1977–1991)
+	// * `AON` - Angolan New Kwanza (1990–2000)
+	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+	// * `ARA` - Argentine Austral
+	// * `ARS` - Argentine Peso
+	// * `ARM` - Argentine Peso (1881–1970)
+	// * `ARP` - Argentine Peso (1983–1985)
+	// * `ARL` - Argentine Peso Ley (1970–1983)
+	// * `AMD` - Armenian Dram
+	// * `AWG` - Aruban Florin
+	// * `AUD` - Australian Dollar
+	// * `ATS` - Austrian Schilling
+	// * `AZN` - Azerbaijani Manat
+	// * `AZM` - Azerbaijani Manat (1993–2006)
+	// * `BSD` - Bahamian Dollar
+	// * `BHD` - Bahraini Dinar
+	// * `BDT` - Bangladeshi Taka
+	// * `BBD` - Barbadian Dollar
+	// * `BYN` - Belarusian Ruble
+	// * `BYB` - Belarusian Ruble (1994–1999)
+	// * `BYR` - Belarusian Ruble (2000–2016)
+	// * `BEF` - Belgian Franc
+	// * `BEC` - Belgian Franc (convertible)
+	// * `BEL` - Belgian Franc (financial)
+	// * `BZD` - Belize Dollar
+	// * `BMD` - Bermudan Dollar
+	// * `BTN` - Bhutanese Ngultrum
+	// * `BOB` - Bolivian Boliviano
+	// * `BOL` - Bolivian Boliviano (1863–1963)
+	// * `BOV` - Bolivian Mvdol
+	// * `BOP` - Bolivian Peso
+	// * `BAM` - Bosnia-Herzegovina Convertible Mark
+	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+	// * `BWP` - Botswanan Pula
+	// * `BRC` - Brazilian Cruzado (1986–1989)
+	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+	// * `BRE` - Brazilian Cruzeiro (1990–1993)
+	// * `BRR` - Brazilian Cruzeiro (1993–1994)
+	// * `BRN` - Brazilian New Cruzado (1989–1990)
+	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+	// * `BRL` - Brazilian Real
+	// * `GBP` - British Pound
+	// * `BND` - Brunei Dollar
+	// * `BGL` - Bulgarian Hard Lev
+	// * `BGN` - Bulgarian Lev
+	// * `BGO` - Bulgarian Lev (1879–1952)
+	// * `BGM` - Bulgarian Socialist Lev
+	// * `BUK` - Burmese Kyat
+	// * `BIF` - Burundian Franc
+	// * `XPF` - CFP Franc
+	// * `KHR` - Cambodian Riel
+	// * `CAD` - Canadian Dollar
+	// * `CVE` - Cape Verdean Escudo
+	// * `KYD` - Cayman Islands Dollar
+	// * `XAF` - Central African CFA Franc
+	// * `CLE` - Chilean Escudo
+	// * `CLP` - Chilean Peso
+	// * `CLF` - Chilean Unit of Account (UF)
+	// * `CNX` - Chinese People’s Bank Dollar
+	// * `CNY` - Chinese Yuan
+	// * `CNH` - Chinese Yuan (offshore)
+	// * `COP` - Colombian Peso
+	// * `COU` - Colombian Real Value Unit
+	// * `KMF` - Comorian Franc
+	// * `CDF` - Congolese Franc
+	// * `CRC` - Costa Rican Colón
+	// * `HRD` - Croatian Dinar
+	// * `HRK` - Croatian Kuna
+	// * `CUC` - Cuban Convertible Peso
+	// * `CUP` - Cuban Peso
+	// * `CYP` - Cypriot Pound
+	// * `CZK` - Czech Koruna
+	// * `CSK` - Czechoslovak Hard Koruna
+	// * `DKK` - Danish Krone
+	// * `DJF` - Djiboutian Franc
+	// * `DOP` - Dominican Peso
+	// * `NLG` - Dutch Guilder
+	// * `XCD` - East Caribbean Dollar
+	// * `DDM` - East German Mark
+	// * `ECS` - Ecuadorian Sucre
+	// * `ECV` - Ecuadorian Unit of Constant Value
+	// * `EGP` - Egyptian Pound
+	// * `GQE` - Equatorial Guinean Ekwele
+	// * `ERN` - Eritrean Nakfa
+	// * `EEK` - Estonian Kroon
+	// * `ETB` - Ethiopian Birr
+	// * `EUR` - Euro
+	// * `XBA` - European Composite Unit
+	// * `XEU` - European Currency Unit
+	// * `XBB` - European Monetary Unit
+	// * `XBC` - European Unit of Account (XBC)
+	// * `XBD` - European Unit of Account (XBD)
+	// * `FKP` - Falkland Islands Pound
+	// * `FJD` - Fijian Dollar
+	// * `FIM` - Finnish Markka
+	// * `FRF` - French Franc
+	// * `XFO` - French Gold Franc
+	// * `XFU` - French UIC-Franc
+	// * `GMD` - Gambian Dalasi
+	// * `GEK` - Georgian Kupon Larit
+	// * `GEL` - Georgian Lari
+	// * `DEM` - German Mark
+	// * `GHS` - Ghanaian Cedi
+	// * `GHC` - Ghanaian Cedi (1979–2007)
+	// * `GIP` - Gibraltar Pound
+	// * `XAU` - Gold
+	// * `GRD` - Greek Drachma
+	// * `GTQ` - Guatemalan Quetzal
+	// * `GWP` - Guinea-Bissau Peso
+	// * `GNF` - Guinean Franc
+	// * `GNS` - Guinean Syli
+	// * `GYD` - Guyanaese Dollar
+	// * `HTG` - Haitian Gourde
+	// * `HNL` - Honduran Lempira
+	// * `HKD` - Hong Kong Dollar
+	// * `HUF` - Hungarian Forint
+	// * `IMP` - IMP
+	// * `ISK` - Icelandic Króna
+	// * `ISJ` - Icelandic Króna (1918–1981)
+	// * `INR` - Indian Rupee
+	// * `IDR` - Indonesian Rupiah
+	// * `IRR` - Iranian Rial
+	// * `IQD` - Iraqi Dinar
+	// * `IEP` - Irish Pound
+	// * `ILS` - Israeli New Shekel
+	// * `ILP` - Israeli Pound
+	// * `ILR` - Israeli Shekel (1980–1985)
+	// * `ITL` - Italian Lira
+	// * `JMD` - Jamaican Dollar
+	// * `JPY` - Japanese Yen
+	// * `JOD` - Jordanian Dinar
+	// * `KZT` - Kazakhstani Tenge
+	// * `KES` - Kenyan Shilling
+	// * `KWD` - Kuwaiti Dinar
+	// * `KGS` - Kyrgystani Som
+	// * `LAK` - Laotian Kip
+	// * `LVL` - Latvian Lats
+	// * `LVR` - Latvian Ruble
+	// * `LBP` - Lebanese Pound
+	// * `LSL` - Lesotho Loti
+	// * `LRD` - Liberian Dollar
+	// * `LYD` - Libyan Dinar
+	// * `LTL` - Lithuanian Litas
+	// * `LTT` - Lithuanian Talonas
+	// * `LUL` - Luxembourg Financial Franc
+	// * `LUC` - Luxembourgian Convertible Franc
+	// * `LUF` - Luxembourgian Franc
+	// * `MOP` - Macanese Pataca
+	// * `MKD` - Macedonian Denar
+	// * `MKN` - Macedonian Denar (1992–1993)
+	// * `MGA` - Malagasy Ariary
+	// * `MGF` - Malagasy Franc
+	// * `MWK` - Malawian Kwacha
+	// * `MYR` - Malaysian Ringgit
+	// * `MVR` - Maldivian Rufiyaa
+	// * `MVP` - Maldivian Rupee (1947–1981)
+	// * `MLF` - Malian Franc
+	// * `MTL` - Maltese Lira
+	// * `MTP` - Maltese Pound
+	// * `MRU` - Mauritanian Ouguiya
+	// * `MRO` - Mauritanian Ouguiya (1973–2017)
+	// * `MUR` - Mauritian Rupee
+	// * `MXV` - Mexican Investment Unit
+	// * `MXN` - Mexican Peso
+	// * `MXP` - Mexican Silver Peso (1861–1992)
+	// * `MDC` - Moldovan Cupon
+	// * `MDL` - Moldovan Leu
+	// * `MCF` - Monegasque Franc
+	// * `MNT` - Mongolian Tugrik
+	// * `MAD` - Moroccan Dirham
+	// * `MAF` - Moroccan Franc
+	// * `MZE` - Mozambican Escudo
+	// * `MZN` - Mozambican Metical
+	// * `MZM` - Mozambican Metical (1980–2006)
+	// * `MMK` - Myanmar Kyat
+	// * `NAD` - Namibian Dollar
+	// * `NPR` - Nepalese Rupee
+	// * `ANG` - Netherlands Antillean Guilder
+	// * `TWD` - New Taiwan Dollar
+	// * `NZD` - New Zealand Dollar
+	// * `NIO` - Nicaraguan Córdoba
+	// * `NIC` - Nicaraguan Córdoba (1988–1991)
+	// * `NGN` - Nigerian Naira
+	// * `KPW` - North Korean Won
+	// * `NOK` - Norwegian Krone
+	// * `OMR` - Omani Rial
+	// * `PKR` - Pakistani Rupee
+	// * `XPD` - Palladium
+	// * `PAB` - Panamanian Balboa
+	// * `PGK` - Papua New Guinean Kina
+	// * `PYG` - Paraguayan Guarani
+	// * `PEI` - Peruvian Inti
+	// * `PEN` - Peruvian Sol
+	// * `PES` - Peruvian Sol (1863–1965)
+	// * `PHP` - Philippine Peso
+	// * `XPT` - Platinum
+	// * `PLN` - Polish Zloty
+	// * `PLZ` - Polish Zloty (1950–1995)
+	// * `PTE` - Portuguese Escudo
+	// * `GWE` - Portuguese Guinea Escudo
+	// * `QAR` - Qatari Rial
+	// * `XRE` - RINET Funds
+	// * `RHD` - Rhodesian Dollar
+	// * `RON` - Romanian Leu
+	// * `ROL` - Romanian Leu (1952–2006)
+	// * `RUB` - Russian Ruble
+	// * `RUR` - Russian Ruble (1991–1998)
+	// * `RWF` - Rwandan Franc
+	// * `SVC` - Salvadoran Colón
+	// * `WST` - Samoan Tala
+	// * `SAR` - Saudi Riyal
+	// * `RSD` - Serbian Dinar
+	// * `CSD` - Serbian Dinar (2002–2006)
+	// * `SCR` - Seychellois Rupee
+	// * `SLL` - Sierra Leonean Leone
+	// * `XAG` - Silver
+	// * `SGD` - Singapore Dollar
+	// * `SKK` - Slovak Koruna
+	// * `SIT` - Slovenian Tolar
+	// * `SBD` - Solomon Islands Dollar
+	// * `SOS` - Somali Shilling
+	// * `ZAR` - South African Rand
+	// * `ZAL` - South African Rand (financial)
+	// * `KRH` - South Korean Hwan (1953–1962)
+	// * `KRW` - South Korean Won
+	// * `KRO` - South Korean Won (1945–1953)
+	// * `SSP` - South Sudanese Pound
+	// * `SUR` - Soviet Rouble
+	// * `ESP` - Spanish Peseta
+	// * `ESA` - Spanish Peseta (A account)
+	// * `ESB` - Spanish Peseta (convertible account)
+	// * `XDR` - Special Drawing Rights
+	// * `LKR` - Sri Lankan Rupee
+	// * `SHP` - St. Helena Pound
+	// * `XSU` - Sucre
+	// * `SDD` - Sudanese Dinar (1992–2007)
+	// * `SDG` - Sudanese Pound
+	// * `SDP` - Sudanese Pound (1957–1998)
+	// * `SRD` - Surinamese Dollar
+	// * `SRG` - Surinamese Guilder
+	// * `SZL` - Swazi Lilangeni
+	// * `SEK` - Swedish Krona
+	// * `CHF` - Swiss Franc
+	// * `SYP` - Syrian Pound
+	// * `STN` - São Tomé & Príncipe Dobra
+	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+	// * `TVD` - TVD
+	// * `TJR` - Tajikistani Ruble
+	// * `TJS` - Tajikistani Somoni
+	// * `TZS` - Tanzanian Shilling
+	// * `XTS` - Testing Currency Code
+	// * `THB` - Thai Baht
+	// * `XXX` - The codes assigned for transactions where no currency is involved
+	// * `TPE` - Timorese Escudo
+	// * `TOP` - Tongan Paʻanga
+	// * `TTD` - Trinidad & Tobago Dollar
+	// * `TND` - Tunisian Dinar
+	// * `TRY` - Turkish Lira
+	// * `TRL` - Turkish Lira (1922–2005)
+	// * `TMT` - Turkmenistani Manat
+	// * `TMM` - Turkmenistani Manat (1993–2009)
+	// * `USD` - US Dollar
+	// * `USN` - US Dollar (Next day)
+	// * `USS` - US Dollar (Same day)
+	// * `UGX` - Ugandan Shilling
+	// * `UGS` - Ugandan Shilling (1966–1987)
+	// * `UAH` - Ukrainian Hryvnia
+	// * `UAK` - Ukrainian Karbovanets
+	// * `AED` - United Arab Emirates Dirham
+	// * `UYW` - Uruguayan Nominal Wage Index Unit
+	// * `UYU` - Uruguayan Peso
+	// * `UYP` - Uruguayan Peso (1975–1993)
+	// * `UYI` - Uruguayan Peso (Indexed Units)
+	// * `UZS` - Uzbekistani Som
+	// * `VUV` - Vanuatu Vatu
+	// * `VES` - Venezuelan Bolívar
+	// * `VEB` - Venezuelan Bolívar (1871–2008)
+	// * `VEF` - Venezuelan Bolívar (2008–2018)
+	// * `VND` - Vietnamese Dong
+	// * `VNN` - Vietnamese Dong (1978–1985)
+	// * `CHE` - WIR Euro
+	// * `CHW` - WIR Franc
+	// * `XOF` - West African CFA Franc
+	// * `YDD` - Yemeni Dinar
+	// * `YER` - Yemeni Rial
+	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+	// * `YUM` - Yugoslavian New Dinar (1994–2002)
+	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+	// * `ZWN` - ZWN
+	// * `ZRN` - Zairean New Zaire (1993–1998)
+	// * `ZRZ` - Zairean Zaire (1971–1993)
+	// * `ZMW` - Zambian Kwacha
+	// * `ZMK` - Zambian Kwacha (1968–2012)
+	// * `ZWD` - Zimbabwean Dollar (1980–2008)
+	// * `ZWR` - Zimbabwean Dollar (2008)
+	// * `ZWL` - Zimbabwean Dollar (2009)
+	Currency *SalesOrderCurrency `json:"currency,omitempty" url:"currency,omitempty"`
+	// The exchange rate applied if the order currency differs from the base currency.
+	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
+	// The subsidiary associated with the order.
+	Company *SalesOrderCompany `json:"company,omitempty" url:"company,omitempty"`
+	// The 3rd party URL of the sales order.
+	SalesOrderUrl *string `json:"sales_order_url,omitempty" url:"sales_order_url,omitempty"`
+	// The status of the sales order.
+	//
+	// * `DRAFT` - DRAFT
+	// * `PENDING_APPROVAL` - PENDING_APPROVAL
+	// * `OPEN` - OPEN
+	// * `PARTIALLY_COMPLETED` - PARTIALLY_COMPLETED
+	// * `COMPLETED` - COMPLETED
+	// * `CLOSED` - CLOSED
+	Status *SalesOrderStatus `json:"status,omitempty" url:"status,omitempty"`
+	// The payment terms applied to this order.
+	PaymentTerm *SalesOrderPaymentTerm `json:"payment_term,omitempty" url:"payment_term,omitempty"`
+	// Notes or comments attached to the order.
+	Memo *string `json:"memo,omitempty" url:"memo,omitempty"`
+	// The shipping address for the order.
+	ShippingAddress    *SalesOrderShippingAddress          `json:"shipping_address,omitempty" url:"shipping_address,omitempty"`
+	TrackingCategories []*SalesOrderTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	// The date the sales order was issued.
+	IssueDate *time.Time `json:"issue_date,omitempty" url:"issue_date,omitempty"`
+	// The human-readable sales order number or transaction reference.
+	TransactionNumber *string `json:"transaction_number,omitempty" url:"transaction_number,omitempty"`
+	// Total amount of order.
+	Total *float64               `json:"total,omitempty" url:"total,omitempty"`
+	Lines []*SalesOrderLinesItem `json:"lines,omitempty" url:"lines,omitempty"`
+	// When the third party's sales order was created.
+	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty" url:"remote_created_at,omitempty"`
+	// When the third party's sales order was updated.
+	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty" url:"remote_updated_at,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
+	RemoteData       []*RemoteData          `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+	RemoteFields     []*RemoteField         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *SalesOrder) GetId() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Id
+}
+
+func (s *SalesOrder) GetRemoteId() *string {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteId
+}
+
+func (s *SalesOrder) GetCreatedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.CreatedAt
+}
+
+func (s *SalesOrder) GetModifiedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.ModifiedAt
+}
+
+func (s *SalesOrder) GetCustomer() *SalesOrderCustomer {
+	if s == nil {
+		return nil
+	}
+	return s.Customer
+}
+
+func (s *SalesOrder) GetCurrency() *SalesOrderCurrency {
+	if s == nil {
+		return nil
+	}
+	return s.Currency
+}
+
+func (s *SalesOrder) GetExchangeRate() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ExchangeRate
+}
+
+func (s *SalesOrder) GetCompany() *SalesOrderCompany {
+	if s == nil {
+		return nil
+	}
+	return s.Company
+}
+
+func (s *SalesOrder) GetSalesOrderUrl() *string {
+	if s == nil {
+		return nil
+	}
+	return s.SalesOrderUrl
+}
+
+func (s *SalesOrder) GetStatus() *SalesOrderStatus {
+	if s == nil {
+		return nil
+	}
+	return s.Status
+}
+
+func (s *SalesOrder) GetPaymentTerm() *SalesOrderPaymentTerm {
+	if s == nil {
+		return nil
+	}
+	return s.PaymentTerm
+}
+
+func (s *SalesOrder) GetMemo() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Memo
+}
+
+func (s *SalesOrder) GetShippingAddress() *SalesOrderShippingAddress {
+	if s == nil {
+		return nil
+	}
+	return s.ShippingAddress
+}
+
+func (s *SalesOrder) GetTrackingCategories() []*SalesOrderTrackingCategoriesItem {
+	if s == nil {
+		return nil
+	}
+	return s.TrackingCategories
+}
+
+func (s *SalesOrder) GetIssueDate() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.IssueDate
+}
+
+func (s *SalesOrder) GetTransactionNumber() *string {
+	if s == nil {
+		return nil
+	}
+	return s.TransactionNumber
+}
+
+func (s *SalesOrder) GetTotal() *float64 {
+	if s == nil {
+		return nil
+	}
+	return s.Total
+}
+
+func (s *SalesOrder) GetLines() []*SalesOrderLinesItem {
+	if s == nil {
+		return nil
+	}
+	return s.Lines
+}
+
+func (s *SalesOrder) GetRemoteCreatedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteCreatedAt
+}
+
+func (s *SalesOrder) GetRemoteUpdatedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteUpdatedAt
+}
+
+func (s *SalesOrder) GetRemoteWasDeleted() *bool {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteWasDeleted
+}
+
+func (s *SalesOrder) GetFieldMappings() map[string]interface{} {
+	if s == nil {
+		return nil
+	}
+	return s.FieldMappings
+}
+
+func (s *SalesOrder) GetRemoteData() []*RemoteData {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteData
+}
+
+func (s *SalesOrder) GetRemoteFields() []*RemoteField {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteFields
+}
+
+func (s *SalesOrder) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *SalesOrder) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetId(id *string) {
+	s.Id = id
+	s.require(salesOrderFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetRemoteId(remoteId *string) {
+	s.RemoteId = remoteId
+	s.require(salesOrderFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetCreatedAt(createdAt *time.Time) {
+	s.CreatedAt = createdAt
+	s.require(salesOrderFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetModifiedAt(modifiedAt *time.Time) {
+	s.ModifiedAt = modifiedAt
+	s.require(salesOrderFieldModifiedAt)
+}
+
+// SetCustomer sets the Customer field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetCustomer(customer *SalesOrderCustomer) {
+	s.Customer = customer
+	s.require(salesOrderFieldCustomer)
+}
+
+// SetCurrency sets the Currency field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetCurrency(currency *SalesOrderCurrency) {
+	s.Currency = currency
+	s.require(salesOrderFieldCurrency)
+}
+
+// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetExchangeRate(exchangeRate *string) {
+	s.ExchangeRate = exchangeRate
+	s.require(salesOrderFieldExchangeRate)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetCompany(company *SalesOrderCompany) {
+	s.Company = company
+	s.require(salesOrderFieldCompany)
+}
+
+// SetSalesOrderUrl sets the SalesOrderUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetSalesOrderUrl(salesOrderUrl *string) {
+	s.SalesOrderUrl = salesOrderUrl
+	s.require(salesOrderFieldSalesOrderUrl)
+}
+
+// SetStatus sets the Status field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetStatus(status *SalesOrderStatus) {
+	s.Status = status
+	s.require(salesOrderFieldStatus)
+}
+
+// SetPaymentTerm sets the PaymentTerm field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetPaymentTerm(paymentTerm *SalesOrderPaymentTerm) {
+	s.PaymentTerm = paymentTerm
+	s.require(salesOrderFieldPaymentTerm)
+}
+
+// SetMemo sets the Memo field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetMemo(memo *string) {
+	s.Memo = memo
+	s.require(salesOrderFieldMemo)
+}
+
+// SetShippingAddress sets the ShippingAddress field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetShippingAddress(shippingAddress *SalesOrderShippingAddress) {
+	s.ShippingAddress = shippingAddress
+	s.require(salesOrderFieldShippingAddress)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetTrackingCategories(trackingCategories []*SalesOrderTrackingCategoriesItem) {
+	s.TrackingCategories = trackingCategories
+	s.require(salesOrderFieldTrackingCategories)
+}
+
+// SetIssueDate sets the IssueDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetIssueDate(issueDate *time.Time) {
+	s.IssueDate = issueDate
+	s.require(salesOrderFieldIssueDate)
+}
+
+// SetTransactionNumber sets the TransactionNumber field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetTransactionNumber(transactionNumber *string) {
+	s.TransactionNumber = transactionNumber
+	s.require(salesOrderFieldTransactionNumber)
+}
+
+// SetTotal sets the Total field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetTotal(total *float64) {
+	s.Total = total
+	s.require(salesOrderFieldTotal)
+}
+
+// SetLines sets the Lines field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetLines(lines []*SalesOrderLinesItem) {
+	s.Lines = lines
+	s.require(salesOrderFieldLines)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	s.RemoteCreatedAt = remoteCreatedAt
+	s.require(salesOrderFieldRemoteCreatedAt)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	s.RemoteUpdatedAt = remoteUpdatedAt
+	s.require(salesOrderFieldRemoteUpdatedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	s.RemoteWasDeleted = remoteWasDeleted
+	s.require(salesOrderFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetFieldMappings(fieldMappings map[string]interface{}) {
+	s.FieldMappings = fieldMappings
+	s.require(salesOrderFieldFieldMappings)
+}
+
+// SetRemoteData sets the RemoteData field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetRemoteData(remoteData []*RemoteData) {
+	s.RemoteData = remoteData
+	s.require(salesOrderFieldRemoteData)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrder) SetRemoteFields(remoteFields []*RemoteField) {
+	s.RemoteFields = remoteFields
+	s.require(salesOrderFieldRemoteFields)
+}
+
+func (s *SalesOrder) UnmarshalJSON(data []byte) error {
+	type embed SalesOrder
+	var unmarshaler = struct {
+		embed
+		CreatedAt       *internal.DateTime `json:"created_at,omitempty"`
+		ModifiedAt      *internal.DateTime `json:"modified_at,omitempty"`
+		IssueDate       *internal.DateTime `json:"issue_date,omitempty"`
+		RemoteCreatedAt *internal.DateTime `json:"remote_created_at,omitempty"`
+		RemoteUpdatedAt *internal.DateTime `json:"remote_updated_at,omitempty"`
+	}{
+		embed: embed(*s),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*s = SalesOrder(unmarshaler.embed)
+	s.CreatedAt = unmarshaler.CreatedAt.TimePtr()
+	s.ModifiedAt = unmarshaler.ModifiedAt.TimePtr()
+	s.IssueDate = unmarshaler.IssueDate.TimePtr()
+	s.RemoteCreatedAt = unmarshaler.RemoteCreatedAt.TimePtr()
+	s.RemoteUpdatedAt = unmarshaler.RemoteUpdatedAt.TimePtr()
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *SalesOrder) MarshalJSON() ([]byte, error) {
+	type embed SalesOrder
+	var marshaler = struct {
+		embed
+		CreatedAt       *internal.DateTime `json:"created_at,omitempty"`
+		ModifiedAt      *internal.DateTime `json:"modified_at,omitempty"`
+		IssueDate       *internal.DateTime `json:"issue_date,omitempty"`
+		RemoteCreatedAt *internal.DateTime `json:"remote_created_at,omitempty"`
+		RemoteUpdatedAt *internal.DateTime `json:"remote_updated_at,omitempty"`
+	}{
+		embed:           embed(*s),
+		CreatedAt:       internal.NewOptionalDateTime(s.CreatedAt),
+		ModifiedAt:      internal.NewOptionalDateTime(s.ModifiedAt),
+		IssueDate:       internal.NewOptionalDateTime(s.IssueDate),
+		RemoteCreatedAt: internal.NewOptionalDateTime(s.RemoteCreatedAt),
+		RemoteUpdatedAt: internal.NewOptionalDateTime(s.RemoteUpdatedAt),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, s.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (s *SalesOrder) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// The subsidiary associated with the order.
+type SalesOrderCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (s *SalesOrderCompany) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderCompany) GetCompanyInfo() *CompanyInfo {
+	if s == nil {
+		return nil
+	}
+	return s.CompanyInfo
+}
+
+func (s *SalesOrderCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		s.typ = "CompanyInfo"
+		s.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderCompany) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "CompanyInfo" || s.CompanyInfo != nil {
+		return json.Marshal(s.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (s *SalesOrderCompany) Accept(visitor SalesOrderCompanyVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "CompanyInfo" || s.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(s.CompanyInfo)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// The currency code for the order.
+//
+// * `XUA` - ADB Unit of Account
+// * `AFN` - Afghan Afghani
+// * `AFA` - Afghan Afghani (1927–2002)
+// * `ALL` - Albanian Lek
+// * `ALK` - Albanian Lek (1946–1965)
+// * `DZD` - Algerian Dinar
+// * `ADP` - Andorran Peseta
+// * `AOA` - Angolan Kwanza
+// * `AOK` - Angolan Kwanza (1977–1991)
+// * `AON` - Angolan New Kwanza (1990–2000)
+// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
+// * `ARA` - Argentine Austral
+// * `ARS` - Argentine Peso
+// * `ARM` - Argentine Peso (1881–1970)
+// * `ARP` - Argentine Peso (1983–1985)
+// * `ARL` - Argentine Peso Ley (1970–1983)
+// * `AMD` - Armenian Dram
+// * `AWG` - Aruban Florin
+// * `AUD` - Australian Dollar
+// * `ATS` - Austrian Schilling
+// * `AZN` - Azerbaijani Manat
+// * `AZM` - Azerbaijani Manat (1993–2006)
+// * `BSD` - Bahamian Dollar
+// * `BHD` - Bahraini Dinar
+// * `BDT` - Bangladeshi Taka
+// * `BBD` - Barbadian Dollar
+// * `BYN` - Belarusian Ruble
+// * `BYB` - Belarusian Ruble (1994–1999)
+// * `BYR` - Belarusian Ruble (2000–2016)
+// * `BEF` - Belgian Franc
+// * `BEC` - Belgian Franc (convertible)
+// * `BEL` - Belgian Franc (financial)
+// * `BZD` - Belize Dollar
+// * `BMD` - Bermudan Dollar
+// * `BTN` - Bhutanese Ngultrum
+// * `BOB` - Bolivian Boliviano
+// * `BOL` - Bolivian Boliviano (1863–1963)
+// * `BOV` - Bolivian Mvdol
+// * `BOP` - Bolivian Peso
+// * `BAM` - Bosnia-Herzegovina Convertible Mark
+// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
+// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
+// * `BWP` - Botswanan Pula
+// * `BRC` - Brazilian Cruzado (1986–1989)
+// * `BRZ` - Brazilian Cruzeiro (1942–1967)
+// * `BRE` - Brazilian Cruzeiro (1990–1993)
+// * `BRR` - Brazilian Cruzeiro (1993–1994)
+// * `BRN` - Brazilian New Cruzado (1989–1990)
+// * `BRB` - Brazilian New Cruzeiro (1967–1986)
+// * `BRL` - Brazilian Real
+// * `GBP` - British Pound
+// * `BND` - Brunei Dollar
+// * `BGL` - Bulgarian Hard Lev
+// * `BGN` - Bulgarian Lev
+// * `BGO` - Bulgarian Lev (1879–1952)
+// * `BGM` - Bulgarian Socialist Lev
+// * `BUK` - Burmese Kyat
+// * `BIF` - Burundian Franc
+// * `XPF` - CFP Franc
+// * `KHR` - Cambodian Riel
+// * `CAD` - Canadian Dollar
+// * `CVE` - Cape Verdean Escudo
+// * `KYD` - Cayman Islands Dollar
+// * `XAF` - Central African CFA Franc
+// * `CLE` - Chilean Escudo
+// * `CLP` - Chilean Peso
+// * `CLF` - Chilean Unit of Account (UF)
+// * `CNX` - Chinese People’s Bank Dollar
+// * `CNY` - Chinese Yuan
+// * `CNH` - Chinese Yuan (offshore)
+// * `COP` - Colombian Peso
+// * `COU` - Colombian Real Value Unit
+// * `KMF` - Comorian Franc
+// * `CDF` - Congolese Franc
+// * `CRC` - Costa Rican Colón
+// * `HRD` - Croatian Dinar
+// * `HRK` - Croatian Kuna
+// * `CUC` - Cuban Convertible Peso
+// * `CUP` - Cuban Peso
+// * `CYP` - Cypriot Pound
+// * `CZK` - Czech Koruna
+// * `CSK` - Czechoslovak Hard Koruna
+// * `DKK` - Danish Krone
+// * `DJF` - Djiboutian Franc
+// * `DOP` - Dominican Peso
+// * `NLG` - Dutch Guilder
+// * `XCD` - East Caribbean Dollar
+// * `DDM` - East German Mark
+// * `ECS` - Ecuadorian Sucre
+// * `ECV` - Ecuadorian Unit of Constant Value
+// * `EGP` - Egyptian Pound
+// * `GQE` - Equatorial Guinean Ekwele
+// * `ERN` - Eritrean Nakfa
+// * `EEK` - Estonian Kroon
+// * `ETB` - Ethiopian Birr
+// * `EUR` - Euro
+// * `XBA` - European Composite Unit
+// * `XEU` - European Currency Unit
+// * `XBB` - European Monetary Unit
+// * `XBC` - European Unit of Account (XBC)
+// * `XBD` - European Unit of Account (XBD)
+// * `FKP` - Falkland Islands Pound
+// * `FJD` - Fijian Dollar
+// * `FIM` - Finnish Markka
+// * `FRF` - French Franc
+// * `XFO` - French Gold Franc
+// * `XFU` - French UIC-Franc
+// * `GMD` - Gambian Dalasi
+// * `GEK` - Georgian Kupon Larit
+// * `GEL` - Georgian Lari
+// * `DEM` - German Mark
+// * `GHS` - Ghanaian Cedi
+// * `GHC` - Ghanaian Cedi (1979–2007)
+// * `GIP` - Gibraltar Pound
+// * `XAU` - Gold
+// * `GRD` - Greek Drachma
+// * `GTQ` - Guatemalan Quetzal
+// * `GWP` - Guinea-Bissau Peso
+// * `GNF` - Guinean Franc
+// * `GNS` - Guinean Syli
+// * `GYD` - Guyanaese Dollar
+// * `HTG` - Haitian Gourde
+// * `HNL` - Honduran Lempira
+// * `HKD` - Hong Kong Dollar
+// * `HUF` - Hungarian Forint
+// * `IMP` - IMP
+// * `ISK` - Icelandic Króna
+// * `ISJ` - Icelandic Króna (1918–1981)
+// * `INR` - Indian Rupee
+// * `IDR` - Indonesian Rupiah
+// * `IRR` - Iranian Rial
+// * `IQD` - Iraqi Dinar
+// * `IEP` - Irish Pound
+// * `ILS` - Israeli New Shekel
+// * `ILP` - Israeli Pound
+// * `ILR` - Israeli Shekel (1980–1985)
+// * `ITL` - Italian Lira
+// * `JMD` - Jamaican Dollar
+// * `JPY` - Japanese Yen
+// * `JOD` - Jordanian Dinar
+// * `KZT` - Kazakhstani Tenge
+// * `KES` - Kenyan Shilling
+// * `KWD` - Kuwaiti Dinar
+// * `KGS` - Kyrgystani Som
+// * `LAK` - Laotian Kip
+// * `LVL` - Latvian Lats
+// * `LVR` - Latvian Ruble
+// * `LBP` - Lebanese Pound
+// * `LSL` - Lesotho Loti
+// * `LRD` - Liberian Dollar
+// * `LYD` - Libyan Dinar
+// * `LTL` - Lithuanian Litas
+// * `LTT` - Lithuanian Talonas
+// * `LUL` - Luxembourg Financial Franc
+// * `LUC` - Luxembourgian Convertible Franc
+// * `LUF` - Luxembourgian Franc
+// * `MOP` - Macanese Pataca
+// * `MKD` - Macedonian Denar
+// * `MKN` - Macedonian Denar (1992–1993)
+// * `MGA` - Malagasy Ariary
+// * `MGF` - Malagasy Franc
+// * `MWK` - Malawian Kwacha
+// * `MYR` - Malaysian Ringgit
+// * `MVR` - Maldivian Rufiyaa
+// * `MVP` - Maldivian Rupee (1947–1981)
+// * `MLF` - Malian Franc
+// * `MTL` - Maltese Lira
+// * `MTP` - Maltese Pound
+// * `MRU` - Mauritanian Ouguiya
+// * `MRO` - Mauritanian Ouguiya (1973–2017)
+// * `MUR` - Mauritian Rupee
+// * `MXV` - Mexican Investment Unit
+// * `MXN` - Mexican Peso
+// * `MXP` - Mexican Silver Peso (1861–1992)
+// * `MDC` - Moldovan Cupon
+// * `MDL` - Moldovan Leu
+// * `MCF` - Monegasque Franc
+// * `MNT` - Mongolian Tugrik
+// * `MAD` - Moroccan Dirham
+// * `MAF` - Moroccan Franc
+// * `MZE` - Mozambican Escudo
+// * `MZN` - Mozambican Metical
+// * `MZM` - Mozambican Metical (1980–2006)
+// * `MMK` - Myanmar Kyat
+// * `NAD` - Namibian Dollar
+// * `NPR` - Nepalese Rupee
+// * `ANG` - Netherlands Antillean Guilder
+// * `TWD` - New Taiwan Dollar
+// * `NZD` - New Zealand Dollar
+// * `NIO` - Nicaraguan Córdoba
+// * `NIC` - Nicaraguan Córdoba (1988–1991)
+// * `NGN` - Nigerian Naira
+// * `KPW` - North Korean Won
+// * `NOK` - Norwegian Krone
+// * `OMR` - Omani Rial
+// * `PKR` - Pakistani Rupee
+// * `XPD` - Palladium
+// * `PAB` - Panamanian Balboa
+// * `PGK` - Papua New Guinean Kina
+// * `PYG` - Paraguayan Guarani
+// * `PEI` - Peruvian Inti
+// * `PEN` - Peruvian Sol
+// * `PES` - Peruvian Sol (1863–1965)
+// * `PHP` - Philippine Peso
+// * `XPT` - Platinum
+// * `PLN` - Polish Zloty
+// * `PLZ` - Polish Zloty (1950–1995)
+// * `PTE` - Portuguese Escudo
+// * `GWE` - Portuguese Guinea Escudo
+// * `QAR` - Qatari Rial
+// * `XRE` - RINET Funds
+// * `RHD` - Rhodesian Dollar
+// * `RON` - Romanian Leu
+// * `ROL` - Romanian Leu (1952–2006)
+// * `RUB` - Russian Ruble
+// * `RUR` - Russian Ruble (1991–1998)
+// * `RWF` - Rwandan Franc
+// * `SVC` - Salvadoran Colón
+// * `WST` - Samoan Tala
+// * `SAR` - Saudi Riyal
+// * `RSD` - Serbian Dinar
+// * `CSD` - Serbian Dinar (2002–2006)
+// * `SCR` - Seychellois Rupee
+// * `SLL` - Sierra Leonean Leone
+// * `XAG` - Silver
+// * `SGD` - Singapore Dollar
+// * `SKK` - Slovak Koruna
+// * `SIT` - Slovenian Tolar
+// * `SBD` - Solomon Islands Dollar
+// * `SOS` - Somali Shilling
+// * `ZAR` - South African Rand
+// * `ZAL` - South African Rand (financial)
+// * `KRH` - South Korean Hwan (1953–1962)
+// * `KRW` - South Korean Won
+// * `KRO` - South Korean Won (1945–1953)
+// * `SSP` - South Sudanese Pound
+// * `SUR` - Soviet Rouble
+// * `ESP` - Spanish Peseta
+// * `ESA` - Spanish Peseta (A account)
+// * `ESB` - Spanish Peseta (convertible account)
+// * `XDR` - Special Drawing Rights
+// * `LKR` - Sri Lankan Rupee
+// * `SHP` - St. Helena Pound
+// * `XSU` - Sucre
+// * `SDD` - Sudanese Dinar (1992–2007)
+// * `SDG` - Sudanese Pound
+// * `SDP` - Sudanese Pound (1957–1998)
+// * `SRD` - Surinamese Dollar
+// * `SRG` - Surinamese Guilder
+// * `SZL` - Swazi Lilangeni
+// * `SEK` - Swedish Krona
+// * `CHF` - Swiss Franc
+// * `SYP` - Syrian Pound
+// * `STN` - São Tomé & Príncipe Dobra
+// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
+// * `TVD` - TVD
+// * `TJR` - Tajikistani Ruble
+// * `TJS` - Tajikistani Somoni
+// * `TZS` - Tanzanian Shilling
+// * `XTS` - Testing Currency Code
+// * `THB` - Thai Baht
+// * `XXX` - The codes assigned for transactions where no currency is involved
+// * `TPE` - Timorese Escudo
+// * `TOP` - Tongan Paʻanga
+// * `TTD` - Trinidad & Tobago Dollar
+// * `TND` - Tunisian Dinar
+// * `TRY` - Turkish Lira
+// * `TRL` - Turkish Lira (1922–2005)
+// * `TMT` - Turkmenistani Manat
+// * `TMM` - Turkmenistani Manat (1993–2009)
+// * `USD` - US Dollar
+// * `USN` - US Dollar (Next day)
+// * `USS` - US Dollar (Same day)
+// * `UGX` - Ugandan Shilling
+// * `UGS` - Ugandan Shilling (1966–1987)
+// * `UAH` - Ukrainian Hryvnia
+// * `UAK` - Ukrainian Karbovanets
+// * `AED` - United Arab Emirates Dirham
+// * `UYW` - Uruguayan Nominal Wage Index Unit
+// * `UYU` - Uruguayan Peso
+// * `UYP` - Uruguayan Peso (1975–1993)
+// * `UYI` - Uruguayan Peso (Indexed Units)
+// * `UZS` - Uzbekistani Som
+// * `VUV` - Vanuatu Vatu
+// * `VES` - Venezuelan Bolívar
+// * `VEB` - Venezuelan Bolívar (1871–2008)
+// * `VEF` - Venezuelan Bolívar (2008–2018)
+// * `VND` - Vietnamese Dong
+// * `VNN` - Vietnamese Dong (1978–1985)
+// * `CHE` - WIR Euro
+// * `CHW` - WIR Franc
+// * `XOF` - West African CFA Franc
+// * `YDD` - Yemeni Dinar
+// * `YER` - Yemeni Rial
+// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
+// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
+// * `YUM` - Yugoslavian New Dinar (1994–2002)
+// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
+// * `ZWN` - ZWN
+// * `ZRN` - Zairean New Zaire (1993–1998)
+// * `ZRZ` - Zairean Zaire (1971–1993)
+// * `ZMW` - Zambian Kwacha
+// * `ZMK` - Zambian Kwacha (1968–2012)
+// * `ZWD` - Zimbabwean Dollar (1980–2008)
+// * `ZWR` - Zimbabwean Dollar (2008)
+// * `ZWL` - Zimbabwean Dollar (2009)
+type SalesOrderCurrency struct {
+	TransactionCurrencyEnum TransactionCurrencyEnum
+	String                  string
+
+	typ string
+}
+
+func (s *SalesOrderCurrency) GetTransactionCurrencyEnum() TransactionCurrencyEnum {
+	if s == nil {
+		return ""
+	}
+	return s.TransactionCurrencyEnum
+}
+
+func (s *SalesOrderCurrency) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderCurrency) UnmarshalJSON(data []byte) error {
+	var valueTransactionCurrencyEnum TransactionCurrencyEnum
+	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
+		s.typ = "TransactionCurrencyEnum"
+		s.TransactionCurrencyEnum = valueTransactionCurrencyEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderCurrency) MarshalJSON() ([]byte, error) {
+	if s.typ == "TransactionCurrencyEnum" || s.TransactionCurrencyEnum != "" {
+		return json.Marshal(s.TransactionCurrencyEnum)
+	}
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderCurrencyVisitor interface {
+	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
+	VisitString(string) error
+}
+
+func (s *SalesOrderCurrency) Accept(visitor SalesOrderCurrencyVisitor) error {
+	if s.typ == "TransactionCurrencyEnum" || s.TransactionCurrencyEnum != "" {
+		return visitor.VisitTransactionCurrencyEnum(s.TransactionCurrencyEnum)
+	}
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// The customer associated with the sales order.
+type SalesOrderCustomer struct {
+	String  string
+	Contact *Contact
+
+	typ string
+}
+
+func (s *SalesOrderCustomer) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderCustomer) GetContact() *Contact {
+	if s == nil {
+		return nil
+	}
+	return s.Contact
+}
+
+func (s *SalesOrderCustomer) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueContact := new(Contact)
+	if err := json.Unmarshal(data, &valueContact); err == nil {
+		s.typ = "Contact"
+		s.Contact = valueContact
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderCustomer) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "Contact" || s.Contact != nil {
+		return json.Marshal(s.Contact)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderCustomerVisitor interface {
+	VisitString(string) error
+	VisitContact(*Contact) error
+}
+
+func (s *SalesOrderCustomer) Accept(visitor SalesOrderCustomerVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "Contact" || s.Contact != nil {
+		return visitor.VisitContact(s.Contact)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// # The SalesOrderLine Object
+// ### Description
+// The `SalesOrderLine` object represents a specific line item on a sales order.
+//
+// ### Usage Example
+// Fetch from the `GET SalesOrder` endpoint and view a company's sales order line items.
+var (
+	salesOrderLineFieldId                 = big.NewInt(1 << 0)
+	salesOrderLineFieldRemoteId           = big.NewInt(1 << 1)
+	salesOrderLineFieldCreatedAt          = big.NewInt(1 << 2)
+	salesOrderLineFieldModifiedAt         = big.NewInt(1 << 3)
+	salesOrderLineFieldDescription        = big.NewInt(1 << 4)
+	salesOrderLineFieldUnitPrice          = big.NewInt(1 << 5)
+	salesOrderLineFieldQuantity           = big.NewInt(1 << 6)
+	salesOrderLineFieldItem               = big.NewInt(1 << 7)
+	salesOrderLineFieldTaxRate            = big.NewInt(1 << 8)
+	salesOrderLineFieldTrackingCategories = big.NewInt(1 << 9)
+	salesOrderLineFieldCompany            = big.NewInt(1 << 10)
+	salesOrderLineFieldRemoteCreatedAt    = big.NewInt(1 << 11)
+	salesOrderLineFieldRemoteUpdatedAt    = big.NewInt(1 << 12)
+	salesOrderLineFieldRemoteWasDeleted   = big.NewInt(1 << 13)
+	salesOrderLineFieldRemoteFields       = big.NewInt(1 << 14)
+)
+
+type SalesOrderLine struct {
+	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty" url:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty" url:"modified_at,omitempty"`
+	// Description of the line item.
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+	// The unit price of the item.
+	UnitPrice *string `json:"unit_price,omitempty" url:"unit_price,omitempty"`
+	// Quantity ordered for this line.
+	Quantity *string             `json:"quantity,omitempty" url:"quantity,omitempty"`
+	Item     *SalesOrderLineItem `json:"item,omitempty" url:"item,omitempty"`
+	// The tax rate of the line item.
+	TaxRate *SalesOrderLineTaxRate `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
+	// The dimensions or classification tags.
+	TrackingCategories []*SalesOrderLineTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
+	// The subsidiary associated with the order.
+	Company *SalesOrderLineCompany `json:"company,omitempty" url:"company,omitempty"`
+	// When the third party's sales order line item was created.
+	RemoteCreatedAt *time.Time `json:"remote_created_at,omitempty" url:"remote_created_at,omitempty"`
+	// When the third party's sales order line item was updated.
+	RemoteUpdatedAt *time.Time `json:"remote_updated_at,omitempty" url:"remote_updated_at,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool          `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	RemoteFields     []*RemoteField `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *SalesOrderLine) GetId() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Id
+}
+
+func (s *SalesOrderLine) GetRemoteId() *string {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteId
+}
+
+func (s *SalesOrderLine) GetCreatedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.CreatedAt
+}
+
+func (s *SalesOrderLine) GetModifiedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.ModifiedAt
+}
+
+func (s *SalesOrderLine) GetDescription() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Description
+}
+
+func (s *SalesOrderLine) GetUnitPrice() *string {
+	if s == nil {
+		return nil
+	}
+	return s.UnitPrice
+}
+
+func (s *SalesOrderLine) GetQuantity() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Quantity
+}
+
+func (s *SalesOrderLine) GetItem() *SalesOrderLineItem {
+	if s == nil {
+		return nil
+	}
+	return s.Item
+}
+
+func (s *SalesOrderLine) GetTaxRate() *SalesOrderLineTaxRate {
+	if s == nil {
+		return nil
+	}
+	return s.TaxRate
+}
+
+func (s *SalesOrderLine) GetTrackingCategories() []*SalesOrderLineTrackingCategoriesItem {
+	if s == nil {
+		return nil
+	}
+	return s.TrackingCategories
+}
+
+func (s *SalesOrderLine) GetCompany() *SalesOrderLineCompany {
+	if s == nil {
+		return nil
+	}
+	return s.Company
+}
+
+func (s *SalesOrderLine) GetRemoteCreatedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteCreatedAt
+}
+
+func (s *SalesOrderLine) GetRemoteUpdatedAt() *time.Time {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteUpdatedAt
+}
+
+func (s *SalesOrderLine) GetRemoteWasDeleted() *bool {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteWasDeleted
+}
+
+func (s *SalesOrderLine) GetRemoteFields() []*RemoteField {
+	if s == nil {
+		return nil
+	}
+	return s.RemoteFields
+}
+
+func (s *SalesOrderLine) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *SalesOrderLine) require(field *big.Int) {
+	if s.explicitFields == nil {
+		s.explicitFields = big.NewInt(0)
+	}
+	s.explicitFields.Or(s.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetId(id *string) {
+	s.Id = id
+	s.require(salesOrderLineFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetRemoteId(remoteId *string) {
+	s.RemoteId = remoteId
+	s.require(salesOrderLineFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetCreatedAt(createdAt *time.Time) {
+	s.CreatedAt = createdAt
+	s.require(salesOrderLineFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetModifiedAt(modifiedAt *time.Time) {
+	s.ModifiedAt = modifiedAt
+	s.require(salesOrderLineFieldModifiedAt)
+}
+
+// SetDescription sets the Description field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetDescription(description *string) {
+	s.Description = description
+	s.require(salesOrderLineFieldDescription)
+}
+
+// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetUnitPrice(unitPrice *string) {
+	s.UnitPrice = unitPrice
+	s.require(salesOrderLineFieldUnitPrice)
+}
+
+// SetQuantity sets the Quantity field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetQuantity(quantity *string) {
+	s.Quantity = quantity
+	s.require(salesOrderLineFieldQuantity)
+}
+
+// SetItem sets the Item field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetItem(item *SalesOrderLineItem) {
+	s.Item = item
+	s.require(salesOrderLineFieldItem)
+}
+
+// SetTaxRate sets the TaxRate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetTaxRate(taxRate *SalesOrderLineTaxRate) {
+	s.TaxRate = taxRate
+	s.require(salesOrderLineFieldTaxRate)
+}
+
+// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetTrackingCategories(trackingCategories []*SalesOrderLineTrackingCategoriesItem) {
+	s.TrackingCategories = trackingCategories
+	s.require(salesOrderLineFieldTrackingCategories)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetCompany(company *SalesOrderLineCompany) {
+	s.Company = company
+	s.require(salesOrderLineFieldCompany)
+}
+
+// SetRemoteCreatedAt sets the RemoteCreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetRemoteCreatedAt(remoteCreatedAt *time.Time) {
+	s.RemoteCreatedAt = remoteCreatedAt
+	s.require(salesOrderLineFieldRemoteCreatedAt)
+}
+
+// SetRemoteUpdatedAt sets the RemoteUpdatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetRemoteUpdatedAt(remoteUpdatedAt *time.Time) {
+	s.RemoteUpdatedAt = remoteUpdatedAt
+	s.require(salesOrderLineFieldRemoteUpdatedAt)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	s.RemoteWasDeleted = remoteWasDeleted
+	s.require(salesOrderLineFieldRemoteWasDeleted)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (s *SalesOrderLine) SetRemoteFields(remoteFields []*RemoteField) {
+	s.RemoteFields = remoteFields
+	s.require(salesOrderLineFieldRemoteFields)
+}
+
+func (s *SalesOrderLine) UnmarshalJSON(data []byte) error {
+	type embed SalesOrderLine
+	var unmarshaler = struct {
+		embed
+		CreatedAt       *internal.DateTime `json:"created_at,omitempty"`
+		ModifiedAt      *internal.DateTime `json:"modified_at,omitempty"`
+		RemoteCreatedAt *internal.DateTime `json:"remote_created_at,omitempty"`
+		RemoteUpdatedAt *internal.DateTime `json:"remote_updated_at,omitempty"`
+	}{
+		embed: embed(*s),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*s = SalesOrderLine(unmarshaler.embed)
+	s.CreatedAt = unmarshaler.CreatedAt.TimePtr()
+	s.ModifiedAt = unmarshaler.ModifiedAt.TimePtr()
+	s.RemoteCreatedAt = unmarshaler.RemoteCreatedAt.TimePtr()
+	s.RemoteUpdatedAt = unmarshaler.RemoteUpdatedAt.TimePtr()
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *SalesOrderLine) MarshalJSON() ([]byte, error) {
+	type embed SalesOrderLine
+	var marshaler = struct {
+		embed
+		CreatedAt       *internal.DateTime `json:"created_at,omitempty"`
+		ModifiedAt      *internal.DateTime `json:"modified_at,omitempty"`
+		RemoteCreatedAt *internal.DateTime `json:"remote_created_at,omitempty"`
+		RemoteUpdatedAt *internal.DateTime `json:"remote_updated_at,omitempty"`
+	}{
+		embed:           embed(*s),
+		CreatedAt:       internal.NewOptionalDateTime(s.CreatedAt),
+		ModifiedAt:      internal.NewOptionalDateTime(s.ModifiedAt),
+		RemoteCreatedAt: internal.NewOptionalDateTime(s.RemoteCreatedAt),
+		RemoteUpdatedAt: internal.NewOptionalDateTime(s.RemoteUpdatedAt),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, s.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (s *SalesOrderLine) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+// The subsidiary associated with the order.
+type SalesOrderLineCompany struct {
+	String      string
+	CompanyInfo *CompanyInfo
+
+	typ string
+}
+
+func (s *SalesOrderLineCompany) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderLineCompany) GetCompanyInfo() *CompanyInfo {
+	if s == nil {
+		return nil
+	}
+	return s.CompanyInfo
+}
+
+func (s *SalesOrderLineCompany) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueCompanyInfo := new(CompanyInfo)
+	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
+		s.typ = "CompanyInfo"
+		s.CompanyInfo = valueCompanyInfo
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderLineCompany) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "CompanyInfo" || s.CompanyInfo != nil {
+		return json.Marshal(s.CompanyInfo)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLineCompanyVisitor interface {
+	VisitString(string) error
+	VisitCompanyInfo(*CompanyInfo) error
+}
+
+func (s *SalesOrderLineCompany) Accept(visitor SalesOrderLineCompanyVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "CompanyInfo" || s.CompanyInfo != nil {
+		return visitor.VisitCompanyInfo(s.CompanyInfo)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLineItem struct {
+	String string
+	Item   *Item
+
+	typ string
+}
+
+func (s *SalesOrderLineItem) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderLineItem) GetItem() *Item {
+	if s == nil {
+		return nil
+	}
+	return s.Item
+}
+
+func (s *SalesOrderLineItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueItem := new(Item)
+	if err := json.Unmarshal(data, &valueItem); err == nil {
+		s.typ = "Item"
+		s.Item = valueItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderLineItem) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "Item" || s.Item != nil {
+		return json.Marshal(s.Item)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLineItemVisitor interface {
+	VisitString(string) error
+	VisitItem(*Item) error
+}
+
+func (s *SalesOrderLineItem) Accept(visitor SalesOrderLineItemVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "Item" || s.Item != nil {
+		return visitor.VisitItem(s.Item)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// The tax rate of the line item.
+type SalesOrderLineTaxRate struct {
+	String  string
+	TaxRate *TaxRate
+
+	typ string
+}
+
+func (s *SalesOrderLineTaxRate) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderLineTaxRate) GetTaxRate() *TaxRate {
+	if s == nil {
+		return nil
+	}
+	return s.TaxRate
+}
+
+func (s *SalesOrderLineTaxRate) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueTaxRate := new(TaxRate)
+	if err := json.Unmarshal(data, &valueTaxRate); err == nil {
+		s.typ = "TaxRate"
+		s.TaxRate = valueTaxRate
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderLineTaxRate) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "TaxRate" || s.TaxRate != nil {
+		return json.Marshal(s.TaxRate)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLineTaxRateVisitor interface {
+	VisitString(string) error
+	VisitTaxRate(*TaxRate) error
+}
+
+func (s *SalesOrderLineTaxRate) Accept(visitor SalesOrderLineTaxRateVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "TaxRate" || s.TaxRate != nil {
+		return visitor.VisitTaxRate(s.TaxRate)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLineTrackingCategoriesItem struct {
+	String           string
+	TrackingCategory *TrackingCategory
+
+	typ string
+}
+
+func (s *SalesOrderLineTrackingCategoriesItem) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderLineTrackingCategoriesItem) GetTrackingCategory() *TrackingCategory {
+	if s == nil {
+		return nil
+	}
+	return s.TrackingCategory
+}
+
+func (s *SalesOrderLineTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		s.typ = "TrackingCategory"
+		s.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderLineTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "TrackingCategory" || s.TrackingCategory != nil {
+		return json.Marshal(s.TrackingCategory)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLineTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (s *SalesOrderLineTrackingCategoriesItem) Accept(visitor SalesOrderLineTrackingCategoriesItemVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "TrackingCategory" || s.TrackingCategory != nil {
+		return visitor.VisitTrackingCategory(s.TrackingCategory)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLinesItem struct {
+	String         string
+	SalesOrderLine *SalesOrderLine
+
+	typ string
+}
+
+func (s *SalesOrderLinesItem) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderLinesItem) GetSalesOrderLine() *SalesOrderLine {
+	if s == nil {
+		return nil
+	}
+	return s.SalesOrderLine
+}
+
+func (s *SalesOrderLinesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueSalesOrderLine := new(SalesOrderLine)
+	if err := json.Unmarshal(data, &valueSalesOrderLine); err == nil {
+		s.typ = "SalesOrderLine"
+		s.SalesOrderLine = valueSalesOrderLine
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderLinesItem) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "SalesOrderLine" || s.SalesOrderLine != nil {
+		return json.Marshal(s.SalesOrderLine)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderLinesItemVisitor interface {
+	VisitString(string) error
+	VisitSalesOrderLine(*SalesOrderLine) error
+}
+
+func (s *SalesOrderLinesItem) Accept(visitor SalesOrderLinesItemVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "SalesOrderLine" || s.SalesOrderLine != nil {
+		return visitor.VisitSalesOrderLine(s.SalesOrderLine)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// The payment terms applied to this order.
+type SalesOrderPaymentTerm struct {
+	String      string
+	PaymentTerm *PaymentTerm
+
+	typ string
+}
+
+func (s *SalesOrderPaymentTerm) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderPaymentTerm) GetPaymentTerm() *PaymentTerm {
+	if s == nil {
+		return nil
+	}
+	return s.PaymentTerm
+}
+
+func (s *SalesOrderPaymentTerm) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valuePaymentTerm := new(PaymentTerm)
+	if err := json.Unmarshal(data, &valuePaymentTerm); err == nil {
+		s.typ = "PaymentTerm"
+		s.PaymentTerm = valuePaymentTerm
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderPaymentTerm) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "PaymentTerm" || s.PaymentTerm != nil {
+		return json.Marshal(s.PaymentTerm)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderPaymentTermVisitor interface {
+	VisitString(string) error
+	VisitPaymentTerm(*PaymentTerm) error
+}
+
+func (s *SalesOrderPaymentTerm) Accept(visitor SalesOrderPaymentTermVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "PaymentTerm" || s.PaymentTerm != nil {
+		return visitor.VisitPaymentTerm(s.PaymentTerm)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// The shipping address for the order.
+type SalesOrderShippingAddress struct {
+	String  string
+	Address *Address
+
+	typ string
+}
+
+func (s *SalesOrderShippingAddress) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderShippingAddress) GetAddress() *Address {
+	if s == nil {
+		return nil
+	}
+	return s.Address
+}
+
+func (s *SalesOrderShippingAddress) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueAddress := new(Address)
+	if err := json.Unmarshal(data, &valueAddress); err == nil {
+		s.typ = "Address"
+		s.Address = valueAddress
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderShippingAddress) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "Address" || s.Address != nil {
+		return json.Marshal(s.Address)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderShippingAddressVisitor interface {
+	VisitString(string) error
+	VisitAddress(*Address) error
+}
+
+func (s *SalesOrderShippingAddress) Accept(visitor SalesOrderShippingAddressVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "Address" || s.Address != nil {
+		return visitor.VisitAddress(s.Address)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// The status of the sales order.
+//
+// * `DRAFT` - DRAFT
+// * `PENDING_APPROVAL` - PENDING_APPROVAL
+// * `OPEN` - OPEN
+// * `PARTIALLY_COMPLETED` - PARTIALLY_COMPLETED
+// * `COMPLETED` - COMPLETED
+// * `CLOSED` - CLOSED
+type SalesOrderStatus struct {
+	SalesOrderStatusEnum SalesOrderStatusEnum
+	String               string
+
+	typ string
+}
+
+func (s *SalesOrderStatus) GetSalesOrderStatusEnum() SalesOrderStatusEnum {
+	if s == nil {
+		return ""
+	}
+	return s.SalesOrderStatusEnum
+}
+
+func (s *SalesOrderStatus) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderStatus) UnmarshalJSON(data []byte) error {
+	var valueSalesOrderStatusEnum SalesOrderStatusEnum
+	if err := json.Unmarshal(data, &valueSalesOrderStatusEnum); err == nil {
+		s.typ = "SalesOrderStatusEnum"
+		s.SalesOrderStatusEnum = valueSalesOrderStatusEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderStatus) MarshalJSON() ([]byte, error) {
+	if s.typ == "SalesOrderStatusEnum" || s.SalesOrderStatusEnum != "" {
+		return json.Marshal(s.SalesOrderStatusEnum)
+	}
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderStatusVisitor interface {
+	VisitSalesOrderStatusEnum(SalesOrderStatusEnum) error
+	VisitString(string) error
+}
+
+func (s *SalesOrderStatus) Accept(visitor SalesOrderStatusVisitor) error {
+	if s.typ == "SalesOrderStatusEnum" || s.SalesOrderStatusEnum != "" {
+		return visitor.VisitSalesOrderStatusEnum(s.SalesOrderStatusEnum)
+	}
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+// * `DRAFT` - DRAFT
+// * `PENDING_APPROVAL` - PENDING_APPROVAL
+// * `OPEN` - OPEN
+// * `PARTIALLY_COMPLETED` - PARTIALLY_COMPLETED
+// * `COMPLETED` - COMPLETED
+// * `CLOSED` - CLOSED
+type SalesOrderStatusEnum string
+
+const (
+	SalesOrderStatusEnumDraft              SalesOrderStatusEnum = "DRAFT"
+	SalesOrderStatusEnumPendingApproval    SalesOrderStatusEnum = "PENDING_APPROVAL"
+	SalesOrderStatusEnumOpen               SalesOrderStatusEnum = "OPEN"
+	SalesOrderStatusEnumPartiallyCompleted SalesOrderStatusEnum = "PARTIALLY_COMPLETED"
+	SalesOrderStatusEnumCompleted          SalesOrderStatusEnum = "COMPLETED"
+	SalesOrderStatusEnumClosed             SalesOrderStatusEnum = "CLOSED"
+)
+
+func NewSalesOrderStatusEnumFromString(s string) (SalesOrderStatusEnum, error) {
+	switch s {
+	case "DRAFT":
+		return SalesOrderStatusEnumDraft, nil
+	case "PENDING_APPROVAL":
+		return SalesOrderStatusEnumPendingApproval, nil
+	case "OPEN":
+		return SalesOrderStatusEnumOpen, nil
+	case "PARTIALLY_COMPLETED":
+		return SalesOrderStatusEnumPartiallyCompleted, nil
+	case "COMPLETED":
+		return SalesOrderStatusEnumCompleted, nil
+	case "CLOSED":
+		return SalesOrderStatusEnumClosed, nil
+	}
+	var t SalesOrderStatusEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SalesOrderStatusEnum) Ptr() *SalesOrderStatusEnum {
+	return &s
+}
+
+type SalesOrderTrackingCategoriesItem struct {
+	String           string
+	TrackingCategory *TrackingCategory
+
+	typ string
+}
+
+func (s *SalesOrderTrackingCategoriesItem) GetString() string {
+	if s == nil {
+		return ""
+	}
+	return s.String
+}
+
+func (s *SalesOrderTrackingCategoriesItem) GetTrackingCategory() *TrackingCategory {
+	if s == nil {
+		return nil
+	}
+	return s.TrackingCategory
+}
+
+func (s *SalesOrderTrackingCategoriesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		s.typ = "String"
+		s.String = valueString
+		return nil
+	}
+	valueTrackingCategory := new(TrackingCategory)
+	if err := json.Unmarshal(data, &valueTrackingCategory); err == nil {
+		s.typ = "TrackingCategory"
+		s.TrackingCategory = valueTrackingCategory
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
+}
+
+func (s SalesOrderTrackingCategoriesItem) MarshalJSON() ([]byte, error) {
+	if s.typ == "String" || s.String != "" {
+		return json.Marshal(s.String)
+	}
+	if s.typ == "TrackingCategory" || s.TrackingCategory != nil {
+		return json.Marshal(s.TrackingCategory)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
+}
+
+type SalesOrderTrackingCategoriesItemVisitor interface {
+	VisitString(string) error
+	VisitTrackingCategory(*TrackingCategory) error
+}
+
+func (s *SalesOrderTrackingCategoriesItem) Accept(visitor SalesOrderTrackingCategoriesItemVisitor) error {
+	if s.typ == "String" || s.String != "" {
+		return visitor.VisitString(s.String)
+	}
+	if s.typ == "TrackingCategory" || s.TrackingCategory != nil {
+		return visitor.VisitTrackingCategory(s.TrackingCategory)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", s)
 }
 
 // * `IN_NEXT_SYNC` - IN_NEXT_SYNC
@@ -24741,7 +32849,7 @@ type TaxRate struct {
 	// The tax rate’s effective tax rate - total amount of tax with compounding.
 	EffectiveTaxRate *float64 `json:"effective_tax_rate,omitempty" url:"effective_tax_rate,omitempty"`
 	// The related tax components of the tax rate.
-	TaxComponents []*TaxRateTaxComponentsItem `json:"tax_components,omitempty" url:"tax_components,omitempty"`
+	TaxComponents []*TaxComponent `json:"tax_components,omitempty" url:"tax_components,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
@@ -24838,7 +32946,7 @@ func (t *TaxRate) GetEffectiveTaxRate() *float64 {
 	return t.EffectiveTaxRate
 }
 
-func (t *TaxRate) GetTaxComponents() []*TaxRateTaxComponentsItem {
+func (t *TaxRate) GetTaxComponents() []*TaxComponent {
 	if t == nil {
 		return nil
 	}
@@ -24963,7 +33071,7 @@ func (t *TaxRate) SetEffectiveTaxRate(effectiveTaxRate *float64) {
 
 // SetTaxComponents sets the TaxComponents field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (t *TaxRate) SetTaxComponents(taxComponents []*TaxRateTaxComponentsItem) {
+func (t *TaxRate) SetTaxComponents(taxComponents []*TaxComponent) {
 	t.TaxComponents = taxComponents
 	t.require(taxRateFieldTaxComponents)
 }
@@ -25169,68 +33277,6 @@ func (t *TaxRateStatus) Accept(visitor TaxRateStatusVisitor) error {
 	return fmt.Errorf("type %T does not include a non-empty union type", t)
 }
 
-type TaxRateTaxComponentsItem struct {
-	String       string
-	TaxComponent *TaxComponent
-
-	typ string
-}
-
-func (t *TaxRateTaxComponentsItem) GetString() string {
-	if t == nil {
-		return ""
-	}
-	return t.String
-}
-
-func (t *TaxRateTaxComponentsItem) GetTaxComponent() *TaxComponent {
-	if t == nil {
-		return nil
-	}
-	return t.TaxComponent
-}
-
-func (t *TaxRateTaxComponentsItem) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		t.typ = "String"
-		t.String = valueString
-		return nil
-	}
-	valueTaxComponent := new(TaxComponent)
-	if err := json.Unmarshal(data, &valueTaxComponent); err == nil {
-		t.typ = "TaxComponent"
-		t.TaxComponent = valueTaxComponent
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
-}
-
-func (t TaxRateTaxComponentsItem) MarshalJSON() ([]byte, error) {
-	if t.typ == "String" || t.String != "" {
-		return json.Marshal(t.String)
-	}
-	if t.typ == "TaxComponent" || t.TaxComponent != nil {
-		return json.Marshal(t.TaxComponent)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", t)
-}
-
-type TaxRateTaxComponentsItemVisitor interface {
-	VisitString(string) error
-	VisitTaxComponent(*TaxComponent) error
-}
-
-func (t *TaxRateTaxComponentsItem) Accept(visitor TaxRateTaxComponentsItemVisitor) error {
-	if t.typ == "String" || t.String != "" {
-		return visitor.VisitString(t.String)
-	}
-	if t.typ == "TaxComponent" || t.TaxComponent != nil {
-		return visitor.VisitTaxComponent(t.TaxComponent)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", t)
-}
-
 // # The TrackingCategory Object
 // ### Description
 // A `TrackingCategory` object represents a categorization method used to classify transactions within an accounting platform. They are often used to group records for reporting and analysis purposes. The most common types of `TrackingCategories` are Classes and Departments.
@@ -25238,17 +33284,18 @@ func (t *TaxRateTaxComponentsItem) Accept(visitor TaxRateTaxComponentsItemVisito
 // ### Usage Example
 // Fetch from the `GET TrackingCategory` endpoint and view a company's tracking category.
 var (
-	trackingCategoryFieldId               = big.NewInt(1 << 0)
-	trackingCategoryFieldRemoteId         = big.NewInt(1 << 1)
-	trackingCategoryFieldCreatedAt        = big.NewInt(1 << 2)
-	trackingCategoryFieldModifiedAt       = big.NewInt(1 << 3)
-	trackingCategoryFieldName             = big.NewInt(1 << 4)
-	trackingCategoryFieldStatus           = big.NewInt(1 << 5)
-	trackingCategoryFieldCategoryType     = big.NewInt(1 << 6)
-	trackingCategoryFieldParentCategory   = big.NewInt(1 << 7)
-	trackingCategoryFieldCompany          = big.NewInt(1 << 8)
-	trackingCategoryFieldRemoteWasDeleted = big.NewInt(1 << 9)
-	trackingCategoryFieldFieldMappings    = big.NewInt(1 << 10)
+	trackingCategoryFieldId                  = big.NewInt(1 << 0)
+	trackingCategoryFieldRemoteId            = big.NewInt(1 << 1)
+	trackingCategoryFieldCreatedAt           = big.NewInt(1 << 2)
+	trackingCategoryFieldModifiedAt          = big.NewInt(1 << 3)
+	trackingCategoryFieldName                = big.NewInt(1 << 4)
+	trackingCategoryFieldStatus              = big.NewInt(1 << 5)
+	trackingCategoryFieldCategoryType        = big.NewInt(1 << 6)
+	trackingCategoryFieldParentCategory      = big.NewInt(1 << 7)
+	trackingCategoryFieldCompany             = big.NewInt(1 << 8)
+	trackingCategoryFieldRemoteWasDeleted    = big.NewInt(1 << 9)
+	trackingCategoryFieldFieldMappings       = big.NewInt(1 << 10)
+	trackingCategoryFieldTrackingCategoryUrl = big.NewInt(1 << 11)
 )
 
 type TrackingCategory struct {
@@ -25277,6 +33324,8 @@ type TrackingCategory struct {
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
 	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
+	// The 3rd party URL of the tracking category.
+	TrackingCategoryUrl *string `json:"tracking_category_url,omitempty" url:"tracking_category_url,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -25360,6 +33409,13 @@ func (t *TrackingCategory) GetFieldMappings() map[string]interface{} {
 		return nil
 	}
 	return t.FieldMappings
+}
+
+func (t *TrackingCategory) GetTrackingCategoryUrl() *string {
+	if t == nil {
+		return nil
+	}
+	return t.TrackingCategoryUrl
 }
 
 func (t *TrackingCategory) GetExtraProperties() map[string]interface{} {
@@ -25448,6 +33504,13 @@ func (t *TrackingCategory) SetRemoteWasDeleted(remoteWasDeleted *bool) {
 func (t *TrackingCategory) SetFieldMappings(fieldMappings map[string]interface{}) {
 	t.FieldMappings = fieldMappings
 	t.require(trackingCategoryFieldFieldMappings)
+}
+
+// SetTrackingCategoryUrl sets the TrackingCategoryUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *TrackingCategory) SetTrackingCategoryUrl(trackingCategoryUrl *string) {
+	t.TrackingCategoryUrl = trackingCategoryUrl
+	t.require(trackingCategoryFieldTrackingCategoryUrl)
 }
 
 func (t *TrackingCategory) UnmarshalJSON(data []byte) error {
@@ -27072,6 +35135,7 @@ var (
 	vendorCreditFieldAccountingPeriod   = big.NewInt(1 << 16)
 	vendorCreditFieldFieldMappings      = big.NewInt(1 << 17)
 	vendorCreditFieldRemoteData         = big.NewInt(1 << 18)
+	vendorCreditFieldVendorCreditUrl    = big.NewInt(1 << 19)
 )
 
 type VendorCredit struct {
@@ -27405,7 +35469,7 @@ type VendorCredit struct {
 	InclusiveOfTax *bool `json:"inclusive_of_tax,omitempty" url:"inclusive_of_tax,omitempty"`
 	// The company the vendor credit belongs to.
 	Company            *VendorCreditCompany                  `json:"company,omitempty" url:"company,omitempty"`
-	Lines              []*VendorCreditLine                   `json:"lines,omitempty" url:"lines,omitempty"`
+	Lines              []*VendorCreditLinesItem              `json:"lines,omitempty" url:"lines,omitempty"`
 	TrackingCategories []*VendorCreditTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
 	// A list of VendorCredit Applied to Lines objects.
 	AppliedToLines []*VendorCreditApplyLineForVendorCredit `json:"applied_to_lines,omitempty" url:"applied_to_lines,omitempty"`
@@ -27415,6 +35479,8 @@ type VendorCredit struct {
 	AccountingPeriod *VendorCreditAccountingPeriod `json:"accounting_period,omitempty" url:"accounting_period,omitempty"`
 	FieldMappings    map[string]interface{}        `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
 	RemoteData       []*RemoteData                 `json:"remote_data,omitempty" url:"remote_data,omitempty"`
+	// The 3rd party URL of the vendor credit.
+	VendorCreditUrl *string `json:"vendor_credit_url,omitempty" url:"vendor_credit_url,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -27507,7 +35573,7 @@ func (v *VendorCredit) GetCompany() *VendorCreditCompany {
 	return v.Company
 }
 
-func (v *VendorCredit) GetLines() []*VendorCreditLine {
+func (v *VendorCredit) GetLines() []*VendorCreditLinesItem {
 	if v == nil {
 		return nil
 	}
@@ -27554,6 +35620,13 @@ func (v *VendorCredit) GetRemoteData() []*RemoteData {
 		return nil
 	}
 	return v.RemoteData
+}
+
+func (v *VendorCredit) GetVendorCreditUrl() *string {
+	if v == nil {
+		return nil
+	}
+	return v.VendorCreditUrl
 }
 
 func (v *VendorCredit) GetExtraProperties() map[string]interface{} {
@@ -27653,7 +35726,7 @@ func (v *VendorCredit) SetCompany(company *VendorCreditCompany) {
 
 // SetLines sets the Lines field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (v *VendorCredit) SetLines(lines []*VendorCreditLine) {
+func (v *VendorCredit) SetLines(lines []*VendorCreditLinesItem) {
 	v.Lines = lines
 	v.require(vendorCreditFieldLines)
 }
@@ -27698,6 +35771,13 @@ func (v *VendorCredit) SetFieldMappings(fieldMappings map[string]interface{}) {
 func (v *VendorCredit) SetRemoteData(remoteData []*RemoteData) {
 	v.RemoteData = remoteData
 	v.require(vendorCreditFieldRemoteData)
+}
+
+// SetVendorCreditUrl sets the VendorCreditUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (v *VendorCredit) SetVendorCreditUrl(vendorCreditUrl *string) {
+	v.VendorCreditUrl = vendorCreditUrl
+	v.require(vendorCreditFieldVendorCreditUrl)
 }
 
 func (v *VendorCredit) UnmarshalJSON(data []byte) error {
@@ -29770,6 +37850,68 @@ func (v *VendorCreditLineRequestProject) Accept(visitor VendorCreditLineRequestP
 	return fmt.Errorf("type %T does not include a non-empty union type", v)
 }
 
+type VendorCreditLinesItem struct {
+	String           string
+	VendorCreditLine *VendorCreditLine
+
+	typ string
+}
+
+func (v *VendorCreditLinesItem) GetString() string {
+	if v == nil {
+		return ""
+	}
+	return v.String
+}
+
+func (v *VendorCreditLinesItem) GetVendorCreditLine() *VendorCreditLine {
+	if v == nil {
+		return nil
+	}
+	return v.VendorCreditLine
+}
+
+func (v *VendorCreditLinesItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		v.typ = "String"
+		v.String = valueString
+		return nil
+	}
+	valueVendorCreditLine := new(VendorCreditLine)
+	if err := json.Unmarshal(data, &valueVendorCreditLine); err == nil {
+		v.typ = "VendorCreditLine"
+		v.VendorCreditLine = valueVendorCreditLine
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, v)
+}
+
+func (v VendorCreditLinesItem) MarshalJSON() ([]byte, error) {
+	if v.typ == "String" || v.String != "" {
+		return json.Marshal(v.String)
+	}
+	if v.typ == "VendorCreditLine" || v.VendorCreditLine != nil {
+		return json.Marshal(v.VendorCreditLine)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", v)
+}
+
+type VendorCreditLinesItemVisitor interface {
+	VisitString(string) error
+	VisitVendorCreditLine(*VendorCreditLine) error
+}
+
+func (v *VendorCreditLinesItem) Accept(visitor VendorCreditLinesItemVisitor) error {
+	if v.typ == "String" || v.String != "" {
+		return visitor.VisitString(v.String)
+	}
+	if v.typ == "VendorCreditLine" || v.VendorCreditLine != nil {
+		return visitor.VisitVendorCreditLine(v.VendorCreditLine)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", v)
+}
+
 type VendorCreditTrackingCategoriesItem struct {
 	String           string
 	TrackingCategory *TrackingCategory
@@ -29896,17 +38038,23 @@ func (v *VendorCreditVendor) Accept(visitor VendorCreditVendorVisitor) error {
 }
 
 var (
-	warningValidationProblemFieldSource      = big.NewInt(1 << 0)
-	warningValidationProblemFieldTitle       = big.NewInt(1 << 1)
-	warningValidationProblemFieldDetail      = big.NewInt(1 << 2)
-	warningValidationProblemFieldProblemType = big.NewInt(1 << 3)
+	warningValidationProblemFieldSource         = big.NewInt(1 << 0)
+	warningValidationProblemFieldTitle          = big.NewInt(1 << 1)
+	warningValidationProblemFieldDetail         = big.NewInt(1 << 2)
+	warningValidationProblemFieldProblemType    = big.NewInt(1 << 3)
+	warningValidationProblemFieldBlockMergeLink = big.NewInt(1 << 4)
+	warningValidationProblemFieldRawError       = big.NewInt(1 << 5)
+	warningValidationProblemFieldErrorCode      = big.NewInt(1 << 6)
 )
 
 type WarningValidationProblem struct {
-	Source      *ValidationProblemSource `json:"source,omitempty" url:"source,omitempty"`
-	Title       string                   `json:"title" url:"title"`
-	Detail      string                   `json:"detail" url:"detail"`
-	ProblemType string                   `json:"problem_type" url:"problem_type"`
+	Source         *ValidationProblemSource `json:"source,omitempty" url:"source,omitempty"`
+	Title          string                   `json:"title" url:"title"`
+	Detail         string                   `json:"detail" url:"detail"`
+	ProblemType    string                   `json:"problem_type" url:"problem_type"`
+	BlockMergeLink *bool                    `json:"block_merge_link,omitempty" url:"block_merge_link,omitempty"`
+	RawError       *string                  `json:"raw_error,omitempty" url:"raw_error,omitempty"`
+	ErrorCode      *int                     `json:"error_code,omitempty" url:"error_code,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -29941,6 +38089,27 @@ func (w *WarningValidationProblem) GetProblemType() string {
 		return ""
 	}
 	return w.ProblemType
+}
+
+func (w *WarningValidationProblem) GetBlockMergeLink() *bool {
+	if w == nil {
+		return nil
+	}
+	return w.BlockMergeLink
+}
+
+func (w *WarningValidationProblem) GetRawError() *string {
+	if w == nil {
+		return nil
+	}
+	return w.RawError
+}
+
+func (w *WarningValidationProblem) GetErrorCode() *int {
+	if w == nil {
+		return nil
+	}
+	return w.ErrorCode
 }
 
 func (w *WarningValidationProblem) GetExtraProperties() map[string]interface{} {
@@ -29980,6 +38149,27 @@ func (w *WarningValidationProblem) SetDetail(detail string) {
 func (w *WarningValidationProblem) SetProblemType(problemType string) {
 	w.ProblemType = problemType
 	w.require(warningValidationProblemFieldProblemType)
+}
+
+// SetBlockMergeLink sets the BlockMergeLink field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WarningValidationProblem) SetBlockMergeLink(blockMergeLink *bool) {
+	w.BlockMergeLink = blockMergeLink
+	w.require(warningValidationProblemFieldBlockMergeLink)
+}
+
+// SetRawError sets the RawError field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WarningValidationProblem) SetRawError(rawError *string) {
+	w.RawError = rawError
+	w.require(warningValidationProblemFieldRawError)
+}
+
+// SetErrorCode sets the ErrorCode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (w *WarningValidationProblem) SetErrorCode(errorCode *int) {
+	w.ErrorCode = errorCode
+	w.require(warningValidationProblemFieldErrorCode)
 }
 
 func (w *WarningValidationProblem) UnmarshalJSON(data []byte) error {

@@ -473,6 +473,38 @@ func (a *AccountIntegration) String() string {
 	return fmt.Sprintf("%#v", a)
 }
 
+// * `VIEW` - VIEW
+// * `CREATE` - CREATE
+// * `EDIT` - EDIT
+// * `DELETE` - DELETE
+type ActionsEnum string
+
+const (
+	ActionsEnumView   ActionsEnum = "VIEW"
+	ActionsEnumCreate ActionsEnum = "CREATE"
+	ActionsEnumEdit   ActionsEnum = "EDIT"
+	ActionsEnumDelete ActionsEnum = "DELETE"
+)
+
+func NewActionsEnumFromString(s string) (ActionsEnum, error) {
+	switch s {
+	case "VIEW":
+		return ActionsEnumView, nil
+	case "CREATE":
+		return ActionsEnumCreate, nil
+	case "EDIT":
+		return ActionsEnumEdit, nil
+	case "DELETE":
+		return ActionsEnumDelete, nil
+	}
+	var t ActionsEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (a ActionsEnum) Ptr() *ActionsEnum {
+	return &a
+}
+
 // # The Attachment Object
 // ### Description
 // The `Attachment` object is used to represent an attachment for a ticket.
@@ -942,12 +974,13 @@ var (
 	collectionFieldAccessLevel      = big.NewInt(1 << 6)
 	collectionFieldCollectionType   = big.NewInt(1 << 7)
 	collectionFieldParentCollection = big.NewInt(1 << 8)
-	collectionFieldCollectionUrl    = big.NewInt(1 << 9)
-	collectionFieldRemoteCreatedAt  = big.NewInt(1 << 10)
-	collectionFieldRemoteUpdatedAt  = big.NewInt(1 << 11)
-	collectionFieldRemoteWasDeleted = big.NewInt(1 << 12)
-	collectionFieldFieldMappings    = big.NewInt(1 << 13)
-	collectionFieldRemoteData       = big.NewInt(1 << 14)
+	collectionFieldPermissions      = big.NewInt(1 << 9)
+	collectionFieldCollectionUrl    = big.NewInt(1 << 10)
+	collectionFieldRemoteCreatedAt  = big.NewInt(1 << 11)
+	collectionFieldRemoteUpdatedAt  = big.NewInt(1 << 12)
+	collectionFieldRemoteWasDeleted = big.NewInt(1 << 13)
+	collectionFieldFieldMappings    = big.NewInt(1 << 14)
+	collectionFieldRemoteData       = big.NewInt(1 << 15)
 )
 
 type Collection struct {
@@ -975,7 +1008,8 @@ type Collection struct {
 	// * `PROJECT` - PROJECT
 	CollectionType *CollectionTypeEnum `json:"collection_type,omitempty" url:"collection_type,omitempty"`
 	// The parent collection for this collection.
-	ParentCollection *CollectionParentCollection `json:"parent_collection,omitempty" url:"parent_collection,omitempty"`
+	ParentCollection *CollectionParentCollection  `json:"parent_collection,omitempty" url:"parent_collection,omitempty"`
+	Permissions      []*CollectionPermissionsItem `json:"permissions,omitempty" url:"permissions,omitempty"`
 	// The 3rd party url of the Collection.
 	CollectionUrl *string `json:"collection_url,omitempty" url:"collection_url,omitempty"`
 	// When the third party's collection was created.
@@ -1055,6 +1089,13 @@ func (c *Collection) GetParentCollection() *CollectionParentCollection {
 		return nil
 	}
 	return c.ParentCollection
+}
+
+func (c *Collection) GetPermissions() []*CollectionPermissionsItem {
+	if c == nil {
+		return nil
+	}
+	return c.Permissions
 }
 
 func (c *Collection) GetCollectionUrl() *string {
@@ -1171,6 +1212,13 @@ func (c *Collection) SetCollectionType(collectionType *CollectionTypeEnum) {
 func (c *Collection) SetParentCollection(parentCollection *CollectionParentCollection) {
 	c.ParentCollection = parentCollection
 	c.require(collectionFieldParentCollection)
+}
+
+// SetPermissions sets the Permissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Collection) SetPermissions(permissions []*CollectionPermissionsItem) {
+	c.Permissions = permissions
+	c.require(collectionFieldPermissions)
 }
 
 // SetCollectionUrl sets the CollectionUrl field and marks it as non-optional;
@@ -1433,6 +1481,68 @@ func (c *CollectionParentCollection) Accept(visitor CollectionParentCollectionVi
 	}
 	if c.typ == "Collection" || c.Collection != nil {
 		return visitor.VisitCollection(c.Collection)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CollectionPermissionsItem struct {
+	String     string
+	Permission *Permission
+
+	typ string
+}
+
+func (c *CollectionPermissionsItem) GetString() string {
+	if c == nil {
+		return ""
+	}
+	return c.String
+}
+
+func (c *CollectionPermissionsItem) GetPermission() *Permission {
+	if c == nil {
+		return nil
+	}
+	return c.Permission
+}
+
+func (c *CollectionPermissionsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		c.typ = "String"
+		c.String = valueString
+		return nil
+	}
+	valuePermission := new(Permission)
+	if err := json.Unmarshal(data, &valuePermission); err == nil {
+		c.typ = "Permission"
+		c.Permission = valuePermission
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CollectionPermissionsItem) MarshalJSON() ([]byte, error) {
+	if c.typ == "String" || c.String != "" {
+		return json.Marshal(c.String)
+	}
+	if c.typ == "Permission" || c.Permission != nil {
+		return json.Marshal(c.Permission)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CollectionPermissionsItemVisitor interface {
+	VisitString(string) error
+	VisitPermission(*Permission) error
+}
+
+func (c *CollectionPermissionsItem) Accept(visitor CollectionPermissionsItemVisitor) error {
+	if c.typ == "String" || c.String != "" {
+		return visitor.VisitString(c.String)
+	}
+	if c.typ == "Permission" || c.Permission != nil {
+		return visitor.VisitPermission(c.Permission)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
@@ -2225,6 +2335,34 @@ func (d *DebugModelLogSummary) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", d)
+}
+
+// * `ALLOWED` - ALLOWED
+// * `DENIED` - DENIED
+// * `INHERITED` - INHERITED
+type EffectEnum string
+
+const (
+	EffectEnumAllowed   EffectEnum = "ALLOWED"
+	EffectEnumDenied    EffectEnum = "DENIED"
+	EffectEnumInherited EffectEnum = "INHERITED"
+)
+
+func NewEffectEnumFromString(s string) (EffectEnum, error) {
+	switch s {
+	case "ALLOWED":
+		return EffectEnumAllowed, nil
+	case "DENIED":
+		return EffectEnumDenied, nil
+	case "INHERITED":
+		return EffectEnumInherited, nil
+	}
+	var t EffectEnum
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (e EffectEnum) Ptr() *EffectEnum {
+	return &e
 }
 
 // * `RAW` - RAW
@@ -3829,6 +3967,641 @@ func (p *PaginatedViewerList) String() string {
 	return fmt.Sprintf("%#v", p)
 }
 
+// # The Permission Object
+// ### Description
+// The `Permission` object is used to represent permissions that can be applied to users, roles, teams, collections, and tickets.
+//
+// ### Usage Example
+// TODO
+var (
+	permissionFieldId                   = big.NewInt(1 << 0)
+	permissionFieldRemoteId             = big.NewInt(1 << 1)
+	permissionFieldCreatedAt            = big.NewInt(1 << 2)
+	permissionFieldModifiedAt           = big.NewInt(1 << 3)
+	permissionFieldEffect               = big.NewInt(1 << 4)
+	permissionFieldActions              = big.NewInt(1 << 5)
+	permissionFieldAppliedToUsers       = big.NewInt(1 << 6)
+	permissionFieldAppliedToRoles       = big.NewInt(1 << 7)
+	permissionFieldAppliedToTeams       = big.NewInt(1 << 8)
+	permissionFieldAppliedToCollections = big.NewInt(1 << 9)
+	permissionFieldRemoteWasDeleted     = big.NewInt(1 << 10)
+	permissionFieldFieldMappings        = big.NewInt(1 << 11)
+)
+
+type Permission struct {
+	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	// The datetime that this object was created by Merge.
+	CreatedAt *time.Time `json:"created_at,omitempty" url:"created_at,omitempty"`
+	// The datetime that this object was modified by Merge.
+	ModifiedAt *time.Time `json:"modified_at,omitempty" url:"modified_at,omitempty"`
+	// Outcome of this permission rule for matching users.
+	//
+	// * `ALLOWED` - ALLOWED
+	// * `DENIED` - DENIED
+	// * `INHERITED` - INHERITED
+	Effect *PermissionEffect `json:"effect,omitempty" url:"effect,omitempty"`
+	// Operations that this permission applies to. If the entity inherits permission from a parent entity, then this should be an empty array. In that case, the entity would inherit the parent entity’s actions.
+	Actions              []*ActionsEnum `json:"actions,omitempty" url:"actions,omitempty"`
+	AppliedToUsers       []*string      `json:"applied_to_users,omitempty" url:"applied_to_users,omitempty"`
+	AppliedToRoles       []*string      `json:"applied_to_roles,omitempty" url:"applied_to_roles,omitempty"`
+	AppliedToTeams       []*string      `json:"applied_to_teams,omitempty" url:"applied_to_teams,omitempty"`
+	AppliedToCollections []*string      `json:"applied_to_collections,omitempty" url:"applied_to_collections,omitempty"`
+	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
+	RemoteWasDeleted *bool                  `json:"remote_was_deleted,omitempty" url:"remote_was_deleted,omitempty"`
+	FieldMappings    map[string]interface{} `json:"field_mappings,omitempty" url:"field_mappings,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (p *Permission) GetId() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Id
+}
+
+func (p *Permission) GetRemoteId() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteId
+}
+
+func (p *Permission) GetCreatedAt() *time.Time {
+	if p == nil {
+		return nil
+	}
+	return p.CreatedAt
+}
+
+func (p *Permission) GetModifiedAt() *time.Time {
+	if p == nil {
+		return nil
+	}
+	return p.ModifiedAt
+}
+
+func (p *Permission) GetEffect() *PermissionEffect {
+	if p == nil {
+		return nil
+	}
+	return p.Effect
+}
+
+func (p *Permission) GetActions() []*ActionsEnum {
+	if p == nil {
+		return nil
+	}
+	return p.Actions
+}
+
+func (p *Permission) GetAppliedToUsers() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToUsers
+}
+
+func (p *Permission) GetAppliedToRoles() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToRoles
+}
+
+func (p *Permission) GetAppliedToTeams() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToTeams
+}
+
+func (p *Permission) GetAppliedToCollections() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToCollections
+}
+
+func (p *Permission) GetRemoteWasDeleted() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteWasDeleted
+}
+
+func (p *Permission) GetFieldMappings() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.FieldMappings
+}
+
+func (p *Permission) GetExtraProperties() map[string]interface{} {
+	return p.extraProperties
+}
+
+func (p *Permission) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetId sets the Id field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetId(id *string) {
+	p.Id = id
+	p.require(permissionFieldId)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(permissionFieldRemoteId)
+}
+
+// SetCreatedAt sets the CreatedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetCreatedAt(createdAt *time.Time) {
+	p.CreatedAt = createdAt
+	p.require(permissionFieldCreatedAt)
+}
+
+// SetModifiedAt sets the ModifiedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetModifiedAt(modifiedAt *time.Time) {
+	p.ModifiedAt = modifiedAt
+	p.require(permissionFieldModifiedAt)
+}
+
+// SetEffect sets the Effect field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetEffect(effect *PermissionEffect) {
+	p.Effect = effect
+	p.require(permissionFieldEffect)
+}
+
+// SetActions sets the Actions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetActions(actions []*ActionsEnum) {
+	p.Actions = actions
+	p.require(permissionFieldActions)
+}
+
+// SetAppliedToUsers sets the AppliedToUsers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetAppliedToUsers(appliedToUsers []*string) {
+	p.AppliedToUsers = appliedToUsers
+	p.require(permissionFieldAppliedToUsers)
+}
+
+// SetAppliedToRoles sets the AppliedToRoles field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetAppliedToRoles(appliedToRoles []*string) {
+	p.AppliedToRoles = appliedToRoles
+	p.require(permissionFieldAppliedToRoles)
+}
+
+// SetAppliedToTeams sets the AppliedToTeams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetAppliedToTeams(appliedToTeams []*string) {
+	p.AppliedToTeams = appliedToTeams
+	p.require(permissionFieldAppliedToTeams)
+}
+
+// SetAppliedToCollections sets the AppliedToCollections field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetAppliedToCollections(appliedToCollections []*string) {
+	p.AppliedToCollections = appliedToCollections
+	p.require(permissionFieldAppliedToCollections)
+}
+
+// SetRemoteWasDeleted sets the RemoteWasDeleted field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetRemoteWasDeleted(remoteWasDeleted *bool) {
+	p.RemoteWasDeleted = remoteWasDeleted
+	p.require(permissionFieldRemoteWasDeleted)
+}
+
+// SetFieldMappings sets the FieldMappings field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *Permission) SetFieldMappings(fieldMappings map[string]interface{}) {
+	p.FieldMappings = fieldMappings
+	p.require(permissionFieldFieldMappings)
+}
+
+func (p *Permission) UnmarshalJSON(data []byte) error {
+	type embed Permission
+	var unmarshaler = struct {
+		embed
+		CreatedAt  *internal.DateTime `json:"created_at,omitempty"`
+		ModifiedAt *internal.DateTime `json:"modified_at,omitempty"`
+	}{
+		embed: embed(*p),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*p = Permission(unmarshaler.embed)
+	p.CreatedAt = unmarshaler.CreatedAt.TimePtr()
+	p.ModifiedAt = unmarshaler.ModifiedAt.TimePtr()
+	extraProperties, err := internal.ExtractExtraProperties(data, *p)
+	if err != nil {
+		return err
+	}
+	p.extraProperties = extraProperties
+	p.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *Permission) MarshalJSON() ([]byte, error) {
+	type embed Permission
+	var marshaler = struct {
+		embed
+		CreatedAt  *internal.DateTime `json:"created_at,omitempty"`
+		ModifiedAt *internal.DateTime `json:"modified_at,omitempty"`
+	}{
+		embed:      embed(*p),
+		CreatedAt:  internal.NewOptionalDateTime(p.CreatedAt),
+		ModifiedAt: internal.NewOptionalDateTime(p.ModifiedAt),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (p *Permission) String() string {
+	if len(p.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// Outcome of this permission rule for matching users.
+//
+// * `ALLOWED` - ALLOWED
+// * `DENIED` - DENIED
+// * `INHERITED` - INHERITED
+type PermissionEffect struct {
+	EffectEnum EffectEnum
+	String     string
+
+	typ string
+}
+
+func (p *PermissionEffect) GetEffectEnum() EffectEnum {
+	if p == nil {
+		return ""
+	}
+	return p.EffectEnum
+}
+
+func (p *PermissionEffect) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PermissionEffect) UnmarshalJSON(data []byte) error {
+	var valueEffectEnum EffectEnum
+	if err := json.Unmarshal(data, &valueEffectEnum); err == nil {
+		p.typ = "EffectEnum"
+		p.EffectEnum = valueEffectEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PermissionEffect) MarshalJSON() ([]byte, error) {
+	if p.typ == "EffectEnum" || p.EffectEnum != "" {
+		return json.Marshal(p.EffectEnum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PermissionEffectVisitor interface {
+	VisitEffectEnum(EffectEnum) error
+	VisitString(string) error
+}
+
+func (p *PermissionEffect) Accept(visitor PermissionEffectVisitor) error {
+	if p.typ == "EffectEnum" || p.EffectEnum != "" {
+		return visitor.VisitEffectEnum(p.EffectEnum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+// # The Permission Object
+// ### Description
+// The `Permission` object is used to represent permissions that can be applied to users, roles, teams, collections, and tickets.
+//
+// ### Usage Example
+// TODO
+var (
+	permissionRequestFieldRemoteId             = big.NewInt(1 << 0)
+	permissionRequestFieldEffect               = big.NewInt(1 << 1)
+	permissionRequestFieldActions              = big.NewInt(1 << 2)
+	permissionRequestFieldAppliedToUsers       = big.NewInt(1 << 3)
+	permissionRequestFieldAppliedToRoles       = big.NewInt(1 << 4)
+	permissionRequestFieldAppliedToTeams       = big.NewInt(1 << 5)
+	permissionRequestFieldAppliedToCollections = big.NewInt(1 << 6)
+	permissionRequestFieldIntegrationParams    = big.NewInt(1 << 7)
+	permissionRequestFieldLinkedAccountParams  = big.NewInt(1 << 8)
+)
+
+type PermissionRequest struct {
+	// The third-party API ID of the matching object.
+	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
+	// Outcome of this permission rule for matching users.
+	//
+	// * `ALLOWED` - ALLOWED
+	// * `DENIED` - DENIED
+	// * `INHERITED` - INHERITED
+	Effect *PermissionRequestEffect `json:"effect,omitempty" url:"effect,omitempty"`
+	// Operations that this permission applies to. If the entity inherits permission from a parent entity, then this should be an empty array. In that case, the entity would inherit the parent entity’s actions.
+	Actions              []*ActionsEnum         `json:"actions,omitempty" url:"actions,omitempty"`
+	AppliedToUsers       []*string              `json:"applied_to_users,omitempty" url:"applied_to_users,omitempty"`
+	AppliedToRoles       []*string              `json:"applied_to_roles,omitempty" url:"applied_to_roles,omitempty"`
+	AppliedToTeams       []*string              `json:"applied_to_teams,omitempty" url:"applied_to_teams,omitempty"`
+	AppliedToCollections []*string              `json:"applied_to_collections,omitempty" url:"applied_to_collections,omitempty"`
+	IntegrationParams    map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
+	LinkedAccountParams  map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (p *PermissionRequest) GetRemoteId() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RemoteId
+}
+
+func (p *PermissionRequest) GetEffect() *PermissionRequestEffect {
+	if p == nil {
+		return nil
+	}
+	return p.Effect
+}
+
+func (p *PermissionRequest) GetActions() []*ActionsEnum {
+	if p == nil {
+		return nil
+	}
+	return p.Actions
+}
+
+func (p *PermissionRequest) GetAppliedToUsers() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToUsers
+}
+
+func (p *PermissionRequest) GetAppliedToRoles() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToRoles
+}
+
+func (p *PermissionRequest) GetAppliedToTeams() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToTeams
+}
+
+func (p *PermissionRequest) GetAppliedToCollections() []*string {
+	if p == nil {
+		return nil
+	}
+	return p.AppliedToCollections
+}
+
+func (p *PermissionRequest) GetIntegrationParams() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.IntegrationParams
+}
+
+func (p *PermissionRequest) GetLinkedAccountParams() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
+	return p.LinkedAccountParams
+}
+
+func (p *PermissionRequest) GetExtraProperties() map[string]interface{} {
+	return p.extraProperties
+}
+
+func (p *PermissionRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetRemoteId sets the RemoteId field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetRemoteId(remoteId *string) {
+	p.RemoteId = remoteId
+	p.require(permissionRequestFieldRemoteId)
+}
+
+// SetEffect sets the Effect field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetEffect(effect *PermissionRequestEffect) {
+	p.Effect = effect
+	p.require(permissionRequestFieldEffect)
+}
+
+// SetActions sets the Actions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetActions(actions []*ActionsEnum) {
+	p.Actions = actions
+	p.require(permissionRequestFieldActions)
+}
+
+// SetAppliedToUsers sets the AppliedToUsers field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetAppliedToUsers(appliedToUsers []*string) {
+	p.AppliedToUsers = appliedToUsers
+	p.require(permissionRequestFieldAppliedToUsers)
+}
+
+// SetAppliedToRoles sets the AppliedToRoles field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetAppliedToRoles(appliedToRoles []*string) {
+	p.AppliedToRoles = appliedToRoles
+	p.require(permissionRequestFieldAppliedToRoles)
+}
+
+// SetAppliedToTeams sets the AppliedToTeams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetAppliedToTeams(appliedToTeams []*string) {
+	p.AppliedToTeams = appliedToTeams
+	p.require(permissionRequestFieldAppliedToTeams)
+}
+
+// SetAppliedToCollections sets the AppliedToCollections field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetAppliedToCollections(appliedToCollections []*string) {
+	p.AppliedToCollections = appliedToCollections
+	p.require(permissionRequestFieldAppliedToCollections)
+}
+
+// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
+	p.IntegrationParams = integrationParams
+	p.require(permissionRequestFieldIntegrationParams)
+}
+
+// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PermissionRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
+	p.LinkedAccountParams = linkedAccountParams
+	p.require(permissionRequestFieldLinkedAccountParams)
+}
+
+func (p *PermissionRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler PermissionRequest
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = PermissionRequest(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *p)
+	if err != nil {
+		return err
+	}
+	p.extraProperties = extraProperties
+	p.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *PermissionRequest) MarshalJSON() ([]byte, error) {
+	type embed PermissionRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*p),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (p *PermissionRequest) String() string {
+	if len(p.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+// Outcome of this permission rule for matching users.
+//
+// * `ALLOWED` - ALLOWED
+// * `DENIED` - DENIED
+// * `INHERITED` - INHERITED
+type PermissionRequestEffect struct {
+	EffectEnum EffectEnum
+	String     string
+
+	typ string
+}
+
+func (p *PermissionRequestEffect) GetEffectEnum() EffectEnum {
+	if p == nil {
+		return ""
+	}
+	return p.EffectEnum
+}
+
+func (p *PermissionRequestEffect) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PermissionRequestEffect) UnmarshalJSON(data []byte) error {
+	var valueEffectEnum EffectEnum
+	if err := json.Unmarshal(data, &valueEffectEnum); err == nil {
+		p.typ = "EffectEnum"
+		p.EffectEnum = valueEffectEnum
+		return nil
+	}
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PermissionRequestEffect) MarshalJSON() ([]byte, error) {
+	if p.typ == "EffectEnum" || p.EffectEnum != "" {
+		return json.Marshal(p.EffectEnum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PermissionRequestEffectVisitor interface {
+	VisitEffectEnum(EffectEnum) error
+	VisitString(string) error
+}
+
+func (p *PermissionRequestEffect) Accept(visitor PermissionRequestEffectVisitor) error {
+	if p.typ == "EffectEnum" || p.EffectEnum != "" {
+		return visitor.VisitEffectEnum(p.EffectEnum)
+	}
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
 // * `URGENT` - URGENT
 // * `HIGH` - HIGH
 // * `NORMAL` - NORMAL
@@ -3874,7 +4647,8 @@ var (
 
 type RemoteData struct {
 	// The third-party API path that is being called.
-	Path string      `json:"path" url:"path"`
+	Path string `json:"path" url:"path"`
+	// The data returned from the third-party for this object in its original, unnormalized format.
 	Data interface{} `json:"data,omitempty" url:"data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -5894,17 +6668,18 @@ var (
 	ticketFieldParentTicket     = big.NewInt(1 << 15)
 	ticketFieldAttachments      = big.NewInt(1 << 16)
 	ticketFieldAccessLevel      = big.NewInt(1 << 17)
-	ticketFieldTags             = big.NewInt(1 << 18)
-	ticketFieldRoles            = big.NewInt(1 << 19)
-	ticketFieldTicketUrl        = big.NewInt(1 << 20)
-	ticketFieldPriority         = big.NewInt(1 << 21)
-	ticketFieldRemoteCreatedAt  = big.NewInt(1 << 22)
-	ticketFieldRemoteUpdatedAt  = big.NewInt(1 << 23)
-	ticketFieldCompletedAt      = big.NewInt(1 << 24)
-	ticketFieldRemoteWasDeleted = big.NewInt(1 << 25)
-	ticketFieldFieldMappings    = big.NewInt(1 << 26)
-	ticketFieldRemoteData       = big.NewInt(1 << 27)
-	ticketFieldRemoteFields     = big.NewInt(1 << 28)
+	ticketFieldPermissions      = big.NewInt(1 << 18)
+	ticketFieldTags             = big.NewInt(1 << 19)
+	ticketFieldRoles            = big.NewInt(1 << 20)
+	ticketFieldTicketUrl        = big.NewInt(1 << 21)
+	ticketFieldPriority         = big.NewInt(1 << 22)
+	ticketFieldRemoteCreatedAt  = big.NewInt(1 << 23)
+	ticketFieldRemoteUpdatedAt  = big.NewInt(1 << 24)
+	ticketFieldCompletedAt      = big.NewInt(1 << 25)
+	ticketFieldRemoteWasDeleted = big.NewInt(1 << 26)
+	ticketFieldFieldMappings    = big.NewInt(1 << 27)
+	ticketFieldRemoteData       = big.NewInt(1 << 28)
+	ticketFieldRemoteFields     = big.NewInt(1 << 29)
 )
 
 type Ticket struct {
@@ -5952,6 +6727,7 @@ type Ticket struct {
 	// * `PRIVATE` - PRIVATE
 	// * `COLLECTION` - COLLECTION
 	AccessLevel *TicketAccessLevel `json:"access_level,omitempty" url:"access_level,omitempty"`
+	Permissions []*Permission      `json:"permissions,omitempty" url:"permissions,omitempty"`
 	Tags        []*string          `json:"tags,omitempty" url:"tags,omitempty"`
 	Roles       []*string          `json:"roles,omitempty" url:"roles,omitempty"`
 	// The 3rd party url of the Ticket.
@@ -6106,6 +6882,13 @@ func (t *Ticket) GetAccessLevel() *TicketAccessLevel {
 		return nil
 	}
 	return t.AccessLevel
+}
+
+func (t *Ticket) GetPermissions() []*Permission {
+	if t == nil {
+		return nil
+	}
+	return t.Permissions
 }
 
 func (t *Ticket) GetTags() []*string {
@@ -6320,6 +7103,13 @@ func (t *Ticket) SetAttachments(attachments []*TicketAttachmentsItem) {
 func (t *Ticket) SetAccessLevel(accessLevel *TicketAccessLevel) {
 	t.AccessLevel = accessLevel
 	t.require(ticketFieldAccessLevel)
+}
+
+// SetPermissions sets the Permissions field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (t *Ticket) SetPermissions(permissions []*Permission) {
+	t.Permissions = permissions
+	t.require(ticketFieldPermissions)
 }
 
 // SetTags sets the Tags field and marks it as non-optional;

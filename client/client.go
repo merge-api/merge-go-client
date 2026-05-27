@@ -29,12 +29,6 @@ type Client struct {
 
 func NewClient(opts ...option.RequestOption) *Client {
 	options := core.NewRequestOptions(opts...)
-	baseURL := options.BaseURL
-	if baseURL == "" {
-		baseURL = "https://api.merge.dev/api"
-	}
-	// Update the options with the resolved base URL
-	options.BaseURL = baseURL
 	return &Client{
 		Ats:         client.NewClient(options),
 		Accounting:  accountingclient.NewClient(options),
@@ -43,7 +37,7 @@ func NewClient(opts ...option.RequestOption) *Client {
 		Hris:        hrisclient.NewClient(options),
 		Ticketing:   ticketingclient.NewClient(options),
 		options:     options,
-		baseURL:     baseURL,
+		baseURL:     options.BaseURL,
 		caller: internal.NewCaller(
 			&internal.CallerParams{
 				Client:      options.HTTPClient,

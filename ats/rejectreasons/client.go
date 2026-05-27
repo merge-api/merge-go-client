@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.RejectReasonsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.RejectReason], error) {
+) (*core.Page[*string, *ats.RejectReason, *ats.PaginatedRejectReasonList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/reject-reasons"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedRejectReasonList) *core.PageResponse[*string, *ats.RejectReason] {
+	readPageResponse := func(response *ats.PaginatedRejectReasonList) *core.PageResponse[*string, *ats.RejectReason, *ats.PaginatedRejectReasonList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.RejectReason]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.RejectReason, *ats.PaginatedRejectReasonList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

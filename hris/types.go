@@ -2017,46 +2017,49 @@ func (d *DebugModelLogSummary) String() string {
 // ### Usage Example
 // Fetch from the `LIST Employee` endpoint and filter by `ID` to show all employees.
 var (
-	employeeFieldId                = big.NewInt(1 << 0)
-	employeeFieldRemoteId          = big.NewInt(1 << 1)
-	employeeFieldCreatedAt         = big.NewInt(1 << 2)
-	employeeFieldModifiedAt        = big.NewInt(1 << 3)
-	employeeFieldEmployeeNumber    = big.NewInt(1 << 4)
-	employeeFieldCompany           = big.NewInt(1 << 5)
-	employeeFieldFirstName         = big.NewInt(1 << 6)
-	employeeFieldLastName          = big.NewInt(1 << 7)
-	employeeFieldPreferredName     = big.NewInt(1 << 8)
-	employeeFieldDisplayFullName   = big.NewInt(1 << 9)
-	employeeFieldUsername          = big.NewInt(1 << 10)
-	employeeFieldGroups            = big.NewInt(1 << 11)
-	employeeFieldWorkEmail         = big.NewInt(1 << 12)
-	employeeFieldPersonalEmail     = big.NewInt(1 << 13)
-	employeeFieldMobilePhoneNumber = big.NewInt(1 << 14)
-	employeeFieldEmployments       = big.NewInt(1 << 15)
-	employeeFieldHomeLocation      = big.NewInt(1 << 16)
-	employeeFieldWorkLocation      = big.NewInt(1 << 17)
-	employeeFieldManager           = big.NewInt(1 << 18)
-	employeeFieldTeam              = big.NewInt(1 << 19)
-	employeeFieldPayGroup          = big.NewInt(1 << 20)
-	employeeFieldSsn               = big.NewInt(1 << 21)
-	employeeFieldGender            = big.NewInt(1 << 22)
-	employeeFieldEthnicity         = big.NewInt(1 << 23)
-	employeeFieldMaritalStatus     = big.NewInt(1 << 24)
-	employeeFieldDateOfBirth       = big.NewInt(1 << 25)
-	employeeFieldHireDate          = big.NewInt(1 << 26)
-	employeeFieldStartDate         = big.NewInt(1 << 27)
-	employeeFieldRemoteCreatedAt   = big.NewInt(1 << 28)
-	employeeFieldEmploymentStatus  = big.NewInt(1 << 29)
-	employeeFieldTerminationDate   = big.NewInt(1 << 30)
-	employeeFieldAvatar            = big.NewInt(1 << 31)
-	employeeFieldCustomFields      = big.NewInt(1 << 32)
-	employeeFieldRemoteWasDeleted  = big.NewInt(1 << 33)
-	employeeFieldFieldMappings     = big.NewInt(1 << 34)
-	employeeFieldRemoteData        = big.NewInt(1 << 35)
+	employeeFieldEmployeeUrl       = big.NewInt(1 << 0)
+	employeeFieldId                = big.NewInt(1 << 1)
+	employeeFieldRemoteId          = big.NewInt(1 << 2)
+	employeeFieldCreatedAt         = big.NewInt(1 << 3)
+	employeeFieldModifiedAt        = big.NewInt(1 << 4)
+	employeeFieldEmployeeNumber    = big.NewInt(1 << 5)
+	employeeFieldCompany           = big.NewInt(1 << 6)
+	employeeFieldFirstName         = big.NewInt(1 << 7)
+	employeeFieldLastName          = big.NewInt(1 << 8)
+	employeeFieldPreferredName     = big.NewInt(1 << 9)
+	employeeFieldDisplayFullName   = big.NewInt(1 << 10)
+	employeeFieldUsername          = big.NewInt(1 << 11)
+	employeeFieldGroups            = big.NewInt(1 << 12)
+	employeeFieldWorkEmail         = big.NewInt(1 << 13)
+	employeeFieldPersonalEmail     = big.NewInt(1 << 14)
+	employeeFieldMobilePhoneNumber = big.NewInt(1 << 15)
+	employeeFieldEmployments       = big.NewInt(1 << 16)
+	employeeFieldHomeLocation      = big.NewInt(1 << 17)
+	employeeFieldWorkLocation      = big.NewInt(1 << 18)
+	employeeFieldManager           = big.NewInt(1 << 19)
+	employeeFieldTeam              = big.NewInt(1 << 20)
+	employeeFieldPayGroup          = big.NewInt(1 << 21)
+	employeeFieldSsn               = big.NewInt(1 << 22)
+	employeeFieldGender            = big.NewInt(1 << 23)
+	employeeFieldEthnicity         = big.NewInt(1 << 24)
+	employeeFieldMaritalStatus     = big.NewInt(1 << 25)
+	employeeFieldDateOfBirth       = big.NewInt(1 << 26)
+	employeeFieldHireDate          = big.NewInt(1 << 27)
+	employeeFieldStartDate         = big.NewInt(1 << 28)
+	employeeFieldRemoteCreatedAt   = big.NewInt(1 << 29)
+	employeeFieldEmploymentStatus  = big.NewInt(1 << 30)
+	employeeFieldTerminationDate   = big.NewInt(1 << 31)
+	employeeFieldAvatar            = big.NewInt(1 << 32)
+	employeeFieldCustomFields      = big.NewInt(1 << 33)
+	employeeFieldRemoteWasDeleted  = big.NewInt(1 << 34)
+	employeeFieldFieldMappings     = big.NewInt(1 << 35)
+	employeeFieldRemoteData        = big.NewInt(1 << 36)
 )
 
 type Employee struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the employee.
+	EmployeeUrl *string `json:"employee_url,omitempty" url:"employee_url,omitempty"`
+	Id          *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -2155,6 +2158,13 @@ type Employee struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (e *Employee) GetEmployeeUrl() *string {
+	if e == nil {
+		return nil
+	}
+	return e.EmployeeUrl
 }
 
 func (e *Employee) GetId() *string {
@@ -2418,6 +2428,13 @@ func (e *Employee) require(field *big.Int) {
 		e.explicitFields = big.NewInt(0)
 	}
 	e.explicitFields.Or(e.explicitFields, field)
+}
+
+// SetEmployeeUrl sets the EmployeeUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (e *Employee) SetEmployeeUrl(employeeUrl *string) {
+	e.EmployeeUrl = employeeUrl
+	e.require(employeeFieldEmployeeUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -5446,21 +5463,24 @@ func (g GenderEnum) Ptr() *GenderEnum {
 // ### Usage Example
 // Fetch from the `LIST Employee` endpoint and expand groups to view an employee's groups.
 var (
-	groupFieldId                   = big.NewInt(1 << 0)
-	groupFieldRemoteId             = big.NewInt(1 << 1)
-	groupFieldCreatedAt            = big.NewInt(1 << 2)
-	groupFieldModifiedAt           = big.NewInt(1 << 3)
-	groupFieldParentGroup          = big.NewInt(1 << 4)
-	groupFieldName                 = big.NewInt(1 << 5)
-	groupFieldType                 = big.NewInt(1 << 6)
-	groupFieldIsCommonlyUsedAsTeam = big.NewInt(1 << 7)
-	groupFieldRemoteWasDeleted     = big.NewInt(1 << 8)
-	groupFieldFieldMappings        = big.NewInt(1 << 9)
-	groupFieldRemoteData           = big.NewInt(1 << 10)
+	groupFieldGroupUrl             = big.NewInt(1 << 0)
+	groupFieldId                   = big.NewInt(1 << 1)
+	groupFieldRemoteId             = big.NewInt(1 << 2)
+	groupFieldCreatedAt            = big.NewInt(1 << 3)
+	groupFieldModifiedAt           = big.NewInt(1 << 4)
+	groupFieldParentGroup          = big.NewInt(1 << 5)
+	groupFieldName                 = big.NewInt(1 << 6)
+	groupFieldType                 = big.NewInt(1 << 7)
+	groupFieldIsCommonlyUsedAsTeam = big.NewInt(1 << 8)
+	groupFieldRemoteWasDeleted     = big.NewInt(1 << 9)
+	groupFieldFieldMappings        = big.NewInt(1 << 10)
+	groupFieldRemoteData           = big.NewInt(1 << 11)
 )
 
 type Group struct {
-	Id *string `json:"id,omitempty" url:"id,omitempty"`
+	// The 3rd party URL of the group.
+	GroupUrl *string `json:"group_url,omitempty" url:"group_url,omitempty"`
+	Id       *string `json:"id,omitempty" url:"id,omitempty"`
 	// The third-party API ID of the matching object.
 	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
 	// The datetime that this object was created by Merge.
@@ -5491,6 +5511,13 @@ type Group struct {
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
+}
+
+func (g *Group) GetGroupUrl() *string {
+	if g == nil {
+		return nil
+	}
+	return g.GroupUrl
 }
 
 func (g *Group) GetId() *string {
@@ -5579,6 +5606,13 @@ func (g *Group) require(field *big.Int) {
 		g.explicitFields = big.NewInt(0)
 	}
 	g.explicitFields.Or(g.explicitFields, field)
+}
+
+// SetGroupUrl sets the GroupUrl field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (g *Group) SetGroupUrl(groupUrl *string) {
+	g.GroupUrl = groupUrl
+	g.require(groupFieldGroupUrl)
 }
 
 // SetId sets the Id field and marks it as non-optional;
@@ -7105,6 +7139,7 @@ var (
 	metaResponseFieldStatus                         = big.NewInt(1 << 2)
 	metaResponseFieldHasConditionalParams           = big.NewInt(1 << 3)
 	metaResponseFieldHasRequiredLinkedAccountParams = big.NewInt(1 << 4)
+	metaResponseFieldRemoteFields                   = big.NewInt(1 << 5)
 )
 
 type MetaResponse struct {
@@ -7113,6 +7148,8 @@ type MetaResponse struct {
 	Status                         *LinkedAccountStatus   `json:"status,omitempty" url:"status,omitempty"`
 	HasConditionalParams           bool                   `json:"has_conditional_params" url:"has_conditional_params"`
 	HasRequiredLinkedAccountParams bool                   `json:"has_required_linked_account_params" url:"has_required_linked_account_params"`
+	// Remote field values to populate
+	RemoteFields []string `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -7154,6 +7191,13 @@ func (m *MetaResponse) GetHasRequiredLinkedAccountParams() bool {
 		return false
 	}
 	return m.HasRequiredLinkedAccountParams
+}
+
+func (m *MetaResponse) GetRemoteFields() []string {
+	if m == nil {
+		return nil
+	}
+	return m.RemoteFields
 }
 
 func (m *MetaResponse) GetExtraProperties() map[string]interface{} {
@@ -7200,6 +7244,13 @@ func (m *MetaResponse) SetHasConditionalParams(hasConditionalParams bool) {
 func (m *MetaResponse) SetHasRequiredLinkedAccountParams(hasRequiredLinkedAccountParams bool) {
 	m.HasRequiredLinkedAccountParams = hasRequiredLinkedAccountParams
 	m.require(metaResponseFieldHasRequiredLinkedAccountParams)
+}
+
+// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (m *MetaResponse) SetRemoteFields(remoteFields []string) {
+	m.RemoteFields = remoteFields
+	m.require(metaResponseFieldRemoteFields)
 }
 
 func (m *MetaResponse) UnmarshalJSON(data []byte) error {
@@ -9665,7 +9716,8 @@ var (
 
 type RemoteData struct {
 	// The third-party API path that is being called.
-	Path string      `json:"path" url:"path"`
+	Path string `json:"path" url:"path"`
+	// The data returned from the third-party for this object in its original, unnormalized format.
 	Data interface{} `json:"data,omitempty" url:"data,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted

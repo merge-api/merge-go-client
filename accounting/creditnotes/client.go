@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *accounting.CreditNotesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *accounting.CreditNote], error) {
+) (*core.Page[*string, *accounting.CreditNote, *accounting.PaginatedCreditNoteList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/credit-notes"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *accounting.PaginatedCreditNoteList) *core.PageResponse[*string, *accounting.CreditNote] {
+	readPageResponse := func(response *accounting.PaginatedCreditNoteList) *core.PageResponse[*string, *accounting.CreditNote, *accounting.PaginatedCreditNoteList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *accounting.CreditNote]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *accounting.CreditNote, *accounting.PaginatedCreditNoteList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -119,6 +120,61 @@ func (c *Client) Retrieve(
 		ctx,
 		id,
 		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Updates a `CreditNote` object with the given `id`.
+func (c *Client) PartialUpdate(
+	ctx context.Context,
+	id string,
+	request *accounting.PatchedCreditNoteEndpointRequest,
+	opts ...option.RequestOption,
+) (*accounting.CreditNoteResponse, error) {
+	response, err := c.WithRawResponse.PartialUpdate(
+		ctx,
+		id,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Creates a new CreditNoteApplyLine to apply a credit note to an invoice
+func (c *Client) ApplicationCreate(
+	ctx context.Context,
+	id string,
+	request *accounting.ApplyCreditNoteRequest,
+	opts ...option.RequestOption,
+) (*accounting.CreditNoteResponse, error) {
+	response, err := c.WithRawResponse.ApplicationCreate(
+		ctx,
+		id,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Returns metadata for `CreditNote` PATCHs.
+func (c *Client) MetaPatchRetrieve(
+	ctx context.Context,
+	id string,
+	opts ...option.RequestOption,
+) (*accounting.MetaResponse, error) {
+	response, err := c.WithRawResponse.MetaPatchRetrieve(
+		ctx,
+		id,
 		opts...,
 	)
 	if err != nil {

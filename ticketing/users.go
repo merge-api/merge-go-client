@@ -9,22 +9,27 @@ import (
 )
 
 var (
-	usersListRequestFieldCreatedAfter       = big.NewInt(1 << 0)
-	usersListRequestFieldCreatedBefore      = big.NewInt(1 << 1)
-	usersListRequestFieldCursor             = big.NewInt(1 << 2)
-	usersListRequestFieldEmailAddress       = big.NewInt(1 << 3)
-	usersListRequestFieldExpand             = big.NewInt(1 << 4)
-	usersListRequestFieldIncludeDeletedData = big.NewInt(1 << 5)
-	usersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 6)
-	usersListRequestFieldIncludeShellData   = big.NewInt(1 << 7)
-	usersListRequestFieldModifiedAfter      = big.NewInt(1 << 8)
-	usersListRequestFieldModifiedBefore     = big.NewInt(1 << 9)
-	usersListRequestFieldPageSize           = big.NewInt(1 << 10)
-	usersListRequestFieldRemoteId           = big.NewInt(1 << 11)
-	usersListRequestFieldTeam               = big.NewInt(1 << 12)
+	usersListRequestFieldCollections        = big.NewInt(1 << 0)
+	usersListRequestFieldCreatedAfter       = big.NewInt(1 << 1)
+	usersListRequestFieldCreatedBefore      = big.NewInt(1 << 2)
+	usersListRequestFieldCursor             = big.NewInt(1 << 3)
+	usersListRequestFieldEmailAddress       = big.NewInt(1 << 4)
+	usersListRequestFieldExpand             = big.NewInt(1 << 5)
+	usersListRequestFieldIncludeDeletedData = big.NewInt(1 << 6)
+	usersListRequestFieldIncludeRemoteData  = big.NewInt(1 << 7)
+	usersListRequestFieldIncludeShellData   = big.NewInt(1 << 8)
+	usersListRequestFieldModifiedAfter      = big.NewInt(1 << 9)
+	usersListRequestFieldModifiedBefore     = big.NewInt(1 << 10)
+	usersListRequestFieldPageSize           = big.NewInt(1 << 11)
+	usersListRequestFieldRemoteId           = big.NewInt(1 << 12)
+	usersListRequestFieldRoles              = big.NewInt(1 << 13)
+	usersListRequestFieldTeam               = big.NewInt(1 << 14)
+	usersListRequestFieldTeams              = big.NewInt(1 << 15)
 )
 
 type UsersListRequest struct {
+	// If provided, will only return users involved with at least one of these collections.
+	Collections *string `json:"-" url:"collections,omitempty"`
 	// If provided, will only return objects created after this datetime.
 	CreatedAfter *time.Time `json:"-" url:"created_after,omitempty"`
 	// If provided, will only return objects created before this datetime.
@@ -45,12 +50,16 @@ type UsersListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
+	// If provided, will only return users with at least one of these roles.
+	Roles *string `json:"-" url:"roles,omitempty"`
 	// If provided, will only return users matching in this team.
 	Team *string `json:"-" url:"team,omitempty"`
+	// If provided, will only return users with at least one of these teams.
+	Teams *string `json:"-" url:"teams,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -61,6 +70,13 @@ func (u *UsersListRequest) require(field *big.Int) {
 		u.explicitFields = big.NewInt(0)
 	}
 	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetCollections sets the Collections field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetCollections(collections *string) {
+	u.Collections = collections
+	u.require(usersListRequestFieldCollections)
 }
 
 // SetCreatedAfter sets the CreatedAfter field and marks it as non-optional;
@@ -147,11 +163,25 @@ func (u *UsersListRequest) SetRemoteId(remoteId *string) {
 	u.require(usersListRequestFieldRemoteId)
 }
 
+// SetRoles sets the Roles field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetRoles(roles *string) {
+	u.Roles = roles
+	u.require(usersListRequestFieldRoles)
+}
+
 // SetTeam sets the Team field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (u *UsersListRequest) SetTeam(team *string) {
 	u.Team = team
 	u.require(usersListRequestFieldTeam)
+}
+
+// SetTeams sets the Teams field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UsersListRequest) SetTeams(teams *string) {
+	u.Teams = teams
+	u.require(usersListRequestFieldTeams)
 }
 
 var (
