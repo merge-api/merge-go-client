@@ -39,12 +39,12 @@ func (c *Client) CustomObjectClassesCustomObjectsList(
 	customObjectClassId string,
 	request *crm.CustomObjectClassesCustomObjectsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *crm.CustomObject], error) {
+) (*core.Page[*string, *crm.CustomObject, *crm.PaginatedCustomObjectList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/crm/v1/custom-object-classes/%v/custom-objects",
@@ -77,14 +77,15 @@ func (c *Client) CustomObjectClassesCustomObjectsList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedCustomObjectList) *core.PageResponse[*string, *crm.CustomObject] {
+	readPageResponse := func(response *crm.PaginatedCustomObjectList) *core.PageResponse[*string, *crm.CustomObject, *crm.PaginatedCustomObjectList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *crm.CustomObject]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *crm.CustomObject, *crm.PaginatedCustomObjectList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(
@@ -157,12 +158,12 @@ func (c *Client) CustomObjectClassesCustomObjectsRemoteFieldClassesList(
 	ctx context.Context,
 	request *crm.CustomObjectClassesCustomObjectsRemoteFieldClassesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *crm.RemoteFieldClass], error) {
+) (*core.Page[*string, *crm.RemoteFieldClass, *crm.PaginatedRemoteFieldClassList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/crm/v1/custom-object-classes/custom-objects/remote-field-classes"
 	queryParams, err := internal.QueryValues(request)
@@ -192,14 +193,15 @@ func (c *Client) CustomObjectClassesCustomObjectsRemoteFieldClassesList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *crm.RemoteFieldClass] {
+	readPageResponse := func(response *crm.PaginatedRemoteFieldClassList) *core.PageResponse[*string, *crm.RemoteFieldClass, *crm.PaginatedRemoteFieldClassList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *crm.RemoteFieldClass]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *crm.RemoteFieldClass, *crm.PaginatedRemoteFieldClassList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

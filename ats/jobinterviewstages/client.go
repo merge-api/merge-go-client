@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.JobInterviewStagesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.JobInterviewStage], error) {
+) (*core.Page[*string, *ats.JobInterviewStage, *ats.PaginatedJobInterviewStageList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/job-interview-stages"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedJobInterviewStageList) *core.PageResponse[*string, *ats.JobInterviewStage] {
+	readPageResponse := func(response *ats.PaginatedJobInterviewStageList) *core.PageResponse[*string, *ats.JobInterviewStage, *ats.PaginatedJobInterviewStageList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.JobInterviewStage]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.JobInterviewStage, *ats.PaginatedJobInterviewStageList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

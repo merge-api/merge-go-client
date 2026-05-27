@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *ats.SyncStatusListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *ats.SyncStatus], error) {
+) (*core.Page[*string, *ats.SyncStatus, *ats.PaginatedSyncStatusList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/sync-status"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *ats.PaginatedSyncStatusList) *core.PageResponse[*string, *ats.SyncStatus] {
+	readPageResponse := func(response *ats.PaginatedSyncStatusList) *core.PageResponse[*string, *ats.SyncStatus, *ats.PaginatedSyncStatusList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *ats.SyncStatus]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *ats.SyncStatus, *ats.PaginatedSyncStatusList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

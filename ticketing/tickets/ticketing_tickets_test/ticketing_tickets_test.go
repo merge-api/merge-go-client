@@ -170,6 +170,9 @@ func TestTicketingTicketsListWithWireMock(
 		RemoteId: merge.String(
 			"remote_id",
 		),
+		RemoteIds: merge.String(
+			"remote_ids",
+		),
 		RemoteUpdatedAfter: merge.Time(
 			merge.MustParseDateTime(
 				"2024-01-15T09:30:00Z",
@@ -198,7 +201,7 @@ func TestTicketingTicketsListWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/ticketing/v1/tickets", map[string]string{"account_id": "account_id", "assignee_ids": "assignee_ids", "collection_ids": "collection_ids", "completed_after": "2024-01-15T09:30:00Z", "completed_before": "2024-01-15T09:30:00Z", "contact_id": "contact_id", "created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "creator_id": "creator_id", "creator_ids": "creator_ids", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "due_after": "2024-01-15T09:30:00Z", "due_before": "2024-01-15T09:30:00Z", "include_deleted_data": "true", "include_remote_data": "true", "include_remote_fields": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "name": "name", "page_size": "1", "parent_ticket_id": "parent_ticket_id", "priority": "HIGH", "remote_created_after": "2024-01-15T09:30:00Z", "remote_created_before": "2024-01-15T09:30:00Z", "remote_fields": "priority", "remote_id": "remote_id", "remote_updated_after": "2024-01-15T09:30:00Z", "remote_updated_before": "2024-01-15T09:30:00Z", "show_enum_origins": "priority", "status": "", "tags": "tags", "ticket_type": "ticket_type", "ticket_url": "ticket_url"}, 1)
+	VerifyRequestCount(t, "GET", "/ticketing/v1/tickets", map[string]string{"account_id": "account_id", "assignee_ids": "assignee_ids", "collection_ids": "collection_ids", "completed_after": "2024-01-15T09:30:00Z", "completed_before": "2024-01-15T09:30:00Z", "contact_id": "contact_id", "created_after": "2024-01-15T09:30:00Z", "created_before": "2024-01-15T09:30:00Z", "creator_id": "creator_id", "creator_ids": "creator_ids", "cursor": "cD0yMDIxLTAxLTA2KzAzJTNBMjQlM0E1My40MzQzMjYlMkIwMCUzQTAw", "due_after": "2024-01-15T09:30:00Z", "due_before": "2024-01-15T09:30:00Z", "include_deleted_data": "true", "include_remote_data": "true", "include_remote_fields": "true", "include_shell_data": "true", "modified_after": "2024-01-15T09:30:00Z", "modified_before": "2024-01-15T09:30:00Z", "name": "name", "page_size": "1", "parent_ticket_id": "parent_ticket_id", "priority": "HIGH", "remote_created_after": "2024-01-15T09:30:00Z", "remote_created_before": "2024-01-15T09:30:00Z", "remote_fields": "priority", "remote_id": "remote_id", "remote_ids": "remote_ids", "remote_updated_after": "2024-01-15T09:30:00Z", "remote_updated_before": "2024-01-15T09:30:00Z", "show_enum_origins": "priority", "status": "", "tags": "tags", "ticket_type": "ticket_type", "ticket_url": "ticket_url"}, 1)
 }
 
 func TestTicketingTicketsCreateWithWireMock(

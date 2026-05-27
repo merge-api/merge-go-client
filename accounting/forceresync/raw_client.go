@@ -38,7 +38,7 @@ func (r *RawClient) SyncStatusResyncCreate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/accounting/v1/sync-status/resync"
 	headers := internal.MergeHeaders(

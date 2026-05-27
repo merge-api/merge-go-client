@@ -40,12 +40,12 @@ func (c *Client) CustomObjectClassesCustomObjectsAssociationsList(
 	objectId string,
 	request *crm.CustomObjectClassesCustomObjectsAssociationsListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *crm.Association], error) {
+) (*core.Page[*string, *crm.Association, *crm.PaginatedAssociationList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/crm/v1/custom-object-classes/%v/custom-objects/%v/associations",
@@ -79,14 +79,15 @@ func (c *Client) CustomObjectClassesCustomObjectsAssociationsList(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *crm.PaginatedAssociationList) *core.PageResponse[*string, *crm.Association] {
+	readPageResponse := func(response *crm.PaginatedAssociationList) *core.PageResponse[*string, *crm.Association, *crm.PaginatedAssociationList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *crm.Association]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *crm.Association, *crm.PaginatedAssociationList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

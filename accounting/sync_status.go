@@ -17,7 +17,7 @@ var (
 type SyncStatusListRequest struct {
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted

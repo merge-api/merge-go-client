@@ -39,7 +39,7 @@ type CollectionsListRequest struct {
 	// The pagination cursor value.
 	Cursor *string `json:"-" url:"cursor,omitempty"`
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
-	Expand []*string `json:"-" url:"expand,omitempty"`
+	Expand []*CollectionsListRequestExpandItem `json:"-" url:"expand,omitempty"`
 	// Indicates whether or not this object has been deleted in the third party platform. Full coverage deletion detection is a premium add-on. Native deletion detection is offered for free with limited coverage. [Learn more](https://docs.merge.dev/integrations/hris/supported-features/).
 	IncludeDeletedData *bool `json:"-" url:"include_deleted_data,omitempty"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
@@ -52,7 +52,7 @@ type CollectionsListRequest struct {
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
 	// If provided, will only return collections with this name.
 	Name *string `json:"-" url:"name,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// If provided, will only return collections whose parent collection matches the given id.
 	ParentCollectionId *string `json:"-" url:"parent_collection_id,omitempty"`
@@ -104,7 +104,7 @@ func (c *CollectionsListRequest) SetCursor(cursor *string) {
 
 // SetExpand sets the Expand field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CollectionsListRequest) SetExpand(expand []*string) {
+func (c *CollectionsListRequest) SetExpand(expand []*CollectionsListRequestExpandItem) {
 	c.Expand = expand
 	c.require(collectionsListRequestFieldExpand)
 }
@@ -196,7 +196,7 @@ var (
 
 type CollectionsRetrieveRequest struct {
 	// Which relations should be returned in expanded form. Multiple relation names should be comma separated without spaces.
-	Expand []*string `json:"-" url:"expand,omitempty"`
+	Expand []*CollectionsRetrieveRequestExpandItem `json:"-" url:"expand,omitempty"`
 	// Whether to include the original data Merge fetched from the third-party to produce these models.
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
@@ -219,7 +219,7 @@ func (c *CollectionsRetrieveRequest) require(field *big.Int) {
 
 // SetExpand sets the Expand field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CollectionsRetrieveRequest) SetExpand(expand []*string) {
+func (c *CollectionsRetrieveRequest) SetExpand(expand []*CollectionsRetrieveRequestExpandItem) {
 	c.Expand = expand
 	c.require(collectionsRetrieveRequestFieldExpand)
 }
@@ -274,6 +274,50 @@ func NewCollectionsListRequestCollectionTypeFromString(s string) (CollectionsLis
 }
 
 func (c CollectionsListRequestCollectionType) Ptr() *CollectionsListRequestCollectionType {
+	return &c
+}
+
+type CollectionsListRequestExpandItem string
+
+const (
+	CollectionsListRequestExpandItemParentCollection CollectionsListRequestExpandItem = "parent_collection"
+	CollectionsListRequestExpandItemPermissions      CollectionsListRequestExpandItem = "permissions"
+)
+
+func NewCollectionsListRequestExpandItemFromString(s string) (CollectionsListRequestExpandItem, error) {
+	switch s {
+	case "parent_collection":
+		return CollectionsListRequestExpandItemParentCollection, nil
+	case "permissions":
+		return CollectionsListRequestExpandItemPermissions, nil
+	}
+	var t CollectionsListRequestExpandItem
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CollectionsListRequestExpandItem) Ptr() *CollectionsListRequestExpandItem {
+	return &c
+}
+
+type CollectionsRetrieveRequestExpandItem string
+
+const (
+	CollectionsRetrieveRequestExpandItemParentCollection CollectionsRetrieveRequestExpandItem = "parent_collection"
+	CollectionsRetrieveRequestExpandItemPermissions      CollectionsRetrieveRequestExpandItem = "permissions"
+)
+
+func NewCollectionsRetrieveRequestExpandItemFromString(s string) (CollectionsRetrieveRequestExpandItem, error) {
+	switch s {
+	case "parent_collection":
+		return CollectionsRetrieveRequestExpandItemParentCollection, nil
+	case "permissions":
+		return CollectionsRetrieveRequestExpandItemPermissions, nil
+	}
+	var t CollectionsRetrieveRequestExpandItem
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (c CollectionsRetrieveRequestExpandItem) Ptr() *CollectionsRetrieveRequestExpandItem {
 	return &c
 }
 
@@ -429,7 +473,7 @@ type CollectionsViewersListRequest struct {
 	IncludeRemoteData *bool `json:"-" url:"include_remote_data,omitempty"`
 	// Whether to include shell records. Shell records are empty records (they may contain some metadata but all other fields are null).
 	IncludeShellData *bool `json:"-" url:"include_shell_data,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted

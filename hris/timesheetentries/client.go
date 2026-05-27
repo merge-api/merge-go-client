@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *hris.TimesheetEntriesListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *hris.TimesheetEntry], error) {
+) (*core.Page[*string, *hris.TimesheetEntry, *hris.PaginatedTimesheetEntryList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/hris/v1/timesheet-entries"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *hris.PaginatedTimesheetEntryList) *core.PageResponse[*string, *hris.TimesheetEntry] {
+	readPageResponse := func(response *hris.PaginatedTimesheetEntryList) *core.PageResponse[*string, *hris.TimesheetEntry, *hris.PaginatedTimesheetEntryList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *hris.TimesheetEntry]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *hris.TimesheetEntry, *hris.PaginatedTimesheetEntryList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

@@ -233,6 +233,52 @@ func TestAccountingInvoicesPartialUpdateWithWireMock(
 	VerifyRequestCount(t, "PATCH", "/accounting/v1/invoices/id", map[string]string{"is_debug_mode": "true", "run_async": "true"}, 1)
 }
 
+func TestAccountingInvoicesBulkCreateWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	request := &accounting.InvoiceBulkRequest{
+		BatchItems: []*accounting.InvoiceBatchItemRequest{
+			&accounting.InvoiceBatchItemRequest{
+				ItemId:  "item_id",
+				Payload: &accounting.InvoiceRequest{},
+			},
+		},
+	}
+	_, invocationErr := client.Accounting.Invoices.BulkCreate(
+		context.TODO(),
+		request,
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "POST", "/accounting/v1/invoices/bulk", nil, 1)
+}
+
+func TestAccountingInvoicesBulkRetrieveWithWireMock(
+	t *testing.T,
+) {
+	ResetWireMockRequests(t)
+	WireMockBaseURL := "http://localhost:8080"
+	client := client.NewClient(
+		option.WithBaseURL(
+			WireMockBaseURL,
+		),
+	)
+	_, invocationErr := client.Accounting.Invoices.BulkRetrieve(
+		context.TODO(),
+		"batch_id",
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "GET", "/accounting/v1/invoices/bulk/batch_id", nil, 1)
+}
+
 func TestAccountingInvoicesLineItemsRemoteFieldClassesListWithWireMock(
 	t *testing.T,
 ) {

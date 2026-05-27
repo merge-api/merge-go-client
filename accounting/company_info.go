@@ -20,8 +20,9 @@ var (
 	companyInfoListRequestFieldIncludeShellData   = big.NewInt(1 << 6)
 	companyInfoListRequestFieldModifiedAfter      = big.NewInt(1 << 7)
 	companyInfoListRequestFieldModifiedBefore     = big.NewInt(1 << 8)
-	companyInfoListRequestFieldPageSize           = big.NewInt(1 << 9)
-	companyInfoListRequestFieldRemoteId           = big.NewInt(1 << 10)
+	companyInfoListRequestFieldName               = big.NewInt(1 << 9)
+	companyInfoListRequestFieldPageSize           = big.NewInt(1 << 10)
+	companyInfoListRequestFieldRemoteId           = big.NewInt(1 << 11)
 )
 
 type CompanyInfoListRequest struct {
@@ -43,7 +44,9 @@ type CompanyInfoListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// If provided, will only return CompanyInfo objects with this name.
+	Name *string `json:"-" url:"name,omitempty"`
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// The API provider's ID for the given object.
 	RemoteId *string `json:"-" url:"remote_id,omitempty"`
@@ -120,6 +123,13 @@ func (c *CompanyInfoListRequest) SetModifiedAfter(modifiedAfter *time.Time) {
 func (c *CompanyInfoListRequest) SetModifiedBefore(modifiedBefore *time.Time) {
 	c.ModifiedBefore = modifiedBefore
 	c.require(companyInfoListRequestFieldModifiedBefore)
+}
+
+// SetName sets the Name field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CompanyInfoListRequest) SetName(name *string) {
+	c.Name = name
+	c.require(companyInfoListRequestFieldName)
 }
 
 // SetPageSize sets the PageSize field and marks it as non-optional;

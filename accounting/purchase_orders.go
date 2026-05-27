@@ -78,7 +78,7 @@ type PurchaseOrdersLineItemsRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -188,7 +188,7 @@ type PurchaseOrdersListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *string `json:"-" url:"remote_fields,omitempty"`
@@ -350,7 +350,7 @@ type PurchaseOrdersRemoteFieldClassesListRequest struct {
 	IsCommonModelField *bool `json:"-" url:"is_common_model_field,omitempty"`
 	// If provided, will only return remote fields classes with this is_custom value
 	IsCustom *bool `json:"-" url:"is_custom,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
@@ -671,1098 +671,6 @@ func (p *PaginatedPurchaseOrderList) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", p)
-}
-
-// # The PurchaseOrderLineItem Object
-// ### Description
-// The `PurchaseOrderLineItem` object is used to represent a purchase order's line item.
-//
-// ### Usage Example
-// Fetch from the `GET PurchaseOrder` endpoint and view a company's purchase orders.
-var (
-	purchaseOrderLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
-	purchaseOrderLineItemRequestFieldDescription         = big.NewInt(1 << 1)
-	purchaseOrderLineItemRequestFieldUnitPrice           = big.NewInt(1 << 2)
-	purchaseOrderLineItemRequestFieldQuantity            = big.NewInt(1 << 3)
-	purchaseOrderLineItemRequestFieldItem                = big.NewInt(1 << 4)
-	purchaseOrderLineItemRequestFieldAccount             = big.NewInt(1 << 5)
-	purchaseOrderLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 6)
-	purchaseOrderLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 7)
-	purchaseOrderLineItemRequestFieldTaxAmount           = big.NewInt(1 << 8)
-	purchaseOrderLineItemRequestFieldTotalLineAmount     = big.NewInt(1 << 9)
-	purchaseOrderLineItemRequestFieldCurrency            = big.NewInt(1 << 10)
-	purchaseOrderLineItemRequestFieldTaxRate             = big.NewInt(1 << 11)
-	purchaseOrderLineItemRequestFieldExchangeRate        = big.NewInt(1 << 12)
-	purchaseOrderLineItemRequestFieldCompany             = big.NewInt(1 << 13)
-	purchaseOrderLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 14)
-	purchaseOrderLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 15)
-	purchaseOrderLineItemRequestFieldRemoteFields        = big.NewInt(1 << 16)
-)
-
-type PurchaseOrderLineItemRequest struct {
-	// The third-party API ID of the matching object.
-	RemoteId *string `json:"remote_id,omitempty" url:"remote_id,omitempty"`
-	// A description of the good being purchased.
-	Description *string `json:"description,omitempty" url:"description,omitempty"`
-	// The line item's unit price.
-	UnitPrice *float64 `json:"unit_price,omitempty" url:"unit_price,omitempty"`
-	// The line item's quantity.
-	Quantity *float64                          `json:"quantity,omitempty" url:"quantity,omitempty"`
-	Item     *PurchaseOrderLineItemRequestItem `json:"item,omitempty" url:"item,omitempty"`
-	// The purchase order line item's account.
-	Account *string `json:"account,omitempty" url:"account,omitempty"`
-	// The purchase order line item's associated tracking category.
-	TrackingCategory *string `json:"tracking_category,omitempty" url:"tracking_category,omitempty"`
-	// The purchase order line item's associated tracking categories.
-	TrackingCategories []*string `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
-	// The purchase order line item's tax amount.
-	TaxAmount *string `json:"tax_amount,omitempty" url:"tax_amount,omitempty"`
-	// The purchase order line item's total amount.
-	TotalLineAmount *string `json:"total_line_amount,omitempty" url:"total_line_amount,omitempty"`
-	// The purchase order line item's currency.
-	//
-	// * `XUA` - ADB Unit of Account
-	// * `AFN` - Afghan Afghani
-	// * `AFA` - Afghan Afghani (1927–2002)
-	// * `ALL` - Albanian Lek
-	// * `ALK` - Albanian Lek (1946–1965)
-	// * `DZD` - Algerian Dinar
-	// * `ADP` - Andorran Peseta
-	// * `AOA` - Angolan Kwanza
-	// * `AOK` - Angolan Kwanza (1977–1991)
-	// * `AON` - Angolan New Kwanza (1990–2000)
-	// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
-	// * `ARA` - Argentine Austral
-	// * `ARS` - Argentine Peso
-	// * `ARM` - Argentine Peso (1881–1970)
-	// * `ARP` - Argentine Peso (1983–1985)
-	// * `ARL` - Argentine Peso Ley (1970–1983)
-	// * `AMD` - Armenian Dram
-	// * `AWG` - Aruban Florin
-	// * `AUD` - Australian Dollar
-	// * `ATS` - Austrian Schilling
-	// * `AZN` - Azerbaijani Manat
-	// * `AZM` - Azerbaijani Manat (1993–2006)
-	// * `BSD` - Bahamian Dollar
-	// * `BHD` - Bahraini Dinar
-	// * `BDT` - Bangladeshi Taka
-	// * `BBD` - Barbadian Dollar
-	// * `BYN` - Belarusian Ruble
-	// * `BYB` - Belarusian Ruble (1994–1999)
-	// * `BYR` - Belarusian Ruble (2000–2016)
-	// * `BEF` - Belgian Franc
-	// * `BEC` - Belgian Franc (convertible)
-	// * `BEL` - Belgian Franc (financial)
-	// * `BZD` - Belize Dollar
-	// * `BMD` - Bermudan Dollar
-	// * `BTN` - Bhutanese Ngultrum
-	// * `BOB` - Bolivian Boliviano
-	// * `BOL` - Bolivian Boliviano (1863–1963)
-	// * `BOV` - Bolivian Mvdol
-	// * `BOP` - Bolivian Peso
-	// * `BAM` - Bosnia-Herzegovina Convertible Mark
-	// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
-	// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
-	// * `BWP` - Botswanan Pula
-	// * `BRC` - Brazilian Cruzado (1986–1989)
-	// * `BRZ` - Brazilian Cruzeiro (1942–1967)
-	// * `BRE` - Brazilian Cruzeiro (1990–1993)
-	// * `BRR` - Brazilian Cruzeiro (1993–1994)
-	// * `BRN` - Brazilian New Cruzado (1989–1990)
-	// * `BRB` - Brazilian New Cruzeiro (1967–1986)
-	// * `BRL` - Brazilian Real
-	// * `GBP` - British Pound
-	// * `BND` - Brunei Dollar
-	// * `BGL` - Bulgarian Hard Lev
-	// * `BGN` - Bulgarian Lev
-	// * `BGO` - Bulgarian Lev (1879–1952)
-	// * `BGM` - Bulgarian Socialist Lev
-	// * `BUK` - Burmese Kyat
-	// * `BIF` - Burundian Franc
-	// * `XPF` - CFP Franc
-	// * `KHR` - Cambodian Riel
-	// * `CAD` - Canadian Dollar
-	// * `CVE` - Cape Verdean Escudo
-	// * `KYD` - Cayman Islands Dollar
-	// * `XAF` - Central African CFA Franc
-	// * `CLE` - Chilean Escudo
-	// * `CLP` - Chilean Peso
-	// * `CLF` - Chilean Unit of Account (UF)
-	// * `CNX` - Chinese People’s Bank Dollar
-	// * `CNY` - Chinese Yuan
-	// * `CNH` - Chinese Yuan (offshore)
-	// * `COP` - Colombian Peso
-	// * `COU` - Colombian Real Value Unit
-	// * `KMF` - Comorian Franc
-	// * `CDF` - Congolese Franc
-	// * `CRC` - Costa Rican Colón
-	// * `HRD` - Croatian Dinar
-	// * `HRK` - Croatian Kuna
-	// * `CUC` - Cuban Convertible Peso
-	// * `CUP` - Cuban Peso
-	// * `CYP` - Cypriot Pound
-	// * `CZK` - Czech Koruna
-	// * `CSK` - Czechoslovak Hard Koruna
-	// * `DKK` - Danish Krone
-	// * `DJF` - Djiboutian Franc
-	// * `DOP` - Dominican Peso
-	// * `NLG` - Dutch Guilder
-	// * `XCD` - East Caribbean Dollar
-	// * `DDM` - East German Mark
-	// * `ECS` - Ecuadorian Sucre
-	// * `ECV` - Ecuadorian Unit of Constant Value
-	// * `EGP` - Egyptian Pound
-	// * `GQE` - Equatorial Guinean Ekwele
-	// * `ERN` - Eritrean Nakfa
-	// * `EEK` - Estonian Kroon
-	// * `ETB` - Ethiopian Birr
-	// * `EUR` - Euro
-	// * `XBA` - European Composite Unit
-	// * `XEU` - European Currency Unit
-	// * `XBB` - European Monetary Unit
-	// * `XBC` - European Unit of Account (XBC)
-	// * `XBD` - European Unit of Account (XBD)
-	// * `FKP` - Falkland Islands Pound
-	// * `FJD` - Fijian Dollar
-	// * `FIM` - Finnish Markka
-	// * `FRF` - French Franc
-	// * `XFO` - French Gold Franc
-	// * `XFU` - French UIC-Franc
-	// * `GMD` - Gambian Dalasi
-	// * `GEK` - Georgian Kupon Larit
-	// * `GEL` - Georgian Lari
-	// * `DEM` - German Mark
-	// * `GHS` - Ghanaian Cedi
-	// * `GHC` - Ghanaian Cedi (1979–2007)
-	// * `GIP` - Gibraltar Pound
-	// * `XAU` - Gold
-	// * `GRD` - Greek Drachma
-	// * `GTQ` - Guatemalan Quetzal
-	// * `GWP` - Guinea-Bissau Peso
-	// * `GNF` - Guinean Franc
-	// * `GNS` - Guinean Syli
-	// * `GYD` - Guyanaese Dollar
-	// * `HTG` - Haitian Gourde
-	// * `HNL` - Honduran Lempira
-	// * `HKD` - Hong Kong Dollar
-	// * `HUF` - Hungarian Forint
-	// * `IMP` - IMP
-	// * `ISK` - Icelandic Króna
-	// * `ISJ` - Icelandic Króna (1918–1981)
-	// * `INR` - Indian Rupee
-	// * `IDR` - Indonesian Rupiah
-	// * `IRR` - Iranian Rial
-	// * `IQD` - Iraqi Dinar
-	// * `IEP` - Irish Pound
-	// * `ILS` - Israeli New Shekel
-	// * `ILP` - Israeli Pound
-	// * `ILR` - Israeli Shekel (1980–1985)
-	// * `ITL` - Italian Lira
-	// * `JMD` - Jamaican Dollar
-	// * `JPY` - Japanese Yen
-	// * `JOD` - Jordanian Dinar
-	// * `KZT` - Kazakhstani Tenge
-	// * `KES` - Kenyan Shilling
-	// * `KWD` - Kuwaiti Dinar
-	// * `KGS` - Kyrgystani Som
-	// * `LAK` - Laotian Kip
-	// * `LVL` - Latvian Lats
-	// * `LVR` - Latvian Ruble
-	// * `LBP` - Lebanese Pound
-	// * `LSL` - Lesotho Loti
-	// * `LRD` - Liberian Dollar
-	// * `LYD` - Libyan Dinar
-	// * `LTL` - Lithuanian Litas
-	// * `LTT` - Lithuanian Talonas
-	// * `LUL` - Luxembourg Financial Franc
-	// * `LUC` - Luxembourgian Convertible Franc
-	// * `LUF` - Luxembourgian Franc
-	// * `MOP` - Macanese Pataca
-	// * `MKD` - Macedonian Denar
-	// * `MKN` - Macedonian Denar (1992–1993)
-	// * `MGA` - Malagasy Ariary
-	// * `MGF` - Malagasy Franc
-	// * `MWK` - Malawian Kwacha
-	// * `MYR` - Malaysian Ringgit
-	// * `MVR` - Maldivian Rufiyaa
-	// * `MVP` - Maldivian Rupee (1947–1981)
-	// * `MLF` - Malian Franc
-	// * `MTL` - Maltese Lira
-	// * `MTP` - Maltese Pound
-	// * `MRU` - Mauritanian Ouguiya
-	// * `MRO` - Mauritanian Ouguiya (1973–2017)
-	// * `MUR` - Mauritian Rupee
-	// * `MXV` - Mexican Investment Unit
-	// * `MXN` - Mexican Peso
-	// * `MXP` - Mexican Silver Peso (1861–1992)
-	// * `MDC` - Moldovan Cupon
-	// * `MDL` - Moldovan Leu
-	// * `MCF` - Monegasque Franc
-	// * `MNT` - Mongolian Tugrik
-	// * `MAD` - Moroccan Dirham
-	// * `MAF` - Moroccan Franc
-	// * `MZE` - Mozambican Escudo
-	// * `MZN` - Mozambican Metical
-	// * `MZM` - Mozambican Metical (1980–2006)
-	// * `MMK` - Myanmar Kyat
-	// * `NAD` - Namibian Dollar
-	// * `NPR` - Nepalese Rupee
-	// * `ANG` - Netherlands Antillean Guilder
-	// * `TWD` - New Taiwan Dollar
-	// * `NZD` - New Zealand Dollar
-	// * `NIO` - Nicaraguan Córdoba
-	// * `NIC` - Nicaraguan Córdoba (1988–1991)
-	// * `NGN` - Nigerian Naira
-	// * `KPW` - North Korean Won
-	// * `NOK` - Norwegian Krone
-	// * `OMR` - Omani Rial
-	// * `PKR` - Pakistani Rupee
-	// * `XPD` - Palladium
-	// * `PAB` - Panamanian Balboa
-	// * `PGK` - Papua New Guinean Kina
-	// * `PYG` - Paraguayan Guarani
-	// * `PEI` - Peruvian Inti
-	// * `PEN` - Peruvian Sol
-	// * `PES` - Peruvian Sol (1863–1965)
-	// * `PHP` - Philippine Peso
-	// * `XPT` - Platinum
-	// * `PLN` - Polish Zloty
-	// * `PLZ` - Polish Zloty (1950–1995)
-	// * `PTE` - Portuguese Escudo
-	// * `GWE` - Portuguese Guinea Escudo
-	// * `QAR` - Qatari Rial
-	// * `XRE` - RINET Funds
-	// * `RHD` - Rhodesian Dollar
-	// * `RON` - Romanian Leu
-	// * `ROL` - Romanian Leu (1952–2006)
-	// * `RUB` - Russian Ruble
-	// * `RUR` - Russian Ruble (1991–1998)
-	// * `RWF` - Rwandan Franc
-	// * `SVC` - Salvadoran Colón
-	// * `WST` - Samoan Tala
-	// * `SAR` - Saudi Riyal
-	// * `RSD` - Serbian Dinar
-	// * `CSD` - Serbian Dinar (2002–2006)
-	// * `SCR` - Seychellois Rupee
-	// * `SLL` - Sierra Leonean Leone
-	// * `XAG` - Silver
-	// * `SGD` - Singapore Dollar
-	// * `SKK` - Slovak Koruna
-	// * `SIT` - Slovenian Tolar
-	// * `SBD` - Solomon Islands Dollar
-	// * `SOS` - Somali Shilling
-	// * `ZAR` - South African Rand
-	// * `ZAL` - South African Rand (financial)
-	// * `KRH` - South Korean Hwan (1953–1962)
-	// * `KRW` - South Korean Won
-	// * `KRO` - South Korean Won (1945–1953)
-	// * `SSP` - South Sudanese Pound
-	// * `SUR` - Soviet Rouble
-	// * `ESP` - Spanish Peseta
-	// * `ESA` - Spanish Peseta (A account)
-	// * `ESB` - Spanish Peseta (convertible account)
-	// * `XDR` - Special Drawing Rights
-	// * `LKR` - Sri Lankan Rupee
-	// * `SHP` - St. Helena Pound
-	// * `XSU` - Sucre
-	// * `SDD` - Sudanese Dinar (1992–2007)
-	// * `SDG` - Sudanese Pound
-	// * `SDP` - Sudanese Pound (1957–1998)
-	// * `SRD` - Surinamese Dollar
-	// * `SRG` - Surinamese Guilder
-	// * `SZL` - Swazi Lilangeni
-	// * `SEK` - Swedish Krona
-	// * `CHF` - Swiss Franc
-	// * `SYP` - Syrian Pound
-	// * `STN` - São Tomé & Príncipe Dobra
-	// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
-	// * `TVD` - TVD
-	// * `TJR` - Tajikistani Ruble
-	// * `TJS` - Tajikistani Somoni
-	// * `TZS` - Tanzanian Shilling
-	// * `XTS` - Testing Currency Code
-	// * `THB` - Thai Baht
-	// * `XXX` - The codes assigned for transactions where no currency is involved
-	// * `TPE` - Timorese Escudo
-	// * `TOP` - Tongan Paʻanga
-	// * `TTD` - Trinidad & Tobago Dollar
-	// * `TND` - Tunisian Dinar
-	// * `TRY` - Turkish Lira
-	// * `TRL` - Turkish Lira (1922–2005)
-	// * `TMT` - Turkmenistani Manat
-	// * `TMM` - Turkmenistani Manat (1993–2009)
-	// * `USD` - US Dollar
-	// * `USN` - US Dollar (Next day)
-	// * `USS` - US Dollar (Same day)
-	// * `UGX` - Ugandan Shilling
-	// * `UGS` - Ugandan Shilling (1966–1987)
-	// * `UAH` - Ukrainian Hryvnia
-	// * `UAK` - Ukrainian Karbovanets
-	// * `AED` - United Arab Emirates Dirham
-	// * `UYW` - Uruguayan Nominal Wage Index Unit
-	// * `UYU` - Uruguayan Peso
-	// * `UYP` - Uruguayan Peso (1975–1993)
-	// * `UYI` - Uruguayan Peso (Indexed Units)
-	// * `UZS` - Uzbekistani Som
-	// * `VUV` - Vanuatu Vatu
-	// * `VES` - Venezuelan Bolívar
-	// * `VEB` - Venezuelan Bolívar (1871–2008)
-	// * `VEF` - Venezuelan Bolívar (2008–2018)
-	// * `VND` - Vietnamese Dong
-	// * `VNN` - Vietnamese Dong (1978–1985)
-	// * `CHE` - WIR Euro
-	// * `CHW` - WIR Franc
-	// * `XOF` - West African CFA Franc
-	// * `YDD` - Yemeni Dinar
-	// * `YER` - Yemeni Rial
-	// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
-	// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
-	// * `YUM` - Yugoslavian New Dinar (1994–2002)
-	// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
-	// * `ZWN` - ZWN
-	// * `ZRN` - Zairean New Zaire (1993–1998)
-	// * `ZRZ` - Zairean Zaire (1971–1993)
-	// * `ZMW` - Zambian Kwacha
-	// * `ZMK` - Zambian Kwacha (1968–2012)
-	// * `ZWD` - Zimbabwean Dollar (1980–2008)
-	// * `ZWR` - Zimbabwean Dollar (2008)
-	// * `ZWL` - Zimbabwean Dollar (2009)
-	Currency *PurchaseOrderLineItemRequestCurrency `json:"currency,omitempty" url:"currency,omitempty"`
-	// The tax rate that applies to this line item.
-	TaxRate *string `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
-	// The purchase order line item's exchange rate.
-	ExchangeRate *string `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
-	// The company the purchase order line item belongs to.
-	Company             *string                `json:"company,omitempty" url:"company,omitempty"`
-	IntegrationParams   map[string]interface{} `json:"integration_params,omitempty" url:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{} `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
-	RemoteFields        []*RemoteFieldRequest  `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (p *PurchaseOrderLineItemRequest) GetRemoteId() *string {
-	if p == nil {
-		return nil
-	}
-	return p.RemoteId
-}
-
-func (p *PurchaseOrderLineItemRequest) GetDescription() *string {
-	if p == nil {
-		return nil
-	}
-	return p.Description
-}
-
-func (p *PurchaseOrderLineItemRequest) GetUnitPrice() *float64 {
-	if p == nil {
-		return nil
-	}
-	return p.UnitPrice
-}
-
-func (p *PurchaseOrderLineItemRequest) GetQuantity() *float64 {
-	if p == nil {
-		return nil
-	}
-	return p.Quantity
-}
-
-func (p *PurchaseOrderLineItemRequest) GetItem() *PurchaseOrderLineItemRequestItem {
-	if p == nil {
-		return nil
-	}
-	return p.Item
-}
-
-func (p *PurchaseOrderLineItemRequest) GetAccount() *string {
-	if p == nil {
-		return nil
-	}
-	return p.Account
-}
-
-func (p *PurchaseOrderLineItemRequest) GetTrackingCategory() *string {
-	if p == nil {
-		return nil
-	}
-	return p.TrackingCategory
-}
-
-func (p *PurchaseOrderLineItemRequest) GetTrackingCategories() []*string {
-	if p == nil {
-		return nil
-	}
-	return p.TrackingCategories
-}
-
-func (p *PurchaseOrderLineItemRequest) GetTaxAmount() *string {
-	if p == nil {
-		return nil
-	}
-	return p.TaxAmount
-}
-
-func (p *PurchaseOrderLineItemRequest) GetTotalLineAmount() *string {
-	if p == nil {
-		return nil
-	}
-	return p.TotalLineAmount
-}
-
-func (p *PurchaseOrderLineItemRequest) GetCurrency() *PurchaseOrderLineItemRequestCurrency {
-	if p == nil {
-		return nil
-	}
-	return p.Currency
-}
-
-func (p *PurchaseOrderLineItemRequest) GetTaxRate() *string {
-	if p == nil {
-		return nil
-	}
-	return p.TaxRate
-}
-
-func (p *PurchaseOrderLineItemRequest) GetExchangeRate() *string {
-	if p == nil {
-		return nil
-	}
-	return p.ExchangeRate
-}
-
-func (p *PurchaseOrderLineItemRequest) GetCompany() *string {
-	if p == nil {
-		return nil
-	}
-	return p.Company
-}
-
-func (p *PurchaseOrderLineItemRequest) GetIntegrationParams() map[string]interface{} {
-	if p == nil {
-		return nil
-	}
-	return p.IntegrationParams
-}
-
-func (p *PurchaseOrderLineItemRequest) GetLinkedAccountParams() map[string]interface{} {
-	if p == nil {
-		return nil
-	}
-	return p.LinkedAccountParams
-}
-
-func (p *PurchaseOrderLineItemRequest) GetRemoteFields() []*RemoteFieldRequest {
-	if p == nil {
-		return nil
-	}
-	return p.RemoteFields
-}
-
-func (p *PurchaseOrderLineItemRequest) GetExtraProperties() map[string]interface{} {
-	return p.extraProperties
-}
-
-func (p *PurchaseOrderLineItemRequest) require(field *big.Int) {
-	if p.explicitFields == nil {
-		p.explicitFields = big.NewInt(0)
-	}
-	p.explicitFields.Or(p.explicitFields, field)
-}
-
-// SetRemoteId sets the RemoteId field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetRemoteId(remoteId *string) {
-	p.RemoteId = remoteId
-	p.require(purchaseOrderLineItemRequestFieldRemoteId)
-}
-
-// SetDescription sets the Description field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetDescription(description *string) {
-	p.Description = description
-	p.require(purchaseOrderLineItemRequestFieldDescription)
-}
-
-// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetUnitPrice(unitPrice *float64) {
-	p.UnitPrice = unitPrice
-	p.require(purchaseOrderLineItemRequestFieldUnitPrice)
-}
-
-// SetQuantity sets the Quantity field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetQuantity(quantity *float64) {
-	p.Quantity = quantity
-	p.require(purchaseOrderLineItemRequestFieldQuantity)
-}
-
-// SetItem sets the Item field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetItem(item *PurchaseOrderLineItemRequestItem) {
-	p.Item = item
-	p.require(purchaseOrderLineItemRequestFieldItem)
-}
-
-// SetAccount sets the Account field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetAccount(account *string) {
-	p.Account = account
-	p.require(purchaseOrderLineItemRequestFieldAccount)
-}
-
-// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetTrackingCategory(trackingCategory *string) {
-	p.TrackingCategory = trackingCategory
-	p.require(purchaseOrderLineItemRequestFieldTrackingCategory)
-}
-
-// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetTrackingCategories(trackingCategories []*string) {
-	p.TrackingCategories = trackingCategories
-	p.require(purchaseOrderLineItemRequestFieldTrackingCategories)
-}
-
-// SetTaxAmount sets the TaxAmount field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetTaxAmount(taxAmount *string) {
-	p.TaxAmount = taxAmount
-	p.require(purchaseOrderLineItemRequestFieldTaxAmount)
-}
-
-// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetTotalLineAmount(totalLineAmount *string) {
-	p.TotalLineAmount = totalLineAmount
-	p.require(purchaseOrderLineItemRequestFieldTotalLineAmount)
-}
-
-// SetCurrency sets the Currency field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetCurrency(currency *PurchaseOrderLineItemRequestCurrency) {
-	p.Currency = currency
-	p.require(purchaseOrderLineItemRequestFieldCurrency)
-}
-
-// SetTaxRate sets the TaxRate field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetTaxRate(taxRate *string) {
-	p.TaxRate = taxRate
-	p.require(purchaseOrderLineItemRequestFieldTaxRate)
-}
-
-// SetExchangeRate sets the ExchangeRate field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetExchangeRate(exchangeRate *string) {
-	p.ExchangeRate = exchangeRate
-	p.require(purchaseOrderLineItemRequestFieldExchangeRate)
-}
-
-// SetCompany sets the Company field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetCompany(company *string) {
-	p.Company = company
-	p.require(purchaseOrderLineItemRequestFieldCompany)
-}
-
-// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
-	p.IntegrationParams = integrationParams
-	p.require(purchaseOrderLineItemRequestFieldIntegrationParams)
-}
-
-// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
-	p.LinkedAccountParams = linkedAccountParams
-	p.require(purchaseOrderLineItemRequestFieldLinkedAccountParams)
-}
-
-// SetRemoteFields sets the RemoteFields field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderLineItemRequest) SetRemoteFields(remoteFields []*RemoteFieldRequest) {
-	p.RemoteFields = remoteFields
-	p.require(purchaseOrderLineItemRequestFieldRemoteFields)
-}
-
-func (p *PurchaseOrderLineItemRequest) UnmarshalJSON(data []byte) error {
-	type unmarshaler PurchaseOrderLineItemRequest
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*p = PurchaseOrderLineItemRequest(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *p)
-	if err != nil {
-		return err
-	}
-	p.extraProperties = extraProperties
-	p.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (p *PurchaseOrderLineItemRequest) MarshalJSON() ([]byte, error) {
-	type embed PurchaseOrderLineItemRequest
-	var marshaler = struct {
-		embed
-	}{
-		embed: embed(*p),
-	}
-	explicitMarshaler := internal.HandleExplicitFields(marshaler, p.explicitFields)
-	return json.Marshal(explicitMarshaler)
-}
-
-func (p *PurchaseOrderLineItemRequest) String() string {
-	if len(p.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(p); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", p)
-}
-
-// The purchase order line item's currency.
-//
-// * `XUA` - ADB Unit of Account
-// * `AFN` - Afghan Afghani
-// * `AFA` - Afghan Afghani (1927–2002)
-// * `ALL` - Albanian Lek
-// * `ALK` - Albanian Lek (1946–1965)
-// * `DZD` - Algerian Dinar
-// * `ADP` - Andorran Peseta
-// * `AOA` - Angolan Kwanza
-// * `AOK` - Angolan Kwanza (1977–1991)
-// * `AON` - Angolan New Kwanza (1990–2000)
-// * `AOR` - Angolan Readjusted Kwanza (1995–1999)
-// * `ARA` - Argentine Austral
-// * `ARS` - Argentine Peso
-// * `ARM` - Argentine Peso (1881–1970)
-// * `ARP` - Argentine Peso (1983–1985)
-// * `ARL` - Argentine Peso Ley (1970–1983)
-// * `AMD` - Armenian Dram
-// * `AWG` - Aruban Florin
-// * `AUD` - Australian Dollar
-// * `ATS` - Austrian Schilling
-// * `AZN` - Azerbaijani Manat
-// * `AZM` - Azerbaijani Manat (1993–2006)
-// * `BSD` - Bahamian Dollar
-// * `BHD` - Bahraini Dinar
-// * `BDT` - Bangladeshi Taka
-// * `BBD` - Barbadian Dollar
-// * `BYN` - Belarusian Ruble
-// * `BYB` - Belarusian Ruble (1994–1999)
-// * `BYR` - Belarusian Ruble (2000–2016)
-// * `BEF` - Belgian Franc
-// * `BEC` - Belgian Franc (convertible)
-// * `BEL` - Belgian Franc (financial)
-// * `BZD` - Belize Dollar
-// * `BMD` - Bermudan Dollar
-// * `BTN` - Bhutanese Ngultrum
-// * `BOB` - Bolivian Boliviano
-// * `BOL` - Bolivian Boliviano (1863–1963)
-// * `BOV` - Bolivian Mvdol
-// * `BOP` - Bolivian Peso
-// * `BAM` - Bosnia-Herzegovina Convertible Mark
-// * `BAD` - Bosnia-Herzegovina Dinar (1992–1994)
-// * `BAN` - Bosnia-Herzegovina New Dinar (1994–1997)
-// * `BWP` - Botswanan Pula
-// * `BRC` - Brazilian Cruzado (1986–1989)
-// * `BRZ` - Brazilian Cruzeiro (1942–1967)
-// * `BRE` - Brazilian Cruzeiro (1990–1993)
-// * `BRR` - Brazilian Cruzeiro (1993–1994)
-// * `BRN` - Brazilian New Cruzado (1989–1990)
-// * `BRB` - Brazilian New Cruzeiro (1967–1986)
-// * `BRL` - Brazilian Real
-// * `GBP` - British Pound
-// * `BND` - Brunei Dollar
-// * `BGL` - Bulgarian Hard Lev
-// * `BGN` - Bulgarian Lev
-// * `BGO` - Bulgarian Lev (1879–1952)
-// * `BGM` - Bulgarian Socialist Lev
-// * `BUK` - Burmese Kyat
-// * `BIF` - Burundian Franc
-// * `XPF` - CFP Franc
-// * `KHR` - Cambodian Riel
-// * `CAD` - Canadian Dollar
-// * `CVE` - Cape Verdean Escudo
-// * `KYD` - Cayman Islands Dollar
-// * `XAF` - Central African CFA Franc
-// * `CLE` - Chilean Escudo
-// * `CLP` - Chilean Peso
-// * `CLF` - Chilean Unit of Account (UF)
-// * `CNX` - Chinese People’s Bank Dollar
-// * `CNY` - Chinese Yuan
-// * `CNH` - Chinese Yuan (offshore)
-// * `COP` - Colombian Peso
-// * `COU` - Colombian Real Value Unit
-// * `KMF` - Comorian Franc
-// * `CDF` - Congolese Franc
-// * `CRC` - Costa Rican Colón
-// * `HRD` - Croatian Dinar
-// * `HRK` - Croatian Kuna
-// * `CUC` - Cuban Convertible Peso
-// * `CUP` - Cuban Peso
-// * `CYP` - Cypriot Pound
-// * `CZK` - Czech Koruna
-// * `CSK` - Czechoslovak Hard Koruna
-// * `DKK` - Danish Krone
-// * `DJF` - Djiboutian Franc
-// * `DOP` - Dominican Peso
-// * `NLG` - Dutch Guilder
-// * `XCD` - East Caribbean Dollar
-// * `DDM` - East German Mark
-// * `ECS` - Ecuadorian Sucre
-// * `ECV` - Ecuadorian Unit of Constant Value
-// * `EGP` - Egyptian Pound
-// * `GQE` - Equatorial Guinean Ekwele
-// * `ERN` - Eritrean Nakfa
-// * `EEK` - Estonian Kroon
-// * `ETB` - Ethiopian Birr
-// * `EUR` - Euro
-// * `XBA` - European Composite Unit
-// * `XEU` - European Currency Unit
-// * `XBB` - European Monetary Unit
-// * `XBC` - European Unit of Account (XBC)
-// * `XBD` - European Unit of Account (XBD)
-// * `FKP` - Falkland Islands Pound
-// * `FJD` - Fijian Dollar
-// * `FIM` - Finnish Markka
-// * `FRF` - French Franc
-// * `XFO` - French Gold Franc
-// * `XFU` - French UIC-Franc
-// * `GMD` - Gambian Dalasi
-// * `GEK` - Georgian Kupon Larit
-// * `GEL` - Georgian Lari
-// * `DEM` - German Mark
-// * `GHS` - Ghanaian Cedi
-// * `GHC` - Ghanaian Cedi (1979–2007)
-// * `GIP` - Gibraltar Pound
-// * `XAU` - Gold
-// * `GRD` - Greek Drachma
-// * `GTQ` - Guatemalan Quetzal
-// * `GWP` - Guinea-Bissau Peso
-// * `GNF` - Guinean Franc
-// * `GNS` - Guinean Syli
-// * `GYD` - Guyanaese Dollar
-// * `HTG` - Haitian Gourde
-// * `HNL` - Honduran Lempira
-// * `HKD` - Hong Kong Dollar
-// * `HUF` - Hungarian Forint
-// * `IMP` - IMP
-// * `ISK` - Icelandic Króna
-// * `ISJ` - Icelandic Króna (1918–1981)
-// * `INR` - Indian Rupee
-// * `IDR` - Indonesian Rupiah
-// * `IRR` - Iranian Rial
-// * `IQD` - Iraqi Dinar
-// * `IEP` - Irish Pound
-// * `ILS` - Israeli New Shekel
-// * `ILP` - Israeli Pound
-// * `ILR` - Israeli Shekel (1980–1985)
-// * `ITL` - Italian Lira
-// * `JMD` - Jamaican Dollar
-// * `JPY` - Japanese Yen
-// * `JOD` - Jordanian Dinar
-// * `KZT` - Kazakhstani Tenge
-// * `KES` - Kenyan Shilling
-// * `KWD` - Kuwaiti Dinar
-// * `KGS` - Kyrgystani Som
-// * `LAK` - Laotian Kip
-// * `LVL` - Latvian Lats
-// * `LVR` - Latvian Ruble
-// * `LBP` - Lebanese Pound
-// * `LSL` - Lesotho Loti
-// * `LRD` - Liberian Dollar
-// * `LYD` - Libyan Dinar
-// * `LTL` - Lithuanian Litas
-// * `LTT` - Lithuanian Talonas
-// * `LUL` - Luxembourg Financial Franc
-// * `LUC` - Luxembourgian Convertible Franc
-// * `LUF` - Luxembourgian Franc
-// * `MOP` - Macanese Pataca
-// * `MKD` - Macedonian Denar
-// * `MKN` - Macedonian Denar (1992–1993)
-// * `MGA` - Malagasy Ariary
-// * `MGF` - Malagasy Franc
-// * `MWK` - Malawian Kwacha
-// * `MYR` - Malaysian Ringgit
-// * `MVR` - Maldivian Rufiyaa
-// * `MVP` - Maldivian Rupee (1947–1981)
-// * `MLF` - Malian Franc
-// * `MTL` - Maltese Lira
-// * `MTP` - Maltese Pound
-// * `MRU` - Mauritanian Ouguiya
-// * `MRO` - Mauritanian Ouguiya (1973–2017)
-// * `MUR` - Mauritian Rupee
-// * `MXV` - Mexican Investment Unit
-// * `MXN` - Mexican Peso
-// * `MXP` - Mexican Silver Peso (1861–1992)
-// * `MDC` - Moldovan Cupon
-// * `MDL` - Moldovan Leu
-// * `MCF` - Monegasque Franc
-// * `MNT` - Mongolian Tugrik
-// * `MAD` - Moroccan Dirham
-// * `MAF` - Moroccan Franc
-// * `MZE` - Mozambican Escudo
-// * `MZN` - Mozambican Metical
-// * `MZM` - Mozambican Metical (1980–2006)
-// * `MMK` - Myanmar Kyat
-// * `NAD` - Namibian Dollar
-// * `NPR` - Nepalese Rupee
-// * `ANG` - Netherlands Antillean Guilder
-// * `TWD` - New Taiwan Dollar
-// * `NZD` - New Zealand Dollar
-// * `NIO` - Nicaraguan Córdoba
-// * `NIC` - Nicaraguan Córdoba (1988–1991)
-// * `NGN` - Nigerian Naira
-// * `KPW` - North Korean Won
-// * `NOK` - Norwegian Krone
-// * `OMR` - Omani Rial
-// * `PKR` - Pakistani Rupee
-// * `XPD` - Palladium
-// * `PAB` - Panamanian Balboa
-// * `PGK` - Papua New Guinean Kina
-// * `PYG` - Paraguayan Guarani
-// * `PEI` - Peruvian Inti
-// * `PEN` - Peruvian Sol
-// * `PES` - Peruvian Sol (1863–1965)
-// * `PHP` - Philippine Peso
-// * `XPT` - Platinum
-// * `PLN` - Polish Zloty
-// * `PLZ` - Polish Zloty (1950–1995)
-// * `PTE` - Portuguese Escudo
-// * `GWE` - Portuguese Guinea Escudo
-// * `QAR` - Qatari Rial
-// * `XRE` - RINET Funds
-// * `RHD` - Rhodesian Dollar
-// * `RON` - Romanian Leu
-// * `ROL` - Romanian Leu (1952–2006)
-// * `RUB` - Russian Ruble
-// * `RUR` - Russian Ruble (1991–1998)
-// * `RWF` - Rwandan Franc
-// * `SVC` - Salvadoran Colón
-// * `WST` - Samoan Tala
-// * `SAR` - Saudi Riyal
-// * `RSD` - Serbian Dinar
-// * `CSD` - Serbian Dinar (2002–2006)
-// * `SCR` - Seychellois Rupee
-// * `SLL` - Sierra Leonean Leone
-// * `XAG` - Silver
-// * `SGD` - Singapore Dollar
-// * `SKK` - Slovak Koruna
-// * `SIT` - Slovenian Tolar
-// * `SBD` - Solomon Islands Dollar
-// * `SOS` - Somali Shilling
-// * `ZAR` - South African Rand
-// * `ZAL` - South African Rand (financial)
-// * `KRH` - South Korean Hwan (1953–1962)
-// * `KRW` - South Korean Won
-// * `KRO` - South Korean Won (1945–1953)
-// * `SSP` - South Sudanese Pound
-// * `SUR` - Soviet Rouble
-// * `ESP` - Spanish Peseta
-// * `ESA` - Spanish Peseta (A account)
-// * `ESB` - Spanish Peseta (convertible account)
-// * `XDR` - Special Drawing Rights
-// * `LKR` - Sri Lankan Rupee
-// * `SHP` - St. Helena Pound
-// * `XSU` - Sucre
-// * `SDD` - Sudanese Dinar (1992–2007)
-// * `SDG` - Sudanese Pound
-// * `SDP` - Sudanese Pound (1957–1998)
-// * `SRD` - Surinamese Dollar
-// * `SRG` - Surinamese Guilder
-// * `SZL` - Swazi Lilangeni
-// * `SEK` - Swedish Krona
-// * `CHF` - Swiss Franc
-// * `SYP` - Syrian Pound
-// * `STN` - São Tomé & Príncipe Dobra
-// * `STD` - São Tomé & Príncipe Dobra (1977–2017)
-// * `TVD` - TVD
-// * `TJR` - Tajikistani Ruble
-// * `TJS` - Tajikistani Somoni
-// * `TZS` - Tanzanian Shilling
-// * `XTS` - Testing Currency Code
-// * `THB` - Thai Baht
-// * `XXX` - The codes assigned for transactions where no currency is involved
-// * `TPE` - Timorese Escudo
-// * `TOP` - Tongan Paʻanga
-// * `TTD` - Trinidad & Tobago Dollar
-// * `TND` - Tunisian Dinar
-// * `TRY` - Turkish Lira
-// * `TRL` - Turkish Lira (1922–2005)
-// * `TMT` - Turkmenistani Manat
-// * `TMM` - Turkmenistani Manat (1993–2009)
-// * `USD` - US Dollar
-// * `USN` - US Dollar (Next day)
-// * `USS` - US Dollar (Same day)
-// * `UGX` - Ugandan Shilling
-// * `UGS` - Ugandan Shilling (1966–1987)
-// * `UAH` - Ukrainian Hryvnia
-// * `UAK` - Ukrainian Karbovanets
-// * `AED` - United Arab Emirates Dirham
-// * `UYW` - Uruguayan Nominal Wage Index Unit
-// * `UYU` - Uruguayan Peso
-// * `UYP` - Uruguayan Peso (1975–1993)
-// * `UYI` - Uruguayan Peso (Indexed Units)
-// * `UZS` - Uzbekistani Som
-// * `VUV` - Vanuatu Vatu
-// * `VES` - Venezuelan Bolívar
-// * `VEB` - Venezuelan Bolívar (1871–2008)
-// * `VEF` - Venezuelan Bolívar (2008–2018)
-// * `VND` - Vietnamese Dong
-// * `VNN` - Vietnamese Dong (1978–1985)
-// * `CHE` - WIR Euro
-// * `CHW` - WIR Franc
-// * `XOF` - West African CFA Franc
-// * `YDD` - Yemeni Dinar
-// * `YER` - Yemeni Rial
-// * `YUN` - Yugoslavian Convertible Dinar (1990–1992)
-// * `YUD` - Yugoslavian Hard Dinar (1966–1990)
-// * `YUM` - Yugoslavian New Dinar (1994–2002)
-// * `YUR` - Yugoslavian Reformed Dinar (1992–1993)
-// * `ZWN` - ZWN
-// * `ZRN` - Zairean New Zaire (1993–1998)
-// * `ZRZ` - Zairean Zaire (1971–1993)
-// * `ZMW` - Zambian Kwacha
-// * `ZMK` - Zambian Kwacha (1968–2012)
-// * `ZWD` - Zimbabwean Dollar (1980–2008)
-// * `ZWR` - Zimbabwean Dollar (2008)
-// * `ZWL` - Zimbabwean Dollar (2009)
-type PurchaseOrderLineItemRequestCurrency struct {
-	TransactionCurrencyEnum TransactionCurrencyEnum
-	String                  string
-
-	typ string
-}
-
-func (p *PurchaseOrderLineItemRequestCurrency) GetTransactionCurrencyEnum() TransactionCurrencyEnum {
-	if p == nil {
-		return ""
-	}
-	return p.TransactionCurrencyEnum
-}
-
-func (p *PurchaseOrderLineItemRequestCurrency) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PurchaseOrderLineItemRequestCurrency) UnmarshalJSON(data []byte) error {
-	var valueTransactionCurrencyEnum TransactionCurrencyEnum
-	if err := json.Unmarshal(data, &valueTransactionCurrencyEnum); err == nil {
-		p.typ = "TransactionCurrencyEnum"
-		p.TransactionCurrencyEnum = valueTransactionCurrencyEnum
-		return nil
-	}
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PurchaseOrderLineItemRequestCurrency) MarshalJSON() ([]byte, error) {
-	if p.typ == "TransactionCurrencyEnum" || p.TransactionCurrencyEnum != "" {
-		return json.Marshal(p.TransactionCurrencyEnum)
-	}
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PurchaseOrderLineItemRequestCurrencyVisitor interface {
-	VisitTransactionCurrencyEnum(TransactionCurrencyEnum) error
-	VisitString(string) error
-}
-
-func (p *PurchaseOrderLineItemRequestCurrency) Accept(visitor PurchaseOrderLineItemRequestCurrencyVisitor) error {
-	if p.typ == "TransactionCurrencyEnum" || p.TransactionCurrencyEnum != "" {
-		return visitor.VisitTransactionCurrencyEnum(p.TransactionCurrencyEnum)
-	}
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PurchaseOrderLineItemRequestItem struct {
-	String string
-	Item   *Item
-
-	typ string
-}
-
-func (p *PurchaseOrderLineItemRequestItem) GetString() string {
-	if p == nil {
-		return ""
-	}
-	return p.String
-}
-
-func (p *PurchaseOrderLineItemRequestItem) GetItem() *Item {
-	if p == nil {
-		return nil
-	}
-	return p.Item
-}
-
-func (p *PurchaseOrderLineItemRequestItem) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		p.typ = "String"
-		p.String = valueString
-		return nil
-	}
-	valueItem := new(Item)
-	if err := json.Unmarshal(data, &valueItem); err == nil {
-		p.typ = "Item"
-		p.Item = valueItem
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
-}
-
-func (p PurchaseOrderLineItemRequestItem) MarshalJSON() ([]byte, error) {
-	if p.typ == "String" || p.String != "" {
-		return json.Marshal(p.String)
-	}
-	if p.typ == "Item" || p.Item != nil {
-		return json.Marshal(p.Item)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
-}
-
-type PurchaseOrderLineItemRequestItemVisitor interface {
-	VisitString(string) error
-	VisitItem(*Item) error
-}
-
-func (p *PurchaseOrderLineItemRequestItem) Accept(visitor PurchaseOrderLineItemRequestItemVisitor) error {
-	if p.typ == "String" || p.String != "" {
-		return visitor.VisitString(p.String)
-	}
-	if p.typ == "Item" || p.Item != nil {
-		return visitor.VisitItem(p.Item)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
 // # The PurchaseOrder Object
@@ -2133,7 +1041,7 @@ type PurchaseOrderRequest struct {
 	// The purchase order's exchange rate.
 	ExchangeRate        *string                                       `json:"exchange_rate,omitempty" url:"exchange_rate,omitempty"`
 	TrackingCategories  []*PurchaseOrderRequestTrackingCategoriesItem `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
-	LineItems           []*PurchaseOrderLineItemRequest               `json:"line_items,omitempty" url:"line_items,omitempty"`
+	LineItems           []*PurchaseOrderRequestLineItemsItem          `json:"line_items,omitempty" url:"line_items,omitempty"`
 	IntegrationParams   map[string]interface{}                        `json:"integration_params,omitempty" url:"integration_params,omitempty"`
 	LinkedAccountParams map[string]interface{}                        `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
 	RemoteFields        []*RemoteFieldRequest                         `json:"remote_fields,omitempty" url:"remote_fields,omitempty"`
@@ -2243,7 +1151,7 @@ func (p *PurchaseOrderRequest) GetTrackingCategories() []*PurchaseOrderRequestTr
 	return p.TrackingCategories
 }
 
-func (p *PurchaseOrderRequest) GetLineItems() []*PurchaseOrderLineItemRequest {
+func (p *PurchaseOrderRequest) GetLineItems() []*PurchaseOrderRequestLineItemsItem {
 	if p == nil {
 		return nil
 	}
@@ -2382,7 +1290,7 @@ func (p *PurchaseOrderRequest) SetTrackingCategories(trackingCategories []*Purch
 
 // SetLineItems sets the LineItems field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (p *PurchaseOrderRequest) SetLineItems(lineItems []*PurchaseOrderLineItemRequest) {
+func (p *PurchaseOrderRequest) SetLineItems(lineItems []*PurchaseOrderRequestLineItemsItem) {
 	p.LineItems = lineItems
 	p.require(purchaseOrderRequestFieldLineItems)
 }
@@ -2951,6 +1859,68 @@ func (p *PurchaseOrderRequestDeliveryAddress) Accept(visitor PurchaseOrderReques
 	}
 	if p.typ == "Address" || p.Address != nil {
 		return visitor.VisitAddress(p.Address)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderRequestLineItemsItem struct {
+	String                string
+	PurchaseOrderLineItem *PurchaseOrderLineItem
+
+	typ string
+}
+
+func (p *PurchaseOrderRequestLineItemsItem) GetString() string {
+	if p == nil {
+		return ""
+	}
+	return p.String
+}
+
+func (p *PurchaseOrderRequestLineItemsItem) GetPurchaseOrderLineItem() *PurchaseOrderLineItem {
+	if p == nil {
+		return nil
+	}
+	return p.PurchaseOrderLineItem
+}
+
+func (p *PurchaseOrderRequestLineItemsItem) UnmarshalJSON(data []byte) error {
+	var valueString string
+	if err := json.Unmarshal(data, &valueString); err == nil {
+		p.typ = "String"
+		p.String = valueString
+		return nil
+	}
+	valuePurchaseOrderLineItem := new(PurchaseOrderLineItem)
+	if err := json.Unmarshal(data, &valuePurchaseOrderLineItem); err == nil {
+		p.typ = "PurchaseOrderLineItem"
+		p.PurchaseOrderLineItem = valuePurchaseOrderLineItem
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
+}
+
+func (p PurchaseOrderRequestLineItemsItem) MarshalJSON() ([]byte, error) {
+	if p.typ == "String" || p.String != "" {
+		return json.Marshal(p.String)
+	}
+	if p.typ == "PurchaseOrderLineItem" || p.PurchaseOrderLineItem != nil {
+		return json.Marshal(p.PurchaseOrderLineItem)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
+}
+
+type PurchaseOrderRequestLineItemsItemVisitor interface {
+	VisitString(string) error
+	VisitPurchaseOrderLineItem(*PurchaseOrderLineItem) error
+}
+
+func (p *PurchaseOrderRequestLineItemsItem) Accept(visitor PurchaseOrderRequestLineItemsItemVisitor) error {
+	if p.typ == "String" || p.String != "" {
+		return visitor.VisitString(p.String)
+	}
+	if p.typ == "PurchaseOrderLineItem" || p.PurchaseOrderLineItem != nil {
+		return visitor.VisitPurchaseOrderLineItem(p.PurchaseOrderLineItem)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }

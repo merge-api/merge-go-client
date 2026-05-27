@@ -38,12 +38,12 @@ func (c *Client) List(
 	ctx context.Context,
 	request *filestorage.FoldersListRequest,
 	opts ...option.RequestOption,
-) (*core.Page[*string, *filestorage.Folder], error) {
+) (*core.Page[*string, *filestorage.Folder, *filestorage.PaginatedFolderList], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/filestorage/v1/folders"
 	queryParams, err := internal.QueryValues(request)
@@ -73,14 +73,15 @@ func (c *Client) List(
 			Response:        pageRequest.Response,
 		}
 	}
-	readPageResponse := func(response *filestorage.PaginatedFolderList) *core.PageResponse[*string, *filestorage.Folder] {
+	readPageResponse := func(response *filestorage.PaginatedFolderList) *core.PageResponse[*string, *filestorage.Folder, *filestorage.PaginatedFolderList] {
 		var zeroValue *string
 		next := response.GetNext()
 		results := response.GetResults()
-		return &core.PageResponse[*string, *filestorage.Folder]{
-			Next:    next,
-			Results: results,
-			Done:    next == zeroValue,
+		return &core.PageResponse[*string, *filestorage.Folder, *filestorage.PaginatedFolderList]{
+			Results:  results,
+			Response: response,
+			Next:     next,
+			Done:     next == zeroValue,
 		}
 	}
 	pager := internal.NewCursorPager(

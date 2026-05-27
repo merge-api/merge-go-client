@@ -39,7 +39,7 @@ func (r *RawClient) FieldMappingsRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/field-mappings"
 	queryParams, err := internal.QueryValues(request)
@@ -86,7 +86,7 @@ func (r *RawClient) FieldMappingsCreate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/field-mappings"
 	queryParams, err := internal.QueryValues(request)
@@ -135,7 +135,7 @@ func (r *RawClient) FieldMappingsDestroy(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ats/v1/field-mappings/%v",
@@ -179,12 +179,19 @@ func (r *RawClient) FieldMappingsPartialUpdate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/ats/v1/field-mappings/%v",
 		fieldMappingId,
 	)
+	queryParams, err := internal.QueryValues(request)
+	if err != nil {
+		return nil, err
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
 		options.ToHeader(),
@@ -224,7 +231,7 @@ func (r *RawClient) RemoteFieldsRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/remote-fields"
 	queryParams, err := internal.QueryValues(request)
@@ -270,7 +277,7 @@ func (r *RawClient) TargetFieldsRetrieve(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"",
+		"https://api.merge.dev/api",
 	)
 	endpointURL := baseURL + "/ats/v1/target-fields"
 	headers := internal.MergeHeaders(

@@ -11,6 +11,95 @@ import (
 )
 
 var (
+	applyCreditNoteRequestFieldIsDebugMode   = big.NewInt(1 << 0)
+	applyCreditNoteRequestFieldRunAsync      = big.NewInt(1 << 1)
+	applyCreditNoteRequestFieldInvoice       = big.NewInt(1 << 2)
+	applyCreditNoteRequestFieldAppliedDate   = big.NewInt(1 << 3)
+	applyCreditNoteRequestFieldAppliedAmount = big.NewInt(1 << 4)
+)
+
+type ApplyCreditNoteRequest struct {
+	// Whether to include debug fields (such as log file links) in the response.
+	IsDebugMode *bool `json:"-" url:"is_debug_mode,omitempty"`
+	// Whether or not third-party updates should be run asynchronously.
+	RunAsync *bool `json:"-" url:"run_async,omitempty"`
+	// The invoice to apply the credit note to.
+	Invoice *string `json:"invoice,omitempty" url:"-"`
+	// Date that the credit note is applied to the invoice.
+	AppliedDate time.Time `json:"applied_date" url:"-"`
+	// The amount of credit applied to the invoice.
+	AppliedAmount string `json:"applied_amount" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (a *ApplyCreditNoteRequest) require(field *big.Int) {
+	if a.explicitFields == nil {
+		a.explicitFields = big.NewInt(0)
+	}
+	a.explicitFields.Or(a.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplyCreditNoteRequest) SetIsDebugMode(isDebugMode *bool) {
+	a.IsDebugMode = isDebugMode
+	a.require(applyCreditNoteRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplyCreditNoteRequest) SetRunAsync(runAsync *bool) {
+	a.RunAsync = runAsync
+	a.require(applyCreditNoteRequestFieldRunAsync)
+}
+
+// SetInvoice sets the Invoice field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplyCreditNoteRequest) SetInvoice(invoice *string) {
+	a.Invoice = invoice
+	a.require(applyCreditNoteRequestFieldInvoice)
+}
+
+// SetAppliedDate sets the AppliedDate field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplyCreditNoteRequest) SetAppliedDate(appliedDate time.Time) {
+	a.AppliedDate = appliedDate
+	a.require(applyCreditNoteRequestFieldAppliedDate)
+}
+
+// SetAppliedAmount sets the AppliedAmount field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (a *ApplyCreditNoteRequest) SetAppliedAmount(appliedAmount string) {
+	a.AppliedAmount = appliedAmount
+	a.require(applyCreditNoteRequestFieldAppliedAmount)
+}
+
+func (a *ApplyCreditNoteRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler ApplyCreditNoteRequest
+	var body unmarshaler
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	*a = ApplyCreditNoteRequest(body)
+	return nil
+}
+
+func (a *ApplyCreditNoteRequest) MarshalJSON() ([]byte, error) {
+	type embed ApplyCreditNoteRequest
+	var marshaler = struct {
+		embed
+		AppliedDate *internal.DateTime `json:"applied_date"`
+	}{
+		embed:       embed(*a),
+		AppliedDate: internal.NewDateTime(a.AppliedDate),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, a.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+var (
 	creditNoteEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
 	creditNoteEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
 	creditNoteEndpointRequestFieldModel       = big.NewInt(1 << 2)
@@ -95,7 +184,7 @@ type CreditNotesListRequest struct {
 	ModifiedAfter *time.Time `json:"-" url:"modified_after,omitempty"`
 	// If provided, only objects synced by Merge before this date time will be returned.
 	ModifiedBefore *time.Time `json:"-" url:"modified_before,omitempty"`
-	// Number of results to return per page.
+	// Number of results to return per page. The maximum limit is 100.
 	PageSize *int `json:"-" url:"page_size,omitempty"`
 	// Deprecated. Use show_enum_origins.
 	RemoteFields *CreditNotesListRequestRemoteFields `json:"-" url:"remote_fields,omitempty"`
@@ -229,6 +318,51 @@ func (c *CreditNotesListRequest) SetTransactionDateAfter(transactionDateAfter *t
 func (c *CreditNotesListRequest) SetTransactionDateBefore(transactionDateBefore *time.Time) {
 	c.TransactionDateBefore = transactionDateBefore
 	c.require(creditNotesListRequestFieldTransactionDateBefore)
+}
+
+var (
+	patchedCreditNoteEndpointRequestFieldIsDebugMode = big.NewInt(1 << 0)
+	patchedCreditNoteEndpointRequestFieldRunAsync    = big.NewInt(1 << 1)
+	patchedCreditNoteEndpointRequestFieldModel       = big.NewInt(1 << 2)
+)
+
+type PatchedCreditNoteEndpointRequest struct {
+	// Whether to include debug fields (such as log file links) in the response.
+	IsDebugMode *bool `json:"-" url:"is_debug_mode,omitempty"`
+	// Whether or not third-party updates should be run asynchronously.
+	RunAsync *bool              `json:"-" url:"run_async,omitempty"`
+	Model    *CreditNoteRequest `json:"model,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (p *PatchedCreditNoteEndpointRequest) require(field *big.Int) {
+	if p.explicitFields == nil {
+		p.explicitFields = big.NewInt(0)
+	}
+	p.explicitFields.Or(p.explicitFields, field)
+}
+
+// SetIsDebugMode sets the IsDebugMode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCreditNoteEndpointRequest) SetIsDebugMode(isDebugMode *bool) {
+	p.IsDebugMode = isDebugMode
+	p.require(patchedCreditNoteEndpointRequestFieldIsDebugMode)
+}
+
+// SetRunAsync sets the RunAsync field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCreditNoteEndpointRequest) SetRunAsync(runAsync *bool) {
+	p.RunAsync = runAsync
+	p.require(patchedCreditNoteEndpointRequestFieldRunAsync)
+}
+
+// SetModel sets the Model field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (p *PatchedCreditNoteEndpointRequest) SetModel(model *CreditNoteRequest) {
+	p.Model = model
+	p.require(patchedCreditNoteEndpointRequestFieldModel)
 }
 
 var (
@@ -704,609 +838,6 @@ func (c *CreditNoteApplyLineForCreditNoteRequestInvoice) Accept(visitor CreditNo
 	}
 	if c.typ == "Invoice" || c.Invoice != nil {
 		return visitor.VisitInvoice(c.Invoice)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-// # The CreditNoteLineItem Object
-// ### Description
-// The `CreditNoteLineItem` object is used to represent a credit note's line items.
-//
-// ### Usage Example
-// Fetch from the `GET CreditNote` endpoint and view the credit note's line items.
-var (
-	creditNoteLineItemRequestFieldRemoteId            = big.NewInt(1 << 0)
-	creditNoteLineItemRequestFieldItem                = big.NewInt(1 << 1)
-	creditNoteLineItemRequestFieldName                = big.NewInt(1 << 2)
-	creditNoteLineItemRequestFieldDescription         = big.NewInt(1 << 3)
-	creditNoteLineItemRequestFieldQuantity            = big.NewInt(1 << 4)
-	creditNoteLineItemRequestFieldMemo                = big.NewInt(1 << 5)
-	creditNoteLineItemRequestFieldUnitPrice           = big.NewInt(1 << 6)
-	creditNoteLineItemRequestFieldTaxRate             = big.NewInt(1 << 7)
-	creditNoteLineItemRequestFieldTotalLineAmount     = big.NewInt(1 << 8)
-	creditNoteLineItemRequestFieldTrackingCategory    = big.NewInt(1 << 9)
-	creditNoteLineItemRequestFieldTrackingCategories  = big.NewInt(1 << 10)
-	creditNoteLineItemRequestFieldAccount             = big.NewInt(1 << 11)
-	creditNoteLineItemRequestFieldCompany             = big.NewInt(1 << 12)
-	creditNoteLineItemRequestFieldContact             = big.NewInt(1 << 13)
-	creditNoteLineItemRequestFieldProject             = big.NewInt(1 << 14)
-	creditNoteLineItemRequestFieldIntegrationParams   = big.NewInt(1 << 15)
-	creditNoteLineItemRequestFieldLinkedAccountParams = big.NewInt(1 << 16)
-)
-
-type CreditNoteLineItemRequest struct {
-	// The third-party API ID of the matching object.
-	RemoteId *string                        `json:"remote_id,omitempty" url:"remote_id,omitempty"`
-	Item     *CreditNoteLineItemRequestItem `json:"item,omitempty" url:"item,omitempty"`
-	// The credit note line item's name.
-	Name *string `json:"name,omitempty" url:"name,omitempty"`
-	// The description of the item that is owed.
-	Description *string `json:"description,omitempty" url:"description,omitempty"`
-	// The credit note line item's quantity.
-	Quantity *string `json:"quantity,omitempty" url:"quantity,omitempty"`
-	// The credit note line item's memo.
-	Memo *string `json:"memo,omitempty" url:"memo,omitempty"`
-	// The credit note line item's unit price.
-	UnitPrice *string `json:"unit_price,omitempty" url:"unit_price,omitempty"`
-	// The tax rate that applies to this line item.
-	TaxRate *string `json:"tax_rate,omitempty" url:"tax_rate,omitempty"`
-	// The credit note line item's total.
-	TotalLineAmount *string `json:"total_line_amount,omitempty" url:"total_line_amount,omitempty"`
-	// The credit note line item's associated tracking category.
-	TrackingCategory *string `json:"tracking_category,omitempty" url:"tracking_category,omitempty"`
-	// The credit note line item's associated tracking categories.
-	TrackingCategories []*string `json:"tracking_categories,omitempty" url:"tracking_categories,omitempty"`
-	// The credit note line item's account.
-	Account *string `json:"account,omitempty" url:"account,omitempty"`
-	// The company the credit note belongs to.
-	Company *CreditNoteLineItemRequestCompany `json:"company,omitempty" url:"company,omitempty"`
-	// The credit note's contact.
-	Contact             *CreditNoteLineItemRequestContact `json:"contact,omitempty" url:"contact,omitempty"`
-	Project             *CreditNoteLineItemRequestProject `json:"project,omitempty" url:"project,omitempty"`
-	IntegrationParams   map[string]interface{}            `json:"integration_params,omitempty" url:"integration_params,omitempty"`
-	LinkedAccountParams map[string]interface{}            `json:"linked_account_params,omitempty" url:"linked_account_params,omitempty"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (c *CreditNoteLineItemRequest) GetRemoteId() *string {
-	if c == nil {
-		return nil
-	}
-	return c.RemoteId
-}
-
-func (c *CreditNoteLineItemRequest) GetItem() *CreditNoteLineItemRequestItem {
-	if c == nil {
-		return nil
-	}
-	return c.Item
-}
-
-func (c *CreditNoteLineItemRequest) GetName() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Name
-}
-
-func (c *CreditNoteLineItemRequest) GetDescription() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Description
-}
-
-func (c *CreditNoteLineItemRequest) GetQuantity() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Quantity
-}
-
-func (c *CreditNoteLineItemRequest) GetMemo() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Memo
-}
-
-func (c *CreditNoteLineItemRequest) GetUnitPrice() *string {
-	if c == nil {
-		return nil
-	}
-	return c.UnitPrice
-}
-
-func (c *CreditNoteLineItemRequest) GetTaxRate() *string {
-	if c == nil {
-		return nil
-	}
-	return c.TaxRate
-}
-
-func (c *CreditNoteLineItemRequest) GetTotalLineAmount() *string {
-	if c == nil {
-		return nil
-	}
-	return c.TotalLineAmount
-}
-
-func (c *CreditNoteLineItemRequest) GetTrackingCategory() *string {
-	if c == nil {
-		return nil
-	}
-	return c.TrackingCategory
-}
-
-func (c *CreditNoteLineItemRequest) GetTrackingCategories() []*string {
-	if c == nil {
-		return nil
-	}
-	return c.TrackingCategories
-}
-
-func (c *CreditNoteLineItemRequest) GetAccount() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Account
-}
-
-func (c *CreditNoteLineItemRequest) GetCompany() *CreditNoteLineItemRequestCompany {
-	if c == nil {
-		return nil
-	}
-	return c.Company
-}
-
-func (c *CreditNoteLineItemRequest) GetContact() *CreditNoteLineItemRequestContact {
-	if c == nil {
-		return nil
-	}
-	return c.Contact
-}
-
-func (c *CreditNoteLineItemRequest) GetProject() *CreditNoteLineItemRequestProject {
-	if c == nil {
-		return nil
-	}
-	return c.Project
-}
-
-func (c *CreditNoteLineItemRequest) GetIntegrationParams() map[string]interface{} {
-	if c == nil {
-		return nil
-	}
-	return c.IntegrationParams
-}
-
-func (c *CreditNoteLineItemRequest) GetLinkedAccountParams() map[string]interface{} {
-	if c == nil {
-		return nil
-	}
-	return c.LinkedAccountParams
-}
-
-func (c *CreditNoteLineItemRequest) GetExtraProperties() map[string]interface{} {
-	return c.extraProperties
-}
-
-func (c *CreditNoteLineItemRequest) require(field *big.Int) {
-	if c.explicitFields == nil {
-		c.explicitFields = big.NewInt(0)
-	}
-	c.explicitFields.Or(c.explicitFields, field)
-}
-
-// SetRemoteId sets the RemoteId field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetRemoteId(remoteId *string) {
-	c.RemoteId = remoteId
-	c.require(creditNoteLineItemRequestFieldRemoteId)
-}
-
-// SetItem sets the Item field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetItem(item *CreditNoteLineItemRequestItem) {
-	c.Item = item
-	c.require(creditNoteLineItemRequestFieldItem)
-}
-
-// SetName sets the Name field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetName(name *string) {
-	c.Name = name
-	c.require(creditNoteLineItemRequestFieldName)
-}
-
-// SetDescription sets the Description field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetDescription(description *string) {
-	c.Description = description
-	c.require(creditNoteLineItemRequestFieldDescription)
-}
-
-// SetQuantity sets the Quantity field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetQuantity(quantity *string) {
-	c.Quantity = quantity
-	c.require(creditNoteLineItemRequestFieldQuantity)
-}
-
-// SetMemo sets the Memo field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetMemo(memo *string) {
-	c.Memo = memo
-	c.require(creditNoteLineItemRequestFieldMemo)
-}
-
-// SetUnitPrice sets the UnitPrice field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetUnitPrice(unitPrice *string) {
-	c.UnitPrice = unitPrice
-	c.require(creditNoteLineItemRequestFieldUnitPrice)
-}
-
-// SetTaxRate sets the TaxRate field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetTaxRate(taxRate *string) {
-	c.TaxRate = taxRate
-	c.require(creditNoteLineItemRequestFieldTaxRate)
-}
-
-// SetTotalLineAmount sets the TotalLineAmount field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetTotalLineAmount(totalLineAmount *string) {
-	c.TotalLineAmount = totalLineAmount
-	c.require(creditNoteLineItemRequestFieldTotalLineAmount)
-}
-
-// SetTrackingCategory sets the TrackingCategory field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetTrackingCategory(trackingCategory *string) {
-	c.TrackingCategory = trackingCategory
-	c.require(creditNoteLineItemRequestFieldTrackingCategory)
-}
-
-// SetTrackingCategories sets the TrackingCategories field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetTrackingCategories(trackingCategories []*string) {
-	c.TrackingCategories = trackingCategories
-	c.require(creditNoteLineItemRequestFieldTrackingCategories)
-}
-
-// SetAccount sets the Account field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetAccount(account *string) {
-	c.Account = account
-	c.require(creditNoteLineItemRequestFieldAccount)
-}
-
-// SetCompany sets the Company field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetCompany(company *CreditNoteLineItemRequestCompany) {
-	c.Company = company
-	c.require(creditNoteLineItemRequestFieldCompany)
-}
-
-// SetContact sets the Contact field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetContact(contact *CreditNoteLineItemRequestContact) {
-	c.Contact = contact
-	c.require(creditNoteLineItemRequestFieldContact)
-}
-
-// SetProject sets the Project field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetProject(project *CreditNoteLineItemRequestProject) {
-	c.Project = project
-	c.require(creditNoteLineItemRequestFieldProject)
-}
-
-// SetIntegrationParams sets the IntegrationParams field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetIntegrationParams(integrationParams map[string]interface{}) {
-	c.IntegrationParams = integrationParams
-	c.require(creditNoteLineItemRequestFieldIntegrationParams)
-}
-
-// SetLinkedAccountParams sets the LinkedAccountParams field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (c *CreditNoteLineItemRequest) SetLinkedAccountParams(linkedAccountParams map[string]interface{}) {
-	c.LinkedAccountParams = linkedAccountParams
-	c.require(creditNoteLineItemRequestFieldLinkedAccountParams)
-}
-
-func (c *CreditNoteLineItemRequest) UnmarshalJSON(data []byte) error {
-	type unmarshaler CreditNoteLineItemRequest
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*c = CreditNoteLineItemRequest(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *c)
-	if err != nil {
-		return err
-	}
-	c.extraProperties = extraProperties
-	c.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (c *CreditNoteLineItemRequest) MarshalJSON() ([]byte, error) {
-	type embed CreditNoteLineItemRequest
-	var marshaler = struct {
-		embed
-	}{
-		embed: embed(*c),
-	}
-	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
-	return json.Marshal(explicitMarshaler)
-}
-
-func (c *CreditNoteLineItemRequest) String() string {
-	if len(c.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(c); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", c)
-}
-
-// The company the credit note belongs to.
-type CreditNoteLineItemRequestCompany struct {
-	String      string
-	CompanyInfo *CompanyInfo
-
-	typ string
-}
-
-func (c *CreditNoteLineItemRequestCompany) GetString() string {
-	if c == nil {
-		return ""
-	}
-	return c.String
-}
-
-func (c *CreditNoteLineItemRequestCompany) GetCompanyInfo() *CompanyInfo {
-	if c == nil {
-		return nil
-	}
-	return c.CompanyInfo
-}
-
-func (c *CreditNoteLineItemRequestCompany) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		c.typ = "String"
-		c.String = valueString
-		return nil
-	}
-	valueCompanyInfo := new(CompanyInfo)
-	if err := json.Unmarshal(data, &valueCompanyInfo); err == nil {
-		c.typ = "CompanyInfo"
-		c.CompanyInfo = valueCompanyInfo
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
-}
-
-func (c CreditNoteLineItemRequestCompany) MarshalJSON() ([]byte, error) {
-	if c.typ == "String" || c.String != "" {
-		return json.Marshal(c.String)
-	}
-	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
-		return json.Marshal(c.CompanyInfo)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-type CreditNoteLineItemRequestCompanyVisitor interface {
-	VisitString(string) error
-	VisitCompanyInfo(*CompanyInfo) error
-}
-
-func (c *CreditNoteLineItemRequestCompany) Accept(visitor CreditNoteLineItemRequestCompanyVisitor) error {
-	if c.typ == "String" || c.String != "" {
-		return visitor.VisitString(c.String)
-	}
-	if c.typ == "CompanyInfo" || c.CompanyInfo != nil {
-		return visitor.VisitCompanyInfo(c.CompanyInfo)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-// The credit note's contact.
-type CreditNoteLineItemRequestContact struct {
-	String  string
-	Contact *Contact
-
-	typ string
-}
-
-func (c *CreditNoteLineItemRequestContact) GetString() string {
-	if c == nil {
-		return ""
-	}
-	return c.String
-}
-
-func (c *CreditNoteLineItemRequestContact) GetContact() *Contact {
-	if c == nil {
-		return nil
-	}
-	return c.Contact
-}
-
-func (c *CreditNoteLineItemRequestContact) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		c.typ = "String"
-		c.String = valueString
-		return nil
-	}
-	valueContact := new(Contact)
-	if err := json.Unmarshal(data, &valueContact); err == nil {
-		c.typ = "Contact"
-		c.Contact = valueContact
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
-}
-
-func (c CreditNoteLineItemRequestContact) MarshalJSON() ([]byte, error) {
-	if c.typ == "String" || c.String != "" {
-		return json.Marshal(c.String)
-	}
-	if c.typ == "Contact" || c.Contact != nil {
-		return json.Marshal(c.Contact)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-type CreditNoteLineItemRequestContactVisitor interface {
-	VisitString(string) error
-	VisitContact(*Contact) error
-}
-
-func (c *CreditNoteLineItemRequestContact) Accept(visitor CreditNoteLineItemRequestContactVisitor) error {
-	if c.typ == "String" || c.String != "" {
-		return visitor.VisitString(c.String)
-	}
-	if c.typ == "Contact" || c.Contact != nil {
-		return visitor.VisitContact(c.Contact)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-type CreditNoteLineItemRequestItem struct {
-	String string
-	Item   *Item
-
-	typ string
-}
-
-func (c *CreditNoteLineItemRequestItem) GetString() string {
-	if c == nil {
-		return ""
-	}
-	return c.String
-}
-
-func (c *CreditNoteLineItemRequestItem) GetItem() *Item {
-	if c == nil {
-		return nil
-	}
-	return c.Item
-}
-
-func (c *CreditNoteLineItemRequestItem) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		c.typ = "String"
-		c.String = valueString
-		return nil
-	}
-	valueItem := new(Item)
-	if err := json.Unmarshal(data, &valueItem); err == nil {
-		c.typ = "Item"
-		c.Item = valueItem
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
-}
-
-func (c CreditNoteLineItemRequestItem) MarshalJSON() ([]byte, error) {
-	if c.typ == "String" || c.String != "" {
-		return json.Marshal(c.String)
-	}
-	if c.typ == "Item" || c.Item != nil {
-		return json.Marshal(c.Item)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-type CreditNoteLineItemRequestItemVisitor interface {
-	VisitString(string) error
-	VisitItem(*Item) error
-}
-
-func (c *CreditNoteLineItemRequestItem) Accept(visitor CreditNoteLineItemRequestItemVisitor) error {
-	if c.typ == "String" || c.String != "" {
-		return visitor.VisitString(c.String)
-	}
-	if c.typ == "Item" || c.Item != nil {
-		return visitor.VisitItem(c.Item)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-type CreditNoteLineItemRequestProject struct {
-	String  string
-	Project *Project
-
-	typ string
-}
-
-func (c *CreditNoteLineItemRequestProject) GetString() string {
-	if c == nil {
-		return ""
-	}
-	return c.String
-}
-
-func (c *CreditNoteLineItemRequestProject) GetProject() *Project {
-	if c == nil {
-		return nil
-	}
-	return c.Project
-}
-
-func (c *CreditNoteLineItemRequestProject) UnmarshalJSON(data []byte) error {
-	var valueString string
-	if err := json.Unmarshal(data, &valueString); err == nil {
-		c.typ = "String"
-		c.String = valueString
-		return nil
-	}
-	valueProject := new(Project)
-	if err := json.Unmarshal(data, &valueProject); err == nil {
-		c.typ = "Project"
-		c.Project = valueProject
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
-}
-
-func (c CreditNoteLineItemRequestProject) MarshalJSON() ([]byte, error) {
-	if c.typ == "String" || c.String != "" {
-		return json.Marshal(c.String)
-	}
-	if c.typ == "Project" || c.Project != nil {
-		return json.Marshal(c.Project)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
-}
-
-type CreditNoteLineItemRequestProjectVisitor interface {
-	VisitString(string) error
-	VisitProject(*Project) error
-}
-
-func (c *CreditNoteLineItemRequestProject) Accept(visitor CreditNoteLineItemRequestProjectVisitor) error {
-	if c.typ == "String" || c.String != "" {
-		return visitor.VisitString(c.String)
-	}
-	if c.typ == "Project" || c.Project != nil {
-		return visitor.VisitProject(c.Project)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
@@ -2622,8 +2153,8 @@ func (c *CreditNoteRequestCurrency) Accept(visitor CreditNoteRequestCurrencyVisi
 }
 
 type CreditNoteRequestLineItemsItem struct {
-	String                    string
-	CreditNoteLineItemRequest *CreditNoteLineItemRequest
+	String             string
+	CreditNoteLineItem *CreditNoteLineItem
 
 	typ string
 }
@@ -2635,11 +2166,11 @@ func (c *CreditNoteRequestLineItemsItem) GetString() string {
 	return c.String
 }
 
-func (c *CreditNoteRequestLineItemsItem) GetCreditNoteLineItemRequest() *CreditNoteLineItemRequest {
+func (c *CreditNoteRequestLineItemsItem) GetCreditNoteLineItem() *CreditNoteLineItem {
 	if c == nil {
 		return nil
 	}
-	return c.CreditNoteLineItemRequest
+	return c.CreditNoteLineItem
 }
 
 func (c *CreditNoteRequestLineItemsItem) UnmarshalJSON(data []byte) error {
@@ -2649,10 +2180,10 @@ func (c *CreditNoteRequestLineItemsItem) UnmarshalJSON(data []byte) error {
 		c.String = valueString
 		return nil
 	}
-	valueCreditNoteLineItemRequest := new(CreditNoteLineItemRequest)
-	if err := json.Unmarshal(data, &valueCreditNoteLineItemRequest); err == nil {
-		c.typ = "CreditNoteLineItemRequest"
-		c.CreditNoteLineItemRequest = valueCreditNoteLineItemRequest
+	valueCreditNoteLineItem := new(CreditNoteLineItem)
+	if err := json.Unmarshal(data, &valueCreditNoteLineItem); err == nil {
+		c.typ = "CreditNoteLineItem"
+		c.CreditNoteLineItem = valueCreditNoteLineItem
 		return nil
 	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
@@ -2662,23 +2193,23 @@ func (c CreditNoteRequestLineItemsItem) MarshalJSON() ([]byte, error) {
 	if c.typ == "String" || c.String != "" {
 		return json.Marshal(c.String)
 	}
-	if c.typ == "CreditNoteLineItemRequest" || c.CreditNoteLineItemRequest != nil {
-		return json.Marshal(c.CreditNoteLineItemRequest)
+	if c.typ == "CreditNoteLineItem" || c.CreditNoteLineItem != nil {
+		return json.Marshal(c.CreditNoteLineItem)
 	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
 type CreditNoteRequestLineItemsItemVisitor interface {
 	VisitString(string) error
-	VisitCreditNoteLineItemRequest(*CreditNoteLineItemRequest) error
+	VisitCreditNoteLineItem(*CreditNoteLineItem) error
 }
 
 func (c *CreditNoteRequestLineItemsItem) Accept(visitor CreditNoteRequestLineItemsItemVisitor) error {
 	if c.typ == "String" || c.String != "" {
 		return visitor.VisitString(c.String)
 	}
-	if c.typ == "CreditNoteLineItemRequest" || c.CreditNoteLineItemRequest != nil {
-		return visitor.VisitCreditNoteLineItemRequest(c.CreditNoteLineItemRequest)
+	if c.typ == "CreditNoteLineItem" || c.CreditNoteLineItem != nil {
+		return visitor.VisitCreditNoteLineItem(c.CreditNoteLineItem)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
