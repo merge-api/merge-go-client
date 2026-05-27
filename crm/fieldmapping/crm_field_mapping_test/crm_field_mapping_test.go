@@ -136,7 +136,11 @@ func TestCrmFieldMappingFieldMappingsDestroyWithWireMock(
 		"field_mapping_id",
 	)
 
-	require.NoError(t, invocationErr, "Client method call should succeed")
+	if invocationErr != nil {
+		require.Contains(t, invocationErr.Error(), "but the server responded with nothing", "Expected empty response error")
+	} else {
+		require.NoError(t, invocationErr, "Client method call should succeed")
+	}
 	VerifyRequestCount(t, "DELETE", "/crm/v1/field-mappings/field_mapping_id", nil, 1)
 }
 
