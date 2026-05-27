@@ -15,3 +15,4 @@ integration/environment_routing_test.go
 integration/expand_url_format_test.go
 integration/error_response_handling_test.go
 integration/datetime_filters_test.go
+ticketing/enum_forward_compat_test.go
